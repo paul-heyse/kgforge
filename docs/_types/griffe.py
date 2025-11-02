@@ -202,7 +202,7 @@ def build_facade(env: BuildEnvironment) -> GriffeFacade:
     >>> facade = build_facade(env)
     >>> node = facade.loader.load("kgfoundry")
     """
-    from docs._scripts import shared  # noqa: PLC0415
+    from docs._scripts import shared
 
     griffe_loader = shared.make_loader(env)
     adapter = _GriffeLoaderAdapter(griffe_loader)

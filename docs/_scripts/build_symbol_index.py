@@ -11,8 +11,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
-from docs._scripts import shared  # noqa: PLC2701
-from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from tools import (
     StructuredLoggerAdapter,
     build_problem_details,
@@ -20,7 +20,7 @@ from tools import (
     observe_tool_run,
     render_problem,
 )
-from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
+from tools._shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -635,8 +635,40 @@ def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -
     sys.stderr.write(render_problem(payload) + "\n")
 
 
-def main() -> int:
-    """Entry point for the symbol index builder."""
+def main(argv: Sequence[str] | None = None) -> int:
+    """Build and validate documentation symbol index artifacts.
+
+    This entry point generates the symbol index by analyzing all packages
+    in the repository. It produces three artifacts: symbols.json (complete
+    symbol metadata), by_file.json (symbols grouped by file), and
+    by_module.json (symbols grouped by module).
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments (reserved for future use). Currently unused.
+        Defaults to None.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on error.
+
+    Raises
+    ------
+    SystemExit
+        When called as __main__, propagates the exit code.
+
+    Examples
+    --------
+    >>> from docs._scripts.build_symbol_index import main
+    >>> exit_code = main()
+    >>> exit_code
+    0
+    """
+    # argv is reserved for future CLI argument parsing if needed
+    del argv
+
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 
@@ -668,8 +700,7 @@ def main() -> int:
             observation.failure("failure", returncode=1)
             _emit_problem(exc.problem, default_message=str(exc))
             return 1
-        except Exception as exc:  # pragma: no cover - defensive guard  # noqa: BLE001
-            # Defensive catch ensures we emit structured Problem Details for unexpected failures.
+        except BaseException as exc:  # noqa: BLE001 - defensive catch ensures Problem Details emission
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
                 type="https://kgfoundry.dev/problems/docs-symbol-index",

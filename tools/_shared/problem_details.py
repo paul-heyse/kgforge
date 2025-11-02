@@ -46,9 +46,9 @@ JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 ProblemDetailsDict = dict[str, JsonValue]
 
 
-def build_problem_details(  # noqa: PLR0913
+def build_problem_details(
     *,
-    type: str,  # noqa: A002
+    type: str,
     title: str,
     status: int,
     detail: str,
@@ -115,10 +115,10 @@ def _json_pointer_from(error: object) -> str | None:
     return None
 
 
-def build_schema_problem_details(  # noqa: PLR0913
+def build_schema_problem_details(
     *,
     error: Exception,
-    type: str,  # noqa: A002
+    type: str,
     title: str,
     status: int,
     instance: str,
@@ -149,7 +149,7 @@ def build_schema_problem_details(  # noqa: PLR0913
     return problem
 
 
-def build_tool_problem_details(  # noqa: PLR0913
+def build_tool_problem_details(
     *,
     category: str,
     command: Sequence[str],
@@ -259,10 +259,10 @@ def tool_failure_problem_details(
     )
 
 
-def problem_from_exception(  # noqa: PLR0913
+def problem_from_exception(
     exc: Exception,
     *,
-    type: str,  # noqa: A002
+    type: str,
     title: str,
     status: int,
     instance: str,

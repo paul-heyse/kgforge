@@ -142,7 +142,6 @@ def _rel(p: Path) -> str:
     str
         Description.
 
-
     Raises
     ------
     Exception
@@ -165,7 +164,6 @@ def _sha() -> str:
     -------
     str
         Description.
-
 
     Raises
     ------
@@ -202,7 +200,6 @@ def _gh_link(path: Path, start: int | None) -> str | None:
     str | None
         Description.
 
-
     Raises
     ------
     Exception
@@ -232,7 +229,6 @@ def _editor_link(path: Path, line: int | None) -> str:
     -------
     str
         Description.
-
 
     Raises
     ------
@@ -395,7 +391,7 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
     )
 
 
-def load_policy() -> ObservabilityPolicy:  # noqa: PLR0911
+def load_policy() -> ObservabilityPolicy:
     """Load the observability policy from disk, falling back to defaults on failure."""
     if yaml is None or not POLICY_PATH.exists():
         return DEFAULT_POLICY
@@ -545,7 +541,6 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, str]:
     dict[str, str]
         Description.
 
-
     Raises
     ------
     Exception
@@ -582,7 +577,6 @@ def _extract_labels_from_kw(kw_map: dict[str, str]) -> list[str]:
     list[str]
         Description.
 
-
     Raises
     ------
     Exception
@@ -613,7 +607,6 @@ def _infer_unit_from_name(name: str) -> str | None:
     str | None
         Description.
 
-
     Raises
     ------
     Exception
@@ -642,7 +635,6 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
     -------
     str | None
         Description.
-
 
     Raises
     ------
@@ -719,7 +711,6 @@ def _lint_metric(policy: ObservabilityPolicy, row: MetricRow) -> list[LintFindin
     -------
     list[dict]
         Description.
-
 
     Raises
     ------
@@ -827,7 +818,6 @@ def _lint_log(policy: ObservabilityPolicy, row: LogRow) -> list[LintFinding]:
     list[dict]
         Description.
 
-
     Raises
     ------
     Exception
@@ -867,7 +857,6 @@ def _lint_trace(policy: ObservabilityPolicy, row: TraceRow) -> list[LintFinding]
     -------
     list[dict]
         Description.
-
 
     Raises
     ------
@@ -930,7 +919,7 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
     return (text, tree)
 
 
-def scan_file(  # noqa: PLR0914
+def scan_file(
     path: Path, policy: ObservabilityPolicy
 ) -> tuple[list[LogRow], list[MetricRow], list[TraceRow]]:
     """Compute scan file.
@@ -1043,7 +1032,6 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
     -------
     dict[str, str]
         Description.
-
 
     Raises
     ------

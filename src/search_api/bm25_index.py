@@ -419,7 +419,7 @@ class BM25Index:
         except DeserializationError:
             # Try legacy pickle format for backward compatibility
             if path_obj.suffix == ".pkl":
-                import pickle  # noqa: PLC0415
+                import pickle
 
                 with path_obj.open("rb") as handle:
                     # pickle.load returns object - unavoidable for legacy format support

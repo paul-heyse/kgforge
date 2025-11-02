@@ -8,6 +8,7 @@ from kgfoundry_common.errors.
 from __future__ import annotations
 
 from kgfoundry_common.errors.exceptions import (
+    CatalogLoadError,
     ChunkingError,
     DoclingError,
     DownloadError,
@@ -18,10 +19,12 @@ from kgfoundry_common.errors.exceptions import (
     OCRTimeoutError,
     OntologyParseError,
     SpladeOOMError,
+    SymbolAttachmentError,
     UnsupportedMIMEError,
 )
 
 __all__ = [
+    "CatalogLoadError",
     "ChunkingError",
     "DoclingError",
     "DownloadError",
@@ -32,5 +35,6 @@ __all__ = [
     "OCRTimeoutError",
     "OntologyParseError",
     "SpladeOOMError",
+    "SymbolAttachmentError",
     "UnsupportedMIMEError",
 ]

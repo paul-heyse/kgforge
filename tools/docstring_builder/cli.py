@@ -268,7 +268,7 @@ def _command_schema(args: argparse.Namespace) -> int:
     return int(ExitStatus.SUCCESS)
 
 
-def _command_doctor(args: argparse.Namespace) -> int:  # noqa: C901, PLR0912, PLR0914, PLR0915
+def _command_doctor(args: argparse.Namespace) -> int:
     _, selection = load_builder_config(getattr(args, "config_path", None))
     LOGGER.info("[DOCTOR] Active config: %s (%s)", selection.path, selection.source)
     issues: list[str] = []
@@ -403,7 +403,7 @@ LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
 }
 
 
-def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0914, PLR0915
+def build_parser() -> argparse.ArgumentParser:
     """Build the top-level argument parser for the docstring builder CLI."""
     parser = argparse.ArgumentParser(prog="docstring-builder")
     parser.add_argument(

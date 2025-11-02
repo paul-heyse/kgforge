@@ -1,0 +1,49 @@
+## 1. Implementation
+- [ ] 1.1 Capture baseline complexity metrics.
+  - Run `uv run ruff check src/kgfoundry/agent_catalog/models.py --select C901,PLR0912,PLR0914,PLR0915` and save output.
+  - Repeat for `src/kgfoundry/agent_catalog/sqlite.py`, `src/orchestration/cli.py`, `src/embeddings_sparse/{bm25,splade}.py`, and `src/search_api/{bm25_index,fixture_index,splade_index}.py`.
+- [ ] 1.2 Introduce exception taxonomy scaffolding.
+  - Define base exceptions (`CatalogRuntimeError`, `SearchIndexError`, etc.) under `kgfoundry/agent_catalog/errors.py` or module-local files with docstrings.
+  - Replace `except Exception` with targeted catches; ensure each `except` block includes rationale comments and uses `raise ... from err`.
+- [ ] 1.3 Refactor `load_catalog_payload` in `agent_catalog/models.py`.
+  - Extract parsing steps into pure helpers (e.g., `_parse_symbol_index`, `_validate_catalog_document`).
+  - Use typed dataclasses (`CatalogPayload`, `SymbolRecord`) to represent intermediate structures.
+  - Ensure helper functions accept/return immutable data; add unit tests in `tests/agent_catalog/test_models_refactor.py` covering edge cases.
+- [ ] 1.4 Simplify `_attach_symbols_to_modules` in `agent_catalog/sqlite.py`.
+  - Decompose loops into helper functions (`_paginate_symbols`, `_upsert_symbol`), annotate types, and rely on `pathlib.Path` for file handling.
+  - Replace `except Exception` with specific catches (e.g., `sqlite3.DatabaseError`).
+- [ ] 1.5 Harden orchestration CLI index builders.
+  - Split `index_bm25` and `index_faiss` into orchestrator functions plus pure builder helpers (`build_bm25_index`, `train_faiss_index`).
+  - Introduce `IndexBuildContext` dataclass capturing paths, configuration, and dependencies; pass it to helpers.
+  - Replace `pickle` calls with `safe_pickle.dump/load` wrapper enforcing allow-list; add tests for rejection paths.
+- [ ] 1.6 Clean search API hot paths.
+  - For `search_api/{bm25_index,splade_index}.py`, introduce Protocols (`class IndexBackend(Protocol): ...`) defining required methods; split large functions into smaller pure operations.
+  - Move imports like `import faiss` to module top level; if conditional, document with comments and tests verifying ImportError behavior.
+- [ ] 1.7 Update embeddings sparse modules.
+  - Replace deferred imports and `pickle` usage; ensure `Path` usage for file operations.
+  - Extract repeated logic into helpers with typed signatures and docstrings.
+- [ ] 1.8 Modernize typing and path usage across touched modules.
+  - Replace `typing.Dict`/`typing.List` with generics (`dict[str, ...]`, `list[int]`).
+  - Ensure every filesystem interaction uses `pathlib.Path` (including tests and CLI arguments).
+- [ ] 1.9 Document error handling.
+  - Add module-level docstrings summarizing error taxonomy and link to structured logging guidance from Phase 3.
+  - Update docstrings for newly added helpers with explanation of failure modes and Problem Details integration.
+- [ ] 1.10 Add targeted tests.
+  - Create characterization tests before refactoring to ensure parity (e.g., `tests/orchestration/test_index_builders.py`).
+  - After refactor, add new tests verifying exception types, safe pickle rejections, and helper outputs.
+  - Ensure tests cover Windows vs POSIX paths when migrating to `pathlib`.
+- [ ] 1.11 Run focused quality gates iteratively.
+  - After each module refactor, execute `uv run ruff check <module> --select C901,PLR091*` to confirm improvements.
+  - Run `uv run pyrefly check <module>` and `uv run mypy --config-file mypy.ini <module>` to maintain type safety.
+  - Capture before/after metrics for inclusion in the PR.
+
+## 2. Documentation & Verification
+- [ ] 2.1 Update developer documentation.
+  - Add a section to `docs/contributing/linting.md` describing the new exception taxonomy, safe pickle wrapper, and guidelines for avoiding deferred imports.
+  - Provide refactor case study (before/after) in `docs/reference/catalog/indexing.md` to help future contributors follow the pattern.
+- [ ] 2.2 Regenerate artifacts as needed.
+  - Run `make artifacts` to ensure documentation changes render correctly; inspect diffs for unintended changes.
+- [ ] 2.3 Final quality sweep.
+  - Execute full command set: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`.
+  - Verify no new suppressions, and Problem Details examples remain consistent.
+

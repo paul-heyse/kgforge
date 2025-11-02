@@ -1,0 +1,48 @@
+## 1. Implementation
+- [x] 1.1 Inventory logging adapters and handlers.
+  - Use `rg "LoggerAdapter" src/kgfoundry_common -n` and document every subclass or instantiation.
+  - Identify modules lacking `NullHandler` by inspecting `logging.getLogger` usage; note required handler additions.
+- [x] 1.2 Define correlation context primitives.
+  - Create `contextvars.ContextVar[str | None]` for `request_id`, `correlation_id`, `operation`, each with docstrings and typed setters/getters.
+  - Provide helper functions `set_request_context(...)` and `clear_request_context()` returning context tokens for deterministic cleanup.
+- [x] 1.3 Refactor `StructuredLoggerAdapter`.
+  - Update `kgfoundry_common.logging` to declare `type LogExtra = Mapping[str, str | int | float | bool | None]` and `class StructuredLoggerAdapter(logging.LoggerAdapter[logging.Logger])` using proper generics.
+  - Implement `bind(**fields: LogField)` returning a cloned adapter with merged context, ensuring type hints propagate.
+  - Add methods `log_success`, `log_failure`, `log_io` that accept typed payload (`StructuredLogEvent`) and call `self.logger.log(...)` with JSON-ready dicts.
+  - Ensure each method attaches `request_id`, `correlation_id`, `operation`, `duration_ms` (when provided) and uses `time.monotonic()` for duration measurement utilities.
+- [x] 1.4 Attach `NullHandler` and public getter.
+  - Implement `get_logger(name: str, *, extra: LogExtra | None = None) -> StructuredLoggerAdapter` that registers a `logging.NullHandler` once, applies standard format, and returns the adapter.
+  - Update every module in `kgfoundry_common` to call `get_logger(__name__)` instead of `logging.getLogger` directly.
+- [x] 1.5 Replace ad-hoc logging calls.
+  - Sweep `src/kgfoundry_common/**` for `logger.info/debug/error` invocations; convert to structured helper usage with explicit fields (`status="ok"`, `error_type`, `detail`).
+  - Remove f-strings inside logging calls; prepare message templates via helper payloads.
+- [x] 1.6 Migrate configuration to `BaseSettings`.
+  - Introduce `AppSettings(BaseSettings)` in `kgfoundry_common.config` enumerating all env variables with types, validators, and `Field` descriptions.
+  - Replace existing `load_config` to instantiate `AppSettings`, document failure behavior, and emit structured log entry on success.
+  - Add `settings_cache = lru_cache()` or module-level singleton to avoid repeated parsing; provide `load_config(reload: bool = False)` switch.
+- [x] 1.7 Update docstrings and doctest snippets.
+  - Ensure every public function/class in `kgfoundry_common.logging`, `config`, `problem_details`, `errors`, `serialization` has NumPy-style docstrings with runnable examples.
+  - Add doctests demonstrating `get_logger`, `log_failure`, and configuration loading with env overrides via `Pydantic` settings.
+- [x] 1.8 Normalize Problem Details raising.
+  - Audit `kgfoundry_common.problem_details` and `kgfoundry_common.errors` for exception creation; ensure they call `raise ProblemDetailsError(...) from err`.
+  - Replace inline f-strings by assigning formatted strings to variables prior to exception instantiation.
+  - Guarantee Problem Details payload builder returns dictionaries matching `schema/examples/problem_details/**`; update examples if necessary.
+- [x] 1.9 Harden serialization timing and error paths.
+  - Update `kgfoundry_common.serialization` to use `time.monotonic()` for duration tracking utilities; document behavior.
+  - Ensure all exception cases wrap original error with typed exception and structured log call.
+- [x] 1.10 Expand tests.
+  - Add new pytest modules under `tests/kgfoundry_common/test_logging.py` and `tests/kgfoundry_common/test_config.py` with parametrized scenarios (happy path, missing env, invalid type, structured log output).
+  - Add doctest/xdoctest coverage to `pyproject.toml` targets if not already included; ensure examples pass.
+  - Run targeted commands: `uv run ruff check src/kgfoundry_common`, `uv run pyrefly check src/kgfoundry_common`, `uv run mypy --config-file mypy.ini src/kgfoundry_common`, `uv run pytest -q tests/kgfoundry_common -q` after completing updates.
+
+## 2. Reference Docs & Artifacts
+- [x] 2.1 Update documentation snippets.
+  - Revise `docs/reference/common/logging.md` (or create it) to explain structured helpers, include copy-ready examples, and highlight context propagation.
+  - Document configuration fields in `docs/reference/common/configuration.md`; auto-generate tables from `AppSettings.model_fields` if feasible.
+- [x] 2.2 Refresh Problem Details examples and schemas.
+  - Ensure `schema/examples/problem_details/*.json` match new payloads; add sample showing chained cause detail.
+  - Update any OpenAPI references that import shared Problem Details schema; run `spectral lint` to confirm validity.
+- [x] 2.3 Regenerate artifacts and verify cleanliness.
+  - Execute `make artifacts` and review diffs for docs/site outputs, verifying Agent Portal references remain accurate.
+  - Capture artifact preview links/screenshots for reviewers and include them in the PR summary.
+

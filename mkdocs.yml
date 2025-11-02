@@ -54,6 +54,7 @@ nav:
           - Metrics catalog: reference/observability/metrics.md
           - Tracing notes: reference/observability/traces.md
           - Service configuration: reference/observability/config.md
+      - Search API: reference/search.md
       - Schemas: reference/schemas/index.md
   - API:
       - Overview: api/index.md

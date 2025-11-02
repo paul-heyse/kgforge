@@ -131,7 +131,7 @@ def get_metrics_registry() -> DocstringBuilderMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY  # noqa: PLW0603
+    global _METRICS_REGISTRY
     if _METRICS_REGISTRY is None:
         _METRICS_REGISTRY = DocstringBuilderMetrics()
     return _METRICS_REGISTRY

@@ -274,7 +274,7 @@ class FaissModuleProtocol(Protocol):
     METRIC_L2: int
     """Constant for L2 distance metric (used with index_factory)."""
 
-    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:  # noqa: N802
+    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol:
         """Create a flat inner-product index.
 
         <!-- auto:docstring-builder v1 -->
@@ -323,7 +323,7 @@ class FaissModuleProtocol(Protocol):
         """
         ...
 
-    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
+    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
         """Wrap an index with 64-bit ID mapping.
 
         <!-- auto:docstring-builder v1 -->
@@ -388,7 +388,7 @@ class FaissModuleProtocol(Protocol):
         """
         ...
 
-    def normalize_L2(self, vectors: VectorArray) -> None:  # noqa: N802
+    def normalize_L2(self, vectors: VectorArray) -> None:
         """Normalize vectors to unit length in-place.
 
         <!-- auto:docstring-builder v1 -->

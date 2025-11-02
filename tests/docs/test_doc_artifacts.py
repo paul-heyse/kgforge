@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from docs._scripts.validation import validate_against_schema
 from docs._types.artifacts import (
     JsonPayload,
     JsonValue,

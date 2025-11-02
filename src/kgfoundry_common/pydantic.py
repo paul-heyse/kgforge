@@ -68,7 +68,7 @@ if TYPE_CHECKING:
             """
             raise NotImplementedError
 
-        def model_dump(  # noqa: PLR0913
+        def model_dump(
             self,
             *,
             mode: str = "python",
@@ -138,7 +138,7 @@ if TYPE_CHECKING:
             """
             raise NotImplementedError
 
-        def model_dump_json(  # noqa: PLR0913
+        def model_dump_json(
             self,
             *,
             indent: int | None = None,

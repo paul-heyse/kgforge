@@ -38,7 +38,6 @@ except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for pa
 
 LOGGER = get_logger(__name__)
 
-
 type JsonPrimitive = str | int | float | bool | None
 type JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 type JsonObject = dict[str, JsonValue]
@@ -121,7 +120,7 @@ class LoaderFactory(Protocol):
         ...
 
 
-from tools.detect_pkg import detect_packages, detect_primary  # noqa: E402
+from tools.detect_pkg import detect_packages, detect_primary
 
 _griffe_api: GriffeAPI = resolve_griffe()
 GriffeLoader = cast(LoaderFactory, _griffe_api.loader_type)

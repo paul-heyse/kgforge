@@ -134,7 +134,7 @@ def get_metrics_registry() -> NavmapMetrics:
     >>> metrics = get_metrics_registry()
     >>> metrics.build_runs_total.labels(status="success").inc()
     """
-    global _METRICS_REGISTRY  # noqa: PLW0603
+    global _METRICS_REGISTRY
     if _METRICS_REGISTRY is None:
         _METRICS_REGISTRY = NavmapMetrics()
     return _METRICS_REGISTRY

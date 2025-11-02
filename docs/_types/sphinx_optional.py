@@ -142,7 +142,7 @@ def load_optional_dependencies() -> OptionalDependencies:
     # Try to import sphinx_autoapi
     autoapi_import_err_msg = "sphinx_autoapi is required for AutoAPI docs generation"
     try:
-        import sphinx_autoapi  # noqa: PLC0415
+        import sphinx_autoapi
     except ImportError as e:
         autoapi_error = MissingDependencyError("sphinx_autoapi", autoapi_import_err_msg)
         raise autoapi_error from e
@@ -150,7 +150,7 @@ def load_optional_dependencies() -> OptionalDependencies:
     # Try to import astroid
     astroid_import_err_msg = "astroid is required for AST analysis during docs build"
     try:
-        import astroid  # noqa: PLC0415
+        import astroid
     except ImportError as e:
         astroid_error = MissingDependencyError("astroid", astroid_import_err_msg)
         raise astroid_error from e

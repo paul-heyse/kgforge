@@ -12,7 +12,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
@@ -21,16 +21,24 @@ from kgfoundry_common.errors import AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
 from kgfoundry_common.problem_details import JsonValue
 
-
-class _SearchModule(Protocol):
-    SearchOptions: type
-    SearchRequest: type
-    SearchResult: type
-    MetricsProvider: type
-    search_catalog: Callable[..., list[object]]
-
-
-catalog_search = cast(_SearchModule, catalog_search)
+if TYPE_CHECKING:
+    from kgfoundry.agent_catalog.search import (
+        MetricsProvider,
+        SearchOptions,
+        SearchRequest,
+        SearchResult,
+        build_default_search_options,
+        build_faceted_search_options,
+        search_catalog,
+    )
+else:
+    SearchOptions = catalog_search.SearchOptions
+    SearchRequest = catalog_search.SearchRequest
+    SearchResult = catalog_search.SearchResult
+    MetricsProvider = catalog_search.MetricsProvider
+    search_catalog = catalog_search.search_catalog
+    build_faceted_search_options = catalog_search.build_faceted_search_options
+    build_default_search_options = catalog_search.build_default_search_options
 
 
 if TYPE_CHECKING:
@@ -170,7 +178,7 @@ def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> 
         sys.stderr.write(f"{message}\n")
 
 
-def _search_result_to_dict(result: catalog_search.SearchResult) -> dict[str, JsonValue]:
+def _search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
     """Convert SearchResult dataclass to VectorSearchResultTypedDict-compatible dict.
 
     <!-- auto:docstring-builder v1 -->
@@ -204,7 +212,7 @@ def _search_result_to_dict(result: catalog_search.SearchResult) -> dict[str, Jso
     }
 
 
-def _build_cli_envelope(  # noqa: PLR0913
+def _build_cli_envelope(
     subcommand: str,
     status: str,
     duration_seconds: float,
@@ -577,10 +585,10 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
             log_adapter.exception("Search failed", exc_info=exc)
             return
 
-        options = catalog_search.SearchOptions(facets=facets)
+        options = build_faceted_search_options(facets=facets)
         query: str = args.query
         k: int = args.k
-        request = catalog_search.SearchRequest(
+        request = SearchRequest(
             repo_root=client.repo_root,
             query=query,
             k=max(1, k),
@@ -588,7 +596,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         try:
             # model_dump returns dict[str, object] - cast immediately to avoid Any expression
             # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-            results = catalog_search.search_catalog(
+            results = search_catalog(
                 cast(
                     Mapping[
                         str, str | int | float | bool | None | list[object] | dict[str, object]
@@ -597,7 +605,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
                 ),
                 request=request,
                 options=options,
-                metrics=catalog_search.MetricsProvider.default(),
+                metrics=MetricsProvider.default(),
             )
             duration = time.perf_counter() - start_time
             if use_envelope:
@@ -664,8 +672,8 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
     ) as log_adapter:
         query: str = args.query
         k: int = args.k
-        options = catalog_search.SearchOptions(candidate_pool=max(10, k))
-        request = catalog_search.SearchRequest(
+        options = build_default_search_options(candidate_pool=max(10, k))
+        request = SearchRequest(
             repo_root=client.repo_root,
             query=query,
             k=max(1, k),
@@ -673,7 +681,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
         try:
             # model_dump returns dict[str, object] - cast immediately to avoid Any expression
             # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-            results = catalog_search.search_catalog(
+            results = search_catalog(
                 cast(
                     Mapping[
                         str, str | int | float | bool | None | list[object] | dict[str, object]
@@ -682,7 +690,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
                 ),
                 request=request,
                 options=options,
-                metrics=catalog_search.MetricsProvider.default(),
+                metrics=MetricsProvider.default(),
             )
             duration = time.perf_counter() - start_time
             if use_envelope:
@@ -800,7 +808,7 @@ def main(argv: list[str] | None = None) -> int:
             handler(client, args)  # type: ignore[misc]  # handler is guaranteed non-None
             duration = time.perf_counter() - start_time
             log_adapter.info("CLI completed", extra={"status": "success"})
-            return 0  # noqa: TRY300 - handler is guaranteed to be non-None due to exception above
+            return 0
         except (CatalogctlError, AgentCatalogClientError) as exc:
             duration = time.perf_counter() - start_time
             if use_envelope:

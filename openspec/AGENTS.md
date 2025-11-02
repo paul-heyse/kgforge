@@ -354,6 +354,103 @@ Agents must paste **command outputs** for: `ruff`, `pyrefly`, `mypy`, `pytest`, 
 
 ---
 
+## Safe Tooling Practices
+
+Documentation and tooling scripts in `docs/_scripts/` and `tools/` follow these conventions:
+
+### Typed Facades for I/O Operations
+
+Use the typed helpers in `docs._scripts.shared` for JSON operations:
+
+```python
+from docs._scripts import shared  # Internal tooling module
+
+# Safe JSON deserialization with error handling
+data = shared.safe_json_deserialize(
+    path,
+    logger=shared.build_warning_logger("my_operation")
+)
+if data is None:
+    raise ValueError(f"Failed to load {path}")
+
+# Safe JSON serialization with atomic writes
+success = shared.safe_json_serialize(
+    payload,
+    path,
+    logger=shared.build_warning_logger("my_operation")
+)
+if not success:
+    raise ValueError(f"Failed to write {path}")
+```
+
+These helpers ensure:
+- **Atomic writes** via temp-file-then-rename pattern (prevent partial writes)
+- **Type safety** with explicit dict/list validation
+- **Structured logging** with extra context fields
+- **Path safety** using `pathlib` exclusively
+
+### CLI Entry Points
+
+All tools and docs scripts expose a typed `main()` entry point:
+
+```python
+from collections.abc import Sequence
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Describe the tool's purpose and output artifacts.
+    
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments (reserved for future use).
+    
+    Returns
+    -------
+    int
+        Exit code (0 = success, non-zero = failure).
+    """
+    # Implementation here
+    return 0
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+### Error Handling
+
+Follow RFC 9457 Problem Details for all errors:
+
+```python
+from tools import build_problem_details, render_problem
+
+try:
+    # operation
+except SomeError as exc:
+    problem = build_problem_details(
+        type="https://kgfoundry.dev/problems/my-tool",
+        title="Operation failed",
+        status=500,
+        detail=str(exc),
+        instance=f"urn:tool:my-tool:{operation}",
+    )
+    print(render_problem(problem))
+    return 1
+```
+
+### Defensive Exception Handling
+
+When catching broad exceptions for observability, use `BaseException` with a `noqa` comment explaining the defensive purpose:
+
+```python
+except BaseException as exc:  # noqa: BLE001 - defensive catch ensures Problem Details emission
+    observation.failure("exception", returncode=1)
+    problem = build_problem_details(...)
+    # ... emit structured error
+    return 1
+```
+
+---
+
 ## Glossary
 
 - **Capability** — a cohesive feature area described in `openspec/specs/<capability>`

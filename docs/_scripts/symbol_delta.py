@@ -11,13 +11,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from docs._scripts import shared  # noqa: PLC2701
-from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from docs._types.artifacts import (
-    SymbolDeltaChange,  # noqa: PLC2701
-    symbol_delta_to_payload,  # noqa: PLC2701
+    SymbolDeltaChange,
+    symbol_delta_to_payload,
 )
-from docs._types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload  # noqa: PLC2701
+from docs._types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload
 from tools import (
     ToolRunResult,
     build_problem_details,
@@ -26,7 +26,7 @@ from tools import (
     render_problem,
     run_tool,
 )
-from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
+from tools._shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -206,11 +206,51 @@ def _coerce_symbol_rows(data: object, *, source: str) -> list[SymbolRow]:
 
 
 def _load_symbol_rows(path: Path) -> list[SymbolRow]:
-    raw: object = json.loads(path.read_text(encoding="utf-8"))
+    """Load symbol rows from a JSON file.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the JSON file containing symbol rows.
+
+    Returns
+    -------
+    list[SymbolRow]
+        Parsed symbol rows.
+
+    Raises
+    ------
+    ValueError
+        If the file cannot be read or parsed.
+    """
+    try:
+        raw: object = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:  # pragma: no cover - I/O error
+        message = f"Failed to load symbol rows from {path}"
+        raise ValueError(message) from exc
     return _coerce_symbol_rows(raw, source=str(path))
 
 
 def _symbols_from_git_blob(blob: str, *, source: str) -> list[SymbolRow]:
+    """Extract symbol rows from a Git blob content string.
+
+    Parameters
+    ----------
+    blob : str
+        JSON string content from a Git blob.
+    source : str
+        Source identifier for error messages.
+
+    Returns
+    -------
+    list[SymbolRow]
+        Parsed symbol rows.
+
+    Raises
+    ------
+    ValueError
+        If the blob does not contain valid JSON.
+    """
     try:
         data: object = json.loads(blob)
     except json.JSONDecodeError as exc:  # pragma: no cover - defensive
@@ -429,7 +469,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except ToolExecutionError as e:
             _emit_problem(e.problem, default_message=str(e))
             raise
-        except Exception as exc:  # pragma: no cover - defensive  # noqa: BLE001
+        except BaseException as exc:  # noqa: BLE001 - defensive catch ensures Problem Details emission
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
                 type="https://kgfoundry.dev/problems/docs-symbol-delta",

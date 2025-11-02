@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
-from vectorstore_faiss.gpu import FaissGpuIndex, FloatArray, IntArray, StrArray
+from vectorstore_faiss.gpu import (
+    FaissGpuIndex,
+    FloatArray,
+    IntArray,
+    StrArray,
+    VecArray,
+)
 
-__all__ = ["FaissGpuIndex", "FloatArray", "IntArray", "StrArray"]
+__all__ = ["FaissGpuIndex", "FloatArray", "IntArray", "StrArray", "VecArray"]

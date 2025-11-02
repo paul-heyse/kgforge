@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
 import mkdocs_gen_files
-from docs._scripts import shared  # noqa: PLC2701
+from docs._scripts import shared
 from tools import get_logger
 
 ENV = shared.detect_environment()

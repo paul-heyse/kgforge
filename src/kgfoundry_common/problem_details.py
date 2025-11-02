@@ -25,23 +25,14 @@ import json
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, TypedDict
+from typing import TypedDict
 
 import jsonschema
 from jsonschema.exceptions import SchemaError, ValidationError
 
 from kgfoundry_common.fs import read_text
 from kgfoundry_common.logging import get_logger
-
-# Type aliases for JSON values (RFC 7159 compatible)
-# JsonPrimitive represents the basic JSON types
-JsonPrimitive = str | int | float | bool | None
-
-# Recursive JSON type alias (used only for type checking)
-if TYPE_CHECKING:
-    JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
-else:
-    JsonValue = object  # type: ignore[assignment, misc]
+from kgfoundry_common.types import JsonPrimitive, JsonValue
 
 JsonObject = dict[str, JsonValue]
 
@@ -67,11 +58,10 @@ _SCHEMA_PATH = Path(__file__).parent.parent.parent / "schema" / "common" / "prob
 
 
 class ProblemDetails(TypedDict, total=False):
-    """Describe ProblemDetails.
+    """TypedDict for RFC 9457 Problem Details responses.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    This is a partial TypedDict (total=False) where all fields are optional,
+    allowing for flexible payload construction with validation.
     """
 
     type: str
@@ -196,9 +186,9 @@ def validate_problem_details(payload: dict[str, object]) -> None:
         raise ProblemDetailsValidationError(msg) from exc
 
 
-def build_problem_details(  # noqa: PLR0913
+def build_problem_details(
     *,
-    type: str,  # noqa: A002
+    type: str,
     title: str,
     status: int,
     detail: str,
@@ -273,10 +263,10 @@ def build_problem_details(  # noqa: PLR0913
     return payload  # type: ignore[return-value]
 
 
-def problem_from_exception(  # noqa: PLR0913
+def problem_from_exception(
     exc: Exception,
     *,
-    type: str,  # noqa: A002
+    type: str,
     title: str,
     status: int,
     instance: str,

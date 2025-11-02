@@ -14,17 +14,18 @@ from pathlib import Path
 from typing import cast
 
 from kgfoundry.agent_catalog.search import SearchDocument, documents_from_catalog
+from kgfoundry_common.errors import SymbolAttachmentError
 
-JsonValue = None | bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"]
+JsonValue = bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"] | None
 JsonObject = dict[str, JsonValue]
 
-SearchPayloadValue = str | int | float | bool | None | list[object] | dict[str, object]
+SearchPayloadValue = str | int | float | bool | list[object] | dict[str, object] | None
 SearchPayload = Mapping[str, SearchPayloadValue]
 
 
 def _to_json_object(mapping: Mapping[str, JsonValue]) -> JsonObject:
     """Create a JSON object copy from ``mapping``."""
-    return {key: value for key, value in mapping.items()}
+    return dict(mapping)
 
 
 def _to_search_payload(value: JsonValue) -> SearchPayloadValue:
@@ -35,7 +36,8 @@ def _to_search_payload(value: JsonValue) -> SearchPayloadValue:
         return {key: cast(object, _to_search_payload(item)) for key, item in value.items()}
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
-    raise TypeError(f"Unsupported JsonValue type: {type(value)!r}")
+    msg = f"Unsupported JsonValue type: {type(value)!r}"
+    raise TypeError(msg)
 
 
 PackagePayload = Mapping[str, JsonValue]
@@ -828,52 +830,140 @@ def _attach_symbols_to_modules(
         Describe ``call_graph``.
     """
     callers, callees = call_graph
-    rows = cast(
-        list[tuple[str, str, str, str, str, str]],
-        connection.execute(
-            "SELECT symbol_id, package, module, qname, kind, data FROM symbols"
-        ).fetchall(),
-    )
+    try:
+        rows = cast(
+            list[tuple[str, str, str, str, str, str]],
+            connection.execute(
+                "SELECT symbol_id, package, module, qname, kind, data FROM symbols"
+            ).fetchall(),
+        )
+    except sqlite3.DatabaseError as e:
+        msg = "Failed to query symbols from database"
+        raise SymbolAttachmentError(msg, cause=e) from e
+
     for symbol_id, _package_name, module_name, _qname, _kind, data_raw in rows:
-        symbol_data = _json_loads(data_raw)
+        try:
+            symbol_data = _json_loads(data_raw)
+        except ValueError as e:
+            logger.warning("Skipping symbol %s with invalid JSON data: %s", symbol_id, e)
+            continue
+
         if not isinstance(symbol_data, dict):
             continue
+
         symbol_payload = _to_json_object(cast(Mapping[str, JsonValue], symbol_data))
+
+        # Attach anchor data
         if "anchors" not in symbol_payload:
             symbol_payload["anchors"] = anchors.get(symbol_id, {})
+
+        # Assemble metrics from ranking and symbol payload
         ranking_entry = ranking.get(symbol_id, {})
-        metrics = symbol_payload.get("metrics")
-        if not isinstance(metrics, dict):
-            metrics = {}
-        if "complexity" not in metrics:
-            metrics["complexity"] = ranking_entry.get("complexity")
-        if "stability" not in metrics:
-            metrics["stability"] = ranking_entry.get("stability")
-        if "deprecated" not in metrics:
-            metrics["deprecated"] = ranking_entry.get("deprecated")
-        symbol_payload["metrics"] = metrics
-        change_impact = symbol_payload.get("change_impact")
-        if not isinstance(change_impact, dict):
-            change_impact = {}
-        if "callers" not in change_impact:
-            callers_list = sorted(callers.get(symbol_id, []))
-            change_impact["callers"] = cast(JsonValue, callers_list)
-        if "callees" not in change_impact:
-            callees_list = sorted(callees.get(symbol_id, []))
-            change_impact["callees"] = cast(JsonValue, callees_list)
-        if "churn_last_n" not in change_impact:
-            change_impact["churn_last_n"] = ranking_entry.get("churn_last_n")
-        symbol_payload["change_impact"] = change_impact
-        module_entry = modules.get(module_name)
-        if module_entry is None:
-            continue
-        symbols_value = module_entry.get("symbols")
-        if isinstance(symbols_value, list):
-            symbol_list = cast(list[JsonObject], symbols_value)
-        else:
-            symbol_list = []
-            module_entry["symbols"] = cast(JsonValue, symbol_list)
-        symbol_list.append(symbol_payload)
+        _attach_metrics(symbol_payload, ranking_entry)
+
+        # Assemble change impact from call graph
+        _attach_change_impact(symbol_payload, symbol_id, callers, callees, ranking_entry)
+
+        # Add symbol to module
+        _append_symbol_to_module(modules, module_name, symbol_payload)
+
+
+def _attach_metrics(symbol_payload: JsonObject, ranking_entry: JsonObject) -> None:
+    """Attach ranking metrics to symbol payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    symbol_payload : dict[str, JsonValue]
+        Symbol payload dict to update.
+    ranking_entry : dict[str, JsonValue]
+        Ranking entry containing metrics.
+    """
+    metrics = symbol_payload.get("metrics")
+    if not isinstance(metrics, dict):
+        metrics = {}
+
+    if "complexity" not in metrics:
+        metrics["complexity"] = ranking_entry.get("complexity")
+    if "stability" not in metrics:
+        metrics["stability"] = ranking_entry.get("stability")
+    if "deprecated" not in metrics:
+        metrics["deprecated"] = ranking_entry.get("deprecated")
+
+    symbol_payload["metrics"] = metrics
+
+
+def _attach_change_impact(
+    symbol_payload: JsonObject,
+    symbol_id: str,
+    callers: Mapping[str, set[str]],
+    callees: Mapping[str, set[str]],
+    ranking_entry: JsonObject,
+) -> None:
+    """Attach change impact data to symbol payload.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    symbol_payload : dict[str, JsonValue]
+        Symbol payload dict to update.
+    symbol_id : str
+        ID of the symbol.
+    callers : dict[str, set[str]]
+        Mapping of symbol_id to set of caller IDs.
+    callees : dict[str, set[str]]
+        Mapping of symbol_id to set of callee IDs.
+    ranking_entry : dict[str, JsonValue]
+        Ranking entry containing churn info.
+    """
+    change_impact = symbol_payload.get("change_impact")
+    if not isinstance(change_impact, dict):
+        change_impact = {}
+
+    if "callers" not in change_impact:
+        callers_list = sorted(callers.get(symbol_id, []))
+        change_impact["callers"] = cast(JsonValue, callers_list)
+
+    if "callees" not in change_impact:
+        callees_list = sorted(callees.get(symbol_id, []))
+        change_impact["callees"] = cast(JsonValue, callees_list)
+
+    if "churn_last_n" not in change_impact:
+        change_impact["churn_last_n"] = ranking_entry.get("churn_last_n")
+
+    symbol_payload["change_impact"] = change_impact
+
+
+def _append_symbol_to_module(
+    modules: Mapping[str, JsonObject], module_name: str, symbol_payload: JsonObject
+) -> None:
+    """Append symbol payload to a module's symbol list.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    modules : dict[str, JsonValue]
+        Mapping of module names to module payloads.
+    module_name : str
+        Name of the module.
+    symbol_payload : dict[str, JsonValue]
+        Symbol payload to append.
+    """
+    module_entry = modules.get(module_name)
+    if module_entry is None:
+        return
+
+    symbols_value = module_entry.get("symbols")
+    if isinstance(symbols_value, list):
+        symbol_list = cast(list[JsonObject], symbols_value)
+    else:
+        symbol_list = []
+        module_entry["symbols"] = cast(JsonValue, symbol_list)
+
+    symbol_list.append(symbol_payload)
 
 
 def load_catalog_from_sqlite(path: Path) -> JsonObject:

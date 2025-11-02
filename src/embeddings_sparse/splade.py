@@ -313,7 +313,7 @@ class PureImpactIndex:
                 logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
                 # Fall back to legacy pickle
                 if legacy_path.exists():
-                    import pickle  # noqa: PLC0415
+                    import pickle
 
                     with legacy_path.open("rb") as handle:
                         data_raw = pickle.load(handle)  # noqa: S301
@@ -321,7 +321,7 @@ class PureImpactIndex:
                     raise
         elif legacy_path.exists():
             # Legacy pickle format
-            import pickle  # noqa: PLC0415
+            import pickle
 
             with legacy_path.open("rb") as handle:
                 data_raw = pickle.load(handle)  # noqa: S301
@@ -450,7 +450,7 @@ class LuceneImpactIndex:
         if self._searcher is not None:
             return
         try:
-            from pyserini.search.lucene import LuceneImpactSearcher  # noqa: PLC0415
+            from pyserini.search.lucene import LuceneImpactSearcher
         except Exception as exc:  # pragma: no cover - defensive for optional dep
             message = "Pyserini not available for SPLADE impact search"
             logger.exception("Failed to import LuceneImpactSearcher")
@@ -523,7 +523,7 @@ def get_splade(
     if backend == "lucene":
         try:
             return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning(
                 "Failed to create LuceneImpactIndex, falling back to PureImpactIndex: %s",
                 exc,

@@ -1,0 +1,18 @@
+{
+  "type": "https://kgfoundry.dev/problems/vectorstore/index-build-timeout",
+  "title": "FAISS Index Build Timeout",
+  "status": 504,
+  "detail": "FAISS index build exceeded the configured timeout budget of 3600 seconds.",
+  "instance": "urn:operation:index-faiss:2025-11-02T10:45:00Z",
+  "correlation_id": "req-abc123def456",
+  "remediation": "Increase the timeout_seconds parameter, reduce the vector set size, or use GPU acceleration if available.",
+  "retry_after": 7200,
+  "extensions": {
+    "elapsed_seconds": 3612.5,
+    "timeout_seconds": 3600,
+    "factory": "OPQ64,IVF8192,PQ64",
+    "vector_count": 1000000,
+    "metric": "ip",
+    "accelerator": "cpu"
+  }
+}

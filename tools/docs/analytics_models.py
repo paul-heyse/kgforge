@@ -163,12 +163,12 @@ class AgentAnalyticsDocument(BaseStruct, kw_only=True):
 
     if TYPE_CHECKING:
 
-        def __init__(  # noqa: PLR0913
+        def __init__(
             self,
             *,
-            schemaVersion: str = ANALYTICS_SCHEMA_VERSION,  # noqa: N803
-            schemaId: str = ANALYTICS_SCHEMA_ID,  # noqa: N803
-            generatedAt: str | None = None,  # noqa: N803
+            schemaVersion: str = ANALYTICS_SCHEMA_VERSION,
+            schemaId: str = ANALYTICS_SCHEMA_ID,
+            generatedAt: str | None = None,
             repo: RepoInfo | None = None,
             catalog: CatalogMetrics | None = None,
             portal: PortalAnalytics | None = None,

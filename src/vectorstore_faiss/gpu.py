@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import cast
+from typing import TYPE_CHECKING, Final, cast
 
 import numpy as np
 
@@ -17,6 +17,27 @@ from search_api.faiss_gpu import (
     detect_gpu_context,
 )
 from search_api.types import FaissIndexProtocol, FaissModuleProtocol
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import numpy.typing as npt
+
+    type FloatArray = npt.NDArray[np.float32]
+    type IntArray = npt.NDArray[np.int64]
+    type StrArray = npt.NDArray[np.str_]
+    type VecArray = npt.NDArray[np.float32]
+else:  # pragma: no cover - runtime fallback
+    FloatArray = np.ndarray
+    IntArray = np.ndarray
+    StrArray = np.ndarray
+    VecArray = np.ndarray
+
+__all__: Final[list[str]] = [
+    "FaissGpuIndex",
+    "FloatArray",
+    "IntArray",
+    "StrArray",
+    "VecArray",
+]
 
 logger = logging.getLogger(__name__)
 

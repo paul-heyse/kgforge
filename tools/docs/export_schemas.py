@@ -133,7 +133,7 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     """
     try:
-        from pydantic import BaseModel  # noqa: PLC0415
+        from pydantic import BaseModel
     except ImportError:
         return False
     return inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel

@@ -36,12 +36,12 @@ from typing import (
 )
 
 import certifi
-from docs._scripts import shared as docs_shared  # noqa: PLC2701
+from docs._scripts import shared as docs_shared
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
 from tools import get_logger
-from tools._shared.problem_details import build_problem_details  # noqa: PLC2701
+from tools._shared.problem_details import build_problem_details
 from tools.griffe_utils import resolve_griffe
 
 ENV = docs_shared.detect_environment()

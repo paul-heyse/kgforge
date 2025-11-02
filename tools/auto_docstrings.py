@@ -37,7 +37,7 @@ def normalize_qualified_name(name: str) -> str:
     return _legacy._normalize_qualified_name(name)
 
 
-def required_sections(  # noqa: PLR0913
+def required_sections(
     kind: str,
     parameters: list[DocstringIRParameter],
     returns: str | None,

@@ -62,6 +62,8 @@ class ErrorCode(str, Enum):
     SEARCH_TIMEOUT = "search-timeout"
     VECTOR_SEARCH_ERROR = "vector-search-error"
     AGENT_CATALOG_SEARCH_ERROR = "agent-catalog-search-error"
+    CATALOG_LOAD_ERROR = "catalog-load-error"
+    SYMBOL_ATTACHMENT_ERROR = "symbol-attachment-error"
 
     # Configuration & Runtime (5xx)
     CONFIGURATION_ERROR = "configuration-error"

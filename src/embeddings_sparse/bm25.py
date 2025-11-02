@@ -308,7 +308,7 @@ class PurePythonBM25:
                 logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
                 # Fall back to legacy pickle
                 if legacy_path.exists():
-                    import pickle  # noqa: PLC0415
+                    import pickle
 
                     with legacy_path.open("rb") as f:
                         # pickle.load returns object - unavoidable for legacy format support
@@ -322,7 +322,7 @@ class PurePythonBM25:
                     raise
         elif legacy_path.exists():
             # Legacy pickle format
-            import pickle  # noqa: PLC0415
+            import pickle
 
             with legacy_path.open("rb") as f:
                 # pickle.load returns object - unavoidable for legacy format support
@@ -411,7 +411,7 @@ class PurePythonBM25:
         self,
         query: str,
         k: int,
-        fields: Mapping[str, str] | None = None,  # noqa: ARG002
+        fields: Mapping[str, str] | None = None,
     ) -> list[tuple[str, float]]:
         """Score documents stored in the in-memory BM25 index.
 
@@ -526,7 +526,7 @@ class LuceneBM25:
         Raised when Pyserini or Lucene is unavailable.
         """
         try:
-            from pyserini.index.lucene import LuceneIndexer  # noqa: PLC0415
+            from pyserini.index.lucene import LuceneIndexer
         except Exception as exc:
             message = "Pyserini/Lucene not available"
             logger.exception("Failed to import LuceneIndexer")
@@ -555,7 +555,7 @@ class LuceneBM25:
         """
         if self._searcher is not None:
             return
-        from pyserini.search.lucene import LuceneSearcher  # noqa: PLC0415
+        from pyserini.search.lucene import LuceneSearcher
 
         searcher = cast(LuceneSearcherProtocol, LuceneSearcher(self.index_dir))
         searcher.set_bm25(self.k1, self.b)
@@ -565,7 +565,7 @@ class LuceneBM25:
         self,
         query: str,
         k: int,
-        fields: dict[str, str] | None = None,  # noqa: ARG002
+        fields: dict[str, str] | None = None,
     ) -> list[tuple[str, float]]:
         """Execute a Lucene BM25 search.
 
@@ -639,7 +639,7 @@ def get_bm25(
     if backend == "lucene":
         try:
             return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning(
                 "Failed to create LuceneBM25 backend, falling back to PurePythonBM25: %s",
                 exc,

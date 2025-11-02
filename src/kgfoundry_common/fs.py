@@ -219,12 +219,12 @@ def atomic_write(
             if mode == "text":
                 if not isinstance(data, str):
                     msg = "text mode requires str data"
-                    raise ValueError(msg)  # noqa: TRY301
+                    raise ValueError(msg)
                 temp_file.write(data)
             else:
                 if not isinstance(data, bytes):
                     msg = "binary mode requires bytes data"
-                    raise ValueError(msg)  # noqa: TRY301
+                    raise ValueError(msg)
                 temp_file.write(data)
             temp_file.flush()
         if tmp_path is not None:

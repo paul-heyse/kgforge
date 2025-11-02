@@ -74,7 +74,7 @@ class BlindExceptTransformer(cst.CSTTransformer):
         super().__init__()
         self.changes: list[str] = []
 
-    def leave_ExceptHandler(  # noqa: N802 (LibCST visitor pattern)
+    def leave_ExceptHandler(
         self,
         original_node: cst.ExceptHandler,
         updated_node: cst.ExceptHandler,

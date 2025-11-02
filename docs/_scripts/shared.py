@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import sys
@@ -15,6 +16,23 @@ from typing import TYPE_CHECKING, Literal, Protocol, cast
 from tools import StructuredLoggerAdapter, get_logger, with_fields
 from tools.detect_pkg import detect_packages, detect_primary
 from tools.griffe_utils import resolve_griffe
+
+__all__ = [
+    "BuildEnvironment",
+    "DocsSettings",
+    "GriffeLoader",
+    "LinkMode",
+    "WarningLogger",
+    "build_warning_logger",
+    "detect_environment",
+    "ensure_sys_paths",
+    "load_settings",
+    "make_loader",
+    "make_logger",
+    "resolve_git_sha",
+    "safe_json_deserialize",
+    "safe_json_serialize",
+]
 
 LOGGER = get_logger(__name__)
 
@@ -226,3 +244,126 @@ def build_warning_logger(
     """
     logger = make_logger(operation, artifact=artifact)
     return cast(WarningLogger, logger)
+
+
+def safe_json_serialize(
+    data: object,
+    path: Path,
+    *,
+    logger: WarningLogger | None = None,
+) -> bool:
+    """Write data as JSON to path with type safety and error handling.
+
+    Writes data to a temporary file first, then atomically renames it to avoid
+    partial writes. Logs errors and returns False on failure.
+
+    Parameters
+    ----------
+    data : object
+        Data to serialize to JSON.
+    path : Path
+        Output file path (uses pathlib for safe path handling).
+    logger : WarningLogger, optional
+        Logger for warnings and errors. If None, falls back to module logger.
+
+    Returns
+    -------
+    bool
+        True if write succeeded, False on error.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> data = {"key": "value", "items": [1, 2, 3]}
+    >>> success = safe_json_serialize(data, Path("/tmp/test.json"))
+    >>> success
+    True
+    """
+    dest_logger: WarningLogger = logger or cast(WarningLogger, LOGGER)
+    temp_path = path.with_suffix(path.suffix + ".tmp")
+
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        temp_path.replace(path)
+    except (OSError, json.JSONDecodeError) as exc:  # pragma: no cover - I/O error
+        dest_logger.warning(
+            "Failed to write JSON to %s: %s",
+            path,
+            type(exc).__name__,
+            extra={"status": "error", "path": str(path)},
+        )
+        with suppress(FileNotFoundError):
+            temp_path.unlink()
+        return False
+    else:
+        return True
+
+
+def safe_json_deserialize(
+    path: Path,
+    *,
+    logger: WarningLogger | None = None,
+) -> dict[str, object] | list[object] | None:
+    """Load JSON from path with type safety and error handling.
+
+    Safely reads JSON files and logs errors on failure. Returns None if the
+    file cannot be read or parsed.
+
+    Parameters
+    ----------
+    path : Path
+        Input file path (uses pathlib for safe path handling).
+    logger : WarningLogger, optional
+        Logger for warnings and errors. If None, falls back to module logger.
+
+    Returns
+    -------
+    dict[str, object] | list[object] | None
+        Parsed JSON object/array, or None on error.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> data = safe_json_deserialize(Path("/tmp/test.json"))
+    >>> isinstance(data, dict)
+    True
+    """
+    dest_logger: WarningLogger = logger or cast(WarningLogger, LOGGER)
+
+    try:
+        if not path.exists():
+            dest_logger.warning(
+                "JSON file not found: %s",
+                path,
+                extra={"status": "not_found", "path": str(path)},
+            )
+            return None
+
+        content = path.read_text(encoding="utf-8")
+        result: object = json.loads(content)
+        if not isinstance(result, (dict, list)):
+            dest_logger.warning(
+                "JSON root must be object or array, got: %s",
+                type(result).__name__,
+                extra={"status": "invalid_type", "path": str(path)},
+            )
+            return None
+    except json.JSONDecodeError as exc:  # pragma: no cover - I/O error
+        dest_logger.warning(
+            "Failed to parse JSON from %s: %s",
+            path,
+            exc.msg,
+            extra={"status": "parse_error", "path": str(path), "line": exc.lineno},
+        )
+        return None
+    except OSError as exc:  # pragma: no cover - I/O error
+        dest_logger.warning(
+            "Failed to read JSON from %s: %s",
+            path,
+            type(exc).__name__,
+            extra={"status": "error", "path": str(path)},
+        )
+        return None
+    else:
+        return result

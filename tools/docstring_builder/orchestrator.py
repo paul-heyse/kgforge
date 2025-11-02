@@ -287,7 +287,7 @@ class DocstringBuildResult:
     diff_previews: list[tuple[Path, str]] = dataclasses.field(default_factory=list)
 
 
-def build_problem_details(  # noqa: PLR0913
+def build_problem_details(
     status: ExitStatus,
     command: str,
     subcommand: str,
@@ -400,7 +400,7 @@ def _collect_edits(
     return edits, semantics, ir_entries
 
 
-def _handle_docfacts(  # noqa: C901, PLR0911, PLR0914
+def _handle_docfacts(
     docfacts: list[DocFact],
     config: BuilderConfig,
     check_mode: bool,
@@ -543,7 +543,7 @@ def _filter_docfacts_for_output(
     return filtered
 
 
-def _ordered_outcomes(  # noqa: PLR0913, PLR0917
+def _ordered_outcomes(
     files: Sequence[Path],
     jobs: int,
     config: BuilderConfig,
@@ -593,7 +593,7 @@ def _ordered_index(item: tuple[int, Path, FileOutcome]) -> int:
     return item[0]
 
 
-def _process_file(  # noqa: C901, PLR0911
+def _process_file(
     file_path: Path,
     config: BuilderConfig,
     cache: BuilderCache,
@@ -720,7 +720,7 @@ def _process_file(  # noqa: C901, PLR0911
     )
 
 
-def _print_failure_summary(payload: Mapping[str, object]) -> None:  # noqa: C901
+def _print_failure_summary(payload: Mapping[str, object]) -> None:
     """Emit a concise summary to stderr when the CLI exits non-zero."""
     summary_obj = payload.get("summary")
     if isinstance(summary_obj, Mapping):
@@ -892,7 +892,7 @@ def _build_error_result(
     )
 
 
-def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
+def _run_pipeline(
     files: Iterable[Path],
     request: DocstringBuildRequest,
     config: BuilderConfig,
@@ -949,7 +949,7 @@ def _run_pipeline(  # noqa: C901, PLR0912, PLR0914, PLR0915
             ExitStatus.CONFIG, request, "Policy configuration error", selection=selection
         )
 
-    try:  # noqa: PLR1702
+    try:
         policy_engine = PolicyEngine(policy_settings)
         all_ir: list[IRDocstring] = []
         docfacts_checked = False

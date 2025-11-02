@@ -1,0 +1,57 @@
+## 1. Implementation
+- [ ] 1.1 Inventory every construction of `SearchOptions`, `SearchRequest`, and `SearchDocument`.
+  - Run `rg "SearchOptions(" src tools tests -n` and paste results into a scratch note.
+  - Confirm call sites in `src/kgfoundry/agent_catalog/{cli,client,sqlite}.py`, `tools/docs/build_agent_catalog.py`, related doc tooling (`tools/docs/observability.py`, `tools/docstring_builder/observability.py`), and any tests/fixtures.
+  - Record for each site: required dependencies passed today, implicit defaults, and downstream expectations (facets, embedding model behavior, batching semantics).
+- [ ] 1.2 Document current default values and dependency sources.
+  - Trace where `alpha`, `candidate_pool`, `model_loader`, `embedding_model`, `batch_size`, and `facets` originate.
+  - Interview domain owner (or review spec) to confirm canonical defaults (e.g., alpha=0.6, candidate_pool>=50) and capture rationale in a comment draft.
+  - Identify which dependencies should remain required parameters versus optional overrides.
+- [ ] 1.3 Define typed payload structures inside `kgfoundry.agent_catalog.search`.
+  - Introduce `SearchOptionsConfig` and `SearchDocumentPayload` (`TypedDict` or `@dataclass(frozen=True)` with explicit types) aligned to schema fields.
+  - Write module-level docstrings explaining the contract; include references to JSON Schema IDs.
+  - Ensure public types expose modern generics (PEP 695 `type SearchDocumentPayload = TypedDict(...)`).
+- [ ] 1.4 Implement helper factories with validation.
+  - Add `build_search_options(*)` and `build_faceted_search_options(*)` (precise names per coding standards) that accept dependency parameters and raise domain-specific exceptions when missing.
+  - Validate inputs: ensure facets conform to allowed keys, candidate pool >= requested `k`, alpha within [0,1], etc.
+  - Use `ProblemDetailsError` (or introduce one) so failures emit RFC 9457 payloads; chain original exceptions via `raise ... from err`.
+- [ ] 1.5 Update `SearchDocument` construction path.
+  - Centralize creation logic (likely `def make_search_document(row: CatalogRow, metadata: CatalogMetadata) -> SearchDocument`).
+  - Guarantee all required fields (symbol_id, package, module, qname, summary, doc, metadata facets) are populated and validated using the typed payload definitions.
+  - Add defensive normalization (strip whitespace, ensure determinism for ordering) before returning the document.
+- [ ] 1.6 Thread helpers into core call sites.
+  - **CLI (`src/kgfoundry/agent_catalog/cli.py`)**: replace manual dicts with helper invocations, inject dependencies via closure/factories; ensure commands surface Problem Details to stderr with structured logging.
+  - **Client (`src/kgfoundry/agent_catalog/client.py`)**: use helper to build default options for REST calls; document environment knobs controlling candidate pools.
+  - **SQLite adapter (`src/kgfoundry/agent_catalog/sqlite.py`)**: import helper and remove private import usage; ensure search metadata stored locally remains schema-compliant.
+  - **Docs tooling (`tools/docs/build_agent_catalog.py`)**: leverage helper to keep generated artifacts in sync; update logging when validation fails.
+- [ ] 1.7 Clean up redundant or obsolete code paths.
+  - Remove legacy inline factories or `None` defaults for embedding/model loader; replace with explicit helper parameters.
+  - Convert lingering relative imports in `kgfoundry/__init__.py` or search modules to absolute imports per Ruff `TID252`.
+  - Delete or deprecate functions superseded by helpers; add `warnings.warn` with deprecation metadata if external consumers still rely on them.
+- [ ] 1.8 Update type stubs and namespace exports.
+  - Align `stubs/kgfoundry/agent_catalog/search.pyi` with new helper signatures and typed payload aliases; ensure no bare `Any` remains.
+  - Update `__all__` exports in `kgfoundry/agent_catalog/search.py` to include only the supported public helpers and payloads; document intent in module docstring.
+  - Regenerate namespace proxies if required (verify `_namespace_proxy.py` exports align).
+- [ ] 1.9 Strengthen tests alongside implementation.
+  - Add parametrized unit tests in `tests/agent_catalog/test_search_options.py` covering happy path, missing dependency, invalid facet, and candidate pool edge cases.
+  - Extend existing catalog round-trip tests to assert helper usage returns schema-valid payloads (reuse fixtures from docs pipeline where possible).
+  - Add doctest/xdoctest examples to helper docstrings demonstrating basic usage and error handling.
+- [ ] 1.10 Execute targeted quality gates during development.
+  - After code updates, run `uv run ruff check src/kgfoundry/agent_catalog` to catch regressions early.
+  - Use `uv run pyrefly check src/kgfoundry/agent_catalog` and `uv run mypy --config-file mypy.ini src/kgfoundry/agent_catalog` to confirm type cleanliness before moving on to schema changes.
+  - Capture outputs for inclusion in the final PR checklist.
+
+## 2. Schemas & Documentation
+- [ ] 2.1 Update JSON Schema definitions for search payloads.
+  - Locate existing schemas under `schema/agent_catalog/` (or create them if missing) for request (`search-request.json`) and response (`search-response.json`).
+  - Adjust field definitions to match the typed payload (facets structure, candidate pool ranges, embedding metadata) and bump schema version per SemVer guidance.
+  - Add comprehensive examples illustrating helper-produced payloads, including facet filters and Problem Details error envelopes.
+- [ ] 2.2 Align OpenAPI references and documentation.
+  - Update `site/openapi.yaml` (or corresponding source) so search endpoints reference the new schema components; ensure example payloads align with helper defaults.
+  - Cross-link documentation: add narrative in `docs/` (likely `docs/reference/search.md`) describing helper usage, configuration knobs, and error semantics.
+  - Run `spectral lint` (or configured OpenAPI linter) to confirm spec validity.
+- [ ] 2.3 Regenerate artifacts and validate round-trip behavior.
+  - Execute `make artifacts` to rebuild docs, Agent Portal, and catalog indices; inspect diff to confirm SearchDocument fields align with schema changes.
+  - Run dedicated schema validation tests (e.g., `pytest tests/docs/test_doc_artifacts.py -k search`) ensuring no suppressions remain.
+  - Capture artifact preview URLs or screenshots for reviewer context and update PR description accordingly.
+

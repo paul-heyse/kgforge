@@ -17,16 +17,13 @@ import contextvars
 import json
 import logging
 import sys
-from collections.abc import Iterator
+import time
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Final
+from typing import Any, Final, cast
 
 from kgfoundry_common.navmap_types import NavMap
-
-if TYPE_CHECKING:
-    from kgfoundry_common.problem_details import JsonValue
-else:  # pragma: no cover - runtime fallback avoids circular import
-    JsonValue = object  # type: ignore[assignment]
+from kgfoundry_common.types import JsonValue
 
 __all__ = [
     "CorrelationContext",
@@ -34,6 +31,7 @@ __all__ = [
     "LoggerAdapter",
     "get_correlation_id",
     "get_logger",
+    "measure_duration",
     "set_correlation_id",
     "setup_logging",
     "with_fields",
@@ -189,7 +187,7 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(data, default=str)
 
 
-class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
+class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]
     """Logger adapter that injects structured context fields.
 
     <!-- auto:docstring-builder v1 -->
@@ -200,14 +198,11 @@ class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
 
     Parameters
     ----------
-    logger : inspect._empty
-        Describe ``logger``.
-    extra : inspect._empty, optional
-        Describe ``extra``.
+    logger : logging.Logger
+        Base logger instance to wrap.
+    extra : Mapping[str, object] | None, optional
+        Structured fields to inject into log entries.
         Defaults to ``None``.
-    merge_extra : inspect._empty, optional
-        Describe ``merge_extra``.
-        Defaults to ``False``.
 
     Examples
     --------
@@ -215,14 +210,9 @@ class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
     >>> logger = get_logger(__name__)
     >>> logger.info("Search started", extra={"operation": "search", "status": "started"})
     >>> # Correlation ID is automatically injected from context
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
     """
 
-    def process(self, msg: str, kwargs: Any) -> tuple[str, Any]:  # noqa: ANN401
+    def process(self, msg: str, kwargs: Mapping[str, Any]) -> tuple[str, Any]:
         """Process log message and inject structured fields.
 
         <!-- auto:docstring-builder v1 -->
@@ -231,7 +221,7 @@ class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
         ----------
         msg : str
             Log message.
-        kwargs : Any
+        kwargs : Mapping[str, Any]
             Keyword arguments (includes 'extra' dict from logging).
 
         Returns
@@ -258,33 +248,280 @@ class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
                 extra["correlation_id"] = ctx_correlation_id
 
         # Ensure operation and status are present (defaults if missing)
-        self._ensure_operation_and_status(extra, kwargs)
+        self._ensure_operation_and_status(extra, kwargs.get("level", logging.INFO))
 
         return msg, kwargs
 
-    def _ensure_operation_and_status(self, extra: dict[str, Any], kwargs: dict[str, Any]) -> None:
+    @staticmethod
+    def _ensure_operation_and_status(extra: dict[str, Any], level: int) -> None:
         """Ensure operation and status fields are present in extra dict.
-
-        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
         extra : dict[str, Any]
             Extra dict to populate.
-        kwargs : dict[str, Any]
-            Keyword arguments containing log level.
+        level : int
+            Log level to determine status.
         """
         if "operation" not in extra:
             extra["operation"] = "unknown"
         if "status" not in extra:
             # Infer status from log level
-            level = kwargs.get("level", logging.INFO)
             if level >= logging.ERROR:
                 extra["status"] = "error"
             elif level >= logging.WARNING:
                 extra["status"] = "warning"
             else:
                 extra["status"] = "success"
+
+    def debug(self, msg: object, *args: object, **kwargs: object) -> None:
+        """Log a debug message with structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        extra = kwargs_dict.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        # Merge self.extra (fields from LoggerAdapter constructor) into extra
+        if isinstance(self.extra, dict):
+            for key, value in self.extra.items():
+                if key not in extra:
+                    extra[key] = value
+        # Inject correlation_id from context if not provided
+        if "correlation_id" not in extra:
+            ctx_correlation_id = _correlation_id.get()
+            if ctx_correlation_id is not None:
+                extra["correlation_id"] = ctx_correlation_id
+        self._ensure_operation_and_status(extra, logging.DEBUG)
+        kwargs_dict["extra"] = extra
+        self.logger.debug(msg, *args, **kwargs_dict)
+
+    def info(self, msg: object, *args: object, **kwargs: object) -> None:
+        """Log an info message with structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        extra = kwargs_dict.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        # Merge self.extra (fields from LoggerAdapter constructor) into extra
+        if isinstance(self.extra, dict):
+            for key, value in self.extra.items():
+                if key not in extra:
+                    extra[key] = value
+        # Inject correlation_id from context if not provided
+        if "correlation_id" not in extra:
+            ctx_correlation_id = _correlation_id.get()
+            if ctx_correlation_id is not None:
+                extra["correlation_id"] = ctx_correlation_id
+        self._ensure_operation_and_status(extra, logging.INFO)
+        kwargs_dict["extra"] = extra
+        self.logger.info(msg, *args, **kwargs_dict)
+
+    def warning(self, msg: object, *args: object, **kwargs: object) -> None:
+        """Log a warning message with structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        extra = kwargs_dict.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        # Merge self.extra (fields from LoggerAdapter constructor) into extra
+        if isinstance(self.extra, dict):
+            for key, value in self.extra.items():
+                if key not in extra:
+                    extra[key] = value
+        # Inject correlation_id from context if not provided
+        if "correlation_id" not in extra:
+            ctx_correlation_id = _correlation_id.get()
+            if ctx_correlation_id is not None:
+                extra["correlation_id"] = ctx_correlation_id
+        self._ensure_operation_and_status(extra, logging.WARNING)
+        kwargs_dict["extra"] = extra
+        self.logger.warning(msg, *args, **kwargs_dict)
+
+    def error(self, msg: object, *args: object, **kwargs: object) -> None:
+        """Log an error message with structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        extra = kwargs_dict.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        # Merge self.extra (fields from LoggerAdapter constructor) into extra
+        if isinstance(self.extra, dict):
+            for key, value in self.extra.items():
+                if key not in extra:
+                    extra[key] = value
+        # Inject correlation_id from context if not provided
+        if "correlation_id" not in extra:
+            ctx_correlation_id = _correlation_id.get()
+            if ctx_correlation_id is not None:
+                extra["correlation_id"] = ctx_correlation_id
+        self._ensure_operation_and_status(extra, logging.ERROR)
+        kwargs_dict["extra"] = extra
+        self.logger.error(msg, *args, **kwargs_dict)
+
+    def critical(self, msg: object, *args: object, **kwargs: object) -> None:
+        """Log a critical message with structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        extra = kwargs_dict.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        # Merge self.extra (fields from LoggerAdapter constructor) into extra
+        if isinstance(self.extra, dict):
+            for key, value in self.extra.items():
+                if key not in extra:
+                    extra[key] = value
+        # Inject correlation_id from context if not provided
+        if "correlation_id" not in extra:
+            ctx_correlation_id = _correlation_id.get()
+            if ctx_correlation_id is not None:
+                extra["correlation_id"] = ctx_correlation_id
+        self._ensure_operation_and_status(extra, logging.CRITICAL)
+        kwargs_dict["extra"] = extra
+        self.logger.critical(msg, *args, **kwargs_dict)
+
+    def log(self, level: int, msg: object, *args: object, **kwargs: object) -> None:
+        """Log a message at the given level with structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        extra = kwargs_dict.get("extra", {})
+        if not isinstance(extra, dict):
+            extra = {}
+        # Merge self.extra (fields from LoggerAdapter constructor) into extra
+        if isinstance(self.extra, dict):
+            for key, value in self.extra.items():
+                if key not in extra:
+                    extra[key] = value
+        # Inject correlation_id from context if not provided
+        if "correlation_id" not in extra:
+            ctx_correlation_id = _correlation_id.get()
+            if ctx_correlation_id is not None:
+                extra["correlation_id"] = ctx_correlation_id
+        self._ensure_operation_and_status(extra, level)
+        kwargs_dict["extra"] = extra
+        self.logger.log(level, msg, *args, **kwargs_dict)
+
+    def log_success(
+        self,
+        message: str,
+        *,
+        operation: str | None = None,
+        duration_ms: float | None = None,
+        **fields: object,
+    ) -> None:
+        """Log a successful operation with structured fields.
+
+        Parameters
+        ----------
+        message : str
+            Success message.
+        operation : str | None, optional
+            Operation name. If not provided, uses current context value or "unknown".
+            Defaults to ``None``.
+        duration_ms : float | None, optional
+            Operation duration in milliseconds. Defaults to ``None``.
+        **fields : object
+            Additional structured fields to include in log record.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.logging import get_logger
+        >>> logger = get_logger(__name__)
+        >>> logger.log_success("Index built", operation="build_index", duration_ms=1234.5)
+        """
+        extra: dict[str, object] = {"status": "success"}
+        if operation is not None:
+            extra["operation"] = operation
+        if duration_ms is not None:
+            extra["duration_ms"] = duration_ms
+        extra.update(fields)
+        self.info(message, extra=extra)
+
+    def log_failure(
+        self,
+        message: str,
+        *,
+        exception: Exception | None = None,
+        operation: str | None = None,
+        duration_ms: float | None = None,
+        **fields: object,
+    ) -> None:
+        """Log a failure with structured fields and optional exception chaining.
+
+        Parameters
+        ----------
+        message : str
+            Failure message.
+        exception : Exception | None, optional
+            Exception that caused the failure (preserved in extras). Defaults to ``None``.
+        operation : str | None, optional
+            Operation name. Defaults to ``None``.
+        duration_ms : float | None, optional
+            Operation duration in milliseconds. Defaults to ``None``.
+        **fields : object
+            Additional structured fields.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.logging import get_logger
+        >>> logger = get_logger(__name__)
+        >>> try:
+        ...     raise ValueError("Invalid data")
+        ... except ValueError as e:
+        ...     logger.log_failure("Failed to process", exception=e, operation="process_data")
+        """
+        extra: dict[str, object] = {"status": "error"}
+        if operation is not None:
+            extra["operation"] = operation
+        if duration_ms is not None:
+            extra["duration_ms"] = duration_ms
+        if exception is not None:
+            extra["error_type"] = exception.__class__.__name__
+            extra["error_detail"] = str(exception)
+        extra.update(fields)
+        self.error(message, extra=extra)
+
+    def log_io(
+        self,
+        message: str,
+        *,
+        operation: str | None = None,
+        io_type: str = "unknown",
+        size_bytes: int | None = None,
+        duration_ms: float | None = None,
+        **fields: object,
+    ) -> None:
+        """Log I/O operation with structured fields.
+
+        Parameters
+        ----------
+        message : str
+            I/O operation message.
+        operation : str | None, optional
+            Operation name. Defaults to ``None``.
+        io_type : str, optional
+            I/O type ("read", "write", "delete", "unknown"). Defaults to ``"unknown"``.
+        size_bytes : int | None, optional
+            Bytes transferred/processed. Defaults to ``None``.
+        duration_ms : float | None, optional
+            I/O duration in milliseconds. Defaults to ``None``.
+        **fields : object
+            Additional structured fields.
+
+        Examples
+        --------
+        >>> from kgfoundry_common.logging import get_logger
+        >>> logger = get_logger(__name__)
+        >>> logger.log_io(
+        ...     "Downloaded file",
+        ...     operation="download",
+        ...     io_type="read",
+        ...     size_bytes=1024,
+        ...     duration_ms=500.0,
+        ... )
+        """
+        extra: dict[str, object] = {"status": "success", "io_type": io_type}
+        if operation is not None:
+            extra["operation"] = operation
+        if size_bytes is not None:
+            extra["size_bytes"] = size_bytes
+        if duration_ms is not None:
+            extra["duration_ms"] = duration_ms
+        extra.update(fields)
+        self.info(message, extra=extra)
 
 
 def get_logger(name: str) -> LoggerAdapter:
@@ -410,7 +647,7 @@ class CorrelationContext:
     Parameters
     ----------
     correlation_id : str | None
-        Describe ``correlation_id``.
+        Correlation ID to set in context.
 
     Examples
     --------
@@ -424,8 +661,6 @@ class CorrelationContext:
     def __init__(self, correlation_id: str | None) -> None:
         """Initialize correlation context.
 
-        <!-- auto:docstring-builder v1 -->
-
         Parameters
         ----------
         correlation_id : str | NoneType
@@ -437,8 +672,6 @@ class CorrelationContext:
     def __enter__(self) -> CorrelationContext:
         """Enter correlation context and set correlation ID.
 
-        <!-- auto:docstring-builder v1 -->
-
         Returns
         -------
         CorrelationContext
@@ -447,18 +680,21 @@ class CorrelationContext:
         self._token = _correlation_id.set(self.correlation_id)
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:  # noqa: ANN401
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object,
+    ) -> None:
         """Exit correlation context and restore previous correlation ID.
-
-        <!-- auto:docstring-builder v1 -->
 
         Parameters
         ----------
-        exc_type : Any
+        exc_type : type[BaseException] | None
             Exception type (if any).
-        exc_val : Any
+        exc_val : BaseException | None
             Exception value (if any).
-        exc_tb : Any
+        exc_tb : object
             Exception traceback (if any).
         """
         if self._token is not None:
@@ -509,11 +745,6 @@ def with_fields(
       fields in `extra` dicts passed to log calls.
     - **NullHandler**: Libraries should use `get_logger()` which adds NullHandler
       to prevent duplicate handlers in applications.
-
-    Returns
-    -------
-    LoggerAdapter
-        Describe return value.
     """
     # Extract underlying logger if already wrapped
     base_logger = logger.logger if isinstance(logger, LoggerAdapter) else logger
@@ -526,9 +757,28 @@ def with_fields(
 
     try:
         # Create adapter with fields in extra dict
-        adapter = LoggerAdapter(base_logger, fields)
+        adapter = LoggerAdapter(base_logger, dict(fields))
         yield adapter
     finally:
         # Restore previous correlation_id when context exits
         if correlation_token is not None:
             _correlation_id.reset(correlation_token)
+
+
+def measure_duration() -> tuple[float, float]:
+    """Get current monotonic time for measuring operation duration.
+
+    Returns
+    -------
+    tuple[float, float]
+        Tuple of (start_time, current_time) both from monotonic clock.
+
+    Examples
+    --------
+    >>> start_time, _ = measure_duration()
+    >>> # do work...
+    >>> _, end_time = measure_duration()
+    >>> duration_ms = (end_time - start_time) * 1000
+    """
+    current = time.monotonic()
+    return current, current

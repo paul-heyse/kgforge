@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """FAISS adapter with typed GPU fallbacks and DuckDB integration."""
 
 from __future__ import annotations
@@ -7,7 +6,7 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 import duckdb
 import numpy as np
@@ -28,9 +27,22 @@ from search_api.faiss_gpu import (
     configure_search_parameters,
     detect_gpu_context,
 )
-from search_api.types import FaissIndexProtocol, FaissModuleProtocol
+from search_api.types import FaissModuleProtocol
 
-__all__ = ["DenseVecs", "FaissAdapter"]
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import numpy.typing as npt
+
+    type FloatArray = npt.NDArray[np.float32]
+    type IntArray = npt.NDArray[np.int64]
+    type StrArray = npt.NDArray[np.str_]
+    type VecArray = npt.NDArray[np.float32]
+else:  # pragma: no cover - runtime fallback
+    FloatArray = np.ndarray
+    IntArray = np.ndarray
+    StrArray = np.ndarray
+    VecArray = np.ndarray
+
+__all__ = ["DenseVecs", "FaissAdapter", "FloatArray", "IntArray", "StrArray", "VecArray"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.faiss_adapter",
@@ -91,7 +103,7 @@ class DenseVecs:
 class FaissAdapter:
     """Build FAISS indexes with optional GPU acceleration and CPU fallback."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913 - standard __init__ with configuration options
         self,
         db_path: str,
         *,
@@ -110,7 +122,7 @@ class FaissAdapter:
         self.use_cuvs = use_cuvs
         self._gpu_devices = tuple(int(device) for device in (gpu_devices or (0,)))
 
-        self.index: FaissIndexProtocol | None = None
+        self.index: object = None  # FaissIndexProtocol | None
         self.idmap: list[str] | None = None
         self.vecs: DenseVecs | None = None
 
@@ -118,7 +130,13 @@ class FaissAdapter:
         self._gpu_context: GpuContext | None = None
 
     def build(self) -> None:
-        """Build or rebuild the FAISS index from persisted vectors."""
+        """Build or rebuild the FAISS index from persisted vectors.
+
+        Raises
+        ------
+        IndexBuildError
+            If index construction fails.
+        """
         vectors = self._load_dense_vectors()
         self.vecs = vectors
         self.idmap = vectors.ids
@@ -168,7 +186,13 @@ class FaissAdapter:
             raise IndexBuildError(msg) from exc
 
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """Load an existing CPU index or fall back to rebuilding from vectors."""
+        """Load an existing CPU index or fall back to rebuilding from vectors.
+
+        Raises
+        ------
+        VectorSearchError
+            If index loading or vector loading fails.
+        """
         module = faiss
         if module is None or not HAVE_FAISS:
             self.build()
@@ -219,7 +243,25 @@ class FaissAdapter:
     def search(
         self, query: Sequence[float] | NDArray[np.float32], k: int
     ) -> list[tuple[str, float]]:
-        """Return the top ``k`` vector matches for ``query``."""
+        """Return the top ``k`` vector matches for ``query``.
+
+        Parameters
+        ----------
+        query : Sequence[float] | NDArray[np.float32]
+            Query vector.
+        k : int
+            Number of results to return.
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            List of (doc_id, score) tuples sorted by score descending.
+
+        Raises
+        ------
+        ValueError
+            If k is not positive.
+        """
         if k <= 0:
             msg = "k must be positive"
             raise ValueError(msg)
@@ -245,7 +287,20 @@ class FaissAdapter:
         return self._cpu_search(normalized_vector, k)
 
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
-        """Persist the index (when available) and ID mapping to disk."""
+        """Persist the index (when available) and ID mapping to disk.
+
+        Parameters
+        ----------
+        index_uri : str
+            Path where the FAISS index will be saved.
+        idmap_uri : str | None, optional
+            Path where the ID mapping will be saved. If None, defaults to ``{index_uri}.ids.npy``.
+
+        Raises
+        ------
+        RuntimeError
+            If no vectors have been loaded.
+        """
         if self.vecs is None:
             msg = "No vectors loaded; call build() before save()."
             raise RuntimeError(msg)
@@ -261,9 +316,10 @@ class FaissAdapter:
 
         module.write_index(self.index, index_uri)
 
-    # Internal helpers -----------------------------------------------------
+    # Internal helpers -------------------------------------------------------
 
     def _cpu_search(self, query: FloatVector, k: int) -> list[tuple[str, float]]:
+        """Search using CPU fallback (inner product)."""
         if self._cpu_matrix is None or self.idmap is None:
             return []
 
@@ -277,6 +333,13 @@ class FaissAdapter:
         return [(self.idmap[idx], float(scores[idx])) for idx in indices if idx < len(self.idmap)]
 
     def _resolve_metric(self, module: FaissModuleProtocol) -> int:
+        """Resolve metric string to FAISS metric constant.
+
+        Raises
+        ------
+        ValueError
+            If metric is not recognized.
+        """
         metric = self.metric.lower()
         if metric == "ip":
             return module.METRIC_INNER_PRODUCT
@@ -286,6 +349,13 @@ class FaissAdapter:
         raise ValueError(msg)
 
     def _load_dense_vectors(self) -> DenseVecs:
+        """Load dense vectors from DuckDB or Parquet.
+
+        Raises
+        ------
+        VectorSearchError
+            If vectors cannot be loaded.
+        """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
             return self._load_from_parquet(candidate)
@@ -317,6 +387,13 @@ class FaissAdapter:
 
     @staticmethod
     def _load_from_parquet(source: Path) -> DenseVecs:
+        """Load dense vectors from Parquet file.
+
+        Raises
+        ------
+        VectorSearchError
+            If Parquet file cannot be read or is empty.
+        """
         resolved = source.resolve()
         if not resolved.exists():
             msg = f"Parquet source not found: {resolved}"

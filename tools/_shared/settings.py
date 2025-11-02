@@ -11,9 +11,10 @@ required configuration is missing.
 from __future__ import annotations
 
 import inspect
+from collections.abc import Callable, Sequence
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import Callable, Final, Sequence, TypeVar, cast  # noqa: UP035
+from typing import Final, TypeVar, cast
 
 from pydantic import Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -48,7 +49,7 @@ _SettingsT = TypeVar("_SettingsT", bound=BaseSettings)
 _SETTINGS_CACHE: dict[str, ToolRuntimeSettings] = {}
 
 
-def load_settings(  # noqa: UP047 - helper preserves generic subclass typing for callers
+def load_settings(
     settings_factory: Callable[[], _SettingsT],
 ) -> _SettingsT:
     """Instantiate settings via ``settings_factory`` with structured error handling.

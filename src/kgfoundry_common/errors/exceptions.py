@@ -28,6 +28,7 @@ logger = get_logger(__name__)
 
 __all__ = [
     "AgentCatalogSearchError",
+    "CatalogLoadError",
     "CatalogSessionError",
     "ChunkingError",
     "ConfigurationError",
@@ -46,6 +47,7 @@ __all__ = [
     "SchemaValidationError",
     "SerializationError",
     "SpladeOOMError",
+    "SymbolAttachmentError",
     "UnsupportedMIMEError",
     "VectorSearchError",
 ]
@@ -89,7 +91,7 @@ class KgFoundryError(Exception):
     >>> assert details["status"] == 500
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         message: str,
         code: ErrorCode = ErrorCode.RUNTIME_ERROR,
@@ -1338,6 +1340,112 @@ class CatalogSessionError(KgFoundryError):
         super().__init__(
             message,
             code=ErrorCode.SESSION_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context,
+        )
+
+
+class CatalogLoadError(KgFoundryError):
+    """Error during catalog payload loading or parsing.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise CatalogLoadError(
+    ...     "Failed to parse catalog JSON", cause=json.JSONDecodeError("Invalid JSON")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize catalog load error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.CATALOG_LOAD_ERROR,
+            http_status=422,
+            cause=cause,
+            context=context,
+        )
+
+
+class SymbolAttachmentError(KgFoundryError):
+    """Error during symbol attachment to modules in catalog.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise SymbolAttachmentError(
+    ...     "Failed to attach symbols to module", cause=sqlite3.DatabaseError("Database error")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize symbol attachment error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.SYMBOL_ATTACHMENT_ERROR,
             http_status=500,
             cause=cause,
             context=context,

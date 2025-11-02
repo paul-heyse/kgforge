@@ -214,7 +214,7 @@ def _wrap_text(text: str) -> list[str]:
     return wrapped
 
 
-def _required_sections(  # noqa: PLR0913
+def _required_sections(
     kind: str,
     parameters: Sequence[DocstringIRParameter],
     returns: str | None,
@@ -237,7 +237,7 @@ def _required_sections(  # noqa: PLR0913
     return required
 
 
-def build_examples(  # noqa: PLR0913
+def build_examples(
     module_name: str,
     name: str,
     parameters: Sequence[DocstringIRParameter],

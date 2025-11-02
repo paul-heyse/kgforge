@@ -46,23 +46,23 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from docs._scripts import shared  # noqa: PLC2701
-from docs._scripts.validation import validate_against_schema  # noqa: PLC2701
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from docs._types.artifacts import (
-    JsonPayload,  # noqa: PLC2701
+    JsonPayload,
     SymbolDeltaPayload,
     SymbolIndexArtifacts,
-    symbol_delta_from_json,  # noqa: PLC2701
-    symbol_delta_to_payload,  # noqa: PLC2701
-    symbol_index_from_json,  # noqa: PLC2701
-    symbol_index_to_payload,  # noqa: PLC2701
+    symbol_delta_from_json,
+    symbol_delta_to_payload,
+    symbol_index_from_json,
+    symbol_index_to_payload,
 )
 from tools import (
     get_logger,
     observe_tool_run,
 )
 from tools._shared.problem_details import ProblemDetailsDict
-from tools._shared.proc import ToolExecutionError  # noqa: PLC2701
+from tools._shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
