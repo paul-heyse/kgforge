@@ -39,7 +39,6 @@ def NamedTemporaryFile(  # noqa: N802  # Matches stdlib API
     delete: bool = True,
     *,
     errors: str | None = None,
-    delete_on_close: bool = True,
 ) -> _TemporaryFileWrapper: ...
 def mkdtemp(  # Matches stdlib API
     suffix: str | None = None,

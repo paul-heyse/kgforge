@@ -47,7 +47,7 @@ type information, allowing us to drop the local `pyarrow` shims.
 | `astroid>=4.0.0` | `stubs/astroid/**` | no `py.typed` | Retain slim manager/builder stubs until astroid ships types (planned but not released). |
 | `pytestarch>=4.0.1` | `stubs/pytestarch/**` | no types | Keep; upstream typing backlog. |
 | `importlinter` | `stubs/importlinter/**` | minimal runtime typing | Keep stub but consider contributing upstream hints. |
-| `auto-generated tempfile wrapper` | `stubs/tempfile/__init__.pyi` | overrides stdlib | Keep for now (captures extra `delete_on_close` kw); revisit once callers are audited. |
+| `auto-generated tempfile wrapper` | `stubs/tempfile/__init__.pyi` | overrides stdlib | Keep for now; ensures our context manager helpers remain typed while mirroring the stdlib signature. |
 | `opentelemetry-*` | `stubs/opentelemetry/**` | our curated API surface | Keep; upstream annotations are incomplete for the symbols we consume. |
 
 ## 3. Local-only / Intentional Stubs

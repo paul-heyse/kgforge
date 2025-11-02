@@ -138,7 +138,7 @@ class CatalogSession:
         return self._process
 
     @staticmethod
-    def _write_payload(process: Popen[str], payload: JsonObject) -> None:
+    def _write_payload(process: TextProcess, payload: JsonObject) -> None:
         """Write a JSON payload to the process stdin.
 
         <!-- auto:docstring-builder v1 -->
@@ -158,7 +158,7 @@ class CatalogSession:
         stdin.flush()
 
     @staticmethod
-    def _read_response(process: Popen[str]) -> JsonObject:
+    def _read_response(process: TextProcess) -> JsonObject:
         """Read and decode a JSON-RPC response from stdout.
 
         <!-- auto:docstring-builder v1 -->

@@ -18,6 +18,7 @@ def _load_module() -> ModuleType:
 
 
 def __getattr__(name: str) -> object:
+    """Expose attributes from the lazily loaded validation module."""
     if name in __all__:
         module = _load_module()
         return cast(object, getattr(module, name))
@@ -26,6 +27,7 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
+    """Return the set of exported attributes provided by the validation module."""
     module = _load_module()
     exports_obj: object | None = getattr(module, "__all__", None)
     if isinstance(exports_obj, Iterable) and not isinstance(exports_obj, (str, bytes)):
@@ -56,4 +58,6 @@ if TYPE_CHECKING:  # pragma: no cover - typing assistance only
         schema_path: Path,
         *,
         artifact: str,
-    ) -> None: ...
+    ) -> None:
+        """Typed protocol for :func:`validate_against_schema`."""
+        ...
