@@ -7,6 +7,8 @@ implementation specifics.
 
 from __future__ import annotations
 
+import base64
+import binascii
 import logging
 import math
 import re
@@ -14,14 +16,20 @@ from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 from re import Pattern
-from typing import TYPE_CHECKING, Final, Protocol, cast
+from typing import TYPE_CHECKING, BinaryIO, Final, Protocol, cast
 
 if TYPE_CHECKING:
     pass
 
+from kgfoundry_common.config import load_config
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
+from kgfoundry_common.safe_pickle_v2 import (
+    SignedPickleWrapper,
+    UnsafeSerializationError,
+    load_unsigned_legacy,
+)
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
 TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
@@ -33,6 +41,78 @@ def _default_float_dict() -> defaultdict[str, float]:
 
 def _score_value(item: tuple[str, float]) -> float:
     return item[1]
+
+
+def _decode_signing_key() -> bytes | None:
+    """Decode the configured signing key, returning ``None`` if unavailable."""
+    try:
+        settings = load_config()
+    except ValueError as exc:
+        logger.warning("Configuration invalid; proceeding without signing key", exc_info=exc)
+        return None
+
+    encoded_key = settings.signing_key
+    if encoded_key is None:
+        return None
+
+    try:
+        return base64.b64decode(encoded_key)
+    except binascii.Error as exc:
+        logger.warning(
+            "Signing key is not valid base64; ignoring secure pickle signature", exc_info=exc
+        )
+        return None
+
+
+def _load_unsigned_payload(handle: BinaryIO, legacy_path: Path) -> dict[str, JsonValue]:
+    """Load legacy pickle payload with allow-list enforcement."""
+    try:
+        payload_obj = load_unsigned_legacy(handle)
+    except UnsafeSerializationError as exc:
+        msg = f"Legacy pickle at {legacy_path} failed safety validation"
+        raise DeserializationError(msg) from exc
+
+    if not isinstance(payload_obj, dict):
+        msg = f"Invalid legacy pickle payload: expected dict, got {type(payload_obj)}"
+        raise DeserializationError(msg)
+
+    return cast(dict[str, JsonValue], payload_obj)
+
+
+def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
+    """Load SPLADE legacy pickle metadata using signed or unsigned safe loader."""
+    signing_key = _decode_signing_key()
+    try:
+        with legacy_path.open("rb") as handle:
+            if signing_key:
+                wrapper = SignedPickleWrapper(signing_key)
+                try:
+                    payload_obj = wrapper.load(handle)
+                except UnsafeSerializationError:
+                    logger.warning(
+                        "Signed pickle validation failed for legacy SPLADE index; falling back to unsigned loader",
+                        extra={"legacy_path": str(legacy_path)},
+                    )
+                    handle.seek(0)
+                    payload = _load_unsigned_payload(handle, legacy_path)
+                else:
+                    if not isinstance(payload_obj, dict):
+                        msg = (
+                            f"Invalid signed legacy payload: expected dict, got {type(payload_obj)}"
+                        )
+                        raise DeserializationError(msg)
+                    payload = cast(dict[str, JsonValue], payload_obj)
+            else:
+                logger.warning(
+                    "Missing signing key; using unsigned legacy pickle loader",
+                    extra={"legacy_path": str(legacy_path)},
+                )
+                payload = _load_unsigned_payload(handle, legacy_path)
+    except OSError as exc:
+        msg = f"Failed to read legacy SPLADE index at {legacy_path}: {exc}"
+        raise DeserializationError(msg) from exc
+
+    return payload
 
 
 class ImpactHitProtocol(Protocol):
@@ -183,7 +263,8 @@ class SPLADEv3Encoder:
         """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
-            "impact index variant if available."
+            "impact index variant if available. "
+            f"Requested device={self.device!r} with {len(texts)} texts."
         )
         raise NotImplementedError(message)
 
@@ -309,32 +390,26 @@ class PureImpactIndex:
         if metadata_path.exists():
             try:
                 data_raw = deserialize_json(metadata_path, schema_path)
-            except DeserializationError as exc:
-                logger.warning("Failed to load JSON index, trying legacy pickle: %s", exc)
-                # Fall back to legacy pickle
+            except DeserializationError:
+                logger.warning(
+                    "Failed to load JSON index, trying legacy pickle",
+                    extra={"metadata_path": str(metadata_path), "legacy_path": str(legacy_path)},
+                )
                 if legacy_path.exists():
-                    import pickle
-
-                    with legacy_path.open("rb") as handle:
-                        data_raw = pickle.load(handle)  # noqa: S301
+                    data_dict = _load_legacy_metadata(legacy_path)
                 else:
                     raise
+            else:
+                if not isinstance(data_raw, dict):
+                    msg = f"Invalid index data format: expected dict, got {type(data_raw)}"
+                    raise DeserializationError(msg)
+                data_dict = cast(dict[str, JsonValue], data_raw)
         elif legacy_path.exists():
-            # Legacy pickle format
-            import pickle
-
-            with legacy_path.open("rb") as handle:
-                data_raw = pickle.load(handle)  # noqa: S301
+            data_dict = _load_legacy_metadata(legacy_path)
             logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
         else:
             msg = f"Index metadata not found at {metadata_path} or {legacy_path}"
             raise FileNotFoundError(msg)
-
-        # Narrow data type before indexing - pickle.load returns object
-        if not isinstance(data_raw, dict):
-            msg = f"Invalid pickle data format: expected dict, got {type(data_raw)}"
-            raise DeserializationError(msg)
-        data_dict: dict[str, JsonValue] = cast(dict[str, JsonValue], data_raw)
 
         # Extract values with type narrowing
         df_val: JsonValue = data_dict.get("df", {})
@@ -450,13 +525,17 @@ class LuceneImpactIndex:
         if self._searcher is not None:
             return
         try:
-            from pyserini.search.lucene import LuceneImpactSearcher
-        except Exception as exc:  # pragma: no cover - defensive for optional dep
+            from pyserini.search.lucene import LuceneImpactSearcher  # noqa: PLC0415
+        except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
             message = "Pyserini not available for SPLADE impact search"
             logger.exception("Failed to import LuceneImpactSearcher")
             raise RuntimeError(message) from exc
         searcher = LuceneImpactSearcher(self.index_dir, query_encoder=self.query_encoder)
         self._searcher = cast(LuceneImpactSearcherProtocol, searcher)
+
+    def ensure_available(self) -> None:
+        """Ensure the Lucene searcher is initialized and ready for queries."""
+        self._ensure()
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Describe search.
@@ -521,12 +600,15 @@ def get_splade(
         Describe return value.
     """
     if backend == "lucene":
+        lucene_index = LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)
         try:
-            return LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)
-        except Exception as exc:
+            lucene_index.ensure_available()
+        except RuntimeError as exc:
             logger.warning(
-                "Failed to create LuceneImpactIndex, falling back to PureImpactIndex: %s",
-                exc,
-                exc_info=True,
+                "Lucene backend unavailable, falling back to PureImpactIndex",
+                extra={"index_dir": index_dir, "query_encoder": query_encoder},
+                exc_info=exc,
             )
+        else:
+            return lucene_index
     return PureImpactIndex(index_dir)

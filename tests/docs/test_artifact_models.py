@@ -10,7 +10,7 @@ import json
 from typing import cast
 
 import pytest
-from docs._types.artifacts import (
+from docs.types.artifacts import (
     ArtifactValidationError,
     JsonPayload,
     LineSpan,

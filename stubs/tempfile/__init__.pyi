@@ -13,6 +13,21 @@ class _TemporaryFileWrapper:
     def __enter__(self) -> _TemporaryFileWrapper: ...
     def __exit__(self, *args: object) -> None: ...
 
+class TemporaryDirectory:
+    """Context manager for temporary directories."""
+
+    name: str
+
+    def __init__(
+        self,
+        suffix: str | None = None,
+        prefix: str | None = None,
+        dir: str | Path | None = None,  # noqa: A002  # Matches stdlib parameter name
+    ) -> None: ...
+    def __enter__(self) -> str: ...
+    def __exit__(self, *args: object) -> None: ...
+    def cleanup(self) -> None: ...
+
 def NamedTemporaryFile(  # noqa: N802  # Matches stdlib API
     mode: str = "w+b",
     buffering: int = -1,
@@ -29,5 +44,5 @@ def NamedTemporaryFile(  # noqa: N802  # Matches stdlib API
 def mkdtemp(  # Matches stdlib API
     suffix: str | None = None,
     prefix: str | None = None,
-    dir: str | Path | None = None,
+    dir: str | Path | None = None,  # noqa: A002  # Matches stdlib parameter name
 ) -> str: ...

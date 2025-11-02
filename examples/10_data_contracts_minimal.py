@@ -1,3 +1,5 @@
+# ruff: noqa: N999
+
 """Data contracts - schema export smoke.
 ====================================
 

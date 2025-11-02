@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import TextIO, cast
 
 from kgfoundry.agent_catalog.audit import AuditLogger
-from kgfoundry.agent_catalog.cli import ALLOWED_FACET_KEYS, _search_result_to_dict
+from kgfoundry.agent_catalog.cli import ALLOWED_FACET_KEYS, search_result_to_dict
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError
 from kgfoundry.agent_catalog.rbac import AccessController, Role
 from kgfoundry_common.logging import (
@@ -213,7 +213,8 @@ class CatalogSessionServer:
             },
         )
 
-    def _write(self, payload: JsonObject) -> None:
+    @staticmethod
+    def _write(payload: JsonObject) -> None:
         """Document  write.
 
         <!-- auto:docstring-builder v1 -->
@@ -246,7 +247,8 @@ class CatalogSessionServer:
         """
         self._write(payload)
 
-    def _coerce_params(self, raw: object) -> JsonObject:
+    @staticmethod
+    def _coerce_params(raw: object) -> JsonObject:
         """Coerce JSON-RPC params into a JSON object or raise an error.
 
         <!-- auto:docstring-builder v1 -->
@@ -686,7 +688,8 @@ class CatalogSessionServer:
         anchor_raw = cast(JsonObject, self.client.open_anchor(symbol_id))
         return cast(JsonValue, anchor_raw)
 
-    def _parse_limit(self, raw_k: JsonValue) -> int:
+    @staticmethod
+    def _parse_limit(raw_k: JsonValue) -> int:
         """Validate and normalise the `k` parameter for search.
 
         <!-- auto:docstring-builder v1 -->
@@ -737,7 +740,8 @@ class CatalogSessionServer:
             )
         return k_value
 
-    def _parse_facets(self, raw_facets: JsonValue) -> dict[str, str]:
+    @staticmethod
+    def _parse_facets(raw_facets: JsonValue) -> dict[str, str]:
         """Validate facet filters and coerce values to strings.
 
         <!-- auto:docstring-builder v1 -->
@@ -819,7 +823,7 @@ class CatalogSessionServer:
 
         results = self.client.search(query, k=k, facets=facet_map or None)
         typed_results = [
-            cast(VectorSearchResultTypedDict, _search_result_to_dict(result)) for result in results
+            cast(VectorSearchResultTypedDict, search_result_to_dict(result)) for result in results
         ]
         service_response = search_service(typed_results, metrics=self._metrics)
         metadata_obj: JsonObject = {

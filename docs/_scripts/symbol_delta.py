@@ -11,13 +11,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from docs._scripts import shared
-from docs._scripts.validation import validate_against_schema
-from docs._types.artifacts import (
+from docs.scripts import shared
+from docs.scripts.validation import validate_against_schema
+from docs.types.artifacts import (
     SymbolDeltaChange,
     symbol_delta_to_payload,
 )
-from docs._types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload
+from docs.types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload
 from tools import (
     ToolRunResult,
     build_problem_details,
@@ -26,7 +26,9 @@ from tools import (
     render_problem,
     run_tool,
 )
-from tools._shared.proc import ToolExecutionError
+from tools.shared.proc import ToolExecutionError
+
+from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -469,7 +471,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         except ToolExecutionError as e:
             _emit_problem(e.problem, default_message=str(e))
             raise
-        except BaseException as exc:  # noqa: BLE001 - defensive catch ensures Problem Details emission
+        except KeyboardInterrupt:
+            observation.failure("cancelled", returncode=130)
+            DELTA_LOG.info("Symbol delta computation cancelled by user")
+            return 130
+        except (
+            DeserializationError,
+            SerializationError,
+            SchemaValidationError,
+            OSError,
+            RuntimeError,
+            json.JSONDecodeError,
+        ) as exc:
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
                 type="https://kgfoundry.dev/problems/docs-symbol-delta",

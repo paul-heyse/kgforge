@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 import pickle as _stdlib_pickle  # noqa: S403 - wrapped in allow-list validator
-from typing import BinaryIO
+from typing import BinaryIO, cast
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,8 @@ class SafeUnpickler(_stdlib_pickle.Unpickler):  # noqa: S301 - wrapped with allo
         if full_name not in _ALLOWED_TYPES:
             msg = f"Pickle deserialization blocked: {full_name} not in allow-list"
             raise UnsafePickleError(msg, type_name=full_name)
-        return super().find_class(module, name)  # type: ignore[no-any-return, misc]
+        result = cast(type[object], super().find_class(module, name))
+        return result
 
 
 def dump(obj: object, file: BinaryIO) -> None:
@@ -141,7 +142,8 @@ def load(file: BinaryIO) -> object:
     ...     assert loaded == data
     """
     unpickler = SafeUnpickler(file)
-    return unpickler.load()  # type: ignore[misc]
+    loaded: object = unpickler.load()
+    return loaded
 
 
 def _validate_object(obj: object, depth: int = 0) -> None:

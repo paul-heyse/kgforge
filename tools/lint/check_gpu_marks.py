@@ -8,7 +8,7 @@ import re
 import sys
 from collections.abc import Iterable
 
-from tools._shared.logging import get_logger
+from tools.shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

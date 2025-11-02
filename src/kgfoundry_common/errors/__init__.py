@@ -49,7 +49,7 @@ from kgfoundry_common.navmap_types import NavMap
 # HTTP adapters are optional (require fastapi)
 _http_exports: list[str] = []
 try:
-    from kgfoundry_common.errors.http import (
+    from kgfoundry_common.errors.http import (  # noqa: F401
         problem_details_response,
         register_problem_details_handler,
     )

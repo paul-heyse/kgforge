@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import collections
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol, TypedDict
+from typing import Protocol, TypedDict
 
 from kgfoundry_common.observability import MetricsProvider
+
+# Type alias for JSON-compatible primitive values
+JsonValue = str | int | float | bool | None
 
 class SearchOptionsPayload(TypedDict, total=False):
     """Typed payload for SearchOptions configuration."""
@@ -32,7 +36,7 @@ class SearchDocumentPayload(TypedDict):
     anchor_start: int | None
     anchor_end: int | None
     text: str
-    tokens: Any  # collections.Counter[str]
+    tokens: collections.Counter[str]
     row: int
 
 @dataclass(slots=True)
@@ -83,7 +87,7 @@ class SearchDocument:
     anchor_start: int | None
     anchor_end: int | None
     text: str
-    tokens: Any  # collections.Counter[str]
+    tokens: collections.Counter[str]
     row: int
 
 @dataclass(slots=True)
@@ -108,8 +112,8 @@ class SearchResult:
 class VectorSearchContext:
     """Supporting data required to execute a vector search."""
 
-    semantic_meta: Mapping[str, Any]
-    mapping_payload: Mapping[str, Any]
+    semantic_meta: Mapping[str, JsonValue]
+    mapping_payload: Mapping[str, JsonValue]
     index_path: Path
     documents: Sequence[SearchDocument]
     candidate_limit: int
@@ -122,8 +126,8 @@ class PreparedSearchArtifacts:
     """Documents and optional semantic metadata extracted from the catalog."""
 
     documents: list[SearchDocument]
-    semantic_meta: tuple[Mapping[str, Any], Path, Path] | None
-    mapping_payload: Mapping[str, Any] | None
+    semantic_meta: tuple[Mapping[str, JsonValue], Path, Path] | None
+    mapping_payload: Mapping[str, JsonValue] | None
 
 def build_default_search_options(
     *,
@@ -167,7 +171,7 @@ def make_search_document(
     row: int = -1,
 ) -> SearchDocument: ...
 def documents_from_catalog(
-    catalog: Mapping[str, Any],
+    catalog: Mapping[str, list[object] | dict[str, object] | JsonValue],
     row_lookup: Mapping[str, int] | None = None,
 ) -> list[SearchDocument]: ...
 def compute_vector_scores(

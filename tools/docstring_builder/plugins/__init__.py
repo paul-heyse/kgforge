@@ -10,7 +10,6 @@ from importlib import metadata
 from pathlib import Path
 from typing import TypeGuard, TypeVar, cast
 
-from tools._shared.logging import get_logger
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.models import (
@@ -35,6 +34,7 @@ from tools.docstring_builder.plugins.normalize_numpy_params import (
 )
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult
+from tools.shared.logging import get_logger
 
 ENTRY_POINT_GROUP = "kgfoundry.docstrings.plugins"
 
@@ -48,6 +48,24 @@ type PluginInstance = DocstringBuilderPlugin[object, object] | LegacyPluginProto
 
 type RegisteredPlugin = HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
 type PluginFactory = Callable[[], PluginInstance]
+
+_PLUGIN_RUNTIME_ERRORS: tuple[type[Exception], ...] = (
+    RuntimeError,
+    ValueError,
+    TypeError,
+    AttributeError,
+    KeyError,
+)
+
+_PLUGIN_CONFIGURATION_ERRORS: tuple[type[Exception], ...] = (
+    ImportError,
+    RuntimeError,
+    ValueError,
+    TypeError,
+    AttributeError,
+    KeyError,
+    DocstringBuilderError,
+)
 
 
 class PluginConfigurationError(DocstringBuilderError):
@@ -170,7 +188,7 @@ def _invoke_apply(
         return plugin.apply(context, payload)
     except DocstringBuilderError:
         raise
-    except Exception as exc:  # pragma: no cover - defensive guard
+    except _PLUGIN_RUNTIME_ERRORS as exc:  # pragma: no cover - defensive guard
         message = f"Plugin {plugin.name!r} failed during {plugin.stage} execution"
         file_path = str(context.file_path) if context.file_path is not None else None
         _LOGGER.exception(
@@ -190,7 +208,7 @@ def _instantiate_plugin(candidate: object) -> RegisteredPlugin:
     name = _resolve_plugin_name(candidate)
     try:
         instance = _materialize_candidate(candidate)
-    except Exception as exc:  # pragma: no cover - defensive guard
+    except _PLUGIN_CONFIGURATION_ERRORS as exc:  # pragma: no cover - defensive guard
         message = f"Failed to instantiate plugin {name!r}"
         raise PluginConfigurationError(message) from exc
     return _ensure_plugin_instance(instance)
@@ -241,7 +259,7 @@ def _ensure_plugin_instance(obj: object) -> RegisteredPlugin:
     if _is_legacy_plugin(obj):
         try:
             return LegacyPluginAdapter.create(obj)
-        except Exception as exc:  # pragma: no cover - defensive guard
+        except _PLUGIN_CONFIGURATION_ERRORS as exc:  # pragma: no cover - defensive guard
             message = f"Legacy plugin {name!r} is misconfigured"
             raise PluginConfigurationError(message) from exc
     message = f"Plugin {name!r} must define apply() or run()"
@@ -281,7 +299,7 @@ def _load_entry_points() -> list[object]:
         try:
             candidate: object = entry_point.load()
             loaded.append(candidate)
-        except Exception as exc:  # pragma: no cover - best effort guard
+        except _PLUGIN_CONFIGURATION_ERRORS as exc:  # pragma: no cover - best effort guard
             message = f"Failed to load plugin entry point {entry_point.name!r}"
             raise PluginConfigurationError(message) from exc
     return loaded

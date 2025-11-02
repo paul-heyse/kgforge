@@ -402,7 +402,10 @@ class AgentCatalogClient:
             k=k,
         )
         catalog_payload = cast(
-            Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]],
+            Mapping[
+                str,
+                str | int | float | bool | list[object] | dict[str, object] | None,
+            ],
             self._catalog.model_dump(),
         )
         return search_catalog(

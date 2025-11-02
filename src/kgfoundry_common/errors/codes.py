@@ -14,7 +14,7 @@ Examples
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Final
 
 __all__ = ["BASE_TYPE_URI", "ErrorCode", "get_type_uri"]
@@ -22,7 +22,7 @@ __all__ = ["BASE_TYPE_URI", "ErrorCode", "get_type_uri"]
 BASE_TYPE_URI: Final[str] = "https://kgfoundry.dev/problems"
 
 
-class ErrorCode(str, Enum):
+class ErrorCode(StrEnum):
     """Stable error codes for kgfoundry exceptions.
 
     <!-- auto:docstring-builder v1 -->

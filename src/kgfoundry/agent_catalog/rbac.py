@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import ClassVar
 
 
-class Role(str, Enum):
+class Role(StrEnum):
     """Supported access roles for hosted mode.
 
     <!-- auto:docstring-builder v1 -->

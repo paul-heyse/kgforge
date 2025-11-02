@@ -9,7 +9,7 @@ import sys
 import time
 import uuid
 from collections.abc import Callable, Mapping
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
@@ -92,6 +92,69 @@ class CLIEnvelope(TypedDict, total=False):
     payload: dict[str, JsonValue]
 
 
+@dataclass(slots=True)
+class EnvelopeContext:
+    """Context metadata used when constructing CLI envelopes."""
+
+    subcommand: str
+    status: str
+    duration_seconds: float
+    correlation_id: str
+
+
+def _build_success_payload(
+    query: str, results: list[SearchResult], duration_seconds: float
+) -> dict[str, JsonValue]:
+    """Return envelope payload for successful search responses."""
+    results_payload: list[dict[str, JsonValue]] = [
+        search_result_to_dict(result) for result in results
+    ]
+    metadata_payload: dict[str, JsonValue] = {}
+    return {
+        "query": query,
+        "results": cast(JsonValue, results_payload),
+        "total": len(results),
+        "took_ms": int(duration_seconds * 1000),
+        "metadata": metadata_payload,
+    }
+
+
+def _build_error_entries(
+    exc: Exception, problem: dict[str, JsonValue]
+) -> list[dict[str, JsonValue]]:
+    """Return typed error entries for envelope responses."""
+    return [
+        {
+            "status": "error",
+            "message": str(exc),
+            "problem": problem,
+        }
+    ]
+
+
+def _emit_problem_response(
+    *,
+    exc: Exception,
+    problem: dict[str, JsonValue] | None,
+    context: EnvelopeContext,
+    use_envelope: bool,
+    render_problem_to_stderr: bool,
+) -> None:
+    """Emit CLI error output with optional envelope."""
+    if use_envelope:
+        if problem is None:
+            problem = {}
+        errors = _build_error_entries(exc, problem)
+        envelope = _build_cli_envelope(context, errors=errors, problem=problem)
+        _render_json(envelope)
+        return
+
+    if render_problem_to_stderr and problem is not None:
+        _render_error(str(exc), problem=problem)
+    else:
+        _render_error(str(exc))
+
+
 class CatalogctlError(RuntimeError):
     """Document CatalogctlError.
 
@@ -143,6 +206,14 @@ def _parse_facets(raw: list[str]) -> dict[str, str]:
     return facets
 
 
+def _extract_facet_args(namespace: argparse.Namespace) -> list[str]:
+    """Return CLI facet arguments as a list of strings."""
+    raw_value = cast(list[str] | None, getattr(namespace, "facet", None))
+    if raw_value is None:
+        return []
+    return raw_value
+
+
 def _render_json(payload: object) -> None:
     """Write ``payload`` as formatted JSON to stdout.
 
@@ -178,7 +249,7 @@ def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> 
         sys.stderr.write(f"{message}\n")
 
 
-def _search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
+def search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
     """Convert SearchResult dataclass to VectorSearchResultTypedDict-compatible dict.
 
     <!-- auto:docstring-builder v1 -->
@@ -213,10 +284,8 @@ def _search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
 
 
 def _build_cli_envelope(
-    subcommand: str,
-    status: str,
-    duration_seconds: float,
-    correlation_id: str,
+    context: EnvelopeContext,
+    *,
     payload: dict[str, JsonValue] | None = None,
     errors: list[dict[str, JsonValue]] | None = None,
     problem: dict[str, JsonValue] | None = None,
@@ -227,14 +296,8 @@ def _build_cli_envelope(
 
     Parameters
     ----------
-    subcommand : str
-        Subcommand name (empty string if none).
-    status : str
-        Status ("success", "error", "violation", "config").
-    duration_seconds : float
-        Execution duration in seconds.
-    correlation_id : str
-        Correlation ID for tracking.
+    context : EnvelopeContext
+        Envelope metadata containing the subcommand, status, duration, and correlation ID.
     payload : dict[str, object] | NoneType, optional
         Command-specific payload (e.g., search results).
         Defaults to ``None``.
@@ -254,13 +317,13 @@ def _build_cli_envelope(
         "schemaVersion": "1.0.0",
         "schemaId": "https://kgfoundry.dev/schema/cli-envelope.json",
         "generatedAt": datetime.now(tz=UTC).isoformat(),
-        "status": status,
+        "status": context.status,
         "command": "agent_catalog",
-        "subcommand": subcommand,
-        "durationSeconds": duration_seconds,
+        "subcommand": context.subcommand,
+        "durationSeconds": context.duration_seconds,
         "files": [],
         "errors": errors or [],
-        "correlation_id": correlation_id,
+        "correlation_id": context.correlation_id,
     }
     if payload is not None:
         envelope["payload"] = payload
@@ -306,29 +369,38 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("capabilities", help="List packages present in the catalog.")
+    capabilities_parser = subparsers.add_parser(
+        "capabilities", help="List packages present in the catalog."
+    )
+    capabilities_parser.set_defaults(command_handler=_cmd_capabilities)
 
     symbol_parser = subparsers.add_parser("symbol", help="Show metadata for a symbol.")
     symbol_parser.add_argument("symbol_id", help="Symbol identifier to inspect.")
+    symbol_parser.set_defaults(command_handler=_cmd_symbol)
 
     callers_parser = subparsers.add_parser(
         "find-callers", help="List callers recorded for a symbol."
     )
     callers_parser.add_argument("symbol_id", help="Symbol identifier to inspect.")
+    callers_parser.set_defaults(command_handler=_cmd_find_callers)
 
     callees_parser = subparsers.add_parser(
         "find-callees", help="List callees recorded for a symbol."
     )
     callees_parser.add_argument("symbol_id", help="Symbol identifier to inspect.")
+    callees_parser.set_defaults(command_handler=_cmd_find_callees)
 
     change_parser = subparsers.add_parser("change-impact", help="Show change impact metadata.")
     change_parser.add_argument("symbol_id", help="Symbol identifier to inspect.")
+    change_parser.set_defaults(command_handler=_cmd_change_impact)
 
     tests_parser = subparsers.add_parser("suggest-tests", help="List suggested tests for a symbol.")
     tests_parser.add_argument("symbol_id", help="Symbol identifier to inspect.")
+    tests_parser.set_defaults(command_handler=_cmd_suggest_tests)
 
     anchor_parser = subparsers.add_parser("open-anchor", help="Render anchor links for a symbol.")
     anchor_parser.add_argument("symbol_id", help="Symbol identifier to inspect.")
+    anchor_parser.set_defaults(command_handler=_cmd_open_anchor)
 
     search_parser = subparsers.add_parser("search", help="Execute hybrid search over the catalog.")
     search_parser.add_argument("query", help="Search query text.")
@@ -336,9 +408,10 @@ def build_parser() -> argparse.ArgumentParser:
     search_parser.add_argument(
         "--facet",
         action="append",
-        default=[],  # type: ignore[misc]  # argparse default list typing limitation
+        default=None,
         help="Facet filter expressed as key=value (may be repeated).",
     )
+    search_parser.set_defaults(command_handler=_cmd_search)
 
     explain_parser = subparsers.add_parser(
         "explain-ranking",
@@ -346,9 +419,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     explain_parser.add_argument("query", help="Search query text.")
     explain_parser.add_argument("--k", type=int, default=5, help="Number of results to inspect.")
+    explain_parser.set_defaults(command_handler=_cmd_explain_ranking)
 
     modules_parser = subparsers.add_parser("list-modules", help="List modules for a package.")
     modules_parser.add_argument("package", help="Package name to inspect.")
+    modules_parser.set_defaults(command_handler=_cmd_list_modules)
 
     return parser
 
@@ -551,7 +626,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     args : argparse.Namespace
         Describe ``args``.
     """
-    use_envelope, _use_legacy = _determine_output_format(args)
+    use_envelope, _ = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())
     set_correlation_id(correlation_id)
     start_time = time.perf_counter()
@@ -560,8 +635,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         logger, operation="cli_search", correlation_id=correlation_id, status="started"
     ) as log_adapter:
         try:
-            facet_list: list[str] = args.facet
-            facets = _parse_facets(facet_list)
+            facets = _parse_facets(_extract_facet_args(args))
         except CatalogctlError as exc:
             duration = time.perf_counter() - start_time
             if use_envelope:
@@ -573,10 +647,12 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
                     "instance": "urn:cli:agent_catalog:search",
                 }
                 envelope = _build_cli_envelope(
-                    "search",
-                    "error",
-                    duration,
-                    correlation_id,
+                    EnvelopeContext(
+                        subcommand="search",
+                        status="error",
+                        duration_seconds=duration,
+                        correlation_id=correlation_id,
+                    ),
                     problem=cast(dict[str, JsonValue], problem),
                 )
                 _render_json(envelope)
@@ -585,42 +661,37 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
             log_adapter.exception("Search failed", exc_info=exc)
             return
 
-        options = build_faceted_search_options(facets=facets)
-        query: str = args.query
-        k: int = args.k
-        request = SearchRequest(
-            repo_root=client.repo_root,
-            query=query,
-            k=max(1, k),
-        )
+        query = cast(str, args.query)
+        k_value = max(1, cast(int, args.k))
         try:
             # model_dump returns dict[str, object] - cast immediately to avoid Any expression
-            # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-            results = search_catalog(
+            # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]
+            results: list[SearchResult] = search_catalog(
                 cast(
                     Mapping[
-                        str, str | int | float | bool | None | list[object] | dict[str, object]
+                        str,
+                        str | int | float | bool | list[object] | dict[str, object] | None,
                     ],
                     client.catalog.model_dump(),
                 ),
-                request=request,
-                options=options,
+                request=SearchRequest(
+                    repo_root=client.repo_root,
+                    query=query,
+                    k=k_value,
+                ),
+                options=build_faceted_search_options(facets=facets),
                 metrics=MetricsProvider.default(),
             )
             duration = time.perf_counter() - start_time
             if use_envelope:
-                payload: dict[str, JsonValue] = {
-                    "query": query,
-                    "results": [_search_result_to_dict(result) for result in results],
-                    "total": len(results),
-                    "took_ms": int(duration * 1000),
-                    "metadata": {},
-                }
+                payload = _build_success_payload(query, results, duration)
                 envelope = _build_cli_envelope(
-                    "search",
-                    "success",
-                    duration,
-                    correlation_id,
+                    EnvelopeContext(
+                        subcommand="search",
+                        status="success",
+                        duration_seconds=duration,
+                        correlation_id=correlation_id,
+                    ),
                     payload=payload,
                 )
                 _render_json(envelope)
@@ -634,14 +705,17 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
             duration = time.perf_counter() - start_time
             problem_details = exc.to_problem_details(instance="urn:cli:agent_catalog:search")
             if use_envelope:
-                errors = [{"status": "error", "message": str(exc), "problem": problem_details}]
+                problem_payload = cast(dict[str, JsonValue], problem_details)
+                errors_payload = _build_error_entries(exc, problem_payload)
                 envelope = _build_cli_envelope(
-                    "search",
-                    "error",
-                    duration,
-                    correlation_id,
-                    errors=cast(list[dict[str, JsonValue]], errors),
-                    problem=cast(dict[str, JsonValue], problem_details),
+                    EnvelopeContext(
+                        subcommand="search",
+                        status="error",
+                        duration_seconds=duration,
+                        correlation_id=correlation_id,
+                    ),
+                    errors=errors_payload,
+                    problem=problem_payload,
                 )
                 _render_json(envelope)
             else:
@@ -662,7 +736,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
     args : argparse.Namespace
         Describe ``args``.
     """
-    use_envelope, _use_legacy = _determine_output_format(args)
+    use_envelope, _ = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())
     set_correlation_id(correlation_id)
     start_time = time.perf_counter()
@@ -670,42 +744,37 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
     with with_fields(
         logger, operation="cli_explain_ranking", correlation_id=correlation_id, status="started"
     ) as log_adapter:
-        query: str = args.query
-        k: int = args.k
-        options = build_default_search_options(candidate_pool=max(10, k))
-        request = SearchRequest(
-            repo_root=client.repo_root,
-            query=query,
-            k=max(1, k),
-        )
+        query = cast(str, args.query)
+        k_value = max(1, cast(int, args.k))
         try:
             # model_dump returns dict[str, object] - cast immediately to avoid Any expression
-            # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | None | list[object] | dict[str, object]]
-            results = search_catalog(
+            # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]
+            results: list[SearchResult] = search_catalog(
                 cast(
                     Mapping[
-                        str, str | int | float | bool | None | list[object] | dict[str, object]
+                        str,
+                        str | int | float | bool | list[object] | dict[str, object] | None,
                     ],
                     client.catalog.model_dump(),
                 ),
-                request=request,
-                options=options,
+                request=SearchRequest(
+                    repo_root=client.repo_root,
+                    query=query,
+                    k=k_value,
+                ),
+                options=build_default_search_options(candidate_pool=max(10, k_value)),
                 metrics=MetricsProvider.default(),
             )
             duration = time.perf_counter() - start_time
             if use_envelope:
-                payload: dict[str, JsonValue] = {
-                    "query": query,
-                    "results": [_search_result_to_dict(result) for result in results],
-                    "total": len(results),
-                    "took_ms": int(duration * 1000),
-                    "metadata": {},
-                }
+                payload = _build_success_payload(query, results, duration)
                 envelope = _build_cli_envelope(
-                    "explain-ranking",
-                    "success",
-                    duration,
-                    correlation_id,
+                    EnvelopeContext(
+                        subcommand="explain-ranking",
+                        status="success",
+                        duration_seconds=duration,
+                        correlation_id=correlation_id,
+                    ),
                     payload=payload,
                 )
                 _render_json(envelope)
@@ -722,14 +791,17 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
                 instance="urn:cli:agent_catalog:explain-ranking"
             )
             if use_envelope:
-                errors = [{"status": "error", "message": str(exc), "problem": problem_details}]
+                problem_payload = cast(dict[str, JsonValue], problem_details)
+                errors_payload = _build_error_entries(exc, problem_payload)
                 envelope = _build_cli_envelope(
-                    "explain-ranking",
-                    "error",
-                    duration,
-                    correlation_id,
-                    errors=cast(list[dict[str, JsonValue]], errors),
-                    problem=cast(dict[str, JsonValue], problem_details),
+                    EnvelopeContext(
+                        subcommand="explain-ranking",
+                        status="error",
+                        duration_seconds=duration,
+                        correlation_id=correlation_id,
+                    ),
+                    errors=errors_payload,
+                    problem=problem_payload,
                 )
                 _render_json(envelope)
             else:
@@ -755,20 +827,6 @@ def _cmd_list_modules(client: AgentCatalogClient, args: argparse.Namespace) -> N
     _render_json([module.qualified for module in modules])
 
 
-COMMANDS: dict[str, CommandHandler] = {
-    "capabilities": _cmd_capabilities,
-    "symbol": _cmd_symbol,
-    "find-callers": _cmd_find_callers,
-    "find-callees": _cmd_find_callees,
-    "change-impact": _cmd_change_impact,
-    "suggest-tests": _cmd_suggest_tests,
-    "open-anchor": _cmd_open_anchor,
-    "search": _cmd_search,
-    "explain-ranking": _cmd_explain_ranking,
-    "list-modules": _cmd_list_modules,
-}
-
-
 def main(argv: list[str] | None = None) -> int:
     """Execute the CLI and return an exit code.
 
@@ -787,96 +845,137 @@ def main(argv: list[str] | None = None) -> int:
     """
     parser = build_parser()
     args = parser.parse_args(argv)
-    use_envelope, _use_legacy = _determine_output_format(args)
+    use_envelope, _ = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())
     set_correlation_id(correlation_id)
     start_time = time.perf_counter()
+
+    command_name = cast(str, getattr(args, "command", ""))
+    handler = cast(CommandHandler | None, getattr(args, "command_handler", None))
+    if handler is None:
+        _raise_unknown_command_error(command_name)
+    command_handler = cast(CommandHandler, handler)
 
     with with_fields(
         logger,
         operation="cli",
         correlation_id=correlation_id,
-        command=args.command,  # type: ignore[misc]  # argparse.Namespace attribute typing
+        command=command_name,
         status="started",
     ) as log_adapter:
-        command_str: str = args.command
         try:
             client = _load_client(args)
-            handler = COMMANDS.get(command_str)
-            if handler is None:
-                _raise_unknown_command_error(command_str)
-            handler(client, args)  # type: ignore[misc]  # handler is guaranteed non-None
-            duration = time.perf_counter() - start_time
-            log_adapter.info("CLI completed", extra={"status": "success"})
-            return 0
+            command_handler(client, args)
         except (CatalogctlError, AgentCatalogClientError) as exc:
             duration = time.perf_counter() - start_time
+            error_context = EnvelopeContext(
+                subcommand=command_name,
+                status="error",
+                duration_seconds=duration,
+                correlation_id=correlation_id,
+            )
             if use_envelope:
-                problem = {
+                problem: dict[str, JsonValue] = {
                     "type": "https://kgfoundry.dev/problems/runtime-error",
                     "title": "CLI Error",
                     "status": 400 if isinstance(exc, CatalogctlError) else 404,
                     "detail": str(exc),
-                    "instance": f"urn:cli:agent_catalog:{command_str}",
+                    "instance": f"urn:cli:agent_catalog:{command_name}",
                 }
-                errors = [{"status": "error", "message": str(exc), "problem": problem}]
-                envelope = _build_cli_envelope(
-                    command_str,
-                    "error",
-                    duration,
-                    correlation_id,
-                    errors=cast(list[dict[str, JsonValue]], errors),
-                    problem=cast(dict[str, JsonValue], problem),
+                _emit_problem_response(
+                    exc=exc,
+                    problem=problem,
+                    context=error_context,
+                    use_envelope=True,
+                    render_problem_to_stderr=False,
                 )
-                _render_json(envelope)
             else:
-                _render_error(str(exc))
+                _emit_problem_response(
+                    exc=exc,
+                    problem=None,
+                    context=error_context,
+                    use_envelope=False,
+                    render_problem_to_stderr=False,
+                )
             log_adapter.exception("CLI failed", exc_info=exc)
             return 2
         except AgentCatalogSearchError as exc:
             duration = time.perf_counter() - start_time
             problem_details = exc.to_problem_details(
-                instance=f"urn:cli:agent_catalog:{command_str}"
+                instance=f"urn:cli:agent_catalog:{command_name}"
+            )
+            error_context = EnvelopeContext(
+                subcommand=command_name,
+                status="error",
+                duration_seconds=duration,
+                correlation_id=correlation_id,
             )
             if use_envelope:
-                errors = [{"status": "error", "message": str(exc), "problem": problem_details}]
-                envelope = _build_cli_envelope(
-                    command_str,
-                    "error",
-                    duration,
-                    correlation_id,
-                    errors=cast(list[dict[str, JsonValue]], errors),
-                    problem=cast(dict[str, JsonValue], problem_details),
+                problem_payload = cast(dict[str, JsonValue], problem_details)
+                _emit_problem_response(
+                    exc=exc,
+                    problem=problem_payload,
+                    context=error_context,
+                    use_envelope=True,
+                    render_problem_to_stderr=True,
                 )
-                _render_json(envelope)
             else:
-                _render_error(str(exc), problem=cast(dict[str, JsonValue], problem_details))
+                _emit_problem_response(
+                    exc=exc,
+                    problem=cast(dict[str, JsonValue], problem_details),
+                    context=error_context,
+                    use_envelope=False,
+                    render_problem_to_stderr=True,
+                )
             log_adapter.exception("CLI failed", exc_info=exc)
             return 2
-        except Exception as exc:  # pragma: no cover - defensive guard
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - defensive guard  # pylint: disable=broad-except
             duration = time.perf_counter() - start_time
+            error_context = EnvelopeContext(
+                subcommand=command_name,
+                status="error",
+                duration_seconds=duration,
+                correlation_id=correlation_id,
+            )
             if use_envelope:
-                problem = {
-                    "type": "https://kgfoundry.dev/problems/runtime-error",
-                    "title": "Internal Error",
-                    "status": 500,
-                    "detail": f"Internal error: {exc}",
-                    "instance": f"urn:cli:agent_catalog:{command_str}",
-                }
-                errors = [{"status": "error", "message": str(exc), "problem": problem}]
-                envelope = _build_cli_envelope(
-                    command_str,
-                    "error",
-                    duration,
-                    correlation_id,
-                    errors=cast(list[dict[str, JsonValue]], errors),
-                    problem=cast(dict[str, JsonValue], problem),
+                problem_payload = cast(
+                    dict[str, JsonValue],
+                    {
+                        "type": "https://kgfoundry.dev/problems/runtime-error",
+                        "title": "Internal Error",
+                        "status": 500,
+                        "detail": f"Internal error: {exc}",
+                        "instance": f"urn:cli:agent_catalog:{command_name}",
+                    },
                 )
-                _render_json(envelope)
+                _emit_problem_response(
+                    exc=exc,
+                    problem=problem_payload,
+                    context=error_context,
+                    use_envelope=True,
+                    render_problem_to_stderr=False,
+                )
             else:
-                _render_error(f"Internal error: {exc}")
+                _emit_problem_response(
+                    exc=exc,
+                    problem=None,
+                    context=error_context,
+                    use_envelope=False,
+                    render_problem_to_stderr=False,
+                )
             log_adapter.exception("CLI internal error", exc_info=exc)
             return 3
+        else:
+            duration = time.perf_counter() - start_time
+            log_adapter.info("CLI completed", extra={"status": "success"})
+            return 0
 
 
-__all__ = ["build_parser", "main"]
+__all__ = [
+    "ALLOWED_FACET_KEYS",
+    "build_parser",
+    "main",
+    "search_result_to_dict",
+]

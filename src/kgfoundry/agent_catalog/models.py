@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, TypeAdapter
 
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, sqlite_candidates
 from kgfoundry_common.errors import CatalogLoadError
@@ -650,9 +650,8 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
         AgentCatalogModel
             Validated catalog model instance.
         """
-        # Pydantic model_validate accepts object; cast payload to satisfy signature
-        # Pydantic's BaseModel has Any in its type signature - this is a framework limitation
-        return cast(AgentCatalogModel, AgentCatalogModel.model_validate(cast(object, payload)))  # type: ignore[redundant-cast,misc]
+        adapter = TypeAdapter(AgentCatalogModel)
+        return adapter.validate_python(payload)
 
     for candidate in sqlite_candidates(path):
         if candidate.exists():

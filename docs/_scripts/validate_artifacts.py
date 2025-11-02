@@ -46,9 +46,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-from docs._scripts import shared
-from docs._scripts.validation import validate_against_schema
-from docs._types.artifacts import (
+from docs.scripts import shared
+from docs.scripts.validation import validate_against_schema
+from docs.types.artifacts import (
     JsonPayload,
     SymbolDeltaPayload,
     SymbolIndexArtifacts,
@@ -61,8 +61,8 @@ from tools import (
     get_logger,
     observe_tool_run,
 )
-from tools._shared.problem_details import ProblemDetailsDict
-from tools._shared.proc import ToolExecutionError
+from tools.shared.problem_details import ProblemDetailsDict
+from tools.shared.proc import ToolExecutionError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)

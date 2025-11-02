@@ -192,7 +192,7 @@ class OpenAccessHarvester:
             raise TypeError(message)
         typed_results: list[dict[str, object]] = []
         for item in results_obj:
-            if isinstance(item, Mapping) and all(isinstance(k, str) for k in item.keys()):
+            if isinstance(item, Mapping) and all(isinstance(k, str) for k in item):
                 typed_results.append(dict(item))
         return typed_results[:max_works]
 
@@ -231,7 +231,8 @@ class OpenAccessHarvester:
                 return host_url
         return None
 
-    def _lookup_direct_pdf(self, work: Mapping[str, object]) -> str | None:
+    @staticmethod
+    def _lookup_direct_pdf(work: Mapping[str, object]) -> str | None:
         """Describe  lookup direct pdf.
 
         <!-- auto:docstring-builder v1 -->
@@ -255,7 +256,8 @@ class OpenAccessHarvester:
                 return pdf_url
         return None
 
-    def _lookup_locations_pdf(self, locations: object) -> str | None:
+    @staticmethod
+    def _lookup_locations_pdf(locations: object) -> str | None:
         """Describe  lookup locations pdf.
 
         <!-- auto:docstring-builder v1 -->

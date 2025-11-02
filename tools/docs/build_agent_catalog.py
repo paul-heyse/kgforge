@@ -37,8 +37,6 @@ from kgfoundry.agent_catalog.search import (
     load_faiss,
 )
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docs.catalog_models import (
     AgentCatalog,
     AgentHints,
@@ -53,6 +51,8 @@ from tools.docs.catalog_models import (
     SymbolRecord,
 )
 from tools.docs.errors import CatalogBuildError
+from tools.shared.logging import get_logger, with_fields
+from tools.shared.proc import ToolExecutionError, run_tool
 
 type CatalogPayload = Mapping[
     str, bool | dict[str, object] | float | int | list[object] | str | None
@@ -691,11 +691,15 @@ class AgentCatalogBuilder:
             codeowners=[],
             churn_last_n=self._git_churn(analyzer.path),
         )
+        docfacts_payload = dict(docfacts) if docfacts is not None else None
+        if docfacts_payload is not None:
+            docfacts_payload.setdefault("module", module_name)
+
         record = SymbolRecord(
             qname=qname,
             kind=str(kind),
             symbol_id=symbol_id,
-            docfacts=docfacts,
+            docfacts=docfacts_payload,
             anchors=anchors,
             quality=quality,
             metrics=metrics,

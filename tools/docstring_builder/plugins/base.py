@@ -125,10 +125,7 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
         self._plugin = plugin
         self._warned = False
         name_attr: object = getattr(plugin, "name", None)
-        if isinstance(name_attr, str):
-            resolved_name = name_attr
-        else:
-            resolved_name = plugin.__class__.__name__
+        resolved_name = name_attr if isinstance(name_attr, str) else plugin.__class__.__name__
         self.name = resolved_name
 
     @classmethod

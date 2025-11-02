@@ -7,7 +7,7 @@ import importlib
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from tools._shared.logging import get_logger
+from tools.shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

@@ -22,7 +22,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
-from tools._shared.logging import get_logger
+from tools.shared.logging import get_logger
 
 if TYPE_CHECKING:
     pass
@@ -133,7 +133,7 @@ def is_pydantic_model(obj: object) -> bool:
     >>> result  # doctest: +ELLIPSIS
     """
     try:
-        from pydantic import BaseModel
+        from pydantic import BaseModel  # noqa: PLC0415
     except ImportError:
         return False
     return inspect.isclass(obj) and issubclass(obj, BaseModel) and obj is not BaseModel

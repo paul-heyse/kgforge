@@ -279,9 +279,26 @@ def build_default_search_options(
 
     Examples
     --------
-    >>> opts = build_default_search_options(alpha=0.5)
-    >>> assert opts.alpha == 0.5
-    >>> assert opts.candidate_pool == 100  # defaults
+    Create search options with default values (all defaults applied):
+
+    >>> opts = build_default_search_options()
+    >>> assert opts.alpha == 0.6  # default alpha
+    >>> assert opts.candidate_pool == 100  # default pool
+    >>> assert opts.batch_size == 32  # default batch
+
+    Override specific parameters while keeping others as defaults:
+
+    >>> opts = build_default_search_options(alpha=0.5, candidate_pool=500)
+    >>> assert opts.alpha == 0.5  # explicit override
+    >>> assert opts.candidate_pool == 500  # explicit override
+    >>> assert opts.batch_size == 32  # still default
+
+    Invalid alpha (outside [0.0, 1.0]) raises AgentCatalogSearchError:
+
+    >>> try:  # doctest: +SKIP (requires full env)
+    ...     build_default_search_options(alpha=1.5)
+    ... except Exception as e:
+    ...     assert "alpha" in str(e).lower()
     """
     final_alpha = alpha if alpha is not None else _DEFAULT_ALPHA
     final_candidate_pool = candidate_pool if candidate_pool is not None else _DEFAULT_CANDIDATE_POOL
@@ -782,8 +799,13 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         ids : tuple[int, ...] | np.int64
             Describe ``ids``.
         """
+        id_array = np.asarray(ids, dtype=np.int64)
+        vector_array = np.asarray(vectors, dtype=np.float32)
+        if vector_array.shape[0] != id_array.shape[0]:
+            message = "IDs length must match vector count"
+            raise AgentCatalogSearchError(message)
         # Simple index doesn't support ID mapping, fall back to regular add
-        self.add(vectors)
+        self.add(vector_array)
 
     def search(self, vectors: VectorArray, k: int) -> tuple[FloatMatrix, IntVector]:
         """Document search.
@@ -851,7 +873,7 @@ class _SimpleFaissModule:
     METRIC_L2: int = 0
 
     @staticmethod
-    def IndexFlatIP(dimension: int) -> FaissIndexProtocol:
+    def IndexFlatIP(dimension: int) -> FaissIndexProtocol:  # noqa: N802
         """Create a flat inner-product index.
 
         <!-- auto:docstring-builder v1 -->
@@ -896,7 +918,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, _SimpleFaissIndex(dimension))
 
     @staticmethod
-    def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:
+    def IndexIDMap2(index: FaissIndexProtocol) -> FaissIndexProtocol:  # noqa: N802
         """Wrap an index with 64-bit ID mapping.
 
         <!-- auto:docstring-builder v1 -->
@@ -992,7 +1014,7 @@ class _SimpleFaissModule:
         return cast(FaissIndexProtocol, fallback)
 
     @staticmethod
-    def normalize_L2(vectors: VectorArray) -> None:
+    def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
         """Normalize vectors to unit length in-place.
 
         <!-- auto:docstring-builder v1 -->
@@ -1754,19 +1776,18 @@ def compute_vector_scores(
 
     scores: dict[str, float] = {}
     if distances.size > 0 and indices.size > 0:
-        # numpy array indexing returns Any; cast to proper types
-        # This is a limitation of numpy stubs, not a code quality issue
-        query_row: np.ndarray = cast(np.ndarray, indices[0, :])  # type: ignore[type-arg,misc]
-        query_distances: np.ndarray = cast(np.ndarray, distances[0, :])  # type: ignore[type-arg,misc]
-        # zip with strict=False allows different lengths; indices and distances
-        # from FAISS are always same length, but mypy stub doesn't track this
-        for row_idx, distance in zip(query_row, query_distances, strict=False):  # type: ignore[misc]
-            row_id_int = int(row_idx)  # type: ignore[misc]
+        query_row = cast(IntVector, np.asarray(indices[0, :], dtype=np.int64, order="C"))
+        query_distances = cast(
+            FloatVector, np.asarray(distances[0, :], dtype=np.float32, order="C")
+        )
+        row_indices = cast(list[int], query_row.tolist())
+        distance_values = cast(list[float], query_distances.tolist())
+        for row_id_int, distance in zip(row_indices, distance_values):
             if row_id_int < 0:  # sentinel value from FAISS
                 continue
             if row_id_int in context.row_to_document:
                 document = context.row_to_document[row_id_int]
-                scores[document.symbol_id] = float(distance)  # type: ignore[misc]
+                scores[document.symbol_id] = float(distance)
 
     return scores
 

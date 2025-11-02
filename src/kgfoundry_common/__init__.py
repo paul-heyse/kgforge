@@ -14,6 +14,8 @@ for implementation specifics.
 # [nav:anchor models]
 # [nav:anchor navmap_types]
 # [nav:anchor parquet_io]
+# [nav:anchor safe_pickle_v2]
+# [nav:anchor subprocess_utils]
 from kgfoundry_common import (
     config,
     errors,
@@ -25,9 +27,12 @@ from kgfoundry_common import (
     navmap_types,
     observability,
     parquet_io,
+    safe_pickle_v2,
     schema_helpers,
     serialization,
     settings,
+    subprocess_utils,
+    vector_types,
 )
 from kgfoundry_common.navmap_types import NavMap
 
@@ -42,9 +47,12 @@ __all__ = [
     "navmap_types",
     "observability",
     "parquet_io",
+    "safe_pickle_v2",
     "schema_helpers",
     "serialization",
     "settings",
+    "subprocess_utils",
+    "vector_types",
 ]
 
 __navmap__: NavMap = {

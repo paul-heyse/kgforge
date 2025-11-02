@@ -1,0 +1,46 @@
+"""Public facade for reusable tooling helpers.
+
+This package surfaces the modules within ``tools._shared`` under a stable
+``tools.shared`` namespace so first-party code and external consumers can avoid
+private imports that trigger lint violations.
+"""
+
+from __future__ import annotations
+
+import sys
+from importlib import import_module
+from types import ModuleType
+from typing import Final
+
+_SUBMODULES: Final[dict[str, str]] = {
+    "cli": "tools._shared.cli",
+    "logging": "tools._shared.logging",
+    "metrics": "tools._shared.metrics",
+    "problem_details": "tools._shared.problem_details",
+    "proc": "tools._shared.proc",
+    "prometheus": "tools._shared.prometheus",
+    "schema": "tools._shared.schema",
+    "settings": "tools._shared.settings",
+    "validation": "tools._shared.validation",
+}
+
+__all__: tuple[str, ...] = tuple(sorted(_SUBMODULES))
+
+
+def _load_submodule(name: str) -> ModuleType:
+    module = import_module(_SUBMODULES[name])
+    sys.modules.setdefault(f"{__name__}.{name}", module)
+    return module
+
+
+def __getattr__(name: str) -> ModuleType:
+    if name in _SUBMODULES:
+        return _load_submodule(name)
+    message = f"module '{__name__}' has no attribute '{name}'"
+    raise AttributeError(message)
+
+
+def __dir__() -> list[str]:
+    namespace: dict[str, object] = globals()
+    namespace_keys: set[str] = set(namespace.keys())
+    return sorted({*namespace_keys, *__all__})

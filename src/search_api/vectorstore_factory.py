@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from typing import Final
 
 from kgfoundry_common.errors import IndexBuildError
+from kgfoundry_common.prometheus import CounterLike, HistogramLike, build_counter, build_histogram
 from search_api.faiss_adapter import FaissAdapter
 
 __all__ = ["FaissAdapterSettings", "FaissVectorstoreFactory"]
@@ -41,6 +42,36 @@ DEFAULT_NPROBE: Final[int] = 64
 
 VALID_METRICS: Final[set[str]] = {"ip", "l2"}
 """Valid metric types for FAISS indexes."""
+
+_METRIC_STAGE_LABEL = "ingestion"
+
+_BUILD_COUNTER: CounterLike = build_counter(
+    "kgfoundry_vector_ingestion_total",
+    "Total FAISS vector ingestion operations",
+    ("stage", "operation", "status"),
+)
+
+_BUILD_DURATION: HistogramLike = build_histogram(
+    "kgfoundry_vector_ingestion_duration_seconds",
+    "FAISS vector ingestion duration in seconds",
+    ("stage", "operation"),
+)
+
+
+def _ingestion_extra(
+    *, correlation_id: str | None = None, **extra_fields: object
+) -> dict[str, object]:
+    base = dict(extra_fields)
+    if correlation_id:
+        base["correlation_id"] = correlation_id
+    base.setdefault("stage", _METRIC_STAGE_LABEL)
+    return base
+
+
+def _observe_metrics(operation: str, status: str, duration_seconds: float) -> None:
+    labels = {"stage": _METRIC_STAGE_LABEL, "operation": operation, "status": status}
+    _BUILD_COUNTER.labels(**labels).inc()
+    _BUILD_DURATION.labels(stage=_METRIC_STAGE_LABEL, operation=operation).observe(duration_seconds)
 
 
 @dataclass(frozen=True, slots=True)
@@ -152,7 +183,7 @@ class FaissVectorstoreFactory:
             msg = f"Failed to construct FAISS adapter: {exc}"
             raise IndexBuildError(msg) from exc
 
-    def build_index(self) -> FaissAdapter:
+    def build_index(self, *, correlation_id: str | None = None) -> FaissAdapter:
         """Build a FAISS index with timeout enforcement.
 
         Returns
@@ -164,9 +195,15 @@ class FaissVectorstoreFactory:
         ------
         IndexBuildError
             If build exceeds timeout or fails.
+
+        Parameters
+        ----------
+        correlation_id : str | None, optional
+            Correlation identifier propagated to logs and metrics. Defaults to ``None``.
         """
         adapter = self.build_adapter()
         start_time = time.monotonic()
+        operation = "build"
 
         logger.info(
             "Starting FAISS index build",
@@ -174,6 +211,8 @@ class FaissVectorstoreFactory:
                 "operation": "index_build",
                 "index_path": self.settings.index_path,
                 "timeout_seconds": self.settings.timeout_seconds,
+                "stage": _METRIC_STAGE_LABEL,
+                "correlation_id": correlation_id,
             },
         )
 
@@ -188,8 +227,11 @@ class FaissVectorstoreFactory:
                     "status": "error",
                     "duration_seconds": elapsed,
                     "error_type": type(exc).__name__,
+                    "stage": _METRIC_STAGE_LABEL,
+                    "correlation_id": correlation_id,
                 },
             )
+            _observe_metrics(operation, "error", elapsed)
             msg = f"Failed to build FAISS index: {exc}"
             raise IndexBuildError(msg, cause=exc) from exc
 
@@ -199,18 +241,27 @@ class FaissVectorstoreFactory:
             msg = f"Index build exceeded timeout: {elapsed:.1f}s > {self.settings.timeout_seconds}s"
             raise IndexBuildError(msg)
 
+        vector_count = len(adapter.idmap) if adapter.idmap else 0
+        vector_dimension = adapter._cpu_matrix.shape[1] if adapter._cpu_matrix is not None else None
         logger.info(
             "FAISS index build completed",
             extra={
                 "operation": "index_build",
                 "status": "success",
                 "duration_seconds": elapsed,
+                "vector_count": vector_count,
+                "vector_dimension": vector_dimension,
+                "stage": _METRIC_STAGE_LABEL,
+                "correlation_id": correlation_id,
             },
         )
+        _observe_metrics(operation, "success", elapsed)
 
         return adapter
 
-    def load_or_build(self, cpu_index_path: str | None = None) -> FaissAdapter:
+    def load_or_build(
+        self, cpu_index_path: str | None = None, *, correlation_id: str | None = None
+    ) -> FaissAdapter:
         """Load an existing index or build from scratch.
 
         Parameters
@@ -218,6 +269,8 @@ class FaissVectorstoreFactory:
         cpu_index_path : str | None, optional
             Path to existing CPU-format index. If provided and exists, will
             be loaded instead of rebuilding.
+        correlation_id : str | None, optional
+            Correlation identifier propagated to logs and metrics. Defaults to ``None``.
 
         Returns
         -------
@@ -231,11 +284,15 @@ class FaissVectorstoreFactory:
         """
         adapter = self.build_adapter()
 
+        operation = "load_or_build"
+        start_time = time.monotonic()
         logger.info(
             "Loading or building FAISS index",
             extra={
                 "operation": "load_or_build",
                 "cpu_index_path": cpu_index_path,
+                "stage": _METRIC_STAGE_LABEL,
+                "correlation_id": correlation_id,
             },
         )
 
@@ -248,22 +305,34 @@ class FaissVectorstoreFactory:
                     "operation": "load_or_build",
                     "status": "error",
                     "error_type": type(exc).__name__,
+                    "stage": _METRIC_STAGE_LABEL,
+                    "correlation_id": correlation_id,
                 },
             )
             msg = f"Failed to load or build FAISS index: {exc}"
             raise IndexBuildError(msg) from exc
 
+        elapsed = time.monotonic() - start_time
         logger.info(
             "Index load or build completed",
             extra={
                 "operation": "load_or_build",
                 "status": "success",
+                "duration_seconds": elapsed,
+                "stage": _METRIC_STAGE_LABEL,
+                "correlation_id": correlation_id,
             },
         )
+        _observe_metrics(operation, "success", elapsed)
         return adapter
 
     def save_index(  # noqa: PLR6301 - instance method for factory lifecycle management
-        self, adapter: FaissAdapter, index_uri: str, idmap_uri: str | None = None
+        self,
+        adapter: FaissAdapter,
+        index_uri: str,
+        idmap_uri: str | None = None,
+        *,
+        correlation_id: str | None = None,
     ) -> None:
         """Save adapter index and ID mapping to disk.
 
@@ -275,6 +344,8 @@ class FaissVectorstoreFactory:
             Path where index will be saved.
         idmap_uri : str | None, optional
             Path where ID mapping will be saved.
+        correlation_id : str | None, optional
+            Correlation identifier propagated to logs and metrics. Defaults to ``None``.
 
         Raises
         ------
@@ -287,9 +358,13 @@ class FaissVectorstoreFactory:
                 "operation": "save_index",
                 "index_uri": index_uri,
                 "idmap_uri": idmap_uri,
+                "stage": _METRIC_STAGE_LABEL,
+                "correlation_id": correlation_id,
             },
         )
 
+        start_time = time.monotonic()
+        operation = "save"
         try:
             adapter.save(index_uri, idmap_uri)
         except Exception as exc:
@@ -299,14 +374,23 @@ class FaissVectorstoreFactory:
                     "operation": "save_index",
                     "status": "error",
                     "error_type": type(exc).__name__,
+                    "stage": _METRIC_STAGE_LABEL,
+                    "correlation_id": correlation_id,
                 },
             )
+            elapsed = time.monotonic() - start_time
+            _observe_metrics(operation, "error", elapsed)
             raise
 
+        elapsed = time.monotonic() - start_time
         logger.info(
             "Index saved successfully",
             extra={
                 "operation": "save_index",
                 "status": "success",
+                "duration_seconds": elapsed,
+                "stage": _METRIC_STAGE_LABEL,
+                "correlation_id": correlation_id,
             },
         )
+        _observe_metrics(operation, "success", elapsed)

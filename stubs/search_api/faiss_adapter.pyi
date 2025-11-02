@@ -9,6 +9,8 @@ import numpy as np
 import numpy.typing as npt
 from numpy.typing import NDArray
 
+from kgfoundry_common.vector_types import VectorBatch, VectorMatrix
+
 type FloatArray = npt.NDArray[np.float32]
 """Type alias for float32 arrays used in FAISS operations."""
 
@@ -29,18 +31,14 @@ HAVE_FAISS: bool
 MIN_FACTORY_DIMENSION: Final[int]
 
 class DenseVecs:
-    """Dense vector matrix and ID mapping for FAISS indexes.
+    """Validated dense vector payload backed by :class:`VectorBatch`."""
 
-    Parameters
-    ----------
-    ids : list[str]
-        Document/chunk identifiers.
-    matrix : FloatArray
-        Matrix of shape (n_vectors, embedding_dim).
-    """
+    ids: tuple[str, ...]
+    matrix: VectorMatrix
 
-    ids: list[str]
-    matrix: FloatArray
+    def __init__(self, ids: Sequence[str], matrix: object) -> None: ...
+    @property
+    def batch(self) -> VectorBatch: ...
 
 class FaissAdapter:
     """Build and search FAISS indexes with optional GPU acceleration.
@@ -72,6 +70,7 @@ class FaissAdapter:
     index: object  # FaissIndexProtocol | None
     idmap: list[str] | None
     vecs: DenseVecs | None
+    _cpu_matrix: VectorMatrix | None
 
     def __init__(
         self,

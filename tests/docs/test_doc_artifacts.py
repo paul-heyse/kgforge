@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from docs._scripts.validation import validate_against_schema
-from docs._types.artifacts import (
+from docs.scripts.validation import validate_against_schema
+from docs.types.artifacts import (
     JsonPayload,
     JsonValue,
     symbol_delta_from_json,
@@ -61,7 +61,7 @@ class TestSymbolIndexValidation:
         ],
     )
     def test_symbol_index_required_fields(self, field_name: str) -> None:  # type: ignore[misc]
-        """Test that required fields are enforced. (3.2.a: parametrised validation)"""
+        """Test that required fields are enforced as part of scenario 3.2.a."""
         payload = _load(SYMBOL_EXAMPLE)
         assert isinstance(payload, list)
         payload_list = cast(list[Mapping[str, JsonValue]], payload)
@@ -170,14 +170,13 @@ class PayloadFactory:
         result = dict(cast(Mapping[str, JsonValue], payload))
         if missing_field and missing_field in result:
             del result[missing_field]
-        if wrong_type_field:
-            if wrong_type_field == "added" or wrong_type_field == "changed":
-                result[wrong_type_field] = "should-be-array"
+        if wrong_type_field in {"added", "changed"}:
+            result[wrong_type_field] = "should-be-array"
         return result
 
 
 class TestMalformedPayloads:
-    """Tests for malformed payload detection. (3.2.b)"""
+    """Test malformed payload detection for scenario 3.2.b."""
 
     def test_symbol_index_missing_required_path(self) -> None:
         """Test that missing path field is rejected."""
@@ -262,7 +261,7 @@ class TestMalformedPayloads:
 
 
 class TestByteIdenticalRoundTrip:
-    """Tests for byte-identical round-trip serialization. (3.2.c)"""
+    """Test byte-identical round-trip serialization for scenario 3.2.c."""
 
     def test_symbol_index_round_trip_byte_identical(self) -> None:
         """Test that symbol index round-trip produces byte-identical JSON.

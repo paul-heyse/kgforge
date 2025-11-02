@@ -11,8 +11,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
-from docs._scripts import shared
-from docs._scripts.validation import validate_against_schema
+from docs.scripts import shared
+from docs.scripts.validation import validate_against_schema
 from tools import (
     StructuredLoggerAdapter,
     build_problem_details,
@@ -20,7 +20,9 @@ from tools import (
     observe_tool_run,
     render_problem,
 )
-from tools._shared.proc import ToolExecutionError
+from tools.shared.proc import ToolExecutionError
+
+from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -700,7 +702,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             observation.failure("failure", returncode=1)
             _emit_problem(exc.problem, default_message=str(exc))
             return 1
-        except BaseException as exc:  # noqa: BLE001 - defensive catch ensures Problem Details emission
+        except KeyboardInterrupt:
+            observation.failure("cancelled", returncode=130)
+            SYMBOL_LOG.info("Symbol index generation cancelled by user")
+            return 130
+        except (
+            DeserializationError,
+            SerializationError,
+            SchemaValidationError,
+            OSError,
+            RuntimeError,
+            json.JSONDecodeError,
+        ) as exc:
             observation.failure("exception", returncode=1)
             problem = build_problem_details(
                 type="https://kgfoundry.dev/problems/docs-symbol-index",

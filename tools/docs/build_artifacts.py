@@ -6,8 +6,8 @@ import os
 import sys
 from pathlib import Path
 
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.proc import ToolExecutionError, run_tool
+from tools.shared.logging import get_logger, with_fields
+from tools.shared.proc import ToolExecutionError, run_tool
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 

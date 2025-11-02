@@ -161,9 +161,7 @@ def main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, PLR0912
         exit_zero: bool = cast(bool, args.exit_zero)
         return 0 if exit_zero else 1
 
-    print(  # noqa: T201
-        f"✓ All {files_scanned} Python files clean (no unmanaged suppressions)"
-    )
+    print(f"✓ All {files_scanned} Python files clean (no unmanaged suppressions)")  # noqa: T201
     return 0
 
 

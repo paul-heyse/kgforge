@@ -46,7 +46,9 @@ from kgfoundry.embeddings_sparse.bm25 import LuceneBM25, PurePythonBM25, get_bm2
 from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
 from kgfoundry_common.errors import (
+    DeserializationError,
     SerializationError,
+    SettingsError,
     VectorSearchError,
 )
 from kgfoundry_common.errors.http import register_problem_details_handler
@@ -234,7 +236,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
                     "Response validation enabled",
                     extra={"schema_path": str(self.schema_path)},
                 )
-            except Exception as exc:
+            except (FileNotFoundError, DeserializationError) as exc:
                 logger.warning(
                     "Failed to load response schema, validation disabled",
                     extra={"schema_path": str(self.schema_path), "error": str(exc)},
@@ -331,7 +333,7 @@ typed_middleware(
 # --- bootstrap typed configuration ---
 try:
     settings = RuntimeSettings()
-except Exception:
+except SettingsError:
     logger.exception("Failed to load settings, using defaults")
     from kgfoundry_common.settings import (
         FaissConfig,
@@ -367,7 +369,7 @@ try:
         backend=settings.search.sparse_backend,
         index_dir=settings.sparse_embedding.bm25_index_dir,
     )
-except Exception as exc:
+except (FileNotFoundError, DeserializationError, RuntimeError) as exc:
     logger.warning("BM25 index not available: %s", exc, exc_info=True)
 
 try:
@@ -376,7 +378,7 @@ try:
         index_dir=settings.sparse_embedding.splade_index_dir,
         query_encoder=settings.sparse_embedding.splade_query_encoder,
     )
-except Exception as exc:
+except (FileNotFoundError, DeserializationError, RuntimeError) as exc:
     logger.warning("SPLADE index not available: %s", exc, exc_info=True)
 
 

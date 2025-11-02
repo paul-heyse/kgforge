@@ -15,8 +15,8 @@ if __package__ in {None, ""}:  # pragma: no cover - invoked via script entry ins
     raise RuntimeError(message)
 
 from tools import architecture
-from tools._shared.cli import CliEnvelope, CliEnvelopeBuilder, CliStatus, render_cli_envelope
-from tools._shared.logging import get_logger
+from tools.shared.cli import CliEnvelope, CliEnvelopeBuilder, CliStatus, render_cli_envelope
+from tools.shared.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

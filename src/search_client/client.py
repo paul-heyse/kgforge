@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Final, Protocol, cast
 
 import requests
@@ -108,7 +109,13 @@ class SupportsHttp(Protocol):
         Describe return value.
     """
 
-    def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+    def get(
+        self,
+        url: str,
+        *,
+        timeout: float | tuple[float | None, float | None] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> SupportsResponse:
         """Issue an HTTP ``GET`` request.
 
         <!-- auto:docstring-builder v1 -->
@@ -129,7 +136,14 @@ class SupportsHttp(Protocol):
         """
         ...
 
-    def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+    def post(
+        self,
+        url: str,
+        *,
+        json: JsonValue | None = None,
+        headers: Mapping[str, str] | None = None,
+        timeout: float | tuple[float | None, float | None] | None = None,
+    ) -> SupportsResponse:
         """Issue an HTTP ``POST`` request.
 
         <!-- auto:docstring-builder v1 -->
@@ -167,7 +181,16 @@ class RequestsHttp(SupportsHttp):
         Describe return value.
     """
 
-    def get(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+    def __init__(self, session: requests.Session | None = None) -> None:
+        self._session = session or requests.Session()
+
+    def get(
+        self,
+        url: str,
+        *,
+        timeout: float | tuple[float | None, float | None] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> SupportsResponse:
         """Send a ``GET`` request using :func:`requests.get`.
 
         <!-- auto:docstring-builder v1 -->
@@ -186,12 +209,17 @@ class RequestsHttp(SupportsHttp):
         SupportsResponse
             Response returned by :mod:`requests`.
         """
-        # Cast args/kwargs for requests API compatibility
-        # requests.get accepts *args and **kwargs with Any types
-        # mypy cannot infer the complex overloads, so we use type: ignore
-        return cast(SupportsResponse, requests.get(url, *args, **kwargs))  # type: ignore[arg-type]
+        response = self._session.get(url, timeout=timeout, headers=headers)
+        return cast(SupportsResponse, response)
 
-    def post(self, url: str, /, *args: object, **kwargs: object) -> SupportsResponse:
+    def post(
+        self,
+        url: str,
+        *,
+        json: JsonValue | None = None,
+        headers: Mapping[str, str] | None = None,
+        timeout: float | tuple[float | None, float | None] | None = None,
+    ) -> SupportsResponse:
         """Send a ``POST`` request using :func:`requests.post`.
 
         <!-- auto:docstring-builder v1 -->
@@ -210,10 +238,8 @@ class RequestsHttp(SupportsHttp):
         SupportsResponse
             Response returned by :mod:`requests`.
         """
-        # Cast args/kwargs for requests API compatibility
-        # requests.post accepts *args and **kwargs with Any types
-        # mypy cannot infer the complex overloads, so we use type: ignore
-        return cast(SupportsResponse, requests.post(url, *args, **kwargs))  # type: ignore[arg-type]
+        response = self._session.post(url, json=json, headers=headers, timeout=timeout)
+        return cast(SupportsResponse, response)
 
 
 _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
@@ -340,7 +366,17 @@ class KGFoundryClient:
         requests.HTTPError
         Raised when the API responds with a non-success status code.
         """
-        payload = {"query": query, "k": k, "filters": filters or {}, "explain": explain}
+        filters_payload: dict[str, JsonValue]
+        if filters is None:
+            filters_payload = {}
+        else:
+            filters_payload = {key: value for key, value in filters.items()}
+        payload: dict[str, JsonValue] = {
+            "query": query,
+            "k": k,
+            "filters": filters_payload,
+            "explain": explain,
+        }
         response = self._http.post(
             f"{self.base_url}/search",
             json=payload,
@@ -373,9 +409,10 @@ class KGFoundryClient:
         requests.HTTPError
         Raised when the API responds with a non-success status code.
         """
+        body: dict[str, JsonValue] = {"q": q, "limit": limit}
         response = self._http.post(
             f"{self.base_url}/graph/concepts",
-            json={"q": q, "limit": limit},
+            json=body,
             headers=self._headers(),
             timeout=self.timeout,
         )

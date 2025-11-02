@@ -14,11 +14,6 @@ from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import cast
 
-from tools._shared.logging import get_logger, with_fields
-from tools._shared.problem_details import (
-    build_problem_details as build_problem_details_shared,
-)
-from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docstring_builder import BUILDER_VERSION
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.cache import BuilderCache
@@ -43,16 +38,13 @@ from tools.docstring_builder.io import (
     hash_file,
     matches_patterns,
     module_to_path,
-    read_baseline_version,
     select_files,
     should_ignore,
 )
 from tools.docstring_builder.ir import (
-    IR_VERSION,
     IRDocstring,
     build_ir,
     validate_ir,
-    write_schema,
 )
 from tools.docstring_builder.models import (
     CacheSummary,
@@ -60,28 +52,38 @@ from tools.docstring_builder.models import (
     DocfactsDocumentLike,
     DocfactsDocumentPayload,
     DocfactsProvenancePayload,
-    DocfactsReport,
+    DocstringBuilderError,
     ErrorReport,
     FileReport,
     InputHash,
-    ObservabilityReport,
-    PluginReport,
     RunStatus,
     RunSummary,
     SchemaViolationError,
     StatusCounts,
-    build_cli_result_skeleton,
     build_docfacts_document_payload,
-    validate_cli_output,
 )
 from tools.docstring_builder.models import (
     ProblemDetails as ModelProblemDetails,
 )
 from tools.docstring_builder.normalizer import normalize_docstring
 from tools.docstring_builder.observability import (
-    get_correlation_id,
     get_metrics_registry,
     record_operation_metrics,
+)
+from tools.docstring_builder.orchestration.artifact_generator import (
+    ArtifactGenerator,
+    ArtifactGeneratorContext,
+)
+from tools.docstring_builder.orchestration.context_builder import (
+    PipelineContextBuilder,
+)
+from tools.docstring_builder.orchestration.payload_builder import (
+    PayloadBuilder,
+    PayloadBuilderContext,
+)
+from tools.docstring_builder.orchestration.state_accumulator import (
+    FileProcessingContext,
+    PipelineStateAccumulator,
 )
 from tools.docstring_builder.paths import (
     CACHE_PATH,
@@ -89,28 +91,34 @@ from tools.docstring_builder.paths import (
     DOCFACTS_PATH,
     DOCSTRINGS_DIFF_PATH,
     MANIFEST_PATH,
-    NAVMAP_DIFF_PATH,
     OBSERVABILITY_MAX_ERRORS,
     OBSERVABILITY_PATH,
     REPO_ROOT,
-    SCHEMA_DIFF_PATH,
 )
 from tools.docstring_builder.plugins import (
-    PluginConfigurationError,
     PluginManager,
-    load_plugins,
-)
-from tools.docstring_builder.policy import (
-    PolicyConfigurationError,
-    PolicyEngine,
-    load_policy_settings,
 )
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult, build_semantic_schemas
-from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
+from tools.drift_preview import write_html_diff
+from tools.shared.logging import get_logger, with_fields
+from tools.shared.proc import ToolExecutionError, run_tool
 
-LOGGER = get_logger(__name__)
+try:  # pragma: no cover - optional dependency at runtime
+    from libcst import ParserSyntaxError as _ParserSyntaxError
+except ModuleNotFoundError:  # pragma: no cover - defensive guard for optional import
+    _PARSER_SYNTAX_ERRORS: tuple[type[BaseException], ...] = ()
+else:
+    _PARSER_SYNTAX_ERRORS = (_ParserSyntaxError,)
+
+_HARVEST_ERRORS: tuple[type[BaseException], ...] = (
+    *_PARSER_SYNTAX_ERRORS,
+    DocstringBuilderError,
+    OSError,
+)
+
+_LOGGER = get_logger(__name__)
 METRICS = get_metrics_registry()
 
 MISSING_MODULE_PATTERNS = ("docs/_build/**",)
@@ -297,7 +305,7 @@ def build_problem_details(
     errors: Sequence[ErrorReport] | None = None,
 ) -> ModelProblemDetails:
     """Create a RFC 9457 Problem Details payload for CLI failures."""
-    problem_dict = build_problem_details_shared(
+    problem_dict = build_problem_details(
         type="https://kgfoundry.dev/problems/docbuilder/run-failed",
         title="Docstring builder run failed",
         status=_http_status_for_exit(status),
@@ -317,13 +325,13 @@ def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
     if TYPED_PIPELINE_ENABLED:
         raise exc
     log_extra = {"problem": exc.problem} if exc.problem else None
-    LOGGER.warning("%s validation failed: %s", context, exc, extra=log_extra)
+    _LOGGER.warning("%s validation failed: %s", context, exc, extra=log_extra)
 
 
 def _git_output(arguments: Sequence[str]) -> str | None:
     """Return stripped stdout for a git command or ``None`` on failure."""
     command_args: list[str] = list(arguments)
-    adapter = with_fields(LOGGER, command=command_args)
+    adapter = with_fields(_LOGGER, command=command_args)
     try:
         result = run_tool(arguments, timeout=10.0)
     except ToolExecutionError as exc:  # pragma: no cover - git unavailable
@@ -410,16 +418,16 @@ def _handle_docfacts(
     payload = build_docfacts_document_payload(cast(DocfactsDocumentLike, document))
     if check_mode:
         if not DOCFACTS_PATH.exists():
-            LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)
+            _LOGGER.error("DocFacts missing at %s", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts missing")
         try:
             existing_text = DOCFACTS_PATH.read_text(encoding="utf-8")
             existing_raw: object = json.loads(existing_text)
         except json.JSONDecodeError:  # pragma: no cover - defensive guard
-            LOGGER.exception("DocFacts payload at %s is not valid JSON", DOCFACTS_PATH)
+            _LOGGER.exception("DocFacts payload at %s is not valid JSON", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid json")
         if not isinstance(existing_raw, dict):
-            LOGGER.error("DocFacts payload at %s is not a mapping", DOCFACTS_PATH)
+            _LOGGER.error("DocFacts payload at %s is not a mapping", DOCFACTS_PATH)
             return DocfactsOutcome(ExitStatus.CONFIG, "docfacts invalid structure")
         existing_payload = cast(DocfactsDocumentPayload, existing_raw)
         try:
@@ -450,7 +458,7 @@ def _handle_docfacts(
             after = json.dumps(comparison_payload, indent=2, sort_keys=True)
             write_html_diff(before, after, DOCFACTS_DIFF_PATH, "DocFacts drift")
             diff_rel = DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT)
-            LOGGER.error("DocFacts drift detected; run update mode to refresh (see %s)", diff_rel)
+            _LOGGER.error("DocFacts drift detected; run update mode to refresh (see %s)", diff_rel)
             return DocfactsOutcome(ExitStatus.VIOLATION, "docfacts drift")
         DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
         return DocfactsOutcome(ExitStatus.SUCCESS)
@@ -472,7 +480,7 @@ def _load_docfacts_from_disk() -> dict[str, DocFact]:
         raw_text = DOCFACTS_PATH.read_text(encoding="utf-8")
         raw: object = json.loads(raw_text)
     except json.JSONDecodeError:
-        LOGGER.warning("DocFacts cache is not valid JSON; ignoring existing data.")
+        _LOGGER.warning("DocFacts cache is not valid JSON; ignoring existing data.")
         return {}
     entries: dict[str, DocFact] = {}
     payload_items: Iterable[Mapping[str, object]]
@@ -537,7 +545,7 @@ def _filter_docfacts_for_output(
         if source is None:
             source = module_to_path(fact.module)
         if source is not None and should_ignore(source, config):
-            LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
+            _LOGGER.debug("Dropping docfact %s due to ignore rules", qname)
             continue
         filtered.append(fact)
     return filtered
@@ -571,17 +579,20 @@ def _ordered_outcomes(
 
         ordered: list[tuple[int, Path, FileOutcome]] = []
         for index, candidate, future in futures:
-            try:
+            exception = future.exception()
+            if exception is None:
                 outcome = future.result()
-            except Exception as exc:  # pragma: no cover - defensive guard
-                LOGGER.exception("Processing failed for %s", candidate)
+            else:
+                if isinstance(exception, KeyboardInterrupt):  # pragma: no cover - propagate
+                    raise exception
+                _LOGGER.error("Processing failed for %s", candidate, exc_info=exception)
                 outcome = FileOutcome(
                     ExitStatus.ERROR,
                     [],
                     None,
                     False,
                     False,
-                    str(exc),
+                    str(exception),
                 )
             ordered.append((index, candidate, outcome))
 
@@ -614,7 +625,7 @@ def _process_file(
         and not options.force
         and not cache.needs_update(file_path, config.config_hash)
     ):
-        LOGGER.debug("Skipping %s; cache is fresh", file_path)
+        _LOGGER.debug("Skipping %s; cache is fresh", file_path)
         skipped = True
         message = "cache fresh"
         return FileOutcome(
@@ -635,7 +646,7 @@ def _process_file(
         relative = file_path.relative_to(REPO_ROOT)
         message = f"missing dependency: {exc}"
         if options.ignore_missing and matches_patterns(file_path, options.missing_patterns):
-            LOGGER.info("Skipping %s due to missing dependency: %s", relative, exc)
+            _LOGGER.info("Skipping %s due to missing dependency: %s", relative, exc)
             return FileOutcome(
                 ExitStatus.SUCCESS,
                 docfacts,
@@ -644,7 +655,7 @@ def _process_file(
                 True,
                 message,
             )
-        LOGGER.exception("Failed to harvest %s", relative)
+        _LOGGER.exception("Failed to harvest %s", relative)
         return FileOutcome(
             ExitStatus.CONFIG,
             docfacts,
@@ -653,8 +664,8 @@ def _process_file(
             skipped,
             message,
         )
-    except Exception as exc:  # pragma: no cover - runtime defensive handling
-        LOGGER.exception("Failed to harvest %s", file_path)
+    except _HARVEST_ERRORS as exc:
+        _LOGGER.exception("Failed to harvest %s", file_path)
         return FileOutcome(
             ExitStatus.ERROR,
             docfacts,
@@ -702,7 +713,7 @@ def _process_file(
     status = ExitStatus.SUCCESS
     if is_check and changed:
         relative = file_path.relative_to(REPO_ROOT)
-        LOGGER.error("Docstrings out of date in %s", relative)
+        _LOGGER.error("Docstrings out of date in %s", relative)
         status = ExitStatus.VIOLATION
         message = "docstrings drift"
     if is_update:
@@ -774,7 +785,7 @@ def _print_failure_summary(payload: Mapping[str, object]) -> None:
             message = _coerce_str(entry.get("message"), "no additional details")
             lines.append(f"    - {file_name}: {status} ({message})")
     for line in lines:
-        LOGGER.error(line)
+        _LOGGER.error(line)
 
 
 def render_cli_result(result: DocstringBuildResult) -> CliResult | None:
@@ -898,60 +909,52 @@ def _run_pipeline(
     config: BuilderConfig,
     selection: ConfigSelection | None,
 ) -> DocstringBuildResult:
-    command = request.command or "unknown"
-    subcommand = request.invoked_subcommand or request.subcommand or command
-    correlation_id = get_correlation_id()
-    logger = with_fields(
-        LOGGER, correlation_id=correlation_id, command=command, subcommand=subcommand
-    )
+    """Execute the docstring building pipeline.
 
-    cache = BuilderCache(CACHE_PATH)
-    docfact_entries, docfact_sources = _load_docfact_state()
-    is_update = request.command == "update"
-    is_check = request.command == "check"
-    start = time.perf_counter()
+    This function orchestrates the entire pipeline by delegating to modular
+    helper classes that manage specific concerns: context setup, file processing,
+    artifact generation, and payload building. This design provides clear separation
+    of concerns and makes the pipeline logic easy to test and understand.
+
+    Parameters
+    ----------
+    files : Iterable[Path]
+        Paths to Python files for processing.
+    request : DocstringBuildRequest
+        User request with command, options, and flags.
+    config : BuilderConfig
+        Loaded builder configuration.
+    selection : ConfigSelection | None
+        Resolved configuration selection (if any).
+
+    Returns
+    -------
+    DocstringBuildResult
+        Complete result including exit status, errors, reports, and payloads.
+
+    Notes
+    -----
+    All I/O and side effects are encapsulated in helper classes:
+    - PipelineContextBuilder: setup/teardown and dependency resolution
+    - PipelineStateAccumulator: mutable state from file processing
+    - ArtifactGenerator: diff and manifest generation
+    - PayloadBuilder: observability and CLI payloads
+    """
     files_list = list(files)
-    status_counts: Counter[ExitStatus] = Counter()
-    processed_count = 0
-    skipped_count = 0
-    changed_count = 0
-    cache_hits = 0
-    cache_misses = 0
-    errors: list[ErrorReport] = []
-    file_reports: list[FileReport] = []
-    docstring_diffs: list[DocstringDriftEntry] = []
-    diff_previews: list[tuple[Path, str]] = []
-    options = ProcessingOptions(
-        command=request.command or "",
-        force=request.force,
-        ignore_missing=request.ignore_missing,
-        missing_patterns=tuple(MISSING_MODULE_PATTERNS),
-        skip_docfacts=request.skip_docfacts,
-        baseline=request.baseline or None,
-    )
-    try:
-        plugin_manager = load_plugins(
-            config,
-            REPO_ROOT,
-            only=list(request.only_plugins),
-            disable=list(request.disable_plugins),
-        )
-    except PluginConfigurationError:
-        logger.exception("Plugin configuration error", extra={"operation": "plugin_load"})
-        return _build_error_result(
-            ExitStatus.CONFIG, request, "Plugin configuration error", selection=selection
-        )
-    try:
-        policy_settings = load_policy_settings(REPO_ROOT, cli_overrides=request.policy_overrides)
-    except PolicyConfigurationError:
-        logger.exception("Policy configuration error", extra={"operation": "policy_load"})
-        return _build_error_result(
-            ExitStatus.CONFIG, request, "Policy configuration error", selection=selection
-        )
+    start = time.perf_counter()
+
+    # Phase 1: Build execution context
+    context_builder = PipelineContextBuilder(request, config, selection, files_list)
+    build_result = context_builder.build()
+    if isinstance(build_result, DocstringBuildResult):
+        return build_result
+    _, plugin_manager, policy_engine, options = build_result
 
     try:
-        policy_engine = PolicyEngine(policy_settings)
-        all_ir: list[IRDocstring] = []
+        # Phase 2: Process files and accumulate state
+        accumulator = PipelineStateAccumulator()
+        cache = BuilderCache(CACHE_PATH)
+        docfact_entries, docfact_sources = _load_docfact_state()
         docfacts_checked = False
         docfacts_result: DocfactsOutcome | None = None
         docfacts_payload_text: str | None = None
@@ -960,90 +963,30 @@ def _run_pipeline(
         if jobs <= 0:
             jobs = max(1, os.cpu_count() or 1)
 
-        outcomes = _ordered_outcomes(
-            files_list,
-            jobs,
-            config,
-            cache,
-            options,
-            plugin_manager,
-        )
-
+        outcomes = _ordered_outcomes(files_list, jobs, config, cache, options, plugin_manager)
         for file_path, outcome in outcomes:
-            status_counts[outcome.status] += 1
-            if outcome.skipped:
-                skipped_count += 1
-            else:
-                processed_count += 1
-            if outcome.changed:
-                changed_count += 1
-            if outcome.cache_hit:
-                cache_hits += 1
-            else:
-                cache_misses += 1
-            if (
-                is_check
-                and outcome.changed
-                and request.diff
-                and not request.json_output
-                and outcome.preview is not None
-            ):
-                diff_previews.append((file_path, outcome.preview))
-            if outcome.status is not ExitStatus.SUCCESS:
-                rel = str(file_path.relative_to(REPO_ROOT))
-                errors.append(
-                    {
-                        "file": rel,
-                        "status": _status_from_exit(outcome.status),
-                        "message": outcome.message or "",
-                    }
-                )
+            ctx = FileProcessingContext(
+                file_path=file_path,
+                outcome=outcome,
+                options=options,
+                request_command=request.command,
+                request_json_output=request.json_output,
+                request_diff=request.diff,
+            )
+            accumulator.process_file_outcome(ctx)
             _record_docfacts(outcome.docfacts, file_path, docfact_entries, docfact_sources)
             if outcome.semantics:
                 policy_engine.record(outcome.semantics)
-            all_ir.extend(outcome.ir)
-            if request.json_output:
-                rel_path = str(file_path.relative_to(REPO_ROOT))
-                file_report: FileReport = {
-                    "path": rel_path,
-                    "status": _status_from_exit(outcome.status),
-                    "changed": outcome.changed,
-                    "skipped": outcome.skipped,
-                    "cacheHit": outcome.cache_hit,
-                }
-                if outcome.message:
-                    file_report["message"] = outcome.message
-                if outcome.preview:
-                    file_report["preview"] = outcome.preview
-                if options.baseline:
-                    file_report["baseline"] = options.baseline
-                file_reports.append(file_report)
-            if options.baseline:
-                baseline_text = read_baseline_version(options.baseline, file_path)
-                if baseline_text is not None:
-                    if outcome.preview is not None:
-                        current_text = outcome.preview
-                    else:
-                        try:
-                            current_text = file_path.read_text(encoding="utf-8")
-                        except FileNotFoundError:
-                            current_text = ""
-                    if baseline_text != current_text:
-                        docstring_diffs.append(
-                            DocstringDriftEntry(
-                                path=str(file_path.relative_to(REPO_ROOT)),
-                                before=baseline_text,
-                                after=current_text,
-                            )
-                        )
 
         if request.command in {"update", "check"} and not options.skip_docfacts:
             filtered = _filter_docfacts_for_output(docfact_entries, docfact_sources, config)
-            docfacts_result = _handle_docfacts(filtered, config, check_mode=is_check)
+            docfacts_result = _handle_docfacts(
+                filtered, config, check_mode=request.command == "check"
+            )
             docfacts_checked = True
-            status_counts[docfacts_result.status] += 1
+            accumulator.status_counts[docfacts_result.status] += 1
             if docfacts_result.status is not ExitStatus.SUCCESS:
-                errors.append(
+                accumulator.errors.append(
                     {
                         "file": "<docfacts>",
                         "status": _status_from_exit(docfacts_result.status),
@@ -1055,12 +998,13 @@ def _run_pipeline(
                     docfacts_payload_text = DOCFACTS_PATH.read_text(encoding="utf-8")
                 except FileNotFoundError:
                     docfacts_payload_text = None
-        if is_update:
+
+        if request.command == "update":
             cache.write()
 
         policy_report = policy_engine.finalize()
         for violation in policy_report.violations:
-            errors.append(
+            accumulator.errors.append(
                 {
                     "file": violation.symbol,
                     "status": _status_from_label(str(violation.action)),
@@ -1068,265 +1012,189 @@ def _run_pipeline(
                 }
             )
             if violation.fatal:
-                status_counts[ExitStatus.VIOLATION] += 1
+                accumulator.status_counts[ExitStatus.VIOLATION] += 1
 
+        # Phase 3: Build metadata
         duration = time.perf_counter() - start
         exit_status = max(
-            (status for status, count in status_counts.items() if count), default=ExitStatus.SUCCESS
+            (status for status, count in accumulator.status_counts.items() if count),
+            default=ExitStatus.SUCCESS,
         )
         status_label = STATUS_LABELS[exit_status]
-        METRICS.cli_duration_seconds.labels(command=command, status=status_label).observe(duration)
+        METRICS.cli_duration_seconds.labels(
+            command=request.command or "unknown", status=status_label
+        ).observe(duration)
         METRICS.runs_total.labels(status=status_label).inc()
-        status_counts.setdefault(ExitStatus.SUCCESS, 0)
-        status_counts_full: StatusCounts = {
-            "success": status_counts.get(ExitStatus.SUCCESS, 0),
-            "violation": status_counts.get(ExitStatus.VIOLATION, 0),
-            "config": status_counts.get(ExitStatus.CONFIG, 0),
-            "error": status_counts.get(ExitStatus.ERROR, 0),
-        }
-        cache_payload: CacheSummary = {
-            "path": str(CACHE_PATH),
-            "exists": CACHE_PATH.exists(),
-            "mtime": None,
-            "hits": cache_hits,
-            "misses": cache_misses,
-        }
-        input_hashes: dict[str, InputHash] = {}
-        for path in files_list:
-            rel = str(path.relative_to(REPO_ROOT))
-            if path.exists():
-                input_hashes[rel] = {
-                    "hash": hash_file(path),
-                    "mtime": datetime.datetime.fromtimestamp(
-                        path.stat().st_mtime, tz=datetime.UTC
-                    ).isoformat(),
-                }
-            else:
-                input_hashes[rel] = {"hash": "", "mtime": None}
 
-        dependency_map = {
-            str(path.relative_to(REPO_ROOT)): [
-                str(dependent.relative_to(REPO_ROOT)) for dependent in dependents_for(path)
-            ]
-            for path in files_list
-        }
+        status_counts_full = _build_status_counts(accumulator.status_counts)
+        cache_payload = _build_cache_summary(accumulator.cache_hits, accumulator.cache_misses)
+        input_hashes = _build_input_hashes(files_list)
+        dependency_map = _build_dependency_map(files_list)
 
-        write_docstring_drift(docstring_diffs, DOCSTRINGS_DIFF_PATH)
-        if options.baseline and docfacts_payload_text and not DOCFACTS_DIFF_PATH.exists():
-            baseline_docfacts = read_baseline_version(options.baseline, DOCFACTS_PATH)
-            if baseline_docfacts is not None and baseline_docfacts != docfacts_payload_text:
-                write_html_diff(
-                    baseline_docfacts,
-                    docfacts_payload_text,
-                    DOCFACTS_DIFF_PATH,
-                    "DocFacts baseline drift",
-                )
-
-        invoked = str(request.invoked_subcommand or request.subcommand or command or "")
-        manifest_payload: dict[str, object] = {
-            "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
-            "command": request.command,
-            "subcommand": invoked,
-            "options": {
-                "module": request.module,
-                "since": request.since,
-                "force": request.force,
-                "changed_only": request.changed_only,
-                "skip_docfacts": request.skip_docfacts,
-            },
-            "counts": {
-                "considered": len(files_list),
-                "processed": processed_count,
-                "skipped": skipped_count,
-                "changed": changed_count,
-            },
-            "cache": cache_payload,
-            "hashes": input_hashes,
-            "dependencies": dependency_map,
-        }
-        diff_links: dict[str, str] = {}
-        for label, path in (
-            ("docfacts", DOCFACTS_DIFF_PATH),
-            ("docstrings", DOCSTRINGS_DIFF_PATH),
-            ("navmap", NAVMAP_DIFF_PATH),
-            ("schema", SCHEMA_DIFF_PATH),
-        ):
-            if path.exists():
-                diff_links[label] = str(path.relative_to(REPO_ROOT))
-        if diff_links:
-            manifest_payload["drift_previews"] = diff_links
-        schema_path = REPO_ROOT / "docs" / "_build" / "schema_docstrings.json"
-        previous_schema = schema_path.read_text(encoding="utf-8") if schema_path.exists() else ""
-        write_schema(schema_path)
-        current_schema = schema_path.read_text(encoding="utf-8")
-        if previous_schema and previous_schema != current_schema:
-            write_html_diff(previous_schema, current_schema, SCHEMA_DIFF_PATH, "Schema drift")
-        else:
-            SCHEMA_DIFF_PATH.unlink(missing_ok=True)
-        manifest_payload["ir"] = {
-            "version": IR_VERSION,
-            "schema": str(schema_path.relative_to(REPO_ROOT)),
-            "count": len(all_ir),
-            "symbols": [entry.symbol_id for entry in all_ir],
-        }
-        manifest_payload["policy"] = {
-            "coverage": policy_report.coverage,
-            "threshold": policy_report.threshold,
-            "violations": [
-                {
-                    "rule": violation.rule,
-                    "symbol": violation.symbol,
-                    "action": violation.action,
-                    "message": violation.message,
-                }
-                for violation in policy_report.violations
-            ],
-        }
-        if CACHE_PATH.exists():
-            cache_payload["mtime"] = datetime.datetime.fromtimestamp(
-                CACHE_PATH.stat().st_mtime, tz=datetime.UTC
-            ).isoformat()
-        if selection is not None:
-            manifest_payload["config_source"] = {
-                "path": str(selection.path),
-                "source": selection.source,
-            }
-        MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
-        MANIFEST_PATH.write_text(
-            json.dumps(manifest_payload, indent=2, sort_keys=True), encoding="utf-8"
-        )
-
-        summary: RunSummary = {
-            "considered": len(files_list),
-            "processed": processed_count,
-            "skipped": skipped_count,
-            "changed": changed_count,
-            "duration_seconds": duration,
-            "status_counts": status_counts_full,
-            "cache_hits": cache_hits,
-            "cache_misses": cache_misses,
-            "subcommand": invoked,
-            "docfacts_checked": docfacts_checked,
-        }
-        observability_payload = _build_observability_payload(
-            status=exit_status,
-            summary=summary,
-            errors=errors,
+        # Phase 4: Generate artifacts
+        artifact_gen = ArtifactGenerator()
+        artifact_ctx = ArtifactGeneratorContext(
+            docstring_diffs=accumulator.docstring_diffs,
+            all_ir=accumulator.all_ir,
+            cache_payload=cache_payload,
+            input_hashes=input_hashes,
+            dependency_map=dependency_map,
+            policy_report=policy_report,
+            request=request,
             selection=selection,
+            docfacts_payload_text=docfacts_payload_text,
+            baseline=options.baseline,
+            files_count=len(files_list),
+            processed_count=accumulator.processed_count,
+            skipped_count=accumulator.skipped_count,
+            changed_count=accumulator.changed_count,
         )
-        if selection is not None:
-            observability_payload["config"] = {
-                "path": str(selection.path),
-                "source": selection.source,
-            }
-        observability_payload["policy"] = {
-            "coverage": policy_report.coverage,
-            "threshold": policy_report.threshold,
-            "violations": len(policy_report.violations),
-            "fatal_violations": sum(1 for violation in policy_report.violations if violation.fatal),
-        }
-        if diff_links:
-            observability_payload["drift_previews"] = diff_links
+        diff_links = artifact_gen.generate_and_persist(artifact_ctx)
+
+        # Phase 5: Build observability and CLI payloads
+        payload_builder = PayloadBuilder()
+        payload_ctx = PayloadBuilderContext(
+            exit_status=exit_status,
+            command=request.command or "unknown",
+            invoked=str(request.invoked_subcommand or request.subcommand or request.command or ""),
+            duration=duration,
+            files_count=len(files_list),
+            processed_count=accumulator.processed_count,
+            skipped_count=accumulator.skipped_count,
+            changed_count=accumulator.changed_count,
+            cache_hits=accumulator.cache_hits,
+            cache_misses=accumulator.cache_misses,
+            status_counts=status_counts_full,
+            cache_payload=cache_payload,
+            input_hashes=input_hashes,
+            errors=accumulator.errors,
+            file_reports=accumulator.file_reports,
+            policy_report=policy_report,
+            plugin_manager=plugin_manager,
+            selection=selection,
+            docfacts_checked=docfacts_checked,
+            baseline=options.baseline,
+            diff_links=diff_links,
+        )
+        observability_payload, cli_result, problem_details = payload_builder.build_all(payload_ctx)
+
+        # Phase 6: Persist payloads and assemble result
         OBSERVABILITY_PATH.parent.mkdir(parents=True, exist_ok=True)
         OBSERVABILITY_PATH.write_text(
             json.dumps(observability_payload, indent=2, sort_keys=True),
             encoding="utf-8",
         )
 
-        cli_result: CliResult | None = None
-        if request.json_output:
-            cli_result = build_cli_result_skeleton(_status_from_exit(exit_status))
-            cli_result["command"] = request.command or ""
-            cli_result["subcommand"] = invoked
-            cli_result["durationSeconds"] = duration
-            cli_result["files"] = file_reports
-            cli_result["errors"] = errors
-            summary_block = cli_result["summary"]
-            summary_block["considered"] = len(files_list)
-            summary_block["processed"] = processed_count
-            summary_block["skipped"] = skipped_count
-            summary_block["changed"] = changed_count
-            summary_block["status_counts"] = status_counts_full
-            summary_block["docfacts_checked"] = docfacts_checked
-            summary_block["cache_hits"] = cache_hits
-            summary_block["cache_misses"] = cache_misses
-            summary_block["duration_seconds"] = duration
-            summary_block["subcommand"] = invoked
-            cli_result["policy"] = {
-                "coverage": policy_report.coverage,
-                "threshold": policy_report.threshold,
-                "violations": [
-                    {
-                        "rule": violation.rule,
-                        "symbol": violation.symbol,
-                        "action": str(violation.action),
-                        "message": violation.message,
-                    }
-                    for violation in policy_report.violations
-                ],
-            }
-            if options.baseline:
-                cli_result["baseline"] = options.baseline
-            cli_result["cache"] = cache_payload
-            cli_result["inputs"] = input_hashes
-            plugin_report: PluginReport = {
-                "enabled": plugin_manager.enabled_plugins(),
-                "available": plugin_manager.available,
-                "disabled": plugin_manager.disabled,
-                "skipped": plugin_manager.skipped,
-            }
-            cli_result["plugins"] = plugin_report
-            docfacts_validated = (
-                docfacts_checked
-                and docfacts_result is not None
-                and docfacts_result.status is ExitStatus.SUCCESS
-            )
-            docfacts_report: DocfactsReport = {
-                "path": str(DOCFACTS_PATH.relative_to(REPO_ROOT)),
-                "version": DOCFACTS_VERSION,
-                "validated": docfacts_validated,
-            }
-            if DOCFACTS_DIFF_PATH.exists():
-                docfacts_report["diff"] = str(DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT))
-            cli_result["docfacts"] = docfacts_report
-            observability_block: ObservabilityReport = {
-                "status": _status_from_exit(exit_status),
-                "errors": errors[:OBSERVABILITY_MAX_ERRORS],
-            }
-            if diff_links:
-                observability_block["driftPreviews"] = diff_links
-            cli_result["observability"] = observability_block
-
-        problem_details_payload: ModelProblemDetails | None = None
-        if exit_status is not ExitStatus.SUCCESS:
-            problem_details_payload = build_problem_details(
-                exit_status,
-                command,
-                invoked,
-                f"Docstring builder exited with status {STATUS_LABELS[exit_status]}",
-                errors=errors,
-            )
-            if cli_result is not None:
-                cli_result["problem"] = problem_details_payload
-
-        if cli_result is not None:
-            validate_cli_output(cli_result)
-
         return DocstringBuildResult(
             exit_status=exit_status,
-            errors=errors,
-            file_reports=file_reports,
+            errors=accumulator.errors,
+            file_reports=accumulator.file_reports,
             observability_payload=observability_payload,
             cli_payload=cli_result,
             manifest_path=MANIFEST_PATH,
-            problem_details=problem_details_payload,
+            problem_details=problem_details,
             config_selection=selection,
-            diff_previews=diff_previews,
+            diff_previews=accumulator.diff_previews,
         )
     finally:
         if not files_list and request.command == "check" and request.diff:
             DOCSTRINGS_DIFF_PATH.unlink(missing_ok=True)
             DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
+
+
+def _build_status_counts(status_counts: Counter[ExitStatus]) -> StatusCounts:
+    """Build StatusCounts from counter.
+
+    Parameters
+    ----------
+    status_counts : Counter[ExitStatus]
+        Status counter from file processing.
+
+    Returns
+    -------
+    StatusCounts
+        Typed status counts dictionary.
+    """
+    status_counts.setdefault(ExitStatus.SUCCESS, 0)
+    return {
+        "success": status_counts.get(ExitStatus.SUCCESS, 0),
+        "violation": status_counts.get(ExitStatus.VIOLATION, 0),
+        "config": status_counts.get(ExitStatus.CONFIG, 0),
+        "error": status_counts.get(ExitStatus.ERROR, 0),
+    }
+
+
+def _build_cache_summary(cache_hits: int, cache_misses: int) -> CacheSummary:
+    """Build cache summary payload.
+
+    Parameters
+    ----------
+    cache_hits : int
+        Number of cache hits.
+    cache_misses : int
+        Number of cache misses.
+
+    Returns
+    -------
+    CacheSummary
+        Cache metadata.
+    """
+    return {
+        "path": str(CACHE_PATH),
+        "exists": CACHE_PATH.exists(),
+        "mtime": None,
+        "hits": cache_hits,
+        "misses": cache_misses,
+    }
+
+
+def _build_input_hashes(files_list: list[Path]) -> dict[str, InputHash]:
+    """Build input file hashes.
+
+    Parameters
+    ----------
+    files_list : list[Path]
+        Files to hash.
+
+    Returns
+    -------
+    dict[str, InputHash]
+        File path to hash metadata mapping.
+    """
+    input_hashes: dict[str, InputHash] = {}
+    for path in files_list:
+        rel = str(path.relative_to(REPO_ROOT))
+        if path.exists():
+            input_hashes[rel] = {
+                "hash": hash_file(path),
+                "mtime": datetime.datetime.fromtimestamp(
+                    path.stat().st_mtime, tz=datetime.UTC
+                ).isoformat(),
+            }
+        else:
+            input_hashes[rel] = {"hash": "", "mtime": None}
+    return input_hashes
+
+
+def _build_dependency_map(files_list: list[Path]) -> dict[str, list[str]]:
+    """Build file dependency map.
+
+    Parameters
+    ----------
+    files_list : list[Path]
+        Files to build dependency map for.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        File path to dependent paths mapping.
+    """
+    return {
+        str(path.relative_to(REPO_ROOT)): [
+            str(dependent.relative_to(REPO_ROOT)) for dependent in dependents_for(path)
+        ]
+        for path in files_list
+    }
 
 
 def run_docstring_builder(
@@ -1351,7 +1219,7 @@ def run_docstring_builder(
             explicit_paths=list(request.explicit_paths) or None,
         )
     except InvalidPathError:
-        LOGGER.exception("Invalid path supplied to docstring builder")
+        _LOGGER.exception("Invalid path supplied to docstring builder")
         return _build_error_result(
             ExitStatus.CONFIG,
             request,

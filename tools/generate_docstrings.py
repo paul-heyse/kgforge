@@ -5,8 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from tools._shared.logging import get_logger
-from tools._shared.proc import ToolExecutionError, run_tool
+from tools.shared.logging import get_logger
+from tools.shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 
