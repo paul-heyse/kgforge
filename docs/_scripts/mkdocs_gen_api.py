@@ -70,14 +70,17 @@ def _write_node(destination: Path, node: GriffeNode) -> None:
 
 def _documentable_members(node: GriffeNode) -> Iterable[GriffeNode]:
     """Yield child modules/packages that should receive dedicated pages."""
-    members_attr = getattr(node, "members", {})
+    members_attr: object | None = getattr(node, "members", None)
     if not isinstance(members_attr, Mapping):
         return ()
+    members_mapping = cast(Mapping[str, GriffeNode], members_attr)
     members: list[GriffeNode] = []
-    for member in members_attr.values():
-        if bool(getattr(member, "is_package", False)) or bool(getattr(member, "is_module", False)):
-            members.append(cast(GriffeNode, member))
-    return members
+    for member_node in members_mapping.values():
+        is_package = bool(member_node.is_package)
+        is_module = bool(member_node.is_module)
+        if is_package or is_module:
+            members.append(member_node)
+    return tuple(members)
 
 
 def generate_api_reference(
@@ -91,7 +94,7 @@ def generate_api_reference(
     _write_index(target)
 
     for package in packages:
-        module = loader.load(package)
+        module = cast(GriffeNode, loader.load(package))
         _write_node(target, module)
         for member in _documentable_members(module):
             _write_node(target, member)
