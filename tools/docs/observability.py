@@ -9,113 +9,30 @@ from __future__ import annotations
 
 import time
 import uuid
-from collections.abc import Callable
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, cast
+
+from tools._shared.prometheus import (
+    CollectorRegistry,
+    CounterLike,
+    HistogramLike,
+    build_counter,
+    build_histogram,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-    from prometheus_client import Counter as _CounterType
-    from prometheus_client import Histogram as _HistogramType
-    from prometheus_client.registry import CollectorRegistry as _RegistryType
 
-    CounterFactory = Callable[..., _CounterType]
-    HistogramFactory = Callable[..., _HistogramType]
-    # CollectorRegistry is a class, but we use instances
-    type CollectorRegistryType = _RegistryType
-else:
-    from collections.abc import Iterator
-
-    CounterFactory = Callable[..., object]
-    HistogramFactory = Callable[..., object]
-    # Runtime fallback: use object as the base type
-    type CollectorRegistryType = object
-
-try:
-    from prometheus_client import Counter as _PromCounter
-    from prometheus_client import Histogram as _PromHistogram
-    from prometheus_client.registry import CollectorRegistry
-
-    HAVE_PROMETHEUS = True
-except ImportError:
-    HAVE_PROMETHEUS = False
-    if TYPE_CHECKING:
-
-        class CollectorRegistry:  # type: ignore[no-redef]
-            """Stub registry."""
-
-    class _NoopMetric:
-        """No-op metric stub."""
-
-        def labels(self, **kwargs: object) -> _NoopMetric:  # noqa: ARG002
-            """Return self for chaining."""
-            return self
-
-        def inc(self, value: float = 1.0) -> None:
-            """No-op increment."""
-
-        def observe(self, value: float = 1.0) -> None:
-            """No-op observe."""
-
-    def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:  # noqa: ARG001
-        """Create no-op metric instance."""
-        return _NoopMetric()
-
-    Counter = cast(CounterFactory, _make_noop_metric)
-    Histogram = cast(HistogramFactory, _make_noop_metric)
-else:
-    Counter = cast(CounterFactory, _PromCounter)
-    Histogram = cast(HistogramFactory, _PromHistogram)
-
-# Type alias for registry (instance type, not class type)
-type Registry = CollectorRegistryType
-
-
-class CounterLike(Protocol):
-    """Protocol for counter-like metrics."""
-
-    def labels(self, **kwargs: object) -> CounterLike:
-        """Return labeled counter instance."""
-        ...
-
-    def inc(self, value: float = 1.0) -> None:
-        """Increment counter."""
-        ...
-
-
-class HistogramLike(Protocol):
-    """Protocol for histogram-like metrics."""
-
-    def labels(self, **kwargs: object) -> HistogramLike:
-        """Return labeled histogram instance."""
-        ...
-
-    def observe(self, value: float) -> None:
-        """Observe a value."""
-        ...
-
-
-class _StubCounter:
-    """Stub counter for when prometheus_client is unavailable."""
-
-    def labels(self, **kwargs: object) -> _StubCounter:  # noqa: ARG002
-        """Return self for chaining."""
-        return self
-
-    def inc(self, value: float = 1.0) -> None:
-        """No-op increment."""
-
-
-class _StubHistogram:
-    """Stub histogram for when prometheus_client is unavailable."""
-
-    def labels(self, **kwargs: object) -> _StubHistogram:  # noqa: ARG002
-        """Return self for chaining."""
-        return self
-
-    def observe(self, value: float = 1.0) -> None:
-        """No-op observe."""
+def _resolve_registry(registry: CollectorRegistry | None) -> CollectorRegistry | None:
+    """Return ``registry`` or the global default when Prometheus is available."""
+    if registry is not None:
+        return registry
+    try:  # pragma: no cover - optional dependency guard
+        from prometheus_client import REGISTRY  # noqa: PLC0415
+    except ImportError:
+        return None
+    return cast(CollectorRegistry, REGISTRY)
 
 
 class DocumentationMetrics:
@@ -131,134 +48,112 @@ class DocumentationMetrics:
     >>> metrics.graphs_duration_seconds.labels(status="success").observe(0.123)
     """
 
-    catalog_runs_total: CounterLike | _StubCounter
-    graphs_runs_total: CounterLike | _StubCounter
-    test_map_runs_total: CounterLike | _StubCounter
-    schemas_runs_total: CounterLike | _StubCounter
-    portal_runs_total: CounterLike | _StubCounter
-    analytics_runs_total: CounterLike | _StubCounter
-    catalog_duration_seconds: HistogramLike | _StubHistogram
-    graphs_duration_seconds: HistogramLike | _StubHistogram
-    test_map_duration_seconds: HistogramLike | _StubHistogram
-    schemas_duration_seconds: HistogramLike | _StubHistogram
-    portal_duration_seconds: HistogramLike | _StubHistogram
-    analytics_duration_seconds: HistogramLike | _StubHistogram
+    catalog_runs_total: CounterLike
+    graphs_runs_total: CounterLike
+    test_map_runs_total: CounterLike
+    schemas_runs_total: CounterLike
+    portal_runs_total: CounterLike
+    analytics_runs_total: CounterLike
+    catalog_duration_seconds: HistogramLike
+    graphs_duration_seconds: HistogramLike
+    test_map_duration_seconds: HistogramLike
+    schemas_duration_seconds: HistogramLike
+    portal_duration_seconds: HistogramLike
+    analytics_duration_seconds: HistogramLike
 
-    def __init__(self, registry: CollectorRegistryType | None = None) -> None:
+    def __init__(self, registry: CollectorRegistry | None = None) -> None:
         """Initialize metrics registry.
 
         Parameters
         ----------
-        registry : Registry | None, optional
+        registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        if not HAVE_PROMETHEUS:
-            self.catalog_runs_total = _StubCounter()
-            self.graphs_runs_total = _StubCounter()
-            self.test_map_runs_total = _StubCounter()
-            self.schemas_runs_total = _StubCounter()
-            self.portal_runs_total = _StubCounter()
-            self.analytics_runs_total = _StubCounter()
-            self.catalog_duration_seconds = _StubHistogram()
-            self.graphs_duration_seconds = _StubHistogram()
-            self.test_map_duration_seconds = _StubHistogram()
-            self.schemas_duration_seconds = _StubHistogram()
-            self.portal_duration_seconds = _StubHistogram()
-            self.analytics_duration_seconds = _StubHistogram()
-            return
+        resolved_registry = _resolve_registry(registry)
+        self.registry = resolved_registry
 
-        if registry is None:
-            from prometheus_client import REGISTRY  # noqa: PLC0415
-
-            registry = REGISTRY
-
-        # registry is an instance, not a type
-        self.registry: CollectorRegistryType = registry  # type: ignore[assignment]
-
-        # Counter and Histogram are correctly typed at module level via cast()
-        # pyrefly sees the correct types because we don't use TYPE_CHECKING stubs
-        self.catalog_runs_total = Counter(  # type: ignore[assignment]
+        self.catalog_runs_total = build_counter(
             "docs_catalog_runs_total",
             "Total number of catalog build operations",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.graphs_runs_total = Counter(  # type: ignore[assignment]
+        self.graphs_runs_total = build_counter(
             "docs_graphs_runs_total",
             "Total number of graph build operations",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.test_map_runs_total = Counter(  # type: ignore[assignment]
+        self.test_map_runs_total = build_counter(
             "docs_test_map_runs_total",
             "Total number of test map build operations",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.schemas_runs_total = Counter(  # type: ignore[assignment]
+        self.schemas_runs_total = build_counter(
             "docs_schemas_runs_total",
             "Total number of schema export operations",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.portal_runs_total = Counter(  # type: ignore[assignment]
+        self.portal_runs_total = build_counter(
             "docs_portal_runs_total",
             "Total number of portal render operations",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.analytics_runs_total = Counter(  # type: ignore[assignment]
+        self.analytics_runs_total = build_counter(
             "docs_analytics_runs_total",
             "Total number of analytics build operations",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.catalog_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.catalog_duration_seconds = build_histogram(
             "docs_catalog_duration_seconds",
             "Duration of catalog build operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.graphs_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.graphs_duration_seconds = build_histogram(
             "docs_graphs_duration_seconds",
             "Duration of graph build operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.test_map_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.test_map_duration_seconds = build_histogram(
             "docs_test_map_duration_seconds",
             "Duration of test map build operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.schemas_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.schemas_duration_seconds = build_histogram(
             "docs_schemas_duration_seconds",
             "Duration of schema export operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.portal_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.portal_duration_seconds = build_histogram(
             "docs_portal_duration_seconds",
             "Duration of portal render operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.analytics_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.analytics_duration_seconds = build_histogram(
             "docs_analytics_duration_seconds",
             "Duration of analytics build operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
 

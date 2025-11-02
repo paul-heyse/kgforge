@@ -22,121 +22,19 @@ from __future__ import annotations
 
 import time
 import uuid
-from collections.abc import Callable
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING
+
+from tools._shared.prometheus import (
+    CollectorRegistry,
+    CounterLike,
+    HistogramLike,
+    build_counter,
+    build_histogram,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-    from prometheus_client import Counter as _CounterType
-    from prometheus_client import Histogram as _HistogramType
-    from prometheus_client.registry import CollectorRegistry as _RegistryType
-
-    CounterFactory = Callable[..., _CounterType]
-    HistogramFactory = Callable[..., _HistogramType]
-    # CollectorRegistry is a class, but we use instances
-    type CollectorRegistryType = _RegistryType
-else:
-    from collections.abc import Iterator
-
-    CounterFactory = Callable[..., object]
-    HistogramFactory = Callable[..., object]
-    # Runtime fallback: use object as the base type
-    type CollectorRegistryType = object
-
-try:
-    from prometheus_client import Counter as _PromCounter
-    from prometheus_client import Histogram as _PromHistogram
-    from prometheus_client.registry import CollectorRegistry
-
-    HAVE_PROMETHEUS = True
-except ImportError:
-    HAVE_PROMETHEUS = False
-    if TYPE_CHECKING:
-
-        class CollectorRegistry:  # type: ignore[no-redef]
-            """Stub registry."""
-
-    class _NoopMetric:
-        """No-op metric stub."""
-
-        def labels(self, **kwargs: object) -> _NoopMetric:  # noqa: ARG002
-            """Return self for chaining."""
-            return self
-
-        def inc(self, value: float = 1.0) -> None:
-            """No-op increment."""
-
-        def observe(self, value: float = 1.0) -> None:
-            """No-op observe."""
-
-    def _make_noop_metric(*args: object, **kwargs: object) -> _NoopMetric:  # noqa: ARG001
-        """Create no-op metric instance."""
-        return _NoopMetric()
-
-    Counter = cast(CounterFactory, _make_noop_metric)
-    Histogram = cast(HistogramFactory, _make_noop_metric)
-else:
-    Counter = cast(CounterFactory, _PromCounter)
-    Histogram = cast(HistogramFactory, _PromHistogram)
-
-# Type alias for registry (instance type, not class type)
-type Registry = CollectorRegistryType
-
-
-class MetricLabels(Protocol):
-    """Protocol for metric objects that support labels()."""
-
-    def labels(self, **kwargs: object) -> MetricLabels:
-        """Return labeled metric instance."""
-        ...
-
-
-class CounterLike(Protocol):
-    """Protocol for counter-like metrics."""
-
-    def labels(self, **kwargs: object) -> CounterLike:
-        """Return labeled counter instance."""
-        ...
-
-    def inc(self, value: float = 1.0) -> None:
-        """Increment counter."""
-        ...
-
-
-class HistogramLike(Protocol):
-    """Protocol for histogram-like metrics."""
-
-    def labels(self, **kwargs: object) -> HistogramLike:
-        """Return labeled histogram instance."""
-        ...
-
-    def observe(self, value: float) -> None:
-        """Observe a value."""
-        ...
-
-
-class _StubCounter:
-    """Stub counter for when prometheus_client is unavailable."""
-
-    def labels(self, **kwargs: object) -> _StubCounter:  # noqa: ARG002
-        """Return self for chaining."""
-        return self
-
-    def inc(self, value: float = 1.0) -> None:
-        """No-op increment."""
-
-
-class _StubHistogram:
-    """Stub histogram for when prometheus_client is unavailable."""
-
-    def labels(self, **kwargs: object) -> _StubHistogram:  # noqa: ARG002
-        """Return self for chaining."""
-        return self
-
-    def observe(self, value: float) -> None:
-        """No-op observe."""
 
 
 class DocstringBuilderMetrics:
@@ -152,77 +50,64 @@ class DocstringBuilderMetrics:
     >>> metrics.harvest_duration_seconds.labels(status="success").observe(0.123)
     """
 
-    runs_total: CounterLike | _StubCounter
-    plugin_failures_total: CounterLike | _StubCounter
-    harvest_duration_seconds: HistogramLike | _StubHistogram
-    policy_duration_seconds: HistogramLike | _StubHistogram
-    render_duration_seconds: HistogramLike | _StubHistogram
-    cli_duration_seconds: HistogramLike | _StubHistogram
+    runs_total: CounterLike
+    plugin_failures_total: CounterLike
+    harvest_duration_seconds: HistogramLike
+    policy_duration_seconds: HistogramLike
+    render_duration_seconds: HistogramLike
+    cli_duration_seconds: HistogramLike
 
-    def __init__(self, registry: CollectorRegistryType | None = None) -> None:
+    def __init__(self, registry: CollectorRegistry | None = None) -> None:
         """Initialize metrics registry.
 
         Parameters
         ----------
-        registry : Registry | None, optional
+        registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        if not HAVE_PROMETHEUS:
-            self.runs_total = _StubCounter()
-            self.plugin_failures_total = _StubCounter()
-            self.harvest_duration_seconds = _StubHistogram()
-            self.policy_duration_seconds = _StubHistogram()
-            self.render_duration_seconds = _StubHistogram()
-            self.cli_duration_seconds = _StubHistogram()
-            return
+        resolved_registry = _resolve_registry(registry)
+        self.registry = resolved_registry
 
-        if registry is None:
-            from prometheus_client import REGISTRY  # noqa: PLC0415
-
-            registry = REGISTRY
-
-        self.registry = registry
-
-        self.runs_total = Counter(  # type: ignore[assignment]
+        self.runs_total = build_counter(
             "docbuilder_runs_total",
             "Total number of docstring builder runs",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.plugin_failures_total = Counter(  # type: ignore[assignment]
+        self.plugin_failures_total = build_counter(
             "docbuilder_plugin_failures_total",
             "Total number of plugin execution failures",
             ["plugin_name", "error_type"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.harvest_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.harvest_duration_seconds = build_histogram(
             "docbuilder_harvest_duration_seconds",
             "Duration of harvest operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.policy_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.policy_duration_seconds = build_histogram(
             "docbuilder_policy_duration_seconds",
             "Duration of policy engine operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.render_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.render_duration_seconds = build_histogram(
             "docbuilder_render_duration_seconds",
             "Duration of rendering operations in seconds",
             ["status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
-        self.cli_duration_seconds = Histogram(  # type: ignore[assignment]
+        self.cli_duration_seconds = build_histogram(
             "docbuilder_cli_duration_seconds",
             "Duration of CLI operations in seconds",
             ["command", "status"],
-            registry=registry,
+            registry=resolved_registry,
         )
 
 

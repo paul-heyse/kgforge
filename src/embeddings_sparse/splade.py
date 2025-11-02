@@ -14,7 +14,10 @@ from collections import Counter, defaultdict
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 from re import Pattern
-from typing import Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, Protocol, cast
+
+if TYPE_CHECKING:
+    from pyserini.search.lucene import LuceneImpactSearcher as _LuceneImpactSearcher
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap

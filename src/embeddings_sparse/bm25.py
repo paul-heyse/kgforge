@@ -15,7 +15,11 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from re import Pattern
-from typing import Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, Protocol, cast
+
+if TYPE_CHECKING:
+    from pyserini.index.lucene import LuceneIndexer as _LuceneIndexer
+    from pyserini.search.lucene import LuceneSearcher as _LuceneSearcher
 
 from kgfoundry_common.errors import DeserializationError
 from kgfoundry_common.navmap_types import NavMap

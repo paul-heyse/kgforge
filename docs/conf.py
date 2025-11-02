@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
 from typing import (
+    TYPE_CHECKING,
     Any,
     Final,
     Protocol,
@@ -115,6 +116,15 @@ else:
         GriffeLoadingError = loading_error
     else:
         GriffeLoadingError = RuntimeError
+
+if TYPE_CHECKING:
+    from astroid.builder import AstroidBuilder as _AstroidBuilder
+    from astroid.manager import AstroidManager as _AstroidManager
+    from autoapi._parser import Parser as _AutoapiParser
+else:  # pragma: no cover - only used for typing
+    _AstroidBuilder = object
+    _AstroidManager = object
+    _AutoapiParser = object
 
 astroid_builder = importlib.import_module("astroid.builder")
 astroid_manager = importlib.import_module("astroid.manager")
