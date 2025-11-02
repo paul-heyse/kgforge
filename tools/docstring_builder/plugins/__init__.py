@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 import threading
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
 from pathlib import Path
-from typing import TypeGuard, TypeVar
+from typing import TypeGuard, TypeVar, cast
 
 from tools._shared.logging import get_logger
 from tools.docstring_builder.config import BuilderConfig
@@ -37,15 +38,18 @@ from tools.docstring_builder.semantics import SemanticResult
 
 ENTRY_POINT_GROUP = "kgfoundry.docstrings.plugins"
 
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 _LOGGER = get_logger(__name__)
 
 PayloadT = TypeVar("PayloadT")
 ResultT = TypeVar("ResultT")
 
+type PluginInstance = DocstringBuilderPlugin[object, object] | LegacyPluginProtocol
+
 type RegisteredPlugin = (
     HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
 )
-type PluginFactory = type[DocstringBuilderPlugin[object, object]]
+type PluginFactory = Callable[[], PluginInstance]
 
 
 class PluginConfigurationError(DocstringBuilderError):
@@ -189,23 +193,63 @@ def _invoke_apply(
 
 
 def _instantiate_plugin(candidate: object) -> RegisteredPlugin:
-    if isinstance(candidate, type):
-        return _ensure_plugin_instance(candidate())
+    name = _resolve_plugin_name(candidate)
+    try:
+        instance = _materialize_candidate(candidate)
+    except Exception as exc:  # pragma: no cover - defensive guard
+        message = f"Failed to instantiate plugin {name!r}"
+        raise PluginConfigurationError(message) from exc
+    return _ensure_plugin_instance(instance)
+
+
+def _materialize_candidate(candidate: object) -> object:
+    if _is_registered_plugin(candidate) or _is_legacy_plugin(candidate):
+        return candidate
     if callable(candidate):
-        return _ensure_plugin_instance(candidate())
-    return _ensure_plugin_instance(candidate)
+        factory = cast(Callable[[], PluginInstance], candidate)
+        return factory()
+    message = f"Unsupported plugin candidate {candidate!r}"
+    raise TypeError(message)
+
+
+def _resolve_plugin_name(candidate: object) -> str:
+    name_attr: object = getattr(candidate, "name", None)
+    if isinstance(name_attr, str) and name_attr:
+        return name_attr
+    qualname_attr: object = getattr(candidate, "__name__", None)
+    if isinstance(qualname_attr, str) and qualname_attr:
+        return qualname_attr
+    return candidate.__class__.__name__
+
+
+def _resolve_plugin_name_strict(candidate: object) -> str:
+    name_attr: object = getattr(candidate, "name", None)
+    if isinstance(name_attr, str) and name_attr:
+        return name_attr
+    qualname_attr: object = getattr(candidate, "__name__", None)
+    if isinstance(qualname_attr, str) and qualname_attr:
+        return qualname_attr
+    message = "Discovered plugin without a name attribute"
+    raise PluginConfigurationError(message)
 
 
 def _ensure_plugin_instance(obj: object) -> RegisteredPlugin:
-    name = getattr(obj, "name", obj.__class__.__name__)
-    stage_value = getattr(obj, "stage", None)
-    if not _is_valid_stage(stage_value):
-        message = f"Plugin {name!r} declares invalid stage {stage_value!r}"
+    name = obj.__class__.__name__
+    name_attr: object = getattr(obj, "name", None)
+    if isinstance(name_attr, str) and name_attr:
+        name = name_attr
+    stage_attr: object = getattr(obj, "stage", None)
+    if not _is_valid_stage(stage_attr):
+        message = f"Plugin {name!r} declares invalid stage {stage_attr!r}"
         raise PluginConfigurationError(message)
-    if _is_docstring_plugin(obj):  # pragma: no cover - runtime check
+    if _is_registered_plugin(obj):  # pragma: no cover - runtime check
         return obj
     if _is_legacy_plugin(obj):
-        return LegacyPluginAdapter(obj)
+        try:
+            return LegacyPluginAdapter.create(obj)
+        except Exception as exc:  # pragma: no cover - defensive guard
+            message = f"Legacy plugin {name!r} is misconfigured"
+            raise PluginConfigurationError(message) from exc
     message = f"Plugin {name!r} must define apply() or run()"
     raise PluginConfigurationError(message)
 
@@ -222,8 +266,11 @@ def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
         raise PluginConfigurationError(message)
 
 
-def _is_docstring_plugin(candidate: object) -> TypeGuard[RegisteredPlugin]:
-    return isinstance(candidate, (HarvesterPlugin, TransformerPlugin, FormatterPlugin))
+def _is_registered_plugin(candidate: object) -> TypeGuard[RegisteredPlugin]:
+    return isinstance(
+        candidate,
+        (HarvesterPlugin, TransformerPlugin, FormatterPlugin, LegacyPluginAdapter),
+    )
 
 
 def _is_legacy_plugin(candidate: object) -> TypeGuard[LegacyPluginProtocol]:
@@ -238,11 +285,22 @@ def _load_entry_points() -> list[object]:
     loaded: list[object] = []
     for entry_point in metadata.entry_points().select(group=ENTRY_POINT_GROUP):
         try:
-            loaded.append(entry_point.load())
+            candidate: object = entry_point.load()
+            loaded.append(candidate)
         except Exception as exc:  # pragma: no cover - best effort guard
             message = f"Failed to load plugin entry point {entry_point.name!r}"
             raise PluginConfigurationError(message) from exc
     return loaded
+
+
+def _builtin_candidates(builtin: Sequence[PluginFactory] | None) -> tuple[object, ...]:
+    if builtin is None:
+        return (
+            DataclassFieldDocPlugin,
+            LLMSummaryRewritePlugin,
+            NormalizeNumpyParamsPlugin,
+        )
+    return tuple(builtin)
 
 
 def load_plugins(
@@ -254,25 +312,16 @@ def load_plugins(
     builtin: Sequence[PluginFactory] | None = None,
 ) -> PluginManager:
     """Discover, filter, and instantiate plugins for the current run."""
-    builtin_types: list[object] = [
-        DataclassFieldDocPlugin,
-        LLMSummaryRewritePlugin,
-        NormalizeNumpyParamsPlugin,
-    ]
-    if builtin is not None:
-        builtin_types = list(builtin)
+    builtin_candidates = _builtin_candidates(builtin)
 
-    discovered: dict[str, object] = {}
-    for plugin_type in builtin_types:
-        name = getattr(plugin_type, "name", getattr(plugin_type, "__name__", "unknown"))
-        discovered[name] = plugin_type
+    discovered: dict[str, object] = {
+        _resolve_plugin_name(candidate): candidate for candidate in builtin_candidates
+    }
 
     for candidate in _load_entry_points():
-        name = getattr(candidate, "name", getattr(candidate, "__name__", None))
-        if not name:
-            message = "Discovered plugin without a name attribute"
-            raise PluginConfigurationError(message)
-        discovered.setdefault(name, candidate)
+        name = _resolve_plugin_name_strict(candidate)
+        if name not in discovered:
+            discovered[name] = candidate
 
     only_set = {entry.strip() for entry in only or [] if entry.strip()}
     disable_set = {entry.strip() for entry in disable or [] if entry.strip()}
