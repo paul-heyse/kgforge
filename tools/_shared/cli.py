@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 import msgspec
 from msgspec import UNSET, Struct, UnsetType, structs
@@ -175,11 +175,14 @@ class CliEnvelopeBuilder:
 
     def set_problem(self, problem: ProblemDetailsDict | None) -> None:
         replacement: ProblemDetailsDict | UnsetType = problem if problem is not None else UNSET
-        self.envelope = structs.replace(self.envelope, problem=replacement)
+        self.envelope = cast(CliEnvelope, structs.replace(self.envelope, problem=replacement))
 
     def finish(self, *, duration_seconds: float | None = None) -> CliEnvelope:
         if duration_seconds is not None:
-            self.envelope = structs.replace(self.envelope, durationSeconds=float(duration_seconds))
+            self.envelope = cast(
+                CliEnvelope,
+                structs.replace(self.envelope, durationSeconds=float(duration_seconds)),
+            )
         validate_cli_envelope(self.envelope)
         return self.envelope
 

@@ -104,7 +104,10 @@ def _load_previous(path: Path) -> AgentAnalyticsDocument | None:
     raw = path.read_bytes()
     try:
         document_type: type[AgentAnalyticsDocument] = AgentAnalyticsDocument
-        decoded: AgentAnalyticsDocument = msgspec_json.decode(raw, target_type=document_type)
+        decoded = cast(
+            AgentAnalyticsDocument,
+            msgspec_json.decode(raw, target_type=document_type),
+        )
     except DecodeError:
         try:
             legacy_raw: object = json.loads(raw.decode("utf-8"))

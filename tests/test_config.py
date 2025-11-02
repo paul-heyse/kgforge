@@ -76,8 +76,9 @@ def test_invalid_log_format() -> None:
 def test_frozen() -> None:
     """Test that AppSettings is frozen (immutable)."""
     settings = AppSettings()
+    field_name = "log_level"
     with pytest.raises(ValidationError):
-        settings.log_level = "WARNING"
+        setattr(settings, field_name, "WARNING")
 
 
 def test_load_config_caching() -> None:

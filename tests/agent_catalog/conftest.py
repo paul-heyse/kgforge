@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Protocol, TypedDict
+from typing import TYPE_CHECKING, ParamSpec, Protocol, TypedDict, TypeVar, cast
 
 import pytest
 
@@ -13,6 +14,16 @@ repo_root = Path(__file__).parent.parent.parent
 src_path = repo_root / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+
+    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+
+else:
+    fixture = pytest.fixture
 
 
 class SearchOptionsDict(TypedDict):
@@ -33,7 +44,7 @@ class SearchOptionsFactory(Protocol):
     ) -> SearchOptionsDict: ...
 
 
-@pytest.fixture()
+@fixture()
 def search_options_factory() -> SearchOptionsFactory:
     """Create a factory for SearchOptions test cases.
 
@@ -74,7 +85,7 @@ def search_options_factory() -> SearchOptionsFactory:
             "alpha": alpha,
         }
 
-    return _create_options
+    return cast(SearchOptionsFactory, _create_options)
 
 
 __all__ = ["search_options_factory"]
