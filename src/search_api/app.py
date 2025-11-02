@@ -31,10 +31,10 @@ import json
 import uuid
 from collections.abc import Awaitable, Callable, Mapping
 from pathlib import Path
-from typing import Final, cast
+from typing import Annotated, Final, cast
 
 import jsonschema
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from jsonschema.exceptions import ValidationError as SchemaValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
@@ -55,6 +55,11 @@ from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.schema_helpers import load_schema
 from kgfoundry_common.settings import RuntimeSettings
+from search_api.fastapi_helpers import (
+    DEFAULT_TIMEOUT_SECONDS,
+    typed_dependency,
+    typed_middleware,
+)
 from search_api.fusion import rrf_fuse
 from search_api.schemas import SearchRequest, SearchResponse, SearchResult
 from search_api.service import apply_kg_boosts
@@ -105,6 +110,11 @@ __navmap__: Final[NavMap] = {
 
 logger = get_logger(__name__)
 metrics = MetricsProvider.default()
+
+MIDDLEWARE_TIMEOUT_SECONDS = DEFAULT_TIMEOUT_SECONDS
+DEPENDENCY_TIMEOUT_SECONDS = 5.0
+
+AuthorizationHeader = Annotated[str | None, Header(default=None)]
 
 API_KEYS: set[str] = set()  # NOTE: load from env SEARCH_API_KEYS when secrets wiring is ready
 
@@ -258,7 +268,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Only validate JSON responses
-        if not isinstance(response, JSONResponse):  # type: ignore[misc]  # JSONResponse isinstance check
+        if not isinstance(response, JSONResponse):
             return response
 
         # Only validate /search endpoint responses
@@ -310,7 +320,12 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         return response
 
 
-app.middleware("http")(CorrelationIDMiddleware)  # type: ignore[misc]  # FastAPI middleware registration
+typed_middleware(
+    app,
+    CorrelationIDMiddleware,
+    name="correlation_id_middleware",
+    timeout=MIDDLEWARE_TIMEOUT_SECONDS,
+)
 
 # --- bootstrap typed configuration ---
 try:
@@ -333,23 +348,13 @@ except Exception:
 
 # Initialize response validation middleware if enabled
 if settings.search.validate_responses:
-    # Create a factory function that returns configured middleware
-    def _create_response_validator(app: FastAPI) -> ResponseValidationMiddleware:
-        """Return response validation middleware configured for ``app``.
-
-        Parameters
-        ----------
-        app : FastAPI
-            Application instance that the middleware wraps.
-
-        Returns
-        -------
-        ResponseValidationMiddleware
-            Middleware that enforces response schema validation.
-        """
-        return ResponseValidationMiddleware(app, enabled=True)
-
-    app.middleware("http")(_create_response_validator)
+    typed_middleware(
+        app,
+        ResponseValidationMiddleware,
+        name="response_validation_middleware",
+        timeout=MIDDLEWARE_TIMEOUT_SECONDS,
+        enabled=True,
+    )
 
 # --- bootstrap search backends ---
 kg = MockKG()
@@ -375,9 +380,7 @@ except Exception as exc:  # noqa: BLE001 - defensive guard for SPLADE loading
 
 
 # [nav:anchor auth]
-def auth(
-    authorization: str | None = Header(default=None),  # type: ignore[assignment]  # FastAPI Header marker type
-) -> None:
+def auth(authorization: AuthorizationHeader) -> None:
     """Validate bearer token authentication.
 
     <!-- auto:docstring-builder v1 -->
@@ -399,6 +402,14 @@ def auth(
     token = authorization.split(" ", 1)[1]
     if token not in API_KEYS:
         raise HTTPException(status_code=401, detail="Invalid API key")
+
+
+# Typed dependency markers -------------------------------------------------
+
+AuthDependency = Annotated[
+    None,
+    typed_dependency(auth, name="auth", timeout=DEPENDENCY_TIMEOUT_SECONDS),
+]
 
 
 # [nav:anchor healthz]
@@ -424,7 +435,7 @@ def healthz() -> dict[str, str | dict[str, str]]:
 
 
 # [nav:anchor search]
-def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:  # type: ignore[assignment]  # FastAPI Depends marker type
+def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
     """Execute hybrid search query.
 
     <!-- auto:docstring-builder v1 -->
@@ -564,7 +575,7 @@ def search(req: SearchRequest, _: None = Depends(auth)) -> SearchResponse:  # ty
 # [nav:anchor graph_concepts]
 def graph_concepts(
     body: Mapping[str, JsonValue],
-    _: None = Depends(auth),  # type: ignore[assignment]  # FastAPI Depends marker type
+    _: AuthDependency = None,
 ) -> dict[str, list[dict[str, str]]]:
     """Retrieve knowledge graph concepts matching query.
 
@@ -613,7 +624,7 @@ def graph_concepts(
             q = str((body or {}).get("q", "")).lower()
             limit_raw = body.get("limit", 50) if body else 50
             try:
-                limit: int = int(limit_raw)  # type: ignore[arg-type]  # limit_raw may be JsonValue
+                limit = int(cast(int | float | str, limit_raw))
                 if limit < 0:
                     limit = 50
             except (ValueError, TypeError):

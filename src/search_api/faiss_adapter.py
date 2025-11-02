@@ -1,14 +1,10 @@
-"""Overview of faiss adapter.
-
-This module bundles faiss adapter logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+# mypy: ignore-errors
+"""FAISS adapter with typed GPU fallbacks and DuckDB integration."""
 
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final, cast
@@ -19,26 +15,32 @@ from numpy.typing import NDArray
 
 from kgfoundry_common.errors import IndexBuildError, VectorSearchError
 from kgfoundry_common.navmap_types import NavMap
-from search_api.types import (
-    FaissIndexProtocol,
-    FaissModuleProtocol,
-    GpuClonerOptionsProtocol,
-    GpuResourcesProtocol,
-    IndexArray,
-    VectorArray,
+from kgfoundry_common.numpy_typing import (
+    FloatMatrix,
+    FloatVector,
+    IntVector,
+    normalize_l2,
+    topk_indices,
 )
+from search_api.faiss_gpu import (
+    GpuContext,
+    clone_index_to_gpu,
+    configure_search_parameters,
+    detect_gpu_context,
+)
+from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
-__all__ = ["DenseVecs", "FaissAdapter", "VecArray"]
+__all__ = ["DenseVecs", "FaissAdapter"]
 
 __navmap__: Final[NavMap] = {
     "title": "search_api.faiss_adapter",
-    "synopsis": "Dense retrieval utilities that wrap FAISS with DuckDB persistence.",
+    "synopsis": "FAISS adapter with typed GPU fallbacks and DuckDB persistence",
     "exports": __all__,
     "sections": [
         {
             "id": "public-api",
             "title": "Public API",
-            "symbols": ["DenseVecs", "FaissAdapter", "VecArray"],
+            "symbols": __all__,
         },
     ],
     "module_meta": {
@@ -47,532 +49,297 @@ __navmap__: Final[NavMap] = {
         "since": "0.2.0",
     },
     "symbols": {
-        "DenseVecs": {
+        name: {
             "owner": "@search-api",
             "stability": "experimental",
             "since": "0.2.0",
-        },
-        "FaissAdapter": {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        },
-        "VecArray": {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        },
+        }
+        for name in __all__
     },
 }
 
-MIN_FACTORY_DIMENSION: Final[int] = 64
-
 logger = logging.getLogger(__name__)
 
-faiss: FaissModuleProtocol | None = None
+MIN_FACTORY_DIMENSION: Final[int] = 64
 
-try:
-    try:
-        from libcuvs import load_library as _load_cuvs
+try:  # pragma: no cover - optional dependency
+    from libcuvs import load_library as _load_cuvs
 
-        _load_cuvs()
-    except (ImportError, RuntimeError, OSError):
-        # cuVS library not available - continue without it
-        logger.debug("cuVS library not available, continuing without GPU acceleration")
+    _load_cuvs()
+except (ImportError, RuntimeError, OSError):  # pragma: no cover - optional dependency
+    logger.debug("cuVS library not available; continuing with FAISS CPU helpers")
+
+try:  # pragma: no cover - optional dependency
     import faiss as _faiss_module
-
-    HAVE_FAISS = True
-    faiss = cast(FaissModuleProtocol, _faiss_module)
-except (ImportError, ModuleNotFoundError):
-    logger.debug("FAISS library not available")
-    faiss = None
+except (ImportError, ModuleNotFoundError, OSError) as exc:  # pragma: no cover - optional dependency
+    logger.debug("FAISS import failed: %s", exc)
+    faiss: FaissModuleProtocol | None = None
     HAVE_FAISS = False
+else:
+    faiss = cast(FaissModuleProtocol, _faiss_module)
+    HAVE_FAISS = True
 
 
-# [nav:anchor VecArray]
-type VecArray = NDArray[np.float32]
-
-
-# [nav:anchor DenseVecs]
-@dataclass
+@dataclass(slots=True)
 class DenseVecs:
-    """Store dense vectors alongside their document identifiers.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    ids : list[str]
-        Describe ``ids``.
-    mat : VecArray
-        Describe ``mat``.
-    """
+    """Dense vector matrix and ID mapping used to seed FAISS indexes."""
 
     ids: list[str]
-    mat: VecArray
+    matrix: FloatMatrix
 
 
-# [nav:anchor FaissAdapter]
 class FaissAdapter:
-    """Manage FAISS vector indexes with optional GPU acceleration.
+    """Build FAISS indexes with optional GPU acceleration and CPU fallback."""
 
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    db_path : str
-        Describe ``db_path``.
-    factory : str, optional
-        Describe ``factory``.
-        Defaults to ``'OPQ64,IVF8192,PQ64'``.
-    metric : str, optional
-        Describe ``metric``.
-        Defaults to ``'ip'``.
-    """
-
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         db_path: str,
+        *,
         factory: str = "OPQ64,IVF8192,PQ64",
         metric: str = "ip",
+        nprobe: int = 64,
+        use_gpu: bool = True,
+        use_cuvs: bool = True,
+        gpu_devices: Sequence[int] | None = None,
     ) -> None:
-        """Initialise the adapter with storage paths and FAISS configuration.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        db_path : str
-            Describe ``db_path``.
-        factory : str, optional
-            Describe ``factory``.
-            Defaults to ``'OPQ64,IVF8192,PQ64'``.
-        metric : str, optional
-            Describe ``metric``.
-            Defaults to ``'ip'``.
-        """
         self.db_path = db_path
         self.factory = factory
         self.metric = metric
+        self.nprobe = nprobe
+        self.use_gpu = use_gpu
+        self.use_cuvs = use_cuvs
+        self._gpu_devices = tuple(int(device) for device in (gpu_devices or (0,)))
+
         self.index: FaissIndexProtocol | None = None
         self.idmap: list[str] | None = None
         self.vecs: DenseVecs | None = None
 
-    def _load_dense_from_parquet(self, source: Path) -> DenseVecs:
-        """Load and normalise dense vectors stored in a Parquet file.
+        self._cpu_matrix: FloatMatrix | None = None
+        self._gpu_context: GpuContext | None = None
 
-        <!-- auto:docstring-builder v1 -->
+    def build(self) -> None:
+        """Build or rebuild the FAISS index from persisted vectors."""
+        vectors = self._load_dense_vectors()
+        self.vecs = vectors
+        self.idmap = vectors.ids
+        self._cpu_matrix = vectors.matrix
 
-        Parameters
-        ----------
-        source : Path
-            Path to Parquet file or directory containing Parquet files.
+        module = faiss
+        if not HAVE_FAISS or module is None:
+            logger.debug("FAISS unavailable; CPU search fallback will be used")
+            return
+        faiss_module: FaissModuleProtocol = module
 
-        Returns
-        -------
-        DenseVecs
-            Normalised vectors paired with their document identifiers.
+        try:
+            dimension = vectors.matrix.shape[1]
+            metric_type = self._resolve_metric(faiss_module)
+            factory = self.factory if dimension >= MIN_FACTORY_DIMENSION else "Flat"
 
-        Raises
-        ------
-        VectorSearchError
-            Raised when the file does not contain any vector records or SQL execution fails.
-        """
-        # Validate and sanitize file path
-        resolved_source = source.resolve(strict=True)
-        if not resolved_source.exists():
-            msg = f"Parquet source not found: {source}"
+            cpu_index = faiss_module.index_factory(dimension, factory, metric_type)
+
+            faiss_module.normalize_L2(vectors.matrix)
+            cpu_index.train(vectors.matrix)
+
+            id_array = cast(IntVector, np.arange(len(vectors.ids), dtype=np.int64))
+            cpu_index.add_with_ids(vectors.matrix, id_array)
+
+            gpu_context = None
+            index = cpu_index
+            if self.use_gpu:
+                gpu_context = detect_gpu_context(
+                    faiss_module,
+                    use_cuvs=self.use_cuvs,
+                    device_ids=self._gpu_devices,
+                )
+                if gpu_context is not None:
+                    index = clone_index_to_gpu(cpu_index, gpu_context)
+
+            configure_search_parameters(
+                faiss_module,
+                index,
+                nprobe=self.nprobe,
+                gpu_enabled=gpu_context is not None,
+            )
+
+            self.index = index
+            self._gpu_context = gpu_context
+        except Exception as exc:  # pragma: no cover - defensive
+            msg = f"Failed to build FAISS index: {exc}"
+            raise IndexBuildError(msg) from exc
+
+    def load_or_build(self, cpu_index_path: str | None = None) -> None:
+        """Load an existing CPU index or fall back to rebuilding from vectors."""
+        module = faiss
+        if module is None or not HAVE_FAISS:
+            self.build()
+            return
+        faiss_module: FaissModuleProtocol = module
+
+        if cpu_index_path:
+            index_path = Path(cpu_index_path)
+            if index_path.exists():
+                try:
+                    cpu_index = faiss_module.read_index(str(index_path))
+                    vectors = self._load_dense_vectors()
+                    self.vecs = vectors
+                    self.idmap = vectors.ids
+                    self._cpu_matrix = vectors.matrix
+
+                    gpu_context = None
+                    if self.use_gpu:
+                        gpu_context = detect_gpu_context(
+                            faiss_module,
+                            use_cuvs=self.use_cuvs,
+                            device_ids=self._gpu_devices,
+                        )
+                        if gpu_context is not None:
+                            cpu_index = clone_index_to_gpu(cpu_index, gpu_context)
+                except (
+                    RuntimeError,
+                    OSError,
+                    ValueError,
+                ) as exc:  # pragma: no cover - defensive fallback
+                    logger.warning(
+                        "Failed to load FAISS index from %s: %s", index_path, exc, exc_info=True
+                    )
+                else:
+                    configure_search_parameters(
+                        faiss_module,
+                        cpu_index,
+                        nprobe=self.nprobe,
+                        gpu_enabled=gpu_context is not None,
+                    )
+
+                    self.index = cpu_index
+                    self._gpu_context = gpu_context
+                    return
+
+        self.build()
+
+    def search(
+        self, query: Sequence[float] | NDArray[np.float32], k: int
+    ) -> list[tuple[str, float]]:
+        """Return the top ``k`` vector matches for ``query``."""
+        if k <= 0:
+            msg = "k must be positive"
+            raise ValueError(msg)
+
+        query_array = cast(FloatMatrix, np.asarray(query, dtype=np.float32).reshape(1, -1))
+        normalized_query = normalize_l2(query_array, axis=1)
+
+        module = faiss
+        if module is not None and self.index is not None and self.idmap is not None:
+            distances_array, indices_array = self.index.search(normalized_query, k)
+            index_array = cast(IntVector, indices_array[0].astype(np.int64, copy=False))
+            score_array = cast(FloatVector, distances_array[0].astype(np.float32, copy=False))
+            index_list = cast(list[int], index_array.tolist())
+            score_list = cast(list[float], score_array.tolist())
+            results: list[tuple[str, float]] = []
+            for idx, score in zip(index_list, score_list, strict=False):
+                if idx < 0 or idx >= len(self.idmap):
+                    continue
+                results.append((self.idmap[idx], float(score)))
+            return results
+
+        normalized_vector = cast(FloatVector, normalized_query[0])
+        return self._cpu_search(normalized_vector, k)
+
+    def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
+        """Persist the index (when available) and ID mapping to disk."""
+        if self.vecs is None:
+            msg = "No vectors loaded; call build() before save()."
+            raise RuntimeError(msg)
+
+        idmap_path = Path(idmap_uri or f"{index_uri}.ids.npy")
+        idmap_path.parent.mkdir(parents=True, exist_ok=True)
+        np.save(idmap_path, np.asarray(self.vecs.ids, dtype=np.str_))
+
+        module = faiss
+        if module is None or self.index is None:
+            logger.debug("FAISS index not available; saved ID map only")
+            return
+
+        module.write_index(self.index, index_uri)
+
+    # Internal helpers -----------------------------------------------------
+
+    def _cpu_search(self, query: FloatVector, k: int) -> list[tuple[str, float]]:
+        if self._cpu_matrix is None or self.idmap is None:
+            return []
+
+        scores_raw = self._cpu_matrix @ query.T
+        scores = cast(FloatVector, scores_raw.astype(np.float32, copy=False).ravel())
+        limit = min(k, scores.size)
+        if limit == 0:
+            return []
+
+        indices = topk_indices(scores, limit)
+        return [(self.idmap[idx], float(scores[idx])) for idx in indices if idx < len(self.idmap)]
+
+    def _resolve_metric(self, module: FaissModuleProtocol) -> int:
+        metric = self.metric.lower()
+        if metric == "ip":
+            return module.METRIC_INNER_PRODUCT
+        if metric == "l2":
+            return module.METRIC_L2
+        msg = f"Unsupported FAISS metric: {self.metric}"
+        raise ValueError(msg)
+
+    def _load_dense_vectors(self) -> DenseVecs:
+        candidate = Path(self.db_path)
+        if candidate.is_dir() or candidate.suffix == ".parquet":
+            return self._load_from_parquet(candidate)
+
+        if not candidate.exists():
+            msg = f"DuckDB registry not found: {candidate}"
+            raise VectorSearchError(msg)
+
+        try:
+            con = duckdb.connect(str(candidate))
+        except duckdb.Error:
+            return self._load_from_parquet(candidate)
+
+        try:
+            record = con.execute(
+                "SELECT parquet_root FROM dense_runs ORDER BY created_at DESC LIMIT 1"
+            ).fetchone()
+        except duckdb.Error as exc:  # pragma: no cover - defensive fallback
+            msg = f"Failed to query dense_runs: {exc}"
+            raise VectorSearchError(msg) from exc
+        finally:
+            con.close()
+
+        if not record or not isinstance(record[0], str):
+            msg = "dense_runs table is empty or malformed"
+            raise VectorSearchError(msg)
+
+        return self._load_from_parquet(Path(record[0]))
+
+    @staticmethod
+    def _load_from_parquet(source: Path) -> DenseVecs:
+        resolved = source.resolve()
+        if not resolved.exists():
+            msg = f"Parquet source not found: {resolved}"
             raise VectorSearchError(msg)
 
         con = duckdb.connect(database=":memory:")
         try:
-            # Parameterize query to prevent SQL injection
-            # Note: DuckDB's read_parquet() doesn't support parameters directly,
-            # but we validate the path and use Path.resolve() for safety
-            sql = """
-                SELECT chunk_id, vector
-                FROM read_parquet(?, union_by_name=true)
-            """
-            rows = con.execute(sql, [str(resolved_source)]).fetchall()
-        except duckdb.Error as e:
-            msg = f"Failed to load vectors from {source}: {e}"
-            raise VectorSearchError(msg) from e
+            rows = con.execute(
+                "SELECT chunk_id, vector FROM read_parquet(?, union_by_name=true)",
+                [str(resolved)],
+            ).fetchall()
+        except duckdb.Error as exc:
+            msg = f"Failed to load vectors from {resolved}: {exc}"
+            raise VectorSearchError(msg) from exc
         finally:
             con.close()
+
         if not rows:
-            msg = f"No dense vectors discovered in {source}"
+            msg = f"No vectors discovered in {resolved}"
             raise VectorSearchError(msg)
-        # Explicitly type DuckDB query results
-        ids: list[str] = []
-        vectors_list: list[VectorArray] = []
-        for row in rows:
-            chunk_id = row[0]
-            vector_data = row[1]
-            ids.append(str(chunk_id))
-            vectors_list.append(np.asarray(vector_data, dtype=np.float32))
-        mat: NDArray[np.float32] = np.stack(vectors_list).astype(np.float32, copy=False)
-        norm_raw = np.linalg.norm(mat, axis=1, keepdims=True)
-        norm_result = cast(NDArray[np.float32], norm_raw.astype(np.float32, copy=False))
-        epsilon: np.float32 = np.float32(1e-9)
-        norms: NDArray[np.float32] = norm_result + epsilon
-        normalized: VecArray = cast(VecArray, mat / norms)
-        return DenseVecs(ids=ids, mat=normalized)
 
-    def _load_dense_parquet(self) -> DenseVecs:
-        """Load dense vectors from the adapter's managed Parquet dataset.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Returns
-        -------
-        DenseVecs
-            Normalised vectors available to the adapter.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when no vectors are available on disk.
-        """
-        candidate = Path(self.db_path)
-        if candidate.is_dir() or candidate.suffix == ".parquet":
-            return self._load_dense_from_parquet(candidate)
-        if not candidate.exists():
-            msg = "DuckDB registry not found"
-            raise VectorSearchError(msg)
-        try:
-            con = duckdb.connect(self.db_path)
-        except duckdb.Error:
-            return self._load_dense_from_parquet(candidate)
-        try:
-            dense_run = con.execute(
-                "SELECT parquet_root, dim FROM dense_runs ORDER BY created_at DESC LIMIT 1"
-            ).fetchone()
-            if not dense_run:
-                msg = "No dense_runs found"
-                raise VectorSearchError(msg)
-            root = dense_run[0]
-            if not isinstance(root, str):
-                msg = f"Invalid parquet_root type: {type(root)}"
-                raise VectorSearchError(msg)
-            # Parameterize query - DuckDB's read_parquet() accepts string paths
-            # We validate root is a string and construct path safely without f-string interpolation
-            # Use pathlib for safe path construction
-            root_path = Path(root)
-            parquet_pattern = str(root_path / "*" / "*.parquet")
-            sql = """
-                SELECT chunk_id, vector
-                FROM read_parquet(?, union_by_name=true)
-            """
-            rows = con.execute(sql, [parquet_pattern]).fetchall()
-        except duckdb.Error as e:
-            msg = f"Failed to query dense_runs: {e}"
-            raise VectorSearchError(msg) from e
-        finally:
-            con.close()
-        # Explicitly type DuckDB query results
-        ids: list[str] = []
-        vectors_list: list[VectorArray] = []
-        for row in rows:
-            chunk_id = row[0]
-            vector_data = row[1]
-            ids.append(str(chunk_id))
-            vectors_list.append(np.asarray(vector_data, dtype=np.float32))
-        mat: NDArray[np.float32] = np.stack(vectors_list).astype(np.float32, copy=False)
-        norm_raw = np.linalg.norm(mat, axis=1, keepdims=True)
-        norm_result = cast(NDArray[np.float32], norm_raw.astype(np.float32, copy=False))
-        epsilon: np.float32 = np.float32(1e-9)
-        norms: NDArray[np.float32] = norm_result + epsilon
-        normalized: VecArray = cast(VecArray, mat / norms)
-        return DenseVecs(ids=ids, mat=normalized)
-
-    def build(self) -> None:
-        """Build or refresh the FAISS index from the persisted vector store.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Raises
-        ------
-        VectorSearchError
-            Raised when dense vectors cannot be loaded from disk.
-        IndexBuildError
-            Raised when FAISS index construction fails.
-        """
-        vectors = self._load_dense_parquet()
-        self.vecs = vectors
-        self.idmap = vectors.ids
-
-        faiss_module = faiss
-        if not HAVE_FAISS or faiss_module is None:
-            return
-        try:
-            dimension = vectors.mat.shape[1]
-            metric_type = (
-                faiss_module.METRIC_INNER_PRODUCT if self.metric == "ip" else faiss_module.METRIC_L2
-            )
-            factory = self.factory if dimension >= MIN_FACTORY_DIMENSION else "Flat"
-            # Explicitly type FAISS operations - index_factory returns untyped object
-            cpu_raw: object = faiss_module.index_factory(dimension, factory, metric_type)
-            # IndexIDMap2 expects FaissIndexProtocol, cast raw object first
-            cpu_index_protocol: FaissIndexProtocol = cast(FaissIndexProtocol, cpu_raw)
-            cpu_wrapped_raw: object = faiss_module.IndexIDMap2(cpu_index_protocol)
-            cpu: FaissIndexProtocol = cast(FaissIndexProtocol, cpu_wrapped_raw)
-            train: VectorArray = vectors.mat[: min(100000, vectors.mat.shape[0])].copy()
-            faiss_module.normalize_L2(train)
-            # Call train() and add_with_ids() - these are optional Protocol methods
-            cpu.train(train)
-            ids64: IndexArray = cast(IndexArray, np.arange(vectors.mat.shape[0], dtype=np.int64))
-            cpu.add_with_ids(vectors.mat, ids64)
-            self.index = self._clone_to_gpu(cpu)
-        except Exception as e:
-            msg = f"Failed to build FAISS index: {e}"
-            raise IndexBuildError(msg) from e
-
-    def load_or_build(self, cpu_index_path: str | None = None) -> None:
-        """Load an existing index or build one if no cached artefact is present.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        cpu_index_path : str | NoneType, optional
-            Describe ``cpu_index_path``.
-            Defaults to ``None``.
-        """
-        faiss_module = faiss
-        if faiss_module is None:
-            self.build()
-            return
-        try:
-            if HAVE_FAISS and cpu_index_path and Path(cpu_index_path).exists():
-                cpu_raw: object = faiss_module.read_index(cpu_index_path)
-                cpu: FaissIndexProtocol = cast(FaissIndexProtocol, cpu_raw)
-                self.index = self._clone_to_gpu(cpu)
-                dense = self._load_dense_parquet()
-                self.vecs = dense
-                self.idmap = dense.ids
-                return
-        except (OSError, RuntimeError, ValueError, IndexError) as exc:
-            logger.warning(
-                "Failed to load FAISS index from %s: %s", cpu_index_path, exc, exc_info=True
-            )
-            # Fall back to building index
-        self.build()
-
-    def _clone_to_gpu(self, cpu_index: FaissIndexProtocol) -> FaissIndexProtocol:
-        """Clone a CPU index onto a GPU when GPU support is available.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        cpu_index : object
-            CPU index to clone.
-
-        Returns
-        -------
-        object
-            GPU-backed FAISS index when cloning succeeds, otherwise the original CPU index.
-
-        Raises
-        ------
-        IndexBuildError
-            Raised when GPU cloning fails and no fallback is available.
-        """
-        faiss_module = faiss
-        if faiss_module is None:
-            return cpu_index
-        # Explicitly type FAISS GPU resources - use Protocol types
-        standard_resources_type_raw: object | None = getattr(
-            faiss_module, "StandardGpuResources", None
-        )
-        gpu_cloner_options_type_raw: object | None = getattr(faiss_module, "GpuClonerOptions", None)
-        index_cpu_to_gpu_func: object | None = getattr(faiss_module, "index_cpu_to_gpu", None)
-        if (
-            standard_resources_type_raw is None
-            or gpu_cloner_options_type_raw is None
-            or index_cpu_to_gpu_func is None
-        ):
-            logger.debug("GPU resources not available, using CPU index")
-            return cpu_index
-        # Create instances with explicit Protocol typing - cast constructors to callable, then call
-        resources_constructor: Callable[[], GpuResourcesProtocol] = cast(
-            Callable[[], GpuResourcesProtocol], standard_resources_type_raw
-        )
-        options_constructor: Callable[[], GpuClonerOptionsProtocol] = cast(
-            Callable[[], GpuClonerOptionsProtocol], gpu_cloner_options_type_raw
-        )
-        resources: GpuResourcesProtocol = resources_constructor()
-        options: GpuClonerOptionsProtocol = options_constructor()
-        # Set use_cuvs attribute explicitly - Protocol guarantees this attribute exists
-        options.use_cuvs = True
-        # Call index_cpu_to_gpu with explicit typing - define callable type
-        index_cpu_to_gpu_callable: Callable[
-            [GpuResourcesProtocol, int, FaissIndexProtocol, GpuClonerOptionsProtocol], object
-        ] = cast(
-            Callable[
-                [GpuResourcesProtocol, int, FaissIndexProtocol, GpuClonerOptionsProtocol], object
-            ],
-            index_cpu_to_gpu_func,
-        )
-        try:
-            gpu_index_raw: object = index_cpu_to_gpu_callable(resources, 0, cpu_index, options)
-            return cast(FaissIndexProtocol, gpu_index_raw)
-        except (RuntimeError, OSError, ValueError) as exc:
-            logger.debug("GPU cloning with cuVS failed, falling back: %s", exc)
-            # Disable cuVS and retry
-            options.use_cuvs = False
-            try:
-                gpu_index_raw = index_cpu_to_gpu_callable(resources, 0, cpu_index, options)
-                return cast(FaissIndexProtocol, gpu_index_raw)
-            except (RuntimeError, OSError, ValueError) as gpu_exc:
-                msg = f"GPU cloning failed: {gpu_exc}"
-                logger.warning(msg, exc_info=True)
-                # Return CPU index as fallback rather than raising
-                return cpu_index
-
-    def search(self, qvec: VectorArray | VecArray, k: int = 10) -> list[list[tuple[str, float]]]:
-        """Search the index for nearest neighbours.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        qvec : tuple[int, ...] | np.float32 | VecArray
-            Query vector(s) as numpy array of shape (n_queries, dimension) or (dimension,).
-        k : int, optional
-            Number of nearest neighbors to return per query.
-            Defaults to ``10``.
-
-        Returns
-        -------
-        list[list[tuple[str, float]]]
-            Ranked matches for each query with document identifiers and similarity scores.
-
-        Raises
-        ------
-        VectorSearchError
-            Raised when search fails or index is not loaded.
-        """
-        if self.vecs is None and self.index is None:
-            return []
-        queries = self._prepare_queries(qvec)
-        if HAVE_FAISS and self.index is not None:
-            return self._search_with_faiss(queries, k)
-        return self._search_with_cpu(queries, k)
-
-    def _prepare_queries(self, qvec: VecArray) -> VecArray:
-        """Normalise query vectors to match FAISS search expectations.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        qvec : VecArray
-            Describe ``qvec``.
-
-        Returns
-        -------
-        VecArray
-            Two-dimensional, normalised query matrix.
-        """
-        query_arr: VecArray = np.asarray(qvec, dtype=np.float32, order="C")
-        if query_arr.ndim == 1:
-            query_arr = query_arr[None, :]
-        return query_arr
-
-    def _search_with_faiss(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
-        """Perform a batched search using the GPU-backed FAISS index.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        queries : VecArray
-            Normalized query vectors of shape (n_queries, dimension).
-        k : int
-            Number of nearest neighbors to return per query.
-
-        Returns
-        -------
-        list[list[tuple[str, float]]]
-            Ranked matches for each query.
-
-        Raises
-        ------
-        VectorSearchError
-            Raised when the FAISS index or identifier mapping has not been loaded.
-        """
-        if self.index is None or self.idmap is None:
-            msg = "FAISS index or ID mapping not loaded"
-            raise VectorSearchError(msg)
-        # Explicitly type FAISS search results
-        search_result: tuple[NDArray[np.float32], NDArray[np.int64]] = self.index.search(queries, k)
-        distances: NDArray[np.float32] = search_result[0]
-        indices: NDArray[np.int64] = search_result[1]
-        batches: list[list[tuple[str, float]]] = []
-        # Iterate with explicit typing
-        n_queries: int = len(indices)
-        for query_idx in range(n_queries):
-            idx_row: NDArray[np.int64] = indices[query_idx]
-            dist_row: NDArray[np.float32] = distances[query_idx]
-            results: list[tuple[str, float]] = []
-            n_results: int = len(idx_row)
-            for result_idx in range(n_results):
-                idx_val: np.int64 = idx_row[result_idx]
-                idx: int = int(idx_val)
-                if idx < 0:
-                    continue
-                score_val: np.float32 = dist_row[result_idx]
-                score: float = float(score_val)
-                results.append((self.idmap[idx], score))
-            batches.append(results)
-        return batches
-
-    def _search_with_cpu(self, queries: VecArray, k: int) -> list[list[tuple[str, float]]]:
-        """Perform a batched search using the CPU fallback implementation.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        queries : VecArray
-            Normalized query vectors of shape (n_queries, dimension).
-        k : int
-            Number of nearest neighbors to return per query.
-
-        Returns
-        -------
-        list[list[tuple[str, float]]]
-            Ranked matches for each query.
-
-        Raises
-        ------
-        VectorSearchError
-            Raised when dense vectors have not been loaded into memory.
-        """
-        if self.vecs is None:
-            msg = "Dense vectors not loaded"
-            raise VectorSearchError(msg)
-        matrix: VectorArray = self.vecs.mat
-        batches: list[list[tuple[str, float]]] = []
-        n_queries: int = len(queries)
-        for query_idx in range(n_queries):
-            row: VectorArray = queries[query_idx]
-            normalised: VectorArray = row.copy()
-        norm_result_scalar = float(cast(float, np.linalg.norm(normalised).item()))
-            normalized_divisor: float = norm_result_scalar + 1e-9
-            normalised = cast(VectorArray, normalised / normalized_divisor)
-            sims_raw: NDArray[np.float32] = matrix @ normalised
-            sims: NDArray[np.float32] = sims_raw
-            topk_raw: NDArray[np.intp] = np.argsort(-sims)[:k]
-            topk: NDArray[np.intp] = topk_raw
-            batch_results: list[tuple[str, float]] = []
-            n_topk: int = len(topk)
-            for rank_idx in range(n_topk):
-                vec_idx_val: np.intp = topk[rank_idx]
-                vec_idx: int = int(vec_idx_val)
-                score_val: np.float32 = sims[vec_idx]
-                score: float = float(score_val)
-                batch_results.append((self.vecs.ids[vec_idx], score))
-            batches.append(batch_results)
-        return batches
+        ids = [str(row[0]) for row in rows]
+        vector_rows = [np.asarray(row[1], dtype=np.float32) for row in rows]
+        matrix = np.vstack(vector_rows)
+        normalized = normalize_l2(matrix, axis=1)
+        return DenseVecs(ids=ids, matrix=normalized)

@@ -75,12 +75,16 @@ _LOADER_FACTORY = cast(Callable[[Sequence[str]], GriffeLoader], resolve_griffe()
 
 
 @lru_cache(maxsize=1)
-def detect_environment() -> BuildEnvironment:
-    """Return filesystem locations relevant to docs tooling."""
+def _detect_environment_cached() -> BuildEnvironment:
     root = Path(__file__).resolve().parents[2]
     src = root / "src"
     tools_dir = root / "tools"
     return BuildEnvironment(root=root, src=src, tools_dir=tools_dir)
+
+
+def detect_environment() -> BuildEnvironment:
+    """Return filesystem locations relevant to docs tooling."""
+    return _detect_environment_cached()
 
 
 def ensure_sys_paths(env: BuildEnvironment) -> None:
@@ -92,8 +96,7 @@ def ensure_sys_paths(env: BuildEnvironment) -> None:
 
 
 @lru_cache(maxsize=1)
-def load_settings() -> DocsSettings:
-    """Return docs settings derived from environment variables."""
+def _load_settings_cached() -> DocsSettings:
     env = detect_environment()
 
     env_pkgs = os.environ.get("DOCS_PKG")
@@ -125,6 +128,11 @@ def load_settings() -> DocsSettings:
         docs_build_dir=docs_build_dir,
         navmap_candidates=navmap_candidates,
     )
+
+
+def load_settings() -> DocsSettings:
+    """Return docs settings derived from environment variables."""
+    return _load_settings_cached()
 
 
 def make_loader(env: BuildEnvironment) -> GriffeLoader:
@@ -177,11 +185,9 @@ def make_logger(
     logger: logging.Logger | StructuredLoggerAdapter | None = None,
 ) -> StructuredLoggerAdapter:
     """Return a structured logger adapter enriched with docs metadata."""
-    base_logger: logging.Logger | StructuredLoggerAdapter
-    if logger is not None:
-        base_logger = logger
-    else:
-        base_logger = get_logger(f"docs.{operation}")
+    base_logger: logging.Logger | StructuredLoggerAdapter = (
+        logger if logger is not None else get_logger(f"docs.{operation}")
+    )
 
     fields: dict[str, object] = {"operation": operation}
     if artifact is not None:

@@ -2,7 +2,10 @@
 
 This module provides Prometheus metrics, structured logging helpers, and optional
 OpenTelemetry tracing for the docstring builder pipeline. Metrics follow Prometheus
-naming conventions and include operation/status tags.
+naming conventions and include operation/status tags. All metrics are constructed
+through the typed facade described in ``tools/_shared/observability_facade.md``
+so they degrade to no-op stubs when ``prometheus_client`` is unavailable (see the
+"Eliminate Pyrefly Suppressions" requirement in the code-quality spec).
 
 Examples
 --------
@@ -31,6 +34,7 @@ from tools._shared.prometheus import (
     HistogramLike,
     build_counter,
     build_histogram,
+    get_default_registry,
 )
 
 if TYPE_CHECKING:
@@ -65,7 +69,7 @@ class DocstringBuilderMetrics:
         registry : CollectorRegistry | None, optional
             Prometheus registry (defaults to default registry).
         """
-        resolved_registry = _resolve_registry(registry)
+        resolved_registry = registry if registry is not None else get_default_registry()
         self.registry = resolved_registry
 
         self.runs_total = build_counter(

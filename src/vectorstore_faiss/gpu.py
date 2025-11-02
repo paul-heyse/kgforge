@@ -1,548 +1,89 @@
-"""Overview of gpu.
-
-This module bundles gpu logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
-"""
+"""GPU-aware FAISS index helpers backed by the shared search API facade."""
 
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable
-from pathlib import Path
-from typing import Any, Final, cast
+from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
-from numpy.typing import NDArray
 
-from kgfoundry_common.navmap_types import NavMap
-from search_api.types import (
-    FaissIndexProtocol,
-    FaissModuleProtocol,
-    GpuClonerOptionsProtocol,
-    GpuResourcesProtocol,
+from kgfoundry_common.numpy_typing import FloatMatrix, FloatVector, IntVector, normalize_l2
+from search_api.faiss_gpu import (
+    GpuContext,
+    clone_index_to_gpu,
+    configure_search_parameters,
+    detect_gpu_context,
 )
+from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
 logger = logging.getLogger(__name__)
 
-# Try importing FAISS at module level - handle gracefully if unavailable
-faiss: FaissModuleProtocol | None
-FaissIndexIDMap2: type[Any] | None
-try:
-    import faiss as _faiss_module  # pragma: no cover - optional dependency
-except Exception as exc:  # pragma: no cover - optional dependency
-    logger.debug("FAISS import failed: %s", exc)
-    faiss = None
-    FaissIndexIDMap2 = None
-else:
-    faiss = cast(FaissModuleProtocol, _faiss_module)
-    FaissIndexIDMap2 = getattr(_faiss_module, "IndexIDMap2", None)
 
-__all__ = ["FaissGpuIndex", "FloatArray", "IntArray", "StrArray"]
-
-__navmap__: Final[NavMap] = {
-    "title": "vectorstore_faiss.gpu",
-    "synopsis": "GPU-accelerated FAISS bindings and helper types",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
-
-# [nav:anchor FloatArray]
-type FloatArray = NDArray[np.float32]
-type FloatArrayLike = NDArray[np.floating[Any]]
-
-# [nav:anchor IntArray]
-type IntArray = NDArray[np.int64]
-
-# [nav:anchor StrArray]
-type StrArray = NDArray[np.str_]
-
-
-# [nav:anchor FaissGpuIndex]
+@dataclass(slots=True)
 class FaissGpuIndex:
-    """Describe FaissGpuIndex.
+    """Small GPU-aware facade that delegates to :mod:`search_api.faiss_gpu`.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
-
-    Parameters
-    ----------
-    factory : str, optional
-        Describe ``factory``.
-        Defaults to ``'OPQ64,IVF8192,PQ64'``.
-    nprobe : int, optional
-        Describe ``nprobe``.
-        Defaults to ``64``.
-    gpu : bool, optional
-        Describe ``gpu``.
-        Defaults to ``True``.
-    cuvs : bool, optional
-        Describe ``cuvs``.
-        Defaults to ``True``.
-
-    Raises
-    ------
-    RuntimeError
-    Raised when TODO for RuntimeError.
+    The facade keeps GPU initialisation idempotent by caching the detected
+    context. If GPUs or cuVS helpers are unavailable, the CPU index is returned
+    unchanged, ensuring safe fallbacks without caller intervention.
     """
 
-    def __init__(
-        self,
-        factory: str = "OPQ64,IVF8192,PQ64",
-        nprobe: int = 64,
-        gpu: bool = True,
-        cuvs: bool = True,
-    ) -> None:
-        """Describe   init  .
+    faiss_module: FaissModuleProtocol
+    factory: str
+    metric: str
+    nprobe: int = 64
+    use_gpu: bool = True
+    use_cuvs: bool = True
+    devices: Sequence[int] = (0,)
 
-        <!-- auto:docstring-builder v1 -->
+    _context: GpuContext | None = None
+    _index: FaissIndexProtocol | None = None
 
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    def prepare(self, trained_index: FaissIndexProtocol) -> FaissIndexProtocol:
+        """Clone ``trained_index`` to GPU when possible and set search parameters.
 
-        Parameters
-        ----------
-        factory : str, optional
-            Describe ``factory``.
-            Defaults to ``'OPQ64,IVF8192,PQ64'``.
-        nprobe : int, optional
-            Describe ``nprobe``.
-            Defaults to ``64``.
-        gpu : bool, optional
-            Describe ``gpu``.
-            Defaults to ``True``.
-        cuvs : bool, optional
-            Describe ``cuvs``.
-            Defaults to ``True``.
+        The method is safe to call repeatedly; once a GPU index has been
+        prepared it is reused on subsequent invocations. Any failures during
+        cloning or configuration are logged and the CPU index is returned.
         """
-        self.factory = factory
-        self.nprobe = nprobe
-        self.gpu = gpu
-        self.cuvs = cuvs
-        self._faiss: FaissModuleProtocol | None = None
-        self._res: GpuResourcesProtocol | None = None
-        self._index: FaissIndexProtocol | None = None
-        self._idmap: StrArray | None = None
-        self._xb: FloatArray | None = None
-        # FAISS module-level import handles availability check
-        if faiss is not None:
-            self._faiss = cast(FaissModuleProtocol, faiss)
-        # else: self._faiss remains None from type annotation
+        if not self.use_gpu:
+            logger.debug("GPU acceleration disabled; using CPU index only")
+            self._index = trained_index
+            return trained_index
 
-    def _ensure_resources(self) -> None:
-        """Describe  ensure resources.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
-        """
-        if not self._faiss or not self.gpu:
-            return
-        if self._res is None:
-            faiss_module: FaissModuleProtocol = self._faiss
-            # StandardGpuResources constructor - cast to Protocol
-            resources_constructor_raw: object = getattr(faiss_module, "StandardGpuResources", None)
-            if resources_constructor_raw is not None:
-                resources_constructor: Callable[[], GpuResourcesProtocol] = cast(
-                    Callable[[], GpuResourcesProtocol], resources_constructor_raw
-                )
-                self._res = resources_constructor()
-
-    def train(self, train_vectors: FloatArray | FloatArrayLike, *, seed: int = 42) -> None:
-        """Describe train.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        train_vectors : FloatArray | FloatArrayLike
-            Describe ``train_vectors``.
-        seed : int, optional
-            Describe ``seed``.
-            Defaults to ``42``.
-        """
-        del seed
-        if self._faiss is None:
-            return
-        train_mat: FloatArray = np.asarray(train_vectors, dtype=np.float32, order="C")
-        faiss_module: FaissModuleProtocol = self._faiss
-        dimension = train_mat.shape[1]
-        cpu_index_raw: object = faiss_module.index_factory(
-            dimension, self.factory, faiss_module.METRIC_INNER_PRODUCT
+        context = detect_gpu_context(
+            self.faiss_module,
+            use_cuvs=self.use_cuvs,
+            device_ids=self.devices,
         )
-        cpu_index: FaissIndexProtocol = cast(FaissIndexProtocol, cpu_index_raw)
-        faiss_module.normalize_L2(train_mat)
-        cpu_index.train(train_mat)
-        self._ensure_resources()
-        if self.gpu:
-            options_raw: object = getattr(faiss_module, "GpuClonerOptions", None)
-            if options_raw is None:
-                self._index = cpu_index
-                return
-            options_constructor: Callable[[], GpuClonerOptionsProtocol] = cast(
-                Callable[[], GpuClonerOptionsProtocol], options_raw
-            )
-            options: GpuClonerOptionsProtocol = options_constructor()
-            options.use_cuvs = bool(self.cuvs)
-            try:
-                index_cpu_to_gpu_func_raw: object = getattr(faiss_module, "index_cpu_to_gpu", None)
-                if index_cpu_to_gpu_func_raw is None:
-                    self._index = cpu_index
-                    return
-                index_cpu_to_gpu_callable: Callable[
-                    [GpuResourcesProtocol, int, FaissIndexProtocol, GpuClonerOptionsProtocol],
-                    object,
-                ] = cast(
-                    Callable[
-                        [GpuResourcesProtocol, int, FaissIndexProtocol, GpuClonerOptionsProtocol],
-                        object,
-                    ],
-                    index_cpu_to_gpu_func_raw,
-                )
-                if self._res is not None:
-                    gpu_index_raw: object = index_cpu_to_gpu_callable(
-                        self._res, 0, cpu_index, options
-                    )
-                    self._index = cast(FaissIndexProtocol, gpu_index_raw)
-                else:
-                    self._index = cpu_index
-            except (RuntimeError, OSError, ValueError) as exc:
-                logger.debug("GPU cloning with cuVS failed, falling back to standard GPU: %s", exc)
-                if self._res is not None:
-                    index_cpu_to_gpu_func_fallback_raw: object = getattr(
-                        faiss_module, "index_cpu_to_gpu", None
-                    )
-                    if index_cpu_to_gpu_func_fallback_raw is not None:
-                        index_cpu_to_gpu_callable_fallback: Callable[
-                            [GpuResourcesProtocol, int, FaissIndexProtocol], object
-                        ] = cast(
-                            Callable[[GpuResourcesProtocol, int, FaissIndexProtocol], object],
-                            index_cpu_to_gpu_func_fallback_raw,
-                        )
-                        gpu_index_raw_fallback: object = index_cpu_to_gpu_callable_fallback(
-                            self._res, 0, cpu_index
-                        )
-                        self._index = cast(FaissIndexProtocol, gpu_index_raw_fallback)
-                    else:
-                        self._index = cpu_index
-                else:
-                    self._index = cpu_index
-        else:
-            self._index = cpu_index
-        try:
-            if self.gpu:
-                params_raw: object = getattr(faiss_module, "GpuParameterSpace", None)
-            else:
-                params_raw_cpu: object = getattr(faiss_module, "ParameterSpace", None)
-                params_raw = params_raw_cpu
-            if params_raw is not None and self._index is not None:
-                params_constructor: Callable[[], object] = cast(Callable[[], object], params_raw)
-                params = params_constructor()
-                set_index_param_func_raw: object = getattr(params, "set_index_parameter", None)
-                if set_index_param_func_raw is not None:
-                    set_index_param_func: Callable[
-                        [object, FaissIndexProtocol, str, object], None
-                    ] = cast(
-                        Callable[[object, FaissIndexProtocol, str, object], None],
-                        set_index_param_func_raw,
-                    )
-                    set_index_param_func(params, self._index, "nprobe", self.nprobe)
-        except (RuntimeError, AttributeError, ValueError) as exc:
-            logger.debug("Failed to set nprobe parameter: %s", exc)
-            # Continue without parameter setting (FAISS will use defaults)
+        if context is None:
+            logger.debug("GPU helpers missing; falling back to CPU index")
+            self._index = trained_index
+            return trained_index
 
-    def add(self, keys: list[str], vectors: FloatArray | FloatArrayLike) -> None:
-        """Describe add.
+        gpu_index = clone_index_to_gpu(trained_index, context)
+        configure_search_parameters(
+            self.faiss_module, gpu_index, nprobe=self.nprobe, gpu_enabled=True
+        )
+        self._context = context
+        self._index = gpu_index
+        return gpu_index
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        keys : list[str]
-            Describe ``keys``.
-        vectors : FloatArray | FloatArrayLike
-            Describe ``vectors``.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when TODO for RuntimeError.
-        """
-        vec_array: FloatArray = np.asarray(vectors, dtype=np.float32, order="C")
-        if self._faiss is None:
-            xb: FloatArray = np.array(vec_array, dtype=np.float32, copy=True)
-            self._xb = xb
-            idmap: StrArray = np.asarray(keys, dtype=np.str_)
-            self._idmap = idmap
-            # np.linalg.norm returns floating[Any] due to numpy typing limitations
-            norms_result: NDArray[np.floating[Any]] = np.linalg.norm(
-                self._xb, axis=1, keepdims=True
-            )
-            norms = cast(FloatArray, (norms_result + 1e-12).astype(np.float32, copy=False))
-            self._xb /= norms
-            return
-        faiss_module: FaissModuleProtocol = self._faiss
+    def search(self, query: FloatVector, k: int) -> list[tuple[int, float]]:
+        """Execute a search against the prepared index returning ``(id, score)`` pairs."""
         if self._index is None:
-            message = "FAISS index not initialized; call train() before add()."
-            raise RuntimeError(message)
-        faiss_module.normalize_L2(vec_array)
-        idmap_array: IntArray = np.asarray(keys, dtype=np.int64)
-        if FaissIndexIDMap2 is not None and isinstance(self._index, FaissIndexIDMap2):
-            self._index.add_with_ids(vec_array, idmap_array)
-        else:
-            index_idmap2_constructor_raw: object = getattr(faiss_module, "IndexIDMap2", None)
-            if index_idmap2_constructor_raw is not None:
-                index_idmap2_constructor: Callable[[FaissIndexProtocol], FaissIndexProtocol] = cast(
-                    Callable[[FaissIndexProtocol], FaissIndexProtocol],
-                    index_idmap2_constructor_raw,
-                )
-                index_with_ids: FaissIndexProtocol = index_idmap2_constructor(self._index)
-                index_with_ids.add_with_ids(vec_array, idmap_array)
-                self._index = index_with_ids
-            else:
-                self._index.add(vec_array)
+            msg = "FAISS GPU index not prepared"
+            raise RuntimeError(msg)
 
-    def search(self, query: FloatArray | FloatArrayLike, k: int) -> list[tuple[str, float]]:
-        """Describe search.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        query : FloatArray | FloatArrayLike
-            Describe ``query``.
-        k : int
-            Describe ``k``.
-
-        Returns
-        -------
-        list[tuple[str, float]]
-            Describe return value.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when TODO for RuntimeError.
-        """
-        q: FloatArray = np.asarray(query, dtype=np.float32, order="C")
-        # np.linalg.norm returns floating[Any] due to numpy typing limitations
-        norm_result: NDArray[np.floating[Any]] = np.linalg.norm(q, axis=-1, keepdims=True)
-        norm_float32 = cast(FloatArray, (norm_result + 1e-12).astype(np.float32, copy=False))
-        q /= norm_float32
-        if self._faiss is None or self._index is None:
-            if self._xb is None or self._idmap is None:
-                return []
-            # Matrix multiplication returns floating[Any] due to numpy typing limitations
-            sims_matrix_result: NDArray[np.floating[Any]] = self._xb @ q.T
-            sims_matrix = cast(FloatArray, sims_matrix_result.astype(np.float32, copy=False))
-            sims: FloatArray = np.asarray(sims_matrix, dtype=np.float32).squeeze()
-            indices: NDArray[np.int64] = np.argsort(-sims)[:k]
-            # numpy tolist() returns list[Any] but can be narrowed based on dtype
-            # For int64 arrays, tolist() returns list[int] at runtime
-            indices_list: list[int] = cast(list[int], indices.tolist())
-            # Index sims explicitly - numpy indexing returns Any
-            idmap = cast(StrArray, self._idmap)
-            return [(str(idmap[i]), float(sims[i])) for i in indices_list]
-        if self._idmap is None:
-            message = "ID map not loaded; cannot resolve FAISS results."
-            raise RuntimeError(message)
-        distances_result: tuple[NDArray[np.float32], NDArray[np.int64]] = self._index.search(
-            q.reshape(1, -1), k
-        )
-        distances: NDArray[np.float32] = distances_result[0]
-        indices_result: NDArray[np.int64] = distances_result[1]
-        ids: NDArray[np.int64] = indices_result[0]
-        scores: NDArray[np.float32] = distances[0]
-        # numpy tolist() returns list[Any] but can be narrowed based on dtype
-        # For int64 arrays, tolist() returns list[int] at runtime
-        # For float32 arrays, tolist() returns list[float] at runtime
-        ids_list: list[int] = cast(list[int], ids.tolist())
-        scores_list: list[float] = cast(list[float], scores.tolist())
-        return [
-            (str(ids_list[i]), scores_list[i]) for i in range(len(ids_list)) if ids_list[i] != -1
-        ]
-
-    def save(self, index_uri: str, idmap_uri: str | None = None) -> None:  # noqa: ARG002
-        """Describe save.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        index_uri : str
-            Describe ``index_uri``.
-        idmap_uri : str | NoneType, optional
-            Describe ``idmap_uri``.
-            Defaults to ``None``.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when TODO for RuntimeError.
-        """
-        if self._faiss is None or self._index is None:
-            if self._xb is not None and self._idmap is not None:
-                np.savez(index_uri, xb=self._xb, ids=self._idmap)
-            return
-        faiss_module: FaissModuleProtocol = self._faiss
-        if self.gpu:
-            index_gpu_to_cpu_func_raw: object = getattr(faiss_module, "index_gpu_to_cpu", None)
-            if index_gpu_to_cpu_func_raw is not None and self._index is not None:
-                index_gpu_to_cpu_callable: Callable[[FaissIndexProtocol], FaissIndexProtocol] = (
-                    cast(
-                        Callable[[FaissIndexProtocol], FaissIndexProtocol],
-                        index_gpu_to_cpu_func_raw,
-                    )
-                )
-                target_index: FaissIndexProtocol = index_gpu_to_cpu_callable(self._index)
-            else:
-                target_index = self._index
-        else:
-            target_index = self._index
-        if target_index is not None:
-            write_index_func_raw: object = getattr(faiss_module, "write_index", None)
-            if write_index_func_raw is not None:
-                write_index_callable: Callable[[FaissIndexProtocol, str], None] = cast(
-                    Callable[[FaissIndexProtocol, str], None], write_index_func_raw
-                )
-                write_index_callable(target_index, index_uri)
-
-    def load(self, index_uri: str, idmap_uri: str | None = None) -> None:  # noqa: ARG002
-        """Describe load.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
-
-        Parameters
-        ----------
-        index_uri : str
-            Describe ``index_uri``.
-        idmap_uri : str | NoneType, optional
-            Describe ``idmap_uri``.
-            Defaults to ``None``.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when TODO for RuntimeError.
-        """
-        if self._faiss is None:
-            if Path(index_uri + ".npz").exists():
-                # np.load returns dict[str, NDArray[Any]] with allow_pickle=True
-                # numpy typing limitations require explicit casts
-                data_untyped: object = np.load(index_uri + ".npz", allow_pickle=True)
-                data = cast(dict[str, NDArray[Any]], data_untyped)
-                xb_data_raw: NDArray[Any] = data["xb"]
-                ids_data_raw: NDArray[Any] = data["ids"]
-                self._xb = cast(FloatArray, xb_data_raw.astype(np.float32, copy=False))
-                self._idmap = cast(StrArray, ids_data_raw.astype(np.str_, copy=False))
-            return
-        faiss_module: FaissModuleProtocol | None = self._faiss
-        if faiss_module is None:
-            message = "FAISS not available"
-            raise RuntimeError(message)
-        read_index_func_raw: object = getattr(faiss_module, "read_index", None)
-        if read_index_func_raw is None:
-            message = "FAISS read_index not available"
-            raise RuntimeError(message)
-        read_index_callable: Callable[[str], FaissIndexProtocol] = cast(
-            Callable[[str], FaissIndexProtocol], read_index_func_raw
-        )
-        cpu_index: FaissIndexProtocol = read_index_callable(index_uri)
-        self._ensure_resources()
-        if self.gpu:
-            options_raw: object = getattr(faiss_module, "GpuClonerOptions", None)
-            if options_raw is not None:
-                options_constructor: Callable[[], GpuClonerOptionsProtocol] = cast(
-                    Callable[[], GpuClonerOptionsProtocol], options_raw
-                )
-                options: GpuClonerOptionsProtocol = options_constructor()
-                options.use_cuvs = bool(self.cuvs)
-                try:
-                    index_cpu_to_gpu_func_raw: object = getattr(
-                        faiss_module, "index_cpu_to_gpu", None
-                    )
-                    if index_cpu_to_gpu_func_raw is not None and self._res is not None:
-                        index_cpu_to_gpu_callable: Callable[
-                            [
-                                GpuResourcesProtocol,
-                                int,
-                                FaissIndexProtocol,
-                                GpuClonerOptionsProtocol,
-                            ],
-                            object,
-                        ] = cast(
-                            Callable[
-                                [
-                                    GpuResourcesProtocol,
-                                    int,
-                                    FaissIndexProtocol,
-                                    GpuClonerOptionsProtocol,
-                                ],
-                                object,
-                            ],
-                            index_cpu_to_gpu_func_raw,
-                        )
-                        gpu_index_raw: object = index_cpu_to_gpu_callable(
-                            self._res, 0, cpu_index, options
-                        )
-                        self._index = cast(FaissIndexProtocol, gpu_index_raw)
-                    else:
-                        self._index = cpu_index
-                except (RuntimeError, OSError, ValueError) as exc:
-                    logger.debug(
-                        "GPU cloning with cuVS failed, falling back to standard GPU: %s", exc
-                    )
-                    if self._res is not None:
-                        index_cpu_to_gpu_func_fallback_raw: object = getattr(
-                            faiss_module, "index_cpu_to_gpu", None
-                        )
-                        if index_cpu_to_gpu_func_fallback_raw is not None:
-                            index_cpu_to_gpu_callable_fallback: Callable[
-                                [GpuResourcesProtocol, int, FaissIndexProtocol], object
-                            ] = cast(
-                                Callable[[GpuResourcesProtocol, int, FaissIndexProtocol], object],
-                                index_cpu_to_gpu_func_fallback_raw,
-                            )
-                            gpu_index_raw_fallback: object = index_cpu_to_gpu_callable_fallback(
-                                self._res, 0, cpu_index
-                            )
-                            self._index = cast(FaissIndexProtocol, gpu_index_raw_fallback)
-                        else:
-                            self._index = cpu_index
-                    else:
-                        self._index = cpu_index
-            else:
-                self._index = cpu_index
-        else:
-            self._index = cpu_index
+        query_vector = np.asarray(query, dtype=np.float32).reshape(1, -1)
+        normalized = normalize_l2(query_vector, axis=1)
+        score_matrix, index_matrix = self._index.search(normalized, k)
+        score_matrix_typed: FloatMatrix = np.asarray(score_matrix, dtype=np.float32)
+        index_matrix_typed: IntVector = np.asarray(index_matrix, dtype=np.int64)
+        score_vector: FloatVector = score_matrix_typed[0]
+        index_vector: IntVector = index_matrix_typed[0]
+        top_scores = cast(list[float], score_vector.astype(np.float32, copy=False).tolist())
+        top_indices = cast(list[int], index_vector.astype(np.int64, copy=False).tolist())
+        return list(zip(top_indices, top_scores, strict=False))

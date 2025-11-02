@@ -1,0 +1,28 @@
+{
+  "base_sha": "0123456",
+  "head_sha": "89abcde",
+  "added": [
+    "kgfoundry.docs.new.module.Class"
+  ],
+  "removed": [
+    "kgfoundry.docs.old.module.legacy_function"
+  ],
+  "changed": [
+    {
+      "path": "kgfoundry.docs.sample.module.function",
+      "reasons": [
+        "doc",
+        "signature"
+      ],
+      "before": {
+        "doc": "Return a friendly greeting.",
+        "signature": "(name: str) -> str"
+      },
+      "after": {
+        "doc": "Return a friendly greeting for documentation examples.",
+        "signature": "(name: str, *, excited: bool = False) -> str"
+      }
+    }
+  ]
+}
+

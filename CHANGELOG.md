@@ -12,6 +12,7 @@
 - **Namespace consolidation**: All public APIs are now accessible via the unified `kgfoundry.*` namespace (e.g., `from kgfoundry import vectorstore_faiss`). The namespace proxy automatically resolves submodules on first access, eliminating duplicate top-level package imports.
 - **GPU extras**: GPU-specific dependencies (FAISS GPU, cuVS, PyTorch, vLLM, etc.) are now isolated in the `gpu` extra. Install with `uv sync --extra gpu` or `pip install kgfoundry[gpu]`. This keeps the base installation lightweight while enabling optional GPU acceleration.
 - **Tooling automation**: Added import-linter contracts, suppression guard script (`tools/check_new_suppressions.py`), and PR summary generator (`tools/generate_pr_summary.py`) for improved code quality enforcement.
+- Documented the shared observability facade (`tools/_shared/observability_facade.md`) covering typed Prometheus builders, structured logging fields, tracing helpers, and the fallback semantics for environments without `prometheus_client`.
 
 ### Changed
 - `tools/update_navmaps.py` now validates docstrings instead of injecting `NavMap:` sections.

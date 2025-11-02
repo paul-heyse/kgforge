@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
 import mkdocs_gen_files
-from docs._scripts import shared
+from docs._scripts import shared  # noqa: PLC2701
 from tools import get_logger
 
 ENV = shared.detect_environment()
@@ -36,17 +36,9 @@ class DocumentableNode(Protocol):
     """Protocol capturing the Griffe attributes used for MkDocs generation."""
 
     path: str
-    members: Mapping[str, DocumentableNode]
+    members: Mapping[str, object]
     is_package: bool
     is_module: bool
-
-
-@runtime_checkable
-class GriffeLoader(Protocol):
-    """Subset of the Griffe loader API consumed by the generator."""
-
-    def load(self, package: str) -> DocumentableNode:  # pragma: no cover - runtime protocol
-        ...
 
 
 def iter_packages() -> Sequence[str]:
@@ -67,19 +59,22 @@ def _render_node(node: DocumentableNode, destination: Path) -> RenderedPage:
 
 
 def _documentable_members(node: DocumentableNode) -> Iterable[DocumentableNode]:
-    members_attr = getattr(node, "members", None)
+    members_attr = cast(object, getattr(node, "members", None))
     if not isinstance(members_attr, Mapping):
         return ()
-    members = cast(Mapping[str, DocumentableNode], members_attr)
+    members = cast(Mapping[str, object], members_attr)
     filtered: list[DocumentableNode] = []
     for member in members.values():
-        if bool(getattr(member, "is_package", False)) or bool(getattr(member, "is_module", False)):
-            filtered.append(member)
+        member_node = cast(DocumentableNode, member)
+        is_package = cast(bool, getattr(member_node, "is_package", False))
+        is_module = cast(bool, getattr(member_node, "is_module", False))
+        if is_package or is_module:
+            filtered.append(member_node)
     return tuple(filtered)
 
 
 def generate_api_reference(
-    loader: GriffeLoader,
+    loader: shared.GriffeLoader,
     packages: Sequence[str],
     *,
     destination: Path | None = None,
@@ -89,7 +84,7 @@ def generate_api_reference(
     pages: list[RenderedPage] = [_render_index(target)]
 
     for package in packages:
-        module = loader.load(package)
+        module = cast(DocumentableNode, loader.load(package))
         pages.append(_render_node(module, target))
         for member in _documentable_members(module):
             pages.append(_render_node(member, target))

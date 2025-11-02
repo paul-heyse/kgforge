@@ -28,3 +28,4 @@ def load_library(*args: object, **kwargs: object) -> None:
     - Raises ImportError if libcuvs is not available
     - Typically called before importing faiss in GPU-enabled code paths
     """
+    ...

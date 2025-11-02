@@ -7,6 +7,8 @@ enabling full type checking for vector search operations.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 import numpy.typing as npt
 
@@ -17,6 +19,11 @@ __all__ = [
     "METRIC_INNER_PRODUCT",
     "METRIC_L2",
     "GpuClonerOptions",
+    "GpuDistanceParams",
+    "GpuIndexCagraConfig",
+    "GpuIndexFlatConfig",
+    "GpuIndexFlatIP",
+    "GpuIndexIVFConfig",
     "GpuParameterSpace",
     "IndexFlatIP",
     "IndexIDMap2",
@@ -24,11 +31,17 @@ __all__ = [
     "StandardGpuResources",
     "VectorIndex",
     "index_cpu_to_gpu",
+    "index_cpu_to_gpu_multiple",
     "index_factory",
     "index_gpu_to_cpu",
+    "knn_gpu",
     "normalize_L2",
     "read_index",
+    "read_index_binary",
+    "serialize_index",
+    "should_use_cuvs",
     "write_index",
+    "write_index_binary",
 ]
 
 type VectorArray = npt.NDArray[np.float32]
@@ -85,6 +98,7 @@ class IndexIDMap2(VectorIndex):
 
     def __init__(self, index: VectorIndex) -> None:
         """Wrap an index with ID mapping."""
+        ...
 
     def add_with_ids(self, vectors: VectorArray, ids: IndexArray) -> None:
         """Add vectors with custom IDs.
@@ -127,6 +141,59 @@ class StandardGpuResources:
 
     def __init__(self) -> None:
         """Initialize GPU resources."""
+        ...
+
+    def setTempMemory(self, value: int) -> None:  # noqa: N802
+        """Configure temporary GPU memory budget (bytes)."""
+        ...
+
+    def setPinnedMemory(self, value: int) -> None:  # noqa: N802
+        """Configure pinned host memory budget (bytes)."""
+        ...
+
+class GpuIndexFlatIP(VectorIndex):
+    """GPU-backed flat inner-product index."""
+
+    dimension: int
+
+    def __init__(
+        self,
+        resources: StandardGpuResources,
+        dimension: int,
+        config: object | None = ...,
+    ) -> None:
+        """Create a GPU flat inner-product index."""
+        ...
+
+class GpuIndexFlatConfig:
+    """Configuration surface for GPU flat indexes."""
+
+    use_cuvs: bool
+    device: int
+
+    def __init__(self) -> None:
+        """Initialise configuration with default settings."""
+        ...
+
+class GpuIndexIVFConfig:
+    """Configuration surface for GPU IVF indexes."""
+
+    use_cuvs: bool
+    device: int
+
+    def __init__(self) -> None:
+        """Initialise configuration with default settings."""
+        ...
+
+class GpuIndexCagraConfig:
+    """Configuration surface for GPU CAGRA indexes."""
+
+    use_cuvs: bool
+    device: int
+
+    def __init__(self) -> None:
+        """Initialise configuration with default settings."""
+        ...
 
 class GpuClonerOptions:
     """Stub FAISS GPU cloner options."""
@@ -136,6 +203,7 @@ class GpuClonerOptions:
 
     def __init__(self) -> None:
         """Initialize GPU cloner options."""
+        ...
 
 class ParameterSpace:
     """Stub for CPU parameter space."""
@@ -171,6 +239,21 @@ class GpuParameterSpace:
         """
         ...
 
+    def initialize(self, index: VectorIndex) -> None:
+        """Bind the parameter space to ``index``."""
+        ...
+
+class GpuDistanceParams:
+    """Parameters describing GPU brute-force distance searches."""
+
+    metric: int
+    k: int
+    dims: int
+
+    def __init__(self) -> None:
+        """Initialise distance parameters with defaults."""
+        ...
+
 METRIC_INNER_PRODUCT: int
 """Constant for inner-product metric."""
 
@@ -194,6 +277,7 @@ def index_factory(dimension: int, description: str, metric: int) -> VectorIndex:
     VectorIndex
         Configured index instance.
     """
+    ...
 
 def index_cpu_to_gpu(
     resources: StandardGpuResources,
@@ -219,6 +303,16 @@ def index_cpu_to_gpu(
     VectorIndex
         GPU-backed index instance.
     """
+    ...
+
+def index_cpu_to_gpu_multiple(
+    resources: StandardGpuResources,
+    devices: Sequence[int],
+    index: VectorIndex,
+    options: GpuClonerOptions | None = None,
+) -> list[VectorIndex]:
+    """Clone a CPU index to multiple GPU devices."""
+    ...
 
 def index_gpu_to_cpu(index: VectorIndex) -> VectorIndex:
     """Convert a GPU index back to CPU.
@@ -233,6 +327,7 @@ def index_gpu_to_cpu(index: VectorIndex) -> VectorIndex:
     VectorIndex
         CPU index instance.
     """
+    ...
 
 def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
     """Normalize vectors to unit length in-place.
@@ -242,6 +337,7 @@ def normalize_L2(vectors: VectorArray) -> None:  # noqa: N802
     vectors : VectorArray
         Array to normalize (modified in-place).
     """
+    ...
 
 def write_index(index: VectorIndex, path: str) -> None:
     """Write an index to disk.
@@ -258,6 +354,7 @@ def write_index(index: VectorIndex, path: str) -> None:
     OSError
         If the file cannot be written.
     """
+    ...
 
 def read_index(path: str) -> VectorIndex:
     """Read an index from disk.
@@ -279,6 +376,36 @@ def read_index(path: str) -> VectorIndex:
     OSError
         If the file cannot be read or is corrupted.
     """
+    ...
+
+def write_index_binary(index: VectorIndex, path: str) -> None:
+    """Write an index to disk in binary format."""
+    ...
+
+def read_index_binary(path: str) -> VectorIndex:
+    """Read an index persisted in binary format."""
+    ...
+
+def serialize_index(index: VectorIndex) -> bytes:
+    """Serialize an index into a bytes payload."""
+    ...
+
+def should_use_cuvs(params: object) -> bool:
+    """Return ``True`` when cuVS acceleration should be engaged for ``params``."""
+    ...
+
+def knn_gpu(
+    resources: StandardGpuResources,
+    queries: VectorArray,
+    base: VectorArray,
+    k: int,
+    *,
+    metric: int,
+    use_cuvs: bool | None = None,
+) -> SearchResult:
+    """Run brute-force KNN on GPU, optionally enabling cuVS kernels."""
+    ...
 
 def __getattr__(name: str) -> object:
     """Fallback for dynamic attributes."""
+    ...

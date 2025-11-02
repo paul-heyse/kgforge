@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
-
+from collections.abc import Iterable
 
 class CollectorRegistry:
     """Registry of Prometheus metrics."""
@@ -13,5 +12,3 @@ class CollectorRegistry:
     def unregister(self, metric: object) -> None: ...
 
     def collect(self) -> Iterable[object]: ...
-
-
