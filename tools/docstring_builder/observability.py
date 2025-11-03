@@ -97,28 +97,28 @@ class DocstringBuilderMetrics:
         self.harvest_duration_seconds = build_histogram(
             "docbuilder_harvest_duration_seconds",
             "Duration of harvest operations in seconds",
-            ["status"],
+            labelnames=["status"],
             registry=self.registry,
         )
 
         self.policy_duration_seconds = build_histogram(
             "docbuilder_policy_duration_seconds",
             "Duration of policy engine operations in seconds",
-            ["status"],
+            labelnames=["status"],
             registry=self.registry,
         )
 
         self.render_duration_seconds = build_histogram(
             "docbuilder_render_duration_seconds",
             "Duration of rendering operations in seconds",
-            ["status"],
+            labelnames=["status"],
             registry=self.registry,
         )
 
         self.cli_duration_seconds = build_histogram(
             "docbuilder_cli_duration_seconds",
             "Duration of CLI operations in seconds",
-            ["command", "status"],
+            labelnames=["command", "status"],
             registry=self.registry,
         )
 

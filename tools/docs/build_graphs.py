@@ -372,13 +372,11 @@ def find_top_packages() -> list[str]:
     >>> result  # doctest: +ELLIPSIS
     """
     # Top-level packages are directories under src/ that contain __init__.py
-    pkgs: list[str] = []
     if not SRC.exists():
-        return pkgs
-    for child in SRC.iterdir():
-        if child.is_dir() and (child / "__init__.py").exists():
-            pkgs.append(child.name)
-    return sorted(pkgs)
+        return []
+    return sorted(
+        child.name for child in SRC.iterdir() if child.is_dir() and (child / "__init__.py").exists()
+    )
 
 
 def _rel(p: Path) -> str:
@@ -1030,11 +1028,11 @@ def _sequence_of_sequences(value: object) -> list[list[str]]:
     """
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         return []
-    result: list[list[str]] = []
-    for entry in value:
-        if isinstance(entry, Sequence) and not isinstance(entry, (str, bytes)):
-            result.append([str(item) for item in entry])
-    return result
+    return [
+        [str(item) for item in entry]
+        for entry in value
+        if isinstance(entry, Sequence) and not isinstance(entry, (str, bytes))
+    ]
 
 
 def _edge_from_violation(record: Sequence[str]) -> tuple[str, str] | None:

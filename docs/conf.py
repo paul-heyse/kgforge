@@ -135,15 +135,6 @@ class _AutoDocstringsModule(Protocol):
         ...
 
 
-@runtime_checkable
-class _AutoapiParserProto(Protocol):
-    """Subset of AutoAPI parser surface used when parsing modules."""
-
-    def parse(self, node: object) -> object: ...
-
-    def _parse_file(self, file_path: str, condition: Callable[[str], bool]) -> object: ...
-
-
 def get_project_settings(env: Mapping[str, str] | None = None) -> ProjectSettings:
     """Return strongly typed project settings derived from environment variables."""
     source = env if env is not None else os.environ

@@ -148,7 +148,7 @@ def load_settings() -> DocsSettings:
 def make_loader(env: BuildEnvironment) -> GriffeLoader:
     """Instantiate a Griffe loader configured for the repository layout."""
     search_root = env.src if env.src.exists() else env.root
-    return _LOADER_FACTORY([str(search_root)])
+    return _LOADER_FACTORY(search_paths=[str(search_root)])
 
 
 def resolve_git_sha(

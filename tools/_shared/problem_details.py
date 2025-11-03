@@ -349,8 +349,7 @@ def problem_from_exception(params: ExceptionProblemDetailsParams) -> ProblemDeta
     exc_type_name = params.exception.__class__.__name__
     merged_extensions: dict[str, JsonValue] = {"exception_type": exc_type_name}
     if params.extensions:
-        for key, value in params.extensions.items():
-            merged_extensions[key] = value
+        merged_extensions.update(params.extensions)
     base = replace(params.base, detail=detail, extensions=merged_extensions)
     return build_problem_details(base)
 

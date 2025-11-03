@@ -11,6 +11,11 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
+try:  # griffe 0.44+
+    from griffe.exceptions import AliasResolutionError
+except ImportError:  # pragma: no cover - compatibility fallback
+    from griffe._internal.exceptions import AliasResolutionError  # type: ignore[attr-defined]
+
 from docs._scripts import shared
 from docs._scripts.validation import validate_against_schema
 from tools import (
@@ -167,7 +172,7 @@ def safe_getattr(obj: object, name: str, default: object | None = None) -> objec
     """Return ``getattr`` with defensive error handling."""
     try:
         return cast(object, getattr(obj, name, default))
-    except (AttributeError, RuntimeError):
+    except (AttributeError, RuntimeError, AliasResolutionError):
         return default
 
 

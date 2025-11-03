@@ -1,22 +1,25 @@
 {
-  "commit": "cc0b8c0e39cecdfdbc4bad20ff838326eee5013f",
-  "policy_version": "1",
-  "link_mode": "editor",
+  "schemaVersion": "1.0.0",
+  "schemaId": "https://kgfoundry.dev/schema/tools/navmap-document.json",
+  "generatedAt": "2025-11-03T15:24:39.319632+00:00",
+  "commit": "d5557fcb9ea570c3b3992df46e1bb8e00ffa1bdb",
+  "policyVersion": "1",
+  "linkMode": "editor",
   "modules": {
     "__init__": {
       "path": "src/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "docling.__init__": {
@@ -36,7 +39,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "canonicalizer": 48,
         "hybrid": 49,
@@ -62,10 +65,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Public surface for docling preprocessing utilities",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "docling.canonicalizer": {
@@ -81,7 +84,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "canonicalize_text": 44
       },
@@ -95,10 +98,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "String canonicalisation utilities for docling preprocessing",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "docling.hybrid": {
@@ -114,7 +117,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "HybridChunker": 42
       },
@@ -128,10 +131,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Hybrid docling pipeline combining layout and text cues",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "docling.vlm": {
@@ -147,7 +150,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "GraniteDoclingVLM": 42
       },
@@ -161,10 +164,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Vision-language tagging helpers for docling",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "download.__init__": {
@@ -182,7 +185,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "cli": 10,
         "harvester": 11
@@ -202,10 +205,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Public modules for the download and harvesting pipeline",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "download.cli": {
@@ -221,7 +224,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "harvest": 46
       },
@@ -235,10 +238,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Command-line entrypoints for bulk download orchestration",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "download.harvester": {
@@ -254,7 +257,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "OpenAccessHarvester": 84
       },
@@ -268,10 +271,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Utilities for harvesting open-access PDFs from OpenAlex.",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "embeddings_dense.__init__": {
@@ -289,7 +292,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "base": 43,
         "qwen3": 44
@@ -309,10 +312,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Dense embedding adapters and protocols",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "embeddings_dense.base": {
@@ -328,7 +331,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "DenseEmbeddingModel": 46
       },
@@ -342,10 +345,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Protocols describing dense embedding providers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "embeddings_dense.qwen3": {
@@ -361,7 +364,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "Qwen3Embedder": 42
       },
@@ -375,10 +378,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Qwen-3 dense embedding adapter",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "embeddings_sparse.__init__": {
@@ -398,7 +401,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "base": 48,
         "bm25": 49,
@@ -424,10 +427,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Sparse embedding adapters and indices",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "embeddings_sparse.base": {
@@ -445,7 +448,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "SparseEncoder": 48,
         "SparseIndex": 93
@@ -465,10 +468,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Protocols for sparse embedding encoders and indices",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "embeddings_sparse.bm25": {
@@ -490,12 +493,11 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "BM25Doc": 93,
-        "PurePythonBM25": 115,
-        "LuceneBM25": 428,
-        "get_bm25": 574
+        "BM25Doc": 155,
+        "PurePythonBM25": 178,
+        "LuceneBM25": 511
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/bm25.py"
@@ -522,14 +524,14 @@
           "since": "2024.10"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [
         "bm25",
         "retrieval",
         "sparse"
       ],
       "synopsis": "Pure Python and Lucene-backed BM25 adapters for sparse retrieval",
-      "see_also": [
+      "seeAlso": [
         "kgfoundry.search_api.bm25_index"
       ],
       "deps": [
@@ -555,12 +557,12 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "SPLADEv3Encoder": 82,
-        "PureImpactIndex": 175,
-        "LuceneImpactIndex": 376,
-        "get_splade": 471
+        "SPLADEv3Encoder": 188,
+        "PureImpactIndex": 282,
+        "LuceneImpactIndex": 482,
+        "get_splade": 589
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/splade.py"
@@ -587,26 +589,26 @@
           "since": "2024.10"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "SPLADE sparse embedding helpers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kf_common.__init__": {
       "path": "src/kf_common/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kf_common/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kg_builder.__init__": {
@@ -624,7 +626,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "mock_kg": 43,
         "neo4j_store": 44
@@ -644,10 +646,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Knowledge graph builder components and interfaces",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kg_builder.mock_kg": {
@@ -663,7 +665,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "MockKG": 42
       },
@@ -677,10 +679,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Helpers for the MockKG in-memory knowledge graph",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kg_builder.neo4j_store": {
@@ -696,7 +698,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "Neo4jStore": 42
       },
@@ -710,48 +712,54 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Placeholder interface for a Neo4j-backed store",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.__init__": {
       "path": "src/kgfoundry/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry._namespace_proxy": {
       "path": "src/kgfoundry/_namespace_proxy.py",
       "exports": [
+        "NamespaceRegistry",
+        "namespace_attach",
         "namespace_dir",
+        "namespace_exports",
         "namespace_getattr"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/_namespace_proxy.py"
       },
       "meta": {
+        "NamespaceRegistry": {},
+        "namespace_attach": {},
         "namespace_dir": {},
+        "namespace_exports": {},
         "namespace_getattr": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.__init__": {
@@ -772,7 +780,7 @@
         "write_sqlite_catalog"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/__init__.py"
@@ -792,10 +800,10 @@
         "search": {},
         "write_sqlite_catalog": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.audit": {
@@ -804,7 +812,7 @@
         "AuditLogger"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/audit.py"
@@ -812,32 +820,36 @@
       "meta": {
         "AuditLogger": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.cli": {
       "path": "src/kgfoundry/agent_catalog/cli.py",
       "exports": [
+        "ALLOWED_FACET_KEYS",
         "build_parser",
-        "main"
+        "main",
+        "search_result_to_dict"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/cli.py"
       },
       "meta": {
+        "ALLOWED_FACET_KEYS": {},
         "build_parser": {},
-        "main": {}
+        "main": {},
+        "search_result_to_dict": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.client": {
@@ -847,7 +859,7 @@
         "AgentCatalogClientError"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/client.py"
@@ -856,10 +868,10 @@
         "AgentCatalogClient": {},
         "AgentCatalogClientError": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.mcp": {
@@ -871,7 +883,7 @@
         "main"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/mcp.py"
@@ -882,26 +894,26 @@
         "build_parser": {},
         "main": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.models": {
       "path": "src/kgfoundry/agent_catalog/models.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/models.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.rbac": {
@@ -911,7 +923,7 @@
         "Role"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/rbac.py"
@@ -920,26 +932,62 @@
         "AccessController": {},
         "Role": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.search": {
       "path": "src/kgfoundry/agent_catalog/search.py",
-      "exports": [],
+      "exports": [
+        "EmbeddingModelProtocol",
+        "MetricsProvider",
+        "PreparedSearchArtifacts",
+        "SearchConfig",
+        "SearchDocument",
+        "SearchDocumentPayload",
+        "SearchOptions",
+        "SearchOptionsPayload",
+        "SearchRequest",
+        "SearchResult",
+        "VectorSearchContext",
+        "build_default_search_options",
+        "build_embedding_aware_search_options",
+        "build_faceted_search_options",
+        "documents_from_catalog",
+        "make_search_document",
+        "search_catalog"
+      ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/search.py"
       },
-      "meta": {},
-      "module_meta": {},
+      "meta": {
+        "EmbeddingModelProtocol": {},
+        "MetricsProvider": {},
+        "PreparedSearchArtifacts": {},
+        "SearchConfig": {},
+        "SearchDocument": {},
+        "SearchDocumentPayload": {},
+        "SearchOptions": {},
+        "SearchOptionsPayload": {},
+        "SearchRequest": {},
+        "SearchResult": {},
+        "VectorSearchContext": {},
+        "build_default_search_options": {},
+        "build_embedding_aware_search_options": {},
+        "build_faceted_search_options": {},
+        "documents_from_catalog": {},
+        "make_search_document": {},
+        "search_catalog": {}
+      },
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.session": {
@@ -951,7 +999,7 @@
         "JsonValue"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/session.py"
@@ -962,10 +1010,10 @@
         "JsonObject": {},
         "JsonValue": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.agent_catalog.sqlite": {
@@ -976,7 +1024,7 @@
         "write_sqlite_catalog"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/sqlite.py"
@@ -986,74 +1034,74 @@
         "sqlite_candidates": {},
         "write_sqlite_catalog": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.docling.__init__": {
       "path": "src/kgfoundry/docling/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/docling/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.download.__init__": {
       "path": "src/kgfoundry/download/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/download/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.embeddings_dense.__init__": {
       "path": "src/kgfoundry/embeddings_dense/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_dense/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.embeddings_sparse.__init__": {
       "path": "src/kgfoundry/embeddings_sparse/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.embeddings_sparse.base": {
@@ -1063,7 +1111,7 @@
         "SparseIndex"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/base.py"
@@ -1072,10 +1120,10 @@
         "SparseEncoder": {},
         "SparseIndex": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.embeddings_sparse.bm25": {
@@ -1087,7 +1135,7 @@
         "get_bm25"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/bm25.py"
@@ -1098,10 +1146,10 @@
         "PurePythonBM25": {},
         "get_bm25": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.embeddings_sparse.splade": {
@@ -1113,7 +1161,7 @@
         "get_splade"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/splade.py"
@@ -1124,26 +1172,26 @@
         "SPLADEv3Encoder": {},
         "get_splade": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.kg_builder.__init__": {
       "path": "src/kgfoundry/kg_builder/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kg_builder/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.kg_builder.mock_kg": {
@@ -1152,7 +1200,7 @@
         "MockKG"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kg_builder/mock_kg.py"
@@ -1160,26 +1208,26 @@
       "meta": {
         "MockKG": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.kgfoundry_common.__init__": {
       "path": "src/kgfoundry/kgfoundry_common/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kgfoundry_common/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.kgfoundry_common.parquet_io": {
@@ -1189,7 +1237,7 @@
         "ParquetVectorWriter"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/kgfoundry_common/parquet_io.py"
@@ -1198,74 +1246,100 @@
         "ParquetChunkWriter": {},
         "ParquetVectorWriter": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.linking.__init__": {
       "path": "src/kgfoundry/linking/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/linking/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry.namespace_bridge": {
+      "path": "src/kgfoundry/namespace_bridge.py",
+      "exports": [
+        "namespace_attach",
+        "namespace_dir",
+        "namespace_exports",
+        "namespace_getattr"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/namespace_bridge.py"
+      },
+      "meta": {
+        "namespace_attach": {},
+        "namespace_dir": {},
+        "namespace_exports": {},
+        "namespace_getattr": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.observability.__init__": {
       "path": "src/kgfoundry/observability/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/observability/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.ontology.__init__": {
       "path": "src/kgfoundry/ontology/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/ontology/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.orchestration.__init__": {
       "path": "src/kgfoundry/orchestration/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/orchestration/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.orchestration.fixture_flow": {
@@ -1279,7 +1353,7 @@
         "t_write_fixture_splade"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/orchestration/fixture_flow.py"
@@ -1292,26 +1366,26 @@
         "t_write_fixture_dense": {},
         "t_write_fixture_splade": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.registry.__init__": {
       "path": "src/kgfoundry/registry/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/registry/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.registry.helper": {
@@ -1320,7 +1394,7 @@
         "DuckDBRegistryHelper"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/registry/helper.py"
@@ -1328,10 +1402,10 @@
       "meta": {
         "DuckDBRegistryHelper": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.registry.migrate": {
@@ -1341,7 +1415,7 @@
         "main"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/registry/migrate.py"
@@ -1350,60 +1424,42 @@
         "apply": {},
         "main": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.search_api.__init__": {
       "path": "src/kgfoundry/search_api/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.search_api.app": {
       "path": "src/kgfoundry/search_api/app.py",
-      "exports": [
-        "app",
-        "apply_kg_boosts",
-        "auth",
-        "bm25",
-        "graph_concepts",
-        "healthz",
-        "rrf_fuse",
-        "search"
-      ],
+      "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/app.py"
       },
-      "meta": {
-        "app": {},
-        "apply_kg_boosts": {},
-        "auth": {},
-        "bm25": {},
-        "graph_concepts": {},
-        "healthz": {},
-        "rrf_fuse": {},
-        "search": {}
-      },
-      "module_meta": {},
+      "meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.search_api.bm25_index": {
@@ -1414,7 +1470,7 @@
         "toks"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/bm25_index.py"
@@ -1424,10 +1480,10 @@
         "BM25Index": {},
         "toks": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.search_api.faiss_adapter": {
@@ -1436,10 +1492,13 @@
         "HAVE_FAISS",
         "DenseVecs",
         "FaissAdapter",
+        "FloatArray",
+        "IntArray",
+        "StrArray",
         "VecArray"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_api/faiss_adapter.py"
@@ -1448,32 +1507,31 @@
         "HAVE_FAISS": {},
         "DenseVecs": {},
         "FaissAdapter": {},
+        "FloatArray": {},
+        "IntArray": {},
+        "StrArray": {},
         "VecArray": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.search_client.__init__": {
       "path": "src/kgfoundry/search_client/__init__.py",
-      "exports": [
-        "KGFoundryClient"
-      ],
+      "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_client/__init__.py"
       },
-      "meta": {
-        "KGFoundryClient": {}
-      },
-      "module_meta": {},
+      "meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.search_client.client": {
@@ -1485,7 +1543,7 @@
         "SupportsResponse"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/search_client/client.py"
@@ -1496,26 +1554,52 @@
         "SupportsHttp": {},
         "SupportsResponse": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry.tooling_bridge": {
+      "path": "src/kgfoundry/tooling_bridge.py",
+      "exports": [
+        "namespace_attach",
+        "namespace_dir",
+        "namespace_exports",
+        "namespace_getattr"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/tooling_bridge.py"
+      },
+      "meta": {
+        "namespace_attach": {},
+        "namespace_dir": {},
+        "namespace_exports": {},
+        "namespace_getattr": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.vectorstore_faiss.__init__": {
       "path": "src/kgfoundry/vectorstore_faiss/__init__.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/vectorstore_faiss/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry.vectorstore_faiss.gpu": {
@@ -1524,10 +1608,11 @@
         "FaissGpuIndex",
         "FloatArray",
         "IntArray",
-        "StrArray"
+        "StrArray",
+        "VecArray"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/vectorstore_faiss/gpu.py"
@@ -1536,12 +1621,13 @@
         "FaissGpuIndex": {},
         "FloatArray": {},
         "IntArray": {},
-        "StrArray": {}
+        "StrArray": {},
+        "VecArray": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.__init__": {
@@ -1557,9 +1643,12 @@
         "navmap_types",
         "observability",
         "parquet_io",
+        "safe_pickle_v2",
         "schema_helpers",
         "serialization",
-        "settings"
+        "settings",
+        "subprocess_utils",
+        "vector_types"
       ],
       "sections": [
         {
@@ -1575,13 +1664,16 @@
             "navmap_types",
             "observability",
             "parquet_io",
+            "safe_pickle_v2",
             "schema_helpers",
             "serialization",
-            "settings"
+            "settings",
+            "subprocess_utils",
+            "vector_types"
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "config": 8,
         "errors": 9,
@@ -1591,7 +1683,9 @@
         "logging": 13,
         "models": 14,
         "navmap_types": 15,
-        "parquet_io": 16
+        "parquet_io": 16,
+        "safe_pickle_v2": 17,
+        "subprocess_utils": 18
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/__init__.py"
@@ -1647,6 +1741,11 @@
           "stability": "stable",
           "since": "0.1.0"
         },
+        "safe_pickle_v2": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
         "schema_helpers": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
@@ -1661,17 +1760,28 @@
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
+        },
+        "subprocess_utils": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "vector_types": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Shared utilities and data structures used across kgfoundry",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.config": {
       "path": "src/kgfoundry_common/config.py",
       "exports": [
+        "AppSettings",
         "JsonPrimitive",
         "JsonValue",
         "load_config"
@@ -1680,20 +1790,24 @@
         {
           "id": "public-api",
           "symbols": [
+            "AppSettings",
             "JsonPrimitive",
             "JsonValue",
             "load_config"
           ]
         }
       ],
-      "section_lines": {},
-      "anchors": {
-        "load_config": 58
-      },
+      "sectionLines": {},
+      "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/config.py"
       },
       "meta": {
+        "AppSettings": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
         "JsonPrimitive": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
@@ -1710,10 +1824,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
-      "synopsis": "Configuration helpers shared across kgfoundry",
-      "see_also": [],
+      "synopsis": "Typed configuration management via pydantic_settings",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.errors.__init__": {
@@ -1725,16 +1839,16 @@
           "symbols": []
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Exception hierarchy and Problem Details support",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.errors.codes": {
@@ -1745,7 +1859,7 @@
         "get_type_uri"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors/codes.py"
@@ -1755,16 +1869,17 @@
         "ErrorCode": {},
         "get_type_uri": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.errors.exceptions": {
       "path": "src/kgfoundry_common/errors/exceptions.py",
       "exports": [
         "AgentCatalogSearchError",
+        "CatalogLoadError",
         "CatalogSessionError",
         "ChunkingError",
         "ConfigurationError",
@@ -1774,6 +1889,7 @@
         "EmbeddingError",
         "IndexBuildError",
         "KgFoundryError",
+        "KgFoundryErrorConfig",
         "LinkerCalibrationError",
         "Neo4jError",
         "OCRTimeoutError",
@@ -1783,17 +1899,19 @@
         "SchemaValidationError",
         "SerializationError",
         "SpladeOOMError",
+        "SymbolAttachmentError",
         "UnsupportedMIMEError",
         "VectorSearchError"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors/exceptions.py"
       },
       "meta": {
         "AgentCatalogSearchError": {},
+        "CatalogLoadError": {},
         "CatalogSessionError": {},
         "ChunkingError": {},
         "ConfigurationError": {},
@@ -1803,6 +1921,7 @@
         "EmbeddingError": {},
         "IndexBuildError": {},
         "KgFoundryError": {},
+        "KgFoundryErrorConfig": {},
         "LinkerCalibrationError": {},
         "Neo4jError": {},
         "OCRTimeoutError": {},
@@ -1812,13 +1931,14 @@
         "SchemaValidationError": {},
         "SerializationError": {},
         "SpladeOOMError": {},
+        "SymbolAttachmentError": {},
         "UnsupportedMIMEError": {},
         "VectorSearchError": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.errors.http": {
@@ -1828,7 +1948,7 @@
         "register_problem_details_handler"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors/http.py"
@@ -1837,15 +1957,16 @@
         "problem_details_response": {},
         "register_problem_details_handler": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.errors": {
       "path": "src/kgfoundry_common/errors.py",
       "exports": [
+        "CatalogLoadError",
         "ChunkingError",
         "DoclingError",
         "DownloadError",
@@ -1856,15 +1977,17 @@
         "OCRTimeoutError",
         "OntologyParseError",
         "SpladeOOMError",
+        "SymbolAttachmentError",
         "UnsupportedMIMEError"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors.py"
       },
       "meta": {
+        "CatalogLoadError": {},
         "ChunkingError": {},
         "DoclingError": {},
         "DownloadError": {},
@@ -1875,12 +1998,13 @@
         "OCRTimeoutError": {},
         "OntologyParseError": {},
         "SpladeOOMError": {},
+        "SymbolAttachmentError": {},
         "UnsupportedMIMEError": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.exceptions": {
@@ -1898,7 +2022,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "DownloadError": 50,
         "UnsupportedMIMEError": 55
@@ -1911,51 +2035,77 @@
           "owner": "@kgfoundry-common",
           "stability": "deprecated",
           "since": "0.1.0",
-          "deprecated_in": "0.3.0"
+          "deprecatedIn": "0.3.0"
         },
         "UnsupportedMIMEError": {
           "owner": "@kgfoundry-common",
           "stability": "deprecated",
           "since": "0.1.0",
-          "deprecated_in": "0.3.0"
+          "deprecatedIn": "0.3.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Legacy exception aliases maintained for backwards compatibility",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.fastapi_helpers": {
+      "path": "src/kgfoundry_common/fastapi_helpers.py",
+      "exports": [
+        "DEFAULT_TIMEOUT_SECONDS",
+        "typed_dependency",
+        "typed_exception_handler",
+        "typed_middleware"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/fastapi_helpers.py"
+      },
+      "meta": {
+        "DEFAULT_TIMEOUT_SECONDS": {},
+        "typed_dependency": {},
+        "typed_exception_handler": {},
+        "typed_middleware": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.fs": {
       "path": "src/kgfoundry_common/fs.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/fs.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.gpu": {
       "path": "src/kgfoundry_common/gpu.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/gpu.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.ids": {
@@ -1973,7 +2123,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "urn_doc_from_text": 49,
         "urn_chunk": 72
@@ -1993,10 +2143,42 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Helpers for generating deterministic URNs",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.jsonschema_utils": {
+      "path": "src/kgfoundry_common/jsonschema_utils.py",
+      "exports": [
+        "Draft202012Validator",
+        "Draft202012ValidatorProtocol",
+        "SchemaError",
+        "ValidationError",
+        "ValidationErrorProtocol",
+        "create_draft202012_validator",
+        "validate"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/jsonschema_utils.py"
+      },
+      "meta": {
+        "Draft202012Validator": {},
+        "Draft202012ValidatorProtocol": {},
+        "SchemaError": {},
+        "ValidationError": {},
+        "ValidationErrorProtocol": {},
+        "create_draft202012_validator": {},
+        "validate": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.logging": {
@@ -2004,9 +2186,11 @@
       "exports": [
         "CorrelationContext",
         "JsonFormatter",
+        "LogContextExtra",
         "LoggerAdapter",
         "get_correlation_id",
         "get_logger",
+        "measure_duration",
         "set_correlation_id",
         "setup_logging",
         "with_fields"
@@ -2017,16 +2201,18 @@
           "symbols": [
             "CorrelationContext",
             "JsonFormatter",
+            "LogContextExtra",
             "LoggerAdapter",
             "get_correlation_id",
             "get_logger",
+            "measure_duration",
             "set_correlation_id",
             "setup_logging",
             "with_fields"
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/logging.py"
@@ -2042,6 +2228,11 @@
           "stability": "stable",
           "since": "0.1.0"
         },
+        "LogContextExtra": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
         "LoggerAdapter": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
@@ -2053,6 +2244,11 @@
           "since": "0.1.0"
         },
         "get_logger": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "measure_duration": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
@@ -2073,10 +2269,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Structured logging helpers with correlation IDs and observability",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.models": {
@@ -2100,7 +2296,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "Id": 64,
         "Doc": 68,
@@ -2138,10 +2334,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Typed models shared across kgfoundry services",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.navmap_types": {
@@ -2165,7 +2361,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "Stability": 14,
         "NavSection": 25,
@@ -2203,17 +2399,52 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Shared navigation metadata structures used across kgfoundry.",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.numpy_typing": {
+      "path": "src/kgfoundry_common/numpy_typing.py",
+      "exports": [
+        "MIN_EPSILON",
+        "FloatMatrix",
+        "FloatVector",
+        "IntVector",
+        "normalize_l2",
+        "safe_argpartition",
+        "topk_indices"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/numpy_typing.py"
+      },
+      "meta": {
+        "MIN_EPSILON": {},
+        "FloatMatrix": {},
+        "FloatVector": {},
+        "IntVector": {},
+        "normalize_l2": {},
+        "safe_argpartition": {},
+        "topk_indices": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.observability": {
       "path": "src/kgfoundry_common/observability.py",
       "exports": [
         "MetricsProvider",
+        "MetricsRegistry",
+        "get_metrics_registry",
         "observe_duration",
+        "record_operation",
         "start_span"
       ],
       "sections": [
@@ -2221,12 +2452,15 @@
           "id": "public-api",
           "symbols": [
             "MetricsProvider",
+            "MetricsRegistry",
+            "get_metrics_registry",
             "observe_duration",
+            "record_operation",
             "start_span"
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/observability.py"
@@ -2237,7 +2471,22 @@
           "stability": "stable",
           "since": "0.1.0"
         },
+        "MetricsRegistry": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "get_metrics_registry": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
         "observe_duration": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "record_operation": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
@@ -2248,15 +2497,33 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Prometheus metrics and OpenTelemetry tracing helpers",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.opentelemetry_types": {
+      "path": "src/kgfoundry_common/opentelemetry_types.py",
+      "exports": [],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/opentelemetry_types.py"
+      },
+      "meta": {},
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.parquet_io": {
       "path": "src/kgfoundry_common/parquet_io.py",
       "exports": [
+        "ChunkDocTags",
+        "ChunkRow",
         "ParquetChunkWriter",
         "ParquetVectorWriter",
         "read_table",
@@ -2275,13 +2542,13 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "ParquetVectorWriter": 93,
-        "ParquetChunkWriter": 292,
-        "read_table": 400,
-        "read_table_to_dataframe": 460,
-        "validate_table_schema": 513
+        "ParquetVectorWriter": 121,
+        "ParquetChunkWriter": 319,
+        "read_table": 427,
+        "read_table_to_dataframe": 487,
+        "validate_table_schema": 540
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py"
@@ -2313,16 +2580,22 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Utilities for writing embedding vectors and chunks to Parquet",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.problem_details": {
       "path": "src/kgfoundry_common/problem_details.py",
       "exports": [
+        "ExceptionProblemDetailsParams",
+        "JsonObject",
+        "JsonPrimitive",
+        "JsonValue",
         "ProblemDetails",
+        "ProblemDetailsDict",
+        "ProblemDetailsParams",
         "ProblemDetailsValidationError",
         "build_problem_details",
         "problem_from_exception",
@@ -2330,41 +2603,111 @@
         "validate_problem_details"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/problem_details.py"
       },
       "meta": {
+        "ExceptionProblemDetailsParams": {},
+        "JsonObject": {},
+        "JsonPrimitive": {},
+        "JsonValue": {},
         "ProblemDetails": {},
+        "ProblemDetailsDict": {},
+        "ProblemDetailsParams": {},
         "ProblemDetailsValidationError": {},
         "build_problem_details": {},
         "problem_from_exception": {},
         "render_problem": {},
         "validate_problem_details": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.prometheus": {
+      "path": "src/kgfoundry_common/prometheus.py",
+      "exports": [
+        "HAVE_PROMETHEUS",
+        "CollectorRegistry",
+        "CounterLike",
+        "GaugeLike",
+        "HistogramLike",
+        "HistogramParams",
+        "build_counter",
+        "build_gauge",
+        "build_histogram",
+        "get_default_registry"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/prometheus.py"
+      },
+      "meta": {
+        "HAVE_PROMETHEUS": {},
+        "CollectorRegistry": {},
+        "CounterLike": {},
+        "GaugeLike": {},
+        "HistogramLike": {},
+        "HistogramParams": {},
+        "build_counter": {},
+        "build_gauge": {},
+        "build_histogram": {},
+        "get_default_registry": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.pydantic": {
       "path": "src/kgfoundry_common/pydantic.py",
       "exports": [],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "BaseModel": 9
+        "BaseModel": 8
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/pydantic.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.safe_pickle_v2": {
+      "path": "src/kgfoundry_common/safe_pickle_v2.py",
+      "exports": [
+        "SignedPickleWrapper",
+        "UnsafeSerializationError",
+        "create_unsigned_pickle_payload",
+        "load_unsigned_legacy"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/safe_pickle_v2.py"
+      },
+      "meta": {
+        "SignedPickleWrapper": {},
+        "UnsafeSerializationError": {},
+        "create_unsigned_pickle_payload": {},
+        "load_unsigned_legacy": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.schema_helpers": {
@@ -2375,7 +2718,7 @@
         "validate_model_against_schema"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/schema_helpers.py"
@@ -2385,10 +2728,10 @@
         "load_schema": {},
         "validate_model_against_schema": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.serialization": {
@@ -2401,7 +2744,7 @@
         "verify_checksum"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/serialization.py"
@@ -2413,10 +2756,10 @@
         "validate_payload": {},
         "verify_checksum": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "kgfoundry_common.settings": {
@@ -2444,7 +2787,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/settings.py"
@@ -2486,10 +2829,94 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Typed runtime configuration with fail-fast validation",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.subprocess_utils": {
+      "path": "src/kgfoundry_common/subprocess_utils.py",
+      "exports": [
+        "SubprocessError",
+        "SubprocessTimeoutError",
+        "TextProcess",
+        "TimeoutExpired",
+        "run_subprocess",
+        "spawn_text_process"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/subprocess_utils.py"
+      },
+      "meta": {
+        "SubprocessError": {},
+        "SubprocessTimeoutError": {},
+        "TextProcess": {},
+        "TimeoutExpired": {},
+        "run_subprocess": {},
+        "spawn_text_process": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.types": {
+      "path": "src/kgfoundry_common/types.py",
+      "exports": [
+        "JsonPrimitive",
+        "JsonValue"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/types.py"
+      },
+      "meta": {
+        "JsonPrimitive": {},
+        "JsonValue": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.vector_types": {
+      "path": "src/kgfoundry_common/vector_types.py",
+      "exports": [
+        "VectorBatch",
+        "VectorId",
+        "VectorMatrix",
+        "VectorValidationError",
+        "assert_vector_matrix",
+        "coerce_vector_batch",
+        "validate_vector_batch"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/vector_types.py"
+      },
+      "meta": {
+        "VectorBatch": {},
+        "VectorId": {},
+        "VectorMatrix": {},
+        "VectorValidationError": {},
+        "assert_vector_matrix": {},
+        "coerce_vector_batch": {},
+        "validate_vector_batch": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "linking.__init__": {
@@ -2507,7 +2934,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "calibration": 43,
         "linker": 44
@@ -2527,10 +2954,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Entity linking calibration and production pipelines",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "linking.calibration": {
@@ -2546,7 +2973,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "isotonic_calibrate": 42
       },
@@ -2560,10 +2987,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Placeholder calibration utilities for the linking package",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "linking.linker": {
@@ -2579,7 +3006,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "Linker": 42
       },
@@ -2593,10 +3020,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Linking orchestrations and scoring helpers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "observability.__init__": {
@@ -2612,7 +3039,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "metrics": 8
       },
@@ -2626,26 +3053,40 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Observability metrics and instrumentation helpers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "observability.metrics": {
       "path": "src/observability/metrics.py",
-      "exports": [],
+      "exports": [
+        "bm25_queries_total",
+        "faiss_search_latency_ms",
+        "pdf_download_failure_total",
+        "pdf_download_success_total",
+        "search_total_latency_ms",
+        "splade_queries_total"
+      ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/observability/metrics.py"
       },
-      "meta": {},
-      "module_meta": {},
+      "meta": {
+        "bm25_queries_total": {},
+        "faiss_search_latency_ms": {},
+        "pdf_download_failure_total": {},
+        "pdf_download_success_total": {},
+        "search_total_latency_ms": {},
+        "splade_queries_total": {}
+      },
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "ontology.__init__": {
@@ -2663,7 +3104,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "catalog": 8,
         "loader": 9
@@ -2683,10 +3124,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Ontology loading and lookup helpers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "ontology.catalog": {
@@ -2702,7 +3143,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "OntologyCatalog": 68
       },
@@ -2716,10 +3157,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Utility catalogue for lightweight ontology lookups.",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "ontology.loader": {
@@ -2735,7 +3176,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "OntologyLoader": 42
       },
@@ -2749,10 +3190,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Ontology ingest and caching helpers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "orchestration.__init__": {
@@ -2772,7 +3213,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "cli": 48,
         "fixture_flow": 49,
@@ -2798,10 +3239,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Prefect flows and CLI entrypoints for kgfoundry orchestrations",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "orchestration.cli": {
@@ -2823,12 +3264,12 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "index_bm25": 55,
-        "index_faiss": 160,
-        "api": 234,
-        "e2e": 253
+        "index_bm25": 418,
+        "index_faiss": 506,
+        "api": 681,
+        "e2e": 726
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/orchestration/cli.py"
@@ -2855,10 +3296,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Prefect command-line entrypoints for orchestration flows",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "orchestration.fixture_flow": {
@@ -2884,7 +3325,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "t_prepare_dirs": 82,
         "t_write_fixture_chunks": 122,
@@ -2928,10 +3369,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Prefect flows that build local fixture datasets",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "orchestration.flows": {
@@ -2949,7 +3390,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "t_echo": 65,
         "e2e_flow": 99
@@ -2969,10 +3410,26 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Prefect flow definitions for kgfoundry pipelines",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "orchestration.safe_pickle": {
+      "path": "src/orchestration/safe_pickle.py",
+      "exports": [],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/orchestration/safe_pickle.py"
+      },
+      "meta": {},
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "registry.__init__": {
@@ -2996,7 +3453,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "api": 58,
         "duckdb_helpers": 59,
@@ -3034,10 +3491,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "DuckDB-backed registry APIs and helpers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "registry.api": {
@@ -3053,7 +3510,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "Registry": 44
       },
@@ -3067,10 +3524,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Protocol defining the registry interface",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "registry.duckdb_helpers": {
@@ -3078,6 +3535,7 @@
       "exports": [
         "DEFAULT_SLOW_QUERY_THRESHOLD_S",
         "DEFAULT_TIMEOUT_S",
+        "DuckDBQueryOptions",
         "connect",
         "execute",
         "fetch_all",
@@ -3085,7 +3543,7 @@
         "validate_identifier"
       ],
       "sections": [],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/duckdb_helpers.py"
@@ -3093,16 +3551,17 @@
       "meta": {
         "DEFAULT_SLOW_QUERY_THRESHOLD_S": {},
         "DEFAULT_TIMEOUT_S": {},
+        "DuckDBQueryOptions": {},
         "connect": {},
         "execute": {},
         "fetch_all": {},
         "fetch_one": {},
         "validate_identifier": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "registry.duckdb_registry": {
@@ -3118,9 +3577,9 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "DuckDBRegistry": 47
+        "DuckDBRegistry": 50
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/duckdb_registry.py"
@@ -3132,10 +3591,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Minimal registry wrapper storing pipeline artefacts in DuckDB.",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "registry.helper": {
@@ -3151,9 +3610,9 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "DuckDBRegistryHelper": 50
+        "DuckDBRegistryHelper": 65
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/helper.py"
@@ -3165,10 +3624,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Helper utilities that simplify writing records into the DuckDB registry.",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "registry.migrate": {
@@ -3186,10 +3645,10 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "apply": 48,
-        "main": 91
+        "apply": 49,
+        "main": 94
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/migrate.py"
@@ -3206,10 +3665,10 @@
           "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Migration helpers for DuckDB registry schemas",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.__init__": {
@@ -3221,7 +3680,7 @@
           "symbols": []
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "app": 19,
         "bm25_index": 20,
@@ -3236,10 +3695,10 @@
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/__init__.py"
       },
       "meta": {},
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Search service endpoints and retrieval adapters",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.app": {
@@ -3267,12 +3726,12 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "auth": 378,
-        "healthz": 405,
-        "search": 427,
-        "graph_concepts": 565
+        "auth": 403,
+        "healthz": 426,
+        "search": 448,
+        "graph_concepts": 586
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/app.py"
@@ -3314,10 +3773,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "FastAPI endpoints for hybrid search with FAISS, BM25, and SPLADE",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.bm25_index": {
@@ -3337,11 +3796,11 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "toks": 55,
-        "BM25Doc": 78,
-        "BM25Index": 113
+        "toks": 65,
+        "BM25Doc": 88,
+        "BM25Index": 123
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/bm25_index.py"
@@ -3363,10 +3822,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Toy BM25 index backed by DuckDB parquet exports.",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.faiss_adapter": {
@@ -3374,6 +3833,9 @@
       "exports": [
         "DenseVecs",
         "FaissAdapter",
+        "FloatArray",
+        "IntArray",
+        "StrArray",
         "VecArray"
       ],
       "sections": [
@@ -3382,16 +3844,15 @@
           "symbols": [
             "DenseVecs",
             "FaissAdapter",
+            "FloatArray",
+            "IntArray",
+            "StrArray",
             "VecArray"
           ]
         }
       ],
-      "section_lines": {},
-      "anchors": {
-        "VecArray": 101,
-        "DenseVecs": 111,
-        "FaissAdapter": 130
-      },
+      "sectionLines": {},
+      "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/faiss_adapter.py"
       },
@@ -3406,16 +3867,83 @@
           "stability": "experimental",
           "since": "0.2.0"
         },
+        "FloatArray": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.2.0"
+        },
+        "IntArray": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.2.0"
+        },
+        "StrArray": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.2.0"
+        },
         "VecArray": {
           "owner": "@search-api",
           "stability": "experimental",
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
-      "synopsis": "Dense retrieval utilities that wrap FAISS with DuckDB persistence.",
-      "see_also": [],
+      "synopsis": "FAISS adapter with typed GPU fallbacks and DuckDB persistence",
+      "seeAlso": [],
+      "deps": []
+    },
+    "search_api.faiss_gpu": {
+      "path": "src/search_api/faiss_gpu.py",
+      "exports": [
+        "GpuContext",
+        "clone_index_to_gpu",
+        "configure_search_parameters",
+        "detect_gpu_context"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/search_api/faiss_gpu.py"
+      },
+      "meta": {
+        "GpuContext": {},
+        "clone_index_to_gpu": {},
+        "configure_search_parameters": {},
+        "detect_gpu_context": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
+      "deps": []
+    },
+    "search_api.fastapi_helpers": {
+      "path": "src/search_api/fastapi_helpers.py",
+      "exports": [
+        "DEFAULT_TIMEOUT_SECONDS",
+        "typed_dependency",
+        "typed_exception_handler",
+        "typed_middleware"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/search_api/fastapi_helpers.py"
+      },
+      "meta": {
+        "DEFAULT_TIMEOUT_SECONDS": {},
+        "typed_dependency": {},
+        "typed_exception_handler": {},
+        "typed_middleware": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "search_api.fixture_index": {
@@ -3435,11 +3963,11 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "tokenize": 51,
-        "FixtureDoc": 74,
-        "FixtureIndex": 106
+        "tokenize": 61,
+        "FixtureDoc": 84,
+        "FixtureIndex": 116
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/fixture_index.py"
@@ -3461,10 +3989,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "In-memory fixture index used for tests and tutorials",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.fusion": {
@@ -3480,7 +4008,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "rrf_fuse": 42
       },
@@ -3494,10 +4022,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Reciprocal rank fusion helpers for combining retrieval signals",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.kg_mock": {
@@ -3517,7 +4045,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "detect_query_concepts": 67,
         "linked_concepts_for_text": 93,
@@ -3543,10 +4071,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Mock knowledge graph helpers used by the search API",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.schemas": {
@@ -3566,7 +4094,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "SearchResponse": 47,
         "SearchRequest": 66,
@@ -3592,10 +4120,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Pydantic models used by the search API",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.service": {
@@ -3617,7 +4145,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "rrf_fuse": 54,
         "apply_kg_boosts": 94,
@@ -3649,7 +4177,7 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {
+      "moduleMeta": {
         "since": "2024.10"
       },
       "tags": [
@@ -3657,7 +4185,7 @@
         "ranking"
       ],
       "synopsis": "Search orchestration helpers that combine retrieval backends",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.splade_index": {
@@ -3677,11 +4205,11 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
-        "tok": 50,
-        "SpladeDoc": 73,
-        "SpladeIndex": 102
+        "tok": 52,
+        "SpladeDoc": 75,
+        "SpladeIndex": 104
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/splade_index.py"
@@ -3703,10 +4231,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Example SPLADE index used in the search API fixtures",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_api.types": {
@@ -3723,7 +4251,8 @@
         "SpladeEncoderProtocol",
         "VectorArray",
         "VectorSearchResult",
-        "VectorSearchResultTypedDict"
+        "VectorSearchResultTypedDict",
+        "wrap_faiss_module"
       ],
       "sections": [
         {
@@ -3740,11 +4269,12 @@
             "SpladeEncoderProtocol",
             "VectorArray",
             "VectorSearchResult",
-            "VectorSearchResultTypedDict"
+            "VectorSearchResultTypedDict",
+            "wrap_faiss_module"
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/types.py"
@@ -3809,12 +4339,39 @@
           "owner": "@search-api",
           "stability": "stable",
           "since": "0.1.0"
+        },
+        "wrap_faiss_module": {
+          "owner": "@search-api",
+          "stability": "stable",
+          "since": "0.1.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Vector search protocols and typed result structures",
-      "see_also": [],
+      "seeAlso": [],
+      "deps": []
+    },
+    "search_api.vectorstore_factory": {
+      "path": "src/search_api/vectorstore_factory.py",
+      "exports": [
+        "FaissAdapterSettings",
+        "FaissVectorstoreFactory"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/search_api/vectorstore_factory.py"
+      },
+      "meta": {
+        "FaissAdapterSettings": {},
+        "FaissVectorstoreFactory": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     },
     "search_client.__init__": {
@@ -3830,7 +4387,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "KGFoundryClient": 39
       },
@@ -3844,10 +4401,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Client abstractions for calling the kgfoundry Search API",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "search_client.client": {
@@ -3869,7 +4426,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_client/client.py"
@@ -3896,10 +4453,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "Lightweight client wrapper around the kgfoundry Search API",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "vectorstore_faiss.__init__": {
@@ -3915,7 +4472,7 @@
           ]
         }
       ],
-      "section_lines": {},
+      "sectionLines": {},
       "anchors": {
         "gpu": 38
       },
@@ -3929,10 +4486,10 @@
           "since": "0.2.0"
         }
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
       "synopsis": "FAISS GPU vector store wrappers",
-      "see_also": [],
+      "seeAlso": [],
       "deps": []
     },
     "vectorstore_faiss.gpu": {
@@ -3941,55 +4498,26 @@
         "FaissGpuIndex",
         "FloatArray",
         "IntArray",
-        "StrArray"
+        "StrArray",
+        "VecArray"
       ],
-      "sections": [
-        {
-          "id": "public-api",
-          "symbols": [
-            "FaissGpuIndex",
-            "FloatArray",
-            "IntArray",
-            "StrArray"
-          ]
-        }
-      ],
-      "section_lines": {},
-      "anchors": {
-        "FloatArray": 72,
-        "IntArray": 76,
-        "StrArray": 79,
-        "FaissGpuIndex": 83
-      },
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/vectorstore_faiss/gpu.py"
       },
       "meta": {
-        "FaissGpuIndex": {
-          "owner": "@search-api",
-          "stability": "experimental",
-          "since": "0.2.0"
-        },
-        "FloatArray": {
-          "owner": "@search-api",
-          "stability": "experimental",
-          "since": "0.2.0"
-        },
-        "IntArray": {
-          "owner": "@search-api",
-          "stability": "experimental",
-          "since": "0.2.0"
-        },
-        "StrArray": {
-          "owner": "@search-api",
-          "stability": "experimental",
-          "since": "0.2.0"
-        }
+        "FaissGpuIndex": {},
+        "FloatArray": {},
+        "IntArray": {},
+        "StrArray": {},
+        "VecArray": {}
       },
-      "module_meta": {},
+      "moduleMeta": {},
       "tags": [],
-      "synopsis": "GPU-accelerated FAISS bindings and helper types",
-      "see_also": [],
+      "synopsis": "",
+      "seeAlso": [],
       "deps": []
     }
   }

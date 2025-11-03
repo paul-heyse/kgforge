@@ -219,9 +219,9 @@ class DataclassFieldDocPlugin(TransformerPlugin):
         """Return ``result`` updated with dataclass field documentation."""
         schema = result.schema
         existing = {parameter.name: parameter for parameter in schema.parameters}
-        updated: list[ParameterDoc] = []
         field_names = {field.name for field in fields}
-        for field in fields:
+
+        def _build_parameter_doc(field: _FieldInfo) -> ParameterDoc:
             current = existing.get(field.name)
             description = field.description or (current.description if current else None)
             if not description:
@@ -237,20 +237,20 @@ class DataclassFieldDocPlugin(TransformerPlugin):
                 optional = True
             display_name = current.display_name if current else field.name
             kind = current.kind if current else "positional_or_keyword"
-            updated.append(
-                ParameterDoc(
-                    name=field.name,
-                    annotation=annotation,
-                    description=description,
-                    optional=optional,
-                    default=default,
-                    display_name=display_name,
-                    kind=kind,
-                )
+            return ParameterDoc(
+                name=field.name,
+                annotation=annotation,
+                description=description,
+                optional=optional,
+                default=default,
+                display_name=display_name,
+                kind=kind,
             )
-        for parameter in schema.parameters:
-            if parameter.name not in field_names:
-                updated.append(parameter)
+
+        updated = [_build_parameter_doc(field) for field in fields]
+        updated.extend(
+            parameter for parameter in schema.parameters if parameter.name not in field_names
+        )
         if updated == schema.parameters:
             return result
         updated_schema = replace(schema, parameters=updated)

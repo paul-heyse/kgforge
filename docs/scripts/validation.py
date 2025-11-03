@@ -44,7 +44,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing assistance only
 
     JsonPayload = Mapping[str, object] | Sequence[object] | str | int | float | bool | None
 
-    class _Validator(Protocol):
+    class ValidateAgainstSchema(Protocol):
         def __call__(
             self,
             payload: JsonPayload,
@@ -53,11 +53,4 @@ if TYPE_CHECKING:  # pragma: no cover - typing assistance only
             artifact: str,
         ) -> None: ...
 
-    def validate_against_schema(
-        payload: JsonPayload,
-        schema_path: Path,
-        *,
-        artifact: str,
-    ) -> None:
-        """Typed protocol for :func:`validate_against_schema`."""
-        ...
+    validate_against_schema: ValidateAgainstSchema

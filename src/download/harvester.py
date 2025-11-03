@@ -190,10 +190,11 @@ class OpenAccessHarvester:
         if not isinstance(results_obj, list):
             message = "OpenAlex response must contain a list of results"
             raise TypeError(message)
-        typed_results: list[dict[str, object]] = []
-        for item in results_obj:
-            if isinstance(item, Mapping) and all(isinstance(k, str) for k in item):
-                typed_results.append(dict(item))
+        typed_results = [
+            dict(item)
+            for item in results_obj
+            if isinstance(item, Mapping) and all(isinstance(k, str) for k in item)
+        ]
         return typed_results[:max_works]
 
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:

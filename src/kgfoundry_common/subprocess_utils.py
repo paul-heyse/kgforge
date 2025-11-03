@@ -28,8 +28,6 @@ from importlib import import_module
 from pathlib import Path
 from typing import Final, Protocol, cast
 
-from tools import ToolExecutionError, get_process_runner, run_tool
-
 logger = logging.getLogger(__name__)
 
 # Default timeouts (seconds)
@@ -64,6 +62,69 @@ class _TextProcess(Protocol):
 
 
 TextProcess = _TextProcess
+
+
+class _ToolRunResultProtocol(Protocol):
+    stdout: str
+    stderr: str
+    returncode: int
+
+
+class _AllowListPolicyProtocol(Protocol):
+    def resolve(self, executable: str, command: Sequence[str]) -> Path: ...
+
+
+class _EnvironmentPolicyProtocol(Protocol):
+    def build(self, overrides: Mapping[str, str] | None) -> Mapping[str, str]: ...
+
+
+class _ProcessRunnerProtocol(Protocol):
+    allowlist: _AllowListPolicyProtocol
+    environment: _EnvironmentPolicyProtocol
+
+
+class _RunToolCallable(Protocol):
+    def __call__(
+        self,
+        command: Sequence[str],
+        *,
+        cwd: Path | None = ...,
+        env: Mapping[str, str] | None = ...,
+        timeout: float | None = ...,
+        check: bool = ...,
+    ) -> _ToolRunResultProtocol: ...
+
+
+class _GetProcessRunnerCallable(Protocol):
+    def __call__(self) -> _ProcessRunnerProtocol: ...
+
+
+class _ToolsSurface(Protocol):
+    ToolExecutionError: type[Exception]
+    run_tool: _RunToolCallable
+    get_process_runner: _GetProcessRunnerCallable
+
+
+class _ToolExecutionErrorSurface(Protocol):
+    problem: Mapping[str, object] | None
+    returncode: int | None
+    stderr: str
+
+
+class _ToolExecutionErrorConstructor(Protocol):
+    def __call__(self, message: str, *, command: Sequence[str], **kwargs: object) -> Exception: ...
+
+
+def _load_tools_surface() -> _ToolsSurface:
+    try:
+        module = import_module("tools")
+    except ImportError as exc:
+        msg = (
+            "The 'tools' package is required to execute subprocess utilities. "
+            "Install the 'kgfoundry[tools]' extra and retry."
+        )
+        raise RuntimeError(msg) from exc
+    return cast(_ToolsSurface, module)
 
 
 _subprocess_module = import_module("sub" + "process")
@@ -191,25 +252,30 @@ def run_subprocess(
 
     effective_timeout = float(timeout)
 
+    tools_surface = _load_tools_surface()
+    tool_execution_error_type = tools_surface.ToolExecutionError
+    run_tool_impl = tools_surface.run_tool
+
     try:
-        run_result = run_tool(
+        run_result = run_tool_impl(
             cmd,
             cwd=cwd,
             env=dict(env) if env else None,
             timeout=effective_timeout,
             check=True,
         )
-    except ToolExecutionError as exc:
-        if _is_timeout_error(exc):
+    except tool_execution_error_type as exc:
+        tool_error = cast(_ToolExecutionErrorSurface, exc)
+        if _is_timeout_error(tool_error):
             timeout_seconds = int(effective_timeout)
             msg = f"Subprocess exceeded timeout of {timeout_seconds} seconds: {' '.join(cmd)}"
             logger.exception(msg, extra={"command": " ".join(cmd), "timeout": timeout_seconds})
             raise SubprocessTimeoutError(msg, command=cmd, timeout_seconds=timeout_seconds) from exc
 
-        returncode = exc.returncode
-        stderr_output = exc.stderr or None
+        returncode = tool_error.returncode
+        stderr_output = tool_error.stderr or None
         if returncode is None:
-            message = str(exc)
+            message = str(tool_error)
         else:
             message = f"Subprocess failed with exit code {returncode}: {' '.join(cmd)}"
         logger.exception(
@@ -230,10 +296,12 @@ def run_subprocess(
     return run_result.stdout
 
 
-def _is_timeout_error(error: ToolExecutionError) -> bool:
-    problem_type = (error.problem or {}).get("type") if hasattr(error, "problem") else None
-    if isinstance(problem_type, str) and problem_type.endswith("tool-timeout"):
-        return True
+def _is_timeout_error(error: _ToolExecutionErrorSurface) -> bool:
+    problem = cast(Mapping[str, object] | None, getattr(error, "problem", None))
+    if problem is not None:
+        raw_type = problem.get("type")
+        if isinstance(raw_type, str) and raw_type.endswith("tool-timeout"):
+            return True
     return "timed out" in str(error)
 
 
@@ -249,11 +317,16 @@ def spawn_text_process(
     executable path is trusted, and the environment is sanitised to drop
     inherited state that could affect tooling deterministically.
     """
+    tools_surface = _load_tools_surface()
+    tool_execution_error_ctor = cast(
+        _ToolExecutionErrorConstructor, tools_surface.ToolExecutionError
+    )
     if not command:
         msg = "Command must contain at least one argument"
-        raise ToolExecutionError(msg, command=[])
+        raise tool_execution_error_ctor(msg, command=[])
 
-    runner = get_process_runner()
+    get_runner = tools_surface.get_process_runner
+    runner = get_runner()
 
     executable = runner.allowlist.resolve(command[0], command)
     final_command = (str(executable), *command[1:])
