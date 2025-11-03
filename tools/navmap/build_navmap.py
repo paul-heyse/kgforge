@@ -103,12 +103,7 @@ class AllDictTemplate:
 
 NavPrimitive = str | int | float | bool | None
 type NavTree = (
-    NavPrimitive
-    | list[NavTree]
-    | dict[str, NavTree]
-    | set[NavTree]
-    | AllDictTemplate
-    | AllPlaceholder
+    NavPrimitive | list[NavTree] | dict[str, NavTree] | set[str] | AllDictTemplate | AllPlaceholder
 )
 type ResolvedNavValue = (
     NavPrimitive | list[ResolvedNavValue] | dict[str, ResolvedNavValue] | set[str]
@@ -155,9 +150,16 @@ def _eval_sequence(nodes: Sequence[ast.AST]) -> list[NavTree]:
     return [_literal_eval_navmap(child) for child in nodes]
 
 
-def _eval_set(node: ast.Set) -> set[NavTree]:
+def _eval_set(node: ast.Set) -> set[str]:
     """Evaluate a set literal used inside navmap structures."""
-    return {_literal_eval_navmap(elt) for elt in node.elts}
+    evaluated: set[str] = set()
+    for element in node.elts:
+        value = _literal_eval_navmap(element)
+        if not isinstance(value, str):
+            message = "Navmap set entries must be strings."
+            raise NavmapLiteralError(message)
+        evaluated.add(value)
+    return evaluated
 
 
 def _eval_dict(node: ast.Dict) -> dict[str, NavTree]:
@@ -236,7 +238,7 @@ def _expand_dict(values: dict[str, NavTree], exports: Sequence[str]) -> dict[str
     return {key: _replace_placeholders(sub_value, exports) for key, sub_value in values.items()}
 
 
-def _expand_set(values: set[NavTree], exports: Sequence[str]) -> set[str]:
+def _expand_set(values: set[str], exports: Sequence[str]) -> set[str]:
     """Expand placeholders within sets, enforcing string membership."""
     unique_items: set[str] = set()
     for entry in values:
@@ -267,7 +269,7 @@ def _replace_placeholders(value: NavTree, exports: Sequence[str]) -> ResolvedNav
     if isinstance(value, dict):
         return _expand_dict(value, exports)
     if isinstance(value, set):
-        return _expand_set(value, exports)
+        return _expand_set(cast(set[str], value), exports)
     return value
 
 

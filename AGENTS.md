@@ -38,13 +38,6 @@
      uv sync 
      ```
 
-2) **Plan (write before code)**
-   - Draft a **4‑item design note** for the PR:
-     1. Summary (one paragraph)
-     2. Public API sketch (typed signatures)
-     3. Data/Schema contracts affected (JSON Schema, OpenAPI)
-     4. Test plan (happy paths, edge cases, negative cases)
-   - If data crosses boundaries, confirm schemas (see [Data Contracts](#data-contracts-json-schema-2020-12--openapi-32)).
 
 3) **Implement**
    - Code to the typed API sketch.
@@ -53,8 +46,10 @@
 4) **Validate quality gates locally**
   ```bash
   uv run ruff format && uv run ruff check --fix
+  uv run pyright --warnings --pythonversion=3.13
   uv run pyrefly check
   uv run mypy --config-file mypy.ini
+  uv run vulture src tools stubs --min-confidence 90
   uv run pytest -q
   uv run pip-audit
   # If OpenAPI changed: lint spec (e.g., spectral lint openapi.yaml)
@@ -63,9 +58,111 @@
   python tools/check_imports.py      # verify architectural boundaries
   ```
 
-5) **Ship the PR**
-   - PR description = the **4‑item design note** + **checklist outputs** (commands & exit codes).
-   - If behavior changes, include **migration notes** and bump **SemVer** accordingly.
+### Quality checks (zero-error mandate)
+
+For all code blocks that you make edits to, please check for pyright, mypy, pyrefly, and Ruff errors or warnings and ensure that by the time you have concluded your edits in a code block there are zero errors in any of those four categories. Under no circumstances should you ever suppress errors, even stylistic Ruff errors. Instead of suppressing errors, derive a structural solution that causally addresses the source of the error, even if it is intensive and disruptive to implement. All of your designs should be structural, holistic, and best-in-class, guided by the following principles:
+
+#### Principles for your code design and implementation
+
+##### 1) Clarity & API design
+
+* Public API is explicit and named per PEP 8; internal helpers remain private.
+* Every public module/class/function has a PEP 257 docstring whose first line is a one-sentence summary.
+* Fully annotated signatures; prefer modern generics/type params (PEP 484 + PEP 695). **No untyped public APIs.**
+* Exceptions are part of the contract. Define a small **exception taxonomy**, and for HTTP use **RFC 9457 Problem Details**; always `raise ... from e` to preserve cause chains.
+* **Verify:** `ruff format && ruff check --fix` is clean; docstrings present; types on all public symbols; include a sample Problem Details JSON for at least one error path.
+
+##### 2) Data contracts & schemas
+
+* Cross-boundary data MUST have a schema: **JSON Schema 2020-12** for payloads; **OpenAPI 3.2** for HTTP.
+* Code models may **emit** or **round-trip** the schema, but the schema file is the **source of truth**.
+* Include examples and versioning notes (backward-/forward-compat, deprecations).
+* **Verify:** schema validates against 2020-12 meta-schema; OpenAPI passes a linter; round-trip tests confirm model↔schema parity.
+
+##### 3) Testing strategy
+
+* Pytest; **table-driven** tests with `@pytest.mark.parametrize` covering happy path, edges, and failure modes.
+* Integrate **doctest/xdoctest** so examples in docs truly run.
+* Map tests to scenarios in the spec (when applicable).
+* **Verify:** `pytest -q` green; param/edge/error cases present; doctests pass.
+
+##### 4) Type safety
+
+* Project is **type-clean** under **pyright** (strict mode), **pyrefly** (sharp checks), and **mypy** (strict baseline).
+* Prefer `Protocol`/`TypedDict`/PEP 695 generics over `Any`; minimize `cast` and justify any `# type: ignore[...]`.
+* **Verify:** all three checkers pass; no unexplained ignores.
+
+##### 5) Logging & errors
+
+* Use stdlib `logging`; libraries define a `NullHandler`; apps configure handlers.
+* Prefer **structured logs** (extra fields); never log secrets/PII.
+* For HTTP, return **Problem Details** consistently and log with correlation IDs (see Observability below).
+* **Verify:** module loggers exist; no `print` in libraries; errors produce logs + exceptions/Problem Details.
+
+##### 6) Configuration & 12-factor basics
+
+* Config via **environment variables** (use `pydantic_settings` or equivalent for typed settings); no hard-coded secrets.
+* Backing services are replaceable; logs to stdout/stderr.
+* **Verify:** swapping URLs/credentials is config-only; startup fails fast if required env is missing.
+
+##### 7) Modularity & structure
+
+* Favor **single-responsibility** modules; separate pure logic from I/O; explicit dependency injection; **no global state**.
+* Layering: **domain** (pure) → **adapters/ports** → **I/O/CLI/HTTP**; consider import-linter rules to prevent cross-layer leaks.
+* **Verify:** imports are acyclic; small functions; side-effect boundaries explicit.
+
+##### 8) Concurrency & context correctness
+
+* For async, use **`contextvars`** for request/task context; document timeouts and cancellation.
+* Avoid blocking calls in async code; use thread pools for legacy I/O.
+* **Verify:** async APIs document await/timeout rules; context propagated via `ContextVar`.
+
+##### 9) Observability (logs • metrics • traces)
+
+* Emit **structured logs**, **Prometheus metrics**, and **OpenTelemetry traces** at boundaries.
+* Minimum: request/operation name, duration, status, error type, correlation/trace ID.
+* **Verify:** a failing path produces (1) an error log with context, (2) a counter increment, and (3) a trace span with error status.
+
+##### 10) Security & supply-chain
+
+* **Never** use `eval/exec` or untrusted `pickle`/`yaml.load` (use `safe_load`).
+* Validate/sanitize all untrusted inputs; prevent path traversal with `pathlib` and whitelists.
+* Run a vuln scan (e.g., `pip-audit`) on dependency changes; pin ranges sensibly.
+* **Verify:** secret scanner clean; `pip-audit` clean; inputs validated in tests.
+
+##### 11) Packaging & distribution
+
+* `pyproject.toml` with **PEP 621** metadata; **PEP 440** versioning; build wheels.
+* Keep dependencies minimal; use **extras** for optional features; add environment markers for platform-specific bits.
+* **Verify:** `pip wheel .` succeeds; `pip install .` works in a clean venv; metadata is correct.
+
+##### 12) Performance & scalability
+
+* Set simple budgets where relevant (e.g., p95 latency, memory ceiling) and write micro-bench tests for hot paths.
+* Avoid quadratic behavior; stream large I/O; prefer `pathlib`, `itertools`, vectorized ops where apt.
+* **Verify:** a representative input meets the budget locally; add notes if a budget is intentionally exceeded.
+
+##### 13) Documentation & discoverability
+
+* Examples are **copy-ready** and runnable; public API shows minimal, idiomatic usage.
+* Cross-link code to spec and schema files; keep the **Agent Portal** links working (editor/GitHub).
+* **Verify:** `make artifacts` regenerates docs/catalog/navmap; tree is clean.
+
+##### 14) Versioning & deprecation policy
+
+* Use **SemVer language** for public API; mark deprecations with warnings and removal version; update CHANGELOG.
+* **Verify:** deprecated calls warn once with a clear migration path.
+
+##### 15) Idempotency & error-retries
+
+* Any externally triggered operation (HTTP/CLI/queue) should be **idempotent** where possible; document retry semantics.
+* **Verify:** repeated calls with same input either no-op or converge; tests prove it.
+
+##### 16) File, time, and number hygiene
+
+* **`pathlib`** for paths; **timezone-aware** datetimes; use **`time.monotonic()`** for durations; **`decimal.Decimal`** for money.
+* **Verify:** no `os.path` in new code; no naive datetimes in boundaries.
+
 
 > If any step fails, **stop and fix** before continuing.
 
@@ -81,9 +178,7 @@
   # If scripts/bootstrap.sh exists, use it. Otherwise run the commands below manually.
   uv python install 3.13.9
   uv python pin 3.13.9
-  uv sync --locked
-  uv tool install pre-commit
-  pre-commit install
+
   ```
 - **Remote container / devcontainer:** follow [Link Policy for Remote Editors](#link-policy-for-remote-editors) so deep links open correctly from generated artifacts.
 - **Do not** duplicate tool configs across files. `mypy.ini` and `pyrefly.toml` are canonical; `pyproject.toml` is canonical for Ruff and packaging.
@@ -95,7 +190,8 @@
 Read these first when editing configs or debugging local vs CI drift:
 
 - **Formatting & lint:** `pyproject.toml` → `[tool.ruff]`, `[tool.ruff.lint]`
-- **Types:** `mypy.ini` (single source), `pyrefly.toml` (single source)
+- **Dead code scanning:** `pyproject.toml` → `[tool.vulture]`, `.github/workflows/ci-vulture.yml`, `vulture_whitelist.py`
+- **Types:** `mypy.ini` (single source), `pyrefly.toml` (single source), `pyrightconfig.jsonc` (strict pyright)
 - **Tests:** `pytest.ini` (markers, doctest/xdoctest config)
 - **Docs / Artifacts:** `tools/docs/build_artifacts.py`, `make artifacts`, outputs under `docs/_build/**`, `site/_build/**`
 - **Nav & Catalog:** `tools/navmap/*`, `docs/_build/agent_catalog.json`, `site/_build/agent/` (Agent Portal)
@@ -119,9 +215,13 @@ Read these first when editing configs or debugging local vs CI drift:
 
 ---
 
-## Type Checking (pyrefly sharp, mypy strict)
+## Type Checking (pyright strict, pyrefly sharp, mypy strict)
 
-- **First‑line check (semantics):**
+- **Static analysis (strict mode):**
+  ```bash
+  uv run pyright --warnings --pythonversion=3.13
+  ```
+- **First-line check (semantics):**
   ```bash
   uv run pyrefly check
   ```
@@ -130,12 +230,13 @@ Read these first when editing configs or debugging local vs CI drift:
   uv run mypy --config-file mypy.ini
   ```
 - **Rules of engagement:**
+  - Pyright runs in strict mode (`pyrightconfig.jsonc`); update execution environments when adding new roots.
   - No untyped **public** APIs.
   - Prefer **PEP 695** generics and `Protocol`/`TypedDict` over `Any`.
   - Every `# type: ignore[...]` requires a comment **why** + a ticket reference.
   - Narrow exceptions; HTTP surfaces return **RFC 9457 Problem Details**.
 
-**“Type‑clean” means both pyrefly **and** mypy pass.**
+**“Type-clean” means pyright, pyrefly, **and** mypy all pass.**
 
 ---
 
@@ -285,6 +386,7 @@ Example `PATH_MAP`:
 uv run ruff format && uv run ruff check --fix
 
 # Types (sharp first, then soundness)
+uv run pyright --warnings --pythonversion=3.13
 uv run pyrefly check
 uv run mypy --config-file mypy.ini
 
@@ -298,6 +400,9 @@ git diff --exit-code
 # Architectural boundaries & suppression guard
 python tools/check_new_suppressions.py src
 python tools/check_imports.py
+
+# Dead code
+uv run vulture src tools stubs --min-confidence 90
 
 # Security (vuln scan)
 uv run pip-audit

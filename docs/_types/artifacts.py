@@ -55,6 +55,7 @@ Examples
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping as MappingABC
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, cast
 
@@ -429,6 +430,132 @@ class ArtifactValidationError(RuntimeError):
         self.problem_details = problem_details
 
 
+def _validation_error(
+    field: str,
+    expected: str,
+    *,
+    artifact: str,
+    row: int | None = None,
+) -> ArtifactValidationError:
+    prefix = f"Row {row}: " if row is not None else ""
+    message = f"{prefix}field '{field}' must be {expected}"
+    return ArtifactValidationError(message, artifact_name=artifact)
+
+
+def _coerce_optional_str(
+    value: object,
+    *,
+    field: str,
+    artifact: str,
+    row: int | None = None,
+) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    raise _validation_error(field, "a string or null", artifact=artifact, row=row)
+
+
+def _coerce_str_tuple(
+    value: object,
+    *,
+    field: str,
+    artifact: str,
+    row: int | None = None,
+) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, (list, tuple, set)):
+        items: list[str] = []
+        for index, entry in enumerate(value):
+            if not isinstance(entry, str):
+                indexed_field = f"{field}[{index}]"
+                raise _validation_error(indexed_field, "a string", artifact=artifact, row=row)
+            items.append(entry)
+        if isinstance(value, set):
+            return tuple(sorted(items))
+        return tuple(items)
+    raise _validation_error(field, "a sequence of strings", artifact=artifact, row=row)
+
+
+def _coerce_str_mapping(
+    value: object,
+    *,
+    field: str,
+    artifact: str,
+    row: int | None = None,
+) -> dict[str, str]:
+    if value is None:
+        return {}
+    if isinstance(value, MappingABC):
+        result: dict[str, str] = {}
+        for key, val in value.items():
+            if not isinstance(key, str):
+                raise _validation_error(f"{field} key", "a string", artifact=artifact, row=row)
+            if not isinstance(val, str):
+                raise _validation_error(f"{field}['{key}']", "a string", artifact=artifact, row=row)
+            result[key] = val
+        return result
+    raise _validation_error(
+        field,
+        "a mapping of string keys to string values",
+        artifact=artifact,
+        row=row,
+    )
+
+
+def _coerce_optional_int(
+    value: object,
+    *,
+    field: str,
+    artifact: str,
+    row: int | None = None,
+) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        raise _validation_error(field, "an integer", artifact=artifact, row=row)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    raise _validation_error(field, "an integer", artifact=artifact, row=row)
+
+
+def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaChange, ...]:
+    if value is None:
+        return ()
+    if isinstance(value, (list, tuple)):
+        changes: list[SymbolDeltaChange] = []
+        for index, entry in enumerate(value):
+            if isinstance(entry, SymbolDeltaChange):
+                changes.append(entry)
+                continue
+            if isinstance(entry, MappingABC):
+                try:
+                    changes.append(SymbolDeltaChange.model_validate(dict(entry)))
+                except Exception as exc:  # pragma: no cover - defensive guard
+                    indexed_field = f"changed[{index}]"
+                    raise _validation_error(
+                        indexed_field,
+                        "a valid change mapping",
+                        artifact=artifact,
+                    ) from exc
+                continue
+            indexed_field = f"changed[{index}]"
+            raise _validation_error(
+                indexed_field,
+                "a mapping describing the change",
+                artifact=artifact,
+            )
+        return tuple(changes)
+    raise _validation_error(
+        "changed",
+        "a sequence of change mappings",
+        artifact=artifact,
+    )
+
+
 def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
     """Construct a SymbolIndexArtifacts from a JSON payload with validation.
 
@@ -486,34 +613,73 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
             raise ArtifactValidationError(msg, artifact_name="symbol-index")
 
         try:
-            # Extract span if line numbers are present
-            span: LineSpan | None = None
-            lineno = item.get("lineno")
-            endlineno = item.get("endlineno")
-            if lineno is not None or endlineno is not None:
-                span = LineSpan(
-                    start=int(lineno) if lineno is not None else None,  # type: ignore[arg-type]
-                    end=int(endlineno) if endlineno is not None else None,  # type: ignore[arg-type]
-                )
+            path_raw = item.get("path")
+            if not isinstance(path_raw, str):
+                raise _validation_error("path", "a string", artifact="symbol-index", row=i)
+            kind_raw = item.get("kind")
+            if not isinstance(kind_raw, str):
+                raise _validation_error("kind", "a string", artifact="symbol-index", row=i)
+            doc_raw = item.get("doc")
+            if not isinstance(doc_raw, str):
+                raise _validation_error("doc", "a string", artifact="symbol-index", row=i)
 
-            # Create row with Pydantic validation
+            lineno = _coerce_optional_int(
+                item.get("lineno"), field="lineno", artifact="symbol-index", row=i
+            )
+            endlineno = _coerce_optional_int(
+                item.get("endlineno"), field="endlineno", artifact="symbol-index", row=i
+            )
+            span: LineSpan | None = None
+            if lineno is not None or endlineno is not None:
+                span = LineSpan(start=lineno, end=endlineno)
+
             row = SymbolIndexRow(
-                path=str(item["path"]),
-                kind=str(item["kind"]),
-                doc=str(item["doc"]),
-                tested_by=item.get("tested_by", []),
-                source_link=item.get("source_link", {}),
-                canonical_path=item.get("canonical_path"),
-                module=item.get("module"),
-                package=item.get("package"),
-                file=item.get("file"),
+                path=path_raw,
+                kind=kind_raw,
+                doc=doc_raw,
+                tested_by=_coerce_str_tuple(
+                    item.get("tested_by"), field="tested_by", artifact="symbol-index", row=i
+                ),
+                source_link=_coerce_str_mapping(
+                    item.get("source_link"), field="source_link", artifact="symbol-index", row=i
+                ),
+                canonical_path=_coerce_optional_str(
+                    item.get("canonical_path"),
+                    field="canonical_path",
+                    artifact="symbol-index",
+                    row=i,
+                ),
+                module=_coerce_optional_str(
+                    item.get("module"), field="module", artifact="symbol-index", row=i
+                ),
+                package=_coerce_optional_str(
+                    item.get("package"), field="package", artifact="symbol-index", row=i
+                ),
+                file=_coerce_optional_str(
+                    item.get("file"), field="file", artifact="symbol-index", row=i
+                ),
                 span=span,
-                signature=item.get("signature"),
-                owner=item.get("owner"),
-                stability=item.get("stability"),
-                since=item.get("since"),
-                deprecated_in=item.get("deprecated_in"),
-                section=item.get("section"),
+                signature=_coerce_optional_str(
+                    item.get("signature"), field="signature", artifact="symbol-index", row=i
+                ),
+                owner=_coerce_optional_str(
+                    item.get("owner"), field="owner", artifact="symbol-index", row=i
+                ),
+                stability=_coerce_optional_str(
+                    item.get("stability"), field="stability", artifact="symbol-index", row=i
+                ),
+                since=_coerce_optional_str(
+                    item.get("since"), field="since", artifact="symbol-index", row=i
+                ),
+                deprecated_in=_coerce_optional_str(
+                    item.get("deprecated_in"),
+                    field="deprecated_in",
+                    artifact="symbol-index",
+                    row=i,
+                ),
+                section=_coerce_optional_str(
+                    item.get("section"), field="section", artifact="symbol-index", row=i
+                ),
                 is_async=bool(item.get("is_async", False)),
                 is_property=bool(item.get("is_property", False)),
             )
@@ -623,13 +789,24 @@ def symbol_delta_from_json(raw: JsonPayload) -> SymbolDeltaPayload:
         raise ArtifactValidationError(msg, artifact_name="symbol-delta")
 
     try:
-        return SymbolDeltaPayload(
-            base_sha=raw.get("base_sha"),
-            head_sha=raw.get("head_sha"),
-            added=raw.get("added", []),
-            removed=raw.get("removed", []),
-            changed=raw.get("changed", []),
+        base_sha = _coerce_optional_str(
+            raw.get("base_sha"), field="base_sha", artifact="symbol-delta"
         )
+        head_sha = _coerce_optional_str(
+            raw.get("head_sha"), field="head_sha", artifact="symbol-delta"
+        )
+        added = _coerce_str_tuple(raw.get("added"), field="added", artifact="symbol-delta")
+        removed = _coerce_str_tuple(raw.get("removed"), field="removed", artifact="symbol-delta")
+        changed = _coerce_delta_changes(raw.get("changed"), artifact="symbol-delta")
+        return SymbolDeltaPayload(
+            base_sha=base_sha,
+            head_sha=head_sha,
+            added=added,
+            removed=removed,
+            changed=changed,
+        )
+    except ArtifactValidationError:
+        raise
     except (ValueError, TypeError) as e:
         msg = f"Failed to construct SymbolDeltaPayload: {e}"
         raise ArtifactValidationError(msg, artifact_name="symbol-delta") from e

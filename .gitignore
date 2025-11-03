@@ -10,6 +10,8 @@ data/**/*
 *.parquet
 *.faiss
 *.ids
+docs/_build/**/*
+site/_build/**/*
 
 # envs & build junk
 .venv/

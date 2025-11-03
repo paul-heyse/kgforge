@@ -692,6 +692,44 @@ numpy = "np"
 pandas = "pd"
 "matplotlib.pyplot" = "plt"
 
+[tool.vulture]
+# Strict, but still manageable threshold.
+min_confidence = 90
+
+# Where to scan by default. (You can add "tests" too, but that can be noisy.)
+paths = ["src", "tools", "stubs"]
+
+# Keep this aligned with your Ruff/mypy excludes.
+exclude = [
+  ".git/*", ".hg/*", ".venv/*",
+  ".mypy_cache/*", ".ruff_cache/*", ".pytest_cache/*",
+  "build/*", "dist/*", "node_modules/*",
+  "docs/_build/*", "site/*",
+  "faiss/*",
+  "kgfoundry.egg-info/*", "src/kgfoundry.egg-info/*"
+]
+
+# Decorators that indicate runtime or framework-driven usage.
+# (Names are matched anywhere in the dotted path, without arguments.)
+ignore_decorators = [
+  "overload", "typing.overload",
+  "pytest.fixture",
+  "click.command", "click.group", "click.option",
+  "property", "functools.cached_property",
+  "pydantic.validator", "pydantic.root_validator",
+  "pydantic.field_validator", "pydantic.model_validator",
+  "dataclasses.dataclass"
+]
+
+# Name patterns that are often referenced dynamically.
+ignore_names = [
+  "__all__", "main",
+  "initialize_*", "register_*"
+]
+
+# A Python file of stubs that mark dynamic usages as 'used' for Vulture.
+whitelist = ["vulture_whitelist.py"]
+
 [tool.docs.extensions]
 enabled = [
     "myst_parser",
