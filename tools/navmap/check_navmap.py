@@ -12,9 +12,9 @@ from __future__ import annotations
 import ast
 import re
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
 
@@ -86,12 +86,7 @@ class AllDictTemplate:
 
 NavPrimitive = str | int | float | bool | None
 type NavTree = (
-    NavPrimitive
-    | list[NavTree]
-    | dict[str, NavTree]
-    | set[NavTree]
-    | AllDictTemplate
-    | AllPlaceholder
+    NavPrimitive | list[NavTree] | dict[str, NavTree] | set[str] | AllDictTemplate | AllPlaceholder
 )
 type ResolvedNavValue = (
     NavPrimitive | list["ResolvedNavValue"] | dict[str, "ResolvedNavValue"] | set[str]
@@ -169,9 +164,16 @@ def _eval_sequence(nodes: Sequence[ast.AST]) -> list[NavTree]:
     return [_literal_eval_navmap(child) for child in nodes]
 
 
-def _eval_set(node: ast.Set) -> set[NavTree]:
+def _eval_set(node: ast.Set) -> set[str]:
     """Evaluate a set literal into navmap values."""
-    return {_literal_eval_navmap(elt) for elt in node.elts}
+    evaluated: set[str] = set()
+    for element in node.elts:
+        value = _literal_eval_navmap(element)
+        if not isinstance(value, str):
+            message = "Navmap set entries must be strings."
+            raise NavmapLiteralError(message)
+        evaluated.add(value)
+    return evaluated
 
 
 def _eval_dict(node: ast.Dict) -> dict[str, NavTree]:
@@ -262,7 +264,7 @@ def _expand_dict(values: dict[str, NavTree], exports: Sequence[str]) -> dict[str
     return {key: _expand_nav_value(sub_value, exports) for key, sub_value in values.items()}
 
 
-def _expand_set(values: set[NavTree], exports: Sequence[str]) -> set[str]:
+def _expand_set(values: set[str], exports: Sequence[str]) -> set[str]:
     """Expand navmap sets and ensure all members resolve to strings."""
     resolved: set[str] = set()
     for entry in values:
@@ -293,7 +295,7 @@ def _expand_nav_value(value: NavTree, exports: Sequence[str]) -> ResolvedNavValu
     if isinstance(value, dict):
         return _expand_dict(value, exports)
     if isinstance(value, set):
-        return _expand_set(value, exports)
+        return _expand_set(cast(set[str], value), exports)
     return value
 
 
@@ -486,15 +488,26 @@ def _symbols_meta_dict(value: ResolvedNavValue | None) -> dict[str, SymbolMetaDi
     """Return symbol metadata entries as ``SymbolMetaDict`` instances."""
     if not isinstance(value, dict):
         return {}
-    return {
-        key: {
-            field: value_str
-            for field in ("owner", "stability", "since", "deprecated_in")
-            if isinstance((value_str := payload.get(field)), str) and value_str
-        }
-        for key, payload in value.items()
-        if isinstance(key, str) and isinstance(payload, dict)
-    }
+    result: dict[str, SymbolMetaDict] = {}
+    for key, payload in value.items():
+        if not isinstance(key, str) or not isinstance(payload, dict):
+            continue
+        entry: SymbolMetaDict = {}
+        owner = payload.get("owner")
+        if isinstance(owner, str) and owner:
+            entry["owner"] = owner
+        stability = payload.get("stability")
+        if isinstance(stability, str) and stability:
+            entry["stability"] = stability
+        since = payload.get("since")
+        if isinstance(since, str) and since:
+            entry["since"] = since
+        deprecated = payload.get("deprecated_in")
+        if isinstance(deprecated, str) and deprecated:
+            entry["deprecated_in"] = deprecated
+        if entry:
+            result[key] = entry
+    return result
 
 
 def _validate_sections(
@@ -582,15 +595,13 @@ def _collect_module_errors() -> list[str]:
 def _round_trip_line_errors(
     file_path: Path,
     lines: list[str],
-    mapping: dict[str, object],
+    mapping: Mapping[str, int],
     pattern: re.Pattern[str],
     label: str,
 ) -> list[str]:
     """Return mismatches for ``mapping`` entries compared against ``lines``."""
     errors: list[str] = []
     for key, value in mapping.items():
-        if not isinstance(key, str) or not isinstance(value, int):
-            continue
         if value < 1 or value > len(lines) or not pattern.match(lines[value - 1]):
             errors.append(f"{file_path}: round-trip mismatch for {label} '{key}' at line {value}")
     return errors
@@ -612,12 +623,30 @@ def _round_trip_errors(index: NavIndexDict | dict[str, object]) -> list[str]:
         lines = _read_text(file_path)
         section_lines = entry.get("sectionLines") or entry.get("section_lines")
         if isinstance(section_lines, dict):
-            errors.extend(
-                _round_trip_line_errors(file_path, lines, section_lines, SECTION_RE, "section")
-            )
+            normalized_sections = {
+                key: value
+                for key, value in section_lines.items()
+                if isinstance(key, str) and isinstance(value, int)
+            }
+            if normalized_sections:
+                errors.extend(
+                    _round_trip_line_errors(
+                        file_path, lines, normalized_sections, SECTION_RE, "section"
+                    )
+                )
         anchors = entry.get("anchors")
         if isinstance(anchors, dict):
-            errors.extend(_round_trip_line_errors(file_path, lines, anchors, ANCHOR_RE, "anchor"))
+            normalized_anchors = {
+                key: value
+                for key, value in anchors.items()
+                if isinstance(key, str) and isinstance(value, int)
+            }
+            if normalized_anchors:
+                errors.extend(
+                    _round_trip_line_errors(
+                        file_path, lines, normalized_anchors, ANCHOR_RE, "anchor"
+                    )
+                )
     return errors
 
 

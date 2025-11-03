@@ -33,6 +33,14 @@ repos:
         additional_dependencies: [setuptools]
         args: ["-i", "src", "--fail-under", "90"]
 
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.13
+    hooks:
+      - id: vulture
+        name: vulture (scan full tree)
+        pass_filenames: false
+        args: ["src", "tools", "stubs"]
+
   - repo: local
     hooks:
       - id: pydoclint
