@@ -33,11 +33,12 @@ class AstroidBuilderProtocol(Protocol):
 
 
 def _coerce_class(module: ModuleType, attribute: str, kind: str) -> type[object]:
-    candidate = getattr(module, attribute, None)
-    if not isinstance(candidate, type):
+    candidate_any = getattr(module, attribute, None)  # type: ignore[misc]
+    if candidate_any is None or not isinstance(candidate_any, type):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a {kind} class"
         raise TypeError(message)
-    return cast(type[object], candidate)
+    typed_candidate = cast(type[object], candidate_any)
+    return typed_candidate
 
 
 def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProtocol]:

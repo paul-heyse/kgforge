@@ -30,8 +30,9 @@ def coerce_parser_class(
     attribute: str = "Parser",
 ) -> type[AutoapiParserProtocol]:
     """Return the ``Parser`` class from ``module`` with precise typing."""
-    candidate = getattr(module, attribute, None)
-    if not isinstance(candidate, type):
+    candidate_any = getattr(module, attribute, None)  # type: ignore[misc]
+    if candidate_any is None or not isinstance(candidate_any, type):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a class"
         raise TypeError(message)
-    return cast(type[AutoapiParserProtocol], candidate)
+    parser_type = cast(type[object], candidate_any)
+    return cast(type[AutoapiParserProtocol], parser_type)  # type: ignore[misc]

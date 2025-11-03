@@ -236,6 +236,18 @@ def _type_error(message: str) -> NoReturn:
     raise TypeError(message)
 
 
+def _ensure_int(value: object, *, message: str) -> int:
+    if isinstance(value, int):
+        return value
+    _type_error(message)
+
+
+def _ensure_exception(value: object, *, message: str) -> Exception:
+    if isinstance(value, Exception):
+        return value
+    _type_error(message)
+
+
 def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDetailsParams:
     if args and isinstance(args[0], ProblemDetailsParams):
         if len(args) > 1 or kwargs:
@@ -262,10 +274,9 @@ def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDe
         unexpected = ", ".join(sorted(kwargs))
         _type_error(f"build_problem_details() got unexpected keyword arguments: {unexpected}")
 
-    status_value = values["status"]
-    if not isinstance(status_value, int):
-        _type_error("build_problem_details() expected 'status' to be an int")
-    status_int = int(status_value)
+    status_int = _ensure_int(
+        values["status"], message="build_problem_details() expected 'status' to be an int"
+    )
 
     return ProblemDetailsParams(
         problem_type=str(values["problem_type"]),
@@ -287,10 +298,9 @@ def _coerce_exception_params(*args: object, **kwargs: object) -> ExceptionProble
     if not args:
         _type_error("problem_from_exception() missing required argument: 'exc'")
 
-    exc_obj = args[0]
-    if not isinstance(exc_obj, Exception):
-        _type_error("problem_from_exception() first argument must be an Exception instance")
-    exc = exc_obj
+    exc = _ensure_exception(
+        args[0], message="problem_from_exception() first argument must be an Exception instance"
+    )
 
     if "detail" in kwargs:
         _type_error("problem_from_exception() does not accept a 'detail' argument")
@@ -304,7 +314,7 @@ def _coerce_exception_params(*args: object, **kwargs: object) -> ExceptionProble
 
 
 @overload
-def build_problem_details(params: ProblemDetailsParams) -> ProblemDetails: ...
+def build_problem_details(params: ProblemDetailsParams, /) -> ProblemDetails: ...
 
 
 @overload
@@ -371,7 +381,7 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
     if params.code is not None:
         payload["code"] = params.code
     if params.extensions:
-        payload["errors"] = dict(params.extensions)
+        payload["extensions"] = dict(params.extensions)
 
     # Validate against schema (cast since dict[str, object] ⊇ Mapping[str, JsonValue])
     validate_problem_details(cast(Mapping[str, JsonValue], payload))

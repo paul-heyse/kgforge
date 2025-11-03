@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import cast
-
 from tools._types.pytestarch_facade import (
+    EvaluableArchitectureFactory,
     EvaluableArchitectureProtocol,
     LayeredArchitectureProtocol,
     ModuleNameFilterProtocol,
@@ -19,12 +17,9 @@ from tools._types.pytestarch_facade import (
 
 LayeredArchitecture: type[LayeredArchitectureProtocol] = get_layered_architecture_cls()
 ModuleNameFilter: type[ModuleNameFilterProtocol] = get_module_name_filter_cls()
-get_evaluable_architecture = cast(
-    Callable[..., EvaluableArchitectureProtocol], get_evaluable_architecture_fn()
-)
-get_evaluable_architecture_for_module_objects = cast(
-    Callable[..., EvaluableArchitectureProtocol],
-    get_evaluable_architecture_for_module_objects_fn(),
+get_evaluable_architecture: EvaluableArchitectureFactory = get_evaluable_architecture_fn()
+get_evaluable_architecture_for_module_objects: EvaluableArchitectureFactory = (
+    get_evaluable_architecture_for_module_objects_fn()
 )
 
 EvaluableArchitecture = EvaluableArchitectureProtocol

@@ -209,25 +209,32 @@ def atomic_write(
     ensure_dir(path.parent, exist_ok=True)
     tmp_path: Path | None = None
     try:
-        with tempfile.NamedTemporaryFile(
-            mode="w" if mode == "text" else "wb",
-            dir=str(path.parent) if path.parent else None,
-            delete=False,
-            encoding="utf-8" if mode == "text" else None,
-        ) as temp_file:
-            # temp_file is _TemporaryFileWrapper with name: str attribute
-            tmp_path = Path(temp_file.name)
-            if mode == "text":
-                if not isinstance(data, str):
-                    msg = "text mode requires str data"
-                    raise ValueError(msg)
+        dir_arg = str(path.parent) if path.parent else None
+        if mode == "text":
+            if not isinstance(data, str):
+                msg = "text mode requires str data"
+                raise ValueError(msg)
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                dir=dir_arg,
+                delete=False,
+                encoding="utf-8",
+            ) as temp_file:
+                tmp_path = Path(temp_file.name)
                 temp_file.write(data)
-            else:
-                if not isinstance(data, bytes):
-                    msg = "binary mode requires bytes data"
-                    raise ValueError(msg)
+                temp_file.flush()
+        else:
+            if not isinstance(data, bytes):
+                msg = "binary mode requires bytes data"
+                raise ValueError(msg)
+            with tempfile.NamedTemporaryFile(
+                mode="wb",
+                dir=dir_arg,
+                delete=False,
+            ) as temp_file:
+                tmp_path = Path(temp_file.name)
                 temp_file.write(data)
-            temp_file.flush()
+                temp_file.flush()
         if tmp_path is not None:
             tmp_path.replace(path)
     finally:

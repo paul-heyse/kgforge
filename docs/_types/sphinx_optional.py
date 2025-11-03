@@ -81,21 +81,21 @@ class _OptionalDependenciesImpl:
     def __init__(
         self,
         autoapi_parser: AutoapiParserFacade,
-        astroid_manager: object,
+        astroid_manager: AstroidManagerFacade,
     ) -> None:
         """Initialize with optional dependency instances."""
-        self._autoapi_parser: AutoapiParserFacade = autoapi_parser
-        self._astroid_manager: object = astroid_manager
+        self._autoapi_parser = autoapi_parser
+        self._astroid_manager = astroid_manager
 
     @property
     def autoapi_parser(self) -> AutoapiParserFacade:
         """Return the AutoAPI parser."""
-        return cast(AutoapiParserFacade, self._autoapi_parser)
+        return self._autoapi_parser
 
     @property
     def astroid_manager(self) -> AstroidManagerFacade:
         """Return the Astroid manager."""
-        return cast(AstroidManagerFacade, self._astroid_manager)
+        return self._astroid_manager
 
 
 def load_optional_dependencies() -> OptionalDependencies:
@@ -139,7 +139,8 @@ def load_optional_dependencies() -> OptionalDependencies:
 
     # If we get here, both are available
     # Return facades wrapping the actual modules/objects
+    manager_facade = cast(AstroidManagerFacade, astroid.MANAGER)
     return _OptionalDependenciesImpl(
         autoapi_parser=parser_cls,
-        astroid_manager=cast(AstroidManagerFacade, astroid.MANAGER),
+        astroid_manager=manager_facade,
     )

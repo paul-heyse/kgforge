@@ -29,8 +29,12 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Final, Literal, Protocol, TypedDict, cast
 
-from jsonschema import Draft202012Validator, ValidationError
-
+from kgfoundry_common.jsonschema_utils import (
+    Draft202012ValidatorProtocol,
+    ValidationError,
+    ValidationErrorProtocol,
+    create_draft202012_validator,
+)
 from tools._shared.problem_details import (
     ProblemDetailsParams,
     SchemaProblemDetailsParams,
@@ -470,19 +474,19 @@ class CliResult(TypedDict, total=False):
     problem: ProblemDetails
 
 
-_DOCFACTS_VALIDATOR: Final[Draft202012Validator] = Draft202012Validator(
+_DOCFACTS_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
     cast(dict[str, JsonValue], json.loads(_DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")))
 )
-_CLI_VALIDATOR: Final[Draft202012Validator] = Draft202012Validator(
+_CLI_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
     cast(dict[str, JsonValue], json.loads(_CLI_SCHEMA_PATH.read_text(encoding="utf-8")))
 )
 
 
-def _load_docfacts_validator() -> Draft202012Validator:
+def _load_docfacts_validator() -> Draft202012ValidatorProtocol:
     return _DOCFACTS_VALIDATOR
 
 
-def _load_cli_validator() -> Draft202012Validator:
+def _load_cli_validator() -> Draft202012ValidatorProtocol:
     return _CLI_VALIDATOR
 
 
@@ -698,7 +702,7 @@ def build_cli_result_skeleton(status: RunStatus) -> CliResult:
     return payload
 
 
-def _json_pointer_from(error: ValidationError) -> str | None:
+def _json_pointer_from(error: ValidationErrorProtocol) -> str | None:
     raw_path = cast(Sequence[object], getattr(error, "absolute_path", ()))
     tokens: list[str] = []
     for part in raw_path:
