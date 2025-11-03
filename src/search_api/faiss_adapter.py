@@ -115,7 +115,7 @@ def _load_libcuvs() -> LoadLibraryFn | None:
         except (ImportError, ModuleNotFoundError):  # pragma: no cover - optional dependency
             continue
         except (RuntimeError, OSError):  # pragma: no cover - optional dependency
-            logger.debug("Failed to import %%s: runtime error", name)
+            logger.debug("Failed to import %s: runtime error", name)
             continue
         else:
             break
@@ -209,6 +209,11 @@ class FaissAdapter:
 
         self._cpu_matrix: FloatMatrix | None = None
         self._gpu_context: GpuContext | None = None
+
+    @property
+    def cpu_matrix(self) -> FloatMatrix | None:
+        """Return the CPU-resident vector matrix when available."""
+        return self._cpu_matrix
 
     @classmethod
     def _resolve_config(

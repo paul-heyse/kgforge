@@ -539,28 +539,18 @@ def build_configuration_problem(
         extensions["validation"] = cast("dict[str, JsonValue]", context_value)
 
     # Get the message - use str() as fallback
-    message: str
     msg_value: object = getattr(config_error, "message", None)
-    if isinstance(msg_value, str):
-        message = msg_value
-    else:
-        message = str(config_error)
+    message: str = msg_value if isinstance(msg_value, str) else str(config_error)
 
     # Get http_status - expect int, default to 500
     http_status: int = cast("int", getattr(config_error, "http_status", 500))
 
     # Get code value - should be ErrorCode enum with .value attribute
     code_obj: object = getattr(config_error, "code", None)
-    code_value: str
-    if hasattr(code_obj, "value"):
-        # code_obj is known to have .value, extract it
-        value_attr: object = getattr(code_obj, "value", None)
-        if isinstance(value_attr, str):
-            code_value = value_attr
-        else:
-            code_value = "configuration-error"
-    else:
-        code_value = "configuration-error"
+    value_attr: object | None = (
+        getattr(code_obj, "value", None) if hasattr(code_obj, "value") else None
+    )
+    code_value: str = value_attr if isinstance(value_attr, str) else "configuration-error"
 
     return build_problem_details(
         problem_type="https://kgfoundry.dev/problems/configuration-error",

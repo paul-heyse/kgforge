@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.errors import ConfigurationError
 from kgfoundry_common.problem_details import (
     build_configuration_problem,
     render_problem,
 )
+from orchestration.config import IndexCliConfig
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestConfigurationErrorHandling:
@@ -44,14 +48,13 @@ class TestConfigurationErrorHandling:
         assert '"type"' in json_str
         assert '"status"' in json_str
 
-    def test_configuration_error_has_correct_exit_code(self) -> None:
+    def test_configuration_error_has_correct_exit_code(self, tmp_path: Path) -> None:
         """Verify that ConfigurationError handling uses exit code 2."""
-        from orchestration.config import IndexCliConfig
-
         # Create a config that would work, but then the error is thrown during load
+        index_path = tmp_path / "test.idx"
         config = IndexCliConfig(
             dense_vectors="vectors.json",
-            index_path="/tmp/test.idx",
+            index_path=str(index_path),
             factory="Flat",
             metric="ip",
         )

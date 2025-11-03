@@ -960,7 +960,7 @@ def _process_module(module: GriffeObjectLike, cfg: ReadmeConfig, missing_meta: s
     return changed
 
 
-def _report_duration(start: float, changed_any: bool) -> None:
+def _report_duration(start: float, *, changed_any: bool) -> None:
     """Print a timing summary when verbose mode is enabled."""
     duration = time.monotonic() - start
     with_fields(LOGGER, duration_seconds=round(duration, 2), changed=changed_any).info(
@@ -1019,7 +1019,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             _raise_missing_metadata(detail, problem)
 
         if cfg.verbose:
-            _report_duration(start, changed_any)
+            _report_duration(start, changed_any=changed_any)
 
     except MissingMetadataError as exc:
         problem = exc.problem or build_problem_details(

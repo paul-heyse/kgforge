@@ -249,8 +249,8 @@ def _t_register_in_duckdb_impl(
             )
         ]
     )
-    registry.close_run(dense_run, True)
-    registry.close_run(sparse_run, True)
+    registry.close_run(dense_run, success=True)
+    registry.close_run(sparse_run, success=True)
     return {"runs": [dense_run, sparse_run]}
 
 

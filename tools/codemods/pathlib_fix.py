@@ -356,7 +356,7 @@ def ensure_pathlib_import(
     return module.with_changes(body=new_body_tuple)
 
 
-def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:
+def transform_file(file_path: Path, *, dry_run: bool = False) -> list[str]:
     """Transform a single Python file.
 
     Parameters
@@ -365,7 +365,6 @@ def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:
         Path to Python file to transform.
     dry_run : bool, optional
         If True, only report changes without modifying files.
-        Defaults to False.
 
     Returns
     -------

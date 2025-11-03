@@ -470,13 +470,13 @@ class AgentCatalogBuilder:
             "lexical_fields": list(search_config.lexical_fields),
         }
         artifacts = {
-            key: self._relative_string(self._resolve_artifact_path(path))
+            key: self._relative_string(self.resolve_artifact_path(path))
             for key, path in self.artifact_paths.items()
         }
         if semantic_index is not None:
             artifacts["semantic_index"] = semantic_index.index
             artifacts["semantic_mapping"] = semantic_index.mapping
-        sqlite_target = self._resolve_artifact_path(self.sqlite_path)
+        sqlite_target = self.resolve_artifact_path(self.sqlite_path)
         artifacts["catalog_sqlite"] = self._relative_string(sqlite_target)
         catalog = AgentCatalog(
             version=self.args.version,
@@ -502,6 +502,10 @@ class AgentCatalogBuilder:
 
     def _resolve_artifact_path(self, path: Path) -> Path:
         return path if path.is_absolute() else (self.repo_root / path)
+
+    def resolve_artifact_path(self, path: Path) -> Path:
+        """Public resolver returning absolute artifact paths."""
+        return self._resolve_artifact_path(path)
 
     def _resolve_link_policy(self) -> LinkPolicy:
         env_mode = os.environ.get("DOCS_LINK_MODE")
@@ -1491,9 +1495,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.search_query:
         try:
             facets = _parse_facet_args(args.search_facet)
-            catalog_path = builder._resolve_artifact_path(
-                args.output
-            )  # pylint: disable=protected-access
+            catalog_path = builder.resolve_artifact_path(args.output)
             catalog_data = load_catalog(catalog_path, load_shards=True)
             options = (
                 build_faceted_search_options(

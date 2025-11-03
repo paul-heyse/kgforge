@@ -75,7 +75,7 @@ def has_header(source: str) -> bool:
 
 def insert_header(source: str) -> str:
     """Insert the standard header near the top of the file."""
-    lines = source.splitlines(True)
+    lines = source.splitlines(keepends=True)
     index = 0
     while index < len(lines):
         line = lines[index]
