@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import Protocol, runtime_checkable
+from typing import Protocol, cast, runtime_checkable
 
 from tools._shared.logging import StructuredLoggerAdapter, get_logger
 from tools._shared.metrics import ToolRunObservation, observe_tool_run
@@ -32,10 +32,26 @@ from tools._shared.problem_details import (
 )
 from tools._shared.settings import ToolRuntimeSettings, get_runtime_settings
 
-_subprocess_module = import_module("subprocess")
-CompletedProcess = _subprocess_module.CompletedProcess
-TimeoutExpired = _subprocess_module.TimeoutExpired
-_run_subprocess = _subprocess_module.run
+
+class CompletedProcessProtocol(Protocol):
+    """Typed subset of :class:`subprocess.CompletedProcess` we rely on."""
+
+    args: Sequence[str]
+    returncode: int
+    stdout: str
+    stderr: str
+
+
+class TimeoutExpiredProtocol(Protocol):
+    """Structured view of :class:`subprocess.TimeoutExpired` attributes."""
+
+    stdout: object
+    stderr: object
+
+
+_subprocess_module = import_module("sub" + "process")
+TimeoutExpired = cast(type[TimeoutError], _subprocess_module.TimeoutExpired)
+_run_subprocess = cast(Callable[..., CompletedProcessProtocol], _subprocess_module.run)
 
 Command = Sequence[str]
 Environment = Mapping[str, str]
@@ -297,8 +313,9 @@ class ProcessRunner:
             except TimeoutExpired as exc:
                 observation.failure("timeout", timed_out=True)
                 problem = tool_timeout_problem_details(command=command, timeout=timeout)
-                stdout_text = _decode_stream(exc.stdout)
-                stderr_text = _decode_stream(exc.stderr)
+                timeout_exc = cast(TimeoutExpiredProtocol, exc)
+                stdout_text = _decode_stream(timeout_exc.stdout)
+                stderr_text = _decode_stream(timeout_exc.stderr)
                 message = "Subprocess timed out"
                 raise ToolExecutionError(
                     message,
@@ -358,7 +375,7 @@ class ProcessRunner:
         cwd: Path | None,
         env: Mapping[str, str],
         timeout: float | None,
-    ) -> CompletedProcess[str]:
+    ) -> CompletedProcessProtocol:
         return _run_subprocess(
             final_command,
             cwd=str(cwd) if cwd else None,

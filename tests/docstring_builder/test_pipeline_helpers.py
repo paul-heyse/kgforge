@@ -6,6 +6,7 @@ import logging
 from dataclasses import dataclass, field
 
 import pytest
+from _pytest.logging import LogCaptureFixture
 from tools.docstring_builder.builder_types import ExitStatus
 from tools.docstring_builder.docfacts import DocFact
 from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
@@ -45,7 +46,7 @@ def _empty_docfacts() -> list[DocFact]:
     return []
 
 
-def _captured_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
+def _captured_messages(caplog: LogCaptureFixture) -> list[str]:
     """Return captured log messages from the caplog fixture."""
     return [record.getMessage() for record in caplog.records]
 
@@ -53,7 +54,7 @@ def _captured_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
 class TestFailureSummaryRenderer:
     """Tests for FailureSummaryRenderer."""
 
-    def test_render_no_errors(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_render_no_errors(self, caplog: LogCaptureFixture) -> None:
         """Empty error list should produce no output."""
         renderer = FailureSummaryRenderer(logger=logging.getLogger(__name__))
         summary = RunSummarySnapshot(
@@ -66,7 +67,7 @@ class TestFailureSummaryRenderer:
         renderer.render(summary, [])
         assert len(caplog.records) == 0
 
-    def test_render_with_errors(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_render_with_errors(self, caplog: LogCaptureFixture) -> None:
         """Error list should produce structured logging."""
         renderer = FailureSummaryRenderer(logger=logging.getLogger(__name__))
         summary = RunSummarySnapshot(
@@ -84,7 +85,7 @@ class TestFailureSummaryRenderer:
         messages = _captured_messages(caplog)
         assert any("[SUMMARY]" in message for message in messages)
 
-    def test_render_truncates_top_errors(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_render_truncates_top_errors(self, caplog: LogCaptureFixture) -> None:
         """Should only show top 5 errors."""
         renderer = FailureSummaryRenderer(logger=logging.getLogger(__name__))
         summary = RunSummarySnapshot(

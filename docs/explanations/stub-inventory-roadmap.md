@@ -46,18 +46,14 @@ type information, allowing us to drop the local `pyarrow` shims.
 
 ## 2. Needs Follow-up (runtime lacks py.typed)
 
-| Package | Stub paths | Status | Suggested action |
-| --- | --- | --- | --- |
-| `pyserini>=1.2.0` | `stubs/pyserini/**` | no `py.typed` | Audited 2025-11-02 — stubs mirror Lucene search/index surfaces we consume; retain until upstream ships typing. |
-| `auto-generated tempfile wrapper` | `stubs/tempfile/__init__.pyi` | overrides stdlib | Audited 2025-11-02 — mirrors stdlib signature while preserving wrapper typing; keep while helper exists. |
+None — the final follow-up items (Pyserini and the bespoke tempfile shim) were migrated on
+2025-11-03. Lucene adapters in `embeddings_sparse` now cast the runtime modules to local
+Protocols, and filesystem helpers rely on the standard library `tempfile` annotations.
 
 ## 3. Local-only / Intentional Stubs
 
-| Stub | Purpose | Notes |
-| --- | --- | --- |
-| `stubs/conftest.pyi` | Declares dynamic `pytest_plugins`, `HAS_GPU_STACK` | Keep to satisfy test namespace imports. |
-| `stubs/docs/scripts/**` | Provides stubs for docs helper scripts | Keep while docs tooling lacks shipping types. |
-| Empty directories (`search_api/`) | Residual from previous clean-up | ✅ Removed 2025-11-02 alongside stub retirement. |
+None — as of 2025-11-03 all remaining shim directories have been removed. The `stubs/`
+tree now contains only documentation (`README.md`).
 
 ## 4. Execution Plan
 

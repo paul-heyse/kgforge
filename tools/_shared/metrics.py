@@ -38,19 +38,19 @@ LOGGER = get_logger(__name__)
 TOOL_RUNS_TOTAL: CounterLike = build_counter(
     "tool_runs_total",
     "Total tooling subprocess invocations",
-    ["tool", "status"],
+    labelnames=["tool", "status"],
 )
 
 TOOL_FAILURES_TOTAL: CounterLike = build_counter(
     "tool_failures_total",
     "Count of tooling subprocess failures grouped by reason",
-    ["tool", "reason"],
+    labelnames=["tool", "reason"],
 )
 
 TOOL_DURATION_SECONDS: HistogramLike = build_histogram(
     "tool_duration_seconds",
     "Tooling subprocess duration in seconds",
-    ["tool", "status"],
+    labelnames=["tool", "status"],
 )
 
 

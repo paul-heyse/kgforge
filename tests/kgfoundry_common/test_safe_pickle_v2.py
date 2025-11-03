@@ -9,6 +9,7 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, ParamSpec, TypeVar, cast
 
 import pytest
+from _pytest.logging import LogCaptureFixture
 
 from kgfoundry_common.safe_pickle_v2 import SignedPickleWrapper, UnsafeSerializationError
 
@@ -154,7 +155,7 @@ class TestSignedPickleWrapper:
         ):
             wrapper.load(buffer)
 
-    def test_short_key_warning_logged(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_short_key_warning_logged(self, caplog: LogCaptureFixture) -> None:
         """Test that short keys generate a warning."""
         short_key = b"short_key"
         with caplog.at_level("WARNING"):
