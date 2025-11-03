@@ -36,7 +36,14 @@ from typing import (
 )
 
 import certifi
-from docs._types.autoapi_parser import AutoapiParserProtocol, coerce_parser_class
+from docs.types_facade import (
+    AstroidBuilderProtocol,
+    AstroidManagerProtocol,
+    AutoapiParserProtocol,
+    coerce_astroid_builder_class,
+    coerce_astroid_manager_class,
+    coerce_parser_class,
+)
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx

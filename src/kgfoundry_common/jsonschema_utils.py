@@ -29,14 +29,22 @@ class ValidationErrorProtocol(Protocol):
 class Draft202012ValidatorProtocol(Protocol):
     """Typed facade for :class:`jsonschema.validators.Draft202012Validator`."""
 
-    def __init__(self, schema: Mapping[str, object], *args: object, **kwargs: object) -> None: ...
+    def __init__(self, schema: Mapping[str, object], *args: object, **kwargs: object) -> None:
+        """Initialize the validator with ``schema``."""
+        ...
 
     @classmethod
-    def check_schema(cls, schema: Mapping[str, object]) -> None: ...
+    def check_schema(cls, schema: Mapping[str, object]) -> None:
+        """Validate that ``schema`` conforms to the Draft 2020-12 meta-schema."""
+        ...
 
-    def iter_errors(self, instance: object) -> Iterable[ValidationErrorProtocol]: ...
+    def iter_errors(self, instance: object) -> Iterable[ValidationErrorProtocol]:
+        """Yield validation errors for ``instance`` without raising."""
+        ...
 
-    def validate(self, instance: object) -> None: ...
+    def validate(self, instance: object) -> None:
+        """Validate ``instance`` against the configured schema."""
+        ...
 
 
 Draft202012Validator = cast(type[Draft202012ValidatorProtocol], _Draft202012Validator)
@@ -64,5 +72,6 @@ def create_draft202012_validator(
     schema: Mapping[str, object],
 ) -> Draft202012ValidatorProtocol:
     """Return a typed Draft 2020-12 validator for ``schema``."""
-    instance = _Draft202012Validator(dict(schema))
+    concrete_schema = {str(key): value for key, value in schema.items()}
+    instance = _Draft202012Validator(concrete_schema)
     return cast(Draft202012ValidatorProtocol, instance)

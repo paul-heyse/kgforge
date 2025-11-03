@@ -19,7 +19,7 @@ class AutoapiParserProtocol(Protocol):
         """Parse ``file_path`` when ``condition`` evaluates to ``True``."""
 
     def parse_file(self, file_path: str, /) -> object:
-        """Convenience wrapper around :meth:`_parse_file`."""
+        """Wrap :meth:`_parse_file` for convenience."""
 
     def parse_file_in_namespace(self, file_path: str, dir_root: str, /) -> object:
         """Parse ``file_path`` relative to ``dir_root`` namespace."""

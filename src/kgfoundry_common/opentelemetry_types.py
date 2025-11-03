@@ -8,7 +8,7 @@ dependency safely at runtime without leaking ``Any`` into the type graph.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from importlib import import_module
@@ -21,61 +21,87 @@ Attributes = Mapping[str, SpanAttributeValue]
 class SpanProtocol(Protocol):
     """Minimal span surface exercised by the observability helpers."""
 
-    def set_attribute(self, key: str, value: SpanAttributeValue) -> None: ...
+    def set_attribute(self, key: str, value: SpanAttributeValue) -> None:
+        """Attach ``value`` to ``key`` on the span."""
 
-    def record_exception(self, exception: BaseException) -> None: ...
+    def record_exception(self, exception: BaseException) -> None:
+        """Record ``exception`` on the span."""
 
-    def set_status(self, status: object) -> None: ...
+    def set_status(self, status: object) -> None:
+        """Persist ``status`` on the span."""
 
 
 class TracerProtocol(Protocol):
     """Tracer facade returned by ``opentelemetry.trace.get_tracer``."""
 
-    def start_as_current_span(self, name: str) -> AbstractContextManager[SpanProtocol]: ...
+    def start_as_current_span(self, name: str) -> AbstractContextManager[SpanProtocol]:
+        """Return a context manager yielding a span."""
+        ...
 
 
 class TraceAPIProtocol(Protocol):
     """Subset of the OpenTelemetry trace module used by the codebase."""
 
-    def get_tracer(self, name: str) -> TracerProtocol: ...
+    def get_tracer(self, name: str) -> TracerProtocol:
+        """Return a tracer for ``name``."""
+        ...
 
 
 class SpanProcessorProtocol(Protocol):
     """Span processor lifecycle hooks invoked by the tests."""
 
-    def on_start(self, span: SpanProtocol, parent_context: object | None = ...) -> None: ...
+    def on_start(self, span: SpanProtocol, parent_context: object | None = None) -> None:
+        """Observe ``span`` immediately after creation."""
+        ...
 
-    def on_end(self, span: SpanProtocol) -> None: ...
+    def on_end(self, span: SpanProtocol) -> None:
+        """Observe ``span`` once it has completed."""
+        ...
 
-    def shutdown(self) -> None: ...
+    def shutdown(self) -> None:
+        """Release resources associated with the processor."""
+        ...
 
-    def force_flush(self, timeout_millis: int = ...) -> bool: ...
+    def force_flush(self, timeout_millis: int | None = None) -> bool:
+        """Flush buffered spans within ``timeout_millis``."""
+        ...
 
 
 class TracerProviderProtocol(Protocol):
     """Tracer provider constructor and helpers used in fixtures."""
 
-    def __init__(self, *args: object, **kwargs: object) -> None: ...
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        """Initialise the provider with optional configuration."""
 
     def get_tracer(
         self,
         instrumenting_module_name: str,
-        instrumenting_library_version: str | None = ...,
-        schema_url: str | None = ...,
-        attributes: Attributes | None = ...,
-    ) -> TracerProtocol: ...
+        instrumenting_library_version: str | None = None,
+        schema_url: str | None = None,
+        attributes: Attributes | None = None,
+    ) -> TracerProtocol:
+        """Return a tracer configured for the given instrumentation metadata."""
+        ...
 
-    def add_span_processor(self, processor: SpanProcessorProtocol) -> None: ...
+    def add_span_processor(self, processor: SpanProcessorProtocol) -> None:
+        """Register ``processor`` for span lifecycle callbacks."""
+        ...
 
-    def shutdown(self) -> None: ...
+    def shutdown(self) -> None:
+        """Shut down the provider gracefully."""
+        ...
 
-    def force_flush(self, timeout_millis: int = ...) -> bool: ...
+    def force_flush(self, timeout_millis: int | None = None) -> bool:
+        """Flush pending spans and return ``True`` on success."""
+        ...
 
 
 class SpanExporterProtocol(Protocol):
     """Minimal exporter interface used by the OpenTelemetry fixtures."""
 
-    def export(self, spans: Sequence[object]) -> None: ...
+    def export(self, spans: Sequence[object]) -> None:
+        """Export ``spans`` to the configured backend."""
+        ...
 
 
 class StatusCodeProtocol(Protocol):
@@ -90,8 +116,10 @@ class StatusFactory(Protocol):
     def __call__(
         self,
         status_code: StatusCodeProtocol,
-        description: str | None = ...,
-    ) -> object: ...
+        description: str | None = None,
+    ) -> object:
+        """Create a status object using ``status_code`` and ``description``."""
+        ...
 
 
 @dataclass(slots=True)
@@ -127,27 +155,39 @@ def load_trace_runtime() -> TraceRuntime:
     )
 
 
-def load_tracer_provider_cls() -> type[TracerProviderProtocol] | None:
-    """Return the OpenTelemetry ``TracerProvider`` class if present."""
+def load_tracer_provider_cls() -> Callable[[], TracerProviderProtocol] | None:
+    """Return a factory for the OpenTelemetry ``TracerProvider`` if present."""
     try:
         sdk_trace_module = import_module("opentelemetry.sdk.trace")
     except ImportError:
         return None
 
-    provider_cls = _safe_getattr(sdk_trace_module, "TracerProvider")
-    if provider_cls is None:
+    provider_raw = _safe_getattr(sdk_trace_module, "TracerProvider")
+    if provider_raw is None or not callable(provider_raw):
         return None
-    return cast(type[TracerProviderProtocol], provider_cls)
+    provider_factory = cast(Callable[[], object], provider_raw)
+
+    def factory() -> TracerProviderProtocol:
+        provider = provider_factory()
+        return cast(TracerProviderProtocol, provider)
+
+    return factory
 
 
-def load_in_memory_span_exporter_cls() -> type[SpanExporterProtocol] | None:
-    """Return the in-memory span exporter class if the SDK is installed."""
+def load_in_memory_span_exporter_cls() -> Callable[[], SpanExporterProtocol] | None:
+    """Return a factory for the in-memory span exporter if available."""
     try:
         exporter_module = import_module("opentelemetry.sdk.trace.export.in_memory_span_exporter")
     except ImportError:
         return None
 
-    exporter_cls = _safe_getattr(exporter_module, "InMemorySpanExporter")
-    if exporter_cls is None:
+    exporter_raw = _safe_getattr(exporter_module, "InMemorySpanExporter")
+    if exporter_raw is None or not callable(exporter_raw):
         return None
-    return cast(type[SpanExporterProtocol], exporter_cls)
+    exporter_factory = cast(Callable[[], object], exporter_raw)
+
+    def factory() -> SpanExporterProtocol:
+        exporter = exporter_factory()
+        return cast(SpanExporterProtocol, exporter)
+
+    return factory

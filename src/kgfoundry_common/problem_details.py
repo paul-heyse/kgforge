@@ -265,7 +265,7 @@ def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDe
     status_value = values["status"]
     if not isinstance(status_value, int):
         _type_error("build_problem_details() expected 'status' to be an int")
-    status_int = cast(int, status_value)
+    status_int = int(status_value)
 
     return ProblemDetailsParams(
         problem_type=str(values["problem_type"]),
@@ -290,7 +290,7 @@ def _coerce_exception_params(*args: object, **kwargs: object) -> ExceptionProble
     exc_obj = args[0]
     if not isinstance(exc_obj, Exception):
         _type_error("problem_from_exception() first argument must be an Exception instance")
-    exc = cast(Exception, exc_obj)
+    exc = exc_obj
 
     if "detail" in kwargs:
         _type_error("problem_from_exception() does not accept a 'detail' argument")
