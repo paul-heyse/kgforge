@@ -46,11 +46,13 @@
           "doc_id": {"type": "string"},
           "title": {"type": "string"},
           "section": {"type": "string"},
+          "body": {"type": "string"},
           "tf": {
             "type": "object",
             "additionalProperties": {"type": "number", "minimum": 0}
           },
-          "dl": {"type": "number", "minimum": 0}
+          "dl": {"type": "number", "minimum": 0},
+          "length": {"type": "number", "minimum": 0}
         }
       }
     },

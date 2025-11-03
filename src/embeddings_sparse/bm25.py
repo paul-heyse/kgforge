@@ -7,16 +7,14 @@ implementation specifics.
 
 from __future__ import annotations
 
-import importlib
 import logging
 import math
 import re
 from collections import defaultdict
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from re import Pattern
-from types import ModuleType
 from typing import TYPE_CHECKING, Final, Protocol, cast
 
 if TYPE_CHECKING:
@@ -153,7 +151,7 @@ class BM25Doc:
     doc_id: str
     length: int
     fields: dict[str, str]
-    term_freqs: dict[str, int]
+    term_freqs: dict[str, int] = field(default_factory=dict)
 
 
 # [nav:anchor PurePythonBM25]
@@ -246,7 +244,6 @@ class PurePythonBM25:
         postings: defaultdict[str, defaultdict[str, int]] = defaultdict(_default_int_dict)
         docs: dict[str, BM25Doc] = {}
         lengths: list[int] = []
-        doc_term_freqs: dict[str, dict[str, int]] = {}
         for doc_id, fields in docs_iterable:
             body = fields.get("body", "")
             section = fields.get("section", "")
@@ -254,11 +251,6 @@ class PurePythonBM25:
             # field boosts applied at scoring time; here we merge for length calc
             toks = self._tokenize(title + " " + section + " " + body)
             lengths.append(len(toks))
-            docs[doc_id] = BM25Doc(
-                doc_id=doc_id,
-                length=len(toks),
-                fields={"title": title, "section": section, "body": body},
-            )
             seen = set()
             term_freqs: defaultdict[str, int] = defaultdict(int)
             for tok in toks:
@@ -267,7 +259,13 @@ class PurePythonBM25:
                 if tok not in seen:
                     df[tok] += 1
                     seen.add(tok)
-            doc_term_freqs[doc_id] = {term: int(count) for term, count in term_freqs.items()}
+            term_freq_map = {term: int(count) for term, count in term_freqs.items()}
+            docs[doc_id] = BM25Doc(
+                doc_id=doc_id,
+                length=len(toks),
+                fields={"title": title, "section": section, "body": body},
+                term_freqs=term_freq_map,
+            )
         self.N = len(docs)
         self.avgdl = sum(lengths) / max(1, len(lengths))
         self.df = dict(df)
@@ -288,7 +286,8 @@ class PurePythonBM25:
                 "doc_id": doc_id,
                 "title": doc_fields.get("title", ""),
                 "section": doc_fields.get("section", ""),
-                "tf": doc_term_freqs.get(doc_id, {}),
+                "body": doc_fields.get("body", ""),
+                "tf": doc.term_freqs,
                 "dl": float(doc.length),
             }
             docs_data.append(doc_record)
@@ -380,12 +379,16 @@ class PurePythonBM25:
             for doc_value in docs_data_raw:
                 if not isinstance(doc_value, dict):
                     continue
-                doc_id = str(doc_value.get("doc_id", ""))
-                length_val = doc_value.get("length", 0)
+                doc_id_raw = doc_value.get("doc_id") or doc_value.get("chunk_id")
+                doc_id = str(doc_id_raw) if doc_id_raw is not None else ""
+                if not doc_id:
+                    continue
+                length_val = doc_value.get("dl", doc_value.get("length", 0))
                 length = int(length_val) if isinstance(length_val, (int, float)) else 0
                 title = str(doc_value.get("title", ""))
                 section = str(doc_value.get("section", ""))
-                tf_raw = doc_value.get("tf", {})
+                body = str(doc_value.get("body", ""))
+                tf_raw = doc_value.get("tf", doc_value.get("term_freqs", {}))
                 tf_map = (
                     {
                         str(term): int(freq)
@@ -398,7 +401,7 @@ class PurePythonBM25:
                 docs[doc_id] = BM25Doc(
                     doc_id=doc_id,
                     length=length,
-                    fields={"title": title, "section": section, "body": ""},
+                    fields={"title": title, "section": section, "body": body},
                     term_freqs=tf_map,
                 )
             return docs
@@ -513,17 +516,19 @@ class LuceneBM25:
     ) -> None:
         """Initialise the Lucene-backed BM25 adapter.
 
-        <!-- auto:docstring-builder v1 -->
-
         Parameters
         ----------
         index_dir : str
-            Describe ``index_dir``.
+            Path to the Lucene index directory on disk.
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+            BM25 term saturation parameter forwarded to Pyserini. Defaults to ``0.9``.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
-        field_boosts : dict[str, float] | NoneType, optional
-            Describe ``
+            BM25 document length normalisation parameter. Defaults to ``0.4``.
+        field_boosts : dict[str, float] | None, optional
+            Optional mapping of field names to boost weights. Defaults to ``None``.
+
+        Raises
+        ------
+        RuntimeError
+            Raised when Pyserini or its Java dependencies are unavailable.
+        """

@@ -88,6 +88,10 @@ __navmap__: Final[NavMap] = {
 app = typer.Typer(help="kgfoundry orchestration CLI")
 
 
+class _BM25Builder(Protocol):
+    def build(self, docs: Iterable[tuple[str, dict[str, str]]]) -> None: ...
+
+
 @dataclass(frozen=True)
 class BM25BuildConfig:
     """Configuration for BM25 index building."""
@@ -230,7 +234,7 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
         Backend identifier that successfully produced the index.
     """
     docs = _load_bm25_documents(config.chunks_path)
-    idx = get_bm25(config.backend, config.index_dir, k1=0.9, b=0.4)
+    idx = cast(_BM25Builder, get_bm25(config.backend, config.index_dir, k1=0.9, b=0.4))
     backend_used = config.backend
     try:
         idx.build(docs)
@@ -242,7 +246,7 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
             extra={"operation": "index_bm25", "error": type(exc).__name__},
             exc_info=exc,
         )
-        fallback = get_bm25("pure", config.index_dir, k1=0.9, b=0.4)
+        fallback = cast(_BM25Builder, get_bm25("pure", config.index_dir, k1=0.9, b=0.4))
         try:
             fallback.build(docs)
         except Exception as fallback_exc:  # pragma: no cover - defensive fallback path
