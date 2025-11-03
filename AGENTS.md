@@ -9,7 +9,7 @@
 2. [Environment Setup (Agent‑grade, deterministic)](#environment-setup-agentgrade-deterministic)
 3. [Source‑of‑Truth Index](#source-of-truth-index)
 4. [Code Formatting & Style (Ruff is canonical)](#code-formatting--style-ruff-is-canonical)
-5. [Type Checking (pyrefly sharp, mypy strict)](#type-checking-pyrefly-sharp-mypy-strict)
+5. [Type Checking (pyright strict, pyrefly sharp, mypy strict)](#type-checking-pyright-strict-pyrefly-sharp-mypy-strict)
 6. [Docstrings (NumPy style; enforced; runnable)](#docstrings-numpy-style-enforced-runnable)
 7. [Testing Standards (markers, coverage, GPU hygiene)](#testing-standards-markers-coverage-gpu-hygiene)
 8. [Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.2)](#data-contracts-json-schema-2020-12--openapi-32)
@@ -34,10 +34,9 @@
    - Read this file end‑to‑end.
    - Open the relevant spec/proposal under `openspec/` (when applicable).
    - Bootstrap environment and run local checks:
-     ```bash
-     uv sync 
-     ```
-
+    ```bash
+    scripts/bootstrap.sh
+    ```
 
 3) **Implement**
    - Code to the typed API sketch.
@@ -173,13 +172,14 @@ For all code blocks that you make edits to, please check for pyright, mypy, pyre
 - **Canonical manager:** `uv`
 - **Python:** pinned to **3.13.9**
 - **Virtual env:** project‑local `.venv/` only (never system Python)
-- **One‑shot bootstrap (preferred):**
+- **One-shot bootstrap (REQUIRED):** use `scripts/bootstrap.sh`
   ```bash
-  # If scripts/bootstrap.sh exists, use it. Otherwise run the commands below manually.
-  uv python install 3.13.9
-  uv python pin 3.13.9
-
+  scripts/bootstrap.sh
   ```
+  The script lives at `scripts/bootstrap.sh` and provisions uv, pins Python 3.13.9, syncs dependencies, activates the project `.venv/`, and sets project paths correctly. It is REQUIRED, the code will not function correctly if you do not run this script. Pass `--help` for options.
+
+  If you are having difficulties with reaching the directory even after running `scripts/bootstrap.sh` please attempt to run the bash command "/bin/bash -lc 'pwd && ls -la'"
+
 - **Remote container / devcontainer:** follow [Link Policy for Remote Editors](#link-policy-for-remote-editors) so deep links open correctly from generated artifacts.
 - **Do not** duplicate tool configs across files. `mypy.ini` and `pyrefly.toml` are canonical; `pyproject.toml` is canonical for Ruff and packaging.
 
