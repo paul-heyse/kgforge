@@ -378,45 +378,51 @@ def _check_mypy_configuration(config_path: Path) -> list[str]:
 
 
 def _check_stub_packages(relative_paths: Sequence[str]) -> list[str]:
-    issues: list[str] = []
-    for relative in relative_paths:
-        if not (REPO_ROOT / relative).exists():
-            issues.append(f"Missing stub package at {relative}.")
-    return issues
+    return [
+        f"Missing stub package at {relative}."
+        for relative in relative_paths
+        if not (REPO_ROOT / relative).exists()
+    ]
 
 
 def _check_optional_dependencies(modules: Sequence[str]) -> list[str]:
-    issues: list[str] = []
-    for module_name in modules:
+    def _module_issue(module_name: str) -> str | None:
         try:
             __import__(module_name)
         except ModuleNotFoundError as exc:
-            issues.append(f"Optional dependency '{module_name}' not importable: {exc}.")
-    return issues
+            return f"Optional dependency '{module_name}' not importable: {exc}."
+        return None
+
+    return [
+        message for module_name in modules if (message := _module_issue(module_name)) is not None
+    ]
 
 
 def _check_writable_directories(directories: Sequence[Path]) -> list[str]:
-    issues: list[str] = []
-    for directory in directories:
+    def _directory_issue(directory: Path) -> str | None:
         try:
             directory.mkdir(parents=True, exist_ok=True)
             probe = directory / ".doctor_probe"
             probe.write_text("", encoding="utf-8")
             probe.unlink()
         except OSError as exc:
-            issues.append(f"Directory {directory} is not writeable: {exc}.")
-    return issues
+            return f"Directory {directory} is not writeable: {exc}."
+        return None
+
+    return [message for directory in directories if (message := _directory_issue(directory))]
 
 
 def _extract_precommit_hook_names(config_path: Path) -> list[str]:
     data = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
-    hook_names: list[str] = []
-    for repo in data.get("repos", []):
-        for hook in repo.get("hooks", []):
-            name = hook.get("name") or hook.get("id", "")
-            if name:
-                hook_names.append(name)
-    return hook_names
+    repos = data.get("repos", [])
+    return [
+        name
+        for repo in repos
+        if isinstance(repo, dict)
+        for hook in repo.get("hooks", [])
+        if isinstance(hook, dict)
+        if (name := hook.get("name") or hook.get("id", ""))
+    ]
 
 
 def _evaluate_precommit_hooks(config_path: Path) -> list[str]:

@@ -260,14 +260,14 @@ class SanitisedEnvironment(EnvironmentPolicy):
     )
 
     def build(self, overrides: Mapping[str, str] | None) -> dict[str, str]:
-        baseline: dict[str, str] = {}
-        for key, value in os.environ.items():
-            if key in self.allowed_keys or key.startswith(("GIT_", "UV_", "CI")):
-                baseline[key] = value
+        baseline = {
+            key: value
+            for key, value in os.environ.items()
+            if key in self.allowed_keys or key.startswith(("GIT_", "UV_", "CI"))
+        }
 
         if overrides:
-            for key, value in overrides.items():
-                baseline[key] = value
+            baseline.update(overrides)
 
         return {key: str(value) for key, value in baseline.items()}
 

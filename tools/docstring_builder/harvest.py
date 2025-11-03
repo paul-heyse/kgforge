@@ -197,6 +197,8 @@ def _module_name(root: Path, file_path: Path) -> str:
     parts = rel.with_suffix("").parts
     if parts and parts[0] in {"src", "tools", "docs"}:
         parts = parts[1:]
+    if parts and parts[-1] == "__init__":
+        parts = parts[:-1]
     return ".".join(parts)
 
 
@@ -298,7 +300,7 @@ def _collect_symbols(
         owned = (docstring and config.ownership_marker in docstring) or docstring is None
         if qname in config.package_settings.opt_out:
             owned = False
-        col_offset = obj.col_offset if obj.col_offset is not None else 0
+        col_offset = getattr(obj, "col_offset", 0) or 0
         yield SymbolHarvest(
             qname=qname,
             module=module_name,
@@ -312,8 +314,8 @@ def _collect_symbols(
             end_lineno=obj.endlineno,
             col_offset=col_offset,
             decorators=_decorator_names(tuple(obj.decorators)),
-            is_async=obj.is_async,
-            is_generator=obj.is_generator,
+            is_async=False,
+            is_generator=False,
         )
         yield from _walk_members(obj, module_name, file_path, config, [*prefix, obj.name])
         return
@@ -324,8 +326,10 @@ def _collect_symbols(
         owned = (docstring and config.ownership_marker in docstring) or docstring is None
         if qname in config.package_settings.opt_out:
             owned = False
-        return_annotation_obj = obj.return_annotation or obj.returns
-        col_offset = obj.col_offset if obj.col_offset is not None else 0
+        return_annotation_obj = getattr(obj, "return_annotation", None) or getattr(
+            obj, "returns", None
+        )
+        col_offset = getattr(obj, "col_offset", 0) or 0
         yield SymbolHarvest(
             qname=qname,
             module=module_name,
@@ -339,8 +343,8 @@ def _collect_symbols(
             end_lineno=obj.endlineno,
             col_offset=col_offset,
             decorators=_decorator_names(tuple(obj.decorators)),
-            is_async=obj.is_async,
-            is_generator=obj.is_generator,
+            is_async=bool(getattr(obj, "is_async", False)),
+            is_generator=bool(getattr(obj, "is_generator", False)),
         )
         return
     if _is_griffe_module(obj):

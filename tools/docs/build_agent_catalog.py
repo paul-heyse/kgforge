@@ -864,22 +864,21 @@ class AgentCatalogBuilder:
 
     @staticmethod
     def _normalize_tests(tests: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        normalized: list[dict[str, Any]] = []
-        for test in tests:
-            normalized.append(
-                {
-                    "file": test.get("file", ""),
-                    "lines": list(test.get("lines", [])),
-                    "reason": test.get("reason"),
-                    "windows": [
-                        {
-                            "start": window.get("start"),
-                            "end": window.get("end"),
-                        }
-                        for window in test.get("windows", [])
-                    ],
-                }
-            )
+        normalized = [
+            {
+                "file": test.get("file", ""),
+                "lines": list(test.get("lines", [])),
+                "reason": test.get("reason"),
+                "windows": [
+                    {
+                        "start": window.get("start"),
+                        "end": window.get("end"),
+                    }
+                    for window in test.get("windows", [])
+                ],
+            }
+            for test in tests
+        ]
         normalized.sort(key=lambda item: (item["file"], item["lines"]))
         return normalized
 
@@ -1474,9 +1473,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.search_query:
         try:
             facets = _parse_facet_args(args.search_facet)
-            catalog_path = builder._resolve_artifact_path(
-                args.output
-            )  # pylint: disable=protected-access
+            catalog_path = builder._resolve_artifact_path(args.output)  # pylint: disable=protected-access
             catalog_data = load_catalog(catalog_path, load_shards=True)
             options = (
                 build_faceted_search_options(

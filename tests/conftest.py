@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, ParamSpec, Protocol, TypeVar, cast
 import pytest
 from _pytest.logging import LogCaptureFixture
 from prometheus_client.registry import CollectorRegistry
+
 from tests.bootstrap import ensure_src_path
 
 ensure_src_path()
@@ -318,7 +319,7 @@ def metrics_asserter(
         Function to assert metric exists and has expected value.
     """
 
-    def assert_metric(name: str, value: int | float | None = None) -> None:
+    def assert_metric(name: str, value: float | None = None) -> None:
         """Assert Prometheus metric exists and optionally has expected value.
 
         Parameters

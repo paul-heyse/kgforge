@@ -7,6 +7,7 @@ import threading
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
+from inspect import isclass
 from pathlib import Path
 from typing import TypeGuard, TypeVar, cast
 
@@ -215,7 +216,15 @@ def _instantiate_plugin(candidate: object) -> RegisteredPlugin:
 
 
 def _materialize_candidate(candidate: object) -> object:
-    if _is_registered_plugin(candidate) or _is_legacy_plugin(candidate):
+    if _is_registered_plugin(candidate):
+        if isclass(candidate):
+            plugin_type = cast(type[RegisteredPlugin], candidate)
+            return plugin_type()
+        return candidate
+    if _is_legacy_plugin(candidate):
+        if isclass(candidate):
+            legacy_type = cast(type[LegacyPluginProtocol], candidate)
+            return legacy_type()
         return candidate
     if callable(candidate):
         factory = cast(Callable[[], PluginInstance], candidate)
@@ -267,15 +276,18 @@ def _ensure_plugin_instance(obj: object) -> RegisteredPlugin:
 
 
 def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
-    if isinstance(plugin, HarvesterPlugin):
-        manager.harvesters.append(plugin)
-    elif isinstance(plugin, TransformerPlugin):
-        manager.transformers.append(plugin)
-    elif isinstance(plugin, FormatterPlugin):
-        manager.formatters.append(plugin)
-    else:  # pragma: no cover - defensive guard
-        message = f"Unsupported plugin stage: {plugin.stage!r}"
-        raise PluginConfigurationError(message)
+    stage = getattr(plugin, "stage", None)
+    if stage == "harvester":
+        manager.harvesters.append(cast(HarvesterPlugin, plugin))
+        return
+    if stage == "transformer":
+        manager.transformers.append(cast(TransformerPlugin, plugin))
+        return
+    if stage == "formatter":
+        manager.formatters.append(cast(FormatterPlugin, plugin))
+        return
+    message = f"Unsupported plugin stage: {stage!r}"
+    raise PluginConfigurationError(message)
 
 
 def _is_registered_plugin(candidate: object) -> TypeGuard[RegisteredPlugin]:

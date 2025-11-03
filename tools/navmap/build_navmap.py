@@ -19,8 +19,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-import msgspec
-
 from tools import ToolExecutionError, get_logger, run_tool, validate_tools_payload
 from tools.drift_preview import write_html_diff
 from tools.navmap.document_models import (
@@ -785,7 +783,7 @@ def build_index(root: Path = SRC, json_path: Path | None = None) -> dict[str, ob
         link_mode=link_mode,
     )
 
-    payload: dict[str, object] = msgspec.to_builtins(document)
+    payload: dict[str, object] = document.model_dump(by_alias=True, exclude_none=True)
     validate_tools_payload(payload, NAVMAP_SCHEMA)
 
     out = json_path or INDEX_PATH

@@ -620,11 +620,7 @@ def _collect_section_dicts(raw: object) -> list[dict[str, object]]:
     """Return section dictionaries extracted from ``raw`` when possible."""
     if not isinstance(raw, list):
         return []
-    sections: list[dict[str, object]] = []
-    for entry in raw:
-        if isinstance(entry, dict):
-            sections.append(entry)
-    return sections
+    return [entry for entry in raw if isinstance(entry, dict)]
 
 
 def _build_sections(
@@ -637,12 +633,11 @@ def _build_sections(
 
 def _collect_top_level_meta(navmap: Mapping[str, object]) -> dict[str, object]:
     """Return module metadata declared at the root of ``navmap``."""
-    meta: dict[str, object] = {}
-    for key in ("owner", "stability", "since", "deprecated_in"):
-        value = navmap.get(key)
-        if isinstance(value, str) and value:
-            meta[key] = value
-    return meta
+    return {
+        key: value
+        for key in ("owner", "stability", "since", "deprecated_in")
+        if isinstance((value := navmap.get(key)), str) and value
+    }
 
 
 def _normalized_module_meta(navmap: dict[str, object]) -> dict[str, object]:
@@ -659,18 +654,18 @@ def _normalized_symbols(raw: object) -> dict[str, SymbolMetadata]:
     """Return symbol metadata dictionaries keyed by symbol name."""
     if not isinstance(raw, dict):
         return {}
-    result: dict[str, SymbolMetadata] = {}
-    for name, meta in raw.items():
-        if not isinstance(name, str) or not isinstance(meta, dict):
-            continue
-        filtered: SymbolMetadata = {
-            key: value
-            for key, value in meta.items()
-            if isinstance(key, str) and isinstance(value, str) and value
-        }
-        if filtered:
-            result[name] = filtered
-    return result
+    return {
+        name: filtered
+        for name, meta in raw.items()
+        if isinstance(name, str) and isinstance(meta, dict)
+        if (
+            filtered := {
+                key: value
+                for key, value in meta.items()
+                if isinstance(key, str) and isinstance(value, str) and value
+            }
+        )
+    }
 
 
 def _apply_symbol_defaults(

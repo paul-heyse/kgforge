@@ -258,15 +258,14 @@ def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDe
     if len(args) > len(positional):
         _type_error("build_problem_details() received too many positional arguments")
 
-    values: dict[str, object] = {}
-    for field_name, value in zip(positional, args, strict=False):
-        values[field_name] = value
+    values: dict[str, object] = dict(zip(positional, args, strict=False))
 
     remaining_fields = positional[len(args) :]
-    for field_name in remaining_fields:
-        if field_name not in kwargs:
-            _type_error(f"build_problem_details() missing required argument: '{field_name}'")
-        values[field_name] = kwargs.pop(field_name)
+    missing_fields = [field_name for field_name in remaining_fields if field_name not in kwargs]
+    if missing_fields:
+        missing = missing_fields[0]
+        _type_error(f"build_problem_details() missing required argument: '{missing}'")
+    values.update({field_name: kwargs.pop(field_name) for field_name in remaining_fields})
 
     code = kwargs.pop("code", None)
     extensions = kwargs.pop("extensions", None)

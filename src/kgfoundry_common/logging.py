@@ -21,7 +21,7 @@ import time
 from collections.abc import Mapping
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Final, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Final, Self, TypedDict, cast
 
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.types import JsonValue
@@ -715,7 +715,7 @@ class CorrelationContext:
         self.correlation_id = correlation_id
         self._token: contextvars.Token[str | None] | None = None
 
-    def __enter__(self) -> CorrelationContext:
+    def __enter__(self) -> Self:
         """Enter correlation context and set correlation ID.
 
         Returns

@@ -1304,16 +1304,18 @@ def iter_symbol_entries(
             modules = package.get("modules")
             if not package_name or not isinstance(modules, list):
                 continue
-            for module in modules:
-                if not isinstance(module, Mapping):
-                    continue
-                module_name = _stringify(module.get("qualified"))
-                symbols = module.get("symbols")
-                if not module_name or not isinstance(symbols, list):
-                    continue
-                for symbol in symbols:
-                    if isinstance(symbol, Mapping):
-                        entries.append((package_name, module_name, symbol))
+            module_entries = [
+                (package_name, module_name, symbol)
+                for module in modules
+                if isinstance(module, Mapping)
+                for module_name, symbols in [
+                    (_stringify(module.get("qualified")), module.get("symbols"))
+                ]
+                if module_name and isinstance(symbols, list)
+                for symbol in symbols
+                if isinstance(symbol, Mapping)
+            ]
+            entries.extend(module_entries)
     return entries
 
 

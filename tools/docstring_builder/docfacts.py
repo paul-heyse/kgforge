@@ -197,11 +197,7 @@ def _mapping_items(value: object | None) -> list[Mapping[str, object]]:
         return []
     if isinstance(value, Mapping):
         return [value]
-    mappings: list[Mapping[str, object]] = []
-    for item in _iterable_values(value):
-        if isinstance(item, Mapping):
-            mappings.append(item)
-    return mappings
+    return [item for item in _iterable_values(value) if isinstance(item, Mapping)]
 
 
 def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:

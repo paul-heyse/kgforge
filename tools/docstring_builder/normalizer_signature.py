@@ -65,6 +65,9 @@ def resolve_callable(symbol: SymbolHarvest) -> Callable[..., object]:
     except ImportError as exc:  # pragma: no cover - defensive guard
         message = f"Module {symbol.module!r} import failed for {symbol.qname}"
         raise SymbolResolutionError(message) from exc
+    except Exception as exc:  # pragma: no cover - optional dependencies may fail
+        message = f"Module {symbol.module!r} import failed for {symbol.qname}"
+        raise SymbolResolutionError(message) from exc
 
     module_parts = symbol.module.split(".")
     qname_parts = symbol.qname.split(".")

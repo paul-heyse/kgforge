@@ -111,8 +111,7 @@ def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot
 def _append_section(lines: list[str], heading: str, entries: Iterable[str]) -> None:
     """Append a markdown heading and bullet entries to ``lines``."""
     lines.append(heading)
-    for entry in entries:
-        lines.append(entry)
+    lines.extend(entries)
     lines.append("")
 
 
@@ -183,8 +182,7 @@ def generate_summary(
     lines.append("")
     lines.append("| Check | Status |")
     lines.append("|-------|--------|")
-    for check in checks or DEFAULT_CHECKS:
-        lines.append(check.to_row())
+    lines.extend(check.to_row() for check in (checks or DEFAULT_CHECKS))
     lines.append("")
 
     if artifact_snapshot.codemod_log:

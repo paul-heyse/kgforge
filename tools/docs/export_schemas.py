@@ -381,8 +381,7 @@ def _inject_versions(schema: dict[str, object], versions: Mapping[str, object] |
     """
     if versions:
         # prefer root-level x- fields so they survive tools that merge properties
-        for k, v in versions.items():
-            schema[k] = v
+        schema.update(versions)
 
 
 # --------------------------- drift summarizer ---------------------------

@@ -479,36 +479,22 @@ def _sections_list(value: ResolvedNavValue | None) -> list[dict[str, ResolvedNav
     """Return section entries when ``value`` is a list of dictionaries."""
     if not isinstance(value, list):
         return []
-    entries: list[dict[str, ResolvedNavValue]] = []
-    for item in value:
-        if isinstance(item, dict):
-            entries.append(item)
-    return entries
+    return [item for item in value if isinstance(item, dict)]
 
 
 def _symbols_meta_dict(value: ResolvedNavValue | None) -> dict[str, SymbolMetaDict]:
     """Return symbol metadata entries as ``SymbolMetaDict`` instances."""
     if not isinstance(value, dict):
         return {}
-    meta: dict[str, SymbolMetaDict] = {}
-    for key, payload in value.items():
-        if not isinstance(key, str) or not isinstance(payload, dict):
-            continue
-        entry: SymbolMetaDict = {}
-        owner = payload.get("owner")
-        if isinstance(owner, str) and owner:
-            entry["owner"] = owner
-        stability = payload.get("stability")
-        if isinstance(stability, str) and stability:
-            entry["stability"] = stability
-        since = payload.get("since")
-        if isinstance(since, str) and since:
-            entry["since"] = since
-        deprecated_in = payload.get("deprecated_in")
-        if isinstance(deprecated_in, str) and deprecated_in:
-            entry["deprecated_in"] = deprecated_in
-        meta[key] = entry
-    return meta
+    return {
+        key: {
+            field: value_str
+            for field in ("owner", "stability", "since", "deprecated_in")
+            if isinstance((value_str := payload.get(field)), str) and value_str
+        }
+        for key, payload in value.items()
+        if isinstance(key, str) and isinstance(payload, dict)
+    }
 
 
 def _validate_sections(

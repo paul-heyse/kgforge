@@ -118,9 +118,9 @@ def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtoc
     return typed_module.get_evaluable_architecture
 
 
-def get_evaluable_architecture_for_module_objects_fn() -> (
-    Callable[..., EvaluableArchitectureProtocol]
-):
+def get_evaluable_architecture_for_module_objects_fn() -> Callable[
+    ..., EvaluableArchitectureProtocol
+]:
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture_for_module_objects"):
         message = "pytestarch module is missing get_evaluable_architecture_for_module_objects"

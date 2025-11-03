@@ -580,10 +580,7 @@ class LuceneImpactIndex:
             message = "Lucene impact searcher not initialized"
             raise RuntimeError(message)
         hits = self._searcher.search(query, k)
-        results: list[tuple[str, float]] = []
-        for hit in hits:
-            results.append((str(hit.docid), float(hit.score)))
-        return results
+        return [(str(hit.docid), float(hit.score)) for hit in hits]
 
 
 # [nav:anchor get_splade]

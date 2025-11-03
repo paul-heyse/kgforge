@@ -21,7 +21,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from threading import Lock
 from types import TracebackType
-from typing import cast
+from typing import Self, cast
 
 from kgfoundry_common.errors import CatalogSessionError
 from kgfoundry_common.logging import get_logger, with_fields
@@ -577,7 +577,7 @@ class CatalogSession:
             process.kill()
         self._process = None
 
-    def __enter__(self) -> CatalogSession:
+    def __enter__(self) -> Self:
         """Start the session process and return ``self``.
 
         <!-- auto:docstring-builder v1 -->

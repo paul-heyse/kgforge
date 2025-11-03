@@ -662,16 +662,15 @@ def symbol_delta_to_payload(model: SymbolDeltaPayload) -> dict[str, JsonValue]:
     >>> payload = symbol_delta_to_payload(delta)
     >>> assert payload["base_sha"] == "abc123"
     """
-    changed_list: list[dict[str, JsonValue]] = []
-    for change in model.changed:
-        changed_list.append(
-            {
-                "path": change.path,
-                "before": cast(JsonValue, change.before),
-                "after": cast(JsonValue, change.after),
-                "reasons": cast(JsonValue, list(change.reasons)),
-            }
-        )
+    changed_list = [
+        {
+            "path": change.path,
+            "before": cast(JsonValue, change.before),
+            "after": cast(JsonValue, change.after),
+            "reasons": cast(JsonValue, list(change.reasons)),
+        }
+        for change in model.changed
+    ]
 
     return {
         "base_sha": model.base_sha,

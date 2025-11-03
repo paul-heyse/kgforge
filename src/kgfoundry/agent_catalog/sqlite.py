@@ -211,11 +211,7 @@ def _iter_packages(payload: CatalogPayload) -> list[PackagePayload]:
     packages = payload.get("packages")
     if not isinstance(packages, Sequence):
         return []
-    typed_packages: list[PackagePayload] = []
-    for item in packages:
-        if isinstance(item, Mapping):
-            typed_packages.append(cast(PackagePayload, item))
-    return typed_packages
+    return [cast(PackagePayload, item) for item in packages if isinstance(item, Mapping)]
 
 
 def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
@@ -223,11 +219,7 @@ def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
     modules = package.get("modules")
     if not isinstance(modules, Sequence):
         return []
-    typed_modules: list[ModulePayload] = []
-    for module in modules:
-        if isinstance(module, Mapping):
-            typed_modules.append(cast(ModulePayload, module))
-    return typed_modules
+    return [cast(ModulePayload, module) for module in modules if isinstance(module, Mapping)]
 
 
 def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
@@ -235,11 +227,7 @@ def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
     symbols = module.get("symbols")
     if not isinstance(symbols, Sequence):
         return []
-    typed_symbols: list[SymbolPayload] = []
-    for symbol in symbols:
-        if isinstance(symbol, Mapping):
-            typed_symbols.append(cast(SymbolPayload, symbol))
-    return typed_symbols
+    return [cast(SymbolPayload, symbol) for symbol in symbols if isinstance(symbol, Mapping)]
 
 
 def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
@@ -250,11 +238,7 @@ def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
     calls = graph.get("calls")
     if not isinstance(calls, Sequence):
         return []
-    typed_calls: list[CallEdgePayload] = []
-    for edge in calls:
-        if isinstance(edge, Mapping):
-            typed_calls.append(cast(CallEdgePayload, edge))
-    return typed_calls
+    return [cast(CallEdgePayload, edge) for edge in calls if isinstance(edge, Mapping)]
 
 
 def _build_metadata_rows(payload: CatalogPayload) -> list[tuple[str, str]]:
@@ -1082,7 +1066,4 @@ __all__ = [
 
 def _coerce_packages(packages: Sequence[Mapping[str, JsonValue]]) -> list[PackagePayload]:
     """Return a list of package payloads from ``packages``."""
-    result: list[PackagePayload] = []
-    for package in packages:
-        result.append(package)
-    return result
+    return list(packages)

@@ -34,7 +34,6 @@ STEPS: list[tuple[str, list[str], str]] = [
             sys.executable,
             "-m",
             "tools.docstring_builder.cli",
-            "--all",
             "--ignore-missing",
             "generate",
         ],
