@@ -1,0 +1,16 @@
+{
+  "type": "https://kgfoundry.dev/problems/configuration-error",
+  "title": "Configuration Error",
+  "status": 500,
+  "detail": "Configuration validation failed for field 'timeout_seconds': Must be > 0",
+  "instance": "urn:config:validation",
+  "code": "configuration-error",
+  "extensions": {
+    "exception_type": "ConfigurationError",
+    "validation": {
+      "field": "timeout_seconds",
+      "issue": "Must be > 0",
+      "hint": "Provide a positive integer value for timeout in seconds"
+    }
+  }
+}

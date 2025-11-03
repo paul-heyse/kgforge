@@ -36,9 +36,9 @@ class TestToolsTypingImports:
 
                 source = py_file.read_text(encoding="utf-8")
 
-                assert "from __future__ import annotations" in source, (
-                    f"{py_file.name} missing `from __future__ import annotations`"
-                )
+                assert (
+                    "from __future__ import annotations" in source
+                ), f"{py_file.name} missing `from __future__ import annotations`"
 
     def test_no_unguarded_heavy_imports_in_tools(self) -> None:
         """Verify heavy optional dependencies are only imported in TYPE_CHECKING blocks."""
@@ -162,9 +162,9 @@ class TestToolsTypingFacade:
         # Verify some key symbols are exported
         for symbol in ["NavMap", "ProblemDetails"]:
             assert hasattr(tools.typing, symbol), f"tools.typing should re-export {symbol}"
-            assert getattr(tools.typing, symbol) == getattr(kgfoundry_common.typing, symbol), (
-                f"tools.typing.{symbol} should be identical to kgfoundry_common.typing.{symbol}"
-            )
+            assert getattr(tools.typing, symbol) == getattr(
+                kgfoundry_common.typing, symbol
+            ), f"tools.typing.{symbol} should be identical to kgfoundry_common.typing.{symbol}"
 
 
 @pytest.mark.parametrize(
@@ -195,9 +195,9 @@ def test_tools_no_private_cache_imports() -> None:
             source = py_file.read_text(encoding="utf-8")
 
             # Check for direct imports from private _cache module
-            assert "from _cache import" not in source, (
-                f"{py_file.name} should not import from private _cache module"
-            )
-            assert "from docs._cache import" not in source, (
-                f"{py_file.name} should not import from docs._cache module"
-            )
+            assert (
+                "from _cache import" not in source
+            ), f"{py_file.name} should not import from private _cache module"
+            assert (
+                "from docs._cache import" not in source
+            ), f"{py_file.name} should not import from docs._cache module"

@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 import ast
+import os
+import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, cast, overload
 
 import libcst as cst
+
+from tools.docstring_builder.config_models import DocstringApplyConfig
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
@@ -137,8 +142,35 @@ class _DocstringTransformer(cst.CSTTransformer):
         return cast("BaseStatement", transformed)
 
 
+def _atomic_write(target: Path, content: str, *, encoding: str = "utf-8") -> None:
+    """Persist content atomically, replacing the target file."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding=encoding,
+            dir=target.parent,
+            delete=False,
+        ) as tmp_file:
+            tmp_file.write(content)
+            tmp_file.flush()
+            os.fsync(tmp_file.fileno())
+            temp_path = Path(tmp_file.name)
+        if temp_path is None:
+            msg = "Temporary file path not captured during atomic write"
+            raise RuntimeError(msg)
+        Path(temp_path).replace(target)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink()
+
+
 def apply_edits(
-    result: HarvestResult, edits: Iterable[DocstringEdit], write: bool = True
+    result: HarvestResult,
+    edits: Iterable[DocstringEdit],
+    *,
+    apply_config: DocstringApplyConfig | None = None,
 ) -> tuple[bool, str | None]:
     """Apply docstring edits to the harvested file.
 
@@ -148,22 +180,23 @@ def apply_edits(
         The harvested module metadata, including the target filepath.
     edits : Iterable[DocstringEdit]
         The sequence of docstring edits to apply to the module.
-    write : bool, default True
-        When ``True`` (default), persist the modified module back to disk. When ``False``,
-        skip writing and return the rendered source code for inspection.
+    apply_config : DocstringApplyConfig, optional
+        Configuration controlling whether edits are written, whether backups are created,
+        and whether atomic writes are used. Defaults to ``DocstringApplyConfig()``.
 
     Returns
     -------
     tuple[bool, str | None]
         A tuple ``(changed, code)`` where ``changed`` indicates whether any docstrings were
-        updated. The ``code`` element contains the rendered module when ``write`` is ``False``;
-        otherwise, it is ``None``.
+        updated. The ``code`` element contains the rendered module when the configuration runs
+        in dry-run mode (``write_changes=False``); otherwise, it is ``None``.
 
     Raises
     ------
     libcst.ParserSyntaxError
         Raised when the harvested module cannot be parsed by LibCST.
     """
+    config = apply_config or DocstringApplyConfig()
     mapping = {edit.qname: edit for edit in edits}
     if not mapping:
         return False, None
@@ -172,9 +205,18 @@ def apply_edits(
     transformer = _DocstringTransformer(module_name=result.module, edits=mapping)
     new_module = module.visit(transformer)
     code = new_module.code
-    if transformer.changed and write:
-        result.filepath.write_text(code, encoding="utf-8")
-    return transformer.changed, (code if not write else None)
+    if transformer.changed and config.write_changes:
+        if config.create_backups:
+            backup_path = result.filepath.with_name(f"{result.filepath.name}.bak")
+            backup_path.write_text(original, encoding="utf-8")
+        if config.atomic_writes:
+            _atomic_write(result.filepath, code)
+        else:
+            result.filepath.write_text(code, encoding="utf-8")
+    preview: str | None = None
+    if not config.write_changes:
+        preview = code
+    return transformer.changed, preview
 
 
 __all__ = ["apply_edits"]

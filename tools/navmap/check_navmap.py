@@ -11,7 +11,7 @@ import ast
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict
 
 from packaging.version import InvalidVersion, Version
 
@@ -295,7 +295,10 @@ def _expand_nav_value(value: NavTree, exports: Sequence[str]) -> ResolvedNavValu
     if isinstance(value, dict):
         return _expand_dict(value, exports)
     if isinstance(value, set):
-        str_values = cast("set[str]", value)
+        if not all(isinstance(item, str) for item in value):
+            message = "Navmap sets must contain only strings."
+            raise NavmapPlaceholderError(message)
+        str_values: set[str] = set(value)
         return _expand_set(str_values, exports)
     return value
 

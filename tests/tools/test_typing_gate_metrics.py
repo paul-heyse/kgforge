@@ -13,7 +13,7 @@ Task: Phase 2, Task 2.5 - Surface compliance metrics
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pytest
 
@@ -48,7 +48,8 @@ class TestViolationRecord:
             lineno=42,
         )
         with pytest.raises(AttributeError):
-            record.lineno = 100
+            mutable = cast("Any", record)
+            mutable.lineno = 100
 
 
 class TestTypingGateMetrics:

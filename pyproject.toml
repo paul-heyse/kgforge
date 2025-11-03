@@ -625,9 +625,9 @@ select = [
     "YTT",
     "PYI",
     "TC",      # Type-checking imports (typing gates enforcement)
+    "SLOT",
     "FBT",
     "SLF",
-    "SLOT",
     "ASYNC",
     "INP",     # Input validation (implicit namespace packages)
     "EXE",     # Executable shebang checks

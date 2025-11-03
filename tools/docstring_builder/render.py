@@ -40,7 +40,12 @@ _ENV = _build_environment()
 _TEMPLATE_OBJ = _ENV.from_string(_TEMPLATE)
 
 
-def render_docstring(schema: DocstringSchema, marker: str, include_signature: bool = False) -> str:
+def render_docstring(
+    schema: DocstringSchema,
+    marker: str,
+    *,
+    include_signature: bool = False,
+) -> str:
     """Render the provided schema to a concrete docstring string."""
     signature = _build_signature(schema) if include_signature else ""
     rendered = _TEMPLATE_OBJ.render(schema=schema, marker=marker, signature=signature).strip()

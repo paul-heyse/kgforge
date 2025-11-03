@@ -85,6 +85,13 @@ class PluginConfigurationError(DocstringBuilderError):
     """Raised when plugin discovery or filtering fails."""
 
 
+def _extract_stage(source: object, default: str | None = "unknown") -> str | None:
+    stage_attr = getattr(source, "stage", default)
+    if isinstance(stage_attr, str):
+        return stage_attr
+    return default
+
+
 @dataclass(slots=True)
 class PluginManager:
     """Coordinate plugin execution across builder stages."""
@@ -416,14 +423,18 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
     if _is_registered_plugin(candidate) or _is_legacy_plugin(candidate):
         # Wrap the instance in a factory
         instance = candidate
+
         # Return a callable that returns the instance
-        return lambda: instance  # type: ignore[return-value]
+        def factory() -> PluginInstance:
+            return cast("PluginInstance", instance)
+
+        return factory
 
     # If it's a class, check if it's Protocol or abstract
     if isclass(candidate):
         if _is_protocol_class(candidate):
             # getattr on dynamic attributes returns Any per Python's type system
-            stage = getattr(candidate, "stage", "unknown")  # type: ignore[assignment]
+            stage = _extract_stage(candidate)
             message = f"Cannot register Protocol class {name!r} as plugin"
             raise PluginRegistryError(
                 message,
@@ -435,7 +446,7 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
             )
         if _is_abstract_class(candidate):
             # getattr on dynamic attributes returns Any per Python's type system
-            stage = getattr(candidate, "stage", "unknown")  # type: ignore[assignment]
+            stage = _extract_stage(candidate)
             message = f"Cannot register abstract class {name!r} as plugin"
             raise PluginRegistryError(
                 message,
@@ -446,11 +457,11 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
                 },
             )
         # It's a concrete class, treat as factory
-        return candidate  # type: ignore[return-value]
+        return cast("PluginFactoryCandidateT", candidate)
 
     # If it's callable, treat as factory
     if callable(candidate):
-        return candidate  # type: ignore[return-value]
+        return cast("PluginFactoryCandidateT", candidate)
 
     message = f"Unsupported plugin candidate {name!r}: not callable"
     raise PluginRegistryError(
@@ -519,7 +530,7 @@ def _ensure_plugin_instance(obj: object) -> RegisteredPlugin:
 
 def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
     # getattr on dynamic attributes returns Any per Python's type system
-    stage = getattr(plugin, "stage", None)  # type: ignore[assignment]
+    stage = _extract_stage(plugin, default=None)
     if stage == "harvester":
         manager.harvesters.append(cast("HarvesterPlugin", plugin))
         return

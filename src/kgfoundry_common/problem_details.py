@@ -61,6 +61,7 @@ __all__ = [
     "ProblemDetailsDict",
     "ProblemDetailsParams",
     "ProblemDetailsValidationError",
+    "build_configuration_problem",
     "build_problem_details",
     "problem_from_exception",
     "render_problem",
@@ -478,6 +479,97 @@ def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
             code=params.base.code,
             extensions=merged_extensions,
         )
+    )
+
+
+def build_configuration_problem(
+    config_error: Exception,
+) -> ProblemDetails:
+    """Build Problem Details from a ConfigurationError.
+
+    Parameters
+    ----------
+    config_error : Exception
+        A ConfigurationError instance with validation context.
+
+    Returns
+    -------
+    ProblemDetails
+        Problem Details payload with configuration error details.
+
+    Raises
+    ------
+    TypeError
+        If the provided exception is not a ConfigurationError.
+
+    Examples
+    --------
+    >>> from kgfoundry_common.errors import ConfigurationError
+    >>> error = ConfigurationError.with_details(
+    ...     field="api_key",
+    ...     issue="Missing required environment variable",
+    ...     hint="Set KGFOUNDRY_API_KEY before running",
+    ... )
+    >>> problem = build_configuration_problem(error)
+    >>> assert problem["status"] == 500
+    >>> assert "api_key" in str(problem["extensions"])
+    """
+    # Check class name to avoid circular import
+    if type(config_error).__name__ != "ConfigurationError":
+        msg = (
+            f"build_configuration_problem() expected ConfigurationError, "
+            f"got {type(config_error).__name__}"
+        )
+        raise TypeError(msg)
+
+    # Verify it has the expected attributes
+    if not hasattr(config_error, "message") or not hasattr(config_error, "http_status"):
+        msg = (
+            "build_configuration_problem() expected object with 'message' "
+            "and 'http_status' attributes"
+        )
+        raise TypeError(msg)
+
+    # Extract field details from context if available
+    extensions: dict[str, JsonValue] = {
+        "exception_type": "ConfigurationError",
+    }
+    context_value: object = getattr(config_error, "context", None)
+    if isinstance(context_value, dict):
+        extensions["validation"] = cast("dict[str, JsonValue]", context_value)
+
+    # Get the message - use str() as fallback
+    message: str
+    msg_value: object = getattr(config_error, "message", None)
+    if isinstance(msg_value, str):
+        message = msg_value
+    else:
+        message = str(config_error)
+
+    # Get http_status - expect int, default to 500
+    http_status: int = cast("int", getattr(config_error, "http_status", 500))
+
+    # Get code value - should be ErrorCode enum with .value attribute
+    code_obj: object = getattr(config_error, "code", None)
+    code_value: str
+    if hasattr(code_obj, "value"):
+        # code_obj is known to have .value, extract it
+        value_attr: object = getattr(code_obj, "value", None)
+        if isinstance(value_attr, str):
+            code_value = value_attr
+        else:
+            code_value = "configuration-error"
+    else:
+        code_value = "configuration-error"
+
+    return build_problem_details(
+        problem_type="https://kgfoundry.dev/problems/configuration-error",
+        title="Configuration Error",
+        status=http_status,
+        detail=message,
+        instance="urn:config:validation",
+        code=code_value,
+        extensions=extensions,
     )
 
 

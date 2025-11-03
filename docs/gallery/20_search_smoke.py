@@ -1,3 +1,4 @@
+# ruff: noqa: N999 - numeric prefix required for gallery ordering
 """Search - tiny corpus smoke (no GPU).
 ===================================
 

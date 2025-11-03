@@ -273,7 +273,10 @@ def _replace_placeholders(value: NavTree, exports: Sequence[str]) -> ResolvedNav
     if isinstance(value, dict):
         return _expand_dict(value, exports)
     if isinstance(value, set):
-        str_values = cast("set[str]", value)
+        if not all(isinstance(item, str) for item in value):
+            message = "Navmap sets must contain only strings."
+            raise NavmapPlaceholderError(message)
+        str_values: set[str] = set(value)
         return _expand_set(str_values, exports)
     return value
 

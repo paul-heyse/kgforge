@@ -358,7 +358,9 @@ def format_violations(
 
     """
     if json_output:
-        payload: list[dict[str, object]] = [cast("dict[str, object]", asdict(v)) for v in violations]
+        payload: list[dict[str, object]] = [
+            cast("dict[str, object]", asdict(v)) for v in violations
+        ]
         return json.dumps(payload, indent=2)
 
     if list_output:

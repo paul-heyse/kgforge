@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
@@ -28,12 +29,9 @@ __all__ = [
 ]
 
 
+@lru_cache(maxsize=1)
 def _load_module() -> ModuleType:
-    module = cast("ModuleType | None", getattr(_load_module, "_cache", None))
-    if module is None:
-        module = import_module(MODULE_PATH)
-        _load_module._cache = module  # type: ignore[attr-defined] # noqa: SLF001
-    return module
+    return import_module(MODULE_PATH)
 
 
 def __getattr__(name: str) -> object:
