@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from types import ModuleType
 from typing import Protocol, cast, runtime_checkable
 
@@ -11,6 +12,8 @@ __all__ = [
     "coerce_astroid_builder_class",
     "coerce_astroid_manager_class",
 ]
+
+_MISSING = object()
 
 
 @runtime_checkable
@@ -33,12 +36,11 @@ class AstroidBuilderProtocol(Protocol):
 
 
 def _coerce_class(module: ModuleType, attribute: str, kind: str) -> type[object]:
-    candidate_any = getattr(module, attribute, None)  # type: ignore[misc]
-    if candidate_any is None or not isinstance(candidate_any, type):
+    candidate_obj = getattr(module, attribute, _MISSING)
+    if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a {kind} class"
         raise TypeError(message)
-    typed_candidate = cast(type[object], candidate_any)
-    return typed_candidate
+    return cast(type[object], candidate_obj)
 
 
 def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProtocol]:

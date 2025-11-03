@@ -1,3 +1,5 @@
+# ruff: noqa: PLC2701
+
 """Public facade re-exporting typed helpers for documentation tooling.
 
 This module wraps the internal ``docs._types`` package so that other modules
@@ -14,7 +16,10 @@ from docs._types.astroid_facade import (
     coerce_astroid_builder_class,
     coerce_astroid_manager_class,
 )
-from docs._types.autoapi_parser import AutoapiParserProtocol, coerce_parser_class
+from docs._types.autoapi_parser import (
+    AutoapiParserProtocol,
+    coerce_parser_class,
+)
 
 __all__ = [
     "AstroidBuilderProtocol",

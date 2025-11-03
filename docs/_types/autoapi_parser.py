@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable
 from types import ModuleType
 from typing import Protocol, cast
 
 __all__ = ["AutoapiParserProtocol", "coerce_parser_class"]
+
+_MISSING = object()
 
 
 class AutoapiParserProtocol(Protocol):
@@ -30,9 +33,8 @@ def coerce_parser_class(
     attribute: str = "Parser",
 ) -> type[AutoapiParserProtocol]:
     """Return the ``Parser`` class from ``module`` with precise typing."""
-    candidate_any = getattr(module, attribute, None)  # type: ignore[misc]
-    if candidate_any is None or not isinstance(candidate_any, type):
+    candidate_obj = getattr(module, attribute, _MISSING)
+    if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a class"
         raise TypeError(message)
-    parser_type = cast(type[object], candidate_any)
-    return cast(type[AutoapiParserProtocol], parser_type)  # type: ignore[misc]
+    return cast(type[AutoapiParserProtocol], candidate_obj)

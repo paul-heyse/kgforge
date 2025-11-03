@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from importlib import import_module
 from types import ModuleType
 from typing import Protocol, cast, runtime_checkable
 
 __all__ = [
-    "EvaluableArchitectureFactory",
     "EvaluableArchitectureProtocol",
     "IdentifierProtocol",
     "LayeredArchitectureProtocol",
@@ -21,6 +21,8 @@ __all__ = [
     "get_module_name_filter_cls",
     "get_module_name_filter_factory",
 ]
+
+_MISSING = object()
 
 
 @runtime_checkable
@@ -65,22 +67,8 @@ class EvaluableArchitectureProtocol(Protocol):
     ) -> ModuleDependencies: ...
 
 
-class EvaluableArchitectureFactory(Protocol):
-    """Callable that builds an evaluable architecture object."""
-
-    def __call__(self, *args: object, **kwargs: object) -> EvaluableArchitectureProtocol: ...
-
-
 def _import(name: str) -> ModuleType:
     return import_module(name)
-
-
-class _LayeredArchitectureModule(Protocol):
-    LayeredArchitecture: type[LayeredArchitectureProtocol]
-
-
-class _EvaluableArchitectureModule(Protocol):
-    ModuleNameFilter: type[ModuleNameFilterProtocol]
 
 
 class _PytestarchModule(Protocol):
@@ -97,22 +85,20 @@ class _PytestarchModule(Protocol):
 
 def get_layered_architecture_cls() -> type[LayeredArchitectureProtocol]:
     module = _import("pytestarch.query_language.layered_architecture_rule")
-    candidate = getattr(module, "LayeredArchitecture", None)
-    if candidate is None or not isinstance(candidate, type):
+    candidate_obj = getattr(module, "LayeredArchitecture", _MISSING)
+    if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = "pytestarch layered architecture module is missing LayeredArchitecture class"
         raise TypeError(message)
-    typed_module = cast(_LayeredArchitectureModule, module)
-    return typed_module.LayeredArchitecture
+    return cast(type[LayeredArchitectureProtocol], candidate_obj)
 
 
 def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
     module = _import("pytestarch.eval_structure.evaluable_architecture")
-    candidate = getattr(module, "ModuleNameFilter", None)
-    if candidate is None or not isinstance(candidate, type):
+    candidate_obj = getattr(module, "ModuleNameFilter", _MISSING)
+    if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = "pytestarch evaluable architecture module is missing ModuleNameFilter class"
         raise TypeError(message)
-    typed_module = cast(_EvaluableArchitectureModule, module)
-    return typed_module.ModuleNameFilter
+    return cast(type[ModuleNameFilterProtocol], candidate_obj)
 
 
 def get_layered_architecture_factory() -> Callable[[], LayeredArchitectureProtocol]:
@@ -123,22 +109,21 @@ def get_module_name_filter_factory() -> Callable[[str], ModuleNameFilterProtocol
     return get_module_name_filter_cls()
 
 
-def get_evaluable_architecture_fn() -> EvaluableArchitectureFactory:
+def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtocol]:
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture"):
         message = "pytestarch module is missing get_evaluable_architecture"
         raise AttributeError(message)
     typed_module = cast(_PytestarchModule, module)
-    return cast(EvaluableArchitectureFactory, typed_module.get_evaluable_architecture)
+    return typed_module.get_evaluable_architecture
 
 
-def get_evaluable_architecture_for_module_objects_fn() -> EvaluableArchitectureFactory:
+def get_evaluable_architecture_for_module_objects_fn() -> Callable[
+    ..., EvaluableArchitectureProtocol
+]:
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture_for_module_objects"):
         message = "pytestarch module is missing get_evaluable_architecture_for_module_objects"
         raise AttributeError(message)
     typed_module = cast(_PytestarchModule, module)
-    return cast(
-        EvaluableArchitectureFactory,
-        typed_module.get_evaluable_architecture_for_module_objects,
-    )
+    return typed_module.get_evaluable_architecture_for_module_objects

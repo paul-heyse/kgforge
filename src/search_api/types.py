@@ -86,18 +86,24 @@ else:  # pragma: no cover - runtime fallback for doc generation
     VectorArray = np.ndarray
     IndexArray = np.ndarray
 
-VectorArray.__doc__ = (
-    "Type alias for float32 vector arrays used in FAISS operations.\n\n"
-    "All vectors must be normalized to unit length for inner-product search.\n"
-    "Dimensions are typically 2560 for dense embeddings or configurable for\n"
-    "sparse representations."
-)
+try:
+    VectorArray.__doc__ = (
+        "Type alias for float32 vector arrays used in FAISS operations.\n\n"
+        "All vectors must be normalized to unit length for inner-product search.\n"
+        "Dimensions are typically 2560 for dense embeddings or configurable for\n"
+        "sparse representations."
+    )
+except (AttributeError, TypeError):  # pragma: no cover - ndarray may forbid updates
+    pass
 
-IndexArray.__doc__ = (
-    "Type alias for int64 index arrays used in FAISS search results.\n\n"
-    "Index arrays contain row indices into the vector store, typically returned\n"
-    "from search operations alongside distance/similarity scores."
-)
+try:
+    IndexArray.__doc__ = (
+        "Type alias for int64 index arrays used in FAISS search results.\n\n"
+        "Index arrays contain row indices into the vector store, typically returned\n"
+        "from search operations alongside distance/similarity scores."
+    )
+except (AttributeError, TypeError):  # pragma: no cover - ndarray may forbid updates
+    pass
 
 
 class FaissIndexProtocol(Protocol):
