@@ -39,6 +39,7 @@ _DEFAULT_FIELD_BOOSTS: Final[dict[str, float]] = {
     "body": 1.0,
 }
 
+
 def _normalize_field_boosts(boosts: Mapping[str, float] | None) -> dict[str, float]:
     if boosts is None:
         return dict(_DEFAULT_FIELD_BOOSTS)
@@ -46,6 +47,7 @@ def _normalize_field_boosts(boosts: Mapping[str, float] | None) -> dict[str, flo
     for field_name, value in boosts.items():
         normalized[str(field_name)] = float(value)
     return normalized
+
 
 __all__ = ["BM25Doc", "LuceneBM25", "PurePythonBM25", "get_bm25"]
 
@@ -386,9 +388,7 @@ class PurePythonBM25:
         self.b = float(b_val) if isinstance(b_val, (int, float)) else 0.4
         field_boosts_val = data.get("field_boosts", _DEFAULT_FIELD_BOOSTS)
         if isinstance(field_boosts_val, Mapping):
-            self.field_boosts = _normalize_field_boosts(
-                cast(Mapping[str, float], field_boosts_val)
-            )
+            self.field_boosts = _normalize_field_boosts(cast(Mapping[str, float], field_boosts_val))
         else:
             self.field_boosts = dict(_DEFAULT_FIELD_BOOSTS)
         df_val = data.get("df", {})
