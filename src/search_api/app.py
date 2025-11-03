@@ -384,6 +384,8 @@ try:
     bm25 = get_bm25(
         backend=settings.search.sparse_backend,
         index_dir=settings.sparse_embedding.bm25_index_dir,
+        k1=settings.sparse_embedding.bm25_k1,
+        b=settings.sparse_embedding.bm25_b,
     )
 except (FileNotFoundError, DeserializationError, RuntimeError) as exc:
     logger.warning("BM25 index not available: %s", exc, exc_info=True)
