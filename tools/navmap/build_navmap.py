@@ -747,6 +747,11 @@ def _collect_module_entries(files: Sequence[Path]) -> dict[str, ModuleEntryDict]
     return modules
 
 
+def collect_module_info(path: Path) -> ModuleInfo | None:
+    """Return raw navmap metadata for ``path`` if it should be indexed."""
+    return _collect_module(path)
+
+
 def _discover_py_files(root: Path = SRC) -> list[Path]:
     """Return every Python source file under ``root`` sorted lexicographically."""
     return sorted(p for p in root.rglob("*.py") if p.is_file())
