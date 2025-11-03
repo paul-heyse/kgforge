@@ -32,9 +32,6 @@ from typing import TYPE_CHECKING, cast
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.prometheus import (
-    CollectorRegistry,
-    CounterLike,
-    HistogramLike,
     build_counter,
     build_histogram,
     get_default_registry,
@@ -42,6 +39,12 @@ from tools._shared.prometheus import (
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+    from tools._shared.prometheus import (
+        CollectorRegistry,
+        CounterLike,
+        HistogramLike,
+    )
 
 
 _LOGGER = get_logger(__name__)
@@ -76,7 +79,7 @@ class DocstringBuilderMetrics:
             Prometheus registry (defaults to default registry).
         """
         resolved_registry = (
-            registry if registry is not None else cast(CollectorRegistry, get_default_registry())
+            registry if registry is not None else cast("CollectorRegistry", get_default_registry())
         )
         self.registry = resolved_registry
 

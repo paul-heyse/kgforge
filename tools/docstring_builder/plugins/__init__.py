@@ -5,16 +5,13 @@ from __future__ import annotations
 import inspect
 import logging
 import threading
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from importlib import metadata
 from inspect import isclass
-from pathlib import Path
-from typing import TypeGuard, TypeVar, cast
+from typing import TYPE_CHECKING, TypeGuard, TypeVar, cast
 
 from tools._shared.logging import get_logger
-from tools.docstring_builder.config import BuilderConfig
-from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.models import (
     DocstringBuilderError,
     PluginExecutionError,
@@ -33,7 +30,6 @@ from tools.docstring_builder.plugins.base import (
     PluginContext,
     PluginFactory,
     PluginRegistryError,
-    PluginStage,
     TransformerPlugin,
 )
 from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
@@ -41,8 +37,18 @@ from tools.docstring_builder.plugins.llm_summary import LLMSummaryRewritePlugin
 from tools.docstring_builder.plugins.normalize_numpy_params import (
     NormalizeNumpyParamsPlugin,
 )
-from tools.docstring_builder.schema import DocstringEdit
-from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from pathlib import Path
+
+    from tools.docstring_builder.config import BuilderConfig
+    from tools.docstring_builder.harvest import HarvestResult
+    from tools.docstring_builder.plugins.base import (
+        PluginStage,
+    )
+    from tools.docstring_builder.schema import DocstringEdit
+    from tools.docstring_builder.semantics import SemanticResult
 
 ENTRY_POINT_GROUP = "kgfoundry.docstrings.plugins"
 
@@ -271,7 +277,7 @@ def _validate_callable_signature(
     # Use typed inspection module instead of raw inspect
     has_required_params: bool
     try:
-        has_required_params = has_required_parameters(cast(Callable[..., object], factory))
+        has_required_params = has_required_parameters(cast("Callable[..., object]", factory))
     except (ValueError, TypeError) as exc:
         msg = f"Could not inspect factory signature for {name!r}"
         raise PluginRegistryError(
@@ -382,7 +388,7 @@ def _instantiate_plugin_from_factory(
             },
         ) from exc
 
-    return cast(PluginInstance, instance)
+    return cast("PluginInstance", instance)
 
 
 def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
@@ -515,13 +521,13 @@ def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
     # getattr on dynamic attributes returns Any per Python's type system
     stage = getattr(plugin, "stage", None)  # type: ignore[assignment]
     if stage == "harvester":
-        manager.harvesters.append(cast(HarvesterPlugin, plugin))
+        manager.harvesters.append(cast("HarvesterPlugin", plugin))
         return
     if stage == "transformer":
-        manager.transformers.append(cast(TransformerPlugin, plugin))
+        manager.transformers.append(cast("TransformerPlugin", plugin))
         return
     if stage == "formatter":
-        manager.formatters.append(cast(FormatterPlugin, plugin))
+        manager.formatters.append(cast("FormatterPlugin", plugin))
         return
     message = f"Unsupported plugin stage: {stage!r}"
     raise PluginConfigurationError(message)
@@ -559,7 +565,7 @@ def _builtin_candidates(
 ) -> tuple[PluginFactoryCandidateT, ...]:
     if builtin is None:
         return cast(
-            tuple[PluginFactoryCandidateT, ...],
+            "tuple[PluginFactoryCandidateT, ...]",
             (
                 DataclassFieldDocPlugin,
                 LLMSummaryRewritePlugin,

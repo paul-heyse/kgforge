@@ -13,26 +13,33 @@ Examples
 from __future__ import annotations
 
 import time
-from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Final, Literal, cast
+from typing import TYPE_CHECKING, Final, Literal, cast
 
 from kgfoundry_common.logging import get_logger, with_fields
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.opentelemetry_types import (
-    StatusCodeProtocol,
-    TraceRuntime,
     load_trace_runtime,
 )
 from kgfoundry_common.prometheus import (
-    CollectorRegistry,
-    CounterLike,
-    HistogramLike,
     build_counter,
     build_histogram,
     get_default_registry,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Mapping
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.opentelemetry_types import (
+        StatusCodeProtocol,
+        TraceRuntime,
+    )
+    from kgfoundry_common.prometheus import (
+        CollectorRegistry,
+        CounterLike,
+        HistogramLike,
+    )
 
 trace_runtime: TraceRuntime = load_trace_runtime()
 trace_api = trace_runtime.api
@@ -98,7 +105,7 @@ class MetricsProvider:
 
     def __init__(self, registry: CollectorRegistry | None = None) -> None:
         """Initialise the metrics provider."""
-        resolved_registry = cast(CollectorRegistry | None, registry or get_default_registry())
+        resolved_registry = cast("CollectorRegistry | None", registry or get_default_registry())
         self._registry = resolved_registry
         self.runs_total = build_counter(
             "kgfoundry_runs_total",
@@ -142,7 +149,7 @@ class MetricsRegistry:
         registry: CollectorRegistry | None = None,
     ) -> None:
         """Initialise a metrics registry scoped to ``namespace``."""
-        resolved_registry = cast(CollectorRegistry | None, registry or get_default_registry())
+        resolved_registry = cast("CollectorRegistry | None", registry or get_default_registry())
         metric_prefix = namespace.replace("-", "_")
         labels = ("operation", "status")
         self._registry = resolved_registry

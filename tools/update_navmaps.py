@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Overview of update navmaps.
 
 This module bundles update navmaps logic for the kgfoundry stack. It groups related helpers so

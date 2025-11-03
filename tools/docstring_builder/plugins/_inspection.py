@@ -7,8 +7,11 @@ to eliminate the 'Any' types that come from its type stubs.
 from __future__ import annotations
 
 import inspect as stdlib_inspect
-from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 __all__ = [
     "ParameterInfo",

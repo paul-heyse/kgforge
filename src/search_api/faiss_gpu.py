@@ -9,20 +9,23 @@ behaviour automatically.
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.sequence_guards import (
     first_or_error,
     first_or_error_multi_device,
 )
-from search_api.types import (
-    FaissIndexProtocol,
-    FaissModuleProtocol,
-    GpuClonerOptionsProtocol,
-    GpuResourcesProtocol,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from search_api.types import (
+        FaissIndexProtocol,
+        FaissModuleProtocol,
+        GpuClonerOptionsProtocol,
+        GpuResourcesProtocol,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -62,17 +65,19 @@ def detect_gpu_context(
     device_ids : Sequence[int] | None, optional
         Specific GPU device IDs to target. Defaults to ``(0,)`` when omitted.
     """
-    standard_gpu_resources_raw = cast(object | None, getattr(module, "StandardGpuResources", None))
+    standard_gpu_resources_raw = cast(
+        "object | None", getattr(module, "StandardGpuResources", None)
+    )
     if standard_gpu_resources_raw is None:
         return None
 
-    resources_ctor = cast(Callable[[], GpuResourcesProtocol], standard_gpu_resources_raw)
+    resources_ctor = cast("Callable[[], GpuResourcesProtocol]", standard_gpu_resources_raw)
     resources = resources_ctor()
 
-    options_ctor_raw = cast(object | None, getattr(module, "GpuClonerOptions", None))
+    options_ctor_raw = cast("object | None", getattr(module, "GpuClonerOptions", None))
     options: GpuClonerOptionsProtocol | None = None
     if options_ctor_raw is not None:
-        options_ctor = cast(Callable[[], GpuClonerOptionsProtocol], options_ctor_raw)
+        options_ctor = cast("Callable[[], GpuClonerOptionsProtocol]", options_ctor_raw)
         options = options_ctor()
         if hasattr(options, "use_cuvs"):
             options.use_cuvs = bool(use_cuvs)
@@ -96,19 +101,11 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
     try:
         if len(devices) > 1:
             multi_clone_raw = cast(
-                object | None, getattr(module, "index_cpu_to_gpu_multiple", None)
+                "object | None", getattr(module, "index_cpu_to_gpu_multiple", None)
             )
             if multi_clone_raw is not None:
                 multi_clone = cast(
-                    Callable[
-                        [
-                            GpuResourcesProtocol,
-                            Sequence[int],
-                            FaissIndexProtocol,
-                            GpuClonerOptionsProtocol | None,
-                        ],
-                        list[FaissIndexProtocol],
-                    ],
+                    "Callable[[GpuResourcesProtocol, Sequence[int], FaissIndexProtocol, GpuClonerOptionsProtocol | None], list[FaissIndexProtocol]]",
                     multi_clone_raw,
                 )
                 gpu_indices = multi_clone(context.resources, list(devices), index, options)
@@ -117,16 +114,13 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
                         gpu_indices, context="gpu_indices_from_multi_clone"
                     )
 
-        clone_raw = cast(object | None, getattr(module, "index_cpu_to_gpu", None))
+        clone_raw = cast("object | None", getattr(module, "index_cpu_to_gpu", None))
         if clone_raw is None:
             return index
 
         if options is not None:
             clone = cast(
-                Callable[
-                    [GpuResourcesProtocol, int, FaissIndexProtocol, GpuClonerOptionsProtocol],
-                    FaissIndexProtocol,
-                ],
+                "Callable[[GpuResourcesProtocol, int, FaissIndexProtocol, GpuClonerOptionsProtocol], FaissIndexProtocol]",
                 clone_raw,
             )
             return clone(
@@ -137,7 +131,7 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
             )
 
         clone_without_options = cast(
-            Callable[[GpuResourcesProtocol, int, FaissIndexProtocol], FaissIndexProtocol],
+            "Callable[[GpuResourcesProtocol, int, FaissIndexProtocol], FaissIndexProtocol]",
             clone_raw,
         )
         return clone_without_options(
@@ -171,17 +165,17 @@ def configure_search_parameters(
         Whether the index runs on GPU (selects GPU or CPU parameter space).
     """
     params_name = "GpuParameterSpace" if gpu_enabled else "ParameterSpace"
-    params_ctor_raw = cast(object | None, getattr(module, params_name, None))
+    params_ctor_raw = cast("object | None", getattr(module, params_name, None))
     if params_ctor_raw is None:
         return
 
-    params_ctor = cast(Callable[[], object], params_ctor_raw)
+    params_ctor = cast("Callable[[], object]", params_ctor_raw)
     params = params_ctor()
-    setter_raw = cast(object | None, getattr(params, "set_index_parameter", None))
+    setter_raw = cast("object | None", getattr(params, "set_index_parameter", None))
     if setter_raw is None:
         return
 
-    setter = cast(Callable[[FaissIndexProtocol, str, object], None], setter_raw)
+    setter = cast("Callable[[FaissIndexProtocol, str, object], None]", setter_raw)
     try:
         setter(index, "nprobe", nprobe)
     except (

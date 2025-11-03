@@ -4,30 +4,38 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from tools.docstring_builder.builder_types import LoggerLike
-from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.docfacts import (
     DOCFACTS_VERSION,
-    DocFact,
-    DocfactsDocument,
-    DocfactsProvenance,
     build_docfacts_document,
     validate_docfacts_payload,
     write_docfacts,
 )
 from tools.docstring_builder.models import (
-    DocfactsDocumentLike,
-    DocfactsDocumentPayload,
     SchemaViolationError,
     build_docfacts_document_payload,
 )
 from tools.docstring_builder.paths import DOCFACTS_DIFF_PATH, DOCFACTS_PATH, REPO_ROOT
 from tools.docstring_builder.pipeline_types import DocfactsResult
 from tools.drift_preview import write_html_diff
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from tools.docstring_builder.builder_types import LoggerLike
+    from tools.docstring_builder.config import BuilderConfig
+    from tools.docstring_builder.docfacts import (
+        DocFact,
+        DocfactsDocument,
+        DocfactsProvenance,
+    )
+    from tools.docstring_builder.models import (
+        DocfactsDocumentLike,
+        DocfactsDocumentPayload,
+    )
 
 
 def _coerce_provenance_payload(data: object) -> dict[str, str] | None:
@@ -66,7 +74,7 @@ class DocfactsCoordinator:
         """Reconcile DocFacts artifacts for the current run."""
         provenance = self.build_provenance(self.config)
         document = build_docfacts_document(docfacts, provenance, DOCFACTS_VERSION)
-        payload = build_docfacts_document_payload(cast(DocfactsDocumentLike, document))
+        payload = build_docfacts_document_payload(cast("DocfactsDocumentLike", document))
         if self.check_mode:
             return self._check_payload(payload)
         return self._update_payload(document, payload)
@@ -85,7 +93,7 @@ class DocfactsCoordinator:
         if not isinstance(existing_raw, Mapping):
             self.logger.error("DocFacts payload at %s is not a mapping", DOCFACTS_PATH)
             return DocfactsResult(status="config", message="docfacts invalid structure")
-        existing_payload = cast(DocfactsDocumentPayload, existing_raw)
+        existing_payload = cast("DocfactsDocumentPayload", existing_raw)
         try:
             validate_docfacts_payload(existing_payload)
         except SchemaViolationError as exc:
@@ -93,7 +101,7 @@ class DocfactsCoordinator:
             return DocfactsResult(status="success")
 
         comparison_payload = cast(
-            DocfactsDocumentPayload,
+            "DocfactsDocumentPayload",
             json.loads(json.dumps(payload)),
         )
         provenance_existing = _coerce_provenance_payload(existing_payload.get("provenance"))

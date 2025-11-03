@@ -10,10 +10,12 @@ registered with type-aware loaders, enabling full type-checking support.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, MutableMapping
 from dataclasses import dataclass, field
-from types import ModuleType
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, MutableMapping
+    from types import ModuleType
 
 # Type variable for generic loader results
 T = TypeVar("T")
@@ -102,7 +104,7 @@ class NamespaceRegistry:
 def namespace_getattr(module: ModuleType, name: str) -> object:
     """Return ``name`` from ``module`` while preserving the original attribute."""
     # getattr returns Any; cast to object for type safety
-    return cast(object, getattr(module, name))
+    return cast("object", getattr(module, name))
 
 
 def namespace_exports(module: ModuleType) -> list[str]:
@@ -110,7 +112,7 @@ def namespace_exports(module: ModuleType) -> list[str]:
     exports: object = getattr(module, "__all__", None)
     if isinstance(exports, (list, tuple, set)):
         # Cast narrowed iterable to ensure mypy can infer str() return
-        return [str(item) for item in cast(Iterable[object], exports)]
+        return [str(item) for item in cast("Iterable[object]", exports)]
     return [attr for attr in dir(module) if not attr.startswith("_")]
 
 
@@ -122,7 +124,7 @@ def namespace_attach(
     """Populate ``target`` with attributes sourced from ``module``."""
     for name in names:
         # getattr returns Any; cast to object for type safety
-        target[name] = cast(object, getattr(module, name))
+        target[name] = cast("object", getattr(module, name))
 
 
 def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:

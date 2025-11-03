@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from importlib import import_module
-from types import ModuleType
 from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 MODULE_PATH = "docs._scripts.shared"
 
@@ -27,17 +29,17 @@ __all__ = [
 
 
 def _load_module() -> ModuleType:
-    module = cast(ModuleType | None, getattr(_load_module, "_cache", None))
+    module = cast("ModuleType | None", getattr(_load_module, "_cache", None))
     if module is None:
         module = import_module(MODULE_PATH)
-        _load_module._cache = module  # type: ignore[attr-defined]
+        _load_module._cache = module  # type: ignore[attr-defined] # noqa: SLF001
     return module
 
 
 def __getattr__(name: str) -> object:
     if name in __all__:
         module = _load_module()
-        return cast(object, getattr(module, name))
+        return cast("object", getattr(module, name))
     message = f"module '{__name__}' has no attribute '{name}'"
     raise AttributeError(message)
 

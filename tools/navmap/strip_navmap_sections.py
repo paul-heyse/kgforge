@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Remove deprecated NavMap metadata from module docstrings."""
 
 from __future__ import annotations

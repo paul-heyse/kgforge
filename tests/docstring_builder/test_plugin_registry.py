@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from pathlib import Path
-from typing import Any, Protocol, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 
 import pytest
 from tools.docstring_builder.config import BuilderConfig
@@ -20,6 +18,10 @@ from tools.docstring_builder.plugins.base import (
 from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPlugin
 
 from kgfoundry_common.errors import KgFoundryError
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from pathlib import Path
 
 
 def expect_context(value: Mapping[str, Any] | None) -> Mapping[str, Any]:
@@ -53,11 +55,11 @@ class TestPluginRegistryError:
         details = error.to_problem_details(instance="/api/plugins/test")
         # Cast to ensure all fields are present
         assert (
-            cast(str, details.get("type")) == "https://kgfoundry.dev/problems/configuration-error"
+            cast("str", details.get("type")) == "https://kgfoundry.dev/problems/configuration-error"
         )
-        assert cast(int, details.get("status")) == 500
-        assert cast(str, details.get("detail")) == "test error"
-        assert cast(str, details.get("instance")) == "/api/plugins/test"
+        assert cast("int", details.get("status")) == 500
+        assert cast("str", details.get("detail")) == "test error"
+        assert cast("str", details.get("instance")) == "/api/plugins/test"
 
     def test_with_cause(self) -> None:
         """PluginRegistryError preserves cause chain."""

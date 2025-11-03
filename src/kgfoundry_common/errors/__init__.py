@@ -15,8 +15,7 @@ Examples
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any, Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, Protocol, cast
 
 from kgfoundry_common.errors.codes import BASE_TYPE_URI, ErrorCode, get_type_uri
 from kgfoundry_common.errors.exceptions import (
@@ -50,7 +49,11 @@ from kgfoundry_common.errors.exceptions import (
     UnsupportedMIMEError,
     VectorSearchError,
 )
-from kgfoundry_common.navmap_types import NavMap
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from kgfoundry_common.navmap_types import NavMap
 
 # Structural protocols for optional FastAPI integration. We keep the
 # expectations minimal so the package does not need FastAPI installed for
@@ -101,6 +104,9 @@ class RegisterProblemDetailsHandler(Protocol):
 
 
 # HTTP adapters are optional (require fastapi)
+_problem_details_response: ProblemDetailsResponse
+_register_problem_details_handler: RegisterProblemDetailsHandler
+
 try:
     from kgfoundry_common.errors.http import (
         problem_details_response as _http_problem_details_response,
@@ -110,31 +116,37 @@ try:
     )
 except ImportError:  # pragma: no cover - optional dependency
 
-    def _problem_details_response(
+    def _missing_problem_details_response(
         error: KgFoundryError,
         request: RequestProtocol | None = None,
     ) -> JSONResponseProtocol:
         """Raise an informative error when FastAPI dependencies are missing."""
+        del error, request
         message = (
             "FastAPI support is not installed. Install kgfoundry[api] to enable "
             "problem details response helpers."
         )
         raise RuntimeError(message)
 
-    def _register_problem_details_handler(app: FastAPIProtocol) -> None:
+    _problem_details_response = _missing_problem_details_response
+
+    def _missing_register_problem_details_handler(app: FastAPIProtocol) -> None:
         """Raise an informative error when FastAPI dependencies are missing."""
+        del app
         message = (
             "FastAPI support is not installed. Install kgfoundry[api] to enable "
             "Problem Details handlers."
         )
         raise RuntimeError(message)
+
+    _register_problem_details_handler = _missing_register_problem_details_handler
 else:
     _problem_details_response = cast(
-        ProblemDetailsResponse,
+        "ProblemDetailsResponse",
         _http_problem_details_response,
     )
     _register_problem_details_handler = cast(
-        RegisterProblemDetailsHandler,
+        "RegisterProblemDetailsHandler",
         _http_register_problem_details_handler,
     )
 
@@ -151,16 +163,12 @@ def problem_details_response(
     implementation in ``kgfoundry_common.errors.http``. Otherwise it raises an
     informative ``RuntimeError`` describing the missing optional dependency.
     """
-    response = _problem_details_response(
-        error,
-        cast(Any, request),
-    )
-    return cast(JSONResponseProtocol, response)
+    return _problem_details_response(error, request)
 
 
 def register_problem_details_handler(app: FastAPIProtocol) -> None:
     """Register the KgFoundry Problem Details handler on a FastAPI app."""
-    _register_problem_details_handler(cast(Any, app))
+    _register_problem_details_handler(app)
 
 
 __all__ = [

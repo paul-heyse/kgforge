@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from importlib import import_module
-from types import ModuleType
 from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 MODULE_PATH = "docs._scripts.validation"
 
@@ -21,7 +23,7 @@ def __getattr__(name: str) -> object:
     """Expose attributes from the lazily loaded validation module."""
     if name in __all__:
         module = _load_module()
-        return cast(object, getattr(module, name))
+        return cast("object", getattr(module, name))
     message = f"module '{__name__}' has no attribute '{name}'"
     raise AttributeError(message)
 

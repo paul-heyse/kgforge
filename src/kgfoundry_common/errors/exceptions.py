@@ -19,11 +19,14 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.errors.codes import ErrorCode, get_type_uri
 from kgfoundry_common.logging import get_logger
-from kgfoundry_common.problem_details import JsonValue, ProblemDetails, build_problem_details
+from kgfoundry_common.problem_details import build_problem_details
+
+if TYPE_CHECKING:
+    from kgfoundry_common.problem_details import JsonValue, ProblemDetails
 
 logger = get_logger(__name__)
 
@@ -239,7 +242,9 @@ class KgFoundryError(Exception):
             detail=self.message,
             instance=instance or "urn:kgfoundry:error",
             code=self.code.value,
-            extensions=cast(Mapping[str, JsonValue] | None, self.context if self.context else None),
+            extensions=cast(
+                "Mapping[str, JsonValue] | None", self.context if self.context else None
+            ),
         )
 
     def __str__(self) -> str:
@@ -1254,7 +1259,7 @@ class RetryExhaustedError(KgFoundryError):
             detail=self.message,
             instance=instance or "urn:kgfoundry:error",
             code=self.code.value,
-            extensions=cast(Mapping[str, JsonValue] | None, extensions if extensions else None),
+            extensions=cast("Mapping[str, JsonValue] | None", extensions if extensions else None),
         )
 
 

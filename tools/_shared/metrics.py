@@ -16,21 +16,27 @@ and the spec scenario documented in
 from __future__ import annotations
 
 import time
-from collections.abc import Iterator, Sequence
 from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from kgfoundry_common.observability import start_span
-from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
+from tools._shared.logging import get_logger, with_fields
 from tools._shared.prometheus import (
-    CounterLike,
-    HistogramLike,
     build_counter,
     build_histogram,
 )
 from tools._shared.settings import get_runtime_settings
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+
+    from tools._shared.logging import StructuredLoggerAdapter
+    from tools._shared.prometheus import (
+        CounterLike,
+        HistogramLike,
+    )
 
 LOGGER = get_logger(__name__)
 

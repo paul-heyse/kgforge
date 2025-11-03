@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import ast
-from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
-from tools.docstring_builder.config import BuilderConfig
-from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest, parameter_display_name
+from tools.docstring_builder.harvest import parameter_display_name
 from tools.docstring_builder.overrides import extended_summary as overrides_extended_summary
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc, RaiseDoc, ReturnDoc
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tools.docstring_builder.config import BuilderConfig
+    from tools.docstring_builder.harvest import HarvestResult, SymbolHarvest
 
 
 @dataclass(slots=True)

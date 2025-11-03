@@ -29,11 +29,13 @@ from __future__ import annotations
 import hashlib
 import hmac
 import io
-from collections.abc import Callable
 from importlib import import_module
 from typing import TYPE_CHECKING, BinaryIO, Protocol, cast
 
 from kgfoundry_common.logging import get_logger
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = get_logger(__name__)
 
@@ -50,7 +52,7 @@ def _load_cloudpickle_dumps() -> Callable[[object], bytes] | None:
             continue
         dumps_candidate: object = getattr(module, "dumps", None)
         if callable(dumps_candidate):
-            return cast(Callable[[object], bytes], dumps_candidate)
+            return cast("Callable[[object], bytes]", dumps_candidate)
     return None
 
 
@@ -58,7 +60,7 @@ _CLOUDPICKLE_DUMPS: Callable[[object], bytes] | None = _load_cloudpickle_dumps()
 
 try:
     pickle_module = import_module("pickle")
-    _PICKLING_ERROR = cast(type[Exception], pickle_module.PicklingError)
+    _PICKLING_ERROR = cast("type[Exception]", pickle_module.PicklingError)
 except (ImportError, AttributeError):  # pragma: no cover - defensive fallback
     _PICKLING_ERROR = Exception
 
@@ -144,15 +146,15 @@ if TYPE_CHECKING:
 
         def find_class(self, module: str, name: str) -> object: ...
 
-    _stdlib_pickle = cast(_PickleModule, None)
+    _stdlib_pickle = cast("_PickleModule", None)
 else:  # pragma: no cover - runtime import keeps Ruff S403 quiet
 
     def _load_stdlib_pickle() -> _PickleModule:
         module_name = "_pickle"
-        return cast(_PickleModule, import_module(module_name))
+        return cast("_PickleModule", import_module(module_name))
 
     _stdlib_pickle = _load_stdlib_pickle()
-    _StdlibUnpickler = cast(type[_UnpicklerProtocol], _stdlib_pickle.Unpickler)
+    _StdlibUnpickler = cast("type[_UnpicklerProtocol]", _stdlib_pickle.Unpickler)
 
 
 class _SafeUnpickler(_StdlibUnpickler):
@@ -203,7 +205,7 @@ class _SafeUnpickler(_StdlibUnpickler):
         if full_name not in _ALLOWED_TYPES:
             msg = f"Deserialization blocked: {full_name} not in allow-list"
             raise UnsafeSerializationError(msg, reason="disallowed_type")
-        return cast(type[object], super().find_class(module, name))
+        return cast("type[object]", super().find_class(module, name))
 
     def load(self) -> object:
         """Deserialize the payload using the hardened allow-list."""

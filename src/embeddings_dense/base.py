@@ -7,13 +7,15 @@ implementation specifics.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Final, Protocol
+from typing import TYPE_CHECKING, Final, Protocol
 
-import numpy as np
-from numpy.typing import NDArray
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
-from kgfoundry_common.navmap_types import NavMap
+    import numpy as np
+    from numpy.typing import NDArray
+
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["DenseEmbeddingModel"]
 

@@ -11,13 +11,15 @@ Verify:
 from __future__ import annotations
 
 import logging
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import pytest
-from _pytest.logging import LogCaptureFixture
 from prometheus_client import Counter, Histogram
-from prometheus_client.registry import CollectorRegistry
-from prometheus_client.samples import Sample
+
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
+    from prometheus_client.registry import CollectorRegistry
+    from prometheus_client.samples import Sample
 
 COUNTER_CASES: Final[tuple[tuple[str, str, int], ...]] = (
     ("search", "success", 1),

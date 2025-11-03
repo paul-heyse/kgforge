@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools.make_importlinter import main as generate_importlinter
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def run() -> Path:

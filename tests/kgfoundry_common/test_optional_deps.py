@@ -9,8 +9,8 @@ This module tests:
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
-from typing import Any
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
@@ -22,6 +22,9 @@ from kgfoundry_common.optional_deps import (
     safe_import_griffe,
     safe_import_sphinx,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _expect_mapping(value: object, label: str) -> Mapping[str, Any]:

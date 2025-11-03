@@ -461,6 +461,11 @@ dependencies = [
 [project.scripts]
 catalogctl = "kgfoundry.agent_catalog.cli:main"
 catalogctl-mcp = "kgfoundry.agent_catalog.mcp:main"
+docs-build-symbol-index = "docs.toolchain:build_symbol_index"
+docs-validate-artifacts = "docs.toolchain:validate_artifacts"
+docs-symbol-delta = "docs.toolchain:symbol_delta"
+tools-build-agent-catalog = "tools.cli:build_agent_catalog"
+tools-build-navmap = "tools.cli:build_navmap"
 
 
 [project.optional-dependencies]
@@ -619,11 +624,26 @@ select = [
     "PERF",
     "YTT",
     "PYI",
+    "TC",      # Type-checking imports (typing gates enforcement)
+    "FBT",
+    "SLF",
+    "SLOT",
+    "ASYNC",
+    "INP",     # Input validation (implicit namespace packages)
+    "EXE",     # Executable shebang checks
+    "FIX",
+    "NPY",
+    "PD",
+    "PLE",
     #"DOC",
 ]
 ignore = ["Q", "E203", "D203", "D213", "D205"]
 preview = true
 extend-select = ["RUF100", "D401", "D417"]
+
+# Typing gates enforcement: escalate these to errors via explicit config
+extend-ignore = []  # Placeholder for potential future ignores
+# Note: TC, INP, EXE rules are ERRORS by default; PLC2701 (typing-only import) treated specially per-file
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
@@ -671,6 +691,10 @@ runtime-evaluated-base-classes = [
 "docs/_types/**" = ["PLC2701"]  # docs._types is a special module namespace for typed facades
 "docs/_scripts/**" = ["PLC2701"]  # docs._scripts is internal tooling; importing from docs._types and tools._shared is expected
 "docs/types/artifacts.py" = ["PLC2701"]  # docs/types is a facade re-exporting from private docs._types module
+# New: Façade modules are allowed to import from private sources (controlled re-export)
+"src/kgfoundry_common/typing/__init__.py" = []  # Canonical typing façade
+"tools/typing/__init__.py" = []  # Tooling typing façade
+"docs/typing/__init__.py" = []  # Docs typing façade
 
 [tool.ruff.lint.isort]
 known-first-party = [
@@ -865,5 +889,4 @@ python_version = "3.13"
 
 [dependency-groups]
 dev = [
-    "libcst>=1.8.5",
 ]

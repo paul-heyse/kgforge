@@ -3,31 +3,35 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from pathlib import Path
 from types import SimpleNamespace
-from typing import Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
-import pytest
 from tools.docstring_builder.builder_types import (
     STATUS_LABELS,
     DocstringBuildRequest,
     ExitStatus,
     status_from_exit,
 )
-from tools.docstring_builder.cache import BuilderCache
-from tools.docstring_builder.diff_manager import DiffManager
-from tools.docstring_builder.docfacts import DocFact
-from tools.docstring_builder.docfacts_coordinator import DocfactsCoordinator
-from tools.docstring_builder.file_processor import FileProcessor
 from tools.docstring_builder.metrics import MetricsRecorder
-from tools.docstring_builder.models import ErrorReport, ProblemDetails
 from tools.docstring_builder.orchestrator import load_builder_config
 from tools.docstring_builder.pipeline import PipelineConfig, PipelineRunner
 from tools.docstring_builder.pipeline_types import DocfactsResult, FileOutcome, ProcessingOptions
-from tools.docstring_builder.policy import PolicyEngine, PolicyReport
-from tools.docstring_builder.semantics import SemanticResult
+from tools.docstring_builder.policy import PolicyReport
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from pathlib import Path
+
+    import pytest
+    from tools.docstring_builder.cache import BuilderCache
+    from tools.docstring_builder.diff_manager import DiffManager
+    from tools.docstring_builder.docfacts import DocFact
+    from tools.docstring_builder.docfacts_coordinator import DocfactsCoordinator
+    from tools.docstring_builder.file_processor import FileProcessor
+    from tools.docstring_builder.models import ErrorReport, ProblemDetails
+    from tools.docstring_builder.policy import PolicyEngine
+    from tools.docstring_builder.semantics import SemanticResult
 
 
 def _noop_record_docfacts(_facts: Iterable[DocFact], _path: Path) -> None:
@@ -145,19 +149,37 @@ def _build_pipeline_config(
     def _write_cache() -> None:
         return None
 
-    cache = cast(BuilderCache, SimpleNamespace(write=_write_cache))
+    cache = cast("BuilderCache", SimpleNamespace(write=_write_cache))
 
     def _process_file(_path: Path) -> FileOutcome:
         return file_outcomes[0]
 
-    file_processor = cast(FileProcessor, SimpleNamespace(process=_process_file))
+    file_processor = cast("FileProcessor", SimpleNamespace(process=_process_file))
 
-    def coordinator_factory(check_mode: bool) -> DocfactsCoordinator:
-        status = docfacts_status if check_mode else "success"
-        return cast(
-            DocfactsCoordinator,
-            _StubDocfactsCoordinator(status=status, message=docfacts_message),
-        )
+    class CoordinatorFactory:
+        """Factory for creating DocfactsCoordinator instances."""
+
+        def __call__(self, is_check: bool) -> DocfactsCoordinator:  # noqa: FBT001
+            """Create coordinator with appropriate status based on mode.
+
+            Parameters
+            ----------
+            is_check : bool
+                If True, use check status; otherwise use 'success'.
+
+            Returns
+            -------
+            DocfactsCoordinator
+                A stub coordinator with appropriate status.
+
+            """
+            status = docfacts_status if is_check else "success"
+            return cast(
+                "DocfactsCoordinator",
+                _StubDocfactsCoordinator(status=status, message=docfacts_message),
+            )
+
+    coordinator_factory = CoordinatorFactory()
 
     config, _ = load_builder_config(None)
 
@@ -179,9 +201,9 @@ def _build_pipeline_config(
         filter_docfacts=_empty_docfacts,
         docfacts_coordinator_factory=coordinator_factory,
         plugin_manager=None,
-        policy_engine=cast(PolicyEngine, _StubPolicyEngine()),
+        policy_engine=cast("PolicyEngine", _StubPolicyEngine()),
         metrics=_build_metrics_recorder(),
-        diff_manager=cast(DiffManager, _StubDiffManager()),
+        diff_manager=cast("DiffManager", _StubDiffManager()),
         logger=logging.getLogger(__name__),
         status_from_exit=status_from_exit,
         status_labels=STATUS_LABELS,

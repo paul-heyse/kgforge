@@ -11,10 +11,8 @@ from __future__ import annotations
 
 import enum
 import logging
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.logging import LoggerAdapter
 from tools._shared.problem_details import (
@@ -23,17 +21,24 @@ from tools._shared.problem_details import (
 from tools._shared.problem_details import (
     build_problem_details as _build_problem_details,
 )
-from tools.docstring_builder.config import ConfigSelection
 from tools.docstring_builder.models import (
-    CliResult,
-    ErrorReport,
-    FileReport,
     RunStatus,
     StatusCounts,
 )
-from tools.docstring_builder.models import (
-    ProblemDetails as ModelProblemDetails,
-)
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from pathlib import Path
+
+    from tools.docstring_builder.config import ConfigSelection
+    from tools.docstring_builder.models import (
+        CliResult,
+        ErrorReport,
+        FileReport,
+    )
+    from tools.docstring_builder.models import (
+        ProblemDetails as ModelProblemDetails,
+    )
 
 type LoggerLike = LoggerAdapter | logging.Logger
 """Type alias for logger parameters: accepts both StructuredLoggerAdapter and stdlib Logger."""
@@ -170,7 +175,7 @@ def build_problem_details(
         "subcommand": subcommand,
         "errorCount": len(errors) if errors is not None else 0,
     }
-    return cast(ModelProblemDetails, problem_dict)
+    return cast("ModelProblemDetails", problem_dict)
 
 
 __all__ = [

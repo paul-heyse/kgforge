@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, ParamSpec, Protocol, TypedDict, TypeVar, cast
 
@@ -19,6 +18,7 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
 
     def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
 
@@ -85,7 +85,7 @@ def search_options_factory() -> SearchOptionsFactory:
             "alpha": alpha,
         }
 
-    return cast(SearchOptionsFactory, _create_options)
+    return cast("SearchOptionsFactory", _create_options)
 
 
 __all__ = ["search_options_factory"]

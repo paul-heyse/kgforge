@@ -10,11 +10,11 @@ from kgfoundry.tooling_bridge import namespace_dir, namespace_getattr
 from search_client.client import KGFoundryClient, RequestsHttp, SupportsHttp, SupportsResponse
 
 __all__ = ["KGFoundryClient", "RequestsHttp", "SupportsHttp", "SupportsResponse"]
-_module_doc = cast(str | None, getattr(_module, "__doc__", None))
+_module_doc = cast("str | None", getattr(_module, "__doc__", None))
 if isinstance(_module_doc, str):  # pragma: no branch - simple type guard
     __doc__ = _module_doc
 
-_module_path = cast(Sequence[object] | None, getattr(_module, "__path__", None))
+_module_path = cast("Sequence[object] | None", getattr(_module, "__path__", None))
 __path__ = [str(item) for item in _module_path] if isinstance(_module_path, Sequence) else []
 
 

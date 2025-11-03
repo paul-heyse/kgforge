@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Final, TypedDict
+from typing import TYPE_CHECKING, Final, TypedDict
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from tools.navmap.models import ModuleMeta, NavIndex, SymbolMeta
+if TYPE_CHECKING:
+    from tools.navmap.models import ModuleMeta, NavIndex, SymbolMeta
 
 NAVMAP_SCHEMA: Final[str] = "navmap_document.json"
 NAVMAP_SCHEMA_ID: Final[str] = "https://kgfoundry.dev/schema/tools/navmap-document.json"

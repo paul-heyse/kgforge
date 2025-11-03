@@ -44,5 +44,5 @@ CliMain = Callable[[list[str] | None], int]
 def main(argv: list[str] | None = None) -> int:
     """Dispatch to the CLI entry point without eagerly importing it."""
     cli_module = import_module("tools.docstring_builder.cli")
-    cli_main = cast(CliMain, cli_module.main)
+    cli_main = cast("CliMain", cli_module.main)
     return cli_main(argv)

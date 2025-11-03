@@ -16,17 +16,20 @@ Examples
 from __future__ import annotations
 
 import base64
-import functools
-from collections.abc import Mapping, Sequence
 from functools import lru_cache
-from typing import Final, Literal, Self, cast
+from typing import TYPE_CHECKING, Final, Literal, Self, cast
 
 from pydantic import AliasChoices, Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings
 
 from kgfoundry_common.logging import get_logger
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.types import JsonPrimitive, JsonValue
+
+if TYPE_CHECKING:
+    import functools
+    from collections.abc import Mapping, Sequence
+
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["AppSettings", "JsonPrimitive", "JsonValue", "load_config"]
 
@@ -348,7 +351,7 @@ def load_config(reload: bool = False) -> AppSettings:
 
 def _format_validation_error(exc: ValidationError) -> str:
     """Return the most helpful message from a pydantic ``ValidationError``."""
-    errors_raw = cast(Sequence[Mapping[str, object]], exc.errors())
+    errors_raw = cast("Sequence[Mapping[str, object]]", exc.errors())
     if errors_raw:
         primary = errors_raw[0]
         msg_obj = primary.get("msg")

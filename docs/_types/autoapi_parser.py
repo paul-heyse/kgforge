@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable
-from types import ModuleType
-from typing import Protocol, cast
+from typing import TYPE_CHECKING, Protocol, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import ModuleType
 
 __all__ = ["AutoapiParserProtocol", "coerce_parser_class"]
 
@@ -37,4 +39,4 @@ def coerce_parser_class(
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a class"
         raise TypeError(message)
-    return cast(type[AutoapiParserProtocol], candidate_obj)
+    return cast("type[AutoapiParserProtocol]", candidate_obj)

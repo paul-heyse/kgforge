@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools._shared.logging import get_logger
 from tools._shared.proc import ToolExecutionError, run_tool
-from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import iter_target_files
 from tools.docstring_builder.paths import REPO_ROOT
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+
+    from tools.docstring_builder.config import BuilderConfig
 
 LOGGER = get_logger(__name__)
 

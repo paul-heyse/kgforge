@@ -11,9 +11,8 @@ and emit Problem Details envelopes consistent with
 from __future__ import annotations
 
 import logging
-from collections.abc import Mapping, MutableMapping
 from importlib import import_module
-from types import MappingProxyType, ModuleType
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Final, cast
 
 from ._shared.cli import (
@@ -75,6 +74,9 @@ from ._shared.validation import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, MutableMapping
+    from types import ModuleType
+
     from . import codemods, docs, docstring_builder, gen_readmes, generate_pr_summary, navmap
     from .docs import build_agent_api, build_agent_catalog
 
@@ -95,12 +97,12 @@ _PUBLIC_EXPORTS: dict[str, object] = {
     "ProblemDetailsParams": ProblemDetailsParams,
     "SchemaProblemDetailsParams": SchemaProblemDetailsParams,
     "SettingsError": SettingsError,
-    "StructuredLoggerAdapter": cast(object, StructuredLoggerAdapter),
+    "StructuredLoggerAdapter": cast("object", StructuredLoggerAdapter),
     "ProcessRunner": ProcessRunner,
     "ToolExecutionError": ToolExecutionError,
     "ToolRunObservation": ToolRunObservation,
     "ToolRunResult": ToolRunResult,
-    "ToolRuntimeSettings": cast(object, ToolRuntimeSettings),
+    "ToolRuntimeSettings": cast("object", ToolRuntimeSettings),
     "ToolProblemDetailsParams": ToolProblemDetailsParams,
     "ValidationError": ValidationError,
     "build_problem_details": build_problem_details,
@@ -207,14 +209,14 @@ __all__: tuple[str, ...] = (
 def __getattr__(name: str) -> ModuleType:
     if name in MODULE_EXPORTS:
         module = import_module(MODULE_EXPORTS[name])
-        namespace = cast(MutableMapping[str, object], globals())
+        namespace = cast("MutableMapping[str, object]", globals())
         namespace[name] = module
-        _PUBLIC_EXPORTS[name] = cast(object, module)
+        _PUBLIC_EXPORTS[name] = cast("object", module)
         return module
     message = f"module 'tools' has no attribute {name!r}"
     raise AttributeError(message)
 
 
 def __dir__() -> list[str]:
-    namespace = cast(MutableMapping[str, object], globals())
+    namespace = cast("MutableMapping[str, object]", globals())
     return sorted({*namespace, *MODULE_EXPORTS.keys()})

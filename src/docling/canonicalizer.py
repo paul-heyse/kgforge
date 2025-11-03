@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["canonicalize_text"]
 

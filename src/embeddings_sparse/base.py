@@ -7,10 +7,12 @@ implementation specifics.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
-from typing import Final, Protocol
+from typing import TYPE_CHECKING, Final, Protocol
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping
+
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["SparseEncoder", "SparseIndex"]
 

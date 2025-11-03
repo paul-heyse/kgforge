@@ -15,10 +15,10 @@ import os
 import re
 import sys
 import tokenize
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import jsonschema
 import numpy as np
@@ -26,12 +26,8 @@ import numpy as np
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.search import (
     LEXICAL_FIELDS,
-    EmbeddingModelProtocol,
     SearchDocument,
-    SearchOptions,
     SearchRequest,
-    SearchResult,
-    VectorArray,
     build_default_search_options,
     build_faceted_search_options,
     load_faiss,
@@ -54,6 +50,16 @@ from tools.docs.catalog_models import (
     SymbolRecord,
 )
 from tools.docs.errors import CatalogBuildError
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from kgfoundry.agent_catalog.search import (
+        EmbeddingModelProtocol,
+        SearchOptions,
+        SearchResult,
+        VectorArray,
+    )
 
 type CatalogPayload = Mapping[str, JsonValue]
 
@@ -416,24 +422,24 @@ class AgentCatalogBuilder:
 
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
-        repo_root_arg = cast(Path, args.repo_root)
+        repo_root_arg = cast("Path", args.repo_root)
         self.repo_root = repo_root_arg.resolve()
         self.artifact_paths = {
-            "docfacts": cast(Path, args.docfacts),
-            "navmap": cast(Path, args.navmap),
-            "by_module": cast(Path, args.by_module),
-            "by_file": cast(Path, args.by_file),
-            "symbols": cast(Path, args.symbols),
-            "test_map": cast(Path, args.test_map),
-            "test_map_coverage": cast(Path, args.test_map_coverage),
-            "test_map_summary": cast(Path, args.test_map_summary),
+            "docfacts": cast("Path", args.docfacts),
+            "navmap": cast("Path", args.navmap),
+            "by_module": cast("Path", args.by_module),
+            "by_file": cast("Path", args.by_file),
+            "symbols": cast("Path", args.symbols),
+            "test_map": cast("Path", args.test_map),
+            "test_map_coverage": cast("Path", args.test_map_coverage),
+            "test_map_summary": cast("Path", args.test_map_summary),
         }
-        self.semantic_dir = cast(Path, args.semantic_dir)
+        self.semantic_dir = cast("Path", args.semantic_dir)
         self.embedding_model = str(args.embedding_model)
         self.embedding_batch_size = int(args.embedding_batch_size)
         self.search_alpha = float(args.search_alpha)
         self.search_candidates = int(args.search_candidates)
-        self.sqlite_path = cast(Path, args.sqlite)
+        self.sqlite_path = cast("Path", args.sqlite)
         self._symbol_records: dict[str, SymbolRecord] = {}
         self._git_churn_cache: dict[Path, int] = {}
         self._git_modified_cache: dict[Path, str | None] = {}
@@ -519,7 +525,7 @@ class AgentCatalogBuilder:
                     raise CatalogBuildError(message)
         resolved_github: dict[str, str] | None
         if all(value is not None for value in raw_github.values()):
-            resolved_github = {key: cast(str, value) for key, value in raw_github.items()}
+            resolved_github = {key: cast("str", value) for key, value in raw_github.items()}
         else:
             resolved_github = None
         return LinkPolicy(
@@ -531,7 +537,7 @@ class AgentCatalogBuilder:
 
     def _resolve_repo_sha(self) -> str:
         if self.args.repo_sha:
-            return cast(str, self.args.repo_sha)
+            return cast("str", self.args.repo_sha)
         log_adapter = with_fields(logger, command=["git", "rev-parse", "--short", "HEAD"])
         try:
             result = run_tool(
@@ -551,22 +557,22 @@ class AgentCatalogBuilder:
 
     def _collect_packages(self) -> list[PackageRecord]:
         symbols_data = cast(
-            list[dict[str, Any]], self._load_json(self.artifact_paths["symbols"], [])
+            "list[dict[str, Any]]", self._load_json(self.artifact_paths["symbols"], [])
         )
         docfacts_raw = self._load_json(self.artifact_paths["docfacts"], {})
         if isinstance(docfacts_raw, dict):
-            docfacts_data = cast(list[dict[str, Any]], docfacts_raw.get("entries", []))
+            docfacts_data = cast("list[dict[str, Any]]", docfacts_raw.get("entries", []))
         else:
-            docfacts_data = cast(list[dict[str, Any]], docfacts_raw or [])
+            docfacts_data = cast("list[dict[str, Any]]", docfacts_raw or [])
         by_module = cast(
-            dict[str, list[str]], self._load_json(self.artifact_paths["by_module"], {})
+            "dict[str, list[str]]", self._load_json(self.artifact_paths["by_module"], {})
         )
         self._test_map = cast(
-            dict[str, list[dict[str, Any]]],
+            "dict[str, list[dict[str, Any]]]",
             self._load_json(self.artifact_paths["test_map"], {}),
         )
         self._coverage_map = cast(
-            dict[str, Any],
+            "dict[str, Any]",
             self._load_json(self.artifact_paths["test_map_coverage"], {}),
         )
         module_index = self._index_modules(symbols_data)
@@ -1198,7 +1204,7 @@ class AgentCatalogBuilder:
     def write(self, catalog: AgentCatalog, path: Path, schema: Path) -> None:
         """Write the catalog and validate against the schema."""
         catalog_json = json.loads(json.dumps(catalog.model_dump()))
-        catalog_payload = cast(dict[str, JsonValue], catalog_json)
+        catalog_payload = cast("dict[str, JsonValue]", catalog_json)
         output_path = self._resolve_artifact_path(path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(catalog_payload, indent=2), encoding="utf-8")
@@ -1206,7 +1212,7 @@ class AgentCatalogBuilder:
         schema_data = json.loads(schema_path.read_text(encoding="utf-8"))
         validator = jsonschema.Draft202012Validator(schema_data)
         errors = sorted(
-            validator.iter_errors(cast(CatalogPayload, catalog_payload)),
+            validator.iter_errors(cast("CatalogPayload", catalog_payload)),
             key=lambda err: tuple(err.path),
         )
         if errors:
@@ -1220,7 +1226,7 @@ class AgentCatalogBuilder:
         if self._packages_snapshot:
             snapshot_json = json.loads(json.dumps(self._packages_snapshot))
             packages_override = [
-                cast(Mapping[str, JsonValue], entry)
+                cast("Mapping[str, JsonValue]", entry)
                 for entry in snapshot_json
                 if isinstance(entry, dict)
             ]
@@ -1228,12 +1234,12 @@ class AgentCatalogBuilder:
             raw_packages = catalog_payload.get("packages", [])
             if isinstance(raw_packages, list):
                 packages_override = [
-                    cast(Mapping[str, JsonValue], entry)
+                    cast("Mapping[str, JsonValue]", entry)
                     for entry in raw_packages
                     if isinstance(entry, dict)
                 ]
         write_sqlite_catalog(
-            cast(CatalogPayload, catalog_payload),
+            cast("CatalogPayload", catalog_payload),
             sqlite_target,
             packages_override=packages_override,
         )
@@ -1255,7 +1261,7 @@ def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
     except Exception as exc:  # pragma: no cover - defensive guard
         message = f"Unable to load embedding model '{model_name}'"
         raise CatalogBuildError(message) from exc
-    return cast(EmbeddingModelProtocol, model)
+    return cast("EmbeddingModelProtocol", model)
 
 
 def _tokenize(text: str) -> list[str]:
@@ -1438,7 +1444,7 @@ def search_catalog(
 
 def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
     """Load a catalog JSON file and expand shards if requested."""
-    data = cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    data = cast("dict[str, Any]", json.loads(path.read_text(encoding="utf-8")))
     shards = data.get("shards")
     if load_shards and not data.get("packages") and isinstance(shards, Mapping):
         packages: list[dict[str, Any]] = []
@@ -1453,7 +1459,7 @@ def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
             if not shard_path.is_absolute():
                 shard_path = (base_dir / shard_path).resolve()
             shard_data = cast(
-                dict[str, Any],
+                "dict[str, Any]",
                 json.loads(shard_path.read_text(encoding="utf-8")),
             )
             packages.append(shard_data)
@@ -1556,7 +1562,7 @@ class _DocstringStripper(ast.NodeTransformer):
         return self._strip_doc(node)
 
     def _strip_doc(self, node: DocNode) -> DocNode:
-        updated = cast(DocNode, self.generic_visit(node))
+        updated = cast("DocNode", self.generic_visit(node))
         body = list(updated.body)
         if (
             body

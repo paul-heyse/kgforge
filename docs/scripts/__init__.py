@@ -11,7 +11,7 @@ __all__ = ["validate_against_schema"]
 def __getattr__(name: str) -> object:
     if name == "validate_against_schema":
         module = import_module("docs.scripts.validation")
-        return cast(object, getattr(module, name))
+        return cast("object", getattr(module, name))
     message = f"module '{__name__}' has no attribute '{name}'"
     raise AttributeError(message)
 

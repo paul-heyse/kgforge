@@ -4,15 +4,13 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
-from dataclasses import replace as dataclass_replace
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Literal, cast
 
 import msgspec
-from msgspec import UNSET, Struct, UnsetType, structs
+from msgspec import UNSET, Struct, structs
 
-from tools._shared.problem_details import ProblemDetailsDict
 from tools._shared.schema import validate_tools_payload
 
 CliStatus = Literal["success", "violation", "config", "error"]
@@ -25,6 +23,12 @@ CLI_ENVELOPE_SCHEMA_ID = "https://kgfoundry.dev/schema/cli-envelope.json"
 
 
 if TYPE_CHECKING:
+    from dataclasses import field
+    from dataclasses import replace as dataclass_replace
+
+    from msgspec import UnsetType
+
+    from tools._shared.problem_details import ProblemDetailsDict
 
     @dataclass(slots=True)
     class CliFileResult:
@@ -180,7 +184,7 @@ class CliEnvelopeBuilder:
             self.envelope = dataclass_replace(self.envelope, problem=replacement)
         else:
             self.envelope = cast(
-                CliEnvelope,
+                "CliEnvelope",
                 structs.replace(self.envelope, problem=replacement),
             )
 
@@ -193,7 +197,7 @@ class CliEnvelopeBuilder:
                 )
             else:
                 self.envelope = cast(
-                    CliEnvelope,
+                    "CliEnvelope",
                     structs.replace(
                         self.envelope,
                         durationSeconds=float(duration_seconds),

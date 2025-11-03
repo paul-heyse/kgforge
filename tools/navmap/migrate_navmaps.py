@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Regenerate the navigation map JSON consumed by the documentation site."""
 
 from __future__ import annotations
@@ -69,8 +68,8 @@ def _parse_args(argv: list[str] | None = None) -> MigrateArgs:
     )
     namespace = parser.parse_args(argv)
     return MigrateArgs(
-        output=cast(Path, namespace.output),
-        compact=cast(bool, namespace.compact),
+        output=cast("Path", namespace.output),
+        compact=cast("bool", namespace.compact),
     )
 
 

@@ -3,20 +3,23 @@
 from __future__ import annotations
 
 import ast
-from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import cast, overload
+from typing import TYPE_CHECKING, cast, overload
 
 import libcst as cst
-from libcst import (
-    BaseSmallStatement,
-    BaseStatement,
-    FlattenSentinel,
-    RemovalSentinel,
-)
 
-from tools.docstring_builder.harvest import HarvestResult
-from tools.docstring_builder.schema import DocstringEdit
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
+
+    from libcst import (
+        BaseSmallStatement,
+        BaseStatement,
+        FlattenSentinel,
+        RemovalSentinel,
+    )
+
+    from tools.docstring_builder.harvest import HarvestResult
+    from tools.docstring_builder.schema import DocstringEdit
 
 
 def _escape_docstring(text: str, indent: str) -> str:
@@ -71,7 +74,7 @@ class _DocstringTransformer(cst.CSTTransformer):
         docstring_stmt = cst.SimpleStatementLine(body=(expr,))
 
         body = node.body
-        original_statements = cast(Sequence[cst.BaseStatement | BaseSmallStatement], body.body)
+        original_statements = cast("Sequence[cst.BaseStatement | BaseSmallStatement]", body.body)
 
         def _as_statement(item: cst.BaseStatement | BaseSmallStatement) -> cst.BaseStatement:
             if isinstance(item, cst.BaseStatement):
@@ -89,7 +92,7 @@ class _DocstringTransformer(cst.CSTTransformer):
                 and isinstance(first.body[0], cst.Expr)
                 and isinstance(first.body[0].value, cst.SimpleString)
             ):
-                current_value = cast(str, ast.literal_eval(first.body[0].value.value))
+                current_value = cast("str", ast.literal_eval(first.body[0].value.value))
                 if current_value == desired:
                     return node
                 new_statements: list[cst.BaseStatement] = [
@@ -105,7 +108,7 @@ class _DocstringTransformer(cst.CSTTransformer):
             return node
         self.changed = True
         new_body = body.with_changes(
-            body=cast(tuple[cst.BaseStatement, ...], tuple(new_statements))
+            body=cast("tuple[cst.BaseStatement, ...]", tuple(new_statements))
         )
         return node.with_changes(body=new_body)
 
@@ -119,7 +122,7 @@ class _DocstringTransformer(cst.CSTTransformer):
         qname = self._qualify(updated_node.name.value)
         self.namespace.pop()
         transformed = self._inject_docstring(updated_node, qname)
-        return cast(BaseStatement, transformed)
+        return cast("BaseStatement", transformed)
 
     def visit_functiondef(self, node: cst.FunctionDef) -> bool:
         self.namespace.append(node.name.value)
@@ -131,7 +134,7 @@ class _DocstringTransformer(cst.CSTTransformer):
         qname = self._qualify(updated_node.name.value)
         self.namespace.pop()
         transformed = self._inject_docstring(updated_node, qname)
-        return cast(BaseStatement, transformed)
+        return cast("BaseStatement", transformed)
 
 
 def apply_edits(

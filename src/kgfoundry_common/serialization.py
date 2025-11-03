@@ -85,7 +85,7 @@ def _load_schema_by_path_str_impl(schema_path_str: str) -> dict[str, object]:
         if not isinstance(schema_raw, dict):
             msg = f"Schema must be a JSON object at root, got {type(schema_raw).__name__}"
             raise SchemaValidationError(msg)
-        schema_obj = cast(dict[str, object], schema_raw)
+        schema_obj = cast("dict[str, object]", schema_raw)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         msg = f"Failed to load schema from {schema_path_str}: {e}"
         raise SchemaValidationError(msg) from e

@@ -16,12 +16,14 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import libcst as cst
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,9 +63,9 @@ def _parse_args(argv: Sequence[str] | None = None) -> PathlibArgs:
     )
 
     parsed: argparse.Namespace = parser.parse_args(argv)
-    targets = tuple(cast(list[Path], parsed.targets))
-    log_path = cast(Path | None, parsed.log)
-    dry_run = bool(cast(bool, parsed.dry_run))
+    targets = tuple(cast("list[Path]", parsed.targets))
+    log_path = cast("Path | None", parsed.log)
+    dry_run = bool(cast("bool", parsed.dry_run))
     return PathlibArgs(targets=targets, dry_run=dry_run, log=log_path)
 
 
@@ -271,7 +273,7 @@ class PathlibTransformer(cst.CSTTransformer):
             remaining_args: tuple[cst.Arg, ...] = ()
             if isinstance(updated_item.item, cst.Call):
                 call_args = cast(
-                    tuple[cst.Arg, ...],
+                    "tuple[cst.Arg, ...]",
                     tuple(updated_item.item.args),
                 )
                 remaining_args = call_args[1:]

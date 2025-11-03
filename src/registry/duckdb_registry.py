@@ -9,15 +9,18 @@ from __future__ import annotations
 
 import json
 import uuid
-from collections.abc import Mapping
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
-import duckdb
-
-from kgfoundry_common.models import Doc, DoctagsAsset
-from kgfoundry_common.navmap_types import NavMap
 from registry import duckdb_helpers
 from registry.duckdb_helpers import DuckDBQueryOptions
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    import duckdb
+
+    from kgfoundry_common.models import Doc, DoctagsAsset
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["DuckDBRegistry"]
 

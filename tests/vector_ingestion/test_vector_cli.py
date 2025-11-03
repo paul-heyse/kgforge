@@ -4,16 +4,19 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Callable
-from pathlib import Path
-from typing import cast
-from uuid import UUID
+from typing import TYPE_CHECKING, cast
 
-import pytest
-from _pytest.logging import LogCaptureFixture
 from typer.testing import CliRunner
 
 from orchestration.cli import app
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+    from uuid import UUID
+
+    import pytest
+    from _pytest.logging import LogCaptureFixture
 
 
 def _filter_index_records(
@@ -25,7 +28,7 @@ def _filter_index_records(
     """Return records emitted by the FAISS index operation."""
     filtered: list[logging.LogRecord] = []
     for record in records:
-        operation = cast(str | None, getattr(record, "operation", None))
+        operation = cast("str | None", getattr(record, "operation", None))
         if operation != "index_faiss":
             continue
         if level is not None and record.levelname != level:
@@ -46,7 +49,7 @@ def _parse_problem(stderr: str) -> dict[str, object]:
 
     problem_raw: object = json.loads(json_line)
     assert isinstance(problem_raw, dict)
-    return cast(dict[str, object], problem_raw)
+    return cast("dict[str, object]", problem_raw)
 
 
 def test_index_faiss_cli_success(
@@ -80,9 +83,9 @@ def test_index_faiss_cli_success(
     build_records = _filter_index_records(caplog.records, message="Building FAISS index")
     assert build_records, "Expected structured build log with operation metadata"
     build_record = build_records[-1]
-    vectors = cast(int | None, getattr(build_record, "vectors", None))
-    dimension = cast(int | None, getattr(build_record, "dimension", None))
-    correlation_id = cast(str | None, getattr(build_record, "correlation_id", None))
+    vectors = cast("int | None", getattr(build_record, "vectors", None))
+    dimension = cast("int | None", getattr(build_record, "dimension", None))
+    correlation_id = cast("str | None", getattr(build_record, "correlation_id", None))
     assert vectors == 2
     assert dimension == 3
     assert correlation_id
@@ -121,12 +124,12 @@ def test_index_faiss_cli_problem_details(
     problem = _parse_problem(result.stderr)
     assert problem.get("type") == "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
     assert problem.get("status") == 422
-    extensions_obj = cast(dict[str, object], problem.get("extensions", {}))
-    errors_field = cast(dict[str, object], extensions_obj.get("errors", {}))
+    extensions_obj = cast("dict[str, object]", problem.get("extensions", {}))
+    errors_field = cast("dict[str, object]", extensions_obj.get("errors", {}))
     assert isinstance(errors_field, dict)
     assert errors_field, "Expected validation error details"
 
     failure_records = _filter_index_records(caplog.records, level="ERROR")
     assert failure_records, "Expected error log with correlation metadata"
-    failure_correlation = cast(str | None, getattr(failure_records[-1], "correlation_id", None))
+    failure_correlation = cast("str | None", getattr(failure_records[-1], "correlation_id", None))
     assert failure_correlation == "12345678123456781234567812345678"

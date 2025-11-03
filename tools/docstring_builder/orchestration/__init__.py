@@ -2,3 +2,5 @@
 
 Provides modular components for the refactored _run_pipeline function.
 """
+
+from __future__ import annotations

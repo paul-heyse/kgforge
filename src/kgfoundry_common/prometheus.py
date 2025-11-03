@@ -25,7 +25,6 @@ Fallback behaviour (no Prometheus import required):
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, NoReturn, Protocol, cast, overload
 
@@ -46,6 +45,8 @@ __all__ = [
 
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Sequence
+
     from prometheus_client import Counter as _PromCounterType
     from prometheus_client import Gauge as _PromGaugeType
     from prometheus_client import Histogram as _PromHistogramType
@@ -239,9 +240,9 @@ except ImportError:  # pragma: no cover - handled by fallback
     HAVE_PROMETHEUS = False
 else:  # pragma: no cover - exercised when dependency present
     HAVE_PROMETHEUS = True
-    _COUNTER_CONSTRUCTOR = cast(_CounterConstructor, _PromCounter)
-    _GAUGE_CONSTRUCTOR = cast(_GaugeConstructor, _PromGauge)
-    _HISTOGRAM_CONSTRUCTOR = cast(_HistogramConstructor, _PromHistogram)
+    _COUNTER_CONSTRUCTOR = cast("_CounterConstructor", _PromCounter)
+    _GAUGE_CONSTRUCTOR = cast("_GaugeConstructor", _PromGauge)
+    _HISTOGRAM_CONSTRUCTOR = cast("_HistogramConstructor", _PromHistogram)
     _DEFAULT_REGISTRY = _PROMETHEUS_REGISTRY
     _PROMETHEUS_VERSION = getattr(prometheus_client, "__version__", None)
 
@@ -259,11 +260,11 @@ def _existing_collector(
     if registry is not None:
         target_registry = registry
     else:
-        target_registry = cast(CollectorRegistry | None, _DEFAULT_REGISTRY)
+        target_registry = cast("CollectorRegistry | None", _DEFAULT_REGISTRY)
     if target_registry is None:
         return None
     names_to_collectors = cast(
-        dict[str, object] | None,
+        "dict[str, object] | None",
         getattr(target_registry, "_names_to_collectors", None),
     )
     if isinstance(names_to_collectors, dict):
@@ -317,7 +318,7 @@ def build_counter(
         existing = _existing_collector(name, registry)
         if existing is None:
             raise
-        return cast(CounterLike, existing)
+        return cast("CounterLike", existing)
 
 
 def build_gauge(
@@ -344,7 +345,7 @@ def build_gauge(
         existing = _existing_collector(name, registry)
         if existing is None:
             raise
-        return cast(GaugeLike, existing)
+        return cast("GaugeLike", existing)
 
 
 def _coerce_histogram_params(*args: object, **kwargs: object) -> HistogramParams:
@@ -388,9 +389,9 @@ def _coerce_histogram_params(*args: object, **kwargs: object) -> HistogramParams
     return HistogramParams(
         name=name,
         documentation=documentation,
-        labelnames=cast(Sequence[str] | None, labelnames),
-        buckets=cast(Sequence[float] | None, buckets),
-        registry=cast(CollectorRegistry | None, registry),
+        labelnames=cast("Sequence[str] | None", labelnames),
+        buckets=cast("Sequence[float] | None", buckets),
+        registry=cast("CollectorRegistry | None", registry),
         unit=None if unit is None else str(unit),
     )
 
@@ -438,7 +439,7 @@ def build_histogram(*args: object, **kwargs: object) -> HistogramLike:
         existing = _existing_collector(params.name, params.registry)
         if existing is None:
             raise
-        return cast(HistogramLike, existing)
+        return cast("HistogramLike", existing)
 
 
 def get_default_registry() -> object | None:

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Build schema-validated symbol index artifacts for the documentation pipeline."""
 
 from __future__ import annotations
@@ -5,17 +6,14 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Protocol, cast, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
-from docs._scripts import shared
-from docs._scripts.validation import validate_against_schema
 from tools import (
     ProblemDetailsParams,
-    StructuredLoggerAdapter,
     build_problem_details,
     get_logger,
     observe_tool_run,
@@ -23,8 +21,17 @@ from tools import (
 )
 from tools._shared.proc import ToolExecutionError
 
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
 from kgfoundry_common.optional_deps import OptionalDependencyError, safe_import_griffe
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tools import (
+        StructuredLoggerAdapter,
+    )
 
 
 def _resolve_alias_resolution_error() -> type[Exception]:
@@ -183,7 +190,7 @@ class GriffeNode(Protocol):
 def safe_getattr(obj: object, name: str, default: object | None = None) -> object | None:
     """Return ``getattr`` with defensive error handling."""
     try:
-        return cast(object, getattr(obj, name, default))
+        return cast("object", getattr(obj, name, default))
     except (AttributeError, RuntimeError, AliasResolutionErrorType):
         return default
 
@@ -339,7 +346,7 @@ def _record_module_defaults(
     module_meta: dict[str, dict[str, JsonValue]],
     symbol_meta: dict[str, dict[str, JsonValue]],
 ) -> dict[str, JsonValue]:
-    defaults = _clean_meta(cast(Mapping[str, JsonValue] | None, payload.get("module_meta")))
+    defaults = _clean_meta(cast("Mapping[str, JsonValue] | None", payload.get("module_meta")))
     module_meta[module_name] = defaults
     if defaults:
         symbol_meta.setdefault(module_name, dict(defaults))
@@ -391,21 +398,21 @@ def _navmap_from_payload(data: Mapping[str, JsonValue]) -> NavLookup:
     modules_value = data.get("modules")
     if not isinstance(modules_value, Mapping):
         return NavLookup.empty()
-    modules_mapping = cast(Mapping[str, JsonValue], modules_value)
+    modules_mapping = cast("Mapping[str, JsonValue]", modules_value)
 
     for module_name, payload in modules_mapping.items():
         if not isinstance(module_name, str) or not isinstance(payload, Mapping):
             continue
-        payload_mapping = cast(Mapping[str, JsonValue], payload)
+        payload_mapping = cast("Mapping[str, JsonValue]", payload)
         _record_module_defaults(module_name, payload_mapping, module_meta, symbol_meta)
         _record_symbol_meta(
             module_name,
-            cast(Mapping[str, JsonValue] | None, payload_mapping.get("meta")),
+            cast("Mapping[str, JsonValue] | None", payload_mapping.get("meta")),
             symbol_meta,
         )
         _record_sections(
             module_name,
-            cast(Sequence[JsonValue] | None, payload_mapping.get("sections")),
+            cast("Sequence[JsonValue] | None", payload_mapping.get("sections")),
             sections,
         )
 
@@ -418,7 +425,7 @@ def load_nav_lookup() -> NavLookup:
         if not candidate.exists():
             continue
         try:
-            payload = cast(JsonPayload, json.loads(candidate.read_text(encoding="utf-8")))
+            payload = cast("JsonPayload", json.loads(candidate.read_text(encoding="utf-8")))
         except json.JSONDecodeError as exc:
             BASE_LOGGER.warning(
                 "Failed to parse navmap candidate",
@@ -455,7 +462,7 @@ def load_test_map() -> dict[str, JsonValue]:
     if not path.exists():
         return {}
     try:
-        payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        payload = cast("JsonPayload", json.loads(path.read_text(encoding="utf-8")))
     except json.JSONDecodeError as exc:
         SYMBOL_LOG.warning(
             "Failed to parse test_map.json",
@@ -470,7 +477,7 @@ def load_test_map() -> dict[str, JsonValue]:
 def _iter_members(node: GriffeNode) -> Iterable[GriffeNode]:
     members = safe_getattr(node, "members")
     if isinstance(members, Mapping):
-        return tuple(cast(GriffeNode, member) for member in members.values())
+        return tuple(cast("GriffeNode", member) for member in members.values())
     return ()
 
 
@@ -553,7 +560,7 @@ def _build_reverse_map(
 ) -> dict[str, tuple[str, ...]]:
     mapping: dict[str, set[str]] = {}
     for row in rows:
-        value = cast(object, getattr(row, attribute))
+        value = cast("object", getattr(row, attribute))
         if isinstance(value, str):
             if value not in mapping:
                 mapping[value] = set()
@@ -570,7 +577,7 @@ def generate_index(
     test_map = load_test_map()
     rows: list[SymbolIndexRow] = []
     for package in packages:
-        root = cast(GriffeNode, loader.load(package))
+        root = cast("GriffeNode", loader.load(package))
         rows.extend(_collect_rows(root, nav=nav_lookup, test_map=test_map))
 
     def get_row_path(row: SymbolIndexRow) -> str:
@@ -617,7 +624,7 @@ def write_artifact(
     """Validate (when configured) and write ``payload`` to ``path`` if it changed."""
     if validation is not None:
         validate_against_schema(
-            cast(JsonPayload, payload),
+            cast("JsonPayload", payload),
             validation.schema,
             artifact=artifact,
         )

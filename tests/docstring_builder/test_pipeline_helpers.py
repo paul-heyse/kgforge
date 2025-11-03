@@ -4,16 +4,19 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.logging import LogCaptureFixture
 from tools.docstring_builder.builder_types import ExitStatus
-from tools.docstring_builder.docfacts import DocFact
 from tools.docstring_builder.failure_summary import FailureSummaryRenderer, RunSummarySnapshot
 from tools.docstring_builder.metrics import MetricsRecorder
 from tools.docstring_builder.models import RunStatus
 from tools.docstring_builder.paths import OBSERVABILITY_PATH
 from tools.docstring_builder.pipeline_types import ErrorEnvelope, FileOutcome
+
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
+    from tools.docstring_builder.docfacts import DocFact
 
 
 @dataclass(slots=True)

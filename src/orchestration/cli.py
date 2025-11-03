@@ -10,10 +10,9 @@ import contextlib
 import importlib
 import json
 import logging
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from types import ModuleType
 from typing import TYPE_CHECKING, Annotated, Final, Protocol, cast
 from uuid import uuid4
 
@@ -22,16 +21,11 @@ import typer
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry_common.errors import IndexBuildError
 from kgfoundry_common.jsonschema_utils import (
-    Draft202012ValidatorProtocol,
-    ValidationErrorProtocol,
     create_draft202012_validator,
 )
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import ProblemDetails, build_problem_details, render_problem
+from kgfoundry_common.problem_details import build_problem_details, render_problem
 from kgfoundry_common.schema_helpers import load_schema
-from kgfoundry_common.types import JsonValue
 from kgfoundry_common.vector_types import (
-    VectorBatch,
     VectorValidationError,
     coerce_vector_batch,
 )
@@ -39,6 +33,20 @@ from orchestration import safe_pickle
 
 if TYPE_CHECKING:
     # Type signature for e2e_flow: takes no args, returns list of strings
+    from collections.abc import Callable, Iterable
+    from types import ModuleType
+
+    from kgfoundry_common.jsonschema_utils import (
+        Draft202012ValidatorProtocol,
+        ValidationErrorProtocol,
+    )
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import ProblemDetails
+    from kgfoundry_common.types import JsonValue
+    from kgfoundry_common.vector_types import (
+        VectorBatch,
+    )
+
     type _E2EFlow = Callable[[], list[str]]
 
 
@@ -255,7 +263,7 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
             exc_info=exc,
         )
         fallback = cast(
-            _BM25Builder,
+            "_BM25Builder",
             get_bm25("pure", config.index_dir, k1=0.9, b=0.4, load_existing=False),
         )
         try:
@@ -276,7 +284,7 @@ def _instantiate_bm25_builder(config: BM25BuildConfig) -> tuple[_BM25Builder, st
     requested_backend = config.backend.strip().lower()
     try:
         builder = cast(
-            _BM25Builder,
+            "_BM25Builder",
             get_bm25(
                 requested_backend,
                 config.index_dir,
@@ -300,7 +308,7 @@ def _instantiate_bm25_builder(config: BM25BuildConfig) -> tuple[_BM25Builder, st
             exc_info=exc,
         )
         fallback_builder = cast(
-            _BM25Builder,
+            "_BM25Builder",
             get_bm25("pure", config.index_dir, k1=0.9, b=0.4, load_existing=False),
         )
         return fallback_builder, "pure"
@@ -322,7 +330,7 @@ def _vector_batch_validator() -> Draft202012ValidatorProtocol:
     validator = _VECTOR_VALIDATOR_CACHE.get("validator")
     if validator is None:
         schema = load_schema(_VECTOR_SCHEMA_PATH)
-        validator = create_draft202012_validator(cast(dict[str, object], schema))
+        validator = create_draft202012_validator(cast("dict[str, object]", schema))
         _VECTOR_VALIDATOR_CACHE["validator"] = validator
     return validator
 
@@ -361,7 +369,7 @@ def _build_vector_problem_details(
     instance: str,
 ) -> ProblemDetails:
     """Create Problem Details payload for vector ingestion failures."""
-    validation_errors = cast(list[JsonValue], list(errors))
+    validation_errors = cast("list[JsonValue]", list(errors))
     errors_payload: dict[str, JsonValue] = {
         "schema_id": _VECTOR_SCHEMA_ID,
         "vector_path": vector_path,
@@ -397,7 +405,7 @@ def load_vector_batch_from_json(vectors_path: str) -> VectorBatch:
         raise VectorValidationError(msg, errors=[msg])
 
     _validate_vector_payload(payload)
-    records = cast(Iterable[Mapping[str, object]], payload)
+    records = cast("Iterable[Mapping[str, object]]", payload)
     return coerce_vector_batch(records)
 
 
@@ -584,7 +592,7 @@ def index_faiss(
             },
         )
 
-        matrix_rows = cast(list[list[float]], batch.matrix.tolist())
+        matrix_rows = cast("list[list[float]]", batch.matrix.tolist())
         vectors_payload: list[list[float]] = [
             [float(component) for component in row] for row in matrix_rows
         ]
@@ -698,12 +706,12 @@ def api(port: int = 8080) -> None:
         )
         raise typer.Exit(code=1) from exc
 
-    module_attrs = cast(Mapping[str, object], vars(uvicorn_module))
+    module_attrs = cast("Mapping[str, object]", vars(uvicorn_module))
     run_attr = module_attrs.get("run")
     if not callable(run_attr):
         typer.echo("uvicorn.run entry point not available", err=True)
         raise typer.Exit(code=1)
-    run_server = cast(_UvicornRun, run_attr)
+    run_server = cast("_UvicornRun", run_attr)
     run_server("search_api.app:app", host="127.0.0.1", port=port, reload=False)
 
 

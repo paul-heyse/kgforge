@@ -13,13 +13,15 @@ import importlib
 import importlib.util
 import inspect
 import sys
-from collections.abc import Callable
 from importlib import import_module
 from pathlib import Path
-from types import ModuleType
-from typing import Final, Protocol, cast, no_type_check
+from typing import TYPE_CHECKING, Final, Protocol, cast, no_type_check
 
-from click.testing import Result
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import ModuleType
+
+    from click.testing import Result
 
 REPO_ROOT: Final[Path] = Path(__file__).resolve().parent.parent
 SRC_PATH: Final[Path] = REPO_ROOT / "src"
@@ -39,7 +41,7 @@ def _load_cli_runner_cls() -> type[_CliRunnerProtocol] | None:
     candidate_obj: object | None = getattr(testing_module, "CliRunner", None)
     if candidate_obj is None or not isinstance(candidate_obj, type):
         return None
-    runner_cls_obj = cast(type[_CliRunnerProtocol], candidate_obj)
+    runner_cls_obj = cast("type[_CliRunnerProtocol]", candidate_obj)
     if not hasattr(runner_cls_obj, "invoke"):
         return None
     return runner_cls_obj
@@ -72,7 +74,7 @@ def load_optional_attr(module_name: str, attr_name: str) -> object | None:
     module = load_optional_module(module_name)
     if module is None:
         return None
-    return cast(object | None, getattr(module, attr_name, None))
+    return cast("object | None", getattr(module, attr_name, None))
 
 
 # Ensure the src layout is active as soon as the bootstrap module is imported.
@@ -102,15 +104,15 @@ def _patch_cli_runner_mix_stderr() -> None:
     if "mix_stderr" in signature.parameters:
         return
 
-    invoke_attr = cast(object, cli_runner_cls.invoke)
-    invoke_callable = cast(Callable[..., Result], invoke_attr)
+    invoke_attr = cast("object", cli_runner_cls.invoke)
+    invoke_callable = cast("Callable[..., Result]", invoke_attr)
 
     def invoke(self: object, *invoke_args: object, **invoke_kwargs: object) -> Result:
         invoke_kwargs.pop("mix_stderr", None)
         return invoke_callable(self, *invoke_args, **invoke_kwargs)
 
     invoke.__kgfoundry_mixstderr__ = True
-    cli_runner_cls.invoke = cast(Callable[..., Result], invoke)
+    cli_runner_cls.invoke = cast("Callable[..., Result]", invoke)
 
 
 _patch_cli_runner_mix_stderr()

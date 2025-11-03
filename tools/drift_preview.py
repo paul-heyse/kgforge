@@ -5,7 +5,10 @@ from __future__ import annotations
 import difflib
 import html
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _DIFF = difflib.HtmlDiff(wrapcolumn=80)
 

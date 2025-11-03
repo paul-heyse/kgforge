@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Overview of repair navmaps.
 
 This module bundles repair navmaps logic for the kgfoundry stack. It groups related helpers so
@@ -12,14 +11,13 @@ import argparse
 import ast
 import sys
 import time
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from pprint import pformat
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tools import (
-    CliEnvelope,
     CliEnvelopeBuilder,
     ProblemDetailsParams,
     build_problem_details,
@@ -27,6 +25,13 @@ from tools import (
     render_cli_envelope,
     validate_cli_envelope,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from tools import (
+        CliEnvelope,
+    )
 
 LOGGER = get_logger(__name__)
 
@@ -197,7 +202,7 @@ def _docstring_end(tree: ast.Module) -> int | None:
         and isinstance(node.value, ast.Constant)
         and isinstance(node.value.value, str)
     ):
-        end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+        end_lineno = cast("int | None", getattr(node, "end_lineno", None))
         return end_lineno if isinstance(end_lineno, int) else node.lineno
     return None
 
@@ -229,14 +234,14 @@ def _all_assignment_end(tree: ast.Module) -> int | None:
         if isinstance(node, ast.Assign):
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__all__":
-                    end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+                    end_lineno = cast("int | None", getattr(node, "end_lineno", None))
                     return end_lineno if isinstance(end_lineno, int) else node.lineno
         if (
             isinstance(node, ast.AnnAssign)
             and isinstance(node.target, ast.Name)
             and node.target.id == "__all__"
         ):
-            end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+            end_lineno = cast("int | None", getattr(node, "end_lineno", None))
             return end_lineno if isinstance(end_lineno, int) else node.lineno
     return None
 
@@ -274,7 +279,7 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
         for target in targets:
             if isinstance(target, ast.Name) and target.id == "__navmap__":
                 start = node.lineno
-                end_lineno = cast(int | None, getattr(node, "end_lineno", None))
+                end_lineno = cast("int | None", getattr(node, "end_lineno", None))
                 end = end_lineno if isinstance(end_lineno, int) else start
                 return start, end
     return None
@@ -331,7 +336,7 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, object]:
     >>> _ensure_navmap_structure(...)
     """
     raw_navmap = info.navmap_dict if info.navmap_dict else {}
-    navmap = cast(dict[str, object], dict(raw_navmap))
+    navmap = cast("dict[str, object]", dict(raw_navmap))
     exports = _normalize_exports(navmap.get("exports"), info.exports)
     navmap["exports"] = exports
 
@@ -448,9 +453,9 @@ def _parse_args(argv: list[str] | None = None) -> RepairArgs:
         help="Emit machine-readable results to stdout using the base CLI envelope schema.",
     )
     namespace = parser.parse_args(argv)
-    root_arg = cast(Path, namespace.root)
-    apply_flag = cast(bool, namespace.apply)
-    json_flag = cast(bool, namespace.json)
+    root_arg = cast("Path", namespace.root)
+    apply_flag = cast("bool", namespace.apply)
+    json_flag = cast("bool", namespace.json)
     return RepairArgs(root=root_arg, apply=apply_flag, json=json_flag)
 
 

@@ -6,15 +6,20 @@ import json
 import logging
 import sqlite3
 from collections import defaultdict
-from collections.abc import Iterable, Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from os import environ
 from pathlib import Path
-from typing import assert_never, cast
+from typing import TYPE_CHECKING, assert_never, cast
 
-from kgfoundry.agent_catalog.search import SearchDocument, documents_from_catalog
+from kgfoundry.agent_catalog.search import documents_from_catalog
 from kgfoundry_common.errors import SymbolAttachmentError
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+    from kgfoundry.agent_catalog.search import SearchDocument
 
 JsonValue = bool | int | float | str | list["JsonValue"] | dict[str, "JsonValue"] | None
 JsonObject = dict[str, JsonValue]
@@ -31,9 +36,9 @@ def _to_json_object(mapping: Mapping[str, JsonValue]) -> JsonObject:
 def _to_search_payload(value: JsonValue) -> SearchPayloadValue:
     """Convert ``value`` into a search payload compatible structure."""
     if isinstance(value, list):
-        return [cast(object, _to_search_payload(item)) for item in value]
+        return [cast("object", _to_search_payload(item)) for item in value]
     if isinstance(value, dict):
-        return {key: cast(object, _to_search_payload(item)) for key, item in value.items()}
+        return {key: cast("object", _to_search_payload(item)) for key, item in value.items()}
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
     assert_never(value)
@@ -179,7 +184,7 @@ def _json_loads(value: str | None) -> JsonValue:
     """
     if value is None:
         return None
-    return cast(JsonValue, json.loads(value))
+    return cast("JsonValue", json.loads(value))
 
 
 def _stringify(value: JsonValue) -> str | None:
@@ -211,7 +216,7 @@ def _iter_packages(payload: CatalogPayload) -> list[PackagePayload]:
     packages = payload.get("packages")
     if not isinstance(packages, Sequence):
         return []
-    return [cast(PackagePayload, item) for item in packages if isinstance(item, Mapping)]
+    return [cast("PackagePayload", item) for item in packages if isinstance(item, Mapping)]
 
 
 def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
@@ -219,7 +224,7 @@ def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
     modules = package.get("modules")
     if not isinstance(modules, Sequence):
         return []
-    return [cast(ModulePayload, module) for module in modules if isinstance(module, Mapping)]
+    return [cast("ModulePayload", module) for module in modules if isinstance(module, Mapping)]
 
 
 def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
@@ -227,7 +232,7 @@ def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
     symbols = module.get("symbols")
     if not isinstance(symbols, Sequence):
         return []
-    return [cast(SymbolPayload, symbol) for symbol in symbols if isinstance(symbol, Mapping)]
+    return [cast("SymbolPayload", symbol) for symbol in symbols if isinstance(symbol, Mapping)]
 
 
 def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
@@ -238,7 +243,7 @@ def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
     calls = graph.get("calls")
     if not isinstance(calls, Sequence):
         return []
-    return [cast(CallEdgePayload, edge) for edge in calls if isinstance(edge, Mapping)]
+    return [cast("CallEdgePayload", edge) for edge in calls if isinstance(edge, Mapping)]
 
 
 def _build_metadata_rows(payload: CatalogPayload) -> list[tuple[str, str]]:
@@ -556,7 +561,7 @@ def _build_search_documents(
     payload_for_docs_obj: dict[str, SearchPayloadValue] = {
         key: _to_search_payload(value) for key, value in payload_for_docs.items()
     }
-    search_payload = cast(SearchPayload, payload_for_docs_obj)
+    search_payload = cast("SearchPayload", payload_for_docs_obj)
     return list(documents_from_catalog(search_payload))
 
 
@@ -665,7 +670,7 @@ def _fetch_metadata(connection: sqlite3.Connection) -> JsonObject:
     """
     result: JsonObject = {}
     rows = cast(
-        list[tuple[str, str]], connection.execute("SELECT key, value FROM metadata").fetchall()
+        "list[tuple[str, str]]", connection.execute("SELECT key, value FROM metadata").fetchall()
     )
     for key, value_str in rows:
         result[key] = _json_loads(value_str)
@@ -689,20 +694,20 @@ def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject
     """
     packages: dict[str, JsonObject] = {}
     rows = cast(
-        list[tuple[str, str]],
+        "list[tuple[str, str]]",
         connection.execute("SELECT name, data FROM packages ORDER BY name").fetchall(),
     )
     for package_name, data_raw in rows:
         package_data = _json_loads(data_raw)
         data: JsonObject
         if isinstance(package_data, dict):
-            data = _to_json_object(cast(Mapping[str, JsonValue], package_data))
+            data = _to_json_object(cast("Mapping[str, JsonValue]", package_data))
         else:
-            data = cast(JsonObject, {"name": package_name})
+            data = cast("JsonObject", {"name": package_name})
         modules_list: list[JsonObject] = [
-            _to_json_object(module) for module in _iter_modules(cast(PackagePayload, data))
+            _to_json_object(module) for module in _iter_modules(cast("PackagePayload", data))
         ]
-        data["modules"] = cast(JsonValue, modules_list)
+        data["modules"] = cast("JsonValue", modules_list)
         packages[package_name] = data
     return packages
 
@@ -729,7 +734,7 @@ def _load_modules_table(
     """
     modules: dict[str, JsonObject] = {}
     rows = cast(
-        list[tuple[str, str, str]],
+        "list[tuple[str, str, str]]",
         connection.execute(
             "SELECT qualified, package, data FROM modules ORDER BY qualified"
         ).fetchall(),
@@ -738,23 +743,23 @@ def _load_modules_table(
         module_data = _json_loads(data_raw)
         data: JsonObject
         if isinstance(module_data, dict):
-            data = _to_json_object(cast(Mapping[str, JsonValue], module_data))
+            data = _to_json_object(cast("Mapping[str, JsonValue]", module_data))
         else:
-            data = cast(JsonObject, {"qualified": qualified})
+            data = cast("JsonObject", {"qualified": qualified})
         symbols_list: list[JsonObject] = [
-            _to_json_object(symbol) for symbol in _iter_symbols(cast(ModulePayload, data))
+            _to_json_object(symbol) for symbol in _iter_symbols(cast("ModulePayload", data))
         ]
-        data["symbols"] = cast(JsonValue, symbols_list)
+        data["symbols"] = cast("JsonValue", symbols_list)
         modules[qualified] = data
         package_entry = packages.get(package_name)
         if package_entry is not None:
             module_list_value = package_entry.get("modules")
             module_list: list[JsonObject]
             if isinstance(module_list_value, list):
-                module_list = cast(list[JsonObject], module_list_value)
+                module_list = cast("list[JsonObject]", module_list_value)
             else:
-                module_list = cast(list[JsonObject], [])
-                package_entry["modules"] = cast(JsonValue, module_list)
+                module_list = cast("list[JsonObject]", [])
+                package_entry["modules"] = cast("JsonValue", module_list)
             module_list.append(data)
     return modules
 
@@ -776,7 +781,7 @@ def _load_anchor_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
     """
     anchors: dict[str, JsonObject] = {}
     rows = cast(
-        list[tuple[str, int | None, int | None, str | None, str | None]],
+        "list[tuple[str, int | None, int | None, str | None, str | None]]",
         connection.execute(
             "SELECT symbol_id, start_line, end_line, cst_fingerprint, remap_order FROM anchors"
         ).fetchall(),
@@ -808,7 +813,7 @@ def _load_ranking_table(connection: sqlite3.Connection) -> dict[str, JsonObject]
     """
     ranking: dict[str, JsonObject] = {}
     rows = cast(
-        list[tuple[str, float | None, float | None, int | None, str | None, int]],
+        "list[tuple[str, float | None, float | None, int | None, str | None, int]]",
         connection.execute(
             "SELECT symbol_id, coverage, complexity, churn, stability, deprecated FROM ranking_features"
         ).fetchall(),
@@ -842,7 +847,7 @@ def _load_call_graph(connection: sqlite3.Connection) -> CallGraph:
     callers: dict[str, set[str]] = defaultdict(set)
     callees: dict[str, set[str]] = defaultdict(set)
     rows = cast(
-        list[tuple[str | None, str | None, str]],
+        "list[tuple[str | None, str | None, str]]",
         connection.execute(
             "SELECT caller_symbol_id, callee_symbol_id, callee_qname FROM calls"
         ).fetchall(),
@@ -883,7 +888,7 @@ def _attach_symbols_to_modules(
     callers, callees = call_graph
     try:
         rows = cast(
-            list[tuple[str, str, str, str, str, str]],
+            "list[tuple[str, str, str, str, str, str]]",
             connection.execute(
                 "SELECT symbol_id, package, module, qname, kind, data FROM symbols"
             ).fetchall(),
@@ -902,7 +907,7 @@ def _attach_symbols_to_modules(
         if not isinstance(symbol_data, dict):
             continue
 
-        symbol_payload = _to_json_object(cast(Mapping[str, JsonValue], symbol_data))
+        symbol_payload = _to_json_object(cast("Mapping[str, JsonValue]", symbol_data))
 
         # Attach anchor data
         if "anchors" not in symbol_payload:
@@ -975,11 +980,11 @@ def _attach_change_impact(
 
     if "callers" not in change_impact:
         callers_list = sorted(callers.get(symbol_id, []))
-        change_impact["callers"] = cast(JsonValue, callers_list)
+        change_impact["callers"] = cast("JsonValue", callers_list)
 
     if "callees" not in change_impact:
         callees_list = sorted(callees.get(symbol_id, []))
-        change_impact["callees"] = cast(JsonValue, callees_list)
+        change_impact["callees"] = cast("JsonValue", callees_list)
 
     if "churn_last_n" not in change_impact:
         change_impact["churn_last_n"] = ranking_entry.get("churn_last_n")
@@ -1009,10 +1014,10 @@ def _append_symbol_to_module(
 
     symbols_value = module_entry.get("symbols")
     if isinstance(symbols_value, list):
-        symbol_list = cast(list[JsonObject], symbols_value)
+        symbol_list = cast("list[JsonObject]", symbols_value)
     else:
         symbol_list = []
-        module_entry["symbols"] = cast(JsonValue, symbol_list)
+        module_entry["symbols"] = cast("JsonValue", symbol_list)
 
     symbol_list.append(symbol_payload)
 

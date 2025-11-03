@@ -2,23 +2,26 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, NotRequired, TypedDict, cast
 
 from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.models import (
-    AgentCatalogModel,
-    ChangeImpactModel,
-    ModuleModel,
-    PackageModel,
-    SymbolModel,
     load_catalog_model,
 )
-from kgfoundry_common.problem_details import JsonObject, JsonValue
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from kgfoundry.agent_catalog.models import (
+        AgentCatalogModel,
+        ChangeImpactModel,
+        ModuleModel,
+        PackageModel,
+        SymbolModel,
+    )
     from kgfoundry.agent_catalog.search import (
         SearchOptions,
         SearchRequest,
@@ -26,6 +29,7 @@ if TYPE_CHECKING:
         build_faceted_search_options,
         search_catalog,
     )
+    from kgfoundry_common.problem_details import JsonObject, JsonValue
 else:
     SearchOptions = catalog_search.SearchOptions
     SearchRequest = catalog_search.SearchRequest
@@ -61,7 +65,7 @@ _DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
 _DEFAULT_GITHUB_TEMPLATE = "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}"
 
 
-_EMPTY_GITHUB_POLICY: GithubLinkPolicy = cast(GithubLinkPolicy, {})
+_EMPTY_GITHUB_POLICY: GithubLinkPolicy = cast("GithubLinkPolicy", {})
 
 
 def _coerce_str(value: object, default: str = "") -> str:
@@ -412,10 +416,7 @@ class AgentCatalogClient:
             k=k,
         )
         catalog_payload = cast(
-            Mapping[
-                str,
-                str | int | float | bool | list[object] | dict[str, object] | None,
-            ],
+            "Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]",
             self._catalog.model_dump(),
         )
         return search_catalog(
@@ -444,7 +445,7 @@ class AgentCatalogClient:
         module = self._require_module(module_name)
 
         location = _resolve_symbol_anchor_context(symbol, module, self.repo_root)
-        raw_policy = cast(JsonObject | None, self._catalog.link_policy)
+        raw_policy = cast("JsonObject | None", self._catalog.link_policy)
         policy = _normalize_link_policy(raw_policy)
         return _build_anchor_links(policy, location)
 
@@ -552,4 +553,4 @@ def _normalize_link_policy(raw_policy: JsonObject | None) -> LinkPolicy:
         if github_values:
             normalized["github"] = github_values
 
-    return cast(LinkPolicy, normalized)
+    return cast("LinkPolicy", normalized)

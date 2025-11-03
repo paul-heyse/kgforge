@@ -3,23 +3,28 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final, cast
 
 import numpy as np
 
-from kgfoundry_common.numpy_typing import FloatMatrix, FloatVector, IntVector, normalize_l2
+from kgfoundry_common.numpy_typing import normalize_l2
 from search_api.faiss_gpu import (
-    GpuContext,
     clone_index_to_gpu,
     configure_search_parameters,
     detect_gpu_context,
 )
-from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Sequence
+
     import numpy.typing as npt
+
+    from kgfoundry_common.numpy_typing import FloatMatrix, FloatVector, IntVector
+    from search_api.faiss_gpu import (
+        GpuContext,
+    )
+    from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
     type FloatArray = npt.NDArray[np.float32]
     type IntArray = npt.NDArray[np.int64]
@@ -105,6 +110,6 @@ class FaissGpuIndex:
         index_matrix_typed: IntVector = np.asarray(index_matrix, dtype=np.int64)
         score_vector: FloatVector = score_matrix_typed[0]
         index_vector: IntVector = index_matrix_typed[0]
-        top_scores = cast(list[float], score_vector.astype(np.float32, copy=False).tolist())
-        top_indices = cast(list[int], index_vector.astype(np.int64, copy=False).tolist())
+        top_scores = cast("list[float]", score_vector.astype(np.float32, copy=False).tolist())
+        top_indices = cast("list[int]", index_vector.astype(np.int64, copy=False).tolist())
         return list(zip(top_indices, top_scores, strict=False))

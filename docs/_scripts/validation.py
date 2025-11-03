@@ -44,18 +44,23 @@ from __future__ import annotations
 import json
 import logging
 from collections.abc import Mapping, Sequence
-from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from jsonschema import Draft202012Validator
 from jsonschema import exceptions as jsonschema_exceptions
 from tools._shared.problem_details import (
-    ProblemDetailsDict,
     ProblemDetailsParams,
     SchemaProblemDetailsParams,
     build_schema_problem_details,
 )
 from tools._shared.proc import ToolExecutionError
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from tools._shared.problem_details import (
+        ProblemDetailsDict,
+    )
 
 JsonPayload = Mapping[str, Any] | Sequence[Any] | str | int | float | bool | None
 
@@ -101,7 +106,7 @@ def _get_validator(schema_path: Path) -> Draft202012Validator:
         message = f"Failed to load JSON Schema from {resolved}"
         raise ValueError(message) from exc
 
-    schema_data = cast(dict[str, object], schema_data_raw)
+    schema_data = cast("dict[str, object]", schema_data_raw)
     Draft202012Validator.check_schema(schema_data)
     validator = Draft202012Validator(schema_data)
     _VALIDATOR_CACHE[resolved] = validator

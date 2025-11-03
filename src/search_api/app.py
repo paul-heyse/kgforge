@@ -30,17 +30,14 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
-from collections.abc import Awaitable, Callable, Mapping
 from pathlib import Path
-from typing import Annotated, Final, cast
+from typing import TYPE_CHECKING, Annotated, Final, cast
 
 from fastapi import FastAPI, Header, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request as StarletteRequest
-from starlette.responses import JSONResponse, Response
-from starlette.types import ASGIApp
+from starlette.responses import JSONResponse
 
-from kgfoundry.embeddings_sparse.bm25 import LuceneBM25, PurePythonBM25, get_bm25
+from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry.embeddings_sparse.splade import get_splade
 from kgfoundry.kg_builder.mock_kg import MockKG
 from kgfoundry_common.errors import (
@@ -54,15 +51,10 @@ from kgfoundry_common.jsonschema_utils import (
     ValidationError as JsonSchemaValidationError,
 )
 from kgfoundry_common.jsonschema_utils import (
-    ValidationErrorProtocol,
-)
-from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.observability import MetricsProvider, observe_duration
-from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.schema_helpers import load_schema
 from kgfoundry_common.settings import RuntimeSettings
 from search_api.fastapi_helpers import (
@@ -71,8 +63,23 @@ from search_api.fastapi_helpers import (
     typed_middleware,
 )
 from search_api.fusion import rrf_fuse
-from search_api.schemas import SearchRequest, SearchResponse, SearchResult
+from search_api.schemas import SearchResponse, SearchResult
 from search_api.service import apply_kg_boosts
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable, Mapping
+
+    from starlette.requests import Request as StarletteRequest
+    from starlette.responses import Response
+    from starlette.types import ASGIApp
+
+    from kgfoundry.embeddings_sparse.bm25 import LuceneBM25, PurePythonBM25
+    from kgfoundry_common.jsonschema_utils import (
+        ValidationErrorProtocol,
+    )
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
+    from search_api.schemas import SearchRequest
 
 __all__ = [
     "CorrelationIDMiddleware",
@@ -228,7 +235,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
             Defaults to None.
             Defaults to ``None``.
         """
-        super().__init__(cast(ASGIApp, app))
+        super().__init__(cast("ASGIApp", app))
         self.enabled = enabled
         if schema_path is None:
             # Default to schema/search/search_response.json relative to repo root
@@ -309,7 +316,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
             jsonschema_validate(instance=response_body, schema=self.schema)
         except JsonSchemaValidationError as exc:
             with with_fields(logger, operation="response_validation") as log_adapter:
-                error_details = cast(ValidationErrorProtocol, exc)
+                error_details = cast("ValidationErrorProtocol", exc)
                 log_adapter.exception(
                     "Response validation failed",
                     extra={
@@ -333,7 +340,7 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
                 status_code=500,
                 headers=response.headers,
             )
-            return cast(Response, problem_response)
+            return cast("Response", problem_response)
 
         # Return original response if validation passes
         return response
@@ -635,7 +642,7 @@ def graph_concepts(
             q = str((body or {}).get("q", "")).lower()
             limit_raw = body.get("limit", 50) if body else 50
             try:
-                limit = int(cast(int | float | str, limit_raw))
+                limit = int(cast("int | float | str", limit_raw))
                 if limit < 0:
                     limit = 50
             except (ValueError, TypeError):

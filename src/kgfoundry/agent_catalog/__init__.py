@@ -1,5 +1,7 @@
 """Public interface for the agent catalog client and utilities."""
 
+from __future__ import annotations
+
 from kgfoundry.agent_catalog import search
 from kgfoundry.agent_catalog.audit import AuditLogger
 from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClientError

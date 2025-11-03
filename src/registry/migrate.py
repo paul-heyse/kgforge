@@ -10,12 +10,14 @@ from __future__ import annotations
 import argparse
 import pathlib
 from contextlib import closing
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 from kgfoundry_common.errors import RegistryError
-from kgfoundry_common.navmap_types import NavMap
 from registry import duckdb_helpers
 from registry.duckdb_helpers import DuckDBQueryOptions
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["apply", "main"]
 
@@ -106,9 +108,9 @@ def main() -> None:
     a.add_argument("--db", required=True)
     a.add_argument("--migrations", required=True)
     ns = ap.parse_args()
-    db_arg = cast(str, ns.db)
-    migrations_arg = cast(str, ns.migrations)
-    cmd = cast(str, ns.cmd)
+    db_arg = cast("str", ns.db)
+    migrations_arg = cast("str", ns.migrations)
+    cmd = cast("str", ns.cmd)
     if cmd == "apply":
         apply(db_arg, migrations_arg)
 

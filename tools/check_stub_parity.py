@@ -17,9 +17,11 @@ from __future__ import annotations
 import ast
 import importlib
 import sys
-from collections.abc import Iterable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def get_module_exports(module_name: str) -> set[str]:
@@ -46,7 +48,7 @@ def get_module_exports(module_name: str) -> set[str]:
     if isinstance(all_attr, (list, tuple, set)):
         # Build set explicitly with typed iteration to avoid Any in set() call
         result: set[str] = set()
-        for item in cast(Iterable[object], all_attr):
+        for item in cast("Iterable[object]", all_attr):
             result.add(str(item))
         return result
 

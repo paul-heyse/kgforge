@@ -7,11 +7,12 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import typer
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["harvest"]
 

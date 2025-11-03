@@ -7,12 +7,14 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import TYPE_CHECKING, Final, Literal
 
 from pydantic import ConfigDict, Field
 
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["Chunk", "Doc", "DoctagsAsset", "Id", "LinkAssertion"]
 

@@ -13,7 +13,7 @@ from kgfoundry.namespace_bridge import (
 )
 
 _EXPORTS = tuple(namespace_exports(_module))
-namespace_attach(_module, cast(dict[str, object], globals()), _EXPORTS)
+namespace_attach(_module, cast("dict[str, object]", globals()), _EXPORTS)
 
 __doc__ = _module.__doc__
 if hasattr(_module, "__path__"):

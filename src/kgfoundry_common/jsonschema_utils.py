@@ -9,13 +9,15 @@ re-export the typed surfaces for internal use.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
-from typing import Protocol, cast
+from typing import TYPE_CHECKING, Protocol, cast
 
 from jsonschema import validate as _jsonschema_validate
 from jsonschema.exceptions import SchemaError as _SchemaError
 from jsonschema.exceptions import ValidationError as _ValidationError
 from jsonschema.validators import Draft202012Validator as _Draft202012Validator
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
 
 
 class ValidationErrorProtocol(Protocol):
@@ -47,9 +49,9 @@ class Draft202012ValidatorProtocol(Protocol):
         ...
 
 
-Draft202012Validator = cast(type[Draft202012ValidatorProtocol], _Draft202012Validator)
-SchemaError = cast(type[Exception], _SchemaError)
-ValidationError = cast(type[Exception], _ValidationError)
+Draft202012Validator = cast("type[Draft202012ValidatorProtocol]", _Draft202012Validator)
+SchemaError = cast("type[Exception]", _SchemaError)
+ValidationError = cast("type[Exception]", _ValidationError)
 
 
 def validate(instance: object, schema: Mapping[str, object]) -> None:
@@ -74,4 +76,4 @@ def create_draft202012_validator(
     """Return a typed Draft 2020-12 validator for ``schema``."""
     concrete_schema = {str(key): value for key, value in schema.items()}
     instance = _Draft202012Validator(concrete_schema)
-    return cast(Draft202012ValidatorProtocol, instance)
+    return cast("Draft202012ValidatorProtocol", instance)

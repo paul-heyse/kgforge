@@ -8,14 +8,17 @@ deduplication. All functions include structured logging and metrics.
 from __future__ import annotations
 
 import time
-from collections.abc import Mapping
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from kgfoundry_common.logging import get_logger, with_fields
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.observability import MetricsProvider, observe_duration
-from kgfoundry_common.problem_details import JsonValue
-from search_api.types import AgentSearchResponse, VectorSearchResultTypedDict
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
+    from search_api.types import AgentSearchResponse, VectorSearchResultTypedDict
 
 __all__ = ["apply_kg_boosts", "mmr_deduplicate", "rrf_fuse", "search_service"]
 

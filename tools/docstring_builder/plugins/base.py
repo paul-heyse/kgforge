@@ -3,17 +3,20 @@
 from __future__ import annotations
 
 import warnings
-from collections.abc import Callable
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Literal, Protocol, TypeVar, cast, runtime_checkable
+from typing import TYPE_CHECKING, Literal, Protocol, TypeVar, cast, runtime_checkable
 
 from kgfoundry_common.errors import KgFoundryError
 from kgfoundry_common.errors.codes import ErrorCode
-from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+
+    from tools.docstring_builder.config import BuilderConfig
 
 PluginStage = Literal["harvester", "transformer", "formatter"]
 type DocstringPayload = HarvestResult | SemanticResult | DocstringEdit
@@ -272,14 +275,14 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
         """Invoke the legacy ``on_start`` hook if present."""
         hook: object = getattr(self._plugin, "on_start", None)
         if callable(hook):
-            start_hook = cast(Callable[[PluginContext], object], hook)
+            start_hook = cast("Callable[[PluginContext], object]", hook)
             start_hook(context)
 
     def on_finish(self, context: PluginContext) -> None:
         """Invoke the legacy ``on_finish`` hook if present."""
         hook: object = getattr(self._plugin, "on_finish", None)
         if callable(hook):
-            finish_hook = cast(Callable[[PluginContext], object], hook)
+            finish_hook = cast("Callable[[PluginContext], object]", hook)
             finish_hook(context)
 
     def apply(self, context: PluginContext, payload: DocstringPayload) -> DocstringPayload:

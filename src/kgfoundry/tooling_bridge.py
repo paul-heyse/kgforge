@@ -11,8 +11,7 @@ available in the current environment before importing this module.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, MutableMapping
-from types import ModuleType
+from typing import TYPE_CHECKING
 
 from kgfoundry._namespace_proxy import (
     namespace_attach as _namespace_attach,
@@ -26,6 +25,10 @@ from kgfoundry._namespace_proxy import (
 from kgfoundry._namespace_proxy import (
     namespace_getattr as _namespace_getattr,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, MutableMapping
+    from types import ModuleType
 
 __all__ = [
     "namespace_attach",

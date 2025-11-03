@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import argparse
 import importlib
-from collections.abc import Iterable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from tools import get_logger
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 LOGGER = get_logger(__name__)
 

@@ -5,9 +5,14 @@ packages can import a single cohesive namespace. Refer to the functions and clas
 implementation specifics.
 """
 
-from kgfoundry_common.navmap_types import NavMap
+from __future__ import annotations
 
-from . import canonicalizer, hybrid, vlm
+from typing import TYPE_CHECKING
+
+from docling import canonicalizer, hybrid, vlm
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["canonicalizer", "hybrid", "vlm"]
 

@@ -4,15 +4,21 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, replace
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools.docstring_builder.plugins.base import (
-    PluginContext,
-    PluginStage,
     TransformerPlugin,
 )
 from tools.docstring_builder.schema import ParameterDoc
-from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from tools.docstring_builder.plugins.base import (
+        PluginContext,
+        PluginStage,
+    )
+    from tools.docstring_builder.semantics import SemanticResult
 
 _DATACLASS_DECORATORS = {
     "dataclass",

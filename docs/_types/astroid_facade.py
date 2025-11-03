@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import inspect
-from types import ModuleType
-from typing import Protocol, cast, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 __all__ = [
     "AstroidBuilderProtocol",
@@ -40,16 +42,16 @@ def _coerce_class(module: ModuleType, attribute: str, kind: str) -> type[object]
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a {kind} class"
         raise TypeError(message)
-    return cast(type[object], candidate_obj)
+    return cast("type[object]", candidate_obj)
 
 
 def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProtocol]:
     """Return the typed Astroid manager class from ``module``."""
     manager_cls = _coerce_class(module, "AstroidManager", "AstroidManager")
-    return cast(type[AstroidManagerProtocol], manager_cls)
+    return cast("type[AstroidManagerProtocol]", manager_cls)
 
 
 def coerce_astroid_builder_class(module: ModuleType) -> type[AstroidBuilderProtocol]:
     """Return the typed Astroid builder class from ``module``."""
     builder_cls = _coerce_class(module, "AstroidBuilder", "AstroidBuilder")
-    return cast(type[AstroidBuilderProtocol], builder_cls)
+    return cast("type[AstroidBuilderProtocol]", builder_cls)

@@ -11,14 +11,15 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Iterable
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import pytest
 import typer
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Iterable
+    from pathlib import Path
+
     from _pytest.logging import LogCaptureFixture
 else:  # pragma: no cover - runtime alias for type checking convenience
     LogCaptureFixture = Any
@@ -75,7 +76,7 @@ class TestIndexBM25Idempotency:
             assert index_dir_2.exists()
 
             found_operation = any(
-                cast(str | None, getattr(record, "operation", None)) == "index_bm25"
+                cast("str | None", getattr(record, "operation", None)) == "index_bm25"
                 for record in caplog.records
             )
             assert found_operation
@@ -131,7 +132,7 @@ class TestIndexFAISSIdempotency:
 
         # Verify structured logs indicate operation
         found_operation = any(
-            cast(str | None, getattr(record, "operation", None)) == "index_faiss"
+            cast("str | None", getattr(record, "operation", None)) == "index_faiss"
             for record in caplog.records
         )
         assert found_operation
@@ -211,10 +212,10 @@ class TestIndexingErrorHandling:
         assert is_err is True
         problem_raw: object = json.loads(payload_str)
         assert isinstance(problem_raw, dict)
-        problem = cast(dict[str, object], problem_raw)
+        problem = cast("dict[str, object]", problem_raw)
         extensions_raw = problem.get("extensions")
         assert isinstance(extensions_raw, dict)
-        errors_raw = cast(dict[str, object] | None, extensions_raw.get("errors"))
+        errors_raw = cast("dict[str, object] | None", extensions_raw.get("errors"))
         assert isinstance(errors_raw, dict)
         errors_field: dict[str, object] = {str(key): value for key, value in errors_raw.items()}
 

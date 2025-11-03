@@ -14,14 +14,18 @@ Examples
 from __future__ import annotations
 
 import asyncio
+from typing import TYPE_CHECKING
 
-from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from kgfoundry_common.errors.exceptions import KgFoundryError
 from kgfoundry_common.fastapi_helpers import typed_exception_handler
 from kgfoundry_common.logging import get_logger
-from kgfoundry_common.problem_details import ProblemDetails
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI, Request
+
+    from kgfoundry_common.problem_details import ProblemDetails
 
 __all__ = ["problem_details_response", "register_problem_details_handler"]
 

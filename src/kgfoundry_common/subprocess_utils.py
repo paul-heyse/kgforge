@@ -21,12 +21,14 @@ hello
 
 from __future__ import annotations
 
-import io
 import logging
-from collections.abc import Mapping, Sequence
 from importlib import import_module
-from pathlib import Path
-from typing import Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, Protocol, cast
+
+if TYPE_CHECKING:
+    import io
+    from collections.abc import Mapping, Sequence
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -124,13 +126,13 @@ def _load_tools_surface() -> _ToolsSurface:
             "Install the 'kgfoundry[tools]' extra and retry."
         )
         raise RuntimeError(msg) from exc
-    return cast(_ToolsSurface, module)
+    return cast("_ToolsSurface", module)
 
 
 _subprocess_module = import_module("sub" + "process")
-_PIPE = cast(int, _subprocess_module.PIPE)
-_Popen = cast(_PopenFactory, _subprocess_module.Popen)
-TimeoutExpired = cast(type[TimeoutError], _subprocess_module.TimeoutExpired)
+_PIPE = cast("int", _subprocess_module.PIPE)
+_Popen = cast("_PopenFactory", _subprocess_module.Popen)
+TimeoutExpired = cast("type[TimeoutError]", _subprocess_module.TimeoutExpired)
 
 
 class SubprocessTimeoutError(TimeoutError):
@@ -265,7 +267,7 @@ def run_subprocess(
             check=True,
         )
     except tool_execution_error_type as exc:
-        tool_error = cast(_ToolExecutionErrorSurface, exc)
+        tool_error = cast("_ToolExecutionErrorSurface", exc)
         if _is_timeout_error(tool_error):
             timeout_seconds = int(effective_timeout)
             msg = f"Subprocess exceeded timeout of {timeout_seconds} seconds: {' '.join(cmd)}"
@@ -297,7 +299,7 @@ def run_subprocess(
 
 
 def _is_timeout_error(error: _ToolExecutionErrorSurface) -> bool:
-    problem = cast(Mapping[str, object] | None, getattr(error, "problem", None))
+    problem = cast("Mapping[str, object] | None", getattr(error, "problem", None))
     if problem is not None:
         raw_type = problem.get("type")
         if isinstance(raw_type, str) and raw_type.endswith("tool-timeout"):
@@ -319,7 +321,7 @@ def spawn_text_process(
     """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(
-        _ToolExecutionErrorConstructor, tools_surface.ToolExecutionError
+        "_ToolExecutionErrorConstructor", tools_surface.ToolExecutionError
     )
     if not command:
         msg = "Command must contain at least one argument"

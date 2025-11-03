@@ -5,7 +5,7 @@ Tests are organized in classes for logical grouping and test isolation.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -19,7 +19,11 @@ from kgfoundry.agent_catalog.search import (
     make_search_document,
 )
 from kgfoundry_common.errors import AgentCatalogSearchError
-from search_api.types import VectorArray
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from search_api.types import VectorArray
 
 
 @pytest.fixture

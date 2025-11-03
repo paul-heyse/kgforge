@@ -11,28 +11,33 @@ from typing import TYPE_CHECKING, ClassVar, Final, TypeGuard, cast
 
 import duckdb
 import numpy as np
-from numpy.typing import NDArray
 
 from kgfoundry_common.errors import IndexBuildError, VectorSearchError
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.numpy_typing import (
-    FloatMatrix,
-    FloatVector,
-    IntVector,
     normalize_l2,
     topk_indices,
 )
 from registry.duckdb_helpers import fetch_all, fetch_one
 from search_api.faiss_gpu import (
-    GpuContext,
     clone_index_to_gpu,
     configure_search_parameters,
     detect_gpu_context,
 )
-from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     import numpy.typing as npt
+    from numpy.typing import NDArray
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.numpy_typing import (
+        FloatMatrix,
+        FloatVector,
+        IntVector,
+    )
+    from search_api.faiss_gpu import (
+        GpuContext,
+    )
+    from search_api.types import FaissIndexProtocol, FaissModuleProtocol
 
     type FloatArray = npt.NDArray[np.float32]
     type IntArray = npt.NDArray[np.int64]
@@ -121,7 +126,7 @@ def _load_libcuvs() -> LoadLibraryFn | None:
     if hasattr(module, "load_library"):
         candidate: object = module.load_library
         if callable(candidate):
-            return cast(LoadLibraryFn, candidate)
+            return cast("LoadLibraryFn", candidate)
     return None
 
 
@@ -142,7 +147,7 @@ def _load_faiss_module() -> FaissModuleProtocol | None:
     ) as exc:  # pragma: no cover - optional dependency
         logger.debug("FAISS import failed: %s", exc)
         return None
-    return cast(FaissModuleProtocol, module)
+    return cast("FaissModuleProtocol", module)
 
 
 faiss = _load_faiss_module()
@@ -321,7 +326,7 @@ class FaissAdapter:
             faiss_module.normalize_l2(vectors.matrix)
             cpu_index.train(vectors.matrix)
 
-            id_array = cast(IntVector, np.arange(len(vectors.ids), dtype=np.int64))
+            id_array = cast("IntVector", np.arange(len(vectors.ids), dtype=np.int64))
             cpu_index.add_with_ids(vectors.matrix, id_array)
 
             gpu_context = None
@@ -438,7 +443,7 @@ class FaissAdapter:
             msg = "k must be positive"
             raise ValueError(msg)
 
-        query_array = cast(FloatMatrix, np.asarray(query, dtype=np.float32).reshape(1, -1))
+        query_array = cast("FloatMatrix", np.asarray(query, dtype=np.float32).reshape(1, -1))
         normalized_query = normalize_l2(query_array, axis=1)
 
         module = faiss
@@ -449,10 +454,10 @@ class FaissAdapter:
                 raise RuntimeError(msg)
 
             distances_array, indices_array = index_candidate.search(normalized_query, k)
-            distance_row = cast(FloatVector, distances_array[0])
-            index_row = cast(IntVector, indices_array[0])
-            index_list = cast(list[int], index_row.tolist())
-            score_list = cast(list[float], distance_row.tolist())
+            distance_row = cast("FloatVector", distances_array[0])
+            index_row = cast("IntVector", indices_array[0])
+            index_list = cast("list[int]", index_row.tolist())
+            score_list = cast("list[float]", distance_row.tolist())
             results: list[tuple[str, float]] = []
             for idx, score in zip(index_list, score_list, strict=False):
                 if idx < 0 or idx >= len(self.idmap):
@@ -460,7 +465,7 @@ class FaissAdapter:
                 results.append((self.idmap[idx], float(score)))
             return results
 
-        normalized_vector = cast(FloatVector, normalized_query[0])
+        normalized_vector = cast("FloatVector", normalized_query[0])
         return self._cpu_search(normalized_vector, k)
 
     def save(self, index_uri: str, idmap_uri: str | None = None) -> None:
@@ -523,13 +528,13 @@ class FaissAdapter:
         np.dot(matrix, vector, out=scores_buffer)
         scores: FloatVector = scores_buffer
         idmap_list: list[str] = idmap
-        score_list = cast(list[float], scores.tolist())
+        score_list = cast("list[float]", scores.tolist())
         limit = min(k, scores.size)
         if limit == 0:
             return []
 
         indices = topk_indices(scores, limit)
-        index_list = cast(list[int], indices.tolist())
+        index_list = cast("list[int]", indices.tolist())
         return [
             (idmap_list[idx], float(score_list[idx])) for idx in index_list if idx < len(idmap_list)
         ]

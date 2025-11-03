@@ -15,7 +15,6 @@ Examples
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.errors import DeserializationError, SerializationError
@@ -29,11 +28,13 @@ from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger
-from kgfoundry_common.problem_details import JsonValue
-from kgfoundry_common.pydantic import BaseModel
 
 if TYPE_CHECKING:
+    from pathlib import Path
     from typing import cast
+
+    from kgfoundry_common.problem_details import JsonValue
+    from kgfoundry_common.pydantic import BaseModel
 else:
     from typing import cast
 
@@ -122,7 +123,7 @@ def validate_model_against_schema(
         # Convert model to dict (using model_dump with mode='json' for JSON-compatible types)
         # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
         data: dict[str, JsonValue] = cast(
-            dict[str, JsonValue], model_instance.model_dump(mode="json")
+            "dict[str, JsonValue]", model_instance.model_dump(mode="json")
         )
         jsonschema_validate(instance=data, schema=schema)
     except ValidationError as exc:

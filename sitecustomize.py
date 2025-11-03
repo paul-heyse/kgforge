@@ -10,7 +10,6 @@ from __future__ import annotations
 import logging
 import os
 import warnings
-from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, cast
 
 logger = logging.getLogger("kgfoundry.docstring_shim")
@@ -19,6 +18,8 @@ _FLAG_VALUE = os.environ.get("KGFOUNDRY_DOCSTRINGS_SITECUSTOMIZE", "1").strip().
 ENABLE_SITECUSTOMIZE = _FLAG_VALUE not in {"0", "false", "off", "no"}
 
 if TYPE_CHECKING:  # pragma: no cover - imported solely for typing information
+    from collections.abc import Callable, Sequence
+
     from docstring_parser.common import Docstring, DocstringParam, DocstringReturns
 
     class DocstringYields(DocstringReturns):
@@ -218,7 +219,7 @@ def ensure_docstring_attrs(
             if isinstance(entry, attr_cls) and _get_attr_name(entry) is not None
         ]
 
-    doc_cls_any = cast(Any, doc_cls)
+    doc_cls_any = cast("Any", doc_cls)
     doc_cls_any.attrs = property(_attrs)
     logger.debug("Registered attrs property on %s", doc_cls)
     return True
@@ -240,7 +241,7 @@ def ensure_docstring_yields(
                     return entry
             return None
 
-        doc_cls_any = cast(Any, doc_cls)
+        doc_cls_any = cast("Any", doc_cls)
         doc_cls_any.yields = property(_yield_entry)
         added_single = True
 
@@ -250,7 +251,7 @@ def ensure_docstring_yields(
             """Return all generator metadata entries in the docstring."""
             return [entry for entry in self.meta if isinstance(entry, yields_cls)]
 
-        doc_cls_any = cast(Any, doc_cls)
+        doc_cls_any = cast("Any", doc_cls)
         doc_cls_any.many_yields = property(_many)
         added_many = True
 
@@ -279,7 +280,7 @@ def ensure_docstring_size(doc_cls: type[DocstringProto]) -> bool:
                 blocks.append(description)
         return sum(len(block) for block in blocks)
 
-    doc_cls_any = cast(Any, doc_cls)
+    doc_cls_any = cast("Any", doc_cls)
     doc_cls_any.size = property(_size)
     logger.debug("Registered size property on %s", doc_cls)
     return True
@@ -292,7 +293,7 @@ try:  # pragma: no cover - best effort compatibility shim
 except ImportError:  # pragma: no cover - the library is optional at runtime
     logger.debug("docstring_parser.common unavailable; skipping compatibility shim")
 else:
-    doc_common = cast(DocstringCommonModuleProto, _imported_common)
+    doc_common = cast("DocstringCommonModuleProto", _imported_common)
 
 if doc_common is not None and not ENABLE_SITECUSTOMIZE:
     logger.info(
@@ -321,7 +322,7 @@ if doc_common is not None and ENABLE_SITECUSTOMIZE:
             return_name: str | None = None,
         ) -> None:
             """Initialise the compatibility ``DocstringYields`` shim."""
-            base_init = cast(Callable[..., None], base_returns.__init__)
+            base_init = cast("Callable[..., None]", base_returns.__init__)
             base_init(
                 self,
                 list(args),
@@ -342,7 +343,7 @@ if doc_common is not None and ENABLE_SITECUSTOMIZE:
         )
 
         _DocstringYieldsShim = cast(
-            type[DocstringYieldsProto],
+            "type[DocstringYieldsProto]",
             type(
                 "DocstringYields",
                 (base_returns,),
@@ -360,7 +361,7 @@ if doc_common is not None and ENABLE_SITECUSTOMIZE:
     attr_cls_candidate = getattr(doc_common_local, "DocstringAttr", None) or getattr(
         doc_common_local, "DocstringParam", None
     )
-    attr_cls = cast(type[DocstringAttrProto] | None, attr_cls_candidate)
+    attr_cls = cast("type[DocstringAttrProto] | None", attr_cls_candidate)
     yields_cls: type[DocstringYieldsProto] | None = getattr(
         doc_common_local, "DocstringYields", None
     )

@@ -10,7 +10,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TextIO, cast
+from typing import TYPE_CHECKING, TextIO, cast
 
 from kgfoundry.agent_catalog.audit import AuditLogger
 from kgfoundry.agent_catalog.cli import ALLOWED_FACET_KEYS, search_result_to_dict
@@ -25,7 +25,9 @@ from kgfoundry_common.logging import (
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.problem_details import JsonValue
 from search_api.service import search_service
-from search_api.types import VectorSearchResultTypedDict
+
+if TYPE_CHECKING:
+    from search_api.types import VectorSearchResultTypedDict
 
 logger = get_logger(__name__)
 
@@ -196,7 +198,7 @@ class CatalogSessionServer:
         self._role = access.role.value
         self._metrics = metrics or MetricsProvider.default()
         self._methods = cast(
-            dict[str, Handler],
+            "dict[str, Handler]",
             {
                 "initialize": self._handle_initialize,
                 "catalog.capabilities": self._handle_capabilities,
@@ -266,7 +268,7 @@ class CatalogSessionServer:
         if raw is None:
             return {}
         if isinstance(raw, dict):
-            return cast(JsonObject, raw)
+            return cast("JsonObject", raw)
         message = "Params must be an object"
         raise CatalogSessionServerError(400, "invalid-params", message, code=INVALID_PARAMS_CODE)
 
@@ -452,10 +454,10 @@ class CatalogSessionServer:
                 )
                 self._error(None, error)
                 continue
-            message_obj = cast(dict[str, object], message_raw)
+            message_obj = cast("dict[str, object]", message_raw)
             params = self._coerce_params(message_obj.get("params"))
-            method = cast(JsonValue, message_obj.get("method"))
-            request_id = cast(JsonValue | None, message_obj.get("id"))
+            method = cast("JsonValue", message_obj.get("method"))
+            request_id = cast("JsonValue | None", message_obj.get("id"))
             context = RequestContext(
                 correlation_id=correlation_id,
                 request_id=request_id,
@@ -493,9 +495,9 @@ class CatalogSessionServer:
             Describe return value.
         """
         commands = sorted(name for name in self._methods if name.startswith("catalog."))
-        procedures = cast(list[JsonValue], list(commands))
-        capabilities: JsonObject = {"procedures": cast(JsonValue, procedures)}
-        payload: JsonObject = {"capabilities": cast(JsonValue, capabilities)}
+        procedures = cast("list[JsonValue]", list(commands))
+        capabilities: JsonObject = {"procedures": cast("JsonValue", procedures)}
+        payload: JsonObject = {"capabilities": cast("JsonValue", capabilities)}
         return payload
 
     def _handle_capabilities(self, _params: JsonObject, _context: RequestContext) -> JsonValue:
@@ -520,7 +522,7 @@ class CatalogSessionServer:
             Describe return value.
         """
         packages = [pkg.name for pkg in self.client.list_packages()]
-        return cast(JsonValue, packages)
+        return cast("JsonValue", packages)
 
     def _handle_symbol(self, params: JsonObject, _context: RequestContext) -> JsonValue:
         """Document  handle symbol.
@@ -553,7 +555,7 @@ class CatalogSessionServer:
         if symbol is None:
             detail = f"Unknown symbol: {symbol_id}"
             raise CatalogSessionServerError(404, "unknown-symbol", detail, code=CATALOG_ERROR_CODE)
-        return cast(JsonValue, symbol.model_dump())
+        return cast("JsonValue", symbol.model_dump())
 
     def _handle_find_callers(self, params: JsonObject, _context: RequestContext) -> JsonValue:
         """Document  handle find callers.
@@ -578,7 +580,7 @@ class CatalogSessionServer:
         """
         symbol_id = str(params.get("symbol_id"))
         callers = self.client.find_callers(symbol_id)
-        return cast(JsonValue, callers)
+        return cast("JsonValue", callers)
 
     def _handle_find_callees(self, params: JsonObject, _context: RequestContext) -> JsonValue:
         """Document  handle find callees.
@@ -603,7 +605,7 @@ class CatalogSessionServer:
         """
         symbol_id = str(params.get("symbol_id"))
         callees = self.client.find_callees(symbol_id)
-        return cast(JsonValue, callees)
+        return cast("JsonValue", callees)
 
     def _handle_change_impact(self, params: JsonObject, _context: RequestContext) -> JsonValue:
         """Document  handle change impact.
@@ -628,10 +630,10 @@ class CatalogSessionServer:
         """
         symbol_id = str(params.get("symbol_id"))
         impact_raw = cast(
-            dict[str, JsonValue],
+            "dict[str, JsonValue]",
             self.client.change_impact(symbol_id).model_dump(),
         )
-        return cast(JsonValue, impact_raw)
+        return cast("JsonValue", impact_raw)
 
     def _handle_suggest_tests(self, params: JsonObject, _context: RequestContext) -> JsonValue:
         """Document  handle suggest tests.
@@ -685,8 +687,8 @@ class CatalogSessionServer:
             Describe return value.
         """
         symbol_id = str(params.get("symbol_id"))
-        anchor_raw = cast(JsonObject, self.client.open_anchor(symbol_id))
-        return cast(JsonValue, anchor_raw)
+        anchor_raw = cast("JsonObject", self.client.open_anchor(symbol_id))
+        return cast("JsonValue", anchor_raw)
 
     @staticmethod
     def _parse_limit(raw_k: JsonValue) -> int:
@@ -823,7 +825,7 @@ class CatalogSessionServer:
 
         results = self.client.search(query, k=k, facets=facet_map or None)
         typed_results = [
-            cast(VectorSearchResultTypedDict, search_result_to_dict(result)) for result in results
+            cast("VectorSearchResultTypedDict", search_result_to_dict(result)) for result in results
         ]
         service_response = search_service(typed_results, metrics=self._metrics)
         metadata_obj: JsonObject = {
@@ -840,7 +842,7 @@ class CatalogSessionServer:
             }
         )
         response_obj: JsonObject = {
-            "results": cast(JsonValue, service_response["results"]),
+            "results": cast("JsonValue", service_response["results"]),
             "total": service_response["total"],
             "took_ms": service_response["took_ms"],
             "metadata": metadata_obj,
@@ -871,7 +873,7 @@ class CatalogSessionServer:
         """
         package = str(params.get("package"))
         modules = [module.qualified for module in self.client.list_modules(package)]
-        return cast(JsonValue, modules)
+        return cast("JsonValue", modules)
 
     def _handle_shutdown(self, _params: JsonObject, _context: RequestContext) -> None:
         """Document  handle shutdown.
@@ -1005,23 +1007,23 @@ def main(argv: list[str] | None = None) -> int:
     """
     parser = build_parser()
     args = parser.parse_args(argv)
-    catalog_path = cast(Path, args.catalog)
+    catalog_path = cast("Path", args.catalog)
     if not catalog_path.exists():
         message = f"Catalog not found at {catalog_path}"
         raise SystemExit(message)
-    repo_root = cast(Path, args.repo_root)
+    repo_root = cast("Path", args.repo_root)
     if not repo_root.exists():
         message = f"Repository root does not exist: {repo_root}"
         raise SystemExit(message)
     client = AgentCatalogClient.from_path(catalog_path, repo_root=repo_root)
     try:
-        role_value = cast(str, args.role)
+        role_value = cast("str", args.role)
         role = _resolve_role(role_value)
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
-    hosted_mode = cast(bool, args.hosted_mode)
+    hosted_mode = cast("bool", args.hosted_mode)
     access = AccessController(role=role, enabled=hosted_mode)
-    audit_log_path = cast(Path, args.audit_log)
+    audit_log_path = cast("Path", args.audit_log)
     audit_logger = AuditLogger(audit_log_path, enabled=access.enabled)
     server = CatalogSessionServer(client, access=access, audit=audit_logger)
     return server.serve()

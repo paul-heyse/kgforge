@@ -9,19 +9,22 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 import duckdb
 
 from kgfoundry_common.errors import DeserializationError
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 from registry.duckdb_helpers import fetch_all, fetch_one
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
 
 __all__ = ["BM25Doc", "BM25Index", "toks"]
 
@@ -410,7 +413,7 @@ class BM25Index:
     def _coerce_payload(raw: object) -> dict[str, JsonValue]:
         if not isinstance(raw, dict):
             return {}
-        return cast(dict[str, JsonValue], raw)
+        return cast("dict[str, JsonValue]", raw)
 
     @classmethod
     def _load_payload(cls, metadata_path: Path, schema_path: Path) -> dict[str, JsonValue]:
@@ -475,7 +478,7 @@ class BM25Index:
                     doc_id=str(doc_id) if isinstance(doc_id, str) else "",
                     title=str(title) if isinstance(title, str) else "",
                     section=str(section) if isinstance(section, str) else "",
-                    tf=(cast(dict[str, float], tf_value) if isinstance(tf_value, dict) else {}),
+                    tf=(cast("dict[str, float]", tf_value) if isinstance(tf_value, dict) else {}),
                     dl=(float(doc_length) if isinstance(doc_length, (int, float)) else 0.0),
                 )
             )

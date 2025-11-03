@@ -3,29 +3,17 @@
 Tests cover round-trip serialization, schema compliance, and validation of
 symbol index and delta artifacts.
 """
-# pyright: ignore[reportCallIssue]  # Test fixtures intentionally use keyword args for optional Pydantic fields
-# This file uses SymbolIndexRow, SymbolDeltaChange, etc. with minimal required arguments,
-# relying on Pydantic field defaults for optional parameters. Pyright's strict mode flags this
-# as missing arguments, but Pydantic's Field(...) with defaults handles it correctly.
-#
-# To verify: all fields are properly typed with defaults in docs/_types/artifacts.py:
-# - tested_by: tuple[str, ...] = ()
-# - source_link: dict[str, str] = Field(default_factory=dict)
-# - canonical_path, module, package, file, etc.: str | None = Field(None, ...)
-# - is_async, is_property: bool = Field(False, ...)
-#
-# The ignore applies to the entire module since these patterns are intentional throughout.
 
 from __future__ import annotations
 
 import json
-from typing import cast
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from docs.types.artifacts import (
     SYMBOL_INDEX_ROW_FIELDS,
     ArtifactValidationError,
-    JsonPayload,
     JsonValue,
     LineSpan,
     SymbolDeltaChange,
@@ -42,6 +30,11 @@ from docs.types.artifacts import (
 from kgfoundry_common.errors import (
     ArtifactDeserializationError,
 )
+
+if TYPE_CHECKING:
+    from docs.types.artifacts import (
+        JsonPayload,
+    )
 
 type JsonObject = dict[str, JsonValue]
 type JsonArray = list[JsonValue]
@@ -63,96 +56,95 @@ def _empty_reverse_map() -> dict[str, tuple[str, ...]]:
     return {}
 
 
+def _normalize_tested_by(value: object) -> tuple[str, ...]:
+    """Coerce tested_by payload values to a tuple of strings."""
+    if isinstance(value, tuple):
+        entries: list[str] = []
+        for entry in value:
+            if not isinstance(entry, str):
+                message = "tested_by must contain only strings"
+                raise TypeError(message)
+            entries.append(entry)
+        return tuple(entries)
+    if isinstance(value, list):
+        entries = []
+        for entry in value:
+            if not isinstance(entry, str):
+                message = "tested_by must contain only strings"
+                raise TypeError(message)
+            entries.append(entry)
+        return tuple(entries)
+    message = "tested_by must be a tuple or list of strings"
+    raise TypeError(message)
+
+
+def _normalize_source_link(value: object) -> dict[str, str]:
+    """Coerce source_link payloads to mapping of strings."""
+    if value is None:
+        return _empty_source_link()
+    if isinstance(value, Mapping):
+        typed_source_link: dict[str, str] = {}
+        for key, raw_value in value.items():
+            if not isinstance(key, str):
+                message = "source_link keys must be strings"
+                raise TypeError(message)
+            key_str = key
+            if not isinstance(raw_value, str):
+                message = "source_link values must be strings"
+                raise TypeError(message)
+            value_str = raw_value
+            typed_source_link[key_str] = value_str
+        return typed_source_link
+    message = "source_link must be a mapping of strings"
+    raise TypeError(message)
+
+
 def _symbol_row(
     path: str = "pkg.func",
     kind: str = "function",
     doc: str = "doc",
-    *,
-    tested_by: tuple[str, ...] | list[str] = (),
-    source_link: dict[str, str] | None = None,
-    canonical_path: str | None = None,
-    module: str | None = None,
-    package: str | None = None,
-    file: str | None = None,
-    span: LineSpan | None = None,
-    signature: str | None = None,
-    owner: str | None = None,
-    stability: str | None = None,
-    since: str | None = None,
-    deprecated_in: str | None = None,
-    section: str | None = None,
-    is_async: bool = False,
-    is_property: bool = False,
+    **overrides: object,
 ) -> SymbolIndexRow:
-    """Create a SymbolIndexRow with sensible defaults for testing.
+    """Construct a schema-aligned ``SymbolIndexRow`` for test fixtures.
 
-    This helper ensures all required fields are provided and Pyright
-    type checking passes with complete type safety.
-
-    Parameters
-    ----------
-    path : str, optional
-        Symbol path. Defaults to "pkg.func".
-    kind : str, optional
-        Symbol kind. Defaults to "function".
-    doc : str, optional
-        Documentation. Defaults to "doc".
-    tested_by : tuple[str, ...] | list[str], optional
-        Test paths. Defaults to ().
-    source_link : dict[str, str] | None, optional
-        Source links. Defaults to None (converted to {}).
-    canonical_path : str | None, optional
-        Canonical path if alias. Defaults to None.
-    module : str | None, optional
-        Module name. Defaults to None.
-    package : str | None, optional
-        Package name. Defaults to None.
-    file : str | None, optional
-        File path. Defaults to None.
-    span : LineSpan | None, optional
-        Line span. Defaults to None.
-    signature : str | None, optional
-        Function signature. Defaults to None.
-    owner : str | None, optional
-        Owner class. Defaults to None.
-    stability : str | None, optional
-        Stability tag. Defaults to None.
-    since : str | None, optional
-        Version introduced. Defaults to None.
-    deprecated_in : str | None, optional
-        Deprecation version. Defaults to None.
-    section : str | None, optional
-        Documentation section. Defaults to None.
-    is_async : bool, optional
-        Is async function. Defaults to False.
-    is_property : bool, optional
-        Is property. Defaults to False.
-
-    Returns
-    -------
-    SymbolIndexRow
-        A properly constructed symbol index row.
+    The helper seeds a payload with canonical defaults, applies overrides, and
+    routes the result through ``align_schema_fields`` to guarantee parity with
+    the JSON Schema surface before instantiating the Pydantic model.
     """
-    return SymbolIndexRow(
-        path=path,
-        kind=kind,
-        doc=doc,
-        tested_by=tuple(tested_by) if isinstance(tested_by, list) else tested_by,
-        source_link=source_link or _empty_source_link(),
-        canonical_path=canonical_path,
-        module=module,
-        package=package,
-        file=file,
-        span=span,
-        signature=signature,
-        owner=owner,
-        stability=stability,
-        since=since,
-        deprecated_in=deprecated_in,
-        section=section,
-        is_async=is_async,
-        is_property=is_property,
+    payload: dict[str, object] = {
+        "path": path,
+        "kind": kind,
+        "doc": doc,
+        "tested_by": (),
+        "source_link": _empty_source_link(),
+        "canonical_path": None,
+        "module": None,
+        "package": None,
+        "file": None,
+        "span": None,
+        "signature": None,
+        "owner": None,
+        "stability": None,
+        "since": None,
+        "deprecated_in": None,
+        "section": None,
+        "is_async": False,
+        "is_property": False,
+    }
+    payload.update(overrides)
+
+    tested_by_value = payload.get("tested_by", ())
+    payload["tested_by"] = _normalize_tested_by(tested_by_value)
+
+    source_link_value = payload.get("source_link")
+    payload["source_link"] = _normalize_source_link(source_link_value)
+
+    aligned = align_schema_fields(
+        payload,
+        expected_fields=SYMBOL_INDEX_ROW_FIELDS,
+        artifact_id="symbol-index-row-test-fixture",
     )
+    return SymbolIndexRow.model_validate(aligned)
 
 
 def _symbol_payload(**overrides: JsonValue) -> dict[str, JsonValue]:
@@ -161,8 +153,8 @@ def _symbol_payload(**overrides: JsonValue) -> dict[str, JsonValue]:
         "path": "pkg.func",
         "kind": "function",
         "doc": "doc",
-        "tested_by": [],
-        "source_link": cast(JsonValue, _empty_source_link()),
+        "tested_by": cast("JsonValue", []),
+        "source_link": cast("JsonValue", _empty_source_link()),
     }
     payload.update(overrides)
     return payload
@@ -197,7 +189,7 @@ def expect_json_sequence(value: JsonValue) -> list[JsonValue]:
 
 
 def to_json_payload(rows: JsonObjectArray) -> JsonPayload:
-    return [cast(JsonValue, row) for row in rows]
+    return [cast("JsonValue", row) for row in rows]
 
 
 class TestLineSpan:
@@ -328,11 +320,10 @@ class TestSymbolIndexRoundTrip:
     def test_row_with_span_round_trip(self) -> None:
         """Test round-trip preserves line span information."""
         span = LineSpan(start=42, end=100)
-        row = SymbolIndexRow(
+        row = _symbol_row(
             path="pkg.func",
             kind="function",
             doc="doc",
-            tested_by=(),
             source_link=_empty_source_link(),
             span=span,
         )
@@ -354,7 +345,7 @@ class TestSymbolIndexRoundTrip:
 
     def test_row_with_tested_by_round_trip(self) -> None:
         """Test round-trip preserves tested_by list."""
-        row = SymbolIndexRow(
+        row = _symbol_row(
             path="pkg.func",
             kind="function",
             doc="doc",
@@ -511,7 +502,7 @@ class TestArtifactCoercion:
         artifacts = symbol_index_from_json(
             to_json_payload(
                 [
-                    _symbol_payload(tested_by=cast(JsonValue, ["test1.py", "test2.py"])),
+                    _symbol_payload(tested_by=cast("JsonValue", ["test1.py", "test2.py"])),
                 ]
             ),
         )
@@ -519,7 +510,7 @@ class TestArtifactCoercion:
 
     def test_tested_by_coercion_from_tuple(self) -> None:
         """Test that tested_by tuple stays as tuple."""
-        tuple_value = cast(JsonValue, ("test1.py", "test2.py"))
+        tuple_value = cast("JsonValue", ("test1.py", "test2.py"))
         artifacts = symbol_index_from_json(
             to_json_payload([_symbol_payload(tested_by=tuple_value)]),
         )
@@ -533,12 +524,12 @@ class TestArtifactCoercion:
     def test_is_async_coercion(self) -> None:
         """Test that is_async is coerced to bool."""
         artifacts = symbol_index_from_json(
-            to_json_payload([_symbol_payload(is_async=cast(JsonValue, 1))]),
+            to_json_payload([_symbol_payload(is_async=cast("JsonValue", 1))]),
         )
         assert artifacts.rows[0].is_async is True
 
         artifacts = symbol_index_from_json(
-            to_json_payload([_symbol_payload(is_async=cast(JsonValue, 0))]),
+            to_json_payload([_symbol_payload(is_async=cast("JsonValue", 0))]),
         )
         assert artifacts.rows[0].is_async is False
 
@@ -548,11 +539,10 @@ class TestArtifactJSONFormatting:
 
     def test_json_formatting_readable(self) -> None:
         """Test that serialized JSON is formatted for readability."""
-        row = SymbolIndexRow(
+        row = _symbol_row(
             path="pkg.func",
             kind="function",
             doc="doc",
-            tested_by=(),
             source_link=_empty_source_link(),
         )
         artifacts = SymbolIndexArtifacts(
@@ -568,11 +558,10 @@ class TestArtifactJSONFormatting:
 
     def test_unicode_handling(self) -> None:
         """Test that unicode characters are preserved."""
-        row = SymbolIndexRow(
+        row = _symbol_row(
             path="pkg.func",
             kind="function",
             doc="doc",
-            tested_by=(),
             source_link=_empty_source_link(),
             section="Ñoño API",
         )
@@ -626,11 +615,10 @@ class TestCanonicalConstructors:
 
     def test_canonical_constructor_serialization_roundtrip(self) -> None:
         """Test that canonical constructor output round-trips through JSON."""
-        row = SymbolIndexRow(
+        row = _symbol_row(
             path="pkg.func",
             kind="function",
             doc="A function.",
-            tested_by=(),
             source_link=_empty_source_link(),
             deprecated_in="0.2.0",
         )
@@ -648,19 +636,19 @@ class TestCanonicalConstructors:
         assert first_row["deprecated_in"] == "0.2.0"
 
         # Deserialize and verify fidelity
-        restored = symbol_index_from_json(cast(JsonPayload, payload))
+        restored = symbol_index_from_json(cast("JsonPayload", payload))
         assert restored.rows[0].path == "pkg.func"
         assert restored.rows[0].deprecated_in == "0.2.0"
 
     def test_alignment_helper_with_canonical_payload(self) -> None:
         """Test align_schema_fields with valid canonical payload."""
-        payload = {
+        payload: dict[str, JsonValue] = {
             "path": "pkg.func",
             "kind": "function",
             "doc": "A function",
             "deprecated_in": "0.2.0",
-            "tested_by": [],
-            "source_link": {},
+            "tested_by": cast("JsonValue", []),
+            "source_link": cast("JsonValue", _empty_source_link()),
         }
 
         # Validate with alignment helper
@@ -709,19 +697,19 @@ class TestCanonicalConstructors:
 
     def test_schema_roundtrip_preserves_canonical_casing(self) -> None:
         """Verify schema round-trip preserves canonical field casing."""
-        original_payload = [
+        original_payload: JsonObjectArray = [
             {
                 "path": "pkg.func",
                 "kind": "function",
                 "doc": "A function",
                 "deprecated_in": "0.2.0",
-                "tested_by": [],
-                "source_link": {},
+                "tested_by": cast("JsonValue", []),
+                "source_link": cast("JsonValue", _empty_source_link()),
             }
         ]
 
         # Deserialize
-        artifacts = symbol_index_from_json(cast(JsonPayload, original_payload))
+        artifacts = symbol_index_from_json(cast("JsonPayload", original_payload))
 
         # Serialize back
         output_payload = symbol_index_to_payload(artifacts)
@@ -734,13 +722,13 @@ class TestCanonicalConstructors:
 
     def test_alignment_blocks_unknown_fields(self) -> None:
         """Verify alignment helper rejects payloads with unknown fields."""
-        payload = {
+        payload: dict[str, JsonValue] = {
             "path": "pkg.func",
             "kind": "function",
             "doc": "A function",
             "unknown_field": "invalid",
-            "tested_by": [],
-            "source_link": {},
+            "tested_by": cast("JsonValue", []),
+            "source_link": cast("JsonValue", _empty_source_link()),
         }
 
         with pytest.raises(ArtifactValidationError) as exc_info:

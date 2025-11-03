@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 if __package__ in {None, ""}:  # pragma: no cover - invoked via script entry instead of module
     message = (
@@ -15,8 +15,11 @@ if __package__ in {None, ""}:  # pragma: no cover - invoked via script entry ins
     raise RuntimeError(message)
 
 from tools import architecture
-from tools._shared.cli import CliEnvelope, CliEnvelopeBuilder, CliStatus, render_cli_envelope
+from tools._shared.cli import CliEnvelopeBuilder, render_cli_envelope
 from tools._shared.logging import get_logger
+
+if TYPE_CHECKING:
+    from tools._shared.cli import CliEnvelope, CliStatus
 
 LOGGER = get_logger(__name__)
 
@@ -43,7 +46,7 @@ def main() -> int:
     result = architecture.enforce_tooling_layers()
     envelope = _build_envelope(result)
 
-    output_json = cast(bool, getattr(args, "json", False))
+    output_json = cast("bool", getattr(args, "json", False))
 
     if output_json:
         sys.stdout.write(render_cli_envelope(envelope) + "\n")
