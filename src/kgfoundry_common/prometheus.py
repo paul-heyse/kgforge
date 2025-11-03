@@ -248,7 +248,28 @@ def _labels_or_default(labelnames: Sequence[str] | None) -> Sequence[str]:
     return tuple(labelnames) if labelnames is not None else ()
 
 
-_MAX_HISTOGRAM_POSITIONAL_ARGS = 2
+def _existing_collector(
+    name: str,
+    registry: CollectorRegistry | None,
+) -> object | None:
+    """Return an existing metric collector when one has already been registered."""
+    target_registry: CollectorRegistry | None
+    if registry is not None:
+        target_registry = registry
+    else:
+        target_registry = cast(CollectorRegistry | None, _DEFAULT_REGISTRY)
+    if target_registry is None:
+        return None
+    names_to_collectors = cast(
+        dict[str, object] | None,
+        getattr(target_registry, "_names_to_collectors", None),
+    )
+    if isinstance(names_to_collectors, dict):
+        return names_to_collectors.get(name)
+    return None
+
+
+_MAX_HISTOGRAM_POSITIONAL_ARGS = 3
 _DOCUMENTATION_POSITION = 1
 
 
@@ -282,13 +303,19 @@ def build_counter(
     constructor = _COUNTER_CONSTRUCTOR
     if constructor is None:
         return _NoopCounter()
-    return constructor(
-        name,
-        documentation,
-        _labels_or_default(labelnames),
-        registry=registry,
-        unit=unit,
-    )
+    try:
+        return constructor(
+            name,
+            documentation,
+            _labels_or_default(labelnames),
+            registry=registry,
+            unit=unit,
+        )
+    except ValueError:  # pragma: no cover - only hit when duplicates exist
+        existing = _existing_collector(name, registry)
+        if existing is None:
+            raise
+        return cast(CounterLike, existing)
 
 
 def build_gauge(
@@ -303,13 +330,19 @@ def build_gauge(
     constructor = _GAUGE_CONSTRUCTOR
     if constructor is None:
         return _NoopGauge()
-    return constructor(
-        name,
-        documentation,
-        _labels_or_default(labelnames),
-        registry=registry,
-        unit=unit,
-    )
+    try:
+        return constructor(
+            name,
+            documentation,
+            _labels_or_default(labelnames),
+            registry=registry,
+            unit=unit,
+        )
+    except ValueError:  # pragma: no cover - duplicates are rare
+        existing = _existing_collector(name, registry)
+        if existing is None:
+            raise
+        return cast(GaugeLike, existing)
 
 
 def _coerce_histogram_params(*args: object, **kwargs: object) -> HistogramParams:
@@ -384,12 +417,18 @@ def build_histogram(*args: object, **kwargs: object) -> HistogramLike:
     if params.buckets is not None:
         call_kwargs["buckets"] = tuple(params.buckets)
 
-    return constructor(
-        params.name,
-        params.documentation,
-        label_tuple,
-        **call_kwargs,
-    )
+    try:
+        return constructor(
+            params.name,
+            params.documentation,
+            label_tuple,
+            **call_kwargs,
+        )
+    except ValueError:  # pragma: no cover - duplicates are exceptional
+        existing = _existing_collector(params.name, params.registry)
+        if existing is None:
+            raise
+        return cast(HistogramLike, existing)
 
 
 def get_default_registry() -> object | None:

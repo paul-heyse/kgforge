@@ -13,6 +13,7 @@ import logging
 from typing import Final
 
 from _pytest.logging import LogCaptureFixture
+
 from tests.agent_catalog.conftest import SearchOptionsFactory
 
 SUCCESS_CASES: Final[tuple[tuple[list[str], int, float], ...]] = (

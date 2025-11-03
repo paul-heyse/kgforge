@@ -1,3 +1,5 @@
+# ruff: noqa: E402
+
 """Shared pytest fixtures for table-driven testing and observability validation.
 
 This module provides reusable fixtures for:
@@ -10,7 +12,6 @@ This module provides reusable fixtures for:
 
 from __future__ import annotations
 
-import importlib
 import importlib.util
 import json
 import logging
@@ -21,49 +22,25 @@ from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, ParamSpec, Protocol, TypeVar, cast
+from typing import TYPE_CHECKING, ParamSpec, Protocol, TypeVar, cast
 
 import pytest
 from _pytest.logging import LogCaptureFixture
 from prometheus_client.registry import CollectorRegistry
+from tests.bootstrap import ensure_src_path
 
+ensure_src_path()
 
-def _ensure_src_on_path() -> None:
-    repo_root = Path(__file__).parent.parent
-    src_path = repo_root / "src"
-    if str(src_path) not in sys.path:
-        sys.path.insert(0, str(src_path))
-        importlib.invalidate_caches()
-
-
-_ensure_src_on_path()
-
-if TYPE_CHECKING:  # pragma: no cover - typing only
-    from kgfoundry_common.opentelemetry_types import (
-        SpanExporterProtocol,
-        SpanProtocol,
-        TracerProviderProtocol,
-    )
-    from kgfoundry_common.problem_details import JsonValue
-else:
-    JsonValue = Any
-
-
-def _load_opentelemetry_types_module() -> ModuleType:
-    return import_module("kgfoundry_common.opentelemetry_types")
-
-
-def _load_span_exporter_factory() -> Callable[[], SpanExporterProtocol] | None:
-    module = _load_opentelemetry_types_module()
-    factory = module.load_in_memory_span_exporter_cls
-    return cast("Callable[[], SpanExporterProtocol] | None", factory())
-
-
-def _load_tracer_provider_factory() -> Callable[[], TracerProviderProtocol] | None:
-    module = _load_opentelemetry_types_module()
-    factory = module.load_tracer_provider_cls
-    return cast("Callable[[], TracerProviderProtocol] | None", factory())
-
+from kgfoundry_common.opentelemetry_types import (
+    SpanExporterProtocol,
+    SpanProtocol,
+    TracerProviderProtocol,
+    load_in_memory_span_exporter_cls,
+    load_tracer_provider_cls,
+)
+from kgfoundry_common.problem_details import (
+    JsonValue,
+)
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -97,10 +74,14 @@ def _compute_has_gpu_stack() -> bool:
     cuda_module: object = getattr(torch_module, "cuda", None)
     if not isinstance(cuda_module, ModuleType):
         return False
-    is_available_attr: object = getattr(cuda_module, "is_available", None)
-    if not callable(is_available_attr):
+    raw_is_available = cast(object | None, getattr(cuda_module, "is_available", None))
+    is_available_callable = cast(
+        Callable[[], object] | None,
+        raw_is_available if callable(raw_is_available) else None,
+    )
+    if is_available_callable is None:
         return False
-    return bool(is_available_attr())
+    return bool(is_available_callable())
 
 
 HAS_GPU_STACK = _compute_has_gpu_stack()
@@ -203,7 +184,7 @@ def prometheus_registry() -> CollectorRegistry:
 @fixture
 def otel_span_exporter() -> SpanExporterProtocol:
     """Provide an in-memory OpenTelemetry span exporter for testing."""
-    exporter_factory = _load_span_exporter_factory()
+    exporter_factory = load_in_memory_span_exporter_cls()
     if exporter_factory is None:
         skip_reason = "OpenTelemetry span exporter required for observability tests"
         pytest.skip(skip_reason)
@@ -216,7 +197,7 @@ def otel_tracer_provider(
     otel_span_exporter: SpanExporterProtocol,
 ) -> Iterator[TracerProviderProtocol]:
     """Provide an OpenTelemetry tracer provider configured with in-memory exporter."""
-    tracer_provider_factory = _load_tracer_provider_factory()
+    tracer_provider_factory = load_tracer_provider_cls()
     if tracer_provider_factory is None:
         skip_reason = "OpenTelemetry SDK required for observability tests"
         pytest.skip(skip_reason)
