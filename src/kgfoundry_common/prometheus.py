@@ -29,6 +29,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, NoReturn, Protocol, cast, overload
 
+from kgfoundry_common.sequence_guards import first_or_error
+
 __all__ = [
     "HAVE_PROMETHEUS",
     "CollectorRegistry",
@@ -347,20 +349,28 @@ def build_gauge(
 
 def _coerce_histogram_params(*args: object, **kwargs: object) -> HistogramParams:
     """Normalize legacy histogram arguments into a :class:`HistogramParams` instance."""
-    if args and isinstance(args[0], HistogramParams):
-        if len(args) > 1 or kwargs:
-            _histogram_type_error("build_histogram() received unexpected extra arguments")
-        return args[0]
+    args_list = list(args)
 
-    if not args:
+    if args_list and isinstance(args_list[0], HistogramParams):
+        if len(args_list) > 1 or kwargs:
+            _histogram_type_error("build_histogram() received unexpected extra arguments")
+        return args_list[0]
+
+    if not args_list:
         _histogram_type_error("build_histogram() missing required argument: 'name'")
 
-    if len(args) > _MAX_HISTOGRAM_POSITIONAL_ARGS:
+    if len(args_list) > _MAX_HISTOGRAM_POSITIONAL_ARGS:
         _histogram_type_error("build_histogram() received too many positional arguments")
 
-    name = str(args[0])
-    if len(args) > _DOCUMENTATION_POSITION:
-        documentation = str(args[_DOCUMENTATION_POSITION])
+    name = str(
+        first_or_error(
+            args_list,
+            context="histogram_args_name",
+            operation="build_histogram_coerce_params",
+        )
+    )
+    if len(args_list) > _DOCUMENTATION_POSITION:
+        documentation = str(args_list[_DOCUMENTATION_POSITION])
     else:
         doc = kwargs.pop("documentation", None)
         if doc is None:

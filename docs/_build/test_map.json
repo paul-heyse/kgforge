@@ -1,5 +1,18 @@
 {
-  "download.harvester.annotations": [
+  "embeddings_dense.base.annotations": [
+    {
+      "file": "tests/test_namespace_proxy.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
     {
       "file": "tests/test_config.py",
       "lines": [
@@ -53,6 +66,32 @@
       "reason": "tail"
     },
     {
+      "file": "tests/agent_catalog/test_catalog_schema_roundtrip.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/agent_catalog/test_search_options_table.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        }
+      ],
+      "reason": "tail"
+    },
+    {
       "file": "tests/agent_catalog/test_search_options.py",
       "lines": [
         6
@@ -61,6 +100,19 @@
         {
           "start": 3,
           "end": 9
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_griffe_facade.py",
+      "lines": [
+        10
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
         }
       ],
       "reason": "tail"
@@ -196,6 +248,19 @@
       "reason": "tail"
     },
     {
+      "file": "tests/kgfoundry_common/test_prometheus_metrics.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
         3
@@ -235,351 +300,7 @@
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.config.annotations": [
-    {
-      "file": "tests/test_config.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/test_logging.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.fixture_index.annotations": [
-    {
-      "file": "tests/test_config.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/test_logging.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_type_resolution.annotations": [
-    {
-      "file": "tests/test_config.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.exceptions.Final": [
+  "search_api.splade_index.Final": [
     {
       "file": "tests/test_logging.py",
       "lines": [
@@ -599,7 +320,146 @@
       "reason": "tail"
     }
   ],
-  "embeddings_sparse.splade.PureImpactIndex.search": [
+  "ontology.loader.Final": [
+    {
+      "file": "tests/test_logging.py",
+      "lines": [
+        9,
+        162
+      ],
+      "windows": [
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 159,
+          "end": 165
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.annotations": [
+    {
+      "file": "tests/test_logging.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docstring_builder/test_pipeline_runner.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/docs/test_artifact_models.py",
+      "lines": [
+        7
+      ],
+      "windows": [
+        {
+          "start": 4,
+          "end": 10
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_faiss_adapter.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/vector_ingestion/test_vector_cli.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.LuceneImpactIndex.search": [
     {
       "file": "tests/test_logging.py",
       "lines": [
@@ -645,9 +505,27 @@
         }
       ],
       "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_faiss_adapter.py",
+      "lines": [
+        12,
+        25
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 22,
+          "end": 28
+        }
+      ],
+      "reason": "tail"
     }
   ],
-  "docling.vlm.Final": [
+  "registry.duckdb_registry.Final": [
     {
       "file": "tests/test_logging.py",
       "lines": [
@@ -667,7 +545,7 @@
       "reason": "tail"
     }
   ],
-  "registry.migrate.Final": [
+  "kg_builder.mock_kg.Final": [
     {
       "file": "tests/test_logging.py",
       "lines": [
@@ -687,66 +565,26 @@
       "reason": "tail"
     }
   ],
-  "search_api.service.Final": [
-    {
-      "file": "tests/test_logging.py",
-      "lines": [
-        9,
-        162
-      ],
-      "windows": [
-        {
-          "start": 6,
-          "end": 12
-        },
-        {
-          "start": 159,
-          "end": 165
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "docling.canonicalizer.Final": [
-    {
-      "file": "tests/test_logging.py",
-      "lines": [
-        9,
-        162
-      ],
-      "windows": [
-        {
-          "start": 6,
-          "end": 12
-        },
-        {
-          "start": 159,
-          "end": 165
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "ontology.catalog.dataclass": [
+  "tests.docs.test_scan_observability_policy.pytest": [
     {
       "file": "tests/docstring_builder/test_pipeline_runner.py",
       "lines": [
-        7,
-        102,
-        115
+        12,
+        194,
+        226
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 9,
+          "end": 15
         },
         {
-          "start": 99,
-          "end": 105
+          "start": 191,
+          "end": 197
         },
         {
-          "start": 112,
-          "end": 118
+          "start": 223,
+          "end": 229
         }
       ],
       "reason": "tail"
@@ -754,1068 +592,22 @@
     {
       "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        6,
-        19,
-        32
+        8,
+        9,
+        164
       ],
       "windows": [
         {
-          "start": 3,
-          "end": 9
+          "start": 5,
+          "end": 11
         },
         {
-          "start": 16,
-          "end": 22
+          "start": 6,
+          "end": 12
         },
         {
-          "start": 29,
-          "end": 35
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        242
-      ],
-      "windows": [
-        {
-          "start": 239,
-          "end": 245
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/search_api/test_client_idempotency.py",
-      "lines": [
-        13,
-        20
-      ],
-      "windows": [
-        {
-          "start": 10,
-          "end": 16
-        },
-        {
-          "start": 17,
-          "end": 23
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
-      "lines": [
-        6,
-        19,
-        32
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 16,
-          "end": 22
-        },
-        {
-          "start": 29,
-          "end": 35
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.fixture_index.dataclass": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        7,
-        102,
-        115
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        },
-        {
-          "start": 99,
-          "end": 105
-        },
-        {
-          "start": 112,
-          "end": 118
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docstring_builder/test_pipeline_helpers.py",
-      "lines": [
-        6,
-        19,
-        32
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 16,
-          "end": 22
-        },
-        {
-          "start": 29,
-          "end": 35
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        242
-      ],
-      "windows": [
-        {
-          "start": 239,
-          "end": 245
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/search_api/test_client_idempotency.py",
-      "lines": [
-        13,
-        20
-      ],
-      "windows": [
-        {
-          "start": 10,
-          "end": 16
-        },
-        {
-          "start": 17,
-          "end": 23
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
-      "lines": [
-        6,
-        19,
-        32
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 16,
-          "end": 22
-        },
-        {
-          "start": 29,
-          "end": 35
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.navmap_types.NavMap.title": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        51
-      ],
-      "windows": [
-        {
-          "start": 48,
-          "end": 54
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
-      "lines": [
-        49,
-        50
-      ],
-      "windows": [
-        {
-          "start": 46,
-          "end": 52
-        },
-        {
-          "start": 47,
-          "end": 53
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/search_api/test_client_idempotency.py",
-      "lines": [
-        85,
-        106,
-        170,
-        208
-      ],
-      "windows": [
-        {
-          "start": 82,
-          "end": 88
-        },
-        {
-          "start": 103,
-          "end": 109
-        },
-        {
-          "start": 167,
-          "end": 173
-        },
-        {
-          "start": 205,
-          "end": 211
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.kg_mock.NavMap.title": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        51
-      ],
-      "windows": [
-        {
-          "start": 48,
-          "end": 54
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
-      "lines": [
-        49,
-        50
-      ],
-      "windows": [
-        {
-          "start": 46,
-          "end": 52
-        },
-        {
-          "start": 47,
-          "end": 53
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/search_api/test_client_idempotency.py",
-      "lines": [
-        85,
-        106,
-        170,
-        208
-      ],
-      "windows": [
-        {
-          "start": 82,
-          "end": 88
-        },
-        {
-          "start": 103,
-          "end": 109
-        },
-        {
-          "start": 167,
-          "end": 173
-        },
-        {
-          "start": 205,
-          "end": 211
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.splade_index.dataclass": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        7,
-        102,
-        115
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        },
-        {
-          "start": 99,
-          "end": 105
-        },
-        {
-          "start": 112,
-          "end": 118
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docstring_builder/test_pipeline_helpers.py",
-      "lines": [
-        6,
-        19,
-        32
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 16,
-          "end": 22
-        },
-        {
-          "start": 29,
-          "end": 35
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        242
-      ],
-      "windows": [
-        {
-          "start": 239,
-          "end": 245
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/search_api/test_client_idempotency.py",
-      "lines": [
-        13,
-        20
-      ],
-      "windows": [
-        {
-          "start": 10,
-          "end": 16
-        },
-        {
-          "start": 17,
-          "end": 23
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
-      "lines": [
-        6,
-        19,
-        32
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 16,
-          "end": 22
-        },
-        {
-          "start": 29,
-          "end": 35
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "ontology.catalog.NavMap.title": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        51
-      ],
-      "windows": [
-        {
-          "start": 48,
-          "end": 54
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
-      "lines": [
-        49,
-        50
-      ],
-      "windows": [
-        {
-          "start": 46,
-          "end": 52
-        },
-        {
-          "start": 47,
-          "end": 53
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/search_api/test_client_idempotency.py",
-      "lines": [
-        85,
-        106,
-        170,
-        208
-      ],
-      "windows": [
-        {
-          "start": 82,
-          "end": 88
-        },
-        {
-          "start": 103,
-          "end": 109
-        },
-        {
-          "start": 167,
-          "end": 173
-        },
-        {
-          "start": 205,
-          "end": 211
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.NavMap.title": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        51
-      ],
-      "windows": [
-        {
-          "start": 48,
-          "end": 54
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.errors.NavMap.title": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        51
-      ],
-      "windows": [
-        {
-          "start": 48,
-          "end": 54
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "vectorstore_faiss.gpu.NavMap.title": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        51
-      ],
-      "windows": [
-        {
-          "start": 48,
-          "end": 54
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "observability.metrics._NoopMetric.observe": [
-    {
-      "file": "tests/docstring_builder/test_pipeline_runner.py",
-      "lines": [
-        105,
-        111,
-        112
-      ],
-      "windows": [
-        {
-          "start": 102,
-          "end": 108
-        },
-        {
-          "start": 108,
-          "end": 114
-        },
-        {
-          "start": 109,
-          "end": 115
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.config.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.fixture_index.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.parquet_io.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.splade_index.SpladeIndex.docs": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        240,
-        244,
-        256,
-        291
-      ],
-      "windows": [
-        {
-          "start": 237,
-          "end": 243
-        },
-        {
-          "start": 241,
-          "end": 247
-        },
-        {
-          "start": 253,
-          "end": 259
-        },
-        {
-          "start": 288,
-          "end": 294
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.app.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_dense.base.np": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        10,
-        35,
-        36
-      ],
-      "windows": [
-        {
-          "start": 7,
-          "end": 13
-        },
-        {
-          "start": 32,
-          "end": 38
-        },
-        {
-          "start": 33,
-          "end": 39
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.helper.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_client.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.errors.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.api.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.faiss_adapter.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "docling.hybrid.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.splade_index.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_client.client.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.schemas.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_sparse.bm25.PurePythonBM25.docs": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        240,
-        244,
-        256,
-        291
-      ],
-      "windows": [
-        {
-          "start": 237,
-          "end": 243
-        },
-        {
-          "start": 241,
-          "end": 247
-        },
-        {
-          "start": 253,
-          "end": 259
-        },
-        {
-          "start": 288,
-          "end": 294
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "linking.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "download.harvester.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "linking.calibration.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "vectorstore_faiss.gpu.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_sparse.bm25.dataclass": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        242
-      ],
-      "windows": [
-        {
-          "start": 239,
-          "end": 245
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "docling.vlm.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_sparse.base.annotations": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
+          "start": 161,
+          "end": 167
         }
       ],
       "reason": "tail"
@@ -1823,18 +615,231 @@
     {
       "file": "tests/docs/test_artifact_models.py",
       "lines": [
-        7
+        12,
+        378,
+        384,
+        390
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 375,
+          "end": 381
+        },
+        {
+          "start": 381,
+          "end": 387
+        },
+        {
+          "start": 387,
+          "end": 393
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
+      "lines": [
+        10,
+        112
+      ],
+      "windows": [
+        {
+          "start": 7,
+          "end": 13
+        },
+        {
+          "start": 109,
+          "end": 115
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/vector_ingestion/test_vector_cli.py",
+      "lines": [
+        12,
+        13,
+        95
+      ],
+      "windows": [
+        {
+          "start": 9,
+          "end": 15
+        },
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 92,
+          "end": 98
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        8,
+        9,
+        164
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 161,
+          "end": 167
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.dataclass": [
+    {
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        6,
+        19,
+        32
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 16,
+          "end": 22
+        },
+        {
+          "start": 29,
+          "end": 35
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        13,
+        20
+      ],
+      "windows": [
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 17,
+          "end": 23
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        6,
+        19,
+        32
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 16,
+          "end": 22
+        },
+        {
+          "start": 29,
+          "end": 35
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.faiss_adapter.dataclass": [
+    {
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        6,
+        19,
+        32
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 16,
+          "end": 22
+        },
+        {
+          "start": 29,
+          "end": 35
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        13,
+        20
+      ],
+      "windows": [
+        {
+          "start": 10,
+          "end": 16
+        },
+        {
+          "start": 17,
+          "end": 23
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        6,
+        19,
+        32
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 16,
+          "end": 22
+        },
+        {
+          "start": 29,
+          "end": 35
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "linking.calibration.annotations": [
+    {
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -1847,20 +852,20 @@
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        7
+        11
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 8,
+          "end": 14
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
         3
       ],
@@ -1874,6 +879,19 @@
     },
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -1888,33 +906,7 @@
   ],
   "registry.duckdb_registry.annotations": [
     {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -1927,20 +919,20 @@
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        7
+        11
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 8,
+          "end": 14
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
         3
       ],
@@ -1964,67 +956,24 @@
         }
       ],
       "reason": "tail"
-    }
-  ],
-  "search_api.bm25_index.dataclass": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        242
-      ],
-      "windows": [
-        {
-          "start": 239,
-          "end": 245
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.errors": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        21
-      ],
-      "windows": [
-        {
-          "start": 18,
-          "end": 24
-        }
-      ],
-      "reason": "dotted"
-    }
-  ],
-  "docling.vlm.annotations": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
     },
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        7
+        3
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
-    },
+    }
+  ],
+  "tests.docs.test_scan_observability.annotations": [
     {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -2037,20 +986,20 @@
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        7
+        11
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 8,
+          "end": 14
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
         3
       ],
@@ -2074,187 +1023,24 @@
         }
       ],
       "reason": "tail"
-    }
-  ],
-  "search_api.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_dense.base.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kg_builder.neo4j_store.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "download.cli.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.fixture_index.NavMap.symbols": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        273,
-        290
-      ],
-      "windows": [
-        {
-          "start": 270,
-          "end": 276
-        },
-        {
-          "start": 287,
-          "end": 293
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "download.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.app.annotations": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
     },
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        7
+        3
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
-    },
+    }
+  ],
+  "embeddings_sparse.splade.annotations": [
     {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -2267,20 +1053,20 @@
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        7
+        11
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 8,
+          "end": 14
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
         3
       ],
@@ -2304,87 +1090,24 @@
         }
       ],
       "reason": "tail"
-    }
-  ],
-  "ontology.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.exceptions.NavMap.deprecated": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        228,
-        289,
-        297
-      ],
-      "windows": [
-        {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "linking.linker.annotations": [
-    {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
     },
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        7
+        3
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
-    },
+    }
+  ],
+  "search_api.fixture_index.annotations": [
     {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -2397,20 +1120,20 @@
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        7
+        11
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 8,
+          "end": 14
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
         3
       ],
@@ -2434,62 +1157,24 @@
         }
       ],
       "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.NavMap.deprecated": [
+    },
     {
-      "file": "tests/agent_catalog/test_search_options.py",
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        228,
-        289,
-        297
+        3
       ],
       "windows": [
         {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "search_api.splade_index.annotations": [
+  "tests.conftest.annotations": [
     {
-      "file": "tests/agent_catalog/test_search_options.py",
-      "lines": [
-        6
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
         3
       ],
@@ -2502,20 +1187,20 @@
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        7
+        11
       ],
       "windows": [
         {
-          "start": 4,
-          "end": 10
+          "start": 8,
+          "end": 14
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
         3
       ],
@@ -2539,196 +1224,438 @@
         }
       ],
       "reason": "tail"
-    }
-  ],
-  "ontology.loader.NavMap.deprecated": [
+    },
     {
-      "file": "tests/agent_catalog/test_search_options.py",
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        228,
-        289,
-        297
+        3
       ],
       "windows": [
         {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "embeddings_dense.NavMap.deprecated": [
+  "tests.unit.tools.test_build_graphs.annotations": [
     {
-      "file": "tests/agent_catalog/test_search_options.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        228,
-        289,
-        297
+        3
       ],
       "windows": [
         {
-          "start": 225,
-          "end": 231
-        },
-        {
-          "start": 286,
-          "end": 292
-        },
-        {
-          "start": 294,
-          "end": 300
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kg_builder.NavMap.since": [
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        143
-      ],
-      "windows": [
-        {
-          "start": 140,
-          "end": 146
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.schemas.SearchResult.section": [
-    {
-      "file": "tests/docs/test_artifact_models.py",
-      "lines": [
-        145,
-        476
-      ],
-      "windows": [
-        {
-          "start": 142,
-          "end": 148
-        },
-        {
-          "start": 473,
-          "end": 479
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     },
     {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        49,
-        50
+        11
       ],
       "windows": [
         {
-          "start": 46,
-          "end": 52
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings.pytest": [
+    {
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        8,
+        9,
+        164
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
         },
         {
-          "start": 47,
-          "end": 53
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 161,
+          "end": 167
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        8,
+        9,
+        164
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 161,
+          "end": 167
         }
       ],
       "reason": "tail"
     }
   ],
-  "vectorstore_faiss.NavMap.since": [
+  "tests.docs.test_pipeline_artifacts.annotations": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        143
+        3
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "vectorstore_faiss.gpu.NavMap.since": [
+  "kg_builder.mock_kg.annotations": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        143
+        3
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        11
+      ],
+      "windows": [
+        {
+          "start": 8,
+          "end": 14
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.navmap_types.SymbolMeta.owner": [
+  "kgfoundry_common.errors.annotations": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        141
+        3
       ],
       "windows": [
         {
-          "start": 138,
-          "end": 144
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "registry.NavMap.since": [
+  "tests.mock_servers.run_all.annotations": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        143
+        3
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "search_api.app.NavMap.since": [
+  "tests.unit.tools.test_add_module_docstrings.annotations": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        143
+        3
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.navmap_types.SymbolMeta.since": [
+  "tests.docs.test_build_test_map.pytest": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
       "lines": [
-        143
+        8,
+        9,
+        164
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 161,
+          "end": 167
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        8,
+        9,
+        164
+      ],
+      "windows": [
+        {
+          "start": 5,
+          "end": 11
+        },
+        {
+          "start": 6,
+          "end": 12
+        },
+        {
+          "start": 161,
+          "end": 167
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.bm25.annotations": [
+    {
+      "file": "tests/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    },
+    {
+      "file": "tests/tools/docstring_builder/test_pipeline_helpers.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
@@ -2738,76 +1665,313 @@
     {
       "file": "tests/docs/test_artifact_models.py",
       "lines": [
-        143
+        147
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 144,
+          "end": 150
         }
       ],
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.ids.NavMap.since": [
+  "search_api.fixture_index.NavMap.since": [
     {
       "file": "tests/docs/test_artifact_models.py",
       "lines": [
-        143
+        147
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 144,
+          "end": 150
         }
       ],
       "reason": "tail"
     }
   ],
-  "docling.hybrid.NavMap.since": [
+  "orchestration.flows.NavMap.since": [
     {
       "file": "tests/docs/test_artifact_models.py",
       "lines": [
-        143
+        147
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 144,
+          "end": 150
         }
       ],
       "reason": "tail"
     }
   ],
-  "embeddings_dense.base.NavMap.since": [
+  "embeddings_sparse.bm25.__all__": [
     {
-      "file": "tests/docs/test_artifact_models.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        143
+        298
       ],
       "windows": [
         {
-          "start": 140,
-          "end": 146
+          "start": 295,
+          "end": 301
         }
       ],
       "reason": "tail"
     }
   ],
-  "kgfoundry.__all__": [
+  "vectorstore_faiss.__all__": [
     {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        235
+        298
       ],
       "windows": [
         {
-          "start": 232,
-          "end": 238
+          "start": 295,
+          "end": 301
         }
       ],
       "reason": "tail"
-    },
+    }
+  ],
+  "linking.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "embeddings_sparse.splade.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.exceptions.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.schemas.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.fusion.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.navmap_types.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.faiss_adapter.FaissAdapter.index": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        52,
+        56,
+        57
+      ],
+      "windows": [
+        {
+          "start": 49,
+          "end": 55
+        },
+        {
+          "start": 53,
+          "end": 59
+        },
+        {
+          "start": 54,
+          "end": 60
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.cli.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.splade_index.__all__": [
     {
       "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
@@ -2824,18 +1988,20 @@
   ],
   "orchestration.cli.__all__": [
     {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        235
+        298
       ],
       "windows": [
         {
-          "start": 232,
-          "end": 238
+          "start": 295,
+          "end": 301
         }
       ],
       "reason": "tail"
-    },
+    }
+  ],
+  "embeddings_dense.base.__all__": [
     {
       "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
@@ -2850,37 +2016,85 @@
       "reason": "tail"
     }
   ],
-  "download.cli.typer": [
+  "kgfoundry_common.parquet_io.__all__": [
     {
-      "file": "tests/orchestration/test_index_cli_idempotency.py",
+      "file": "tests/search_api/test_client_idempotency.py",
       "lines": [
-        19,
-        184,
-        199,
-        201
+        298
       ],
       "windows": [
         {
-          "start": 16,
-          "end": 22
-        },
-        {
-          "start": 181,
-          "end": 187
-        },
-        {
-          "start": 196,
-          "end": 202
-        },
-        {
-          "start": 198,
-          "end": 204
+          "start": 295,
+          "end": 301
         }
       ],
       "reason": "tail"
     }
   ],
-  "orchestration.fixture_flow.Path": [
+  "orchestration.flows.NavMap.title": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        85,
+        106,
+        170,
+        208
+      ],
+      "windows": [
+        {
+          "start": 82,
+          "end": 88
+        },
+        {
+          "start": 103,
+          "end": 109
+        },
+        {
+          "start": 167,
+          "end": 173
+        },
+        {
+          "start": 205,
+          "end": 211
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.harvester.__all__": [
+    {
+      "file": "tests/search_api/test_client_idempotency.py",
+      "lines": [
+        298
+      ],
+      "windows": [
+        {
+          "start": 295,
+          "end": 301
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.tools.docs.test_build_graphs.Path": [
+    {
+      "file": "tests/search_api/test_faiss_adapter.py",
+      "lines": [
+        6,
+        113
+      ],
+      "windows": [
+        {
+          "start": 3,
+          "end": 9
+        },
+        {
+          "start": 110,
+          "end": 116
+        }
+      ],
+      "reason": "tail"
+    },
     {
       "file": "tests/vector_ingestion/test_vector_cli.py",
       "lines": [
@@ -2903,471 +2117,28 @@
         }
       ],
       "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        6,
-        98,
-        112
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 95,
-          "end": 101
-        },
-        {
-          "start": 109,
-          "end": 115
-        }
-      ],
-      "reason": "tail"
     }
   ],
-  "download.cli.annotations": [
+  "search_api.faiss_adapter.IndexArray": [
     {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
+      "file": "tests/search_api/test_faiss_adapter.py",
       "lines": [
-        3
+        12,
+        19,
+        38
       ],
       "windows": [
         {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.schemas.annotations": [
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.migrate.annotations": [
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.models.annotations": [
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.tools.docs.test_build_graphs.annotations": [
-    {
-      "file": "tests/vector_ingestion/test_vector_schema.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        7
-      ],
-      "windows": [
-        {
-          "start": 4,
-          "end": 10
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    },
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.docs.test_export_schemas_pruning.json": [
-    {
-      "file": "tests/kgfoundry_common/test_config_smoke.py",
-      "lines": [
-        29
-      ],
-      "windows": [
-        {
-          "start": 26,
-          "end": 32
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_build_test_map.Path": [
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        6,
-        98,
-        112
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
+          "start": 9,
+          "end": 15
         },
         {
-          "start": 95,
-          "end": 101
+          "start": 16,
+          "end": 22
         },
         {
-          "start": 109,
-          "end": 115
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.conftest.os": [
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        136,
-        145,
-        155,
-        179
-      ],
-      "windows": [
-        {
-          "start": 133,
-          "end": 139
-        },
-        {
-          "start": 142,
-          "end": 148
-        },
-        {
-          "start": 152,
-          "end": 158
-        },
-        {
-          "start": 176,
-          "end": 182
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_auto_docstrings_extended_summaries.Path": [
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        6,
-        98,
-        112
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 95,
-          "end": 101
-        },
-        {
-          "start": 109,
-          "end": 115
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_gen_readmes.Path": [
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        6,
-        98,
-        112
-      ],
-      "windows": [
-        {
-          "start": 3,
-          "end": 9
-        },
-        {
-          "start": 95,
-          "end": 101
-        },
-        {
-          "start": 109,
-          "end": 115
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_auto_docstrings_extended_summaries.sys": [
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        37,
-        46,
-        187
-      ],
-      "windows": [
-        {
-          "start": 34,
-          "end": 40
-        },
-        {
-          "start": 43,
-          "end": 49
-        },
-        {
-          "start": 184,
-          "end": 190
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "orchestration.cli.os": [
-    {
-      "file": "tests/kgfoundry_common/test_subprocess_utils.py",
-      "lines": [
-        136,
-        145,
-        155,
-        179
-      ],
-      "windows": [
-        {
-          "start": 133,
-          "end": 139
-        },
-        {
-          "start": 142,
-          "end": 148
-        },
-        {
-          "start": 152,
-          "end": 158
-        },
-        {
-          "start": 176,
-          "end": 182
+          "start": 35,
+          "end": 41
         }
       ],
       "reason": "tail"
@@ -3401,7 +2172,277 @@
       "reason": "dotted"
     }
   ],
+  "tests.tools.docs.test_build_graphs.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "download.harvester.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.navmap_types.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
   "tests.unit.test_gen_readmes.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "registry.helper.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.exceptions.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_client.client.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.app.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.catalog.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_schemas_valid.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "ontology.loader.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.docs.test_build_test_map.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_auto_docstrings_extended_summaries.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.models.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "kgfoundry_common.config.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.unit.test_build_test_map.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "observability.metrics.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "tests.mock_servers.unpaywall_mock.annotations": [
+    {
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
+      "lines": [
+        3
+      ],
+      "windows": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ],
+      "reason": "tail"
+    }
+  ],
+  "search_api.bm25_index.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3446,126 +2487,6 @@
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.exceptions.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_auto_docstrings_extended_summaries.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kg_builder.mock_kg.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "docling.hybrid.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.mock_servers.run_all.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.bm25_index.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.kg_mock.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_sparse.splade.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
   "search_api.service.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
@@ -3581,7 +2502,7 @@
       "reason": "tail"
     }
   ],
-  "tests.docs.test_scan_observability_policy.annotations": [
+  "vectorstore_faiss.gpu.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3596,7 +2517,7 @@
       "reason": "tail"
     }
   ],
-  "tests.unit.tools.test_build_graphs.annotations": [
+  "registry.migrate.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3611,7 +2532,7 @@
       "reason": "tail"
     }
   ],
-  "tests.docs.test_schemas_valid.annotations": [
+  "download.cli.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3626,7 +2547,7 @@
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.logging.annotations": [
+  "docling.vlm.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3641,7 +2562,7 @@
       "reason": "tail"
     }
   ],
-  "embeddings_sparse.bm25.annotations": [
+  "embeddings_dense.qwen3.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3656,37 +2577,7 @@
       "reason": "tail"
     }
   ],
-  "kgfoundry_common.navmap_types.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "search_api.fusion.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "ontology.loader.annotations": [
+  "registry.api.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3731,7 +2622,7 @@
       "reason": "tail"
     }
   ],
-  "tests.mock_servers.unpaywall_mock.annotations": [
+  "search_api.splade_index.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3746,142 +2637,7 @@
       "reason": "tail"
     }
   ],
-  "tests.docs.test_scan_observability.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "embeddings_dense.base.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.errors.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.parquet_io.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.docs.test_pipeline_artifacts.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "linking.calibration.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.helper.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "observability.metrics.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.test_build_test_map.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.docs.test_build_test_map.annotations": [
+  "tests.docs.test_scan_observability_policy.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3911,7 +2667,7 @@
       "reason": "tail"
     }
   ],
-  "embeddings_dense.qwen3.annotations": [
+  "tests.unit.test_type_resolution.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3926,7 +2682,7 @@
       "reason": "tail"
     }
   ],
-  "vectorstore_faiss.gpu.annotations": [
+  "search_api.kg_mock.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3941,7 +2697,7 @@
       "reason": "tail"
     }
   ],
-  "ontology.catalog.annotations": [
+  "docling.hybrid.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -3971,52 +2727,7 @@
       "reason": "tail"
     }
   ],
-  "search_client.client.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "tests.unit.tools.test_add_module_docstrings.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "orchestration.cli.annotations": [
-    {
-      "file": "tests/kgfoundry_common/test_minimal_import2.py",
-      "lines": [
-        3
-      ],
-      "windows": [
-        {
-          "start": 1,
-          "end": 6
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "registry.api.annotations": [
+  "kg_builder.neo4j_store.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -4046,7 +2757,7 @@
       "reason": "tail"
     }
   ],
-  "kg_builder.neo4j_store.annotations": [
+  "kgfoundry_common.logging.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -4061,7 +2772,7 @@
       "reason": "tail"
     }
   ],
-  "tests.conftest.annotations": [
+  "linking.linker.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -4076,7 +2787,7 @@
       "reason": "tail"
     }
   ],
-  "tests.unit.test_auto_docstrings.annotations": [
+  "kgfoundry_common.parquet_io.annotations": [
     {
       "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
@@ -4091,76 +2802,61 @@
       "reason": "tail"
     }
   ],
-  "embeddings_sparse.base.NavMap.tags": [
+  "embeddings_sparse.base.annotations": [
     {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
-        209
+        3
       ],
       "windows": [
         {
-          "start": 206,
-          "end": 212
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "orchestration.NavMap.tags": [
+  "search_api.schemas.annotations": [
     {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
-        209
+        3
       ],
       "windows": [
         {
-          "start": 206,
-          "end": 212
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "registry.helper.NavMap.tags": [
+  "orchestration.cli.annotations": [
     {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
-        209
+        3
       ],
       "windows": [
         {
-          "start": 206,
-          "end": 212
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"
     }
   ],
-  "search_api.faiss_adapter.NavMap.tags": [
+  "search_api.fusion.annotations": [
     {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
+      "file": "tests/kgfoundry_common/test_minimal_import2.py",
       "lines": [
-        209
+        3
       ],
       "windows": [
         {
-          "start": 206,
-          "end": 212
-        }
-      ],
-      "reason": "tail"
-    }
-  ],
-  "kgfoundry_common.navmap_types.NavMap.tags": [
-    {
-      "file": "tests/kgfoundry_common/test_safe_pickle_v2.py",
-      "lines": [
-        209
-      ],
-      "windows": [
-        {
-          "start": 206,
-          "end": 212
+          "start": 1,
+          "end": 6
         }
       ],
       "reason": "tail"

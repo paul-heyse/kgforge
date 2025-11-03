@@ -41,6 +41,45 @@ repos:
         pass_filenames: false
         args: ["src", "tools", "stubs"]
 
+  - repo: https://github.com/returntocorp/semgrep
+    rev: v1.142.0
+    hooks:
+      - id: semgrep
+        name: semgrep (changed files)
+        args:
+          - --config
+          - p/python
+          - --config
+          - p/auto
+          - --config
+          - p/security-audit
+          - --config
+          - p/secrets
+          - --config
+          - .semgrep/kgfoundry.yml
+          - --error
+
+  # Uncomment to enable a pre-push Semgrep scan across the repository.
+  # - repo: https://github.com/returntocorp/semgrep
+  #   rev: v1.142.0
+  #   hooks:
+  #     - id: semgrep
+  #       name: semgrep (full scan on push)
+  #       pass_filenames: false
+  #       stages: [push]
+  #       args:
+  #         - --config
+  #         - p/python
+  #         - --config
+  #         - p/auto
+  #         - --config
+  #         - p/security-audit
+  #         - --config
+  #         - p/secrets
+  #         - --config
+  #         - .semgrep/kgfoundry.yml
+  #         - --error
+
   - repo: local
     hooks:
       - id: pydoclint
@@ -54,6 +93,17 @@ repos:
         entry: uv run python tools/hooks/docformatter.py
         always_run: true
         pass_filenames: false
+
+  - repo: https://github.com/dosisod/refurb
+    rev: v2.2.0
+    hooks:
+      - id: refurb
+        name: refurb (modernization suggestions)
+        args: ["--python-version=3.13"]
+        exclude: |
+          (?x)
+          ^faiss/|^build/|^dist/|^node_modules/|^docs/_build/|^site/|^stubs/|
+          ^\.venv/|^\.ruff_cache/|^\.mypy_cache/|^\.pytest_cache/
 
   - repo: local
     hooks:

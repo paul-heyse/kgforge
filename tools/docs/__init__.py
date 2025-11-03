@@ -11,7 +11,7 @@ import logging
 from collections.abc import Callable, Mapping, Sequence
 from importlib import import_module
 from types import MappingProxyType, ModuleType
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -215,7 +215,23 @@ _MODULE_EXPORTS: dict[str, str] = {
 
 MODULE_EXPORTS: Final[Mapping[str, str]] = MappingProxyType(_MODULE_EXPORTS)
 
-__all__: list[str] = sorted({*PUBLIC_EXPORTS.keys(), *MODULE_EXPORTS.keys()})
+if TYPE_CHECKING:
+    from tools.docs import catalog_models, errors, observability
+
+__all__: tuple[str, ...] = (
+    "build_agent_analytics",
+    "build_agent_api",
+    "build_agent_catalog",
+    "build_artifacts",
+    "build_graphs",
+    "build_test_map",
+    "catalog_models",
+    "errors",
+    "export_schemas",
+    "observability",
+    "render_agent_portal",
+    "scan_observability",
+)
 
 
 def __getattr__(name: str) -> ModuleType:

@@ -15,6 +15,8 @@ The module owns the JSON contract and encapsulates all transformations, ensuring
 
 Examples
 --------
+**Canonical constructor usage (recommended):**
+
 >>> import json
 >>> from pathlib import Path
 >>> from docs._types.artifacts import (
@@ -22,11 +24,17 @@ Examples
 ...     SymbolIndexArtifacts,
 ...     symbol_index_to_payload,
 ...     symbol_index_from_json,
+...     SYMBOL_INDEX_ROW_FIELDS,
+...     align_schema_fields,
 ... )
+
+Construct models with keyword arguments matching canonical schema field names:
+
 >>> row = SymbolIndexRow(
 ...     path="pkg.mod.func",
 ...     canonical_path=None,
 ...     kind="function",
+...     doc="A function module.",
 ...     module="pkg.mod",
 ...     package="pkg",
 ...     file="pkg/mod.py",
@@ -35,9 +43,10 @@ Examples
 ...     owner=None,
 ...     stability=None,
 ...     since=None,
-...     deprecated_in=None,
+...     deprecated_in=None,  # canonical snake_case field name
 ...     section=None,
 ...     tested_by=(),
+...     source_link={},
 ...     is_async=False,
 ...     is_property=False,
 ... )
@@ -50,6 +59,52 @@ Examples
 >>> assert isinstance(payload, list)
 >>> restored = symbol_index_from_json(payload)
 >>> assert restored.rows[0].path == "pkg.mod.func"
+
+**Legacy payload migration with alignment helpers:**
+
+When processing payloads from external sources, use `align_schema_fields` to
+validate and normalize before constructing models:
+
+>>> legacy_payload = {
+...     "path": "pkg.func",
+...     "kind": "function",
+...     "doc": "A function",
+...     "deprecated_in": "0.2.0",
+...     "tested_by": [],
+...     "source_link": {},
+... }
+>>> try:
+...     normalized = align_schema_fields(
+...         legacy_payload,
+...         expected_fields=SYMBOL_INDEX_ROW_FIELDS,
+...         artifact_id="symbol-index-row",
+...     )
+...     row = SymbolIndexRow(**normalized)  # type: ignore[arg-type]
+... except Exception as e:
+...     print(f"Validation error: {e}")
+
+**Invalid payload rejection with Problem Details:**
+
+Payloads with unknown fields trigger `ArtifactValidationError` with RFC 9457
+Problem Details context:
+
+>>> invalid_payload = {
+...     "path": "pkg.func",
+...     "kind": "function",
+...     "doc": "A function",
+...     "unknown_field": "invalid",
+...     "tested_by": [],
+...     "source_link": {},
+... }
+>>> try:
+...     align_schema_fields(
+...         invalid_payload,
+...         expected_fields=SYMBOL_INDEX_ROW_FIELDS,
+...         artifact_id="symbol-index-row",
+...     )
+... except Exception as e:
+...     # Error includes remediation guidance and schema link
+...     assert "unknown_field" in str(e)
 """
 
 from __future__ import annotations
@@ -59,7 +114,20 @@ from collections.abc import Mapping as MappingABC
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, cast
 
+from docs._types.alignment import (
+    SYMBOL_DELTA_CHANGE_FIELDS,
+    SYMBOL_DELTA_PAYLOAD_FIELDS,
+    SYMBOL_INDEX_ARTIFACTS_FIELDS,
+    SYMBOL_INDEX_ROW_FIELDS,
+    align_schema_fields,
+)
 from pydantic import BaseModel, Field, field_validator
+
+from kgfoundry_common.errors import (
+    ArtifactDeserializationError,
+    ArtifactSerializationError,
+    ArtifactValidationError,
+)
 
 # Type aliases matching RFC 7159 JSON structure
 type JsonPrimitive = str | int | float | bool | None
@@ -71,6 +139,10 @@ else:
 type JsonPayload = dict[str, JsonValue] | list[JsonValue]
 
 __all__ = [
+    "SYMBOL_DELTA_CHANGE_FIELDS",
+    "SYMBOL_DELTA_PAYLOAD_FIELDS",
+    "SYMBOL_INDEX_ARTIFACTS_FIELDS",
+    "SYMBOL_INDEX_ROW_FIELDS",
     "ArtifactValidationError",
     "JsonPayload",
     "JsonPrimitive",
@@ -80,6 +152,7 @@ __all__ = [
     "SymbolDeltaPayload",
     "SymbolIndexArtifacts",
     "SymbolIndexRow",
+    "align_schema_fields",
     "dump_symbol_delta",
     "dump_symbol_index",
     "load_symbol_delta",
@@ -379,57 +452,6 @@ class SymbolDeltaPayload(BaseModel):
     model_config = {"frozen": True}
 
 
-class ArtifactValidationError(RuntimeError):
-    """Raised when an artifact fails schema validation or conversion.
-
-    Parameters
-    ----------
-    message : str
-        Human-readable error description.
-    artifact_name : str | None, optional
-        Logical name of the artifact (e.g., "symbols.json").
-        Defaults to None.
-    problem_details : dict[str, JsonValue] | None, optional
-        RFC 9457 Problem Details dict with validation context.
-        Defaults to None.
-
-    Attributes
-    ----------
-    artifact_name : str | None
-        Logical name of the artifact, if provided.
-    problem_details : dict[str, JsonValue] | None
-        RFC 9457 Problem Details, if provided.
-
-    Examples
-    --------
-    >>> from docs._types.artifacts import ArtifactValidationError
-    >>> try:
-    ...     raise ArtifactValidationError(
-    ...         "Missing required field: path",
-    ...         artifact_name="symbols.json",
-    ...         problem_details={
-    ...             "type": "urn:kgfoundry:validation-error",
-    ...             "title": "Validation Error",
-    ...             "detail": "Missing required field: path",
-    ...             "instance": "symbols.json",
-    ...         },
-    ...     )
-    ... except ArtifactValidationError as e:
-    ...     assert e.artifact_name == "symbols.json"
-    """
-
-    def __init__(
-        self,
-        message: str,
-        artifact_name: str | None = None,
-        problem_details: dict[str, JsonValue] | None = None,
-    ) -> None:
-        """Initialize ArtifactValidationError."""
-        super().__init__(message)
-        self.artifact_name = artifact_name
-        self.problem_details = problem_details
-
-
 def _validation_error(
     field: str,
     expected: str,
@@ -439,7 +461,10 @@ def _validation_error(
 ) -> ArtifactValidationError:
     prefix = f"Row {row}: " if row is not None else ""
     message = f"{prefix}field '{field}' must be {expected}"
-    return ArtifactValidationError(message, artifact_name=artifact)
+    return ArtifactValidationError(
+        message,
+        context={"artifact": artifact, "field": field},
+    )
 
 
 def _coerce_optional_str(
@@ -453,6 +478,9 @@ def _coerce_optional_str(
         return None
     if isinstance(value, str):
         return value
+    error_msg = f"{field} must be a string or null"
+    if row is not None:
+        error_msg = f"Row {row}: {error_msg}"
     raise _validation_error(field, "a string or null", artifact=artifact, row=row)
 
 
@@ -467,7 +495,7 @@ def _coerce_str_tuple(
         return ()
     if isinstance(value, (list, tuple, set)):
         items: list[str] = []
-        for index, entry in enumerate(value):
+        for index, entry in enumerate(cast(list[object] | tuple[object, ...] | set[object], value)):
             if not isinstance(entry, str):
                 indexed_field = f"{field}[{index}]"
                 raise _validation_error(indexed_field, "a string", artifact=artifact, row=row)
@@ -491,9 +519,11 @@ def _coerce_str_mapping(
         result: dict[str, str] = {}
         for key, val in value.items():
             if not isinstance(key, str):
-                raise _validation_error(f"{field} key", "a string", artifact=artifact, row=row)
+                key_field = f"{field} key"
+                raise _validation_error(key_field, "a string", artifact=artifact, row=row)
             if not isinstance(val, str):
-                raise _validation_error(f"{field}['{key}']", "a string", artifact=artifact, row=row)
+                val_field = f"{field}['{key}']"
+                raise _validation_error(val_field, "a string", artifact=artifact, row=row)
             result[key] = val
         return result
     raise _validation_error(
@@ -523,17 +553,27 @@ def _coerce_optional_int(
 
 
 def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaChange, ...]:
+    """Coerce value to tuple of SymbolDeltaChange."""
     if value is None:
         return ()
     if isinstance(value, (list, tuple)):
         changes: list[SymbolDeltaChange] = []
-        for index, entry in enumerate(value):
-            if isinstance(entry, SymbolDeltaChange):
-                changes.append(entry)
-                continue
+        for index, entry in enumerate(cast(list[object] | tuple[object, ...], value)):
+            # Try to handle as already-instantiated SymbolDeltaChange
+            if hasattr(entry, "__pydantic_core_schema__"):
+                # Likely a Pydantic model; try direct append
+                try:
+                    changes.append(cast(SymbolDeltaChange, entry))
+                    continue
+                except (TypeError, ValueError):
+                    pass
+
+            # Try to handle as mapping (dict-like)
             if isinstance(entry, MappingABC):
                 try:
-                    changes.append(SymbolDeltaChange.model_validate(dict(entry)))
+                    entry_dict: dict[str, object] = dict(cast(MappingABC[str, object], entry))
+                    # Pydantic model_validate is correct; MyPy can't infer return type
+                    changes.append(SymbolDeltaChange.model_validate(entry_dict))  # type: ignore[misc]
                 except Exception as exc:  # pragma: no cover - defensive guard
                     indexed_field = f"changed[{index}]"
                     raise _validation_error(
@@ -542,6 +582,8 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
                         artifact=artifact,
                     ) from exc
                 continue
+
+            # Unknown entry type
             indexed_field = f"changed[{index}]"
             raise _validation_error(
                 indexed_field,
@@ -549,8 +591,9 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
                 artifact=artifact,
             )
         return tuple(changes)
+    changed_field = "changed"
     raise _validation_error(
-        "changed",
+        changed_field,
         "a sequence of change mappings",
         artifact=artifact,
     )
@@ -604,24 +647,33 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
     """
     if not isinstance(raw, list):
         msg = f"Expected list of rows, got {type(raw).__name__}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-index")
+        raise ArtifactDeserializationError(
+            msg,
+            context={"artifact": "symbol-index", "expected": "list"},
+        )
 
     rows: list[SymbolIndexRow] = []
     for i, item in enumerate(raw):
         if not isinstance(item, dict):
             msg = f"Row {i}: expected dict, got {type(item).__name__}"
-            raise ArtifactValidationError(msg, artifact_name="symbol-index")
+            raise ArtifactDeserializationError(
+                msg,
+                context={"artifact": "symbol-index", "row": i},
+            )
 
         try:
             path_raw = item.get("path")
+            path_field = "path"
             if not isinstance(path_raw, str):
-                raise _validation_error("path", "a string", artifact="symbol-index", row=i)
+                raise _validation_error(path_field, "a string", artifact="symbol-index", row=i)
             kind_raw = item.get("kind")
+            kind_field = "kind"
             if not isinstance(kind_raw, str):
-                raise _validation_error("kind", "a string", artifact="symbol-index", row=i)
+                raise _validation_error(kind_field, "a string", artifact="symbol-index", row=i)
             doc_raw = item.get("doc")
+            doc_field = "doc"
             if not isinstance(doc_raw, str):
-                raise _validation_error("doc", "a string", artifact="symbol-index", row=i)
+                raise _validation_error(doc_field, "a string", artifact="symbol-index", row=i)
 
             lineno = _coerce_optional_int(
                 item.get("lineno"), field="lineno", artifact="symbol-index", row=i
@@ -686,7 +738,11 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
             rows.append(row)
         except (KeyError, ValueError, TypeError) as e:
             msg = f"Row {i}: failed to construct SymbolIndexRow: {e}"
-            raise ArtifactValidationError(msg, artifact_name="symbol-index") from e
+            raise ArtifactDeserializationError(
+                msg,
+                cause=e,
+                context={"artifact": "symbol-index", "row": i},
+            ) from e
 
     # Return artifacts with empty lookups (to be populated separately if needed)
     return SymbolIndexArtifacts(
@@ -786,7 +842,10 @@ def symbol_delta_from_json(raw: JsonPayload) -> SymbolDeltaPayload:
     """
     if not isinstance(raw, dict):
         msg = f"Expected dict, got {type(raw).__name__}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-delta")
+        raise ArtifactDeserializationError(
+            msg,
+            context={"artifact": "symbol-delta", "expected": "dict"},
+        )
 
     try:
         base_sha = _coerce_optional_str(
@@ -805,11 +864,15 @@ def symbol_delta_from_json(raw: JsonPayload) -> SymbolDeltaPayload:
             removed=removed,
             changed=changed,
         )
-    except ArtifactValidationError:
+    except ArtifactDeserializationError:
         raise
     except (ValueError, TypeError) as e:
         msg = f"Failed to construct SymbolDeltaPayload: {e}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-delta") from e
+        raise ArtifactDeserializationError(
+            msg,
+            cause=e,
+            context={"artifact": "symbol-delta"},
+        ) from e
 
 
 def symbol_delta_to_payload(model: SymbolDeltaPayload) -> dict[str, JsonValue]:
@@ -886,7 +949,11 @@ def load_symbol_index(path: Path) -> SymbolIndexArtifacts:
         payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError) as e:
         msg = f"Failed to load {path}: {e}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-index") from e
+        raise ArtifactDeserializationError(
+            msg,
+            cause=e,
+            context={"artifact": "symbol-index", "path": str(path)},
+        ) from e
 
     return symbol_index_from_json(payload)
 
@@ -924,7 +991,11 @@ def dump_symbol_index(path: Path, model: SymbolIndexArtifacts) -> None:
         path.write_text(json_str + "\n", encoding="utf-8")
     except (OSError, TypeError) as e:
         msg = f"Failed to dump symbol index to {path}: {e}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-index") from e
+        raise ArtifactSerializationError(
+            msg,
+            cause=e,
+            context={"artifact": "symbol-index", "path": str(path)},
+        ) from e
 
 
 def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
@@ -955,7 +1026,11 @@ def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
         payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError) as e:
         msg = f"Failed to load {path}: {e}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-delta") from e
+        raise ArtifactDeserializationError(
+            msg,
+            cause=e,
+            context={"artifact": "symbol-delta", "path": str(path)},
+        ) from e
 
     return symbol_delta_from_json(payload)
 
@@ -991,4 +1066,8 @@ def dump_symbol_delta(path: Path, model: SymbolDeltaPayload) -> None:
         path.write_text(json_str + "\n", encoding="utf-8")
     except (OSError, TypeError) as e:
         msg = f"Failed to dump symbol delta to {path}: {e}"
-        raise ArtifactValidationError(msg, artifact_name="symbol-delta") from e
+        raise ArtifactSerializationError(
+            msg,
+            cause=e,
+            context={"artifact": "symbol-delta", "path": str(path)},
+        ) from e

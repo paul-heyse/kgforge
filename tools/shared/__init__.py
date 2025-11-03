@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 from importlib import import_module
 from types import ModuleType
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 _SUBMODULES: Final[dict[str, str]] = {
     "cli": "tools._shared.cli",
@@ -24,7 +24,31 @@ _SUBMODULES: Final[dict[str, str]] = {
     "validation": "tools._shared.validation",
 }
 
-__all__: tuple[str, ...] = tuple(sorted(_SUBMODULES))
+__all__: tuple[str, ...] = (
+    "cli",
+    "logging",
+    "metrics",
+    "problem_details",
+    "proc",
+    "prometheus",
+    "schema",
+    "settings",
+    "validation",
+)
+
+
+if TYPE_CHECKING:
+    from tools._shared import (
+        cli,
+        logging,
+        metrics,
+        problem_details,
+        proc,
+        prometheus,
+        schema,
+        settings,
+        validation,
+    )
 
 
 def _load_submodule(name: str) -> ModuleType:

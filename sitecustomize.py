@@ -39,7 +39,6 @@ if TYPE_CHECKING:  # pragma: no cover - imported solely for typing information
         Describe return value.
         """
 
-
 else:  # pragma: no cover - imported lazily when type checking is disabled
     Docstring = Any
     DocstringParam = Any

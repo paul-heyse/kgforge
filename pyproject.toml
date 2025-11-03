@@ -68,7 +68,7 @@ dependencies = [
     # CLI & User Experience
     # ============================================================================
     "typer>=0.19.2",
-    "rich>=14.2.0",
+    "rich",
     "tqdm>=4.67.1",
     "mypy>=1.11.0",
     "mypy-extensions>=1.0.0",
@@ -453,6 +453,9 @@ dependencies = [
     "msgspec>=0.19.0",
     "pyyaml>=6",
     "pyright>=1.1.407",
+    "vulture>=2.14",
+    "refurb>=2.2.0",
+    "semgrep>=1.142.0",
 ]
 
 [project.scripts]
@@ -461,6 +464,11 @@ catalogctl-mcp = "kgfoundry.agent_catalog.mcp:main"
 
 
 [project.optional-dependencies]
+docs = [
+    "griffe>=1.8.0",
+    "sphinx>=8.2.3,<9",
+    "sphinx-autoapi>=3.2.0",
+]
 tools = [
     "build>=1.2.2",
     "prometheus-client>=0.23.1",
@@ -644,6 +652,7 @@ runtime-evaluated-base-classes = [
     "D104",
     "ANN001",
     "ANN201",
+    "ANN401",
     "PLR2004",
     "N806",
     "C401",
@@ -652,6 +661,7 @@ runtime-evaluated-base-classes = [
     "PLR6301",  # pytest test classes require instance methods for test isolation
 ]
 "tests/test_namespace_proxy.py" = ["PLC0415", "PLC2701", "TID251", "TRY003", "EM101"]  # Tests of internal _namespace_proxy module
+"tests/docs/test_griffe_facade.py" = ["PLC2701"]  # Tests of docs._types and docs._scripts facades; imports from private modules expected
 "**/*.pyi" = ["PIE790"]  # Stub files require ... literals
 "tools/check_new_suppressions.py" = ["T201", "BLE001", "SIM102", "PLR2004"]  # CLI script: print is OK, Exception catch for file I/O
 "tools/check_stub_parity.py" = ["T201"]  # CLI script: print is OK for user-facing diagnostic output
@@ -697,7 +707,8 @@ pandas = "pd"
 min_confidence = 90
 
 # Where to scan by default. (You can add "tests" too, but that can be noisy.)
-paths = ["src", "tools", "stubs"]
+# Include the whitelist module so intentionally referenced names stay marked as used.
+paths = ["src", "tools", "stubs", "vulture_whitelist.py"]
 
 # Keep this aligned with your Ruff/mypy excludes.
 exclude = [
@@ -727,8 +738,6 @@ ignore_names = [
   "initialize_*", "register_*"
 ]
 
-# A Python file of stubs that mark dynamic usages as 'used' for Vulture.
-whitelist = ["vulture_whitelist.py"]
 
 [tool.docs.extensions]
 enabled = [
@@ -845,6 +854,14 @@ coverage-threshold = 0.9
 coverage-action = "error"
 missing-params-action = "error"
 missing-returns-action = "error"
+
+[tool.refurb]
+python_version = "3.13"
+# Once the initial migration is complete, add rule IDs along with justifications when
+# suppressing specific diagnostics.
+# ignore = [
+#   "FURB123",
+# ]
 
 [dependency-groups]
 dev = [

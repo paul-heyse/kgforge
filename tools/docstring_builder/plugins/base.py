@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, Protocol, TypeVar, cast, runtime_checkable
 
+from kgfoundry_common.errors import KgFoundryError
+from kgfoundry_common.errors.codes import ErrorCode
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.harvest import HarvestResult
 from tools.docstring_builder.schema import DocstringEdit
@@ -18,6 +20,7 @@ type DocstringPayload = HarvestResult | SemanticResult | DocstringEdit
 
 InputT_contra = TypeVar("InputT_contra", contravariant=True)
 OutputT_co = TypeVar("OutputT_co", covariant=True)
+T_Plugin_co = TypeVar("T_Plugin_co", covariant=True)
 
 
 @dataclass(slots=True, frozen=True)
@@ -27,6 +30,109 @@ class PluginContext:
     config: BuilderConfig
     repo_root: Path
     file_path: Path | None = None
+
+
+@runtime_checkable
+class PluginFactory(Protocol[T_Plugin_co]):
+    """Factory callable for creating plugin instances.
+
+    Parameters
+    ----------
+    T_Plugin_co : TypeVar
+        Type of plugin instance produced by the factory.
+
+    Examples
+    --------
+    >>> from tools.docstring_builder.plugins.base import (
+    ...     PluginFactory,
+    ...     FormatterPlugin,
+    ...     PluginContext,
+    ... )
+    >>> def my_formatter_factory() -> FormatterPlugin:
+    ...     class MyFormatter:
+    ...         name = "my-formatter"
+    ...         stage = "formatter"
+    ...
+    ...         def on_start(self, context: PluginContext) -> None:
+    ...             pass
+    ...
+    ...         def on_finish(self, context: PluginContext) -> None:
+    ...             pass
+    ...
+    ...         def apply(self, context: PluginContext, payload):
+    ...             return payload
+    ...
+    ...     return MyFormatter()
+    """
+
+    def __call__(self, **kwargs: object) -> T_Plugin_co:
+        """Invoke the factory to create a new plugin instance.
+
+        Returns
+        -------
+        T_Plugin_co
+            A concrete plugin instance.
+        """
+        ...
+
+
+class PluginRegistryError(KgFoundryError):
+    """Raised when plugin registration or validation fails.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Human-readable error message.
+    cause : Exception | None, optional
+        The underlying exception that caused this error.
+        Defaults to ``None``.
+    context : dict[str, object] | None, optional
+        Additional context fields for Problem Details.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> from tools.docstring_builder.plugins.base import PluginRegistryError
+    >>> try:
+    ...     raise PluginRegistryError(
+    ...         "Cannot register Protocol class as plugin",
+    ...         context={"plugin_name": "MyPlugin", "stage": "formatter"},
+    ...     )
+    ... except PluginRegistryError as e:
+    ...     assert e.code == "configuration-error"
+    ...     assert e.http_status == 500
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: dict[str, object] | None = None,
+    ) -> None:
+        """Initialize plugin registry error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Error message describing the registration failure.
+        cause : Exception | None, optional
+            The underlying exception, if any.
+            Defaults to ``None``.
+        context : dict[str, object] | None, optional
+            Additional context for Problem Details.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.CONFIGURATION_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context or {},
+        )
 
 
 @runtime_checkable
@@ -282,6 +388,9 @@ __all__ = [
     "LegacyPluginProtocol",
     "OutputT_co",
     "PluginContext",
+    "PluginFactory",
+    "PluginRegistryError",
     "PluginStage",
+    "T_Plugin_co",
     "TransformerPlugin",
 ]

@@ -1,0 +1,18 @@
+# Paths excluded from Semgrep scans
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.git/
+.hg/
+build/
+dist/
+node_modules/
+docs/_build/
+site/
+faiss/
+kgfoundry.egg-info/
+src/kgfoundry.egg-info/
+stubs/
+tests/
+

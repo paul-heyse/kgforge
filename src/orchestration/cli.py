@@ -43,7 +43,9 @@ if TYPE_CHECKING:
 
 
 class _UvicornRun(Protocol):
-    def __call__(self, app: str, *, host: str, port: int, reload: bool = False) -> None: ...
+    def __call__(self, app: str, *, host: str, port: int, reload: bool = False) -> None:
+        del self, app, host, port, reload
+        raise NotImplementedError
 
 
 # Runtime: may be None if Prefect not installed

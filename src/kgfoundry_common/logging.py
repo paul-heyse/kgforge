@@ -20,8 +20,9 @@ import sys
 import time
 from collections.abc import Mapping
 from contextlib import AbstractContextManager
+from dataclasses import dataclass, replace
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Final, Self, TypedDict, cast
+from typing import TYPE_CHECKING, Any, Final, Self, cast
 
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.types import JsonValue
@@ -66,34 +67,127 @@ __navmap__: Final[NavMap] = {
 }
 
 
-class LogContextExtra(TypedDict, total=False):
-    """TypedDict for structured logging extra fields.
+@dataclass(frozen=True, slots=True)
+class LogContextExtra:
+    """Immutable logging context with required and optional structured fields.
 
-    Fields added to logging records via the 'extra' parameter to enable
-    proper type checking when accessing LogRecord attributes.
+    This frozen dataclass ensures thread-safe, immutable logging contexts that
+    can be safely shared across async tasks. Use the `with_*` methods to create
+    updated copies preserving immutability guarantees.
 
     Attributes
     ----------
-    correlation_id : str, optional
+    correlation_id : str | None
         Request or correlation ID for tracing across services.
-    operation : str, optional
+    operation : str | None
         Name of the operation being logged (e.g., "search", "index_build").
-    status : str, optional
+    status : str | None
         Operation status ("success", "error", "started", "in_progress").
-    duration_ms : float, optional
+    duration_ms : float | None
         Operation duration in milliseconds.
-    service : str, optional
+    service : str | None
         Name of the service producing the log.
-    endpoint : str, optional
+    endpoint : str | None
         HTTP endpoint or internal method being executed.
+
+    Examples
+    --------
+    >>> ctx = LogContextExtra(correlation_id="req-123", operation="search")
+    >>> ctx_with_status = ctx.with_status("success")
+    >>> ctx_with_status.status
+    'success'
+    >>> # Immutable: original is unchanged
+    >>> ctx.status is None
+    True
     """
 
-    correlation_id: str
-    operation: str
-    status: str
-    duration_ms: float
-    service: str
-    endpoint: str
+    correlation_id: str | None = None
+    operation: str | None = None
+    status: str | None = None
+    duration_ms: float | None = None
+    service: str | None = None
+    endpoint: str | None = None
+
+    def with_correlation_id(self, correlation_id: str) -> Self:
+        """Return copy with updated correlation_id.
+
+        Parameters
+        ----------
+        correlation_id : str
+            Correlation ID to set.
+
+        Returns
+        -------
+        LogContextExtra
+            New instance with updated correlation_id.
+        """
+        return replace(self, correlation_id=correlation_id)
+
+    def with_operation(self, operation: str) -> Self:
+        """Return copy with updated operation.
+
+        Parameters
+        ----------
+        operation : str
+            Operation name to set.
+
+        Returns
+        -------
+        LogContextExtra
+            New instance with updated operation.
+        """
+        return replace(self, operation=operation)
+
+    def with_status(self, status: str) -> Self:
+        """Return copy with updated status.
+
+        Parameters
+        ----------
+        status : str
+            Status value to set.
+
+        Returns
+        -------
+        LogContextExtra
+            New instance with updated status.
+        """
+        return replace(self, status=status)
+
+    def with_duration_ms(self, duration_ms: float) -> Self:
+        """Return copy with updated duration_ms.
+
+        Parameters
+        ----------
+        duration_ms : float
+            Duration in milliseconds to set.
+
+        Returns
+        -------
+        LogContextExtra
+            New instance with updated duration_ms.
+        """
+        return replace(self, duration_ms=duration_ms)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dict, excluding None values for logging.
+
+        Returns
+        -------
+        dict[str, Any]
+            Dictionary with non-None fields only.
+        """
+        return {
+            k: v
+            for k, v in {
+                "correlation_id": self.correlation_id,
+                "operation": self.operation,
+                "status": self.status,
+                "duration_ms": self.duration_ms,
+                "service": self.service,
+                "endpoint": self.endpoint,
+            }.items()
+            if v is not None
+        }
 
 
 # Context variable for correlation ID propagation (async-safe)
@@ -222,9 +316,17 @@ class JsonFormatter(logging.Formatter):
 
 if TYPE_CHECKING:
 
-    class _LoggerAdapterBase(logging.LoggerAdapter):  # pragma: no cover - typing helper
+    class _LoggerAdapterBase:  # pragma: no cover - typing helper
+        """Typing helper matching logging.LoggerAdapter interface."""
+
         logger: logging.Logger
-        extra: Mapping[str, object] | None
+        extra: LogContextExtra | Mapping[str, object] | None
+
+        def __init__(
+            self,
+            logger: logging.Logger,
+            extra: LogContextExtra | Mapping[str, object] | None,
+        ) -> None: ...
 
 else:
     _LoggerAdapterBase = logging.LoggerAdapter
@@ -243,9 +345,9 @@ class LoggerAdapter(_LoggerAdapterBase):
     ----------
     logger : logging.Logger
         Base logger instance to wrap.
-    extra : Mapping[str, object] | None, optional
-        Structured fields to inject into log entries.
-        Defaults to ``None``.
+    extra : LogContextExtra | Mapping[str, object] | None, optional
+        Structured fields to inject into log entries. Can be a LogContextExtra
+        frozen dataclass or dict of fields. Defaults to ``None``.
 
     Examples
     --------
@@ -256,7 +358,6 @@ class LoggerAdapter(_LoggerAdapterBase):
     """
 
     logger: logging.Logger
-    extra: Mapping[str, object] | None
 
     def process(self, msg: str, kwargs: Mapping[str, Any]) -> tuple[str, Any]:
         """Process log message and inject structured fields.
@@ -280,9 +381,14 @@ class LoggerAdapter(_LoggerAdapterBase):
 
         extra = kwargs.setdefault("extra", {})
 
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
         # This allows with_fields to inject fields that persist across log calls
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -326,8 +432,13 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -346,8 +457,13 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -366,8 +482,13 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -386,8 +507,13 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -400,14 +526,32 @@ class LoggerAdapter(_LoggerAdapterBase):
         kwargs_dict["extra"] = extra
         self.logger.error(msg, *args, **kwargs_dict)
 
+    def exception(
+        self,
+        msg: object,
+        *args: object,
+        exc_info: object | bool = True,
+        **kwargs: object,
+    ) -> None:
+        """Log an error with traceback using structured fields."""
+        kwargs_dict = cast(dict[str, Any], kwargs)
+        if "exc_info" not in kwargs_dict or kwargs_dict["exc_info"] is False:
+            kwargs_dict["exc_info"] = exc_info
+        self.error(msg, *args, **kwargs_dict)
+
     def critical(self, msg: object, *args: object, **kwargs: object) -> None:
         """Log a critical message with structured fields."""
         kwargs_dict = cast(dict[str, Any], kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -426,8 +570,13 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        # Handle LogContextExtra dataclass: convert to dict if needed
+        if isinstance(self.extra, LogContextExtra):
+            for key, value in self.extra.to_dict().items():
+                if key not in extra:
+                    extra[key] = value
         # Merge self.extra (fields from LoggerAdapter constructor) into extra
-        if isinstance(self.extra, dict):
+        elif isinstance(self.extra, dict):
             for key, value in self.extra.items():
                 if key not in extra:
                     extra[key] = value
@@ -745,6 +894,7 @@ class CorrelationContext:
         """
         if self._token is not None:
             _correlation_id.reset(self._token)
+        del exc_type, exc_val, exc_tb
 
 
 class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
@@ -776,6 +926,7 @@ class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
     ) -> bool | None:
         if self._token is not None:
             _correlation_id.reset(self._token)
+        del exc_type, exc_value, exc_tb
         return None
 
 

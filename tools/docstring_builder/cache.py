@@ -7,7 +7,7 @@ import logging
 import threading
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Final, cast
+from typing import Final, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
@@ -55,12 +55,43 @@ CacheDocumentType: type[CacheDocument] = CacheDocument
 _CACHE_DOCUMENT_ADAPTER: Final[TypeAdapter[CacheDocument]] = TypeAdapter(CacheDocumentType)
 
 
+class _CacheDocumentInit(TypedDict, total=False):
+    schemaVersion: str
+    schemaId: str
+    generatedAt: str
+    entries: dict[str, CacheEntry]
+
+
+def _new_document(
+    *,
+    schema_version: str = DOCSTRING_CACHE_VERSION,
+    schema_id: str = DOCSTRING_CACHE_SCHEMA_ID,
+    generated_at: str | None = None,
+    entries: dict[str, CacheEntry] | None = None,
+) -> CacheDocument:
+    """Create a :class:`CacheDocument` with schema-aligned keyword casing."""
+    payload_entries: dict[str, CacheEntry]
+    if entries is None:
+        payload_entries = {}
+    else:
+        payload_entries = dict(entries)
+
+    payload: _CacheDocumentInit = {
+        "schemaVersion": schema_version,
+        "schemaId": schema_id,
+        "entries": payload_entries,
+    }
+    if generated_at is not None:
+        payload["generatedAt"] = generated_at
+    return CacheDocument(**payload)
+
+
 class BuilderCache:
     """Persist and query cache entries keyed by file path."""
 
     def __init__(self, path: Path) -> None:
         self.path = path
-        self._document = CacheDocument()
+        self._document = _new_document()
         self._lock = threading.Lock()
         if not path.exists():
             return
@@ -108,7 +139,7 @@ class BuilderCache:
         with self._lock:
             entries: dict[str, CacheEntry] = dict(self._document.entries)
             entries[key] = CacheEntry(mtime=mtime, config_hash=config_hash)
-            self._document = CacheDocument(
+            self._document = _new_document(
                 schema_version=self._document.schema_version,
                 schema_id=self._document.schema_id,
                 generated_at=datetime.now(tz=UTC).isoformat(),
@@ -130,7 +161,7 @@ class BuilderCache:
     def clear(self) -> None:
         """Reset the cache by removing the backing file."""
         with self._lock:
-            self._document = CacheDocument()
+            self._document = _new_document()
         if self.path.exists():
             self.path.unlink()
 
