@@ -42,6 +42,8 @@ if TYPE_CHECKING:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = REPO_ROOT / "src"
 
+STANDARD_METHOD_EXTENDED_SUMMARIES = _STANDARD_METHOD_EXTENDED_SUMMARIES
+
 
 @dataclass(slots=True)
 class _CollectedSymbol:
@@ -222,6 +224,11 @@ def _normalize_qualified_name(name: str) -> str:
     return QUALIFIED_NAME_OVERRIDES.get(base, base)
 
 
+def normalize_qualified_name(name: str) -> str:
+    """Canonicalise a fully-qualified name using the override catalogue."""
+    return _normalize_qualified_name(name)
+
+
 def _wrap_text(text: str) -> list[str]:
     wrapped: list[str] = []
     for raw_paragraph in text.splitlines():
@@ -258,6 +265,26 @@ def _required_sections(context: _RequiredSectionsContext) -> list[str]:
     if context.kind == "function" and context.is_public:
         required.append("Examples")
     return required
+
+
+def required_sections(
+    kind: str,
+    parameters: Sequence[DocstringIRParameter],
+    returns: str | None,
+    raises: Sequence[str],
+    *,
+    is_public: bool,
+    **_: object,
+) -> list[str]:
+    """Return the ordered docstring sections for a symbol description."""
+    context = _RequiredSectionsContext(
+        kind=kind,
+        parameters=list(parameters),
+        returns_annotation=returns,
+        raises=list(raises),
+        is_public=is_public,
+    )
+    return _required_sections(context)
 
 
 def build_examples(context: _ExampleContext) -> list[str]:
@@ -363,6 +390,16 @@ def _is_magic(name: str) -> bool:
 def _is_pydantic_artifact(name: str) -> bool:
     """Return ``True`` when the provided name refers to a Pydantic helper."""
     return overrides_is_pydantic_artifact(name)
+
+
+def is_magic(name: str) -> bool:
+    """Return ``True`` when the provided callable is a Python magic method."""
+    return _is_magic(name)
+
+
+def is_pydantic_artifact(name: str) -> bool:
+    """Return ``True`` when the provided name refers to a Pydantic helper."""
+    return _is_pydantic_artifact(name)
 
 
 def build_docstring(
@@ -501,6 +538,7 @@ __all__ = [
     "MAGIC_METHOD_EXTENDED_SUMMARIES",
     "PYDANTIC_ARTIFACT_SUMMARIES",
     "QUALIFIED_NAME_OVERRIDES",
+    "STANDARD_METHOD_EXTENDED_SUMMARIES",
     "_STANDARD_METHOD_EXTENDED_SUMMARIES",
     "_RequiredSectionsContext",
     "_is_magic",
@@ -512,8 +550,12 @@ __all__ = [
     "build_examples",
     "detect_raises",
     "extended_summary",
+    "is_magic",
+    "is_pydantic_artifact",
     "module_name_for",
+    "normalize_qualified_name",
     "parameters_for",
     "process_file",
+    "required_sections",
     "summarize",
 ]

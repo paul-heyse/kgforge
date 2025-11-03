@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from tools import (
         CliEnvelope,
     )
+    from tools.navmap.build_navmap import ModuleInfo
 
 LOGGER = get_logger(__name__)
 
@@ -39,7 +40,7 @@ REPO = Path(__file__).resolve().parents[2]
 SRC = REPO / "src"
 
 try:
-    import tools.navmap.build_navmap as _navmap_builder
+    from tools.navmap.build_navmap import collect_module_info
 except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for packaging installs
     message = (
         "tools.navmap.repair_navmaps requires the tooling optional extra. "
@@ -47,9 +48,6 @@ except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for pa
         "before invoking this script."
     )
     raise ModuleNotFoundError(message) from exc
-
-ModuleInfo = _navmap_builder.ModuleInfo
-_collect_module = _navmap_builder._collect_module
 
 type SymbolMetadata = dict[str, str]
 
@@ -65,12 +63,19 @@ class RepairResult:
 
 
 @dataclass(frozen=True)
+class RepairExecutionConfig:
+    """Execution options controlling how repairs are applied and reported."""
+
+    apply_changes: bool = False
+    emit_json: bool = False
+
+
+@dataclass(frozen=True)
 class RepairArgs:
     """CLI arguments normalized for downstream consumption."""
 
     root: Path
-    apply: bool
-    json: bool
+    config: RepairExecutionConfig
 
 
 def _collect_modules(root: Path) -> list[ModuleInfo]:
@@ -98,7 +103,7 @@ def _collect_modules(root: Path) -> list[ModuleInfo]:
     """
     modules: list[ModuleInfo] = []
     for py in sorted(root.rglob("*.py")):
-        info = _collect_module(py)
+        info = collect_module_info(py)
         if info:
             modules.append(info)
     return modules
@@ -354,15 +359,19 @@ def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, object]:
     return navmap
 
 
-def repair_module(info: ModuleInfo, apply: bool = False) -> RepairResult:
+def repair_module(
+    info: ModuleInfo,
+    *,
+    execution: RepairExecutionConfig,
+) -> RepairResult:
     """Repair a single module's navmap metadata and optionally persist fixes.
 
     Parameters
     ----------
     info
         Metadata describing the target module discovered by ``build_navmap``.
-    apply
-        When ``True`` the computed edits are written back to disk.
+    execution
+        Execution options controlling whether changes are applied to disk.
 
     Returns
     -------
@@ -393,7 +402,7 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> RepairResult:
     changed = changed or nav_changed
     messages.extend(nav_messages)
 
-    if changed and apply:
+    if changed and execution.apply_changes:
         new_text = "\n".join(lines)
         if not new_text.endswith("\n"):
             new_text += "\n"
@@ -403,13 +412,13 @@ def repair_module(info: ModuleInfo, apply: bool = False) -> RepairResult:
         module=path,
         messages=messages,
         changed=changed,
-        applied=changed and apply,
+        applied=changed and execution.apply_changes,
     )
 
 
-def repair_all(root: Path, apply: bool) -> list[RepairResult]:
+def repair_all(root: Path, *, execution: RepairExecutionConfig) -> list[RepairResult]:
     """Repair every module under ``root`` and aggregate the results."""
-    return [repair_module(info, apply=apply) for info in _collect_modules(root)]
+    return [repair_module(info, execution=execution) for info in _collect_modules(root)]
 
 
 def _parse_args(argv: list[str] | None = None) -> RepairArgs:
@@ -456,11 +465,16 @@ def _parse_args(argv: list[str] | None = None) -> RepairArgs:
     root_arg = cast("Path", namespace.root)
     apply_flag = cast("bool", namespace.apply)
     json_flag = cast("bool", namespace.json)
-    return RepairArgs(root=root_arg, apply=apply_flag, json=json_flag)
+    execution = RepairExecutionConfig(apply_changes=apply_flag, emit_json=json_flag)
+    return RepairArgs(root=root_arg, config=execution)
 
 
 def _build_json_envelope(
-    messages: list[str], duration: float, has_issues: bool, apply: bool
+    messages: list[str],
+    duration: float,
+    *,
+    has_issues: bool,
+    execution: RepairExecutionConfig,
 ) -> CliEnvelope:
     """Build CLI envelope JSON payload for repair results.
 
@@ -472,8 +486,8 @@ def _build_json_envelope(
         Operation duration in seconds.
     has_issues : bool
         Whether any issues were detected.
-    apply : bool
-        Whether fixes were applied.
+    execution : RepairExecutionConfig
+        Execution configuration used for the repair.
     """
     builder = CliEnvelopeBuilder.create(
         command="repair_navmaps",
@@ -501,7 +515,7 @@ def _build_json_envelope(
                     message=msg,
                 )
 
-        if not apply:
+        if not execution.apply_changes:
             builder.set_problem(
                 build_problem_details(
                     ProblemDetailsParams(
@@ -578,13 +592,18 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
 
     try:
-        results = repair_all(root, apply=args.apply)
+        results = repair_all(root, execution=args.config)
         messages = [msg for result in results for msg in result.messages]
         duration = time.monotonic() - start_time
         has_issues = any(result.changed or result.messages for result in results)
 
-        if args.json:
-            envelope = _build_json_envelope(messages, duration, has_issues, args.apply)
+        if args.config.emit_json:
+            envelope = _build_json_envelope(
+                messages,
+                duration,
+                has_issues=has_issues,
+                execution=args.config,
+            )
             validate_cli_envelope(envelope)
             sys.stdout.write(render_cli_envelope(envelope))
             sys.stdout.write("\n")
@@ -595,13 +614,13 @@ def main(argv: list[str] | None = None) -> int:
             LOGGER.info("navmap repair: no issues detected")
             return 0
         LOGGER.info("\n".join(messages))
-        if not args.apply:
+        if not args.config.apply_changes:
             LOGGER.info("\nRe-run with --apply to write these fixes.")
         else:
             LOGGER.info("\nnavmap repair: applied fixes")
     except Exception as exc:
         duration = time.monotonic() - start_time
-        if args.json:
+        if args.config.emit_json:
             envelope = _build_error_envelope(exc, duration)
             try:
                 validate_cli_envelope(envelope)

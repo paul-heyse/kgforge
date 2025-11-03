@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import collections
 import importlib
-import inspect
 import json
 import logging
 import os
@@ -463,32 +462,36 @@ autoapi_ignore: list[str] = [
 ]
 
 
-def _autoapi_parse_file(
-    self: AutoapiParser, file_path: str, condition: Callable[[str], bool]
-) -> object:  # pragma: no cover - compatibility shim
-    path = Path(file_path)
-    module_parts: collections.deque[str] = collections.deque()
-    if path.name not in {"__init__.py", "__init__.pyi"}:
-        module_parts.append(path.stem)
-    parent = path.parent
-    while str(parent) and condition(str(parent)):
-        module_parts.appendleft(parent.name)
-        parent = parent.parent
+class KgAutoapiParser(AutoapiParserCls):  # type: ignore[misc]
+    """Parser that resolves module namespaces without mutating private APIs."""
 
-    module_name = ".".join(module_parts)
-    manager = AstroidManagerCls()
-    builder_class = AstroidBuilderCls
-    builder: AstroidBuilder
-    try:
-        builder = builder_class(manager)
-    except TypeError:
-        builder = builder_class()
-    node = builder.file_build(file_path, module_name)
-    return self.parse(node)
+    def _parse_file(  # pragma: no cover - compatibility shim
+        self,
+        file_path: str,
+        condition: Callable[[str], bool],
+    ) -> object:
+        path = Path(file_path)
+        module_parts: collections.deque[str] = collections.deque()
+        if path.name not in {"__init__.py", "__init__.pyi"}:
+            module_parts.append(path.stem)
+        parent = path.parent
+        while str(parent) and condition(str(parent)):
+            module_parts.appendleft(parent.name)
+            parent = parent.parent
+
+        module_name = ".".join(module_parts)
+        manager = AstroidManagerCls()
+        builder_class = AstroidBuilderCls
+        try:
+            builder = builder_class(manager)
+        except TypeError:
+            builder = builder_class()
+        node = builder.file_build(file_path, module_name)
+        return self.parse(node)
 
 
-if "manager" in inspect.signature(AstroidBuilderCls.__init__).parameters:
-    AutoapiParserCls._parse_file = _autoapi_parse_file  # type: ignore[attr-defined]
+autoapi_parser.Parser = KgAutoapiParser
+AutoapiParserCls = KgAutoapiParser
 
 # Show type hints nicely
 autodoc_typehints = "description"

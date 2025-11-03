@@ -214,7 +214,7 @@ def _build_parameters_content(
         if annotation_text is None:
             harvested_text = harvested.get(parameter.name)
             annotation_text = harvested_text or "Any"
-        optional = parameter.default is not inspect._empty
+        optional = parameter.default is not inspect.Signature.empty
         default_text = _format_default(parameter.default)
         block = blocks.get(parameter.name) or _ParameterBlock(
             display_name=display,
@@ -247,7 +247,7 @@ def _build_returns_content(
 
 
 def _format_default(value: object) -> str | None:
-    if value is inspect._empty:
+    if value is inspect.Signature.empty:
         return None
     if isinstance(value, str):
         return repr(value)

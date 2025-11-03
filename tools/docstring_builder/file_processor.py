@@ -58,8 +58,7 @@ class CollectEditsCallable(Protocol):
         format_only: bool = False,
     ) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
         """Return semantic artifacts, edits, and IR entries for a harvested module."""
-
-        ...
+        raise NotImplementedError
 
 
 class ApplyEditsCallable(Protocol):
@@ -73,8 +72,7 @@ class ApplyEditsCallable(Protocol):
         apply_config: DocstringApplyConfig | None = None,
     ) -> tuple[bool, str | None]:
         """Apply rendered docstrings and return change status plus optional preview."""
-
-        ...
+        raise NotImplementedError
 
 
 def _load_apply_edits() -> ApplyEditsCallable:

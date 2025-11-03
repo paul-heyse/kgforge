@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import inspect
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, Protocol, TypeGuard, cast, runtime_checkable
 
 import libcst as cst
 
 from tools.docstring_builder.models import SymbolResolutionError
+from tools.docstring_builder.parameters import format_parameter_name, normalize_parameter_kind
 from tools.griffe_utils import resolve_griffe
 
 if TYPE_CHECKING:
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from tools.docstring_builder.config import BuilderConfig
+    from tools.docstring_builder.parameters import ParameterKind
 
 try:  # Import lazily so unit tests can patch when griffe is unavailable.
     _GRIFFE_API = resolve_griffe()
@@ -99,17 +100,6 @@ def _is_griffe_module(obj: object) -> TypeGuard[GriffeModuleLike]:
     return isinstance(obj, ModuleType)
 
 
-_KIND_LOOKUP: dict[str, inspect._ParameterKind] = {
-    "positional_only": inspect._ParameterKind.POSITIONAL_ONLY,
-    "positional_or_keyword": inspect._ParameterKind.POSITIONAL_OR_KEYWORD,
-    "var_positional": inspect._ParameterKind.VAR_POSITIONAL,
-    "variadic_positional": inspect._ParameterKind.VAR_POSITIONAL,
-    "keyword_only": inspect._ParameterKind.KEYWORD_ONLY,
-    "var_keyword": inspect._ParameterKind.VAR_KEYWORD,
-    "variadic_keyword": inspect._ParameterKind.VAR_KEYWORD,
-}
-
-
 def _safe_getattr(value: object, attr: str) -> object | None:
     try:
         attr_value = cast("object", getattr(value, attr))
@@ -132,22 +122,12 @@ def _docstring_value(docstring: GriffeDocstringLike | None) -> str | None:
     return value if value is not None else None
 
 
-def _normalize_parameter_kind(value: object) -> inspect._ParameterKind:
-    """Coerce ``griffe`` parameter kinds into :class:`inspect._ParameterKind`."""
-    if isinstance(value, inspect._ParameterKind):
-        return value
-    name = _extract_string_attribute(value, "name")
-    token_source = name if name is not None else _safe_getattr(value, "value")
-    key = str(token_source if token_source is not None else value).replace("-", "_").lower()
-    return _KIND_LOOKUP.get(key, inspect._ParameterKind.POSITIONAL_OR_KEYWORD)
-
-
 @dataclass(slots=True)
 class ParameterHarvest:
     """Harvested signature information for a single parameter."""
 
     name: str
-    kind: inspect._ParameterKind
+    kind: ParameterKind
     annotation: str | None
     default: str | None
 
@@ -158,11 +138,7 @@ class ParameterHarvest:
 
 def parameter_display_name(parameter: ParameterHarvest) -> str:
     """Format a harvested parameter for docstring sections."""
-    if parameter.kind is inspect._ParameterKind.VAR_POSITIONAL:
-        return f"*{parameter.name}"
-    if parameter.kind is inspect._ParameterKind.VAR_KEYWORD:
-        return f"**{parameter.name}"
-    return parameter.name
+    return format_parameter_name(parameter.name, parameter.kind)
 
 
 @dataclass(slots=True)
@@ -283,7 +259,7 @@ def _iter_parameters(function: GriffeFunctionLike) -> Iterator[ParameterHarvest]
     for param in function.parameters:
         yield ParameterHarvest(
             name=param.name,
-            kind=_normalize_parameter_kind(param.kind),
+            kind=normalize_parameter_kind(param.kind),
             annotation=_annotation_to_str(param.annotation),
             default=_default_to_str(param.default),
         )

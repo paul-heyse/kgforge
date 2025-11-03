@@ -19,14 +19,25 @@ DEFAULT_OUTPUT: Final[Path] = (
 
 
 @dataclass(frozen=True)
+class NavmapWriteConfig:
+    """Configuration controlling how the navmap JSON payload is emitted."""
+
+    indent: int | None = 2
+
+
+@dataclass(frozen=True)
 class MigrateArgs:
     """CLI arguments for ``migrate_navmaps`` after parsing."""
 
     output: Path
-    compact: bool
+    write_config: NavmapWriteConfig
 
 
-def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str, object]:
+def migrate_navmaps(
+    output: Path | None = None,
+    *,
+    config: NavmapWriteConfig | None = None,
+) -> dict[str, object]:
     """Rebuild the navigation map JSON file from the current source tree.
 
     Parameters
@@ -34,9 +45,9 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
     output
         Destination path for the generated JSON document. When ``None`` the
         navmap is only returned to the caller.
-    pretty
-        When ``True`` the JSON is emitted with indentation suitable for code
-        reviews; otherwise a compact representation is written.
+    config
+        Controls JSON emission options, including indentation. Defaults to
+        :class:`NavmapWriteConfig` which emits human-readable JSON.
 
     Returns
     -------
@@ -44,10 +55,11 @@ def migrate_navmaps(output: Path | None = None, pretty: bool = True) -> dict[str
         Structured navigation metadata emitted by
         :func:`tools.navmap.build_navmap.build_index`.
     """
+    write_config = config or NavmapWriteConfig()
     index = build_index()
     if output:
         output.parent.mkdir(parents=True, exist_ok=True)
-        text = json.dumps(index, indent=2 if pretty else None)
+        text = json.dumps(index, indent=write_config.indent)
         output.write_text(text, encoding="utf-8")
     return index
 
@@ -69,7 +81,7 @@ def _parse_args(argv: list[str] | None = None) -> MigrateArgs:
     namespace = parser.parse_args(argv)
     return MigrateArgs(
         output=cast("Path", namespace.output),
-        compact=cast("bool", namespace.compact),
+        write_config=NavmapWriteConfig(indent=None if cast("bool", namespace.compact) else 2),
     )
 
 
@@ -87,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
         ``0`` on success so the helper integrates cleanly with shell pipelines.
     """
     args = _parse_args(argv)
-    migrate_navmaps(args.output, pretty=not args.compact)
+    migrate_navmaps(args.output, config=args.write_config)
     LOGGER.info("Wrote navmap index to %s", args.output)
     return 0
 
