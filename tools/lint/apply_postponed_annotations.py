@@ -34,7 +34,7 @@ import argparse
 import ast
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -225,7 +225,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         "directories",
         nargs="*",
         type=Path,
-        default=[Path("src")],  # type: ignore[misc]
         help="Directories to process (default: src/)",
     )
     parser.add_argument(
@@ -242,7 +241,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     total_errors = 0
 
     # Cast for type safety (argparse.Namespace.directories is typed as Any)
-    directories: list[Path] = [Path(d) for d in (args.directories or [])]  # type: ignore[misc]
+    raw_directories = cast("Sequence[Path]", getattr(args, "directories", ()))
+    directories = list(raw_directories) if raw_directories else [Path("src")]
     for directory in directories:
         if not directory.exists():
             msg = f"Directory not found: {directory}"
@@ -251,7 +251,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         processed, modified, errors = process_directory(
             directory,
-            check_only=args.check_only,  # type: ignore[misc]
+            check_only=bool(getattr(args, "check_only", False)),
             logger=logger,
         )
         total_processed += processed
@@ -259,7 +259,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         total_errors += errors
 
     # Summary
-    mode = "(CHECK-ONLY)" if args.check_only else "(MODIFIED)"  # type: ignore[misc]
+    mode = "(CHECK-ONLY)" if bool(getattr(args, "check_only", False)) else "(MODIFIED)"
     summary_msg = (
         f"Summary {mode}: processed={total_processed}, "
         f"modified={total_modified}, errors={total_errors}"

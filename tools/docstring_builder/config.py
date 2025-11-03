@@ -113,7 +113,7 @@ def _package_settings_from(data: Mapping[str, object]) -> PackageSettings:
     )
 
 
-def _bool_option(data: Mapping[str, object], key: str, default: bool = False) -> bool:
+def _bool_option(data: Mapping[str, object], key: str, *, default: bool = False) -> bool:
     raw_value = data.get(key, default)
     return bool(raw_value)
 
@@ -133,7 +133,7 @@ def load_config(path: Path | None = None) -> BuilderConfig:
     ownership_marker = str(data.get("ownership_marker", DEFAULT_MARKER))
     dynamic_probes = _bool_option(data, "dynamic_probes")
     normalize_sections = _bool_option(data, "normalize_sections")
-    navmap_metadata = _bool_option(data, "navmap_metadata", True)
+    navmap_metadata = _bool_option(data, "navmap_metadata", default=True)
     package_settings = _package_settings_from(data)
     llm_summary_mode = str(data.get("llm_summary_mode", "off")).lower()
     render_signature = _bool_option(data, "render_signature")

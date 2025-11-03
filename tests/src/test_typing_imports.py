@@ -124,6 +124,6 @@ def test_typing_facade_symbols_available() -> None:
     ]
 
     for symbol in essential_symbols:
-        assert hasattr(kgfoundry_common.typing, symbol), (
-            f"kgfoundry_common.typing should provide {symbol}"
-        )
+        assert hasattr(
+            kgfoundry_common.typing, symbol
+        ), f"kgfoundry_common.typing should provide {symbol}"

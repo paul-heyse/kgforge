@@ -19,17 +19,22 @@ from uuid import uuid4
 import typer
 
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
-from kgfoundry_common.errors import IndexBuildError
+from kgfoundry_common.errors import ConfigurationError, IndexBuildError
 from kgfoundry_common.jsonschema_utils import (
     create_draft202012_validator,
 )
-from kgfoundry_common.problem_details import build_problem_details, render_problem
+from kgfoundry_common.problem_details import (
+    build_configuration_problem,
+    build_problem_details,
+    render_problem,
+)
 from kgfoundry_common.schema_helpers import load_schema
 from kgfoundry_common.vector_types import (
     VectorValidationError,
     coerce_vector_batch,
 )
 from orchestration import safe_pickle
+from orchestration.config import IndexCliConfig
 
 if TYPE_CHECKING:
     # Type signature for e2e_flow: takes no args, returns list of strings
@@ -67,7 +72,7 @@ with contextlib.suppress(ImportError):
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["api", "e2e", "index_bm25", "index_faiss"]
+__all__ = ["api", "e2e", "index_bm25", "index_faiss", "run_index_faiss"]
 
 __navmap__: Final[NavMap] = {
     "title": "orchestration.cli",
@@ -514,6 +519,170 @@ def _index_bm25_cli(
 
 
 # [nav:anchor index_faiss]
+def run_index_faiss(*, config: IndexCliConfig) -> None:
+    """Build FAISS index from dense vectors using typed configuration.
+
+    This function builds a FAISS index from dense vector data with structured
+    observability and comprehensive error handling. The operation is **idempotent**:
+    if an index already exists at the output path, it will be rebuilt from scratch.
+
+    Parameters
+    ----------
+    config : IndexCliConfig
+        Typed configuration with dense_vectors path, index_path, factory string,
+        and metric type.
+
+    Raises
+    ------
+    typer.Exit
+        On any error with exit code 1. Errors are logged with correlation ID
+        and rendered as RFC 9457 Problem Details JSON to stderr.
+
+    Notes
+    -----
+    - **Idempotency**: Running twice with identical inputs rebuilds the index.
+    - **Retries**: No automatic retries. On failure, check logs and re-run.
+    - **GPU Fallback**: If GPU unavailable, CPU index is built automatically.
+    - **Error Handling**: Configuration errors are rendered as Problem Details with
+      correlation IDs for observability and debugging.
+
+    Examples
+    --------
+    Build Flat CPU index for testing:
+
+    >>> from orchestration.config import IndexCliConfig
+    >>> config = IndexCliConfig(
+    ...     dense_vectors="vectors.json",
+    ...     index_path="./_indices/faiss/shard_000.idx",
+    ...     factory="Flat",
+    ...     metric="ip",
+    ... )
+    >>> # run_index_faiss(config=config)
+
+    Build quantized GPU index:
+
+    >>> config = IndexCliConfig(
+    ...     dense_vectors="vectors.json",
+    ...     index_path="./_indices/faiss/shard_000.idx",
+    ...     factory="OPQ64,IVF8192,PQ64",
+    ...     metric="ip",
+    ... )
+    >>> # run_index_faiss(config=config)
+    """
+    correlation_id = uuid4().hex
+    instance_uri = f"urn:orchestration:index-faiss:{correlation_id}"
+
+    try:
+        _prepare_index_directory(config.index_path)
+        batch = load_vector_batch_from_json(config.dense_vectors)
+
+        logger.info(
+            "Building FAISS index",
+            extra={
+                "operation": "index_faiss",
+                "factory": config.factory,
+                "metric": config.metric,
+                "vectors": batch.count,
+                "dimension": batch.dimension,
+                "correlation_id": correlation_id,
+            },
+        )
+
+        matrix_rows = cast("list[list[float]]", batch.matrix.tolist())
+        vectors_payload: list[list[float]] = [
+            [float(component) for component in row] for row in matrix_rows
+        ]
+        index_data: dict[str, object] = {
+            "keys": [str(vector_id) for vector_id in batch.ids],
+            "vectors": vectors_payload,
+            "factory": config.factory,
+            "metric": config.metric,
+        }
+        with Path(config.index_path).open("wb") as file_obj:
+            safe_pickle.dump(index_data, file_obj)
+
+        logger.info(
+            "Index saved successfully",
+            extra={
+                "operation": "index_faiss",
+                "path": config.index_path,
+                "correlation_id": correlation_id,
+            },
+        )
+        typer.echo(f"FAISS index vectors stored at {config.index_path}")
+        logger.info(
+            "FAISS index build completed",
+            extra={
+                "operation": "index_faiss",
+                "path": config.index_path,
+                "factory": config.factory,
+                "metric": config.metric,
+                "correlation_id": correlation_id,
+            },
+        )
+
+    except VectorValidationError as exc:
+        logger.exception(
+            "Vector validation failed",
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
+        )
+        problem = _build_vector_problem_details(
+            detail=str(exc),
+            correlation_id=correlation_id,
+            vector_path=config.dense_vectors,
+            errors=exc.errors,
+            instance=instance_uri,
+        )
+        typer.echo(render_problem(problem), err=True)
+        index_error = IndexBuildError(
+            "Vector payload failed validation",
+            cause=exc,
+            context={"problem": problem, "correlation_id": correlation_id},
+        )
+        raise typer.Exit(code=1) from index_error
+
+    except ConfigurationError as exc:
+        logger.exception(
+            "Configuration validation failed",
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
+        )
+        problem = build_configuration_problem(exc)
+        typer.echo(render_problem(problem), err=True)
+        raise typer.Exit(code=2) from exc
+
+    except (TypeError, json.JSONDecodeError, FileNotFoundError) as exc:
+        logger.exception(
+            "Vector loading failed",
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
+        )
+        typer.echo(f"Error loading vectors: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+
+    except (OSError, ValueError, RuntimeError) as exc:
+        logger.exception(
+            "Index save failed",
+            extra={
+                "operation": "index_faiss",
+                "error": type(exc).__name__,
+                "correlation_id": correlation_id,
+            },
+        )
+        typer.echo(f"Error saving index: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+
+
 def index_faiss(
     dense_vectors: Annotated[
         str, typer.Argument(..., help="Path to dense vectors JSON (skeleton)")
@@ -566,126 +735,13 @@ def index_faiss(
         kgfoundry orchestration cli index_faiss vectors.json \\
             --factory "OPQ64,IVF8192,PQ64"
     """
-    config = FaissIndexConfig(
+    config = IndexCliConfig(
         dense_vectors=dense_vectors,
         index_path=index_path,
         factory=factory,
         metric=metric,
     )
-
-    correlation_id = uuid4().hex
-    instance_uri = f"urn:orchestration:index-faiss:{correlation_id}"
-
-    try:
-        _prepare_index_directory(config.index_path)
-        batch = load_vector_batch_from_json(config.dense_vectors)
-
-        logger.info(
-            "Building FAISS index",
-            extra={
-                "operation": "index_faiss",
-                "factory": factory,
-                "metric": metric,
-                "vectors": batch.count,
-                "dimension": batch.dimension,
-                "correlation_id": correlation_id,
-            },
-        )
-
-        matrix_rows = cast("list[list[float]]", batch.matrix.tolist())
-        vectors_payload: list[list[float]] = [
-            [float(component) for component in row] for row in matrix_rows
-        ]
-        index_data: dict[str, object] = {
-            "keys": [str(vector_id) for vector_id in batch.ids],
-            "vectors": vectors_payload,
-            "factory": factory,
-            "metric": metric,
-        }
-        with Path(config.index_path).open("wb") as file_obj:
-            safe_pickle.dump(index_data, file_obj)
-
-        logger.info(
-            "Index saved successfully",
-            extra={
-                "operation": "index_faiss",
-                "path": index_path,
-                "correlation_id": correlation_id,
-            },
-        )
-        typer.echo(f"FAISS index vectors stored at {config.index_path}")
-        logger.info(
-            "FAISS index build completed",
-            extra={
-                "operation": "index_faiss",
-                "path": index_path,
-                "factory": factory,
-                "metric": metric,
-                "correlation_id": correlation_id,
-            },
-        )
-
-    except VectorValidationError as exc:
-        logger.exception(
-            "Vector validation failed",
-            extra={
-                "operation": "index_faiss",
-                "error": type(exc).__name__,
-                "correlation_id": correlation_id,
-            },
-        )
-        problem = _build_vector_problem_details(
-            detail=str(exc),
-            correlation_id=correlation_id,
-            vector_path=dense_vectors,
-            errors=exc.errors,
-            instance=instance_uri,
-        )
-        typer.echo(render_problem(problem), err=True)
-        index_error = IndexBuildError(
-            "Vector payload failed validation",
-            cause=exc,
-            context={"problem": problem, "correlation_id": correlation_id},
-        )
-        raise typer.Exit(code=1) from index_error
-
-    except (TypeError, json.JSONDecodeError, FileNotFoundError) as exc:
-        logger.exception(
-            "Vector loading failed",
-            extra={
-                "operation": "index_faiss",
-                "error": type(exc).__name__,
-                "correlation_id": correlation_id,
-            },
-        )
-        typer.echo(f"Error loading vectors: {exc}", err=True)
-        raise typer.Exit(code=1) from exc
-
-    except (OSError, ValueError, RuntimeError) as exc:
-        logger.exception(
-            "Index save failed",
-            extra={
-                "operation": "index_faiss",
-                "error": type(exc).__name__,
-                "correlation_id": correlation_id,
-            },
-        )
-        typer.echo(f"Error saving index: {exc}", err=True)
-        raise typer.Exit(code=1) from exc
-
-
-def _index_faiss_cli(
-    dense_vectors: Annotated[
-        str, typer.Argument(..., help="Path to dense vectors JSON (skeleton)")
-    ],
-    index_path: Annotated[
-        str,
-        typer.Option(help="Output index (CPU .idx)", show_default=True),
-    ] = "./_indices/faiss/shard_000.idx",
-    factory: Annotated[str, typer.Option(help="FAISS factory string", show_default=True)] = "Flat",
-    metric: Annotated[str, typer.Option(help="Metric: 'ip' or 'l2'", show_default=True)] = "ip",
-) -> None:
-    index_faiss(dense_vectors, index_path, factory, metric)
+    run_index_faiss(config=config)
 
 
 # [nav:anchor api]
@@ -760,7 +816,7 @@ def e2e() -> None:
 
 
 app.command("index_bm25")(_index_bm25_cli)
-app.command("index_faiss")(_index_faiss_cli)
+app.command("index_faiss")(index_faiss)
 app.command()(api)
 app.command()(e2e)
 

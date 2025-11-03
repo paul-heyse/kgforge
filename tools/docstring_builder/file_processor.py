@@ -3,33 +3,34 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from importlib import import_module
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Protocol, cast
 
 from tools.docstring_builder.builder_types import ExitStatus
-from tools.docstring_builder.config import BuilderConfig
+from tools.docstring_builder.config_models import DocstringApplyConfig
 from tools.docstring_builder.docfacts import build_docfacts
-from tools.docstring_builder.harvest import HarvestResult, harvest_file
+from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import matches_patterns
-from tools.docstring_builder.ir import IRDocstring
 from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.observability import record_operation_metrics
 from tools.docstring_builder.paths import REPO_ROOT
 from tools.docstring_builder.pipeline_types import FileOutcome
-from tools.docstring_builder.plugins import PluginManager
-from tools.docstring_builder.schema import DocstringEdit
-from tools.docstring_builder.semantics import SemanticResult
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterable, Sequence
     from pathlib import Path
 
     from tools.docstring_builder.builder_types import LoggerLike
     from tools.docstring_builder.cache import BuilderCache
+    from tools.docstring_builder.config import BuilderConfig
     from tools.docstring_builder.docfacts import DocFact
+    from tools.docstring_builder.harvest import HarvestResult
+    from tools.docstring_builder.ir import IRDocstring
     from tools.docstring_builder.pipeline_types import ProcessingOptions
+    from tools.docstring_builder.plugins import PluginManager
+    from tools.docstring_builder.schema import DocstringEdit
+    from tools.docstring_builder.semantics import SemanticResult
 
 try:  # pragma: no cover - optional dependency at runtime
     from libcst import ParserSyntaxError as _ParserSyntaxError
@@ -44,14 +45,36 @@ _HARVEST_ERRORS: tuple[type[BaseException], ...] = (
     OSError,
 )
 
-CollectEditsCallable = Callable[
-    [HarvestResult, BuilderConfig, PluginManager | None, bool],
-    tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]],
-]
-ApplyEditsCallable = Callable[
-    [HarvestResult, Iterable[DocstringEdit], bool],
-    tuple[bool, str | None],
-]
+
+class CollectEditsCallable(Protocol):
+    """Protocol for collecting docstring edits from harvested symbols."""
+
+    def __call__(
+        self,
+        result: HarvestResult,
+        config: BuilderConfig,
+        plugin_manager: PluginManager | None,
+        *,
+        format_only: bool = False,
+    ) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
+        """Return semantic artifacts, edits, and IR entries for a harvested module."""
+
+        ...
+
+
+class ApplyEditsCallable(Protocol):
+    """Protocol for applying rendered docstrings to source files."""
+
+    def __call__(
+        self,
+        result: HarvestResult,
+        edits: Iterable[DocstringEdit],
+        *,
+        apply_config: DocstringApplyConfig | None = None,
+    ) -> tuple[bool, str | None]:
+        """Apply rendered docstrings and return change status plus optional preview."""
+
+        ...
 
 
 def _load_apply_edits() -> ApplyEditsCallable:
@@ -98,12 +121,12 @@ class FileProcessor:
             ctx.skipped = True
             ctx.message = "cache fresh"
             return FileOutcome(
-                ExitStatus.SUCCESS,
-                ctx.docfacts,
-                ctx.preview,
-                ctx.changed,
-                ctx.skipped,
-                ctx.message,
+                status=ExitStatus.SUCCESS,
+                docfacts=ctx.docfacts,
+                preview=ctx.preview,
+                changed=ctx.changed,
+                skipped=ctx.skipped,
+                message=ctx.message,
                 cache_hit=True,
             )
 
@@ -117,19 +140,19 @@ class FileProcessor:
             result,
             self.config,
             self.plugin_manager,
-            command == "fmt",
+            format_only=command == "fmt",
         )
 
         # Handle harvest-only command
         if command == "harvest":
             ctx.docfacts = build_docfacts(semantics)
             return FileOutcome(
-                ExitStatus.SUCCESS,
-                ctx.docfacts,
-                ctx.preview,
-                ctx.changed,
-                ctx.skipped,
-                ctx.message,
+                status=ExitStatus.SUCCESS,
+                docfacts=ctx.docfacts,
+                preview=ctx.preview,
+                changed=ctx.changed,
+                skipped=ctx.skipped,
+                message=ctx.message,
                 semantics=list(semantics),
                 ir=list(ir_entries),
             )
@@ -140,12 +163,12 @@ class FileProcessor:
                 self.cache.update(file_path, self.config.config_hash)
             ctx.message = "no managed symbols"
             return FileOutcome(
-                ExitStatus.SUCCESS,
-                ctx.docfacts,
-                ctx.preview,
-                ctx.changed,
-                ctx.skipped,
-                ctx.message,
+                status=ExitStatus.SUCCESS,
+                docfacts=ctx.docfacts,
+                preview=ctx.preview,
+                changed=ctx.changed,
+                skipped=ctx.skipped,
+                message=ctx.message,
                 semantics=list(semantics),
                 ir=list(ir_entries),
             )
@@ -157,19 +180,27 @@ class FileProcessor:
                 self.cache.update(file_path, self.config.config_hash)
             ctx.message = "no edits needed"
             return FileOutcome(
-                ExitStatus.SUCCESS,
-                ctx.docfacts,
-                ctx.preview,
-                ctx.changed,
-                ctx.skipped,
-                ctx.message,
+                status=ExitStatus.SUCCESS,
+                docfacts=ctx.docfacts,
+                preview=ctx.preview,
+                changed=ctx.changed,
+                skipped=ctx.skipped,
+                message=ctx.message,
                 semantics=list(semantics),
                 ir=list(ir_entries),
             )
 
         # Apply edits
+        should_write = is_update or (is_check and bool(self.options.baseline))
+        apply_config = (
+            DocstringApplyConfig()
+            if should_write
+            else DocstringApplyConfig(write_changes=False, atomic_writes=False)
+        )
         ctx.changed, ctx.preview = self._apply_edits(
-            result, edits, write=is_update or (is_check and bool(self.options.baseline))
+            result,
+            edits,
+            apply_config=apply_config,
         )
         if is_update:
             self.cache.update(file_path, self.config.config_hash)
@@ -181,12 +212,12 @@ class FileProcessor:
             ctx.message = "docstring mismatch"
 
         return FileOutcome(
-            status,
-            ctx.docfacts,
-            ctx.preview,
-            ctx.changed,
-            ctx.skipped,
-            ctx.message,
+            status=status,
+            docfacts=ctx.docfacts,
+            preview=ctx.preview,
+            changed=ctx.changed,
+            skipped=ctx.skipped,
+            message=ctx.message,
             semantics=list(semantics),
             ir=list(ir_entries),
         )
@@ -205,32 +236,32 @@ class FileProcessor:
             if self._can_ignore_missing(file_path):
                 self.logger.info("Skipping %s due to missing dependency: %s", relative, exc)
                 result = FileOutcome(
-                    ExitStatus.SUCCESS,
-                    [],
-                    None,
-                    False,
-                    True,
-                    message,
+                    status=ExitStatus.SUCCESS,
+                    docfacts=[],
+                    preview=None,
+                    changed=False,
+                    skipped=True,
+                    message=message,
                 )
             else:
                 self.logger.exception("Failed to harvest %s", relative)
                 result = FileOutcome(
-                    ExitStatus.CONFIG,
-                    [],
-                    None,
-                    False,
-                    False,
-                    message,
+                    status=ExitStatus.CONFIG,
+                    docfacts=[],
+                    preview=None,
+                    changed=False,
+                    skipped=False,
+                    message=message,
                 )
         except _HARVEST_ERRORS as exc:
             self.logger.exception("Failed to harvest %s", file_path)
             result = FileOutcome(
-                ExitStatus.ERROR,
-                [],
-                None,
-                False,
-                False,
-                str(exc),
+                status=ExitStatus.ERROR,
+                docfacts=[],
+                preview=None,
+                changed=False,
+                skipped=False,
+                message=str(exc),
             )
         except KeyboardInterrupt:  # pragma: no cover - propagate user interrupt
             raise
@@ -258,7 +289,8 @@ class FileProcessor:
     def _apply_edits(
         result: HarvestResult,
         edits: Sequence[DocstringEdit],
-        write: bool,
+        *,
+        apply_config: DocstringApplyConfig,
     ) -> tuple[bool, str | None]:
         """Apply docstring edits and return change status plus preview."""
         changed = False
@@ -267,5 +299,9 @@ class FileProcessor:
             return changed, preview
 
         apply_edits = _load_apply_edits()
-        changed, preview = apply_edits(result, list(edits), write)
+        changed, preview = apply_edits(
+            result,
+            list(edits),
+            apply_config=apply_config,
+        )
         return changed, preview

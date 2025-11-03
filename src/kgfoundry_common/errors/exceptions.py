@@ -875,6 +875,50 @@ class ConfigurationError(KgFoundryError):
             context=context,
         )
 
+    @classmethod
+    def with_details(
+        cls,
+        *,
+        field: str,
+        issue: str,
+        hint: str | None = None,
+    ) -> ConfigurationError:
+        """Create a ConfigurationError with structured validation details.
+
+        Parameters
+        ----------
+        field : str
+            Name of the configuration field that failed validation.
+        issue : str
+            Description of the validation issue (e.g., "Must be > 0", "Invalid format").
+        hint : str | None, optional
+            Optional hint for resolving the issue (e.g., "Use ISO 8601 format").
+            Defaults to ``None``.
+
+        Returns
+        -------
+        ConfigurationError
+            New instance with details captured in context.
+
+        Examples
+        --------
+        >>> error = ConfigurationError.with_details(
+        ...     field="timeout_seconds",
+        ...     issue="Must be > 0",
+        ...     hint="Provide a positive integer",
+        ... )
+        >>> assert "timeout_seconds" in str(error.context)
+        """
+        details: dict[str, object] = {
+            "field": field,
+            "issue": issue,
+        }
+        if hint is not None:
+            details["hint"] = hint
+
+        message = f"Configuration validation failed for field '{field}': {issue}"
+        return cls(message, context=details)
+
 
 class SettingsError(KgFoundryError):
     """Error raised when runtime settings validation fails.

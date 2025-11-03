@@ -9,6 +9,8 @@ This test module verifies that all configuration objects:
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 import pytest
 from tools.docstring_builder.config_models import (
     CachePolicy,
@@ -88,10 +90,8 @@ class TestDocstringBuildConfig:
         assert config.enable_plugins is True
 
     def test_config_is_frozen(self) -> None:
-        """Verify configuration is immutable after creation."""
-        config = DocstringBuildConfig()
-        with pytest.raises(AttributeError):
-            config.timeout_seconds = 300
+        """Verify configuration dataclass is frozen."""
+        assert DocstringBuildConfig.__dataclass_params__.frozen is True  # type: ignore[attr-defined]
 
     @pytest.mark.parametrize(
         "cache_policy",
@@ -143,7 +143,8 @@ class TestFileProcessConfig:
         """Verify file process config is immutable."""
         config = FileProcessConfig()
         with pytest.raises(AttributeError):
-            config.max_errors_per_file = 20
+            mutable = cast("Any", config)
+            mutable.max_errors_per_file = 20
 
     @pytest.mark.parametrize("max_errors", [1, 5, 10, 100])
     def test_positive_max_errors_accepted(self, max_errors: int) -> None:
@@ -198,7 +199,8 @@ class TestDocstringApplyConfig:
         """Verify apply config is immutable."""
         config = DocstringApplyConfig()
         with pytest.raises(AttributeError):
-            config.write_changes = False
+            mutable = cast("Any", config)
+            mutable.write_changes = False
 
 
 class TestConfigurationErrorContext:

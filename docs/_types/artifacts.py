@@ -259,8 +259,8 @@ class SymbolIndexRow(BaseModel):
     since: str | None = Field(None, description="Version when introduced")
     deprecated_in: str | None = Field(None, description="Version when deprecated")
     section: str | None = Field(None, description="Documentation section")
-    is_async: bool = Field(False, description="True if async function/method")
-    is_property: bool = Field(False, description="True if @property")
+    is_async: bool = Field(default=False, description="True if async function/method")
+    is_property: bool = Field(default=False, description="True if @property")
 
     @field_validator("path", mode="before")
     @classmethod

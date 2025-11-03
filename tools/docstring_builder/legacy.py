@@ -467,7 +467,7 @@ def process_file(file_path: Path) -> bool:
         return False
 
     result = HarvestResult(module=module_name, filepath=file_path, symbols=[], cst_index={})
-    changed, _ = apply_edits(result, edits, write=True)
+    changed, _ = apply_edits(result, edits)
     if changed:
         _ensure_trailing_blank_lines(file_path)
     return changed

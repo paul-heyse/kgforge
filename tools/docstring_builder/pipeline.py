@@ -312,7 +312,7 @@ class PipelineRunner:
 
         filtered = self._cfg.filter_docfacts()
         is_check = self._cfg.request.command == "check"
-        coordinator = self._cfg.docfacts_coordinator_factory(is_check)
+        coordinator = self._cfg.docfacts_coordinator_factory(check_mode=is_check)
         result = coordinator.reconcile(filtered)
         state.docfacts_checked = True
         exit_status = self._map_docfacts_status(result.status)
@@ -503,7 +503,7 @@ class PipelineRunner:
         if cli_result is not None:
             validate_cli_output(cli_result)
 
-        docfacts_report = self._build_docfacts_report(state.docfacts_checked)
+        docfacts_report = self._build_docfacts_report(docfacts_checked=state.docfacts_checked)
         if cli_result is not None and docfacts_report is not None:
             cli_result["docfacts"] = docfacts_report
 
@@ -686,7 +686,7 @@ class PipelineRunner:
         return cli_result
 
     @classmethod
-    def _build_docfacts_report(cls, docfacts_checked: bool) -> DocfactsReport | None:
+    def _build_docfacts_report(cls, *, docfacts_checked: bool) -> DocfactsReport | None:
         """Build the docfacts report for JSON output."""
         if not docfacts_checked:
             return None

@@ -8,7 +8,6 @@ work correctly with the new DocstringBuildConfig and cache interfaces.
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -18,6 +17,8 @@ from tools.docstring_builder.config_models import DocstringBuildConfig
 from tools.docstring_builder.orchestrator import run_build, run_docstring_builder, run_legacy
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from tools.docstring_builder.cache import DocstringBuilderCache
 
 

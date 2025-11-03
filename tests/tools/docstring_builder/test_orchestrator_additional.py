@@ -9,15 +9,17 @@ This module extends test_orchestrator_new_api.py with additional coverage for:
 from __future__ import annotations
 
 import tempfile
-from collections.abc import Callable
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
 import tools.docstring_builder.orchestrator as orchestrator_module
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config_models import DocstringBuildConfig
 from tools.docstring_builder.orchestrator import run_build, run_legacy
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _call_untyped_run_build(*args: object, **kwargs: object) -> object:

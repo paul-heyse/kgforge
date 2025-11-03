@@ -61,9 +61,7 @@ class TypingFacadeMigrator(cst.CSTTransformer):
 
         return updated_node
 
-    def leave_Call(  # noqa: N802
-        self, original_node: cst.Call, updated_node: cst.Call
-    ) -> cst.Call:
+    def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:  # noqa: N802
         """Replace resolve_* shim calls with gate_import."""
         # Note: original_node is needed by libcst visitor protocol
         del original_node

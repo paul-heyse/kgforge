@@ -1,87 +1,48 @@
 """Documentation toolchain for KGFoundry.
 
-This package consolidates documentation build scripts and provides a unified
-interface for common operations like building symbol indices, generating deltas,
-and validating artifacts.
+This package provides a unified interface for documentation operations with
+typed configuration objects instead of positional arguments.
+
+New Public APIs
+---------------
+- :func:`build_symbol_index` — Build documentation symbol indices with typed config
+- :func:`compute_delta` — Generate symbol deltas between indices
+- :func:`validate_artifacts` — Validate documentation artifacts
+- :class:`DocsSymbolIndexConfig` — Configuration for symbol index building
+- :class:`DocsDeltaConfig` — Configuration for delta computation
+
+Examples
+--------
+Build a symbol index with configuration:
+
+>>> from docs.toolchain.config import DocsSymbolIndexConfig
+>>> from docs.toolchain.build_symbol_index import build_symbol_index
+>>> config = DocsSymbolIndexConfig(include_private=False, output_format="json")
+>>> # index = build_symbol_index(config=config)
+
+Compute a delta with configuration:
+
+>>> from docs.toolchain.config import DocsDeltaConfig
+>>> from docs.toolchain.symbol_delta import compute_delta
+>>> config = DocsDeltaConfig(include_removals=True, severity_threshold="info")
+>>> # delta = compute_delta(config=config, baseline={...}, current={...})
 """
 
 from __future__ import annotations
 
 import logging
-from importlib import import_module
-from types import MappingProxyType
-from typing import TYPE_CHECKING, Final, cast
 
-if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, Sequence
+from docs.toolchain.build_symbol_index import build_symbol_index
+from docs.toolchain.config import DocsDeltaConfig, DocsSymbolIndexConfig
+from docs.toolchain.symbol_delta import compute_delta
+from docs.toolchain.validate_artifacts import validate_artifacts
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-
-def build_symbol_index(argv: Sequence[str] | None = None) -> int:
-    """Build schema-validated symbol index artifacts for the documentation pipeline.
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Optional CLI-style arguments forwarded to the builder.
-
-    Returns
-    -------
-    int
-        Exit code emitted by the symbol index builder.
-    """
-    module = import_module("docs._scripts.build_symbol_index")
-    main_fn = cast("Callable[[Sequence[str] | None], int]", module.main)
-    return main_fn(argv)
-
-
-def validate_artifacts(argv: Sequence[str] | None = None) -> int:
-    """Validate documentation artifacts against defined schemas.
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Optional CLI arguments.
-
-    Returns
-    -------
-    int
-        Exit code from the validation tool.
-    """
-    module = import_module("docs._scripts.validate_artifacts")
-    main_fn = cast("Callable[[Sequence[str] | None], int]", module.main)
-    return main_fn(argv)
-
-
-def symbol_delta(argv: Sequence[str] | None = None) -> int:
-    """Generate symbol index delta between two builds.
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Optional CLI arguments.
-
-    Returns
-    -------
-    int
-        Exit code from the delta generator.
-    """
-    module = import_module("docs._scripts.symbol_delta")
-    main_fn = cast("Callable[[Sequence[str] | None], int]", module.main)
-    return main_fn(argv)
-
-
-_PUBLIC_EXPORTS: dict[str, object] = {
-    "build_symbol_index": build_symbol_index,
-    "symbol_delta": symbol_delta,
-    "validate_artifacts": validate_artifacts,
-}
-
-PUBLIC_EXPORTS: Final[Mapping[str, object]] = MappingProxyType(_PUBLIC_EXPORTS)
-
-__all__: tuple[str, ...] = (
+__all__ = [
+    "DocsDeltaConfig",
+    "DocsSymbolIndexConfig",
     "build_symbol_index",
-    "symbol_delta",
+    "compute_delta",
     "validate_artifacts",
-)
+]

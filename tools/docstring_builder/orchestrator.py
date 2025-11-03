@@ -230,6 +230,7 @@ def _collect_edits(
     result: HarvestResult,
     config: BuilderConfig,
     plugin_manager: PluginManager | None,
+    *,
     format_only: bool = False,
 ) -> tuple[list[DocstringEdit], list[SemanticResult], list[IRDocstring]]:
     semantics = build_semantic_schemas(result, config)
@@ -374,7 +375,7 @@ class _PipelineDependencies:
     def filter_docfacts(self) -> list[DocFact]:
         return self.docfact_state.filtered()
 
-    def docfacts_coordinator_factory(self, check_mode: bool) -> DocfactsCoordinator:
+    def docfacts_coordinator_factory(self, *, check_mode: bool) -> DocfactsCoordinator:
         return DocfactsCoordinator(
             config=self.config,
             build_provenance=_build_docfacts_provenance,

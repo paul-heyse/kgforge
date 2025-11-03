@@ -20,7 +20,7 @@ import sys
 import time
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
-from typing import TYPE_CHECKING, Any, Final, Self, cast
+from typing import TYPE_CHECKING, Any, Final, Protocol, Self, cast, runtime_checkable
 
 if TYPE_CHECKING:
     from kgfoundry_common.navmap_types import NavMap
@@ -31,8 +31,10 @@ __all__ = [
     "JsonFormatter",
     "LogContextExtra",
     "LoggerAdapter",
+    "LoggingCache",
     "get_correlation_id",
     "get_logger",
+    "get_logging_cache",
     "measure_duration",
     "set_correlation_id",
     "setup_logging",
@@ -64,6 +66,49 @@ __navmap__: Final[NavMap] = {
         for name in __all__
     },
 }
+
+
+@runtime_checkable
+class LoggingCache(Protocol):
+    """Protocol for logging cache implementations.
+
+    This protocol defines a contract for caching logging configurations,
+    formatters, or other logging-related state without exposing internal
+    implementation details. Implementations provide a public interface
+    for retrieving cached logging resources.
+
+    Methods
+    -------
+    get_formatter() -> logging.Formatter
+        Get or create a cached JSON formatter instance.
+    clear() -> None
+        Clear all cached entries and reset state.
+
+    Examples
+    --------
+    >>> from kgfoundry_common.logging import LoggingCache, get_logging_cache
+    >>> cache = get_logging_cache()
+    >>> # cache implements LoggingCache protocol
+    >>> assert isinstance(cache, LoggingCache)
+    """
+
+    def get_formatter(self) -> logging.Formatter:
+        """Get or create a cached JSON formatter instance.
+
+        Returns
+        -------
+        logging.Formatter
+            A JsonFormatter instance from cache or newly created.
+        """
+        ...
+
+    def clear(self) -> None:
+        """Clear all cached entries and reset state.
+
+        This method clears formatter caches and any other
+        logging-related cached state.
+        """
+        ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -976,3 +1021,67 @@ def measure_duration() -> tuple[float, float]:
     """
     current = time.monotonic()
     return current, current
+
+
+class _DefaultLoggingCache:
+    """Default implementation of LoggingCache protocol.
+
+    This class provides a simple cache for logging formatters and
+    configuration. It implements the LoggingCache protocol and can be
+    retrieved via get_logging_cache().
+    """
+
+    def __init__(self) -> None:
+        """Initialize the logging cache."""
+        self._formatter_cache: JsonFormatter | None = None
+
+    def get_formatter(self) -> logging.Formatter:
+        """Get or create a cached JSON formatter instance.
+
+        Returns
+        -------
+        logging.Formatter
+            A JsonFormatter instance from cache or newly created.
+        """
+        if self._formatter_cache is None:
+            self._formatter_cache = JsonFormatter()
+        return self._formatter_cache
+
+    def clear(self) -> None:
+        """Clear all cached entries and reset state.
+
+        This method clears the formatter cache and resets internal state.
+        """
+        self._formatter_cache = None
+
+
+# Global logging cache instance
+_logging_cache: _DefaultLoggingCache = _DefaultLoggingCache()
+
+
+def get_logging_cache() -> LoggingCache:
+    """Get the global logging cache instance.
+
+    Returns a LoggingCache implementation that can be used to retrieve
+    cached logging formatters and configurations. The returned object
+    implements the LoggingCache protocol and provides a stable interface
+    for accessing logging infrastructure without exposing internal details.
+
+    Returns
+    -------
+    LoggingCache
+        Global logging cache instance implementing the LoggingCache protocol.
+
+    Examples
+    --------
+    >>> from kgfoundry_common.logging import get_logging_cache
+    >>> cache = get_logging_cache()
+    >>> formatter = cache.get_formatter()
+    >>> # Use formatter for logging...
+
+    Notes
+    -----
+    The returned cache is a singleton instance shared across the entire
+    application. Call cache.clear() to reset cached state if needed.
+    """
+    return _logging_cache

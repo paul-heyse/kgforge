@@ -7,11 +7,11 @@ wrapping existing functions while maintaining backward compatibility.
 from __future__ import annotations
 
 import warnings
-from pathlib import Path
+from pathlib import Path  # noqa: TC003
 
 from tools.navmap import repair_navmaps
-from tools.navmap.config import NavmapRepairOptions
-from tools.navmap.repair_navmaps import ModuleInfo, RepairResult
+from tools.navmap.config import NavmapRepairOptions  # noqa: TC001
+from tools.navmap.repair_navmaps import ModuleInfo, RepairResult  # noqa: TC001
 
 __all__ = [
     "repair_all_legacy",
