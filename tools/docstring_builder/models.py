@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Final, Literal, Protocol, TypedDict, cast
+from typing import Final, Literal, NotRequired, Protocol, Required, TypedDict, cast
 
 from kgfoundry_common.jsonschema_utils import (
     Draft202012ValidatorProtocol,
@@ -359,12 +359,61 @@ class FileReport(TypedDict, total=False):
 
 
 class ErrorReport(TypedDict, total=False):
-    """Summary of a failure encountered during processing."""
+    """Summary of a failure encountered during processing.
 
-    file: str
-    status: RunStatus
-    message: str
-    problem: ProblemDetails
+    This TypedDict uses PEP 655 Required/NotRequired to clearly partition fields.
+    - Required: file, status, message
+    - Optional: problem
+
+    Examples
+    --------
+    >>> error = ErrorReport(file="example.py", status="error", message="Build failed")
+    >>> error_with_problem = error | {"problem": {...}}
+    """
+
+    file: Required[str]
+    status: Required[str]
+    message: Required[str]
+    problem: NotRequired[ProblemDetails]
+
+
+def make_error_report(
+    file: str,
+    status: str,
+    message: str,
+    *,
+    problem: ProblemDetails | None = None,
+) -> ErrorReport:
+    """Construct an ErrorReport with required fields and optional problem details.
+
+    Parameters
+    ----------
+    file : str
+        File path where error occurred.
+    status : str
+        Error status (e.g., "error", "violation", "config").
+    message : str
+        Error message.
+    problem : ProblemDetails | None, optional
+        RFC 9457 Problem Details payload. Defaults to ``None``.
+
+    Returns
+    -------
+    ErrorReport
+        Fully-initialized error report.
+
+    Examples
+    --------
+    >>> error = make_error_report(
+    ...     file="module.py", status="error", message="Failed to build docstring"
+    ... )
+    >>> error["file"]
+    'module.py'
+    """
+    result: ErrorReport = {"file": file, "status": status, "message": message}
+    if problem is not None:
+        result["problem"] = problem
+    return result
 
 
 class PolicyViolationReport(TypedDict):
@@ -452,26 +501,151 @@ class ObservabilityReport(TypedDict, total=False):
 
 
 class CliResult(TypedDict, total=False):
-    """Fully-typed structure matching ``schema/tools/docstring_builder_cli.json``."""
+    """Fully-typed structure matching ``schema/tools/docstring_builder_cli.json``.
 
-    schemaVersion: str
-    schemaId: str
-    status: RunStatus
-    generatedAt: str
-    command: str
-    subcommand: str
-    durationSeconds: float
-    files: list[FileReport]
-    errors: list[ErrorReport]
-    summary: RunSummary
-    policy: PolicyReport
-    baseline: str
-    cache: CacheSummary
-    inputs: dict[str, InputHash]
-    plugins: PluginReport
-    docfacts: DocfactsReport
-    observability: ObservabilityReport
-    problem: ProblemDetails
+    This TypedDict uses PEP 655 Required/NotRequired to clearly partition fields.
+    - Required: schemaVersion, schemaId, status, generatedAt, command
+    - Optional: subcommand, durationSeconds, files, errors, summary, policy,
+      baseline, cache, inputs, plugins, docfacts, observability, problem
+
+    Examples
+    --------
+    >>> result = CliResult(
+    ...     schemaVersion="1.0.0",
+    ...     schemaId="https://kgfoundry.dev/schema/docstring-builder-cli.json",
+    ...     status="success",
+    ...     generatedAt="2024-11-03T00:00:00Z",
+    ...     command="build",
+    ... )
+    """
+
+    schemaVersion: Required[str]
+    schemaId: Required[str]
+    status: Required[str]
+    generatedAt: Required[str]
+    command: Required[str]
+    subcommand: NotRequired[str]
+    durationSeconds: NotRequired[float]
+    files: NotRequired[list[FileReport]]
+    errors: NotRequired[list[ErrorReport]]
+    summary: NotRequired[RunSummary]
+    policy: NotRequired[PolicyReport]
+    baseline: NotRequired[str]
+    cache: NotRequired[CacheSummary]
+    inputs: NotRequired[dict[str, InputHash]]
+    plugins: NotRequired[PluginReport]
+    docfacts: NotRequired[DocfactsReport]
+    observability: NotRequired[ObservabilityReport]
+    problem: NotRequired[ProblemDetails]
+
+
+def make_cli_result(  # noqa: PLR0913, C901, PLR0912
+    status: str,
+    command: str,
+    *,
+    schema_version: str = CLI_SCHEMA_VERSION,
+    schema_id: str = CLI_SCHEMA_ID,
+    subcommand: str | None = None,
+    duration_seconds: float | None = None,
+    files: list[FileReport] | None = None,
+    errors: list[ErrorReport] | None = None,
+    summary: RunSummary | None = None,
+    policy: PolicyReport | None = None,
+    baseline: str | None = None,
+    cache: CacheSummary | None = None,
+    inputs: dict[str, InputHash] | None = None,
+    plugins: PluginReport | None = None,
+    docfacts: DocfactsReport | None = None,
+    observability: ObservabilityReport | None = None,
+    problem: ProblemDetails | None = None,
+) -> CliResult:
+    """Construct a CliResult with required fields and optional extended details.
+
+    Parameters
+    ----------
+    status : str
+        Result status ("success", "violation", "config", "error").
+    command : str
+        Primary CLI command executed.
+    schema_version : str, optional
+        Schema version. Defaults to ``CLI_SCHEMA_VERSION``.
+    schema_id : str, optional
+        Schema URI. Defaults to ``CLI_SCHEMA_ID``.
+    subcommand : str | None, optional
+        Secondary subcommand if applicable. Defaults to ``None``.
+    duration_seconds : float | None, optional
+        Total execution duration in seconds. Defaults to ``None``.
+    files : list[FileReport] | None, optional
+        Per-file processing results. Defaults to ``None``.
+    errors : list[ErrorReport] | None, optional
+        Aggregated error reports. Defaults to ``None``.
+    summary : RunSummary | None, optional
+        Aggregated run statistics. Defaults to ``None``.
+    policy : PolicyReport | None, optional
+        Policy validation results. Defaults to ``None``.
+    baseline : str | None, optional
+        Baseline hash or reference. Defaults to ``None``.
+    cache : CacheSummary | None, optional
+        Cache metadata. Defaults to ``None``.
+    inputs : dict[str, InputHash] | None, optional
+        Input file hashes for reproducibility. Defaults to ``None``.
+    plugins : PluginReport | None, optional
+        Plugin execution status. Defaults to ``None``.
+    docfacts : DocfactsReport | None, optional
+        DocFacts validation results. Defaults to ``None``.
+    observability : ObservabilityReport | None, optional
+        Observability metrics and logs. Defaults to ``None``.
+    problem : ProblemDetails | None, optional
+        RFC 9457 Problem Details for failures. Defaults to ``None``.
+
+    Returns
+    -------
+    CliResult
+        Fully-initialized CLI result.
+
+    Examples
+    --------
+    >>> result = make_cli_result(status="success", command="build", subcommand="docstrings")
+    >>> result["status"]
+    'success'
+    """
+    result: CliResult = {
+        "schemaVersion": schema_version,
+        "schemaId": schema_id,
+        "status": status,
+        "generatedAt": datetime.now(tz=UTC).isoformat(timespec="seconds"),
+        "command": command,
+    }
+
+    # Add optional fields with proper type narrowing
+    if subcommand is not None:
+        result["subcommand"] = subcommand
+    if duration_seconds is not None:
+        result["durationSeconds"] = duration_seconds
+    if files is not None:
+        result["files"] = files
+    if errors is not None:
+        result["errors"] = errors
+    if summary is not None:
+        result["summary"] = summary
+    if policy is not None:
+        result["policy"] = policy
+    if baseline is not None:
+        result["baseline"] = baseline
+    if cache is not None:
+        result["cache"] = cache
+    if inputs is not None:
+        result["inputs"] = inputs
+    if plugins is not None:
+        result["plugins"] = plugins
+    if docfacts is not None:
+        result["docfacts"] = docfacts
+    if observability is not None:
+        result["observability"] = observability
+    if problem is not None:
+        result["problem"] = problem
+
+    return result
 
 
 _DOCFACTS_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
@@ -674,30 +848,7 @@ def build_cli_result_skeleton(status: RunStatus) -> CliResult:
         "schemaId": CLI_SCHEMA_ID,
         "status": status,
         "generatedAt": datetime.now(tz=UTC).isoformat(timespec="seconds"),
-        "files": [],
-        "errors": [],
-        "summary": {
-            "considered": 0,
-            "processed": 0,
-            "skipped": 0,
-            "changed": 0,
-            "status_counts": {
-                "success": 0,
-                "violation": 0,
-                "config": 0,
-                "error": 0,
-            },
-            "docfacts_checked": False,
-            "cache_hits": 0,
-            "cache_misses": 0,
-            "duration_seconds": 0.0,
-            "subcommand": "",
-        },
-        "policy": {"coverage": 0.0, "threshold": 0.0, "violations": []},
-        "cache": {"path": "", "exists": False, "hits": 0, "misses": 0, "mtime": None},
-        "inputs": {},
-        "plugins": {"enabled": [], "available": [], "disabled": [], "skipped": []},
-        "observability": {"status": status, "errors": []},
+        "command": "",
     }
     return payload
 
@@ -726,51 +877,52 @@ def _coerce_symbol_kind(kind: str | None) -> SymbolKind:
     return "function"
 
 
-__all__ = sorted(
-    [
-        "CLI_SCHEMA_ID",
-        "CLI_SCHEMA_VERSION",
-        "CacheSummary",
-        "DocFactLike",
-        "DocfactsDocumentLike",
-        "DocfactsDocumentPayload",
-        "DocfactsEntry",
-        "DocfactsParameter",
-        "DocfactsProvenanceLike",
-        "DocfactsProvenancePayload",
-        "DocfactsRaise",
-        "DocfactsReport",
-        "DocfactsReturn",
-        "DocstringBuilderError",
-        "DocstringIR",
-        "DocstringIRParameter",
-        "DocstringIRRaise",
-        "DocstringIRReturn",
-        "ErrorReport",
-        "FileReport",
-        "IRDocstringLike",
-        "IRParameterLike",
-        "IRRaiseLike",
-        "IRReturnLike",
-        "InputHash",
-        "PluginExecutionError",
-        "PluginReport",
-        "ObservabilityReport",
-        "PolicyReport",
-        "PolicyViolationReport",
-        "PROBLEM_DETAILS_EXAMPLE",
-        "ProblemDetails",
-        "RunStatus",
-        "RunSummary",
-        "SchemaViolationError",
-        "SignatureIntrospectionError",
-        "StatusCounts",
-        "SymbolResolutionError",
-        "ToolConfigurationError",
-        "build_cli_result_skeleton",
-        "build_docfacts_document_payload",
-        "build_docstring_ir_from_legacy",
-        "validate_cli_output",
-        "validate_docfacts_payload",
-    ]
+__all__: tuple[str, ...] = (
+    "CLI_SCHEMA_ID",
+    "CLI_SCHEMA_VERSION",
+    "PROBLEM_DETAILS_EXAMPLE",
+    "CacheSummary",
+    "CliResult",
+    "DocFactLike",
+    "DocfactsDocumentLike",
+    "DocfactsDocumentPayload",
+    "DocfactsEntry",
+    "DocfactsParameter",
+    "DocfactsProvenanceLike",
+    "DocfactsProvenancePayload",
+    "DocfactsRaise",
+    "DocfactsReport",
+    "DocfactsReturn",
+    "DocstringBuilderError",
+    "DocstringIR",
+    "DocstringIRParameter",
+    "DocstringIRRaise",
+    "DocstringIRReturn",
+    "ErrorReport",
+    "FileReport",
+    "IRDocstringLike",
+    "IRParameterLike",
+    "IRRaiseLike",
+    "IRReturnLike",
+    "InputHash",
+    "ObservabilityReport",
+    "PluginExecutionError",
+    "PluginReport",
+    "PolicyReport",
+    "PolicyViolationReport",
+    "ProblemDetails",
+    "RunStatus",
+    "RunSummary",
+    "SchemaViolationError",
+    "SignatureIntrospectionError",
+    "StatusCounts",
+    "SymbolResolutionError",
+    "ToolConfigurationError",
+    "build_cli_result_skeleton",
+    "build_docfacts_document_payload",
+    "build_docstring_ir_from_legacy",
+    "make_cli_result",
+    "make_error_report",
+    "validate_cli_output",
+    "validate_docfacts_payload",
 )

@@ -81,6 +81,11 @@ class ErrorCode(StrEnum):
     DESERIALIZATION_ERROR = "deserialization-error"
     SCHEMA_VALIDATION_ERROR = "schema-validation-error"
     REGISTRY_ERROR = "registry-error"
+    ARTIFACT_MODEL_ERROR = "artifact-model-error"
+    ARTIFACT_VALIDATION_ERROR = "artifact-validation-error"
+    ARTIFACT_SERIALIZATION_ERROR = "artifact-serialization-error"
+    ARTIFACT_DESERIALIZATION_ERROR = "artifact-deserialization-error"
+    ARTIFACT_DEPENDENCY_ERROR = "artifact-dependency-error"
 
     def __str__(self) -> str:
         """Return the code value.

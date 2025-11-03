@@ -51,11 +51,12 @@ else:  # pragma: no cover - runtime fallback when optional deps missing
     PydotDot = Any
 
 try:  # pragma: no cover - optional dependency
-    from yaml import YAMLError as YamlError
+    from yaml import YAMLError as _YamlError
 except (ModuleNotFoundError, ImportError):
+    _YamlError = Exception
 
-    class YamlError(Exception):
-        """Fallback error used when PyYAML is unavailable."""
+
+YamlError = _YamlError
 
 
 def _optional_import(name: str) -> ModuleType | None:

@@ -1,6 +1,17 @@
+from pathlib import Path
 from typing import Any
 
-class GriffeLoader:
-    def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    def load(self, name: str) -> Any: ...
-    def load_module(self, name: str) -> Any: ...
+class ModuleLoader:
+    def load(
+        self,
+        objspec: str | Path | None = None,
+        /,
+        *,
+        submodules: bool = True,
+        try_relative_path: bool = True,
+        find_stubs_package: bool = False,
+    ) -> Any: ...  # noqa: ANN401
+
+__all__ = [
+    "ModuleLoader",
+]

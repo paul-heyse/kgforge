@@ -11,11 +11,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Protocol, cast, runtime_checkable
 
-try:  # griffe 0.44+
-    from griffe.exceptions import AliasResolutionError
-except ImportError:  # pragma: no cover - compatibility fallback
-    from griffe._internal.exceptions import AliasResolutionError  # type: ignore[attr-defined]
-
 from docs._scripts import shared
 from docs._scripts.validation import validate_against_schema
 from tools import (
@@ -29,6 +24,23 @@ from tools import (
 from tools._shared.proc import ToolExecutionError
 
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
+from kgfoundry_common.optional_deps import OptionalDependencyError, safe_import_griffe
+
+
+def _resolve_alias_resolution_error() -> type[Exception]:
+    try:
+        griffe_module = safe_import_griffe()
+    except OptionalDependencyError:
+        return RuntimeError
+
+    exceptions_module = getattr(griffe_module, "exceptions", None)
+    alias_exc = getattr(exceptions_module, "AliasResolutionError", None)
+    if isinstance(alias_exc, type) and issubclass(alias_exc, Exception):
+        return alias_exc
+    return RuntimeError
+
+
+AliasResolutionErrorType = _resolve_alias_resolution_error()
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -172,7 +184,7 @@ def safe_getattr(obj: object, name: str, default: object | None = None) -> objec
     """Return ``getattr`` with defensive error handling."""
     try:
         return cast(object, getattr(obj, name, default))
-    except (AttributeError, RuntimeError, AliasResolutionError):
+    except (AttributeError, RuntimeError, AliasResolutionErrorType):
         return default
 
 

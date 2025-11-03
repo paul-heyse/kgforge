@@ -2,21 +2,34 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from importlib import import_module
-from typing import cast
+from tools._shared.cli import (
+    CLI_ENVELOPE_SCHEMA,
+    CLI_ENVELOPE_SCHEMA_ID,
+    CLI_ENVELOPE_SCHEMA_VERSION,
+    CliEnvelope,
+    CliEnvelopeBuilder,
+    CliErrorEntry,
+    CliErrorStatus,
+    CliFileResult,
+    CliFileStatus,
+    CliStatus,
+    new_cli_envelope,
+    render_cli_envelope,
+    validate_cli_envelope,
+)
 
-_ORIGINAL = import_module("tools._shared.cli")
-
-_PUBLIC_NAMES: tuple[str, ...]
-_original_all: object = getattr(_ORIGINAL, "__all__", None)
-if isinstance(_original_all, Iterable) and not isinstance(_original_all, (str, bytes)):
-    _PUBLIC_NAMES = tuple(str(name) for name in _original_all)
-else:
-    _PUBLIC_NAMES = tuple(name for name in dir(_ORIGINAL) if not name.startswith("_"))
-
-__all__ = _PUBLIC_NAMES
-
-_NAMESPACE: dict[str, object] = globals()
-for _name in __all__:
-    _NAMESPACE[_name] = cast(object, getattr(_ORIGINAL, _name))
+__all__: tuple[str, ...] = (
+    "CLI_ENVELOPE_SCHEMA",
+    "CLI_ENVELOPE_SCHEMA_ID",
+    "CLI_ENVELOPE_SCHEMA_VERSION",
+    "CliEnvelope",
+    "CliEnvelopeBuilder",
+    "CliErrorEntry",
+    "CliErrorStatus",
+    "CliFileResult",
+    "CliFileStatus",
+    "CliStatus",
+    "new_cli_envelope",
+    "render_cli_envelope",
+    "validate_cli_envelope",
+)

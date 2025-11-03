@@ -68,16 +68,20 @@ class _StubPolicyEngine:
         return PolicyReport(coverage=1.0, threshold=1.0, violations=[])
 
 
-DocfactsStatus = Literal["success", "violation", "config", "error"]
+type DocfactsStatus = Literal["success", "violation", "config", "error"]
 
 
 class _StubDocfactsCoordinator:
     def __init__(self, status: DocfactsStatus, message: str | None = None) -> None:
-        self._status = status
+        self._status: DocfactsStatus = status
         self._message = message
 
     def reconcile(self, _docfacts: Iterable[DocFact]) -> DocfactsResult:
-        return DocfactsResult(status=self._status, message=self._message, diff_path=None)
+        return DocfactsResult(
+            status=self._status,
+            message=self._message,
+            diff_path=None,
+        )
 
 
 class _StubDiffManager:

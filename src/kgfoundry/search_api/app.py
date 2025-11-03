@@ -12,8 +12,8 @@ from kgfoundry.namespace_bridge import (
     namespace_getattr,
 )
 
-__all__ = namespace_exports(_module)
-namespace_attach(_module, cast(dict[str, object], globals()), __all__)
+_EXPORTS = tuple(namespace_exports(_module))
+namespace_attach(_module, cast(dict[str, object], globals()), _EXPORTS)
 
 __doc__ = _module.__doc__
 if hasattr(_module, "__path__"):
@@ -27,4 +27,4 @@ def __getattr__(name: str) -> object:
 
 def __dir__() -> list[str]:
     """Return the combined attribute listing."""
-    return namespace_dir(_module, __all__)
+    return namespace_dir(_module, _EXPORTS)

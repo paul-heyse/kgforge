@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
   "schemaId": "https://kgfoundry.dev/schema/tools/navmap-document.json",
-  "generatedAt": "2025-11-03T15:24:39.319632+00:00",
-  "commit": "d5557fcb9ea570c3b3992df46e1bb8e00ffa1bdb",
+  "generatedAt": "2025-11-03T17:26:15.805029+00:00",
+  "commit": "1db8a23880b8476a6698230efc054a0a7a6ed5e6",
   "policyVersion": "1",
   "linkMode": "editor",
   "modules": {
@@ -562,7 +562,7 @@
         "SPLADEv3Encoder": 188,
         "PureImpactIndex": 282,
         "LuceneImpactIndex": 482,
-        "get_splade": 589
+        "get_splade": 586
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/splade.py"
@@ -1879,6 +1879,11 @@
       "path": "src/kgfoundry_common/errors/exceptions.py",
       "exports": [
         "AgentCatalogSearchError",
+        "ArtifactDependencyError",
+        "ArtifactDeserializationError",
+        "ArtifactModelError",
+        "ArtifactSerializationError",
+        "ArtifactValidationError",
         "CatalogLoadError",
         "CatalogSessionError",
         "ChunkingError",
@@ -1911,6 +1916,11 @@
       },
       "meta": {
         "AgentCatalogSearchError": {},
+        "ArtifactDependencyError": {},
+        "ArtifactDeserializationError": {},
+        "ArtifactModelError": {},
+        "ArtifactSerializationError": {},
+        "ArtifactValidationError": {},
         "CatalogLoadError": {},
         "CatalogSessionError": {},
         "ChunkingError": {},

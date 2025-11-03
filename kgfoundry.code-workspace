@@ -72,7 +72,8 @@
     "cSpell.words": [
       "AutoAPI","DocTags","Docling","OpenAlex","Qwen","SPLADE","FAISS",
       "DuckDB","vLLM","PyLucene","cuVS","kgfoundry"
-    ]
+    ],
+    "semgrep.scan.onlyGitDirty": false
   },
 
   "extensions": {

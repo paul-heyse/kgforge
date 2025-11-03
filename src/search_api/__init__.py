@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import importlib
 import sys
+from typing import TYPE_CHECKING
 
 # [nav:anchor app]
 # [nav:anchor bm25_index]
@@ -38,7 +39,32 @@ _ALIASES: dict[str, str] = {
     "types": "search_api.types",
 }
 
-__all__ = sorted(_ALIASES)
+if TYPE_CHECKING:
+    from search_api import (
+        app,
+        bm25_index,
+        faiss_adapter,
+        fixture_index,
+        fusion,
+        kg_mock,
+        schemas,
+        service,
+        splade_index,
+        types,
+    )
+
+__all__: tuple[str, ...] = (
+    "app",
+    "bm25_index",
+    "faiss_adapter",
+    "fixture_index",
+    "fusion",
+    "kg_mock",
+    "schemas",
+    "service",
+    "splade_index",
+    "types",
+)
 
 
 def __getattr__(name: str) -> object:

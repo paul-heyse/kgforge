@@ -11,7 +11,7 @@ from __future__ import annotations
 import sys
 from importlib import import_module
 from types import ModuleType
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 _SUBMODULES: Final[dict[str, str]] = {
     "artifacts": "docs._types.artifacts",
@@ -19,7 +19,16 @@ _SUBMODULES: Final[dict[str, str]] = {
     "sphinx_optional": "docs._types.sphinx_optional",
 }
 
-__all__: tuple[str, ...] = tuple(sorted(_SUBMODULES))
+__all__: tuple[str, ...] = (
+    "artifacts",
+    "griffe",
+    "sphinx_optional",
+)
+
+if TYPE_CHECKING:
+    from docs._types import artifacts as artifacts
+    from docs._types import griffe as griffe
+    from docs._types import sphinx_optional as sphinx_optional
 
 
 def _load_submodule(name: str) -> ModuleType:

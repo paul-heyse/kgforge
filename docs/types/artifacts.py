@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+from docs._types.alignment import (
+    SYMBOL_DELTA_CHANGE_FIELDS,
+    SYMBOL_DELTA_PAYLOAD_FIELDS,
+    SYMBOL_INDEX_ARTIFACTS_FIELDS,
+    SYMBOL_INDEX_ROW_FIELDS,
+    align_schema_fields,
+)
 from docs._types.artifacts import (
     ArtifactValidationError,
     JsonPayload,
@@ -23,6 +30,10 @@ from docs._types.artifacts import (
 )
 
 __all__ = [
+    "SYMBOL_DELTA_CHANGE_FIELDS",
+    "SYMBOL_DELTA_PAYLOAD_FIELDS",
+    "SYMBOL_INDEX_ARTIFACTS_FIELDS",
+    "SYMBOL_INDEX_ROW_FIELDS",
     "ArtifactValidationError",
     "JsonPayload",
     "JsonPrimitive",
@@ -32,6 +43,7 @@ __all__ = [
     "SymbolDeltaPayload",
     "SymbolIndexArtifacts",
     "SymbolIndexRow",
+    "align_schema_fields",
     "dump_symbol_delta",
     "dump_symbol_index",
     "load_symbol_delta",

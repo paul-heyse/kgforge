@@ -89,6 +89,16 @@ def _utc_iso_now() -> str:
     return datetime.now(tz=UTC).isoformat()
 
 
+class _NavmapDocumentInit(TypedDict, total=False):
+    schemaVersion: str
+    schemaId: str
+    generatedAt: str
+    commit: str
+    policyVersion: str
+    linkMode: str
+    modules: dict[str, ModuleEntryDocument]
+
+
 class NavmapDocument(BaseModel):
     """Top-level navmap document captured on disk."""
 
@@ -108,7 +118,7 @@ def _symbol_meta_to_document(meta: SymbolMeta) -> SymbolMetaDocument:
         owner=meta.owner,
         stability=meta.stability,
         since=meta.since,
-        deprecated_in=meta.deprecated_in,
+        deprecatedIn=meta.deprecated_in,
     )
 
 
@@ -117,8 +127,26 @@ def _module_meta_to_document(module_meta: ModuleMeta) -> ModuleMetaDocument:
         owner=module_meta.owner,
         stability=module_meta.stability,
         since=module_meta.since,
-        deprecated_in=module_meta.deprecated_in,
+        deprecatedIn=module_meta.deprecated_in,
     )
+
+
+def _new_navmap_document(
+    *,
+    commit: str,
+    policy_version: str,
+    link_mode: str,
+    modules: dict[str, ModuleEntryDocument],
+) -> NavmapDocument:
+    payload: _NavmapDocumentInit = {
+        "schemaVersion": NAVMAP_SCHEMA_VERSION,
+        "schemaId": NAVMAP_SCHEMA_ID,
+        "commit": commit,
+        "policyVersion": policy_version,
+        "linkMode": link_mode,
+        "modules": modules,
+    }
+    return NavmapDocument(**payload)
 
 
 def navmap_document_from_index(
@@ -164,7 +192,7 @@ def navmap_document_from_index(
         }
         modules[name] = ModuleEntryDocumentType.model_validate(module_payload)
 
-    return NavmapDocument(
+    return _new_navmap_document(
         commit=commit,
         policy_version=policy_version,
         link_mode=link_mode,

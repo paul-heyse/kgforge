@@ -40,6 +40,8 @@ from tools.docstring_builder.models import (
     ObservabilityReport,
     PluginReport,
     RunStatus,
+    RunSummary,
+    StatusCounts,
     build_cli_result_skeleton,
     validate_cli_output,
 )
@@ -622,21 +624,24 @@ class PipelineRunner:
         cli_result["files"] = context.state.file_reports
         cli_result["errors"] = [e.to_report() for e in context.state.errors]
 
-        summary_block = cli_result["summary"]
-        summary_block["processed"] = context.state.processed_count
-        summary_block["skipped"] = context.state.skipped_count
-        summary_block["changed"] = context.state.changed_count
-        summary_block["status_counts"] = {
+        status_counts: StatusCounts = {
             "success": context.state.status_counts.get(self._cfg.success_status, 0),
             "violation": context.state.status_counts.get(self._cfg.violation_status, 0),
             "config": context.state.status_counts.get(self._cfg.config_status, 0),
             "error": context.state.status_counts.get(self._cfg.error_status, 0),
         }
-        summary_block["docfacts_checked"] = context.state.docfacts_checked
-        summary_block["cache_hits"] = context.state.cache_hits
-        summary_block["cache_misses"] = context.state.cache_misses
-        summary_block["duration_seconds"] = context.duration
-        summary_block["subcommand"] = invoked
+        summary_block: RunSummary = {
+            "processed": context.state.processed_count,
+            "skipped": context.state.skipped_count,
+            "changed": context.state.changed_count,
+            "status_counts": status_counts,
+            "docfacts_checked": context.state.docfacts_checked,
+            "cache_hits": context.state.cache_hits,
+            "cache_misses": context.state.cache_misses,
+            "duration_seconds": context.duration,
+            "subcommand": invoked,
+        }
+        cli_result["summary"] = summary_block
 
         cli_result["policy"] = {
             "coverage": context.policy_report.coverage,

@@ -29,6 +29,11 @@ logger = get_logger(__name__)
 
 __all__ = [
     "AgentCatalogSearchError",
+    "ArtifactDependencyError",
+    "ArtifactDeserializationError",
+    "ArtifactModelError",
+    "ArtifactSerializationError",
+    "ArtifactValidationError",
     "CatalogLoadError",
     "CatalogSessionError",
     "ChunkingError",
@@ -1508,6 +1513,271 @@ class SymbolAttachmentError(KgFoundryError):
         super().__init__(
             message,
             code=ErrorCode.SYMBOL_ATTACHMENT_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context,
+        )
+
+
+class ArtifactModelError(KgFoundryError):
+    """Error during artifact model loading or validation.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise ArtifactModelError(
+    ...     "Failed to load artifact model", cause=FileNotFoundError("Model file missing")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize artifact model error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.ARTIFACT_MODEL_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context,
+        )
+
+
+class ArtifactValidationError(KgFoundryError):
+    """Error during artifact validation.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise ArtifactValidationError(
+    ...     "Artifact validation failed", cause=json.JSONDecodeError("Invalid JSON")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize artifact validation error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.ARTIFACT_VALIDATION_ERROR,
+            http_status=422,
+            cause=cause,
+            context=context,
+        )
+
+
+class ArtifactSerializationError(KgFoundryError):
+    """Error during artifact serialization.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise ArtifactSerializationError(
+    ...     "Failed to serialize artifact", cause=json.JSONDecodeError("Invalid JSON")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize artifact serialization error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.ARTIFACT_SERIALIZATION_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context,
+        )
+
+
+class ArtifactDeserializationError(KgFoundryError):
+    """Error during artifact deserialization.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise ArtifactDeserializationError(
+    ...     "Failed to deserialize artifact", cause=json.JSONDecodeError("Invalid JSON")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize artifact deserialization error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.ARTIFACT_DESERIALIZATION_ERROR,
+            http_status=500,
+            cause=cause,
+            context=context,
+        )
+
+
+class ArtifactDependencyError(KgFoundryError):
+    """Error during artifact dependency resolution.
+
+    <!-- auto:docstring-builder v1 -->
+
+    Parameters
+    ----------
+    message : str
+        Describe ``message``.
+    cause : Exception | None, optional
+        Describe ``cause``.
+        Defaults to ``None``.
+    context : Mapping[str, object] | None, optional
+        Describe ``context``.
+        Defaults to ``None``.
+
+    Examples
+    --------
+    >>> raise ArtifactDependencyError(
+    ...     "Failed to resolve artifact dependency", cause=ImportError("Module not found")
+    ... )
+    """
+
+    def __init__(
+        self,
+        message: str,
+        cause: Exception | None = None,
+        context: Mapping[str, object] | None = None,
+    ) -> None:
+        """Initialize artifact dependency error.
+
+        <!-- auto:docstring-builder v1 -->
+
+        Parameters
+        ----------
+        message : str
+            Describe ``message``.
+        cause : Exception | NoneType, optional
+            Describe ``cause``.
+            Defaults to ``None``.
+        context : str | object | NoneType, optional
+            Describe ``context``.
+            Defaults to ``None``.
+        """
+        super().__init__(
+            message,
+            code=ErrorCode.ARTIFACT_DEPENDENCY_ERROR,
             http_status=500,
             cause=cause,
             context=context,

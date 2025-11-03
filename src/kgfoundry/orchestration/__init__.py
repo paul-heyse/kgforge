@@ -12,9 +12,9 @@ from kgfoundry.namespace_bridge import (
     namespace_getattr,
 )
 
-__all__ = namespace_exports(_module)
+_EXPORTS = tuple(namespace_exports(_module))
 _namespace = cast(dict[str, object], globals())
-namespace_attach(_module, _namespace, __all__)
+namespace_attach(_module, _namespace, _EXPORTS)
 
 __doc__ = _module.__doc__
 if hasattr(_module, "__path__"):
@@ -52,4 +52,4 @@ def __dir__() -> list[str]:
     inspect._empty
         Sorted union of exports and implementation attributes.
     """
-    return namespace_dir(_module, __all__)
+    return namespace_dir(_module, _EXPORTS)

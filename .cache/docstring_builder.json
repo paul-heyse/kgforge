@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "schemaId": "https://kgfoundry.dev/schema/tools/docstring-cache.json",
-  "generatedAt": "2025-11-03T15:21:51.030392+00:00",
+  "generatedAt": "2025-11-03T17:23:40.737512+00:00",
   "entries": {
     "/home/paul/kgfoundry/src/docling/__init__.py": {
       "mtime": 1762083039.1020849,
@@ -28,7 +28,7 @@
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/download/harvester.py": {
-      "mtime": 1762083039.1217158,
+      "mtime": 1762186865.6234043,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/embeddings_dense/__init__.py": {
@@ -56,7 +56,7 @@
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/embeddings_sparse/splade.py": {
-      "mtime": 1762118930.1642518,
+      "mtime": 1762183857.3650973,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kf_common/__init__.py": {
@@ -112,15 +112,15 @@
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/search.py": {
-      "mtime": 1762178540.919479,
+      "mtime": 1762186865.6234043,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/session.py": {
-      "mtime": 1762123501.9831784,
+      "mtime": 1762183857.3614178,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry/agent_catalog/sqlite.py": {
-      "mtime": 1762083039.0796375,
+      "mtime": 1762183857.3650973,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry/docling/__init__.py": {
@@ -244,15 +244,15 @@
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/errors/__init__.py": {
-      "mtime": 1762118964.911426,
+      "mtime": 1762190286.8099887,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/errors/codes.py": {
-      "mtime": 1762083039.1340854,
+      "mtime": 1762190285.5629933,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/errors/exceptions.py": {
-      "mtime": 1762119109.5802624,
+      "mtime": 1762190284.180823,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/errors/http.py": {
@@ -276,7 +276,7 @@
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/logging.py": {
-      "mtime": 1762089970.7198918,
+      "mtime": 1762183857.3650973,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/models.py": {
@@ -296,7 +296,7 @@
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/problem_details.py": {
-      "mtime": 1762161072.5668511,
+      "mtime": 1762183857.3650973,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/pydantic.py": {
@@ -808,7 +808,7 @@
       "config_hash": "549d4cd75f7fc7c1e8beb2ea09c4a815b5b374b5fb595a36b6a31a364a5f8e1b"
     },
     "/home/paul/kgfoundry/src/kgfoundry_common/subprocess_utils.py": {
-      "mtime": 1762182551.7690177,
+      "mtime": 1762184595.7359588,
       "config_hash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc"
     },
     "/home/paul/kgfoundry/src/kgfoundry/namespace_bridge.py": {

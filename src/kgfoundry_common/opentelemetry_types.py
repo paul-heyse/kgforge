@@ -52,7 +52,8 @@ class SpanProcessorProtocol(Protocol):
 
     def on_start(self, span: SpanProtocol, parent_context: object | None = None) -> None:
         """Observe ``span`` immediately after creation."""
-        ...
+        del self, span, parent_context
+        raise NotImplementedError
 
     def on_end(self, span: SpanProtocol) -> None:
         """Observe ``span`` once it has completed."""
@@ -64,7 +65,8 @@ class SpanProcessorProtocol(Protocol):
 
     def force_flush(self, timeout_millis: int | None = None) -> bool:
         """Flush buffered spans within ``timeout_millis``."""
-        ...
+        del self, timeout_millis
+        raise NotImplementedError
 
 
 class TracerProviderProtocol(Protocol):
@@ -81,11 +83,13 @@ class TracerProviderProtocol(Protocol):
         attributes: Attributes | None = None,
     ) -> TracerProtocol:
         """Return a tracer configured for the given instrumentation metadata."""
-        ...
+        del self, instrumenting_module_name, instrumenting_library_version, schema_url, attributes
+        raise NotImplementedError
 
     def add_span_processor(self, processor: SpanProcessorProtocol) -> None:
         """Register ``processor`` for span lifecycle callbacks."""
-        ...
+        del self, processor
+        raise NotImplementedError
 
     def shutdown(self) -> None:
         """Shut down the provider gracefully."""
@@ -93,7 +97,8 @@ class TracerProviderProtocol(Protocol):
 
     def force_flush(self, timeout_millis: int | None = None) -> bool:
         """Flush pending spans and return ``True`` on success."""
-        ...
+        del self, timeout_millis
+        raise NotImplementedError
 
 
 class SpanExporterProtocol(Protocol):

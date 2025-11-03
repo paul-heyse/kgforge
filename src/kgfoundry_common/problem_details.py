@@ -248,8 +248,14 @@ def _ensure_exception(value: object, *, message: str) -> Exception:
     _type_error(message)
 
 
+def _first_arg(args: tuple[object, ...], *, func_name: str) -> object:
+    if len(args) == 0:
+        _type_error(f"{func_name}() missing required argument")
+    return args[0]
+
+
 def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDetailsParams:
-    if args and isinstance(args[0], ProblemDetailsParams):
+    if len(args) > 0 and isinstance(args[0], ProblemDetailsParams):
         if len(args) > 1 or kwargs:
             _type_error("build_problem_details() received unexpected extra arguments")
         return args[0]
@@ -289,16 +295,18 @@ def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDe
 
 
 def _coerce_exception_params(*args: object, **kwargs: object) -> ExceptionProblemDetailsParams:
-    if args and isinstance(args[0], ExceptionProblemDetailsParams):
+    if len(args) > 0 and isinstance(args[0], ExceptionProblemDetailsParams):
         if len(args) > 1 or kwargs:
             _type_error("problem_from_exception() received unexpected extra arguments")
         return args[0]
 
-    if not args:
+    if len(args) == 0:
         _type_error("problem_from_exception() missing required argument: 'exc'")
 
+    first_arg = _first_arg(args, func_name="problem_from_exception")
     exc = _ensure_exception(
-        args[0], message="problem_from_exception() first argument must be an Exception instance"
+        first_arg,
+        message="problem_from_exception() first argument must be an Exception instance",
     )
 
     if "detail" in kwargs:

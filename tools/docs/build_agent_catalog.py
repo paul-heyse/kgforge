@@ -37,6 +37,7 @@ from kgfoundry.agent_catalog.search import (
     load_faiss,
 )
 from kgfoundry.agent_catalog.sqlite import write_sqlite_catalog
+from kgfoundry_common.types import JsonValue
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
 from tools.docs.catalog_models import (
@@ -54,9 +55,7 @@ from tools.docs.catalog_models import (
 )
 from tools.docs.errors import CatalogBuildError
 
-type CatalogPayload = Mapping[
-    str, bool | dict[str, object] | float | int | list[object] | str | None
-]
+type CatalogPayload = Mapping[str, JsonValue]
 
 STD_LIB_MODULES = set(sys.stdlib_module_names)
 TRIGRAM_LENGTH = 3
@@ -719,9 +718,11 @@ class AgentCatalogBuilder:
     ) -> Anchors:
         start_line: int | None
         end_line: int | None
-        if node is not None and hasattr(node, "lineno") and hasattr(node, "end_lineno"):
-            start_line = int(node.lineno)
-            end_line = int(node.end_lineno)
+        start_attr = getattr(node, "lineno", None) if node is not None else None
+        end_attr = getattr(node, "end_lineno", None) if node is not None else None
+        if isinstance(start_attr, int) and isinstance(end_attr, int):
+            start_line = start_attr
+            end_line = end_attr
         else:
             start_line = None
             end_line = None
@@ -1196,14 +1197,18 @@ class AgentCatalogBuilder:
 
     def write(self, catalog: AgentCatalog, path: Path, schema: Path) -> None:
         """Write the catalog and validate against the schema."""
-        catalog_dict = catalog.model_dump()
+        catalog_json = json.loads(json.dumps(catalog.model_dump()))
+        catalog_payload = cast(dict[str, JsonValue], catalog_json)
         output_path = self._resolve_artifact_path(path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(json.dumps(catalog_dict, indent=2), encoding="utf-8")
+        output_path.write_text(json.dumps(catalog_payload, indent=2), encoding="utf-8")
         schema_path = self._resolve_artifact_path(schema)
         schema_data = json.loads(schema_path.read_text(encoding="utf-8"))
         validator = jsonschema.Draft202012Validator(schema_data)
-        errors = sorted(validator.iter_errors(catalog_dict), key=lambda err: tuple(err.path))
+        errors = sorted(
+            validator.iter_errors(cast(CatalogPayload, catalog_payload)),
+            key=lambda err: tuple(err.path),
+        )
         if errors:
             rendered = "; ".join(
                 f"{'/'.join(map(str, err.path)) or '<root>'}: {err.message}" for err in errors
@@ -1211,17 +1216,24 @@ class AgentCatalogBuilder:
             message = f"Catalog validation failed: {rendered}"
             raise CatalogBuildError(message)
         sqlite_target = self._resolve_artifact_path(self.sqlite_path)
-        packages_override: list[dict[str, Any]] = []
+        packages_override: list[Mapping[str, JsonValue]] = []
         if self._packages_snapshot:
-            packages_override = json.loads(json.dumps(self._packages_snapshot))
-        elif catalog_dict.get("packages"):
-            raw_packages = catalog_dict.get("packages", [])
+            snapshot_json = json.loads(json.dumps(self._packages_snapshot))
+            packages_override = [
+                cast(Mapping[str, JsonValue], entry)
+                for entry in snapshot_json
+                if isinstance(entry, dict)
+            ]
+        elif catalog_payload.get("packages"):
+            raw_packages = catalog_payload.get("packages", [])
             if isinstance(raw_packages, list):
                 packages_override = [
-                    cast(dict[str, Any], entry) for entry in raw_packages if isinstance(entry, dict)
+                    cast(Mapping[str, JsonValue], entry)
+                    for entry in raw_packages
+                    if isinstance(entry, dict)
                 ]
         write_sqlite_catalog(
-            cast(CatalogPayload, catalog_dict),
+            cast(CatalogPayload, catalog_payload),
             sqlite_target,
             packages_override=packages_override,
         )

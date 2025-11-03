@@ -12,9 +12,9 @@ from kgfoundry.tooling_bridge import (
     namespace_getattr,
 )
 
-__all__ = namespace_exports(_module)
+_EXPORTS = tuple(namespace_exports(_module))
 _namespace = cast(dict[str, object], globals())
-namespace_attach(_module, _namespace, __all__)
+namespace_attach(_module, _namespace, _EXPORTS)
 
 __doc__ = _module.__doc__
 if hasattr(_module, "__path__"):
@@ -28,4 +28,4 @@ def __getattr__(name: str) -> object:
 
 def __dir__() -> list[str]:
     """Return the combined attribute listing exposed by the namespace bridge."""
-    return namespace_dir(_module, __all__)
+    return namespace_dir(_module, _EXPORTS)

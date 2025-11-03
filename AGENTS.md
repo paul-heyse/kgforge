@@ -38,11 +38,11 @@
     scripts/bootstrap.sh
     ```
 
-3) **Implement**
+2) **Implement**
    - Code to the typed API sketch.
    - Keep functions small; separate I/O from pure logic; prefer composition over inheritance.
 
-4) **Validate quality gates locally**
+3) **Validate quality gates locally**
   ```bash
   uv run ruff format && uv run ruff check --fix
   uv run pyright --warnings --pythonversion=3.13
@@ -59,7 +59,7 @@
 
 ### Quality checks (zero-error mandate)
 
-For all code blocks that you make edits to, please check for pyright, mypy, pyrefly, and Ruff errors or warnings and ensure that by the time you have concluded your edits in a code block there are zero errors in any of those four categories. Under no circumstances should you ever suppress errors, even stylistic Ruff errors. Instead of suppressing errors, derive a structural solution that causally addresses the source of the error, even if it is intensive and disruptive to implement. All of your designs should be structural, holistic, and best-in-class, guided by the following principles:
+For all code blocks that you make edits to, please check for pyright, mypy, pyrefly, and Ruff errors or warnings and ensure that by the time you have concluded your edits in a code block there are zero errors in any of those four categories. Your error checking and resolution should not solely focus on your scope, all errors in the files that you have made edits in are part of the scope of your review when implementing a change and should be fully resolved before you conclude your work. Under no circumstances should you ever suppress errors, even stylistic Ruff errors. Instead of suppressing errors, derive a structural solution that causally addresses the source of the error, even if it is intensive to implement. All of your code designs and implementation work should be structural, holistic, and best-in-class, guided by the following principles:
 
 #### Principles for your code design and implementation
 

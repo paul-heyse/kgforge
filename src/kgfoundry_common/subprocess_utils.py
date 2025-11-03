@@ -40,8 +40,8 @@ class _PopenFactory(Protocol):
     def __call__(
         self,
         args: Sequence[str],
-        *unsafe_args: object,
-        **unsafe_kwargs: object,
+        *_unsafe_args: object,
+        **_unsafe_kwargs: object,
     ) -> TextProcess: ...
 
 

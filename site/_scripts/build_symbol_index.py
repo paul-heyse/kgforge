@@ -15,21 +15,28 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from types import ModuleType
 from typing import Any, cast
 
-griffe_module = importlib.import_module("griffe")
-loader_module: ModuleType | None
-try:
-    loader_module = importlib.import_module("griffe.loader")
-except ModuleNotFoundError:
-    loader_module = None
-Object = cast(Any, griffe_module.Object)
-default_loader = griffe_module.GriffeLoader
-GriffeLoader = cast(
-    Any,
-    loader_module.GriffeLoader if loader_module is not None else default_loader,
-)
+from kgfoundry_common.optional_deps import OptionalDependencyError, safe_import_griffe
+
+
+def _resolve_griffe_loader() -> tuple[Any, Any]:
+    try:
+        griffe_module = safe_import_griffe()
+    except OptionalDependencyError as exc:  # pragma: no cover - CLI handles error reporting
+        raise RuntimeError("griffe is required to build the symbol index") from exc
+
+    loader_module = getattr(griffe_module, "loader", None)
+    object_type = cast(Any, getattr(griffe_module, "Object"))
+    default_loader = getattr(griffe_module, "GriffeLoader")
+    if loader_module is not None:
+        loader_cls = getattr(loader_module, "GriffeLoader", default_loader)
+    else:
+        loader_cls = default_loader
+    return object_type, cast(Any, loader_cls)
+
+
+Object, GriffeLoader = _resolve_griffe_loader()
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -149,10 +156,12 @@ def _package_for(module: str | None, path: str | None) -> str | None:
 def _canonical_path(node: Any) -> str | None:
     """Return the canonical path for ``node`` if available."""
     canonical = safe_attr(node, "canonical_path")
-    if isinstance(canonical, Object):
-        return canonical.path
     if canonical is None:
         return None
+    if hasattr(canonical, "path"):
+        path_value = getattr(canonical, "path")
+        if isinstance(path_value, str):
+            return path_value
     return str(canonical)
 
 

@@ -18,7 +18,8 @@ class _Histogram(Protocol):
 
     def observe(self, amount: float) -> None:
         """Record a sample in the histogram."""
-        ...
+        del self, amount
+        raise NotImplementedError
 
 
 class _Counter(Protocol):

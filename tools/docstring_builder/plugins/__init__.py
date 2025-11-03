@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 import threading
 from collections.abc import Callable, Iterable, Sequence
@@ -18,6 +19,10 @@ from tools.docstring_builder.models import (
     DocstringBuilderError,
     PluginExecutionError,
 )
+from tools.docstring_builder.plugins._inspection import (
+    get_signature,
+    has_required_parameters,
+)
 from tools.docstring_builder.plugins.base import (
     DocstringBuilderPlugin,
     DocstringPayload,
@@ -26,6 +31,8 @@ from tools.docstring_builder.plugins.base import (
     LegacyPluginAdapter,
     LegacyPluginProtocol,
     PluginContext,
+    PluginFactory,
+    PluginRegistryError,
     PluginStage,
     TransformerPlugin,
 )
@@ -46,9 +53,8 @@ PayloadT = TypeVar("PayloadT")
 ResultT = TypeVar("ResultT")
 
 type PluginInstance = DocstringBuilderPlugin[object, object] | LegacyPluginProtocol
-
+type PluginFactoryCandidateT = PluginFactory[PluginInstance] | Callable[[], PluginInstance]
 type RegisteredPlugin = HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
-type PluginFactory = Callable[[], PluginInstance]
 
 _PLUGIN_RUNTIME_ERRORS: tuple[type[Exception], ...] = (
     RuntimeError,
@@ -205,32 +211,262 @@ def _invoke_apply(
         raise PluginExecutionError(message) from exc
 
 
+def _validate_factory_signature(
+    factory: object,
+    name: str,
+    stage: PluginStage,
+) -> None:
+    """Validate that factory is a callable with no required parameters.
+
+    Parameters
+    ----------
+    factory : object
+        The factory candidate to validate.
+    name : str
+        The plugin name for error reporting.
+    stage : PluginStage
+        The plugin stage for error reporting.
+
+    Raises
+    ------
+    PluginRegistryError
+        If factory is not callable or has required parameters.
+    """
+    if not callable(factory):
+        msg = f"Plugin factory {name!r} must be callable"
+        raise PluginRegistryError(
+            msg,
+            context={
+                "plugin_name": name,
+                "stage": stage,
+                "reason": "not-callable",
+            },
+        ) from None
+
+    # Validate signature using typed inspection module
+    _validate_callable_signature(factory, name, stage)
+
+
+def _validate_callable_signature(
+    factory: object,
+    name: str,
+    stage: PluginStage,
+) -> None:
+    """Validate a callable's signature has no required parameters.
+
+    Parameters
+    ----------
+    factory : object
+        The factory callable (must already be checked as callable).
+    name : str
+        The plugin name for error reporting.
+    stage : PluginStage
+        The plugin stage for error reporting.
+
+    Raises
+    ------
+    PluginRegistryError
+        If the callable has required parameters.
+    """
+    # Use typed inspection module instead of raw inspect
+    has_required_params: bool
+    try:
+        has_required_params = has_required_parameters(cast(Callable[..., object], factory))
+    except (ValueError, TypeError) as exc:
+        msg = f"Could not inspect factory signature for {name!r}"
+        raise PluginRegistryError(
+            msg,
+            cause=exc,
+            context={
+                "plugin_name": name,
+                "stage": stage,
+                "reason": "signature-inspection-failed",
+            },
+        ) from exc
+
+    if has_required_params:
+        msg = f"Plugin factory {name!r} has required parameters"
+        raise PluginRegistryError(
+            msg,
+            context={
+                "plugin_name": name,
+                "stage": stage,
+                "reason": "required-parameters",
+            },
+        )
+
+
+def _is_protocol_class(candidate: object) -> bool:
+    """Check if candidate is a Protocol class.
+
+    Parameters
+    ----------
+    candidate : object
+        The object to check.
+
+    Returns
+    -------
+    bool
+        True if candidate is a Protocol class.
+    """
+    if not inspect.isclass(candidate):
+        return False
+    # Check for typing_extensions.Protocol marker
+    # getattr on dynamic attributes returns Any per Python's type system
+    return bool(
+        hasattr(candidate, "__protocol_attrs__")
+        or hasattr(candidate, "_is_protocol")
+        or getattr(candidate, "__mro_entries__", None) is not None
+    )
+
+
+def _is_abstract_class(candidate: object) -> bool:
+    """Check if candidate is an abstract base class.
+
+    Parameters
+    ----------
+    candidate : object
+        The object to check.
+
+    Returns
+    -------
+    bool
+        True if candidate is abstract.
+    """
+    if not inspect.isclass(candidate):
+        return False
+    # getattr on dynamic attributes returns Any per Python's type system
+    return bool(getattr(candidate, "__abstractmethods__", None))
+
+
+def _instantiate_plugin_from_factory(
+    factory: PluginFactoryCandidateT,
+    name: str,
+    stage: PluginStage,
+) -> PluginInstance:
+    """Invoke factory to create a plugin instance, with validation.
+
+    Parameters
+    ----------
+    factory : PluginFactoryCandidateT
+        The factory callable.
+    name : str
+        The plugin name.
+    stage : PluginStage
+        The plugin stage.
+
+    Returns
+    -------
+    PluginInstance
+        A concrete plugin instance.
+
+    Raises
+    ------
+    PluginRegistryError
+        If factory invocation fails or factory is invalid.
+    """
+    # Validate factory before invoking
+    _validate_factory_signature(factory, name, stage)
+
+    try:
+        instance: object = factory()
+    except _PLUGIN_CONFIGURATION_ERRORS as exc:
+        message = f"Failed to invoke factory for plugin {name!r}"
+        raise PluginRegistryError(
+            message,
+            cause=exc,
+            context={
+                "plugin_name": name,
+                "stage": stage,
+                "reason": "factory-invocation-failed",
+            },
+        ) from exc
+
+    return cast(PluginInstance, instance)
+
+
+def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
+    """Resolve a candidate to a factory callable.
+
+    Parameters
+    ----------
+    candidate : object
+        A plugin class, factory callable, or instance.
+
+    Returns
+    -------
+    PluginFactoryCandidateT
+        A factory callable.
+
+    Raises
+    ------
+    PluginRegistryError
+        If candidate cannot be resolved to a factory.
+    """
+    name = _resolve_plugin_name(candidate)
+    stage: PluginStage | object
+
+    # If it's already a plugin instance, wrap it
+    if _is_registered_plugin(candidate) or _is_legacy_plugin(candidate):
+        # Wrap the instance in a factory
+        instance = candidate
+        # Return a callable that returns the instance
+        return lambda: instance  # type: ignore[return-value]
+
+    # If it's a class, check if it's Protocol or abstract
+    if isclass(candidate):
+        if _is_protocol_class(candidate):
+            # getattr on dynamic attributes returns Any per Python's type system
+            stage = getattr(candidate, "stage", "unknown")  # type: ignore[assignment]
+            message = f"Cannot register Protocol class {name!r} as plugin"
+            raise PluginRegistryError(
+                message,
+                context={
+                    "plugin_name": name,
+                    "stage": stage,
+                    "reason": "is-protocol",
+                },
+            )
+        if _is_abstract_class(candidate):
+            # getattr on dynamic attributes returns Any per Python's type system
+            stage = getattr(candidate, "stage", "unknown")  # type: ignore[assignment]
+            message = f"Cannot register abstract class {name!r} as plugin"
+            raise PluginRegistryError(
+                message,
+                context={
+                    "plugin_name": name,
+                    "stage": stage,
+                    "reason": "is-abstract",
+                },
+            )
+        # It's a concrete class, treat as factory
+        return candidate  # type: ignore[return-value]
+
+    # If it's callable, treat as factory
+    if callable(candidate):
+        return candidate  # type: ignore[return-value]
+
+    message = f"Unsupported plugin candidate {name!r}: not callable"
+    raise PluginRegistryError(
+        message,
+        context={
+            "plugin_name": name,
+            "reason": "not-callable",
+        },
+    )
+
+
 def _instantiate_plugin(candidate: object) -> RegisteredPlugin:
     name = _resolve_plugin_name(candidate)
     try:
-        instance = _materialize_candidate(candidate)
+        factory = _resolve_factory(candidate)
+        instance = _instantiate_plugin_from_factory(factory, name, "formatter")
+    except PluginRegistryError:
+        raise
     except _PLUGIN_CONFIGURATION_ERRORS as exc:  # pragma: no cover - defensive guard
         message = f"Failed to instantiate plugin {name!r}"
         raise PluginConfigurationError(message) from exc
     return _ensure_plugin_instance(instance)
-
-
-def _materialize_candidate(candidate: object) -> object:
-    if _is_registered_plugin(candidate):
-        if isclass(candidate):
-            plugin_type = cast(type[RegisteredPlugin], candidate)
-            return plugin_type()
-        return candidate
-    if _is_legacy_plugin(candidate):
-        if isclass(candidate):
-            legacy_type = cast(type[LegacyPluginProtocol], candidate)
-            return legacy_type()
-        return candidate
-    if callable(candidate):
-        factory = cast(Callable[[], PluginInstance], candidate)
-        return factory()
-    message = f"Unsupported plugin candidate {candidate!r}"
-    raise TypeError(message)
 
 
 def _resolve_plugin_name(candidate: object) -> str:
@@ -276,7 +512,8 @@ def _ensure_plugin_instance(obj: object) -> RegisteredPlugin:
 
 
 def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
-    stage = getattr(plugin, "stage", None)
+    # getattr on dynamic attributes returns Any per Python's type system
+    stage = getattr(plugin, "stage", None)  # type: ignore[assignment]
     if stage == "harvester":
         manager.harvesters.append(cast(HarvesterPlugin, plugin))
         return
@@ -317,12 +554,17 @@ def _load_entry_points() -> list[object]:
     return loaded
 
 
-def _builtin_candidates(builtin: Sequence[PluginFactory] | None) -> tuple[object, ...]:
+def _builtin_candidates(
+    builtin: Sequence[PluginFactoryCandidateT] | None,
+) -> tuple[PluginFactoryCandidateT, ...]:
     if builtin is None:
-        return (
-            DataclassFieldDocPlugin,
-            LLMSummaryRewritePlugin,
-            NormalizeNumpyParamsPlugin,
+        return cast(
+            tuple[PluginFactoryCandidateT, ...],
+            (
+                DataclassFieldDocPlugin,
+                LLMSummaryRewritePlugin,
+                NormalizeNumpyParamsPlugin,
+            ),
         )
     return tuple(builtin)
 
@@ -333,7 +575,7 @@ def load_plugins(
     *,
     only: Sequence[str] | None = None,
     disable: Sequence[str] | None = None,
-    builtin: Sequence[PluginFactory] | None = None,
+    builtin: Sequence[PluginFactoryCandidateT] | None = None,
 ) -> PluginManager:
     """Discover, filter, and instantiate plugins for the current run."""
     builtin_candidates = _builtin_candidates(builtin)
@@ -378,5 +620,7 @@ __all__ = [
     "DocstringPayload",
     "PluginConfigurationError",
     "PluginManager",
+    "PluginRegistryError",
+    "get_signature",
     "load_plugins",
 ]

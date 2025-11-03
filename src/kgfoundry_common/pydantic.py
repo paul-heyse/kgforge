@@ -75,6 +75,7 @@ if TYPE_CHECKING:
             dict[str, Any]
                 Dictionary representation of the model.
             """
+            del self, model_dump_kwargs
             raise NotImplementedError
 
         def model_dump_json(self, **model_dump_json_kwargs: object) -> str:
@@ -90,6 +91,7 @@ if TYPE_CHECKING:
             str
                 JSON string representing the model.
             """
+            del self, model_dump_json_kwargs
             raise NotImplementedError
 
 else:

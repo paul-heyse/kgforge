@@ -1,0 +1,71 @@
+# kgfoundry Semgrep custom rules
+rules:
+  # Ban stray prints in runtime code (use logging instead).
+  - id: kgfoundry.no-print
+    languages: [python]
+    severity: WARNING
+    message: "Avoid print(); use the structured logger."
+    pattern: print(...)
+
+  # Avoid 'Any' imports in library code (prefer precise typing).
+  - id: kgfoundry.no-typing-any
+    languages: [python]
+    severity: ERROR
+    message: "Avoid 'from typing import Any' in library code; prefer precise types."
+    pattern: from typing import Any
+
+  # Avoid asserts in non-test code (use explicit checks and exceptions).
+  - id: kgfoundry.no-assert-in-runtime
+    languages: [python]
+    severity: ERROR
+    message: "Avoid 'assert' in runtime code; replace with explicit checks and exceptions."
+    pattern: assert $X
+
+  # Dangerous shell usage patterns.
+  - id: kgfoundry.no-shell-injection
+    languages: [python]
+    severity: ERROR
+    message: "Avoid shell=True or os.system(); use subprocess with shell=False and validated args."
+    pattern-either:
+      - pattern: subprocess.run(..., shell=True, ...)
+      - pattern: subprocess.Popen(..., shell=True, ...)
+      - pattern: os.system(...)
+
+  # Avoid eval/exec in library code.
+  - id: kgfoundry.no-eval-exec
+    languages: [python]
+    severity: ERROR
+    message: "Avoid eval()/exec(); use safe parsing or explicit dispatch."
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+
+  # Prefer pathlib over os.path.* (modern, more robust APIs).
+  - id: kgfoundry.prefer-pathlib
+    languages: [python]
+    severity: INFO
+    message: "Prefer pathlib.Path over os.path.* for path manipulation."
+    pattern-either:
+      - pattern: os.path.join(...)
+      - pattern: os.path.exists(...)
+      - pattern: os.path.isdir(...)
+      - pattern: os.path.isfile(...)
+
+  # Don't swallow exceptions without action.
+  - id: kgfoundry.bare-except
+    languages: [python]
+    severity: WARNING
+    message: "Avoid bare 'except:'; catch specific exceptions or re-raise."
+    pattern: |
+      try:
+          ...
+      except:
+          ...
+
+  # Discourage 'from module import *' which harms static analysis and agents.
+  - id: kgfoundry.no-star-imports
+    languages: [python]
+    severity: WARNING
+    message: "Avoid 'from X import *'; import names explicitly."
+    pattern: from $MOD import *
+

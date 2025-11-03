@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import sys
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from contextlib import suppress
 from dataclasses import dataclass
 from functools import lru_cache
@@ -89,7 +89,8 @@ class WarningLogger(Protocol):
         """Log a warning message."""
 
 
-_LOADER_FACTORY = cast(Callable[[Sequence[str]], GriffeLoader], resolve_griffe().loader_type)
+def _loader_factory() -> Callable[..., GriffeLoader]:
+    return cast(Callable[..., GriffeLoader], resolve_griffe().loader_type)
 
 
 @lru_cache(maxsize=1)
@@ -148,7 +149,8 @@ def load_settings() -> DocsSettings:
 def make_loader(env: BuildEnvironment) -> GriffeLoader:
     """Instantiate a Griffe loader configured for the repository layout."""
     search_root = env.src if env.src.exists() else env.root
-    return _LOADER_FACTORY(search_paths=[str(search_root)])
+    loader_cls = _loader_factory()
+    return loader_cls(search_paths=[str(search_root)])
 
 
 def resolve_git_sha(

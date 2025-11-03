@@ -29,6 +29,31 @@ _ALIASES: dict[str, str] = {
     "vectorstore_faiss": "kgfoundry.vectorstore_faiss",
 }
 
+__all__: list[str] = [
+    "docling",
+    "download",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "kg_builder",
+    "kgfoundry_common",
+    "linking",
+    "observability",
+    "ontology",
+    "orchestration",
+    "registry",
+    "search_api",
+    "search_client",
+    "vectorstore_faiss",
+]
+
+if __debug__:
+    expected: set[str] = set(_ALIASES)
+    configured: set[str] = set(__all__)
+    if expected != configured:
+        missing = sorted(expected.difference(configured))
+        extra = sorted(configured.difference(expected))
+        raise RuntimeError(f"kgfoundry exports mismatch. missing={missing!r} extra={extra!r}")
+
 if TYPE_CHECKING:
     kgfoundry_common: ModuleType = import_module("kgfoundry_common")
     docling: ModuleType = import_module("kgfoundry.docling")
@@ -44,8 +69,6 @@ if TYPE_CHECKING:
     search_api: ModuleType = import_module("kgfoundry.search_api")
     search_client: ModuleType = import_module("kgfoundry.search_client")
     vectorstore_faiss: ModuleType = import_module("kgfoundry.vectorstore_faiss")
-
-__all__: list[str] = sorted(_ALIASES)
 
 
 def _load(name: str) -> object:

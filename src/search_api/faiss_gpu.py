@@ -13,6 +13,10 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import cast
 
+from kgfoundry_common.sequence_guards import (
+    first_or_error,
+    first_or_error_multi_device,
+)
 from search_api.types import (
     FaissIndexProtocol,
     FaissModuleProtocol,
@@ -109,7 +113,9 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
                 )
                 gpu_indices = multi_clone(context.resources, list(devices), index, options)
                 if gpu_indices:
-                    return gpu_indices[0]
+                    return first_or_error_multi_device(
+                        gpu_indices, context="gpu_indices_from_multi_clone"
+                    )
 
         clone_raw = cast(object | None, getattr(module, "index_cpu_to_gpu", None))
         if clone_raw is None:
@@ -123,13 +129,22 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
                 ],
                 clone_raw,
             )
-            return clone(context.resources, devices[0], index, options)
+            return clone(
+                context.resources,
+                first_or_error(devices, context="device_ids_single_clone"),
+                index,
+                options,
+            )
 
         clone_without_options = cast(
             Callable[[GpuResourcesProtocol, int, FaissIndexProtocol], FaissIndexProtocol],
             clone_raw,
         )
-        return clone_without_options(context.resources, devices[0], index)
+        return clone_without_options(
+            context.resources,
+            first_or_error(devices, context="device_ids_no_options"),
+            index,
+        )
     except (RuntimeError, OSError, ValueError) as exc:  # pragma: no cover - defensive fallback
         logger.debug("FAISS GPU cloning failed: %s", exc, exc_info=True)
         return index

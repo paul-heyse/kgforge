@@ -8,7 +8,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import cast
+from typing import TypedDict, cast
 
 import msgspec
 from msgspec import DecodeError
@@ -18,6 +18,8 @@ from kgfoundry.agent_catalog.models import load_catalog_payload
 from tools._shared.schema import validate_tools_payload as _validate_tools_payload
 from tools.docs.analytics_models import (
     ANALYTICS_SCHEMA,
+    ANALYTICS_SCHEMA_ID,
+    ANALYTICS_SCHEMA_VERSION,
     AgentAnalyticsDocument,
     AnalyticsErrors,
     BrokenLinkDetail,
@@ -31,6 +33,42 @@ type JSONMapping = Mapping[str, object]
 
 validate_tools_payload: Callable[[Mapping[str, object], str], None]
 validate_tools_payload = _validate_tools_payload
+
+
+class _AnalyticsDocumentInit(TypedDict, total=False):
+    schemaVersion: str
+    schemaId: str
+    generatedAt: str
+    repo: RepoInfo
+    catalog: CatalogMetrics
+    portal: PortalAnalytics
+    errors: AnalyticsErrors
+
+
+def _new_document(
+    *,
+    repo: RepoInfo | None = None,
+    catalog: CatalogMetrics | None = None,
+    portal: PortalAnalytics | None = None,
+    errors: AnalyticsErrors | None = None,
+    generated_at: str | None = None,
+) -> AgentAnalyticsDocument:
+    """Create an :class:`AgentAnalyticsDocument` with schema-aligned keywords."""
+    payload: _AnalyticsDocumentInit = {
+        "schemaVersion": ANALYTICS_SCHEMA_VERSION,
+        "schemaId": ANALYTICS_SCHEMA_ID,
+    }
+    if repo is not None:
+        payload["repo"] = repo
+    if catalog is not None:
+        payload["catalog"] = catalog
+    if portal is not None:
+        payload["portal"] = portal
+    if errors is not None:
+        payload["errors"] = errors
+    if generated_at is not None:
+        payload["generatedAt"] = generated_at
+    return AgentAnalyticsDocument(**payload)
 
 
 def _get_mapping(value: object) -> JSONMapping | None:
@@ -315,7 +353,7 @@ def build_analytics(args: argparse.Namespace) -> AgentAnalyticsDocument:
     previous = _load_previous(output_path)
     metrics = _catalog_metrics(catalog)
     broken_links = _check_links(catalog, repo_root, link_sample)
-    return AgentAnalyticsDocument(
+    return _new_document(
         repo=RepoInfo(root=str(repo_root)),
         catalog=metrics,
         portal=PortalAnalytics(sessions=_portal_sessions(previous)),
@@ -350,8 +388,8 @@ def _legacy_to_document(payload: JSONMapping) -> AgentAnalyticsDocument:
     broken_links, broken_links_total = _legacy_error_bundle(_get_mapping(payload.get("errors")))
     generated_at = _legacy_generated_at(payload.get("generated_at"))
 
-    return AgentAnalyticsDocument(
-        generatedAt=generated_at,
+    return _new_document(
+        generated_at=generated_at,
         repo=RepoInfo(root=repo_root),
         catalog=metrics,
         portal=PortalAnalytics(sessions=sessions),
