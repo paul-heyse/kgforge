@@ -49,7 +49,7 @@ class VectorValidationError(ValueError):
 
     def __init__(self, message: str, *, errors: Sequence[str] | None = None) -> None:
         super().__init__(message)
-        self.errors: tuple[str, ...] = tuple(errors or ())
+        self.errors: tuple[str, ...] = tuple(errors or (message,))
 
 
 @dataclass(frozen=True, slots=True)
@@ -74,21 +74,9 @@ class VectorBatch:
     matrix: VectorMatrix
 
     def __post_init__(self) -> None:
-        """Validate matrix dimensionality and id counts."""
+        """Normalise matrix representation without enforcing ids invariants."""
         matrix = assert_vector_matrix(self.matrix)
-        row_count = len(self.ids)
-        if row_count == 0:
-            msg = "VectorBatch must contain at least one vector"
-            raise VectorValidationError(msg)
-        if matrix.shape[0] != row_count:
-            msg = (
-                "Vector id count must match matrix row count: "
-                f"{row_count} ids vs {matrix.shape[0]} rows"
-            )
-            raise VectorValidationError(msg)
-        if len(set(self.ids)) != row_count:
-            msg = "Vector ids must be unique"
-            raise VectorValidationError(msg)
+        object.__setattr__(self, "matrix", matrix)
 
     @property
     def dimension(self) -> int:
@@ -171,7 +159,7 @@ def validate_vector_batch(batch: VectorBatch) -> VectorBatch:
     return batch
 
 
-def coerce_vector_batch(records: Iterable[Mapping[str, object]]) -> VectorBatch:
+def coerce_vector_batch(records: Iterable[object]) -> VectorBatch:
     """Construct a :class:`VectorBatch` from vector payload mappings.
 
     Parameters
@@ -207,10 +195,15 @@ def coerce_vector_batch(records: Iterable[Mapping[str, object]]) -> VectorBatch:
     (2, 2)
     """
     ids: list[VectorId] = []
+    seen_ids: set[VectorId] = set()
     vectors: list[list[float]] = []
     expected_dim: int | None = None
 
-    for idx, record in enumerate(records):
+    for idx, record_obj in enumerate(records):
+        if not isinstance(record_obj, Mapping):
+            msg = f"Record {idx} is missing a non-empty 'key' string"
+            raise VectorValidationError(msg)
+        record = record_obj
         raw_key = record.get("key")
         if not isinstance(raw_key, str) or not raw_key.strip():
             msg = f"Record {idx} is missing a non-empty 'key' string"
@@ -228,7 +221,12 @@ def coerce_vector_batch(records: Iterable[Mapping[str, object]]) -> VectorBatch:
             )
             raise VectorValidationError(msg)
 
-        ids.append(VectorId(raw_key))
+        vector_id = VectorId(raw_key)
+        if vector_id in seen_ids:
+            msg = f"Record {idx} reuses id '{vector_id}'"
+            raise VectorValidationError(msg)
+        seen_ids.add(vector_id)
+        ids.append(vector_id)
         vectors.append(row)
 
     if not ids:

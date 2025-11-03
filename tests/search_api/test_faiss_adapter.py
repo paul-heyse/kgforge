@@ -3,16 +3,41 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 
 import numpy as np
+import numpy.typing as npt
 import pytest
 
-from search_api.types import FaissIndexProtocol, VectorArray, wrap_faiss_module
+from search_api.types import FaissIndexProtocol, IndexArray, VectorArray, wrap_faiss_module
 
 
 class _FakeIndex:
     def __init__(self, label: str) -> None:
         self.label = label
+        self.last_added: VectorArray | None = None
+        self.last_added_with_ids: tuple[VectorArray, IndexArray] | None = None
+        self.last_trained: VectorArray | None = None
+
+    def add(self, vectors: VectorArray) -> None:
+        self.last_added = vectors
+
+    def search(
+        self, vectors: VectorArray, k: int
+    ) -> tuple[
+        npt.NDArray[np.float32], npt.NDArray[np.int64]
+    ]:  # pragma: no cover - minimal protocol stub
+        distances = np.zeros((vectors.shape[0], k), dtype=np.float32)
+        indices = np.zeros((vectors.shape[0], k), dtype=np.int64)
+        return distances, indices
+
+    def train(self, vectors: VectorArray) -> None:  # pragma: no cover - optional protocol method
+        self.last_trained = vectors
+
+    def add_with_ids(
+        self, vectors: VectorArray, ids: IndexArray
+    ) -> None:  # pragma: no cover - optional protocol method
+        self.last_added_with_ids = (vectors, ids)
 
 
 class _LegacyFaissModule:
@@ -27,6 +52,21 @@ class _LegacyFaissModule:
         self.index_flat_ip_dimension: int | None = None
         self.index_id_map2_index: FaissIndexProtocol | None = None
 
+        def index_flat_ip_impl(dimension: int) -> FaissIndexProtocol:
+            self.index_flat_ip_dimension = dimension
+            return _FakeIndex("flat")
+
+        def index_id_map2_impl(index: FaissIndexProtocol) -> FaissIndexProtocol:
+            self.index_id_map2_index = index
+            return _FakeIndex("idmap")
+
+        def normalize_l2_impl(vectors: VectorArray) -> None:
+            self.normalize_vectors = vectors
+
+        self.IndexFlatIP: Callable[[int], FaissIndexProtocol] = index_flat_ip_impl
+        self.IndexIDMap2: Callable[[FaissIndexProtocol], FaissIndexProtocol] = index_id_map2_impl
+        self.normalize_L2: Callable[[VectorArray], None] = normalize_l2_impl
+
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
         self.index_factory_calls.append((dimension, factory_string, metric))
         return _FakeIndex("factory")
@@ -38,52 +78,39 @@ class _LegacyFaissModule:
         self.read_path = path
         return _FakeIndex("read")
 
-    def IndexFlatIP(
-        self, dimension: int
-    ) -> FaissIndexProtocol:  # pragma: no cover - attribute accessed via adapter
-        self.index_flat_ip_dimension = dimension
-        return _FakeIndex("flat")
-
-    def IndexIDMap2(
-        self, index: FaissIndexProtocol
-    ) -> FaissIndexProtocol:  # pragma: no cover - attribute accessed via adapter
-        self.index_id_map2_index = index
-        return _FakeIndex("idmap")
-
-    def normalize_L2(
-        self, vectors: VectorArray
-    ) -> None:  # pragma: no cover - attribute accessed via adapter
-        self.normalize_vectors = vectors
-
 
 class _ModernFaissModule:
     METRIC_INNER_PRODUCT = 2
     METRIC_L2 = 3
 
-    def __init__(self, builder: Callable[..., FaissIndexProtocol]) -> None:
-        self._builder = builder
+    def __init__(self) -> None:
+        self.records: list[tuple[str, object]] = []
 
     def index_flat_ip(self, dimension: int) -> FaissIndexProtocol:
-        return self._builder("flat", dimension)
+        self.records.append(("flat", dimension))
+        return _FakeIndex("flat")
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
-        return self._builder("factory", dimension)
+        self.records.append(("factory", (dimension, factory_string, metric)))
+        return _FakeIndex("factory")
 
     def index_id_map2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
-        return self._builder("idmap", index)
+        self.records.append(("idmap", index))
+        return _FakeIndex("idmap")
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
-        self._builder("write", path)
+        self.records.append(("write", (index, path)))
 
     def read_index(self, path: str) -> FaissIndexProtocol:
-        return self._builder("read", path)
+        self.records.append(("read", path))
+        return _FakeIndex("read")
 
     def normalize_l2(self, vectors: VectorArray) -> None:
-        self._builder("normalize", vectors)
+        self.records.append(("normalize", vectors.shape))
 
 
 @pytest.mark.parametrize("dimension", [5, 128])
-def test_wrap_faiss_module_adapts_legacy_surface(dimension: int) -> None:
+def test_wrap_faiss_module_adapts_legacy_surface(dimension: int, tmp_path: Path) -> None:
     legacy = _LegacyFaissModule()
     adapted = wrap_faiss_module(legacy)
 
@@ -101,31 +128,27 @@ def test_wrap_faiss_module_adapts_legacy_surface(dimension: int) -> None:
     assert legacy.normalize_vectors is not None
     assert legacy.normalize_vectors.shape == vectors.shape
 
-    factory_index = adapted.index_factory(dimension, "Flat", legacy.metric_l2)
+    factory_index = adapted.index_factory(dimension, "Flat", adapted.metric_l2)
     assert isinstance(factory_index, _FakeIndex)
-    assert legacy.index_factory_calls[-1] == (dimension, "Flat", legacy.metric_l2)
+    assert legacy.index_factory_calls[-1] == (dimension, "Flat", adapted.metric_l2)
 
-    adapted.write_index(factory_index, "/tmp/index.faiss")
-    assert legacy.write_calls[-1] == (factory_index, "/tmp/index.faiss")
+    index_path = tmp_path / "index.faiss"
+    adapted.write_index(factory_index, str(index_path))
+    assert legacy.write_calls[-1] == (factory_index, str(index_path))
 
-    read_index = adapted.read_index("/tmp/index.faiss")
+    read_index = adapted.read_index(str(index_path))
     assert isinstance(read_index, _FakeIndex)
-    assert legacy.read_path == "/tmp/index.faiss"
+    assert legacy.read_path == str(index_path)
 
 
 def test_wrap_faiss_module_returns_pep8_module_directly() -> None:
-    records: list[tuple[str, object]] = []
-
-    def builder(label: str, value: object) -> FaissIndexProtocol:
-        records.append((label, value))
-        return _FakeIndex(label)
-
-    modern = _ModernFaissModule(builder)
+    modern = _ModernFaissModule()
     wrapped = wrap_faiss_module(modern)
 
     # The helper should return the module unchanged when it already satisfies the protocol.
+    assert isinstance(wrapped, _ModernFaissModule)
     assert wrapped is modern
 
     result = wrapped.index_flat_ip(10)
     assert isinstance(result, _FakeIndex)
-    assert records[0] == ("flat", 10)
+    assert modern.records[0] == ("flat", 10)

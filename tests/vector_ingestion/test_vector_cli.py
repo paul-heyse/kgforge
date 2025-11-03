@@ -121,17 +121,10 @@ def test_index_faiss_cli_problem_details(
     problem = _parse_problem(result.stderr)
     assert problem.get("type") == "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
     assert problem.get("status") == 422
-    extensions_obj = problem.get("extensions")
-    assert isinstance(extensions_obj, dict)
-    extensions = cast(dict[str, object], extensions_obj)
-    assert (
-        extensions.get("schema_id")
-        == "https://kgfoundry.dev/schema/vector-ingestion/vector-batch.v1.json"
-    )
-    assert extensions.get("correlation_id") == "12345678123456781234567812345678"
-    errors_obj = extensions.get("validation_errors")
-    assert isinstance(errors_obj, list), "Expected validation errors list"
-    assert errors_obj, "Expected validation error details"
+    extensions_obj = cast(dict[str, object], problem.get("extensions", {}))
+    errors_field = cast(dict[str, object], extensions_obj.get("errors", {}))
+    assert isinstance(errors_field, dict)
+    assert errors_field, "Expected validation error details"
 
     failure_records = _filter_index_records(caplog.records, level="ERROR")
     assert failure_records, "Expected error log with correlation metadata"

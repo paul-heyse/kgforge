@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913
+
 """Configuration helpers shared across kgfoundry.
 
 This module provides typed configuration management via pydantic_settings.BaseSettings,
@@ -15,8 +17,9 @@ from __future__ import annotations
 
 import base64
 import functools
+from collections.abc import Mapping, Sequence
 from functools import lru_cache
-from typing import Final, Self
+from typing import Final, Literal, Self, cast
 
 from pydantic import AliasChoices, Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings
@@ -147,16 +150,24 @@ class AppSettings(BaseSettings):
         obj: object,
         *,
         strict: bool | None = None,
+        extra: Literal["allow", "ignore", "forbid"] | None = None,
         from_attributes: bool | None = None,
-        context: dict[str, object] | None = None,
+        context: Mapping[str, object] | None = None,
+        by_alias: bool | None = None,
+        by_name: bool | None = None,
     ) -> Self:
         """Validate ``obj`` returning ``cls`` while normalising pydantic errors."""
         try:
+            obj_param = obj
+            context_param = context
             return super().model_validate(
-                obj,
+                obj_param,
                 strict=strict,
+                extra=extra,
                 from_attributes=from_attributes,
-                context=context,
+                context=context_param,
+                by_alias=by_alias,
+                by_name=by_name,
             )
         except ValidationError as exc:
             message = _format_validation_error(exc)
@@ -337,10 +348,10 @@ def load_config(reload: bool = False) -> AppSettings:
 
 def _format_validation_error(exc: ValidationError) -> str:
     """Return the most helpful message from a pydantic ``ValidationError``."""
-    errors = exc.errors()
-    if errors:
-        primary = errors[0]
-        msg = primary.get("msg")
-        if isinstance(msg, str) and msg:
-            return msg
+    errors_raw = cast(Sequence[Mapping[str, object]], exc.errors())
+    if errors_raw:
+        primary = errors_raw[0]
+        msg_obj = primary.get("msg")
+        if isinstance(msg_obj, str) and msg_obj:
+            return msg_obj
     return str(exc)

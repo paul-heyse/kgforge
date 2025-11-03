@@ -34,7 +34,7 @@ def test_vector_schema_rejects_empty_vector(
     """Vectors must contain at least one element."""
     payload = [{"key": "vec-1", "vector": []}]
 
-    with pytest.raises(ValidationError, match="too short"):
+    with pytest.raises(ValidationError, match="should be non-empty"):
         vector_validator.validate(payload)
 
 

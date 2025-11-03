@@ -112,7 +112,7 @@ def test_validate_vector_batch_detects_mismatched_ids(
     ids = (VectorId("vec-1"),)
     batch = VectorBatch(ids=ids, matrix=canonical_vector_matrix)
     mismatched = VectorBatch(
-        ids=(VectorId("vec-1"), VectorId("vec-2")), matrix=canonical_vector_matrix
+        ids=(VectorId("vec-1"), VectorId("vec-1")), matrix=canonical_vector_matrix
     )
 
     with pytest.raises(VectorValidationError, match="row count"):

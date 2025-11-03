@@ -153,6 +153,7 @@ class BM25Doc:
     doc_id: str
     length: int
     fields: dict[str, str]
+    term_freqs: dict[str, int]
 
 
 # [nav:anchor PurePythonBM25]
@@ -245,6 +246,7 @@ class PurePythonBM25:
         postings: defaultdict[str, defaultdict[str, int]] = defaultdict(_default_int_dict)
         docs: dict[str, BM25Doc] = {}
         lengths: list[int] = []
+        doc_term_freqs: dict[str, dict[str, int]] = {}
         for doc_id, fields in docs_iterable:
             body = fields.get("body", "")
             section = fields.get("section", "")
@@ -258,11 +260,14 @@ class PurePythonBM25:
                 fields={"title": title, "section": section, "body": body},
             )
             seen = set()
+            term_freqs: defaultdict[str, int] = defaultdict(int)
             for tok in toks:
+                term_freqs[tok] += 1
                 postings[tok][doc_id] += 1
                 if tok not in seen:
                     df[tok] += 1
                     seen.add(tok)
+            doc_term_freqs[doc_id] = {term: int(count) for term, count in term_freqs.items()}
         self.N = len(docs)
         self.avgdl = sum(lengths) / max(1, len(lengths))
         self.df = dict(df)
@@ -275,13 +280,18 @@ class PurePythonBM25:
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
         )
         # Convert docs to JSON-serializable format
-        docs_data = [
-            {
+        docs_data = []
+        for doc_id, doc in self.docs.items():
+            doc_fields = doc.fields
+            doc_record = {
+                "chunk_id": doc_id,
                 "doc_id": doc_id,
-                "length": int(doc.length),
+                "title": doc_fields.get("title", ""),
+                "section": doc_fields.get("section", ""),
+                "tf": doc_term_freqs.get(doc_id, {}),
+                "dl": float(doc.length),
             }
-            for doc_id, doc in self.docs.items()
-        ]
+            docs_data.append(doc_record)
         payload = {
             "k1": self.k1,
             "b": self.b,
@@ -373,7 +383,24 @@ class PurePythonBM25:
                 doc_id = str(doc_value.get("doc_id", ""))
                 length_val = doc_value.get("length", 0)
                 length = int(length_val) if isinstance(length_val, (int, float)) else 0
-                docs[doc_id] = BM25Doc(doc_id=doc_id, length=length, fields={})
+                title = str(doc_value.get("title", ""))
+                section = str(doc_value.get("section", ""))
+                tf_raw = doc_value.get("tf", {})
+                tf_map = (
+                    {
+                        str(term): int(freq)
+                        for term, freq in cast(dict[object, object], tf_raw).items()
+                        if isinstance(term, str) and isinstance(freq, (int, float))
+                    }
+                    if isinstance(tf_raw, dict)
+                    else {}
+                )
+                docs[doc_id] = BM25Doc(
+                    doc_id=doc_id,
+                    length=length,
+                    fields={"title": title, "section": section, "body": ""},
+                    term_freqs=tf_map,
+                )
             return docs
 
         docs_val = data.get("docs", {})
@@ -499,168 +526,4 @@ class LuceneBM25:
             Describe ``b``.
             Defaults to ``0.4``.
         field_boosts : dict[str, float] | NoneType, optional
-            Describe ``field_boosts``.
-            Defaults to ``None``.
-        """
-        self.index_dir = index_dir
-        self.k1 = k1
-        self.b = b
-        self.field_boosts = field_boosts or {"title": 2.0, "section": 1.2, "body": 1.0}
-        self._searcher: LuceneSearcherProtocol | None = None
-
-    def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Index documents with Pyserini's Lucene backend.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        docs_iterable : tuple[str, dict[str, str]]
-            Describe ``docs_iterable``.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when Pyserini or Lucene is unavailable.
-        """
-        try:
-            lucene_module: ModuleType = importlib.import_module("pyserini.index.lucene")
-            lucene_indexer_factory = cast(
-                LuceneIndexerFactory,
-                lucene_module.LuceneIndexer,
-            )
-        except (ImportError, AttributeError) as exc:
-            message = "Pyserini/Lucene not available"
-            logger.exception("Failed to import LuceneIndexer")
-            raise RuntimeError(message) from exc
-        Path(self.index_dir).mkdir(parents=True, exist_ok=True)
-        indexer = lucene_indexer_factory(self.index_dir)
-        for doc_id, fields in docs_iterable:
-            # combine fields with boosts in a "contents" field for simplicity
-            title = fields.get("title", "")
-            section = fields.get("section", "")
-            body = fields.get("body", "")
-            contents = " ".join(
-                [
-                    (title + " ") * int(self.field_boosts.get("title", 1.0)),
-                    (section + " ") * int(self.field_boosts.get("section", 1.0)),
-                    body,
-                ]
-            )
-            indexer.add_doc_dict({"id": doc_id, "contents": contents})
-        indexer.close()
-
-    def _ensure_searcher(self) -> None:
-        """Initialise the Lucene searcher if it has not been created yet.
-
-        <!-- auto:docstring-builder v1 -->
-        """
-        if self._searcher is not None:
-            return
-        try:
-            lucene_search_module: ModuleType = importlib.import_module("pyserini.search.lucene")
-            lucene_searcher_factory = cast(
-                LuceneSearcherFactory,
-                lucene_search_module.LuceneSearcher,
-            )
-        except (
-            ImportError,
-            AttributeError,
-        ) as exc:  # pragma: no cover - defensive for optional dep
-            message = "Pyserini not available for BM25 search"
-            logger.exception("Failed to import LuceneSearcher")
-            raise RuntimeError(message) from exc
-
-        searcher = lucene_searcher_factory(self.index_dir)
-        searcher.set_bm25(self.k1, self.b)
-        self._searcher = searcher
-
-    def search(
-        self,
-        query: str,
-        k: int,
-        fields: dict[str, str] | None = None,
-    ) -> list[tuple[str, float]]:
-        """Execute a Lucene BM25 search.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        query : str
-            Describe ``query``.
-        k : int
-            Describe ``k``.
-        fields : dict[str, str] | NoneType, optional
-            Describe ``fields``.
-            Defaults to ``None``.
-
-        Returns
-        -------
-        list[tuple[str, float]]
-            Ranked document identifiers paired with their BM25 scores.
-
-        Raises
-        ------
-        RuntimeError
-        Raised when the Lucene searcher cannot be initialised.
-        """
-        self._ensure_searcher()
-        if self._searcher is None:
-            message = "Lucene searcher not initialized"
-            raise RuntimeError(message)
-        combined_query = query
-        if fields:
-            combined_query = " ".join([query, *fields.values()])
-        hits = self._searcher.search(combined_query, k)
-        results: list[tuple[str, float]] = []
-        for hit in hits:
-            results.append((str(hit.docid), float(hit.score)))
-        return results
-
-
-# [nav:anchor get_bm25]
-def get_bm25(
-    backend: str,
-    index_dir: str,
-    *,
-    k1: float = 0.9,
-    b: float = 0.4,
-    field_boosts: dict[str, float] | None = None,
-) -> PurePythonBM25 | LuceneBM25:
-    """Instantiate a BM25 backend based on the requested implementation.
-
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    backend : str
-        Describe ``backend``.
-    index_dir : str
-        Describe ``index_dir``.
-    k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
-    b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
-    field_boosts : dict[str, float] | NoneType, optional
-        Describe ``field_boosts``.
-        Defaults to ``None``.
-
-    Returns
-    -------
-    PurePythonBM25 | LuceneBM25
-        Configured BM25 adapter.
-    """
-    if backend == "lucene":
-        try:
-            return LuceneBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)
-        except RuntimeError as exc:
-            logger.warning(
-                "Failed to create LuceneBM25 backend, falling back to PurePythonBM25: %s",
-                exc,
-                exc_info=True,
-            )
-            # allow fallback creation
-    return PurePythonBM25(index_dir, k1=k1, b=b, field_boosts=field_boosts)
+            Describe ``

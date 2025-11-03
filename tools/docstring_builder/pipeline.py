@@ -60,6 +60,13 @@ from tools.docstring_builder.plugins import PluginManager
 from tools.docstring_builder.policy import PolicyEngine, PolicyReport
 
 
+def _repo_relative_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return path.as_posix()
+
+
 def _coerce_int(value: object) -> int:
     """Return ``value`` coerced to ``int`` when possible."""
     if isinstance(value, bool):
@@ -197,6 +204,11 @@ class PipelineRunner:
             return max(1, os.cpu_count() or 1)
         return jobs
 
+    @staticmethod
+    def _repo_label(path: Path) -> str:
+        """Return ``path`` relative to ``REPO_ROOT`` when possible."""
+        return _repo_relative_path(path)
+
     def _process_files(self, files: Sequence[Path], jobs: int, state: PipelineState) -> None:
         """Process files using thread pool or serial execution."""
         for file_path, outcome in self._ordered_outcomes(files, jobs):
@@ -215,7 +227,7 @@ class PipelineRunner:
             if outcome.status is not self._cfg.success_status:
                 state.errors.append(
                     ErrorEnvelope(
-                        file=str(file_path.relative_to(REPO_ROOT)),
+                        file=self._repo_label(file_path),
                         status=self._cfg.status_from_exit(outcome.status),
                         message=outcome.message or "",
                     )
@@ -349,7 +361,7 @@ class PipelineRunner:
     def _build_file_report(self, file_path: Path, outcome: FileOutcome) -> FileReport:
         """Build a file report for JSON output."""
         report: FileReport = {
-            "path": str(file_path.relative_to(REPO_ROOT)),
+            "path": self._repo_label(file_path),
             "status": self._cfg.status_from_exit(outcome.status),
             "changed": outcome.changed,
             "skipped": outcome.skipped,
@@ -517,7 +529,7 @@ class PipelineRunner:
         """Build input file hashes for the manifest."""
         hashes: dict[str, InputHash] = {}
         for path in files:
-            rel = str(path.relative_to(REPO_ROOT))
+            rel = _repo_relative_path(path)
             if path.exists():
                 hashes[rel] = {
                     "hash": hash_file(path),
@@ -533,12 +545,12 @@ class PipelineRunner:
     @staticmethod
     def _build_dependency_map(files: Sequence[Path]) -> dict[str, list[str]]:
         """Build the dependency map for the manifest."""
-        return {
-            str(path.relative_to(REPO_ROOT)): [
-                str(dependent.relative_to(REPO_ROOT)) for dependent in dependents_for(path)
-            ]
-            for path in files
-        }
+        mapping: dict[str, list[str]] = {}
+        for path in files:
+            key = _repo_relative_path(path)
+            dependents = [_repo_relative_path(dependent) for dependent in dependents_for(path)]
+            mapping[key] = dependents
+        return mapping
 
     def _build_plugin_report(self) -> PluginReport:
         """Build the plugin report for the manifest."""
@@ -657,16 +669,16 @@ class PipelineRunner:
 
         return cli_result
 
-    @staticmethod
-    def _build_docfacts_report(docfacts_checked: bool) -> DocfactsReport | None:
+    @classmethod
+    def _build_docfacts_report(cls, docfacts_checked: bool) -> DocfactsReport | None:
         """Build the docfacts report for JSON output."""
         if not docfacts_checked:
             return None
         report: DocfactsReport = {
-            "path": str(DOCFACTS_PATH.relative_to(REPO_ROOT)),
+            "path": cls._repo_label(DOCFACTS_PATH),
             "version": DOCFACTS_VERSION,
             "validated": DOCFACTS_PATH.exists(),
         }
         if DOCFACTS_DIFF_PATH.exists():
-            report["diff"] = str(DOCFACTS_DIFF_PATH.relative_to(REPO_ROOT))
+            report["diff"] = cls._repo_label(DOCFACTS_DIFF_PATH)
         return report
