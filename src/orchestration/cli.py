@@ -234,19 +234,22 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
         Backend identifier that successfully produced the index.
     """
     docs = _load_bm25_documents(config.chunks_path)
-    idx = cast(
-        _BM25Builder,
-        get_bm25(config.backend, config.index_dir, k1=0.9, b=0.4, load_existing=False),
-    )
-    backend_used = config.backend
+    builder, backend_used = _instantiate_bm25_builder(config)
+
     try:
-        idx.build(docs)
+        builder.build(docs)
     except RuntimeError as exc:
-        if config.backend != "lucene":
+        if backend_used != "lucene":
             raise
         logger.warning(
-            "Lucene backend unavailable; falling back to pure Python implementation",
-            extra={"operation": "index_bm25", "error": type(exc).__name__},
+            "Lucene backend failed during build; retrying with pure backend",
+            extra={
+                "operation": "index_bm25",
+                "error": type(exc).__name__,
+                "backend": backend_used,
+                "fallback_backend": "pure",
+                "phase": "build",
+            },
             exc_info=exc,
         )
         fallback = cast(
@@ -258,12 +261,49 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
         except Exception as fallback_exc:  # pragma: no cover - defensive fallback path
             msg = "Failed to build BM25 index with fallback backend"
             raise RuntimeError(msg) from fallback_exc
-        return "pure"
+        backend_used = "pure"
     except (AttributeError, ValueError, KeyError) as exc:
         msg = f"Failed to build BM25 index: {exc}"
         raise RuntimeError(msg) from exc
+
+    return backend_used
+
+
+def _instantiate_bm25_builder(config: BM25BuildConfig) -> tuple[_BM25Builder, str]:
+    """Instantiate a BM25 builder, falling back to pure backend if Lucene fails."""
+    requested_backend = config.backend.strip().lower()
+    try:
+        builder = cast(
+            _BM25Builder,
+            get_bm25(
+                requested_backend,
+                config.index_dir,
+                k1=0.9,
+                b=0.4,
+                load_existing=False,
+            ),
+        )
+    except RuntimeError as exc:
+        if requested_backend != "lucene":
+            raise
+        logger.warning(
+            "Lucene backend unavailable during instantiation; using pure backend",
+            extra={
+                "operation": "index_bm25",
+                "error": type(exc).__name__,
+                "backend": requested_backend,
+                "fallback_backend": "pure",
+                "phase": "instantiate",
+            },
+            exc_info=exc,
+        )
+        fallback_builder = cast(
+            _BM25Builder,
+            get_bm25("pure", config.index_dir, k1=0.9, b=0.4, load_existing=False),
+        )
+        return fallback_builder, "pure"
     else:
-        return backend_used
+        return builder, requested_backend
 
 
 _VECTOR_SCHEMA_PATH = (
@@ -630,16 +670,10 @@ def _index_faiss_cli(
     ],
     index_path: Annotated[
         str,
-        typer.Option(
-            "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)", show_default=True
-        ),
+        typer.Option(help="Output index (CPU .idx)", show_default=True),
     ] = "./_indices/faiss/shard_000.idx",
-    factory: Annotated[
-        str, typer.Option("Flat", help="FAISS factory string", show_default=True)
-    ] = "Flat",
-    metric: Annotated[
-        str, typer.Option("ip", help="Metric: 'ip' or 'l2'", show_default=True)
-    ] = "ip",
+    factory: Annotated[str, typer.Option(help="FAISS factory string", show_default=True)] = "Flat",
+    metric: Annotated[str, typer.Option(help="Metric: 'ip' or 'l2'", show_default=True)] = "ip",
 ) -> None:
     index_faiss(dense_vectors, index_path, factory, metric)
 
