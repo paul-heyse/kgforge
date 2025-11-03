@@ -16,7 +16,10 @@ Examples
 from __future__ import annotations
 
 from importlib import import_module
-from typing import Protocol, runtime_checkable
+from typing import Protocol, TypeAlias, cast, runtime_checkable
+
+from docs._types.astroid_facade import AstroidManagerProtocol
+from docs._types.autoapi_parser import AutoapiParserProtocol, coerce_parser_class
 
 __all__ = [
     "AstroidManagerFacade",
@@ -51,33 +54,10 @@ class MissingDependencyError(ImportError):
         self.module_name = module_name
 
 
-@runtime_checkable
-class AutoapiParserFacade(Protocol):
-    """Protocol for Sphinx AutoAPI parser."""
-
-    def parse(self) -> None:
-        """Parse and populate AutoAPI data."""
-        ...
+AutoapiParserFacade: TypeAlias = type[AutoapiParserProtocol]
 
 
-@runtime_checkable
-class AstroidManagerFacade(Protocol):
-    """Protocol for Astroid manager (AST analysis)."""
-
-    def build_from_file(self, path: str) -> object:
-        """Build an AST from a Python source file.
-
-        Parameters
-        ----------
-        path : str
-            File system path to .py file.
-
-        Returns
-        -------
-        object
-            Astroid module object.
-        """
-        ...
+AstroidManagerFacade: TypeAlias = AstroidManagerProtocol
 
 
 @runtime_checkable
@@ -100,22 +80,22 @@ class _OptionalDependenciesImpl:
 
     def __init__(
         self,
-        autoapi_parser: object,
+        autoapi_parser: AutoapiParserFacade,
         astroid_manager: object,
     ) -> None:
         """Initialize with optional dependency instances."""
-        self._autoapi_parser = autoapi_parser
-        self._astroid_manager = astroid_manager
+        self._autoapi_parser: AutoapiParserFacade = autoapi_parser
+        self._astroid_manager: object = astroid_manager
 
     @property
     def autoapi_parser(self) -> AutoapiParserFacade:
         """Return the AutoAPI parser."""
-        return self._autoapi_parser  # type: ignore[return-value]
+        return cast(AutoapiParserFacade, self._autoapi_parser)
 
     @property
     def astroid_manager(self) -> AstroidManagerFacade:
         """Return the Astroid manager."""
-        return self._astroid_manager  # type: ignore[return-value]
+        return cast(AstroidManagerFacade, self._astroid_manager)
 
 
 def load_optional_dependencies() -> OptionalDependencies:
@@ -140,13 +120,14 @@ def load_optional_dependencies() -> OptionalDependencies:
     ... except MissingDependencyError as e:
     ...     print(f"Cannot load AutoAPI: {e}")
     """
-    # Try to import sphinx_autoapi
-    autoapi_import_err_msg = "sphinx_autoapi is required for AutoAPI docs generation"
+    # Try to import the AutoAPI parser module
+    autoapi_import_err_msg = "autoapi is required for AutoAPI docs generation"
     try:
-        sphinx_autoapi = import_module("sphinx_autoapi")
+        parser_module = import_module("autoapi._parser")
     except ImportError as e:
-        autoapi_error = MissingDependencyError("sphinx_autoapi", autoapi_import_err_msg)
+        autoapi_error = MissingDependencyError("autoapi._parser", autoapi_import_err_msg)
         raise autoapi_error from e
+    parser_cls = coerce_parser_class(parser_module)
 
     # Try to import astroid
     astroid_import_err_msg = "astroid is required for AST analysis during docs build"
@@ -159,6 +140,6 @@ def load_optional_dependencies() -> OptionalDependencies:
     # If we get here, both are available
     # Return facades wrapping the actual modules/objects
     return _OptionalDependenciesImpl(
-        autoapi_parser=sphinx_autoapi,
-        astroid_manager=astroid.MANAGER,
+        autoapi_parser=parser_cls,
+        astroid_manager=cast(AstroidManagerFacade, astroid.MANAGER),
     )

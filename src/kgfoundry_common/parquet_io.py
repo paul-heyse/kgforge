@@ -230,7 +230,7 @@ class ParquetVectorWriter:
         pq.write_table(
             table,
             part_dir / "part-00000.parquet",
-            compression="ZSTD",
+            compression="zstd",
             compression_level=ZSTD_LEVEL,
             data_page_size=ROW_GROUP_SIZE,
         )
@@ -310,7 +310,7 @@ class ParquetVectorWriter:
         pq.write_table(
             table,
             part_dir / "part-00000.parquet",
-            compression="ZSTD",
+            compression="zstd",
             compression_level=ZSTD_LEVEL,
             data_page_size=ROW_GROUP_SIZE,
         )
@@ -424,7 +424,7 @@ class ParquetChunkWriter:
         pq.write_table(
             table,
             self.root / "part-00000.parquet",
-            compression="ZSTD",
+            compression="zstd",
             compression_level=ZSTD_LEVEL,
             data_page_size=ROW_GROUP_SIZE,
         )

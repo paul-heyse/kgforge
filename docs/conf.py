@@ -36,6 +36,7 @@ from typing import (
 )
 
 import certifi
+from docs._types.autoapi_parser import AutoapiParserProtocol, coerce_parser_class
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
@@ -128,26 +129,12 @@ class _AutoDocstringsModule(Protocol):
 
 
 @runtime_checkable
-class _AstroidManagerProto(Protocol):
-    """Subset of Astroid manager behaviour relied upon by the docs toolchain."""
-
-    def __call__(self, *args: object, **kwargs: object) -> None: ...
-
-
-@runtime_checkable
-class _AstroidBuilderProto(Protocol):
-    """Subset of Astroid builder surface used when parsing modules."""
-
-    def __init__(self, manager: _AstroidManagerProto | None = None) -> None: ...
-
-    def file_build(self, file_path: str, module_name: str) -> object: ...
-
-
-@runtime_checkable
 class _AutoapiParserProto(Protocol):
-    """Protocol describing the AutoAPI parser contract used in this module."""
+    """Subset of AutoAPI parser surface used when parsing modules."""
 
     def parse(self, node: object) -> object: ...
+
+    def _parse_file(self, file_path: str, condition: Callable[[str], bool]) -> object: ...
 
 
 def get_project_settings(env: Mapping[str, str] | None = None) -> ProjectSettings:
@@ -207,17 +194,13 @@ autoapi_parser = _import_required_module("autoapi._parser")
 jsonimpl = _import_required_module("sphinxcontrib.serializinghtml.jsonimpl")
 json_module = cast(ModuleType, _require_attr(jsonimpl, "json"))
 
-AstroidManagerCls = cast(type[object], _require_attr(astroid_manager, "AstroidManager"))
-AstroidBuilderCls = cast(type[object], _require_attr(astroid_builder, "AstroidBuilder"))
-AutoapiParserCls = cast(type[_AutoapiParserProto], _require_attr(autoapi_parser, "Parser"))
+AstroidManagerCls = coerce_astroid_manager_class(astroid_manager)
+AstroidBuilderCls = coerce_astroid_builder_class(astroid_builder)
+AutoapiParserCls = coerce_parser_class(autoapi_parser)
 
-
-class AutoapiParser(Protocol):
-    """Partial protocol for AutoAPI parser implementations."""
-
-    def parse(self, node: object, /) -> object:
-        """Return an AutoAPI document tree for the provided AST node."""
-        ...
+AstroidManager = AstroidManagerProtocol
+AstroidBuilder = AstroidBuilderProtocol
+AutoapiParser = AutoapiParserProtocol
 
 
 class GriffeNode(Protocol):
@@ -489,12 +472,13 @@ def _autoapi_parse_file(
         parent = parent.parent
 
     module_name = ".".join(module_parts)
-    manager = cast(_AstroidManagerProto, cast(Any, AstroidManagerCls)())
-    builder_obj = cast(Any, AstroidBuilderCls)
+    manager = AstroidManagerCls()
+    builder_class = AstroidBuilderCls
+    builder: AstroidBuilder
     try:
-        builder = cast(_AstroidBuilderProto, builder_obj(manager))
+        builder = builder_class(manager)
     except TypeError:
-        builder = cast(_AstroidBuilderProto, builder_obj())
+        builder = builder_class()
     node = builder.file_build(file_path, module_name)
     return self.parse(node)
 

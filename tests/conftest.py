@@ -23,6 +23,13 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 from prometheus_client.registry import CollectorRegistry
 
+from kgfoundry_common.opentelemetry_types import (
+    SpanExporterProtocol,
+    SpanProtocol,
+    TracerProviderProtocol,
+    load_in_memory_span_exporter_cls,
+    load_tracer_provider_cls,
+)
 from kgfoundry_common.problem_details import JsonValue
 
 repo_root = Path(__file__).parent.parent
@@ -33,12 +40,6 @@ R = TypeVar("R")
 if TYPE_CHECKING:  # pragma: no cover - typing support only
 
     def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
-
-    class _TracerProviderProtocol(Protocol):
-        def add_span_processor(self, processor: object) -> None: ...
-
-    class _SpanExporterProtocol(Protocol):
-        def export(self, spans: list[object]) -> None: ...
 
 else:
     fixture = pytest.fixture
@@ -124,51 +125,40 @@ def prometheus_registry() -> CollectorRegistry:
 
 
 @fixture
-def otel_span_exporter() -> _SpanExporterProtocol:
-    """Provide an in-memory OpenTelemetry span exporter for testing.
-
-    Skips the depending tests when OpenTelemetry is not installed.
-
-    Returns
-    -------
-    InMemorySpanExporter
-        Span exporter for capturing traces.
-    """
-    exporter_mod = pytest.importorskip(
-        "opentelemetry.sdk.trace.export.in_memory_span_exporter",
-        reason="OpenTelemetry span exporter required for observability tests",
-    )
-    assert isinstance(exporter_mod, ModuleType)
-    exporter_cls = cast(type[object], exporter_mod.InMemorySpanExporter)
-    exporter = exporter_cls()
-    return cast(_SpanExporterProtocol, exporter)
+def otel_span_exporter() -> SpanExporterProtocol:
+    """Provide an in-memory OpenTelemetry span exporter for testing."""
+    exporter_cls = load_in_memory_span_exporter_cls()
+    if exporter_cls is None:
+        pytest.skip("OpenTelemetry span exporter required for observability tests")
+        raise RuntimeError("OpenTelemetry span exporter unavailable")
+    exporter: SpanExporterProtocol = exporter_cls()
+    return exporter
 
 
 @fixture
 def otel_tracer_provider(
-    otel_span_exporter: _SpanExporterProtocol,
-) -> Iterator[_TracerProviderProtocol]:
+    otel_span_exporter: SpanExporterProtocol,
+) -> Iterator[TracerProviderProtocol]:
     """Provide an OpenTelemetry tracer provider configured with in-memory exporter."""
-    sdk_trace_mod = pytest.importorskip(
-        "opentelemetry.sdk.trace",
-        reason="OpenTelemetry SDK required for observability tests",
-    )
-    assert isinstance(sdk_trace_mod, ModuleType)
+    tracer_provider_cls = load_tracer_provider_cls()
+    if tracer_provider_cls is None:
+        pytest.skip("OpenTelemetry SDK required for observability tests")
+        raise RuntimeError("OpenTelemetry SDK unavailable")
+
     otel_trace_mod = pytest.importorskip(
         "opentelemetry.trace",
         reason="OpenTelemetry API required for observability tests",
     )
     assert isinstance(otel_trace_mod, ModuleType)
 
-    tracer_provider_cls = cast(type[object], sdk_trace_mod.TracerProvider)
-    provider = cast(_TracerProviderProtocol, tracer_provider_cls())
+    provider: TracerProviderProtocol = tracer_provider_cls()
     span_processor = _SimpleSpanProcessor(otel_span_exporter)
     provider.add_span_processor(span_processor)
     set_tracer_provider = cast(
-        Callable[[_TracerProviderProtocol], None], otel_trace_mod.set_tracer_provider
+        Callable[[TracerProviderProtocol], None], otel_trace_mod.set_tracer_provider
     )
     get_tracer_provider = cast(
-        Callable[[], _TracerProviderProtocol], otel_trace_mod.get_tracer_provider
+        Callable[[], TracerProviderProtocol], otel_trace_mod.get_tracer_provider
     )
     set_tracer_provider(provider)
     try:
@@ -305,17 +295,24 @@ def metrics_asserter(
 class _SimpleSpanProcessor:
     """Simple span processor for in-memory collection during tests."""
 
-    def __init__(self, exporter: _SpanExporterProtocol) -> None:
+    def __init__(self, exporter: SpanExporterProtocol) -> None:
         """Initialize with exporter.
 
         Parameters
         ----------
-        exporter : _SpanExporterProtocol
+        exporter : SpanExporterProtocol
             OTEL span exporter.
         """
         self.exporter = exporter
 
-    def on_end(self, span: object) -> None:
+    def on_start(self, span: SpanProtocol, parent_context: object | None = None) -> None:
+        """No-op start hook to satisfy span processor protocol."""
+
+    def force_flush(self, timeout_millis: int = 0) -> bool:
+        """Flush spans immediately (noop)."""
+        return True
+
+    def on_end(self, span: SpanProtocol) -> None:
         """Process ended span.
 
         Parameters
@@ -324,6 +321,9 @@ class _SimpleSpanProcessor:
             The ended span.
         """
         self.exporter.export([span])
+
+    def shutdown(self) -> None:
+        """Allow graceful shutdown calls (noop)."""
 
 
 __all__ = [

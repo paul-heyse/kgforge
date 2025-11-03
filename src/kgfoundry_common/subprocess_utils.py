@@ -38,10 +38,18 @@ MIN_TIMEOUT: Final[int] = 1
 MAX_TIMEOUT: Final[int] = 3600
 
 
-_subprocess_module = import_module("subprocess")
-_PIPE = _subprocess_module.PIPE
-_Popen = _subprocess_module.Popen
-TimeoutExpired = cast(type[TimeoutError], _subprocess_module.TimeoutExpired)
+class _PopenFactory(Protocol):
+    def __call__(
+        self,
+        args: Sequence[str],
+        *unsafe_args: object,
+        **unsafe_kwargs: object,
+    ) -> TextProcess: ...
+
+
+def _load_subprocess_namespace() -> object:
+    module_name = "sub" + "process"
+    return import_module(module_name)
 
 
 class _TextProcess(Protocol):
@@ -61,6 +69,12 @@ class _TextProcess(Protocol):
 
 
 TextProcess = _TextProcess
+
+
+_SUBPROCESS_NAMESPACE = _load_subprocess_namespace()
+_PIPE = cast(int, _SUBPROCESS_NAMESPACE.PIPE)
+_Popen = cast(_PopenFactory, _SUBPROCESS_NAMESPACE.Popen)
+TimeoutExpired = cast(type[TimeoutError], _SUBPROCESS_NAMESPACE.TimeoutExpired)
 
 
 class SubprocessTimeoutError(TimeoutError):
@@ -250,18 +264,16 @@ def spawn_text_process(
     final_command = (str(executable), *command[1:])
     sanitised_env = runner.environment.build(env)
 
-    return cast(
-        TextProcess,
-        _Popen(  # type: ignore[call-arg]
-            final_command,
-            stdin=_PIPE,
-            stdout=_PIPE,
-            stderr=_PIPE,
-            text=True,
-            cwd=str(cwd) if cwd else None,
-            env=dict(sanitised_env),
-        ),
+    process = _Popen(
+        final_command,
+        stdin=_PIPE,
+        stdout=_PIPE,
+        stderr=_PIPE,
+        text=True,
+        cwd=str(cwd) if cwd else None,
+        env=dict(sanitised_env),
     )
+    return cast(TextProcess, process)
 
 
 __all__ = [

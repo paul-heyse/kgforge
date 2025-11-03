@@ -26,7 +26,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Final, Protocol, TypedDict, cast
+from typing import TYPE_CHECKING, Final, Protocol, TypedDict, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -748,6 +748,12 @@ class _LegacyFaissModule(Protocol):
 
     read_index: Callable[[str], FaissIndexProtocol]
 
+    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol: ...
+
+    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol: ...
+
+    def normalize_L2(self, vectors: VectorArray) -> None: ...
+
 
 class _FaissModuleAdapter:
     """Adapter that exposes PEP 8 method names for FAISS modules."""
@@ -764,17 +770,13 @@ class _FaissModuleAdapter:
         return self._module.METRIC_L2
 
     def index_flat_ip(self, dimension: int) -> FaissIndexProtocol:
-        legacy_module = cast(Any, self._module)
-        factory = cast(Callable[[int], FaissIndexProtocol], legacy_module.IndexFlatIP)
-        return factory(dimension)
+        return self._module.IndexFlatIP(dimension)
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
         return self._module.index_factory(dimension, factory_string, metric)
 
     def index_id_map2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
-        legacy_module = cast(Any, self._module)
-        mapper = cast(Callable[[FaissIndexProtocol], FaissIndexProtocol], legacy_module.IndexIDMap2)
-        return mapper(index)
+        return self._module.IndexIDMap2(index)
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
         self._module.write_index(index, path)
@@ -783,9 +785,7 @@ class _FaissModuleAdapter:
         return self._module.read_index(path)
 
     def normalize_l2(self, vectors: VectorArray) -> None:
-        legacy_module = cast(Any, self._module)
-        normalise = cast(Callable[[VectorArray], None], legacy_module.normalize_L2)
-        normalise(vectors)
+        self._module.normalize_L2(vectors)
 
     def __getattr__(self, name: str) -> object:
         if name == "METRIC_INNER_PRODUCT":

@@ -18,10 +18,14 @@ from typing import TYPE_CHECKING, Final, Protocol, cast
 from uuid import uuid4
 
 import typer
-from jsonschema import Draft202012Validator, ValidationError
 
 from kgfoundry.embeddings_sparse.bm25 import get_bm25
 from kgfoundry_common.errors import IndexBuildError
+from kgfoundry_common.jsonschema_utils import (
+    Draft202012ValidatorProtocol,
+    ValidationErrorProtocol,
+    create_draft202012_validator,
+)
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import ProblemDetails, build_problem_details, render_problem
 from kgfoundry_common.schema_helpers import load_schema
@@ -235,20 +239,20 @@ _VECTOR_SCHEMA_PATH = (
 _VECTOR_SCHEMA_ID = "https://kgfoundry.dev/schema/vector-ingestion/vector-batch.v1.json"
 _VECTOR_PROBLEM_TYPE = "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
 _VECTOR_SCHEMA_ERROR_LIMIT = 5
-_VECTOR_VALIDATOR_CACHE: dict[str, Draft202012Validator] = {}
+_VECTOR_VALIDATOR_CACHE: dict[str, Draft202012ValidatorProtocol] = {}
 
 
-def _vector_batch_validator() -> Draft202012Validator:
+def _vector_batch_validator() -> Draft202012ValidatorProtocol:
     """Return a cached JSON Schema validator for vector ingestion payloads."""
     validator = _VECTOR_VALIDATOR_CACHE.get("validator")
     if validator is None:
         schema = load_schema(_VECTOR_SCHEMA_PATH)
-        validator = Draft202012Validator(cast(dict[str, object], schema))
+        validator = create_draft202012_validator(cast(dict[str, object], schema))
         _VECTOR_VALIDATOR_CACHE["validator"] = validator
     return validator
 
 
-def _error_sort_key(error: ValidationError) -> tuple[str, ...]:
+def _error_sort_key(error: ValidationErrorProtocol) -> tuple[str, ...]:
     """Build a sortable key for JSON Schema validation errors."""
     return tuple(str(part) for part in error.path)
 
@@ -256,7 +260,8 @@ def _error_sort_key(error: ValidationError) -> tuple[str, ...]:
 def _validate_vector_payload(payload: object) -> None:
     """Validate vector ingestion payloads against the canonical schema."""
     validator = _vector_batch_validator()
-    errors = sorted(validator.iter_errors(payload), key=_error_sort_key)
+    errors_iter = validator.iter_errors(payload)
+    errors = sorted(errors_iter, key=_error_sort_key)
     if not errors:
         return
 

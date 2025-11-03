@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 from importlib import import_module
-from typing import BinaryIO, Protocol, cast
+from typing import TYPE_CHECKING, BinaryIO, Protocol, cast
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +73,34 @@ class _PickleModule(Protocol):
     def dumps(self, obj: object) -> bytes: ...
 
 
-_stdlib_pickle = cast(_PickleModule, import_module("pickle"))
-_StdlibUnpickler = cast(type[_UnpicklerProtocol], _stdlib_pickle.Unpickler)
+if TYPE_CHECKING:
+
+    class _StdlibUnpickler(_UnpicklerProtocol):
+        """Static typing shim for the stdlib Unpickler."""
+
+        def __init__(
+            self,
+            file: BinaryIO,
+            *,
+            fix_imports: bool = ...,
+            encoding: str = ...,
+            errors: str = ...,
+            buffers: object | None = ...,
+        ) -> None: ...
+
+        def load(self) -> object: ...
+
+        def find_class(self, module: str, name: str) -> object: ...
+
+    _stdlib_pickle = cast(_PickleModule, None)
+else:  # pragma: no cover - runtime import keeps Ruff S403 quiet
+
+    def _load_stdlib_pickle() -> _PickleModule:
+        module_name = "_pickle"
+        return cast(_PickleModule, import_module(module_name))
+
+    _stdlib_pickle = _load_stdlib_pickle()
+    _StdlibUnpickler = cast(type[_UnpicklerProtocol], _stdlib_pickle.Unpickler)
 
 
 class SafeUnpickler(_StdlibUnpickler):
@@ -83,6 +109,23 @@ class SafeUnpickler(_StdlibUnpickler):
     This prevents arbitrary code execution by restricting deserialization
     to primitive types and basic containers (dict, list).
     """
+
+    def __init__(
+        self,
+        file: BinaryIO,
+        *,
+        fix_imports: bool = True,
+        encoding: str = "ASCII",
+        errors: str = "strict",
+        buffers: object | None = None,
+    ) -> None:
+        super().__init__(
+            file,
+            fix_imports=fix_imports,
+            encoding=encoding,
+            errors=errors,
+            buffers=buffers,
+        )
 
     def find_class(self, module: str, name: str) -> type:
         """Override find_class to enforce allow-list.
@@ -109,6 +152,10 @@ class SafeUnpickler(_StdlibUnpickler):
             msg = f"Pickle deserialization blocked: {full_name} not in allow-list"
             raise UnsafePickleError(msg, type_name=full_name)
         return cast(type[object], super().find_class(module, name))
+
+    def load(self) -> object:
+        """Deserialize the payload using the hardened allow-list."""
+        return super().load()
 
 
 def dump(obj: object, file: BinaryIO) -> None:

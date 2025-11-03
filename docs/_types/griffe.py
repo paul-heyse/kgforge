@@ -25,7 +25,6 @@ if TYPE_CHECKING:
     from docs._scripts.shared import BuildEnvironment
 
 __all__ = [
-    "AutoapiParserFacade",
     "GriffeFacade",
     "GriffeNode",
     "LoaderFacade",
@@ -206,11 +205,3 @@ def build_facade(env: BuildEnvironment) -> GriffeFacade:
     griffe_loader = shared.make_loader(env)
     adapter = _GriffeLoaderAdapter(griffe_loader)
     return _TypedGriffeFacade(adapter)
-
-
-class AutoapiParserFacade(Protocol):
-    """Protocol for AutoAPI parser integration."""
-
-    def parse(self) -> None:
-        """Parse and populate AutoAPI data."""
-        ...
