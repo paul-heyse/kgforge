@@ -288,7 +288,11 @@ LOGGER = get_logger(__name__)
 
 
 def sh(
-    cmd: list[str], cwd: Path | None = None, check: bool = True, timeout: float = 30.0
+    cmd: list[str],
+    *,
+    cwd: Path | None = None,
+    check: bool = True,
+    timeout: float = 30.0,
 ) -> ToolRunResult:
     """Run a subprocess command using secure run_tool wrapper.
 
@@ -296,12 +300,12 @@ def sh(
     ----------
     cmd : list[str]
         Command to execute.
-    cwd : Path | None
-        Working directory for the command.
-    check : bool
-        If True, raise on non-zero exit code.
-    timeout : float
-        Timeout in seconds (default 30.0 for graphviz commands).
+    cwd : Path | None, optional
+        Working directory for the command. Keyword-only argument.
+    check : bool, optional
+        If True, raise on non-zero exit code. Keyword-only argument.
+    timeout : float, optional
+        Timeout in seconds (default 30.0 for graphviz commands). Keyword-only argument.
 
     Returns
     -------
@@ -756,6 +760,7 @@ def _prune_outward_edges(
     graph: DiGraph,
     pkg2layer: Mapping[str, str],
     layer_rank: Mapping[str, int],
+    *,
     allow_outward: bool,
 ) -> DiGraph:
     """Prune outward edges.
@@ -768,8 +773,8 @@ def _prune_outward_edges(
         Description.
     layer_rank : Mapping[str, int]
         Description.
-    allow_outward : bool
-        Description.
+    allow_outward : bool, optional
+        Description. Keyword-only argument.
 
     Returns
     -------
@@ -933,6 +938,7 @@ def _collect_layer_violations(
     graph: DiGraph,
     layer_rank: Mapping[str, int],
     pkg2layer: Mapping[str, str],
+    *,
     allow_outward: bool,
 ) -> CycleList:
     """Collect layer violations.
@@ -945,8 +951,8 @@ def _collect_layer_violations(
         Description.
     pkg2layer : Mapping[str, str]
         Description.
-    allow_outward : bool
-        Description.
+    allow_outward : bool, optional
+        Description. Keyword-only argument.
 
     Returns
     -------
@@ -1166,7 +1172,7 @@ def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
     allow_outward = _allow_outward_rule(layers)
     rank = _rank_map(order)
 
-    pruned = _prune_outward_edges(graph, pkg2layer, rank, allow_outward)
+    pruned = _prune_outward_edges(graph, pkg2layer, rank, allow_outward=allow_outward)
     cycle_config = _cycle_config()
 
     cycles, skipped, scc_summary = _enumerate_cycles(
@@ -1182,7 +1188,12 @@ def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
         violations: CycleList = []
     else:
         centrality = _degree_centrality(graph)
-        violations = _collect_layer_violations(graph, rank, pkg2layer, allow_outward)
+        violations = _collect_layer_violations(
+            graph,
+            rank,
+            pkg2layer,
+            allow_outward=allow_outward,
+        )
 
     result: AnalysisResult = {
         "cycles": cycles,
@@ -1260,6 +1271,7 @@ def write_meta(meta: Mapping[str, object], out_json: Path) -> None:
 def enforce_policy(
     analysis: Mapping[str, object],
     allow: Mapping[str, object],
+    *,
     fail_cycles: bool,
     fail_layers: bool,
 ) -> None:
@@ -1273,10 +1285,10 @@ def enforce_policy(
         Description for ``analysis``.
     allow : collections.abc.Mapping
         Description for ``allow``.
-    fail_cycles : bool
-        Description for ``fail_cycles``.
-    fail_layers : bool
-        Description for ``fail_layers``.
+    fail_cycles : bool, optional
+        Description for ``fail_cycles``. Keyword-only argument.
+    fail_layers : bool, optional
+        Description for ``fail_layers``. Keyword-only argument.
 
     Examples
     --------
@@ -1426,6 +1438,7 @@ def _maybe_restore_from_cache(
     pkg: str,
     fmt: str,
     cache_dir: Path,
+    *,
     use_cache: bool,
     verbose: bool,
 ) -> CacheContext:
@@ -1439,10 +1452,10 @@ def _maybe_restore_from_cache(
         Description.
     cache_dir : Path
         Description.
-    use_cache : bool
-        Description.
-    verbose : bool
-        Description.
+    use_cache : bool, optional
+        Description. Keyword-only argument.
+    verbose : bool, optional
+        Description. Keyword-only argument.
 
     Returns
     -------
@@ -1460,7 +1473,7 @@ def _maybe_restore_from_cache(
     """
     imports_out, uml_out = _final_output_paths(pkg, fmt)
     if not use_cache:
-        return CacheContext(False, None, None)
+        return CacheContext(used_cache=False, tree_hash=None, bucket=None)
 
     tree_hash = last_tree_commit(pkg)
     bucket = cache_bucket(cache_dir, pkg, tree_hash)
@@ -1474,9 +1487,9 @@ def _maybe_restore_from_cache(
         if verbose:
             snippet = tree_hash[:7]
             LOGGER.info("Cache hit: %s@%s", pkg, snippet)
-        return CacheContext(True, tree_hash, bucket)
+        return CacheContext(used_cache=True, tree_hash=tree_hash, bucket=bucket)
 
-    return CacheContext(False, tree_hash, bucket)
+    return CacheContext(used_cache=False, tree_hash=tree_hash, bucket=bucket)
 
 
 def _prepare_staging(pkg: str, fmt: str) -> StagePaths:
@@ -1600,7 +1613,13 @@ def _promote_outputs(stage: StagePaths) -> bool:
     return True
 
 
-def _update_cache(pkg: str, cache_ctx: CacheContext, stage: StagePaths, verbose: bool) -> None:
+def _update_cache(
+    pkg: str,
+    cache_ctx: CacheContext,
+    stage: StagePaths,
+    *,
+    verbose: bool,
+) -> None:
     """Update cache.
 
     Parameters
@@ -1611,8 +1630,8 @@ def _update_cache(pkg: str, cache_ctx: CacheContext, stage: StagePaths, verbose:
         Description.
     stage : StagePaths
         Description.
-    verbose : bool
-        Description.
+    verbose : bool, optional
+        Description. Keyword-only argument.
 
     Returns
     -------
@@ -1674,8 +1693,8 @@ def build_one_package(pkg: str, config: PackageBuildConfig) -> tuple[str, bool, 
         pkg,
         config.fmt,
         config.cache_dir,
-        config.use_cache,
-        config.verbose,
+        use_cache=config.use_cache,
+        verbose=config.verbose,
     )
     if cache_ctx.used_cache:
         return (pkg, True, True, True)
@@ -1701,7 +1720,7 @@ def build_one_package(pkg: str, config: PackageBuildConfig) -> tuple[str, bool, 
     shutil.rmtree(stage.staging_dir, ignore_errors=True)
 
     if config.use_cache and pydeps_ok and pyrev_ok and not cache_ctx.used_cache:
-        _update_cache(pkg, cache_ctx, stage, config.verbose)
+        _update_cache(pkg, cache_ctx, stage, verbose=config.verbose)
 
     return (pkg, cache_ctx.used_cache, pydeps_ok, pyrev_ok)
 
@@ -1802,20 +1821,24 @@ def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
 
 
 def _log_configuration(
-    verbose: bool, packages: Sequence[str], cache_dir: Path, use_cache: bool
+    *,
+    verbose: bool,
+    packages: Sequence[str],
+    cache_dir: Path,
+    use_cache: bool,
 ) -> None:
     """Log configuration.
 
     Parameters
     ----------
-    verbose : bool
-        Description.
+    verbose : bool, optional
+        Description. Keyword-only argument.
     packages : Sequence[str]
         Description.
     cache_dir : Path
         Description.
-    use_cache : bool
-        Description.
+    use_cache : bool, optional
+        Description. Keyword-only argument.
 
     Returns
     -------
@@ -2135,6 +2158,7 @@ def _write_global_artifacts(
 
 
 def _log_run_summary(
+    *,
     use_cache: bool,
     cache_dir: Path,
     results: Sequence[tuple[str, bool, bool, bool]],
@@ -2145,16 +2169,16 @@ def _log_run_summary(
 
     Parameters
     ----------
-    use_cache : bool
-        Description.
+    use_cache : bool, optional
+        Description. Keyword-only argument.
     cache_dir : Path
         Description.
     results : Sequence[tuple[str, bool, bool, bool]]
         Description.
     duration_s : float
         Description.
-    verbose : bool
-        Description.
+    verbose : bool, optional
+        Description. Keyword-only argument.
 
     Returns
     -------
@@ -2204,7 +2228,12 @@ def main() -> None:
 
     try:
         cache_dir, use_cache = _prepare_cache(args)
-        _log_configuration(args.verbose, packages, cache_dir, use_cache)
+        _log_configuration(
+            verbose=args.verbose,
+            packages=packages,
+            cache_dir=cache_dir,
+            use_cache=use_cache,
+        )
         config = PackageBuildConfig(
             fmt=args.format,
             excludes=tuple(excludes),
@@ -2233,8 +2262,19 @@ def main() -> None:
     analysis = analyze_graph(global_graph, layers)
     _write_global_artifacts(global_graph, layers, args.format, analysis)
 
-    enforce_policy(analysis, allow, args.fail_on_cycles, args.fail_on_layer_violations)
-    _log_run_summary(use_cache, cache_dir, results, duration, args.verbose)
+    enforce_policy(
+        analysis,
+        allow,
+        fail_cycles=args.fail_on_cycles,
+        fail_layers=args.fail_on_layer_violations,
+    )
+    _log_run_summary(
+        use_cache=use_cache,
+        cache_dir=cache_dir,
+        results=results,
+        duration_s=duration,
+        verbose=args.verbose,
+    )
 
 
 if __name__ == "__main__":

@@ -312,7 +312,7 @@ _load_config_cached: functools._lru_cache_wrapper[AppSettings] = lru_cache(maxsi
 )
 
 
-def load_config(reload: bool = False) -> AppSettings:
+def load_config(*, reload: bool = False) -> AppSettings:
     """Load application configuration from environment variables.
 
     This function caches the configuration to avoid repeated environment

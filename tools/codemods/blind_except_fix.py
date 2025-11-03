@@ -128,7 +128,7 @@ class BlindExceptTransformer(cst.CSTTransformer):
         return updated_node
 
 
-def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:
+def transform_file(file_path: Path, *, dry_run: bool = False) -> list[str]:
     """Transform a single Python file.
 
     Parameters
@@ -137,7 +137,6 @@ def transform_file(file_path: Path, dry_run: bool = False) -> list[str]:
         Path to Python file to transform.
     dry_run : bool, optional
         If True, only report changes without modifying files.
-        Defaults to False.
 
     Returns
     -------

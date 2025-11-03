@@ -150,7 +150,7 @@ class DuckDBRegistryHelper:
             )
         return run_id
 
-    def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
+    def close_run(self, run_id: str, *, success: bool, notes: str | None = None) -> None:
         """Describe close run.
 
         <!-- auto:docstring-builder v1 -->

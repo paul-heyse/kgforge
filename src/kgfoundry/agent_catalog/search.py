@@ -747,6 +747,15 @@ class _SimpleFaissIndex(FaissIndexProtocol):
             else np.vstack((self._vectors, array.astype(np.float32, copy=False)))
         )
 
+    @property
+    def vectors(self) -> FloatMatrix:
+        """Return the stored vectors for serialization or inspection."""
+        return self._vectors
+
+    def load_vectors(self, vectors: FloatMatrix) -> None:
+        """Replace the stored vectors with ``vectors`` in contiguous form."""
+        self._vectors = np.ascontiguousarray(vectors, dtype=np.float32)
+
     def train(self, vectors: VectorArray) -> None:
         """Train the index (no-op for simple flat index).
 
@@ -939,7 +948,7 @@ class _SimpleFaissModule:
             File path for the persisted index.
         """
         simple_index = _SimpleFaissModule._ensure_simple_index(index)
-        vectors_payload = cast("list[list[float]]", simple_index._vectors.tolist())
+        vectors_payload = cast("list[list[float]]", simple_index.vectors.tolist())
         payload: dict[str, object] = {
             "dimension": int(simple_index.dimension),
             "vectors": vectors_payload,
@@ -996,7 +1005,7 @@ class _SimpleFaissModule:
             if vectors.ndim != EMBEDDING_MATRIX_RANK:
                 message = "Stored semantic index vectors have an unexpected shape"
                 raise AgentCatalogSearchError(message)
-            fallback._vectors = np.ascontiguousarray(vectors, dtype=np.float32)
+            fallback.load_vectors(vectors)
         return cast("FaissIndexProtocol", fallback)
 
     @staticmethod

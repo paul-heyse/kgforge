@@ -48,8 +48,7 @@ class TestViolationRecord:
             lineno=42,
         )
         with pytest.raises(AttributeError):
-            mutable = cast("Any", record)
-            mutable.lineno = 100
+            cast("Any", record).lineno = 100
 
 
 class TestTypingGateMetrics:

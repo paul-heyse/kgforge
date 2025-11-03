@@ -342,6 +342,7 @@ class KGFoundryClient:
         query: str,
         k: int = 10,
         filters: dict[str, JsonValue] | None = None,
+        *,
         explain: bool = False,
     ) -> JsonValue:
         """Execute a semantic search request.

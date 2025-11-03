@@ -184,7 +184,7 @@ class DuckDBRegistry:
         )
         return run_id
 
-    def close_run(self, run_id: str, success: bool, notes: str | None = None) -> None:
+    def close_run(self, run_id: str, *, success: bool, notes: str | None = None) -> None:
         """Mark a run as finished and record the completion timestamp.
 
         <!-- auto:docstring-builder v1 -->

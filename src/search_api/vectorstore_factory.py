@@ -245,7 +245,8 @@ class FaissVectorstoreFactory:
             raise IndexBuildError(msg)
 
         vector_count = len(adapter.idmap) if adapter.idmap else 0
-        vector_dimension = adapter._cpu_matrix.shape[1] if adapter._cpu_matrix is not None else None
+        matrix = adapter.cpu_matrix
+        vector_dimension = matrix.shape[1] if matrix is not None else None
         logger.info(
             "FAISS index build completed",
             extra={

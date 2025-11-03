@@ -305,7 +305,7 @@ def _coerce_str(value: object, fallback: str) -> str:
     return value if isinstance(value, str) else fallback
 
 
-def _coerce_bool(value: object, fallback: bool) -> bool:
+def _coerce_bool(value: object, *, fallback: bool) -> bool:
     return value if isinstance(value, bool) else fallback
 
 
@@ -336,7 +336,7 @@ def _build_metric_policy(data: Mapping[str, object], default: MetricPolicy) -> M
         counter_suffix=_coerce_str(data.get("counter_suffix"), default.counter_suffix),
         require_unit_suffix=_coerce_bool(
             data.get("require_unit_suffix"),
-            default.require_unit_suffix,
+            fallback=default.require_unit_suffix,
         ),
     )
 
@@ -355,7 +355,7 @@ def _build_logs_policy(data: Mapping[str, object], default: LogsPolicy) -> LogsP
     return LogsPolicy(
         require_structured=_coerce_bool(
             data.get("require_structured"),
-            default.require_structured,
+            fallback=default.require_structured,
         )
     )
 

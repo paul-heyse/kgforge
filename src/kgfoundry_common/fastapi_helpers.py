@@ -47,10 +47,10 @@ E = TypeVar("E", bound=Exception)
 MiddlewareFactory = Callable[..., BaseHTTPMiddleware]
 
 
-async def _await_with_timeout[T](coro: Awaitable[T], timeout: float | None) -> T:
-    if timeout is None:
+async def _await_with_timeout[T](coro: Awaitable[T], timeout_seconds: float | None) -> T:
+    if timeout_seconds is None:
         return await coro
-    return await asyncio.wait_for(coro, timeout)
+    return await asyncio.wait_for(coro, timeout_seconds)
 
 
 def typed_dependency[T](
@@ -73,7 +73,7 @@ def typed_dependency[T](
             try:
                 result = await _await_with_timeout(
                     dependency(*args, **kwargs),
-                    timeout,
+                    timeout_seconds=timeout,
                 )
             except Exception:  # pragma: no cover - propagated to caller
                 duration_ms = (time.perf_counter() - start) * 1000.0
@@ -118,7 +118,7 @@ def typed_exception_handler(
             try:
                 result = await _await_with_timeout(
                     handler(request, exc),
-                    timeout,
+                    timeout_seconds=timeout,
                 )
             except Exception:  # pragma: no cover - FastAPI surfaces this
                 duration_ms = (time.perf_counter() - start) * 1000.0
@@ -165,7 +165,7 @@ def typed_middleware(
                 try:
                     response = await _await_with_timeout(
                         self._delegate.dispatch(request, call_next),
-                        timeout,
+                        timeout_seconds=timeout,
                     )
                 except Exception:  # pragma: no cover - propagated to caller
                     duration_ms = (time.perf_counter() - start) * 1000.0
