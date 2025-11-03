@@ -24,17 +24,20 @@ Examples
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping
 from contextlib import suppress
 from dataclasses import dataclass
 from operator import attrgetter
 from typing import TYPE_CHECKING, Final, Protocol, TypedDict, cast
 
 import numpy as np
-from numpy.typing import NDArray
 
-from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.problem_details import JsonValue
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = [
     "AgentSearchQuery",
@@ -80,6 +83,8 @@ __navmap__: Final[NavMap] = {
 
 # Type aliases for numpy arrays
 if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
     import numpy.typing as npt
 
     type VectorArray = npt.NDArray[np.float32]
@@ -760,7 +765,7 @@ def _legacy_index_flat_ip(module: _LegacyFaissModule) -> Callable[[int], FaissIn
     if not callable(attr_any):  # pragma: no cover - defensive guard for type checkers
         msg = "Legacy FAISS module attribute 'IndexFlatIP' must be callable"
         raise TypeError(msg)
-    return cast(Callable[[int], FaissIndexProtocol], attr_any)
+    return cast("Callable[[int], FaissIndexProtocol]", attr_any)
 
 
 def _legacy_index_id_map2(
@@ -770,7 +775,7 @@ def _legacy_index_id_map2(
     if not callable(attr_any):  # pragma: no cover - defensive guard for type checkers
         msg = "Legacy FAISS module attribute 'IndexIDMap2' must be callable"
         raise TypeError(msg)
-    return cast(Callable[[FaissIndexProtocol], FaissIndexProtocol], attr_any)
+    return cast("Callable[[FaissIndexProtocol], FaissIndexProtocol]", attr_any)
 
 
 def _legacy_normalize_l2(module: _LegacyFaissModule) -> Callable[[VectorArray], None]:
@@ -778,7 +783,7 @@ def _legacy_normalize_l2(module: _LegacyFaissModule) -> Callable[[VectorArray], 
     if not callable(attr_any):  # pragma: no cover - defensive guard for type checkers
         msg = "Legacy FAISS module attribute 'normalize_L2' must be callable"
         raise TypeError(msg)
-    return cast(Callable[[VectorArray], None], attr_any)
+    return cast("Callable[[VectorArray], None]", attr_any)
 
 
 class _FaissModuleAdapter:
@@ -827,7 +832,7 @@ class _FaissModuleAdapter:
             return self.index_id_map2
         if name == "normalize_L2":
             return self.normalize_l2
-        return cast(object, getattr(self._module, name))
+        return cast("object", getattr(self._module, name))
 
 
 def wrap_faiss_module(module: object) -> FaissModuleProtocol:
@@ -841,6 +846,6 @@ def wrap_faiss_module(module: object) -> FaissModuleProtocol:
         "normalize_l2",
     )
     if all(hasattr(module, attribute) for attribute in required_attributes):
-        return cast(FaissModuleProtocol, module)
-    legacy_module = cast(_LegacyFaissModule, module)
-    return cast(FaissModuleProtocol, _FaissModuleAdapter(legacy_module))
+        return cast("FaissModuleProtocol", module)
+    legacy_module = cast("_LegacyFaissModule", module)
+    return cast("FaissModuleProtocol", _FaissModuleAdapter(legacy_module))

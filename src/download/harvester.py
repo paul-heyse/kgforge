@@ -11,13 +11,15 @@ import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 import requests
 
 from kgfoundry_common.errors import DownloadError, UnsupportedMIMEError
 from kgfoundry_common.models import Doc
-from kgfoundry_common.navmap_types import NavMap
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["OpenAccessHarvester"]
 
@@ -185,16 +187,19 @@ class OpenAccessHarvester:
         if not all(isinstance(key, str) for key in raw_payload):
             message = "OpenAlex payload keys must be strings"
             raise TypeError(message)
-        payload = cast(Mapping[str, object], raw_payload)
+        payload = cast("Mapping[str, object]", raw_payload)
         results_obj = payload.get("results", [])
         if not isinstance(results_obj, list):
             message = "OpenAlex response must contain a list of results"
             raise TypeError(message)
-        typed_results = [
-            dict(item)
-            for item in results_obj
-            if isinstance(item, Mapping) and all(isinstance(k, str) for k in item)
-        ]
+        typed_results: list[dict[str, object]] = []
+        for entry in results_obj:
+            if not isinstance(entry, Mapping):
+                continue
+            if any(not isinstance(key, str) for key in entry):
+                continue
+            mapping_entry = cast("Mapping[str, object]", entry)
+            typed_results.append(dict(mapping_entry))
         return typed_results[:max_works]
 
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:
@@ -310,7 +315,7 @@ class OpenAccessHarvester:
             return None
         raw_payload: object = response.json()
         if isinstance(raw_payload, Mapping):
-            payload = cast(Mapping[str, object], raw_payload)
+            payload = cast("Mapping[str, object]", raw_payload)
             best_location = payload.get("best_oa_location")
             if isinstance(best_location, Mapping):
                 url = best_location.get("url_for_pdf")

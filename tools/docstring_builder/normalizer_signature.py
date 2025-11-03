@@ -4,14 +4,19 @@ from __future__ import annotations
 
 import importlib
 import inspect
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from types import ModuleType
+from typing import TYPE_CHECKING
 
-from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import (
     SignatureIntrospectionError,
     SymbolResolutionError,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from tools.docstring_builder.harvest import SymbolHarvest
 
 __all__ = ["load_module_globals", "resolve_callable", "signature_and_hints"]
 

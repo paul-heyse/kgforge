@@ -68,7 +68,7 @@ def safe_argpartition(values: FloatVector, k: int) -> IntVector:
 
     values_array: FloatVector = np.asarray(values, dtype=np.float32, order="C")
     if k == 0 or values_array.size == 0:
-        return cast(IntVector, np.empty(0, dtype=np.int64))
+        return cast("IntVector", np.empty(0, dtype=np.int64))
 
     trimmed_k = min(k, values_array.size)
     partition = np.argpartition(values_array, trimmed_k - 1)[:trimmed_k]
@@ -84,10 +84,10 @@ def topk_indices(scores: FloatVector, k: int) -> IntVector:
     scores_array: FloatVector = np.asarray(scores, dtype=np.float32, order="C")
     total = scores_array.size
     if total == 0:
-        return cast(IntVector, np.empty(0, dtype=np.int64))
+        return cast("IntVector", np.empty(0, dtype=np.int64))
 
     trimmed_k = min(k, total)
-    score_list = cast(list[float], scores_array.astype(np.float64, copy=False).tolist())
+    score_list = cast("list[float]", scores_array.astype(np.float64, copy=False).tolist())
 
     def sort_key(idx: int) -> tuple[float, int]:
         return (float(score_list[idx]), -idx)

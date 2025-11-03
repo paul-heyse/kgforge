@@ -8,11 +8,14 @@ dependency safely at runtime without leaking ``Any`` into the type graph.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
-from contextlib import AbstractContextManager
+from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import import_module
-from typing import Protocol, cast
+from typing import TYPE_CHECKING, Protocol, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from contextlib import AbstractContextManager
 
 SpanAttributeValue = str | int | float | bool
 Attributes = Mapping[str, SpanAttributeValue]
@@ -138,7 +141,7 @@ class TraceRuntime:
 
 def _safe_getattr(module: object, name: str) -> object | None:
     try:
-        return cast(object, getattr(module, name))
+        return cast("object", getattr(module, name))
     except AttributeError:  # pragma: no cover - defensive
         return None
 
@@ -150,13 +153,13 @@ def load_trace_runtime() -> TraceRuntime:
     except ImportError:
         return TraceRuntime(api=None, status_factory=None, status_codes=None)
 
-    api = cast(TraceAPIProtocol, trace_module)
+    api = cast("TraceAPIProtocol", trace_module)
     status_factory = _safe_getattr(trace_module, "Status")
     status_codes = _safe_getattr(trace_module, "StatusCode")
     return TraceRuntime(
         api=api,
-        status_factory=cast(StatusFactory | None, status_factory),
-        status_codes=cast(StatusCodeProtocol | None, status_codes),
+        status_factory=cast("StatusFactory | None", status_factory),
+        status_codes=cast("StatusCodeProtocol | None", status_codes),
     )
 
 
@@ -170,11 +173,11 @@ def load_tracer_provider_cls() -> Callable[[], TracerProviderProtocol] | None:
     provider_raw = _safe_getattr(sdk_trace_module, "TracerProvider")
     if provider_raw is None or not callable(provider_raw):
         return None
-    provider_factory = cast(Callable[[], object], provider_raw)
+    provider_factory = cast("Callable[[], object]", provider_raw)
 
     def factory() -> TracerProviderProtocol:
         provider = provider_factory()
-        return cast(TracerProviderProtocol, provider)
+        return cast("TracerProviderProtocol", provider)
 
     return factory
 
@@ -189,10 +192,10 @@ def load_in_memory_span_exporter_cls() -> Callable[[], SpanExporterProtocol] | N
     exporter_raw = _safe_getattr(exporter_module, "InMemorySpanExporter")
     if exporter_raw is None or not callable(exporter_raw):
         return None
-    exporter_factory = cast(Callable[[], object], exporter_raw)
+    exporter_factory = cast("Callable[[], object]", exporter_raw)
 
     def factory() -> SpanExporterProtocol:
         exporter = exporter_factory()
-        return cast(SpanExporterProtocol, exporter)
+        return cast("SpanExporterProtocol", exporter)
 
     return factory

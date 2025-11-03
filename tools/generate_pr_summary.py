@@ -17,12 +17,14 @@ from __future__ import annotations
 
 import os
 import sys
-from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, Literal
+from typing import TYPE_CHECKING, Final, Literal
 
 from tools._shared.logging import get_logger
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
 
 LOGGER = get_logger(__name__)
 

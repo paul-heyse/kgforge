@@ -3,14 +3,19 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import TYPE_CHECKING
 
 from tools._shared.logging import get_logger
 from tools.docstring_builder.plugins.base import (
-    PluginContext,
-    PluginStage,
     TransformerPlugin,
 )
-from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from tools.docstring_builder.plugins.base import (
+        PluginContext,
+        PluginStage,
+    )
+    from tools.docstring_builder.semantics import SemanticResult
 
 LOGGER = get_logger(__name__)
 

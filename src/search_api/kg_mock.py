@@ -7,9 +7,10 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final, TypedDict
+from typing import TYPE_CHECKING, Final, TypedDict
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["detect_query_concepts", "kg_boost", "linked_concepts_for_text"]
 

@@ -4,15 +4,14 @@ from __future__ import annotations
 
 import ast
 import textwrap
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.config import DEFAULT_MARKER
 from tools.docstring_builder.harvest import HarvestResult
-from tools.docstring_builder.models import DocstringIRParameter, ParameterKind
+from tools.docstring_builder.models import DocstringIRParameter
 from tools.docstring_builder.overrides import (
     _STANDARD_METHOD_EXTENDED_SUMMARIES,
     DEFAULT_MAGIC_METHOD_FALLBACK,
@@ -34,6 +33,11 @@ from tools.docstring_builder.overrides import (
     summarize as overrides_summarize,
 )
 from tools.docstring_builder.schema import DocstringEdit
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from tools.docstring_builder.models import ParameterKind
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = REPO_ROOT / "src"
@@ -171,7 +175,7 @@ def parameters_for(node: ast.AST) -> list[DocstringIRParameter]:
     ) -> None:
         padding = len(items) - len(defaults)
         padded_defaults: list[ast.AST | None] = [None] * padding
-        padded_defaults.extend(cast(ast.AST | None, default) for default in defaults)
+        padded_defaults.extend(cast("ast.AST | None", default) for default in defaults)
         for arg, default_value in zip(items, padded_defaults, strict=True):
             params.append(_make_parameter(arg, default_value, kind=kind))
 

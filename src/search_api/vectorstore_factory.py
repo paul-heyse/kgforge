@@ -24,11 +24,14 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from kgfoundry_common.errors import IndexBuildError
-from kgfoundry_common.prometheus import CounterLike, HistogramLike, build_counter, build_histogram
+from kgfoundry_common.prometheus import build_counter, build_histogram
 from search_api.faiss_adapter import FaissAdapter
+
+if TYPE_CHECKING:
+    from kgfoundry_common.prometheus import CounterLike, HistogramLike
 
 __all__ = ["FaissAdapterSettings", "FaissVectorstoreFactory"]
 

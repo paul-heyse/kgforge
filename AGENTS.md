@@ -240,6 +240,99 @@ Read these first when editing configs or debugging local vs CI drift:
 
 ---
 
+## Typing Gates (Postponed Annotations & TYPE_CHECKING Hygiene)
+
+**Purpose**: Prevent runtime imports of heavy optional dependencies (numpy, fastapi, FAISS) when they're only used in type hints. This ensures tooling stays lightweight and import-clean.
+
+### 1. Postponed Annotations (PEP 563)
+
+Every Python module MUST include:
+```python
+from __future__ import annotations
+```
+
+This directive must be **the first import statement** (after shebang and encoding declaration). Use the automated fixer:
+```bash
+python -m tools.lint.apply_postponed_annotations src/ tools/ docs/_scripts/
+```
+
+**Why**: Postponed annotations eliminate eager type hint evaluation, preventing `NameError` when optional dependencies are missing.
+
+### 2. Typing Façade Modules
+
+Use canonical typing imports instead of direct imports from heavy libraries:
+
+**Canonical façades** (re-export safe type-only helpers):
+- `kgfoundry_common.typing` — Core type aliases and runtime helpers
+- `tools.typing` — Tooling scripts (re-export from kgfoundry_common.typing)
+- `docs.typing` — Documentation scripts (re-export from kgfoundry_common.typing)
+
+**Type-only imports MUST be guarded**:
+```python
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import numpy as np
+    from fastapi import FastAPI
+
+def process(vectors: np.ndarray, app: FastAPI | None = None) -> None:
+    """Annotations use types safely; runtime code doesn't import them."""
+    pass
+```
+
+**Runtime access to heavy types** (when genuinely required):
+```python
+from kgfoundry_common.typing import gate_import
+
+# Inside a function that actually needs numpy at runtime:
+np = gate_import("numpy", "array reshaping in process()")
+result = np.reshape(data, (10, 10))
+```
+
+### 3. Typing Gate Checker
+
+Enforce that type-only imports are guarded:
+```bash
+python -m tools.lint.check_typing_gates src/ tools/ docs/
+```
+
+This AST-based checker scans for unguarded imports of:
+- `numpy`, `torch`, `tensorflow`, `sklearn`
+- `fastapi`, `pydantic`, `sqlalchemy`
+- `pandas`, Other heavy dependencies
+
+It emits errors if imports appear outside `TYPE_CHECKING` blocks.
+
+### 4. Ruff Rules (Automatic Enforcement)
+
+**Enabled rules** (errors by default):
+- `TC001–TC006` — Type-checking import violations (move to TYPE_CHECKING blocks)
+- `PLC2701` — Type-only import used at runtime (special: allowed in façade modules only)
+- `INP001` — Implicit namespace packages (require `__init__.py` for packages)
+- `EXE002` — Missing shebang for executable files
+
+Per-file ignores are defined in `pyproject.toml` for:
+- Façade modules (`src/kgfoundry_common/typing`, `tools/typing`, `docs/typing`)
+- Special internal packages (`docs/_types`, `docs/_scripts`)
+
+### 5. Development Workflow
+
+**When adding a new module that uses type hints**:
+1. Add `from __future__ import annotations` at the top
+2. Move heavy type imports into `if TYPE_CHECKING:` blocks
+3. For runtime needs, use `gate_import()` from the façade
+4. Run checks before committing:
+   ```bash
+   uv run ruff check --fix  # Enforces TC/INP/EXE rules
+   python -m tools.lint.check_typing_gates src/  # Verifies no unguarded imports
+   ```
+
+**Deprecation path**: Old code using `docs._types` or private imports will emit `PLC2701` warnings and will be removed after Phase 1 migration (see openspec/changes/typing-gates-holistic-phase1/).
+
+---
+
 ## Docstrings (NumPy style; enforced; runnable)
 
 - **Style:** NumPy docstrings; PEP 257 structure (module/class/function docstrings for all public symbols)

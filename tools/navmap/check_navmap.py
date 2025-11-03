@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#!/usr/bin/env python3
 """Overview of check navmap.
 
 This module bundles check navmap logic for the kgfoundry stack. It groups related helpers so
@@ -12,15 +10,17 @@ from __future__ import annotations
 import ast
 import re
 import sys
-from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
 
 from tools import get_logger
 from tools.navmap.build_navmap import NavmapError as BuildNavmapError
 from tools.navmap.build_navmap import build_index
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 LOGGER = get_logger(__name__)
 
@@ -89,7 +89,7 @@ type NavTree = (
     NavPrimitive | list[NavTree] | dict[str, NavTree] | set[str] | AllDictTemplate | AllPlaceholder
 )
 type ResolvedNavValue = (
-    NavPrimitive | list["ResolvedNavValue"] | dict[str, "ResolvedNavValue"] | set[str]
+    NavPrimitive | list[ResolvedNavValue] | dict[str, ResolvedNavValue] | set[str]
 )
 
 PLACEHOLDER_ALL = AllPlaceholder()
@@ -295,7 +295,8 @@ def _expand_nav_value(value: NavTree, exports: Sequence[str]) -> ResolvedNavValu
     if isinstance(value, dict):
         return _expand_dict(value, exports)
     if isinstance(value, set):
-        return _expand_set(cast(set[str], value), exports)
+        str_values = cast("set[str]", value)
+        return _expand_set(str_values, exports)
     return value
 
 

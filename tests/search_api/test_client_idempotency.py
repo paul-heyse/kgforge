@@ -11,10 +11,12 @@ Tests verify:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from _pytest.logging import LogCaptureFixture
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
 
-from kgfoundry_common.types import JsonValue
+    from kgfoundry_common.types import JsonValue
 
 
 @dataclass(slots=True)

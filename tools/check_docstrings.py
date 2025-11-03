@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Docstring quality checks shared by kgfoundry development workflows."""
 
 from __future__ import annotations
@@ -6,13 +5,15 @@ from __future__ import annotations
 import argparse
 import ast
 import sys
-from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tools._shared.logging import get_logger
 from tools._shared.proc import ToolExecutionError, run_tool
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 LOGGER = get_logger(__name__)
 
@@ -44,7 +45,7 @@ def parse_args(argv: Sequence[str] | None = None) -> DocstringArgs:
         help="Fail if docstrings contain placeholder text such as 'TODO'.",
     )
     namespace = parser.parse_args(argv)
-    return DocstringArgs(no_todo=bool(cast(bool, namespace.no_todo)))
+    return DocstringArgs(no_todo=bool(cast("bool", namespace.no_todo)))
 
 
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:

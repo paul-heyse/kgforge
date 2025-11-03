@@ -6,15 +6,19 @@ import json
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, SupportsInt, cast
+from typing import TYPE_CHECKING, Final, SupportsInt, cast
 
 from tools.docstring_builder.models import (
-    DocfactsDocumentLike,
-    DocfactsDocumentPayload,
     build_docfacts_document_payload,
     validate_docfacts_payload,
 )
-from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from tools.docstring_builder.models import (
+        DocfactsDocumentLike,
+        DocfactsDocumentPayload,
+    )
+    from tools.docstring_builder.semantics import SemanticResult
 
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]
 DOCFACTS_VERSION: Final = "2.0"
@@ -78,26 +82,26 @@ class DocFact:
         returns_payload: list[dict[str, str | None]] = [
             {
                 "kind": str(value.get("kind", "returns")),
-                "annotation": cast(str | None, value.get("annotation")),
-                "description": cast(str | None, value.get("description")),
+                "annotation": cast("str | None", value.get("annotation")),
+                "description": cast("str | None", value.get("description")),
             }
             for value in _mapping_items(data.get("returns"))
         ]
         raises_payload: list[dict[str, str | None]] = [
             {
                 "exception": str(value.get("exception", "")),
-                "description": cast(str | None, value.get("description")),
+                "description": cast("str | None", value.get("description")),
             }
             for value in _mapping_items(data.get("raises"))
         ]
         parameters_payload: list[dict[str, str | bool | None]] = [
             {
-                "name": cast(str | None, value.get("name")),
-                "display_name": cast(str | None, value.get("display_name")),
-                "annotation": cast(str | None, value.get("annotation")),
-                "optional": cast(bool | None, value.get("optional")),
-                "default": cast(str | None, value.get("default")),
-                "kind": cast(str | None, value.get("kind")),
+                "name": cast("str | None", value.get("name")),
+                "display_name": cast("str | None", value.get("display_name")),
+                "annotation": cast("str | None", value.get("annotation")),
+                "optional": cast("bool | None", value.get("optional")),
+                "default": cast("str | None", value.get("default")),
+                "kind": cast("str | None", value.get("kind")),
             }
             for value in _mapping_items(data.get("parameters"))
         ]
@@ -271,7 +275,7 @@ def write_docfacts(
     validate: bool = True,
 ) -> DocfactsDocumentPayload:
     """Persist DocFacts to ``path`` returning the typed payload."""
-    payload = build_docfacts_document_payload(cast(DocfactsDocumentLike, document))
+    payload = build_docfacts_document_payload(cast("DocfactsDocumentLike", document))
     if validate:
         validate_docfacts_payload(payload)
     path.parent.mkdir(parents=True, exist_ok=True)

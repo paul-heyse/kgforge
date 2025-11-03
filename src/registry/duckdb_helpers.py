@@ -3,17 +3,21 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 import duckdb
-from duckdb import DuckDBPyConnection
 
 from kgfoundry_common.errors import RegistryError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import MetricsProvider, observe_duration
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from duckdb import DuckDBPyConnection
 
 Params = Sequence[object] | Mapping[str, object] | None
 
@@ -329,7 +333,7 @@ def fetch_all(
         params,
         options=_coerce_options(options, operation="duckdb.fetch_all"),
     )
-    raw_rows = cast(list[tuple[object, ...]], relation.fetchall())
+    raw_rows = cast("list[tuple[object, ...]]", relation.fetchall())
     typed_rows: list[tuple[object, ...]] = [tuple(row) for row in raw_rows]
     return typed_rows
 
@@ -369,7 +373,7 @@ def fetch_one(
         params,
         options=_coerce_options(options, operation="duckdb.fetch_one"),
     )
-    raw_row = cast(tuple[object, ...] | None, relation.fetchone())
+    raw_row = cast("tuple[object, ...] | None", relation.fetchone())
     if raw_row is None:
         return None
     return tuple(raw_row)

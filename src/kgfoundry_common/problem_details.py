@@ -22,23 +22,28 @@ Examples
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import NoReturn, TypedDict, cast, overload
+from typing import TYPE_CHECKING, NoReturn, TypedDict, cast, overload
 
 from kgfoundry_common.fs import read_text
 from kgfoundry_common.jsonschema_utils import (
     Draft202012Validator,
     SchemaError,
     ValidationError,
-    ValidationErrorProtocol,
 )
 from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.types import JsonPrimitive, JsonValue
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from kgfoundry_common.jsonschema_utils import (
+        ValidationErrorProtocol,
+    )
 
 JsonObject = dict[str, JsonValue]
 ProblemDetailsDict = dict[str, JsonValue]
@@ -220,7 +225,7 @@ def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:
     try:
         jsonschema_validate(instance=payload, schema=schema)
     except ValidationError as exc:
-        error_details = cast(ValidationErrorProtocol, exc)
+        error_details = cast("ValidationErrorProtocol", exc)
         errors = [error_details.message]
         if error_details.absolute_path:
             path_str = ".".join(str(p) for p in error_details.absolute_path)
@@ -290,7 +295,7 @@ def _coerce_problem_details_params(*args: object, **kwargs: object) -> ProblemDe
         detail=str(values["detail"]),
         instance=str(values["instance"]),
         code=None if code is None else str(code),
-        extensions=cast(Mapping[str, JsonValue] | None, extensions),
+        extensions=cast("Mapping[str, JsonValue] | None", extensions),
     )
 
 
@@ -391,9 +396,9 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
         payload["extensions"] = dict(params.extensions)
 
     # Validate against schema (cast since dict[str, object] ⊇ Mapping[str, JsonValue])
-    validate_problem_details(cast(Mapping[str, JsonValue], payload))
+    validate_problem_details(cast("Mapping[str, JsonValue]", payload))
 
-    return cast(ProblemDetails, payload)
+    return cast("ProblemDetails", payload)
 
 
 @overload

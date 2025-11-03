@@ -17,7 +17,6 @@ import json
 import logging
 import os
 import sys
-from collections.abc import Callable, Iterable, Iterator, Sequence
 from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -25,7 +24,6 @@ from types import ModuleType
 from typing import TYPE_CHECKING, ParamSpec, Protocol, TypeVar, cast
 
 import pytest
-from _pytest.logging import LogCaptureFixture
 from prometheus_client.registry import CollectorRegistry
 
 from tests.bootstrap import ensure_src_path
@@ -33,15 +31,23 @@ from tests.bootstrap import ensure_src_path
 ensure_src_path()
 
 from kgfoundry_common.opentelemetry_types import (
-    SpanExporterProtocol,
-    SpanProtocol,
-    TracerProviderProtocol,
     load_in_memory_span_exporter_cls,
     load_tracer_provider_cls,
 )
 from kgfoundry_common.problem_details import (
     JsonValue,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+
+    from _pytest.logging import LogCaptureFixture
+
+    from kgfoundry_common.opentelemetry_types import (
+        SpanExporterProtocol,
+        SpanProtocol,
+        TracerProviderProtocol,
+    )
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -75,9 +81,9 @@ def _compute_has_gpu_stack() -> bool:
     cuda_module: object = getattr(torch_module, "cuda", None)
     if not isinstance(cuda_module, ModuleType):
         return False
-    raw_is_available = cast(object | None, getattr(cuda_module, "is_available", None))
+    raw_is_available = cast("object | None", getattr(cuda_module, "is_available", None))
     is_available_callable = cast(
-        Callable[[], object] | None,
+        "Callable[[], object] | None",
         raw_is_available if callable(raw_is_available) else None,
     )
     if is_available_callable is None:
@@ -158,7 +164,7 @@ def caplog_records(caplog: LogCaptureFixture) -> dict[str, list[logging.LogRecor
         records_by_op: dict[str, list[logging.LogRecord]] = {}
         records = [record for record in caplog.records if isinstance(record, logging.LogRecord)]
         for record in records:
-            record_dict = cast(dict[str, object], record.__dict__)
+            record_dict = cast("dict[str, object]", record.__dict__)
             op_obj = record_dict.get("operation", "unknown")
             op = op_obj if isinstance(op_obj, str) else "unknown"
             records_by_op.setdefault(op, []).append(record)
@@ -205,7 +211,7 @@ def otel_tracer_provider(
         raise SkipReturnedUnexpectedlyError
 
     otel_trace_mod = cast(
-        ModuleType,
+        "ModuleType",
         pytest.importorskip(
             "opentelemetry.trace",
             reason="OpenTelemetry API required for observability tests",
@@ -216,10 +222,10 @@ def otel_tracer_provider(
     span_processor = _SimpleSpanProcessor(otel_span_exporter)
     provider.add_span_processor(span_processor)
     set_tracer_provider = cast(
-        Callable[[TracerProviderProtocol], None], otel_trace_mod.set_tracer_provider
+        "Callable[[TracerProviderProtocol], None]", otel_trace_mod.set_tracer_provider
     )
     get_tracer_provider = cast(
-        Callable[[], TracerProviderProtocol], otel_trace_mod.get_tracer_provider
+        "Callable[[], TracerProviderProtocol]", otel_trace_mod.get_tracer_provider
     )
     set_tracer_provider(provider)
     try:
@@ -255,7 +261,7 @@ def load_problem_details_example(example_name: str) -> ProblemDetailsDict:
         msg = f"Problem Details example not found: {example_path}"
         raise FileNotFoundError(msg)
 
-    return cast(ProblemDetailsDict, json.loads(example_path.read_text(encoding="utf-8")))
+    return cast("ProblemDetailsDict", json.loads(example_path.read_text(encoding="utf-8")))
 
 
 @fixture
@@ -298,7 +304,7 @@ def structured_log_asserter() -> Callable[[logging.LogRecord, set[str]], None]:
         AssertionError
             If any required field is missing.
         """
-        record_dict = cast(dict[str, object], record.__dict__)
+        record_dict = cast("dict[str, object]", record.__dict__)
         missing = required_fields - set(record_dict.keys())
         if missing:
             msg = f"Missing fields in log record: {missing}"
@@ -335,7 +341,7 @@ def metrics_asserter(
             If metric not found or value mismatch.
         """
         # Collect all families and samples
-        families = [cast(MetricFamily, family) for family in prometheus_registry.collect()]
+        families = [cast("MetricFamily", family) for family in prometheus_registry.collect()]
         for family in families:
             if family.name == name:
                 samples_raw = list(family.samples)

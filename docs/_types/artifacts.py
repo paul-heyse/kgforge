@@ -111,8 +111,9 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping as MappingABC
-from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, cast
+
+from pydantic import BaseModel, Field, field_validator
 
 from docs._types.alignment import (
     SYMBOL_DELTA_CHANGE_FIELDS,
@@ -121,8 +122,6 @@ from docs._types.alignment import (
     SYMBOL_INDEX_ROW_FIELDS,
     align_schema_fields,
 )
-from pydantic import BaseModel, Field, field_validator
-
 from kgfoundry_common.errors import (
     ArtifactDeserializationError,
     ArtifactSerializationError,
@@ -132,6 +131,8 @@ from kgfoundry_common.errors import (
 # Type aliases matching RFC 7159 JSON structure
 type JsonPrimitive = str | int | float | bool | None
 if TYPE_CHECKING:
+    from pathlib import Path
+
     type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
 else:
     JsonValue = object  # type: ignore[assignment, misc]
@@ -495,7 +496,9 @@ def _coerce_str_tuple(
         return ()
     if isinstance(value, (list, tuple, set)):
         items: list[str] = []
-        for index, entry in enumerate(cast(list[object] | tuple[object, ...] | set[object], value)):
+        for index, entry in enumerate(
+            cast("list[object] | tuple[object, ...] | set[object]", value)
+        ):
             if not isinstance(entry, str):
                 indexed_field = f"{field}[{index}]"
                 raise _validation_error(indexed_field, "a string", artifact=artifact, row=row)
@@ -558,12 +561,12 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
         return ()
     if isinstance(value, (list, tuple)):
         changes: list[SymbolDeltaChange] = []
-        for index, entry in enumerate(cast(list[object] | tuple[object, ...], value)):
+        for index, entry in enumerate(cast("list[object] | tuple[object, ...]", value)):
             # Try to handle as already-instantiated SymbolDeltaChange
             if hasattr(entry, "__pydantic_core_schema__"):
                 # Likely a Pydantic model; try direct append
                 try:
-                    changes.append(cast(SymbolDeltaChange, entry))
+                    changes.append(cast("SymbolDeltaChange", entry))
                     continue
                 except (TypeError, ValueError):
                     pass
@@ -571,7 +574,7 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
             # Try to handle as mapping (dict-like)
             if isinstance(entry, MappingABC):
                 try:
-                    entry_dict: dict[str, object] = dict(cast(MappingABC[str, object], entry))
+                    entry_dict: dict[str, object] = dict(cast("MappingABC[str, object]", entry))
                     # Pydantic model_validate is correct; MyPy can't infer return type
                     changes.append(SymbolDeltaChange.model_validate(entry_dict))  # type: ignore[misc]
                 except Exception as exc:  # pragma: no cover - defensive guard
@@ -746,9 +749,9 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
 
     # Return artifacts with empty lookups (to be populated separately if needed)
     return SymbolIndexArtifacts(
-        rows=cast(tuple[SymbolIndexRow, ...], tuple(rows)),
-        by_file=cast(dict[str, tuple[str, ...]], {}),
-        by_module=cast(dict[str, tuple[str, ...]], {}),
+        rows=cast("tuple[SymbolIndexRow, ...]", tuple(rows)),
+        by_file=cast("dict[str, tuple[str, ...]]", {}),
+        by_module=cast("dict[str, tuple[str, ...]]", {}),
     )
 
 
@@ -788,7 +791,7 @@ def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonV
             "canonical_path": row.canonical_path,
             "kind": row.kind,
             "doc": row.doc,
-            "source_link": cast(JsonValue, row.source_link),
+            "source_link": cast("JsonValue", row.source_link),
             "module": row.module,
             "package": row.package,
             "file": row.file,
@@ -798,7 +801,7 @@ def symbol_index_to_payload(model: SymbolIndexArtifacts) -> list[dict[str, JsonV
             "since": row.since,
             "deprecated_in": row.deprecated_in,
             "section": row.section,
-            "tested_by": cast(JsonValue, list(row.tested_by)),
+            "tested_by": cast("JsonValue", list(row.tested_by)),
             "is_async": row.is_async,
             "is_property": row.is_property,
         }
@@ -905,9 +908,9 @@ def symbol_delta_to_payload(model: SymbolDeltaPayload) -> dict[str, JsonValue]:
     changed_list = [
         {
             "path": change.path,
-            "before": cast(JsonValue, change.before),
-            "after": cast(JsonValue, change.after),
-            "reasons": cast(JsonValue, list(change.reasons)),
+            "before": cast("JsonValue", change.before),
+            "after": cast("JsonValue", change.after),
+            "reasons": cast("JsonValue", list(change.reasons)),
         }
         for change in model.changed
     ]
@@ -915,9 +918,9 @@ def symbol_delta_to_payload(model: SymbolDeltaPayload) -> dict[str, JsonValue]:
     return {
         "base_sha": model.base_sha,
         "head_sha": model.head_sha,
-        "added": cast(JsonValue, list(model.added)),
-        "removed": cast(JsonValue, list(model.removed)),
-        "changed": cast(JsonValue, changed_list),
+        "added": cast("JsonValue", list(model.added)),
+        "removed": cast("JsonValue", list(model.removed)),
+        "changed": cast("JsonValue", changed_list),
     }
 
 
@@ -946,7 +949,7 @@ def load_symbol_index(path: Path) -> SymbolIndexArtifacts:
     >>> # artifacts = load_symbol_index(Path("docs/_build/symbols.json"))
     """
     try:
-        payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        payload = cast("JsonPayload", json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError) as e:
         msg = f"Failed to load {path}: {e}"
         raise ArtifactDeserializationError(
@@ -1023,7 +1026,7 @@ def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
     >>> # delta = load_symbol_delta(Path("docs/_build/symbols.delta.json"))
     """
     try:
-        payload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        payload = cast("JsonPayload", json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError) as e:
         msg = f"Failed to load {path}: {e}"
         raise ArtifactDeserializationError(

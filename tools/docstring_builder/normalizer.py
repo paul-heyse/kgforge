@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import inspect
 import textwrap
-from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from tools.docstring_builder.harvest import SymbolHarvest
 from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.normalizer_annotations import format_annotation
 from tools.docstring_builder.normalizer_signature import (
@@ -15,6 +14,11 @@ from tools.docstring_builder.normalizer_signature import (
     resolve_callable,
     signature_and_hints,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from tools.docstring_builder.harvest import SymbolHarvest
 
 
 @dataclass(slots=True)

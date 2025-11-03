@@ -15,7 +15,12 @@ Examples
 
 from __future__ import annotations
 
-from kgfoundry_common.prometheus import CounterLike, HistogramLike, build_counter, build_histogram
+from typing import TYPE_CHECKING
+
+from kgfoundry_common.prometheus import build_counter, build_histogram
+
+if TYPE_CHECKING:
+    from kgfoundry_common.prometheus import CounterLike, HistogramLike
 
 __all__ = [
     "bm25_queries_total",

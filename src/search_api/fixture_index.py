@@ -9,15 +9,18 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import duckdb
 
-from kgfoundry_common.navmap_types import NavMap
 from registry.duckdb_helpers import fetch_all, fetch_one
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["FixtureDoc", "FixtureIndex", "tokenize"]
 

@@ -18,11 +18,14 @@ import io
 import re
 import sys
 import tokenize
-from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools._shared.logging import get_logger
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 LOGGER = get_logger(__name__)
 

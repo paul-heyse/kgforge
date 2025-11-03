@@ -17,16 +17,20 @@ from __future__ import annotations
 
 import json
 import sys
-from collections.abc import Iterable
-from pathlib import Path
 from threading import Lock
-from types import TracebackType
-from typing import Self, cast
+from typing import TYPE_CHECKING, Self, cast
 
 from kgfoundry_common.errors import CatalogSessionError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.problem_details import JsonValue
-from kgfoundry_common.subprocess_utils import TextProcess, TimeoutExpired, spawn_text_process
+from kgfoundry_common.subprocess_utils import TimeoutExpired, spawn_text_process
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from pathlib import Path
+    from types import TracebackType
+
+    from kgfoundry_common.subprocess_utils import TextProcess
 
 JsonObject = dict[str, JsonValue]
 
@@ -394,11 +398,11 @@ class CatalogSession:
         params: JsonObject = {
             "query": query,
             "k": k,
-            "facets": cast(JsonValue, facets_dict),  # dict[str, str] is JsonValue-compatible
+            "facets": cast("JsonValue", facets_dict),  # dict[str, str] is JsonValue-compatible
         }
         result = self._send_request("catalog.search", params)
         if isinstance(result, list):
-            return [cast(JsonObject, entry) for entry in result]
+            return [cast("JsonObject", entry) for entry in result]
         return []
 
     def symbol(self, symbol_id: str) -> JsonObject:
@@ -500,7 +504,7 @@ class CatalogSession:
         """
         result = self._send_request("catalog.suggest_tests", {"symbol_id": symbol_id})
         if isinstance(result, list):
-            return [cast(JsonObject, entry) for entry in result]
+            return [cast("JsonObject", entry) for entry in result]
         return []
 
     def open_anchor(self, symbol_id: str) -> dict[str, str]:

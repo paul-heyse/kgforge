@@ -7,8 +7,7 @@ vector contract enforces dtype/shape invariants and raises
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pytest
@@ -16,12 +15,18 @@ import pytest
 from kgfoundry_common.vector_types import (
     VectorBatch,
     VectorId,
-    VectorMatrix,
     VectorValidationError,
     assert_vector_matrix,
     coerce_vector_batch,
     validate_vector_batch,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
+
+    from kgfoundry_common.vector_types import (
+        VectorMatrix,
+    )
 
 
 def test_coerce_vector_batch_produces_float32_matrix(

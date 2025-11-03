@@ -8,11 +8,14 @@ import tomllib
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tools.docstring_builder.plugins.dataclass_fields import collect_dataclass_field_names
-from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from tools.docstring_builder.semantics import SemanticResult
 
 
 class PolicyConfigurationError(RuntimeError):
@@ -176,7 +179,9 @@ def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, object]) -> N
             continue
         if key == "exceptions":
             if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
-                settings.exceptions = _parse_exceptions(cast(Iterable[Mapping[str, object]], value))
+                settings.exceptions = _parse_exceptions(
+                    cast("Iterable[Mapping[str, object]]", value)
+                )
                 continue
             message = "Policy exceptions must be an iterable of mappings"
             raise PolicyConfigurationError(message)

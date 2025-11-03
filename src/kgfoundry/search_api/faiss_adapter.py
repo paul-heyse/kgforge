@@ -29,7 +29,7 @@ __all__ = [
     "StrArray",
     "VecArray",
 ]
-_namespace = cast(dict[str, object], globals())
+_namespace = cast("dict[str, object]", globals())
 namespace_attach(_module, _namespace, __all__)
 
 

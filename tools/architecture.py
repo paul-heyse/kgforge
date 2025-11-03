@@ -12,17 +12,23 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools.types_facade import (
-    EvaluableArchitecture,
-    LayeredArchitectureProtocol,
     get_evaluable_architecture,
     new_layered_architecture,
     new_module_name_filter,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+
+    from tools.types_facade import (
+        EvaluableArchitecture,
+        LayeredArchitectureProtocol,
+    )
 
 TOOLS_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_ROOT.parent

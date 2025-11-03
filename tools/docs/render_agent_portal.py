@@ -7,12 +7,15 @@ import hashlib
 import html
 import json
 import statistics
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from kgfoundry.agent_catalog.client import AgentCatalogClient
-from kgfoundry.agent_catalog.models import ModuleModel, SymbolModel
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from kgfoundry.agent_catalog.models import ModuleModel, SymbolModel
 
 CacheKey = str
 

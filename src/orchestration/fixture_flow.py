@@ -8,14 +8,17 @@ for implementation specifics.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from prefect import flow, task
 
 from kgfoundry_common.models import Doc
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.parquet_io import ChunkRow, ParquetChunkWriter, ParquetVectorWriter
+from kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
 from registry.helper import DuckDBRegistryHelper
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.parquet_io import ChunkRow
 
 __all__ = [
     "fixture_pipeline",

@@ -92,15 +92,15 @@ if TYPE_CHECKING:
 
         def find_class(self, module: str, name: str) -> object: ...
 
-    _stdlib_pickle = cast(_PickleModule, None)
+    _stdlib_pickle = cast("_PickleModule", None)
 else:  # pragma: no cover - runtime import keeps Ruff S403 quiet
 
     def _load_stdlib_pickle() -> _PickleModule:
         module_name = "_pickle"
-        return cast(_PickleModule, import_module(module_name))
+        return cast("_PickleModule", import_module(module_name))
 
     _stdlib_pickle = _load_stdlib_pickle()
-    _StdlibUnpickler = cast(type[_UnpicklerProtocol], _stdlib_pickle.Unpickler)
+    _StdlibUnpickler = cast("type[_UnpicklerProtocol]", _stdlib_pickle.Unpickler)
 
 
 class SafeUnpickler(_StdlibUnpickler):
@@ -151,7 +151,7 @@ class SafeUnpickler(_StdlibUnpickler):
         if full_name not in _ALLOWED_TYPES:
             msg = f"Pickle deserialization blocked: {full_name} not in allow-list"
             raise UnsafePickleError(msg, type_name=full_name)
-        return cast(type[object], super().find_class(module, name))
+        return cast("type[object]", super().find_class(module, name))
 
     def load(self) -> object:
         """Deserialize the payload using the hardened allow-list."""

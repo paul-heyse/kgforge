@@ -8,10 +8,13 @@ to access these helpers. Failures surface as Problem Details consistent with
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Mapping, Sequence
 from importlib import import_module
-from types import MappingProxyType, ModuleType
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Final, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping, Sequence
+    from types import ModuleType
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -40,7 +43,7 @@ def build_agent_analytics(argv: Sequence[str] | None = None) -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.build_agent_analytics")
-    main_fn = cast(Callable[[list[str] | None], int], module.main)
+    main_fn = cast("Callable[[list[str] | None], int]", module.main)
     return main_fn(_coerce_argv(argv))
 
 
@@ -58,7 +61,7 @@ def build_agent_api() -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.build_agent_api")
-    main_fn = cast(Callable[[], int], module.main)
+    main_fn = cast("Callable[[], int]", module.main)
     return main_fn()
 
 
@@ -81,7 +84,7 @@ def build_agent_catalog(argv: Sequence[str] | None = None) -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.build_agent_catalog")
-    main_fn = cast(Callable[[list[str] | None], int], module.main)
+    main_fn = cast("Callable[[list[str] | None], int]", module.main)
     return main_fn(_coerce_argv(argv))
 
 
@@ -99,7 +102,7 @@ def build_artifacts() -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.build_artifacts")
-    main_fn = cast(Callable[[], int], module.main)
+    main_fn = cast("Callable[[], int]", module.main)
     return main_fn()
 
 
@@ -112,7 +115,7 @@ def build_graphs() -> None:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.build_graphs")
-    main_fn = cast(Callable[[], None], module.main)
+    main_fn = cast("Callable[[], None]", module.main)
     main_fn()
 
 
@@ -125,7 +128,7 @@ def build_test_map() -> None:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.build_test_map")
-    main_fn = cast(Callable[[], None], module.main)
+    main_fn = cast("Callable[[], None]", module.main)
     main_fn()
 
 
@@ -148,7 +151,7 @@ def export_schemas(argv: Sequence[str] | None = None) -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.export_schemas")
-    main_fn = cast(Callable[[list[str] | None], int], module.main)
+    main_fn = cast("Callable[[list[str] | None], int]", module.main)
     return main_fn(_coerce_argv(argv))
 
 
@@ -171,7 +174,7 @@ def render_agent_portal(argv: Sequence[str] | None = None) -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.render_agent_portal")
-    main_fn = cast(Callable[[list[str] | None], int], module.main)
+    main_fn = cast("Callable[[list[str] | None], int]", module.main)
     return main_fn(_coerce_argv(argv))
 
 
@@ -189,7 +192,7 @@ def scan_observability() -> int:
     ``schema/examples/tools/problem_details/tool-execution-error.json``.
     """
     module = import_module("tools.docs.scan_observability")
-    main_fn = cast(Callable[[], int], module.main)
+    main_fn = cast("Callable[[], int]", module.main)
     return main_fn()
 
 
@@ -237,7 +240,7 @@ __all__: tuple[str, ...] = (
 def __getattr__(name: str) -> ModuleType:
     if name in MODULE_EXPORTS:
         module = import_module(MODULE_EXPORTS[name])
-        module_globals = cast(dict[str, object], globals())
+        module_globals = cast("dict[str, object]", globals())
         module_globals[name] = module
         return module
     message = f"module 'tools.docs' has no attribute {name!r}"
@@ -245,5 +248,5 @@ def __getattr__(name: str) -> ModuleType:
 
 
 def __dir__() -> list[str]:
-    module_globals = cast(dict[str, object], globals())
+    module_globals = cast("dict[str, object]", globals())
     return sorted({*module_globals, *MODULE_EXPORTS.keys()})

@@ -4,11 +4,9 @@ from __future__ import annotations
 
 import io
 import os
-from collections.abc import Callable
 from typing import TYPE_CHECKING, ParamSpec, TypeVar, cast
 
 import pytest
-from _pytest.logging import LogCaptureFixture
 
 from kgfoundry_common.safe_pickle_v2 import (
     SignedPickleWrapper,
@@ -21,6 +19,9 @@ R = TypeVar("R")
 
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Callable
+
+    from _pytest.logging import LogCaptureFixture
 
     def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
 
@@ -173,7 +174,7 @@ class TestSignedPickleWrapper:
         current: dict[str, object] = data
         for i in range(150):
             current["nested"] = {"level": i + 1}
-            current = cast(dict[str, object], current["nested"])
+            current = cast("dict[str, object]", current["nested"])
 
         with pytest.raises(ValueError, match="exceeds maximum depth"):
             wrapper.dump(data, io.BytesIO())
@@ -215,12 +216,12 @@ class TestPickleRoundTrip:
         wrapper.dump(data, buffer)
 
         buffer.seek(0)
-        loaded = cast(dict[str, object], wrapper.load(buffer))
+        loaded = cast("dict[str, object]", wrapper.load(buffer))
         assert loaded == data
 
-        users = cast(list[dict[str, object]], loaded["users"])
+        users = cast("list[dict[str, object]]", loaded["users"])
         assert users[0]["name"] == "Alice"
 
-        metadata = cast(dict[str, object], loaded["metadata"])
-        config = cast(dict[str, object], metadata["config"])
+        metadata = cast("dict[str, object]", loaded["metadata"])
+        config = cast("dict[str, object]", metadata["config"])
         assert config["debug"] is False

@@ -14,8 +14,11 @@ to import and alias names to signal usage.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from types import ModuleType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from types import ModuleType
 
 # --- Pydantic validators / dynamic attrs ---
 try:

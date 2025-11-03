@@ -5,6 +5,10 @@ downstream packages can import a single cohesive namespace. Refer to the functio
 for implementation specifics.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 # [nav:anchor config]
 # [nav:anchor errors]
 # [nav:anchor exceptions]
@@ -35,7 +39,9 @@ from kgfoundry_common import (
     subprocess_utils,
     vector_types,
 )
-from kgfoundry_common.navmap_types import NavMap
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = [
     "config",

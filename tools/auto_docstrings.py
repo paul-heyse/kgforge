@@ -1,10 +1,10 @@
 """Compatibility shim exposing legacy docstring generation utilities."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 # pylint: disable=protected-access
-
-from collections.abc import Sequence
-from pathlib import Path
-
 from tools.docstring_builder import legacy as _legacy
 from tools.docstring_builder.legacy import (
     DEFAULT_MAGIC_METHOD_FALLBACK,
@@ -20,7 +20,12 @@ from tools.docstring_builder.legacy import (
     parameters_for,
     summarize,
 )
-from tools.docstring_builder.models import DocstringIRParameter
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from tools.docstring_builder.models import DocstringIRParameter
 
 STANDARD_METHOD_EXTENDED_SUMMARIES = _legacy._STANDARD_METHOD_EXTENDED_SUMMARIES
 

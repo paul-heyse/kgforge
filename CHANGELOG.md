@@ -13,6 +13,9 @@
 - **GPU extras**: GPU-specific dependencies (FAISS GPU, cuVS, PyTorch, vLLM, etc.) are now isolated in the `gpu` extra. Install with `uv sync --extra gpu` or `pip install kgfoundry[gpu]`. This keeps the base installation lightweight while enabling optional GPU acceleration.
 - **Tooling automation**: Added import-linter contracts, suppression guard script (`tools/check_new_suppressions.py`), and PR summary generator (`tools/generate_pr_summary.py`) for improved code quality enforcement.
 - Documented the shared observability facade (`tools/_shared/observability_facade.md`) covering typed Prometheus builders, structured logging fields, tracing helpers, and the fallback semantics for environments without `prometheus_client`.
+- **Typing gates enforcement** (Phase 1): Introduced typing façade modules (`kgfoundry_common.typing`, `tools.typing`, `docs.typing`) with `gate_import()` and `safe_get_type()` helpers for deferred imports. All new modules enforce `from __future__ import annotations` (PEP 563) and TYPE_CHECKING guards for type-only imports. New CI gate: `python -m tools.lint.check_typing_gates` (see `docs/typing_migration_guide.md` for developer guidance and AGENTS.md for best practices).
+- Added `tools/lint/apply_postponed_annotations.py` to automatically inject postponed annotation directives while respecting module headers, shebangs, and docstrings.
+- Added `tools/lint/check_typing_gates.py` for AST-based enforcement of TYPE_CHECKING guards, detecting unguarded imports of heavy dependencies (numpy, FastAPI, FAISS, etc.).
 
 ### Changed
 - `tools/update_navmaps.py` now validates docstrings instead of injecting `NavMap:` sections.

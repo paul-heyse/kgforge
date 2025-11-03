@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, Protocol, cast
 
 import requests
 
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import JsonValue
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
 
 __all__ = [
     "KGFoundryClient",
@@ -212,7 +214,7 @@ class RequestsHttp(SupportsHttp):
             Response returned by :mod:`requests`.
         """
         response = self._session.get(url, timeout=timeout, headers=headers)
-        return cast(SupportsResponse, response)
+        return cast("SupportsResponse", response)
 
     def post(
         self,
@@ -243,7 +245,7 @@ class RequestsHttp(SupportsHttp):
             Response returned by :mod:`requests`.
         """
         response = self._session.post(url, json=json, headers=headers, timeout=timeout)
-        return cast(SupportsResponse, response)
+        return cast("SupportsResponse", response)
 
 
 _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()

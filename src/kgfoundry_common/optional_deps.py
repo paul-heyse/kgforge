@@ -21,12 +21,15 @@ from __future__ import annotations
 import importlib
 import logging
 import uuid
-from collections.abc import Mapping
-from typing import TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from kgfoundry_common.errors import ArtifactDependencyError
 from kgfoundry_common.problem_details import build_problem_details
-from kgfoundry_common.types import JsonValue
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from kgfoundry_common.types import JsonValue
 
 __all__ = [
     "OptionalDependencyError",
@@ -160,7 +163,7 @@ def safe_import_griffe() -> object:
             detail=message,
             instance=f"urn:kgfoundry:docs:griffe:{correlation_id}",
             extensions=cast(
-                Mapping[str, JsonValue],
+                "Mapping[str, JsonValue]",
                 {
                     "module": "griffe",
                     "correlation_id": correlation_id,
@@ -238,7 +241,7 @@ def safe_import_autoapi() -> object:
             detail=message,
             instance=f"urn:kgfoundry:docs:autoapi:{correlation_id}",
             extensions=cast(
-                Mapping[str, JsonValue],
+                "Mapping[str, JsonValue]",
                 {
                     "module": "autoapi",
                     "correlation_id": correlation_id,
@@ -316,7 +319,7 @@ def safe_import_sphinx() -> object:
             detail=message,
             instance=f"urn:kgfoundry:docs:sphinx:{correlation_id}",
             extensions=cast(
-                Mapping[str, JsonValue],
+                "Mapping[str, JsonValue]",
                 {
                     "module": "sphinx",
                     "correlation_id": correlation_id,

@@ -8,19 +8,21 @@ for implementation specifics.
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Iterable
 from pathlib import Path
-from types import ModuleType
 from typing import TYPE_CHECKING, Any, Final, NotRequired, TypedDict
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from kgfoundry_common.errors import DeserializationError
-from kgfoundry_common.navmap_types import NavMap
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from types import ModuleType
+
     from pandas import DataFrame
+
+    from kgfoundry_common.navmap_types import NavMap
 else:
     DataFrame = Any
 

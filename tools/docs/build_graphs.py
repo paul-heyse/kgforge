@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Overview of build graphs.
 
 This module bundles build graphs logic for the kgfoundry stack. It groups related helpers so
@@ -18,13 +17,12 @@ import sys
 import tempfile
 import time
 import warnings
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
 from tools import (
@@ -41,6 +39,9 @@ from tools import (
 from tools.docs.errors import GraphBuildError
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from types import ModuleType
+
     import networkx as nx_mod
     import pydot as pydot_mod
 
@@ -832,10 +833,10 @@ def _cycle_generator(graph: DiGraph, length_bound: int) -> Iterator[list[str]]:
         return iter(())
     if length_bound > 0:
         try:
-            return cast(Iterator[list[str]], nx.simple_cycles(graph, length_bound=length_bound))
+            return cast("Iterator[list[str]]", nx.simple_cycles(graph, length_bound=length_bound))
         except TypeError:
             pass
-    return cast(Iterator[list[str]], nx.simple_cycles(graph))
+    return cast("Iterator[list[str]]", nx.simple_cycles(graph))
 
 
 def _enumerate_cycles(
@@ -1002,7 +1003,7 @@ def _degree_centrality(graph: DiGraph) -> dict[str, float]:
     """
     if nx is None or graph.number_of_nodes() == 0:
         return {}
-    return cast(dict[str, float], nx.degree_centrality(graph))
+    return cast("dict[str, float]", nx.degree_centrality(graph))
 
 
 def _sequence_of_sequences(value: object) -> list[list[str]]:
@@ -1133,9 +1134,9 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
 
     graphs = pydot.graph_from_dot_file(str(dot_path))
     pd_obj = graphs[0] if isinstance(graphs, list) else graphs
-    pd_graph = cast(PydotDot, pd_obj)
-    directed = cast(DiGraph, nx.drawing.nx_pydot.from_pydot(pd_graph).to_directed())
-    collapsed: DiGraph = cast(DiGraph, nx.DiGraph())
+    pd_graph = cast("PydotDot", pd_obj)
+    directed = cast("DiGraph", nx.drawing.nx_pydot.from_pydot(pd_graph).to_directed())
+    collapsed: DiGraph = cast("DiGraph", nx.DiGraph())
 
     module_names = {node: _module_label(node, data) for node, data in directed.nodes(data=True)}
 
@@ -1223,15 +1224,15 @@ def style_and_render(
     """
     pydot_module = _require_pydot()
     pkg2layer = _coerce_mapping(layers.get("packages"))
-    centrality = cast(dict[str, float], analysis.get("centrality", {}))
+    centrality = cast("dict[str, float]", analysis.get("centrality", {}))
     threshold = _centrality_threshold(centrality, 0.80)
-    cycle_edges = _extract_cycle_edges(cast(CycleList, analysis.get("cycles", [])))
+    cycle_edges = _extract_cycle_edges(cast("CycleList", analysis.get("cycles", [])))
 
     dot_graph: PydotDot = pydot_module.Dot(graph_type="digraph", rankdir="LR")
     _add_graph_nodes(dot_graph, graph, pkg2layer, centrality, threshold)
     _add_graph_edges(dot_graph, graph, pkg2layer, cycle_edges)
 
-    renderer = cast(Any, dot_graph)
+    renderer = cast("Any", dot_graph)
     payload = renderer.create_svg() if fmt == "svg" else renderer.create_png()
     out_svg.write_bytes(payload)
 
@@ -1289,8 +1290,8 @@ def enforce_policy(
         if len(edge) == EDGE_COMPONENTS
     }
 
-    cycles = cast(CycleList, analysis.get("cycles", []))
-    violations = cast(CycleList, analysis.get("layer_violations", []))
+    cycles = cast("CycleList", analysis.get("cycles", []))
+    violations = cast("CycleList", analysis.get("layer_violations", []))
 
     new_cycles = [cycle for cycle in cycles if tuple(cycle) not in allowed_cycle_set]
     new_violations = [
@@ -1998,7 +1999,7 @@ def _load_layers_config(path: str) -> LayerConfig:
     if not isinstance(data, Mapping):
         message = f"Layers config '{file_path}' must contain a mapping"
         raise SharedValidationError(message)
-    return cast(LayerConfig, data)
+    return cast("LayerConfig", data)
 
 
 def _load_allowlist(path: str) -> dict[str, object]:

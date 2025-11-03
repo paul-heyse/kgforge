@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -13,6 +12,9 @@ from pydantic import BaseModel, Field
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, sqlite_candidates
 from kgfoundry_common.errors import CatalogLoadError
 from kgfoundry_common.problem_details import JsonValue
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -496,7 +498,7 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, J
         msg = f"Invalid catalog format: expected dict, got {type(payload_raw)}"
         raise CatalogLoadError(msg)
 
-    payload: dict[str, JsonValue] = cast(dict[str, JsonValue], payload_raw)
+    payload: dict[str, JsonValue] = cast("dict[str, JsonValue]", payload_raw)
 
     if load_shards and not payload.get("packages"):
         payload = _expand_shards_if_present(path, payload)
@@ -548,11 +550,11 @@ def _expand_shards_if_present(
         msg = f"Invalid shard index format: expected dict, got {type(index_payload_raw)}"
         raise CatalogLoadError(msg)
 
-    index_payload: dict[str, JsonValue] = cast(dict[str, JsonValue], index_payload_raw)
+    index_payload: dict[str, JsonValue] = cast("dict[str, JsonValue]", index_payload_raw)
 
     packages = _load_shard_packages(base_path / index_path.parent, index_payload)
     # Cast packages to JsonValue for assignment to payload dict
-    payload["packages"] = cast(JsonValue, packages)
+    payload["packages"] = cast("JsonValue", packages)
 
     return payload
 
@@ -610,7 +612,7 @@ def _load_shard_packages(
             logger.warning("Invalid shard package format (expected dict) at %s", shard_path)
             continue
 
-        packages.append(cast(dict[str, JsonValue], shard_payload_raw))
+        packages.append(cast("dict[str, JsonValue]", shard_payload_raw))
 
     return packages
 

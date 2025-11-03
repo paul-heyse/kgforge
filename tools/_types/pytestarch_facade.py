@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from importlib import import_module
-from types import ModuleType
-from typing import Protocol, cast, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+    from types import ModuleType
 
 __all__ = [
     "EvaluableArchitectureProtocol",
@@ -89,7 +92,7 @@ def get_layered_architecture_cls() -> type[LayeredArchitectureProtocol]:
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = "pytestarch layered architecture module is missing LayeredArchitecture class"
         raise TypeError(message)
-    return cast(type[LayeredArchitectureProtocol], candidate_obj)
+    return cast("type[LayeredArchitectureProtocol]", candidate_obj)
 
 
 def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
@@ -98,7 +101,7 @@ def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = "pytestarch evaluable architecture module is missing ModuleNameFilter class"
         raise TypeError(message)
-    return cast(type[ModuleNameFilterProtocol], candidate_obj)
+    return cast("type[ModuleNameFilterProtocol]", candidate_obj)
 
 
 def get_layered_architecture_factory() -> Callable[[], LayeredArchitectureProtocol]:
@@ -114,7 +117,7 @@ def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtoc
     if not hasattr(module, "get_evaluable_architecture"):
         message = "pytestarch module is missing get_evaluable_architecture"
         raise AttributeError(message)
-    typed_module = cast(_PytestarchModule, module)
+    typed_module = cast("_PytestarchModule", module)
     return typed_module.get_evaluable_architecture
 
 
@@ -125,5 +128,5 @@ def get_evaluable_architecture_for_module_objects_fn() -> Callable[
     if not hasattr(module, "get_evaluable_architecture_for_module_objects"):
         message = "pytestarch module is missing get_evaluable_architecture_for_module_objects"
         raise AttributeError(message)
-    typed_module = cast(_PytestarchModule, module)
+    typed_module = cast("_PytestarchModule", module)
     return typed_module.get_evaluable_architecture_for_module_objects

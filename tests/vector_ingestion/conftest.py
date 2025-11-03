@@ -7,21 +7,26 @@ behaviour without repeating setup boilerplate.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 from uuid import UUID
 
 import numpy as np
 import pytest
 
 from kgfoundry_common.jsonschema_utils import (
-    Draft202012ValidatorProtocol,
     create_draft202012_validator,
 )
 from kgfoundry_common.schema_helpers import load_schema
-from kgfoundry_common.types import JsonValue
-from kgfoundry_common.vector_types import VectorMatrix
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from kgfoundry_common.jsonschema_utils import (
+        Draft202012ValidatorProtocol,
+    )
+    from kgfoundry_common.types import JsonValue
+    from kgfoundry_common.vector_types import VectorMatrix
 
 type VectorPayload = list[dict[str, object]]
 
@@ -95,7 +100,7 @@ non_numeric_payload: Callable[[], VectorPayload] = pytest.fixture(_non_numeric_p
 
 def _canonical_vector_matrix(canonical_vector_payload: VectorPayload) -> VectorMatrix:
     """Return a numpy matrix representation of the canonical payload."""
-    vectors = [cast(Sequence[float], record["vector"]) for record in canonical_vector_payload]
+    vectors = [cast("Sequence[float]", record["vector"]) for record in canonical_vector_payload]
     return np.asarray(vectors, dtype=np.float32)
 
 

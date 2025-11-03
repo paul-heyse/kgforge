@@ -14,16 +14,15 @@ import os
 import re
 import shutil
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Final, NoReturn, Protocol, assert_never, cast
+from typing import TYPE_CHECKING, Final, NoReturn, Protocol, assert_never, cast
 from urllib.parse import urlparse
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.problem_details import (
-    ProblemDetailsDict,
     ProblemDetailsParams,
     build_problem_details,
 )
@@ -31,10 +30,18 @@ from tools._shared.proc import ToolExecutionError, run_tool
 from tools.detect_pkg import detect_packages, detect_primary
 from tools.griffe_utils import GriffeAPI, resolve_griffe
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from tools._shared.problem_details import (
+        ProblemDetailsDict,
+    )
+    from tools.griffe_utils import GriffeAPI
+
 ROOT = Path(__file__).resolve().parents[1]
 
 try:
-    from tools.griffe_utils import GriffeAPI, resolve_griffe
+    from tools.griffe_utils import resolve_griffe
 except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for packaging installs
     message = (
         "tools.gen_readmes requires the tooling optional extra. Install with "
@@ -45,7 +52,7 @@ except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for pa
 LOGGER = get_logger(__name__)
 
 type JsonPrimitive = str | int | float | bool | None
-type JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
+type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
 
 
@@ -127,7 +134,7 @@ class LoaderFactory(Protocol):
 
 
 _griffe_api: GriffeAPI = resolve_griffe()
-GriffeLoader = cast(LoaderFactory, _griffe_api.loader_type)
+GriffeLoader = cast("LoaderFactory", _griffe_api.loader_type)
 
 SRC = ROOT / "src"
 NAVMAP_PATH = ROOT / "site" / "_build" / "navmap" / "navmap.json"
@@ -328,7 +335,7 @@ def _load_json(path: Path) -> JsonObject:
         with_fields(LOGGER, path=str(path)).debug("Failed to load JSON: %s", exc)
         return {}
     if isinstance(raw, dict):
-        return cast(JsonObject, raw)
+        return cast("JsonObject", raw)
     with_fields(LOGGER, path=str(path), received=type(raw).__name__).debug(
         "Expected object at JSON root, defaulting to empty document",
     )
@@ -474,12 +481,12 @@ class ReadmeConfig:
         packages = tuple(pkg for pkg in (part.strip() for part in packages_arg.split(",")) if pkg)
         if not packages:
             packages = tuple(iter_packages())
-        link_mode = LinkMode(cast(str, namespace.link_mode))
-        editor = EditorMode(cast(str, namespace.editor))
-        fail_on_metadata_miss = bool(cast(bool, namespace.fail_on_metadata_miss))
-        dry_run = bool(cast(bool, namespace.dry_run))
-        verbose = bool(cast(bool, namespace.verbose))
-        run_doctoc = bool(cast(bool, namespace.run_doctoc))
+        link_mode = LinkMode(cast("str", namespace.link_mode))
+        editor = EditorMode(cast("str", namespace.editor))
+        fail_on_metadata_miss = bool(cast("bool", namespace.fail_on_metadata_miss))
+        dry_run = bool(cast("bool", namespace.dry_run))
+        verbose = bool(cast("bool", namespace.verbose))
+        run_doctoc = bool(cast("bool", namespace.run_doctoc))
         return cls(
             packages=packages,
             link_mode=link_mode,
@@ -674,7 +681,7 @@ def _badge_parts(badge: Badges) -> list[str]:
     parts = [
         f"`{label}:{value}`"
         for attr, label in attributes
-        if (value := cast(str | None, getattr(badge, attr)))
+        if (value := cast("str | None", getattr(badge, attr)))
     ]
     test_badge = _format_test_badge(badge.tested_by)
     if test_badge:
@@ -996,8 +1003,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         if cfg.fail_on_metadata_miss and missing_meta:
             detail = "Public symbols are missing owner or stability metadata"
             extensions_payload: dict[str, JsonValue] = {
-                "packages": cast(JsonValue, list(cfg.packages)),
-                "symbols": cast(JsonValue, sorted(missing_meta)),
+                "packages": cast("JsonValue", list(cfg.packages)),
+                "symbols": cast("JsonValue", sorted(missing_meta)),
             }
             problem = build_problem_details(
                 ProblemDetailsParams(

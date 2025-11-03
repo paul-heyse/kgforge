@@ -3,14 +3,19 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from typing import TYPE_CHECKING
 
 from tools.docstring_builder.plugins.base import (
-    PluginContext,
-    PluginStage,
     TransformerPlugin,
 )
-from tools.docstring_builder.schema import ParameterDoc, ReturnDoc
-from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from tools.docstring_builder.plugins.base import (
+        PluginContext,
+        PluginStage,
+    )
+    from tools.docstring_builder.schema import ParameterDoc, ReturnDoc
+    from tools.docstring_builder.semantics import SemanticResult
 
 
 class NormalizeNumpyParamsPlugin(TransformerPlugin):

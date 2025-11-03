@@ -4,21 +4,25 @@ from __future__ import annotations
 
 import datetime
 import json
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from tools.docstring_builder.config import ConfigSelection
-from tools.docstring_builder.ir import IR_VERSION, IRDocstring
-from tools.docstring_builder.models import (
-    CacheSummary,
-    InputHash,
-    PluginReport,
-)
-from tools.docstring_builder.orchestrator import DocstringBuildRequest
+from tools.docstring_builder.ir import IR_VERSION
 from tools.docstring_builder.paths import MANIFEST_PATH
-from tools.docstring_builder.pipeline_types import ProcessingOptions
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from pathlib import Path
+
+    from tools.docstring_builder.config import ConfigSelection
+    from tools.docstring_builder.ir import IRDocstring
+    from tools.docstring_builder.models import (
+        CacheSummary,
+        InputHash,
+        PluginReport,
+    )
+    from tools.docstring_builder.orchestrator import DocstringBuildRequest
+    from tools.docstring_builder.pipeline_types import ProcessingOptions
 
 
 @dataclass(slots=True, frozen=True)
@@ -77,7 +81,7 @@ def write_manifest(ctx: ManifestContext) -> Path:
     if ctx.options.baseline:
         manifest_payload["baseline"] = ctx.options.baseline
     if ctx.selection is not None:
-        selection = cast(ConfigSelection, ctx.selection)
+        selection = cast("ConfigSelection", ctx.selection)
         manifest_payload["config_source"] = {
             "path": str(selection.path),
             "source": str(selection.source),

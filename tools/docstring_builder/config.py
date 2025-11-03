@@ -83,7 +83,7 @@ def _load_toml(path: Path) -> TomlMapping:
         return {}
     LOGGER.debug("Loading docstring builder config from %s", path)
     with path.open("rb") as stream:
-        return cast(TomlMapping, tomllib.load(stream))
+        return cast("TomlMapping", tomllib.load(stream))
 
 
 def _as_list(value: object) -> list[str]:
@@ -100,7 +100,7 @@ def _as_list(value: object) -> list[str]:
 def _package_settings_from(data: Mapping[str, object]) -> PackageSettings:
     packages_value = data.get("packages")
     packages_mapping = (
-        cast(Mapping[str, object], packages_value) if isinstance(packages_value, Mapping) else {}
+        cast("Mapping[str, object]", packages_value) if isinstance(packages_value, Mapping) else {}
     )
     summary_verbs_raw = packages_mapping.get("summary_verbs")
     if isinstance(summary_verbs_raw, Mapping):

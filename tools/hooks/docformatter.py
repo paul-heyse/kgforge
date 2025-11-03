@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Overview of docformatter.
 
 This module bundles docformatter logic for the kgfoundry stack. It groups related helpers so

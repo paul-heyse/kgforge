@@ -1,4 +1,5 @@
-"""Compute schema-validated deltas between symbol index snapshots."""
+#!/usr/bin/env python3
+"""Generate symbol index delta between two builds for documentation caching."""
 
 from __future__ import annotations
 
@@ -9,18 +10,10 @@ import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from docs._scripts import shared
-from docs._scripts.validation import validate_against_schema
-from docs.types.artifacts import (
-    SymbolDeltaChange,
-    symbol_delta_to_payload,
-)
-from docs.types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload
 from tools import (
     ProblemDetailsParams,
-    ToolRunResult,
     build_problem_details,
     get_logger,
     observe_tool_run,
@@ -29,7 +22,19 @@ from tools import (
 )
 from tools._shared.proc import ToolExecutionError
 
+from docs._scripts import shared
+from docs._scripts.validation import validate_against_schema
+from docs.types.artifacts import (
+    SymbolDeltaChange,
+    symbol_delta_to_payload,
+)
+from docs.types.artifacts import SymbolDeltaPayload as TypedSymbolDeltaPayload
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
+
+if TYPE_CHECKING:
+    from tools import (
+        ToolRunResult,
+    )
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -202,7 +207,7 @@ def _coerce_symbol_rows(data: object, *, source: str) -> list[SymbolRow]:
     rows: list[SymbolRow] = []
     for entry in data:
         if isinstance(entry, Mapping):
-            candidate = _make_symbol_row(cast(Mapping[str, JsonValue], entry))
+            candidate = _make_symbol_row(cast("Mapping[str, JsonValue]", entry))
             if candidate is not None:
                 rows.append(candidate)
     return rows
@@ -346,7 +351,7 @@ def _diff_rows(
                     path=path,
                     before=before_subset,
                     after=after_subset,
-                    reasons=cast(tuple[str, ...], tuple(reasons)),
+                    reasons=cast("tuple[str, ...]", tuple(reasons)),
                 )
             )
 
@@ -373,7 +378,7 @@ def _build_delta(
 def write_delta(delta_path: Path, payload: TypedSymbolDeltaPayload) -> bool:
     builtins_payload = symbol_delta_to_payload(payload)
     validate_against_schema(
-        cast(JsonPayload, builtins_payload),
+        cast("JsonPayload", builtins_payload),
         SYMBOL_DELTA_SCHEMA,
         artifact=delta_path.name,
     )
@@ -433,8 +438,8 @@ def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
         help="Destination delta file",
     )
     namespace = parser.parse_args(argv)
-    base_arg = cast(str, getattr(namespace, "base", "HEAD~1"))
-    output_arg = cast(str, getattr(namespace, "output", str(DEFAULT_DELTA_PATH)))
+    base_arg = cast("str", getattr(namespace, "base", "HEAD~1"))
+    output_arg = cast("str", getattr(namespace, "output", str(DEFAULT_DELTA_PATH)))
     return DeltaArgs(base=base_arg, output=output_arg)
 
 

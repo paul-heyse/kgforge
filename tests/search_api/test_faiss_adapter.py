@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 import pytest
 
-from search_api.types import FaissIndexProtocol, IndexArray, VectorArray, wrap_faiss_module
+from search_api.types import wrap_faiss_module
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+
+    import numpy.typing as npt
+
+    from search_api.types import FaissIndexProtocol, IndexArray, VectorArray
 
 
 class _FakeIndex:

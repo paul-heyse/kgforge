@@ -14,14 +14,16 @@ Examples
 
 from __future__ import annotations
 
-from typing import Any, Final, cast
+from typing import TYPE_CHECKING, Any, Final, cast
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from kgfoundry_common.errors import SettingsError
 from kgfoundry_common.logging import get_logger
-from kgfoundry_common.navmap_types import NavMap
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = [
     "FaissConfig",
@@ -161,7 +163,7 @@ class RuntimeSettings(BaseSettings):
         """Initialise settings with fail-fast validation."""
         try:
             cast_overrides: dict[str, Any] = {
-                key: cast(Any, value) for key, value in overrides.items()
+                key: cast("Any", value) for key, value in overrides.items()
             }
             super().__init__(**cast_overrides)
         except Exception as exc:

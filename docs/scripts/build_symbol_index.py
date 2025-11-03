@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from importlib import import_module
-from types import ModuleType
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 MODULE_PATH = "docs._scripts.build_symbol_index"
 
@@ -13,15 +15,15 @@ __all__: tuple[str, ...] = ()
 
 
 def _load_module() -> ModuleType:
-    module = cast(ModuleType | None, getattr(_load_module, "_cache", None))
+    module = cast("ModuleType | None", getattr(_load_module, "_cache", None))
     if module is None:
         module = import_module(MODULE_PATH)
-        _load_module._cache = module  # type: ignore[attr-defined]
+        _load_module._cache = module  # type: ignore[attr-defined] # noqa: SLF001
     return module
 
 
 def _export_names() -> tuple[str, ...]:
-    exports = cast(tuple[str, ...] | None, getattr(_export_names, "_cache", None))
+    exports = cast("tuple[str, ...] | None", getattr(_export_names, "_cache", None))
     if exports is None:
         module = _load_module()
         exports_obj: object | None = getattr(module, "__all__", None)
@@ -30,8 +32,8 @@ def _export_names() -> tuple[str, ...]:
         else:
             names = tuple(name for name in dir(module) if not name.startswith("_"))
         exports = names
-        _export_names._cache = exports  # type: ignore[attr-defined]
-        namespace = cast(dict[str, object], globals())
+        _export_names._cache = exports  # type: ignore[attr-defined] # noqa: SLF001
+        namespace = cast("dict[str, object]", globals())
         namespace["__all__"] = list(exports)
     return exports
 
@@ -40,7 +42,7 @@ def __getattr__(name: str) -> object:
     exports = _export_names()
     if name in exports:
         module = _load_module()
-        return cast(object, getattr(module, name))
+        return cast("object", getattr(module, name))
     message = f"module '{__name__}' has no attribute '{name}'"
     raise AttributeError(message)
 

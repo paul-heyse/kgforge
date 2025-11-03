@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import UserDict
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -12,6 +12,9 @@ from kgfoundry_common.subprocess_utils import (
     SubprocessTimeoutError,
     run_subprocess,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestSubprocessExecution:

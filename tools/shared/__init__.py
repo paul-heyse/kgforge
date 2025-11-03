@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import sys
 from importlib import import_module
-from types import ModuleType
 from typing import TYPE_CHECKING, Final
 
 _SUBMODULES: Final[dict[str, str]] = {
@@ -38,6 +37,8 @@ __all__: tuple[str, ...] = (
 
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from tools._shared import (
         cli,
         logging,

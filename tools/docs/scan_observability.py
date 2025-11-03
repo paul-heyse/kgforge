@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Overview of scan observability.
 
 This module bundles scan observability logic for the kgfoundry stack. It groups related helpers so
@@ -17,11 +16,15 @@ import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from types import ModuleType
-from typing import Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
-from tools._shared.logging import StructuredLoggerAdapter, get_logger, with_fields
+from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
+
+if TYPE_CHECKING:
+    from types import ModuleType
+
+    from tools._shared.logging import StructuredLoggerAdapter
 
 LOGGER: StructuredLoggerAdapter = get_logger(__name__)
 
@@ -290,8 +293,8 @@ def _deep_merge_dicts(
         existing = merged.get(key)
         if isinstance(existing, Mapping) and isinstance(override_value, Mapping):
             merged[key] = _deep_merge_dicts(
-                cast(Mapping[str, object], existing),
-                cast(Mapping[str, object], override_value),
+                cast("Mapping[str, object]", existing),
+                cast("Mapping[str, object]", override_value),
             )
             continue
         merged[key] = override_value
@@ -374,10 +377,10 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
         message = "Policy overrides must include logs and traces mappings"
         raise TypeError(message)
 
-    metric = _build_metric_policy(cast(Mapping[str, object], metric_data), DEFAULT_POLICY.metric)
-    labels = _build_labels_policy(cast(Mapping[str, object], labels_data), DEFAULT_POLICY.labels)
-    logs = _build_logs_policy(cast(Mapping[str, object], logs_data), DEFAULT_POLICY.logs)
-    traces = _build_traces_policy(cast(Mapping[str, object], traces_data), DEFAULT_POLICY.traces)
+    metric = _build_metric_policy(cast("Mapping[str, object]", metric_data), DEFAULT_POLICY.metric)
+    labels = _build_labels_policy(cast("Mapping[str, object]", labels_data), DEFAULT_POLICY.labels)
+    logs = _build_logs_policy(cast("Mapping[str, object]", logs_data), DEFAULT_POLICY.logs)
+    traces = _build_traces_policy(cast("Mapping[str, object]", traces_data), DEFAULT_POLICY.traces)
     error_taxonomy = _coerce_optional_str(
         data.get("error_taxonomy_json"),
         DEFAULT_POLICY.error_taxonomy_json,
@@ -409,7 +412,7 @@ def load_policy() -> ObservabilityPolicy:
         overrides_raw: object = yaml.safe_load(text)
     except Exception as exc:
         yaml_error_type: type[Exception] = cast(
-            type[Exception],
+            "type[Exception]",
             getattr(yaml, "YAMLError", Exception),
         )
         if isinstance(exc, yaml_error_type):
@@ -429,8 +432,8 @@ def load_policy() -> ObservabilityPolicy:
         return policy
 
     merged_data = _deep_merge_dicts(
-        cast(Mapping[str, object], asdict(DEFAULT_POLICY)),
-        cast(Mapping[str, object], overrides_raw),
+        cast("Mapping[str, object]", asdict(DEFAULT_POLICY)),
+        cast("Mapping[str, object]", overrides_raw),
     )
     try:
         policy = _build_policy_from_mapping(merged_data)
@@ -1176,7 +1179,7 @@ def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
     if not isinstance(tax_data_raw, Mapping):
         return {}
 
-    tax_data = cast(Mapping[str, object], tax_data_raw)
+    tax_data = cast("Mapping[str, object]", tax_data_raw)
 
     runbooks: dict[str, str] = {}
     errors_field = tax_data.get("errors")
@@ -1188,7 +1191,7 @@ def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
             extensions = item.get("extensions")
             if not isinstance(message, str) or not isinstance(extensions, Mapping):
                 continue
-            extensions_map = cast(Mapping[str, object], extensions)
+            extensions_map = cast("Mapping[str, object]", extensions)
             runbook_value = extensions_map.get("runbook")
             if isinstance(runbook_value, str):
                 runbooks[message] = runbook_value
@@ -1217,22 +1220,22 @@ def _write_outputs(
     lints: list[LintFinding],
 ) -> None:
     """Persist JSON artefacts used by downstream documentation builders."""
-    metrics_payload = [cast(dict[str, object], asdict(x)) for x in metrics]
+    metrics_payload = [cast("dict[str, object]", asdict(x)) for x in metrics]
     (OUT / "metrics.json").write_text(
         json.dumps(metrics_payload, indent=2) + "\n",
         encoding="utf-8",
     )
-    log_payload = [cast(dict[str, object], asdict(x)) for x in logs]
+    log_payload = [cast("dict[str, object]", asdict(x)) for x in logs]
     (OUT / "log_events.json").write_text(
         json.dumps(log_payload, indent=2) + "\n",
         encoding="utf-8",
     )
-    trace_payload = [cast(dict[str, object], asdict(x)) for x in traces]
+    trace_payload = [cast("dict[str, object]", asdict(x)) for x in traces]
     (OUT / "traces.json").write_text(
         json.dumps(trace_payload, indent=2) + "\n",
         encoding="utf-8",
     )
-    lint_payload = [cast(dict[str, object], asdict(finding)) for finding in lints]
+    lint_payload = [cast("dict[str, object]", asdict(finding)) for finding in lints]
     (OUT / "observability_lint.json").write_text(
         json.dumps(lint_payload, indent=2) + "\n",
         encoding="utf-8",

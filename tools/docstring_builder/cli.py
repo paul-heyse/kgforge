@@ -23,9 +23,9 @@ import argparse
 import json
 import logging
 import sys
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import yaml
 
@@ -41,7 +41,6 @@ from tools.docstring_builder.ir import write_schema
 from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.orchestrator import (
     DocstringBuildRequest,
-    DocstringBuildResult,
     ExitStatus,
     InvalidPathError,
     load_builder_config,
@@ -57,6 +56,13 @@ from tools.docstring_builder.paths import (
 )
 from tools.docstring_builder.policy import PolicyConfigurationError, load_policy_settings
 from tools.stubs.drift_check import run as run_stub_drift
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from tools.docstring_builder.orchestrator import (
+        DocstringBuildResult,
+    )
 
 LOGGER = get_logger(__name__)
 CommandHandler = Callable[[argparse.Namespace], int]
@@ -613,9 +619,9 @@ def _register_subcommand(
 ) -> None:
     name = str(spec["name"])
     help_text = str(spec.get("help_text", ""))
-    handler = cast(CommandHandler, spec["handler"])
+    handler = cast("CommandHandler", spec["handler"])
     include_paths = bool(spec.get("include_paths"))
-    configure = cast(Callable[[argparse.ArgumentParser], None] | None, spec.get("configure"))
+    configure = cast("Callable[[argparse.ArgumentParser], None] | None", spec.get("configure"))
 
     subparser = subparsers.add_parser(name, help=help_text)
     if include_paths:
@@ -736,7 +742,7 @@ def main(argv: list[str] | None = None) -> int:
     if not hasattr(args, "func"):
         parser.print_help()
         return 1
-    handler = cast(CommandHandler, args.func)
+    handler = cast("CommandHandler", args.func)
     return handler(args)
 
 

@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 import msgspec
 from msgspec import DecodeError
@@ -28,6 +28,9 @@ from tools.docs.analytics_models import (
     PortalSessions,
     RepoInfo,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 type JSONMapping = Mapping[str, object]
 
@@ -73,7 +76,7 @@ def _new_document(
 
 def _get_mapping(value: object) -> JSONMapping | None:
     if isinstance(value, Mapping):
-        return cast(JSONMapping, value)
+        return cast("JSONMapping", value)
     return None
 
 
@@ -343,13 +346,13 @@ def _legacy_generated_at(value: object) -> str:
 
 def build_analytics(args: argparse.Namespace) -> AgentAnalyticsDocument:
     """Return the analytics document for the current catalog snapshot."""
-    catalog_path = cast(Path, args.catalog)
-    output_path = cast(Path, args.output)
-    repo_root = cast(Path, args.repo_root)
-    link_sample = cast(int, args.link_sample)
+    catalog_path = cast("Path", args.catalog)
+    output_path = cast("Path", args.output)
+    repo_root = cast("Path", args.repo_root)
+    link_sample = cast("int", args.link_sample)
 
     catalog_payload: object = load_catalog_payload(catalog_path, load_shards=True)
-    catalog = cast(JSONMapping, catalog_payload)
+    catalog = cast("JSONMapping", catalog_payload)
     previous = _load_previous(output_path)
     metrics = _catalog_metrics(catalog)
     broken_links = _check_links(catalog, repo_root, link_sample)
@@ -366,7 +369,7 @@ def write_analytics(args: argparse.Namespace) -> None:
     document = build_analytics(args)
     payload: dict[str, object] = msgspec.to_builtins(document)
     validate_tools_payload(payload, ANALYTICS_SCHEMA)
-    output = cast(Path, args.output)
+    output = cast("Path", args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(payload, indent=2)
     output.write_text(encoded, encoding="utf-8")

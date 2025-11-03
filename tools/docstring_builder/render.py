@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
-from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from jinja2 import Environment, StrictUndefined
-from jinja2.runtime import Undefined
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+    from pathlib import Path
+
+    from jinja2.runtime import Undefined
     from jinja2.utils import select_autoescape
+
+    from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 else:
     try:
         from jinja2.utils import select_autoescape
@@ -20,13 +23,11 @@ else:
             return lambda _filename=None: True
 
 
-from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
-
 _TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignature\n---------\n{{ signature }}{% endif %}{% if schema.extended %}\n\n{{ schema.extended }}{% endif %}{% if schema.parameters %}\n\nParameters\n----------\n{% for parameter in schema.parameters %}{{ parameter.display_name or parameter.name }} : {{ parameter.annotation or 'Any' }}{% if parameter.optional %}, optional{% endif %}{% if parameter.default %}, by default {{ parameter.default }}{% endif %}\n    {{ parameter.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.returns %}\n\n{% set has_yields = schema.returns|selectattr('kind', 'equalto', 'yields')|list|length > 0 %}{% if has_yields %}Yields\n------\n{% else %}Returns\n-------\n{% endif %}{% for entry in schema.returns %}{{ entry.annotation or 'Any' }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.raises %}\n\nRaises\n------\n{% for entry in schema.raises %}{{ entry.exception }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.notes %}\n\nNotes\n-----\n{% for note in schema.notes %}{{ note }}\n{% endfor %}{% endif %}{% if schema.see_also %}\n\nSee Also\n--------\n{% for link in schema.see_also %}{{ link }}\n{% endfor %}{% endif %}{% if schema.examples %}\n\nExamples\n--------\n{% for example in schema.examples %}{{ example }}\n{% endfor %}{% endif %}"""
 
 
 def _build_environment() -> Environment:
-    undefined_cls = cast(type[Undefined], StrictUndefined)
+    undefined_cls = cast("type[Undefined]", StrictUndefined)
     return Environment(
         undefined=undefined_cls,
         trim_blocks=False,
@@ -109,25 +110,25 @@ def _group_parameters(
 def _compose_signature(groups: dict[str, list[str] | str | None]) -> str:
     """Return the rendered signature string for grouped parameters."""
     parts: list[str] = []
-    pos_only = cast(list[str], groups.get("positional_only", []))
+    pos_only = cast("list[str]", groups.get("positional_only", []))
     if pos_only:
         parts.append(", ".join(pos_only) + " /")
 
-    pos_or_kw = cast(list[str], groups.get("positional_or_keyword", []))
+    pos_or_kw = cast("list[str]", groups.get("positional_or_keyword", []))
     if pos_or_kw:
         parts.append(", ".join(pos_or_kw))
 
-    var_positional = cast(str | None, groups.get("var_positional"))
+    var_positional = cast("str | None", groups.get("var_positional"))
     if var_positional:
         parts.append(var_positional)
 
-    kw_only = cast(list[str], groups.get("keyword_only", []))
+    kw_only = cast("list[str]", groups.get("keyword_only", []))
     if kw_only:
         if not var_positional:
             parts.append("*")
         parts.append(", ".join(kw_only))
 
-    var_keyword = cast(str | None, groups.get("var_keyword"))
+    var_keyword = cast("str | None", groups.get("var_keyword"))
     if var_keyword:
         parts.append(var_keyword)
 

@@ -10,21 +10,28 @@ required configuration is missing.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 from pydantic import Field, ValidationError, field_validator
-from pydantic.fields import FieldInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from tools._shared.problem_details import (
-    JsonValue,
-    ProblemDetailsDict,
     ProblemDetailsParams,
     build_problem_details,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from pydantic.fields import FieldInfo
+
+    from tools._shared.problem_details import (
+        JsonValue,
+        ProblemDetailsDict,
+    )
 
 __all__: Final[list[str]] = [
     "SettingsError",
@@ -151,7 +158,7 @@ class ToolRuntimeSettings(BaseSettings):
     @classmethod
     def _normalise_allowlist(cls, value: object) -> tuple[str, ...]:
         if value is None:
-            fields = cast(Mapping[str, FieldInfo], cls.model_fields)
+            fields = cast("Mapping[str, FieldInfo]", cls.model_fields)
             default_field = fields.get("exec_allowlist")
             if default_field is None:
                 return ()

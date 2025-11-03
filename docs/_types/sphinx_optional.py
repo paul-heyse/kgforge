@@ -139,7 +139,7 @@ def load_optional_dependencies() -> OptionalDependencies:
 
     # If we get here, both are available
     # Return facades wrapping the actual modules/objects
-    manager_facade = cast(AstroidManagerFacade, astroid.MANAGER)
+    manager_facade = cast("AstroidManagerFacade", astroid.MANAGER)
     return _OptionalDependenciesImpl(
         autoapi_parser=parser_cls,
         astroid_manager=manager_facade,

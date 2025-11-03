@@ -18,11 +18,9 @@ Examples
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from docs._scripts import shared
-
 from kgfoundry_common.errors import ArtifactDependencyError
 from kgfoundry_common.optional_deps import (
     safe_import_autoapi,
@@ -30,6 +28,8 @@ from kgfoundry_common.optional_deps import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator, Mapping
+
     from docs._scripts.shared import BuildEnvironment
 
 __all__ = [

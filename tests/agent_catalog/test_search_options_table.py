@@ -10,11 +10,12 @@ Tests verify:
 from __future__ import annotations
 
 import logging
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
-from _pytest.logging import LogCaptureFixture
+if TYPE_CHECKING:
+    from _pytest.logging import LogCaptureFixture
 
-from tests.agent_catalog.conftest import SearchOptionsFactory
+    from tests.agent_catalog.conftest import SearchOptionsFactory
 
 SUCCESS_CASES: Final[tuple[tuple[list[str], int, float], ...]] = (
     (["document", "section"], 1000, 0.5),

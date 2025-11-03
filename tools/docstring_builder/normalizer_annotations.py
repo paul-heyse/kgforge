@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Annotated, Literal, cast, get_args, get_origin
+from typing import TYPE_CHECKING, Annotated, Literal, cast, get_args, get_origin
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 __all__ = ["format_annotation"]
 
@@ -174,7 +176,7 @@ def _format_module_attribute(
     qualname = getattr(annotation, "__qualname__", None)
     if module_name is None or qualname is None:
         return None
-    qualname_str = cast(str, qualname)
+    qualname_str = cast("str", qualname)
     if module_name in {"builtins", "typing", "collections.abc"}:
         return qualname_str
     module_alias = _module_alias(module_name, module_globals)

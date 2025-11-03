@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Overview of export schemas.
 
 This module bundles export schemas logic for the kgfoundry stack. It groups related helpers so
@@ -15,17 +14,16 @@ import json
 import os
 import pkgutil
 import sys
-from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
 
 from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
-    pass
+    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from types import ModuleType
 
 LOGGER = get_logger(__name__)
 
@@ -186,7 +184,7 @@ def _load_navmap() -> dict[str, Any]:
     if not NAVMAP.exists():
         return {}
     try:
-        return cast(dict[str, Any], json.loads(NAVMAP.read_text(encoding="utf-8")))
+        return cast("dict[str, Any]", json.loads(NAVMAP.read_text(encoding="utf-8")))
     except (json.JSONDecodeError, OSError, UnicodeDecodeError):
         return {}
 
@@ -487,12 +485,12 @@ def _export_one_pydantic(
     if cfg.ref_template:
         kwargs["ref_template"] = cfg.ref_template
 
-    model_any = cast(Any, model_cls)
-    schema = cast(dict[str, object], model_any.model_json_schema(**kwargs))
+    model_any = cast("Any", model_cls)
+    schema = cast("dict[str, object]", model_any.model_json_schema(**kwargs))
     _apply_headers(schema, module_name, name, cfg.base_url)
     _inject_versions(schema, _nav_versions(module_name, name, nav))
     _inject_examples(schema, _example_for_pydantic(model_cls))
-    return (OUT / f"{module_name}.{name}.json", cast(dict[str, object], _sorted(schema)))
+    return (OUT / f"{module_name}.{name}.json", cast("dict[str, object]", _sorted(schema)))
 
 
 def _export_one_pandera(
@@ -543,7 +541,7 @@ def _export_one_pandera(
     _apply_headers(schema, module_name, name, cfg.base_url)
     _inject_versions(schema, _nav_versions(module_name, name, nav))
     _inject_examples(schema, _example_for_pandera(model_cls))
-    return (OUT / f"{module_name}.{name}.json", cast(dict[str, object], _sorted(schema)))
+    return (OUT / f"{module_name}.{name}.json", cast("dict[str, object]", _sorted(schema)))
 
 
 def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
@@ -566,7 +564,7 @@ def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
             continue
         for name, obj in vars(module).items():
             if is_pydantic_model(obj) or is_pandera_model(obj):
-                model_cls = cast(type[object], obj)
+                model_cls = cast("type[object]", obj)
                 yield module_name, name, model_cls
 
 

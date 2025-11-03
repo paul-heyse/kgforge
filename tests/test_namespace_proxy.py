@@ -6,10 +6,13 @@ caching, and error handling without relying on Any types.
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from types import ModuleType
+from typing import TYPE_CHECKING
 
 import pytest
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def _set_module_attr(module: ModuleType, name: str, value: object) -> None:

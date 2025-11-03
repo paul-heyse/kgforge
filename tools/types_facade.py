@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from tools._types.pytestarch_facade import (
     EvaluableArchitectureProtocol,
@@ -15,6 +15,9 @@ from tools._types.pytestarch_facade import (
     get_module_name_filter_cls,
     get_module_name_filter_factory,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 LayeredArchitecture: type[LayeredArchitectureProtocol] = get_layered_architecture_cls()
 ModuleNameFilter: type[ModuleNameFilterProtocol] = get_module_name_filter_cls()

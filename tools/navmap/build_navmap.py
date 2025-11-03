@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Overview of build navmap.
 
 This module bundles build navmap logic for the kgfoundry stack. It groups related helpers so
@@ -14,10 +13,9 @@ import json
 import os
 import re
 import sys
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from tools import ToolExecutionError, get_logger, run_tool, validate_tools_payload
 from tools.drift_preview import write_html_diff
@@ -26,13 +24,19 @@ from tools.navmap.document_models import (
     navmap_document_from_index,
 )
 from tools.navmap.models import (
-    ModuleEntryDict,
-    ModuleMetaDict,
-    NavIndexDict,
-    NavSectionDict,
-    SymbolMetaDict,
     nav_index_from_dict,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from tools.navmap.models import (
+        ModuleEntryDict,
+        ModuleMetaDict,
+        NavIndexDict,
+        NavSectionDict,
+        SymbolMetaDict,
+    )
 
 LOGGER = get_logger(__name__)
 
@@ -208,7 +212,7 @@ def _literal_eval_navmap(node: ast.AST | None) -> NavTree:
 
 def _expand_all_placeholder(exports: Sequence[str]) -> list[ResolvedNavValue]:
     """Return a deduplicated list of exports for ``__all__`` placeholders."""
-    return cast(list[ResolvedNavValue], _dedupe_exports(exports))
+    return cast("list[ResolvedNavValue]", _dedupe_exports(exports))
 
 
 def _expand_all_dict_template(
@@ -269,7 +273,8 @@ def _replace_placeholders(value: NavTree, exports: Sequence[str]) -> ResolvedNav
     if isinstance(value, dict):
         return _expand_dict(value, exports)
     if isinstance(value, set):
-        return _expand_set(cast(set[str], value), exports)
+        str_values = cast("set[str]", value)
+        return _expand_set(str_values, exports)
     return value
 
 
@@ -812,7 +817,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    target = cast(Path | None, args.write)
+    target = cast("Path | None", args.write)
     build_index(json_path=target)
     destination = target or INDEX_PATH
     LOGGER.info("[navmap] regenerated %s", destination)

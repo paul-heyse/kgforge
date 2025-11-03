@@ -23,13 +23,15 @@ dtype('float32')
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final, NewType, cast
 
 import numpy as np
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
+    from collections.abc import Iterable, Sequence
+
     import numpy.typing as npt
 
     type VectorMatrix = npt.NDArray[np.float32]
@@ -276,7 +278,7 @@ def _coerce_vector_row(vector_obj: object, idx: int) -> list[float]:
         raise VectorValidationError(msg)
 
     contiguous = np.ascontiguousarray(array, dtype=np.float32)
-    return cast(list[float], contiguous.astype(np.float32, copy=False).tolist())
+    return cast("list[float]", contiguous.astype(np.float32, copy=False).tolist())
 
 
 __all__ = [

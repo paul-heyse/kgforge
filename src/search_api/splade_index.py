@@ -8,14 +8,16 @@ for implementation specifics.
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import duckdb
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["SpladeDoc", "SpladeIndex", "tok"]
 

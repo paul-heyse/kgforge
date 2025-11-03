@@ -10,13 +10,16 @@ Tests verify:
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from kgfoundry_common.problem_details import ProblemDetailsDict
-from kgfoundry_common.types import JsonValue
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from kgfoundry_common.problem_details import ProblemDetailsDict
+    from kgfoundry_common.types import JsonValue
 
 
 class TestCatalogSchemaRoundTrip:

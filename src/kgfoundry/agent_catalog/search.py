@@ -19,35 +19,43 @@ import json
 import os
 import re
 import warnings
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import Protocol, TypedDict, Unpack, cast
+from typing import TYPE_CHECKING, Protocol, TypedDict, Unpack, cast
 
 import numpy as np
 
 from kgfoundry_common.errors import AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.numpy_typing import (
-    FloatMatrix,
-    FloatVector,
-    IntVector,
-    topk_indices,
+    normalize_l2 as _normalize_l2_array,
 )
 from kgfoundry_common.numpy_typing import (
-    normalize_l2 as _normalize_l2_array,
+    topk_indices,
 )
 from kgfoundry_common.observability import MetricsProvider
 from orchestration.safe_pickle import dump as safe_pickle_dump
 from orchestration.safe_pickle import load as safe_pickle_load
 from search_api.types import (
     FaissIndexProtocol,
-    FaissModuleProtocol,
-    IndexArray,
-    VectorArray,
     wrap_faiss_module,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from kgfoundry_common.numpy_typing import (
+        FloatMatrix,
+        FloatVector,
+        IntVector,
+    )
+    from search_api.types import (
+        FaissModuleProtocol,
+        IndexArray,
+        VectorArray,
+    )
 
 logger = get_logger(__name__)
 
@@ -806,13 +814,13 @@ class _SimpleFaissIndex(FaissIndexProtocol):
         indices: IntVector = -np.ones((query_count, k), dtype=np.int64)
         if self._vectors.size == 0:
             return distances, indices
-        similarity_matrix: FloatMatrix = cast(FloatMatrix, queries @ self._vectors.T)
+        similarity_matrix: FloatMatrix = cast("FloatMatrix", queries @ self._vectors.T)
         if similarity_matrix.ndim != EMBEDDING_MATRIX_RANK:
             message = "Unexpected similarity matrix shape"
             raise AgentCatalogSearchError(message)
         top_k = min(k, similarity_matrix.shape[1])
         for row_idx in range(similarity_matrix.shape[0]):
-            scores_row = cast(FloatVector, similarity_matrix[row_idx])
+            scores_row = cast("FloatVector", similarity_matrix[row_idx])
             top_indices = topk_indices(scores_row, top_k)
             distances[row_idx, :top_k] = scores_row[top_indices]
             indices[row_idx, :top_k] = top_indices
@@ -868,7 +876,7 @@ class _SimpleFaissModule:
         FaissIndexProtocol
             Flat index instance.
         """
-        return cast(FaissIndexProtocol, _SimpleFaissModule._create_flat_index(dimension))
+        return cast("FaissIndexProtocol", _SimpleFaissModule._create_flat_index(dimension))
 
     @staticmethod
     def index_factory(dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
@@ -895,7 +903,7 @@ class _SimpleFaissModule:
         """
         del factory_string, metric
         # Simple implementation ignores factory configuration and always returns flat index
-        return cast(FaissIndexProtocol, _SimpleFaissModule._create_flat_index(dimension))
+        return cast("FaissIndexProtocol", _SimpleFaissModule._create_flat_index(dimension))
 
     @staticmethod
     def index_id_map2(index: FaissIndexProtocol) -> FaissIndexProtocol:
@@ -915,7 +923,7 @@ class _SimpleFaissModule:
         FaissIndexProtocol
             Index with ID mapping (same instance in simple implementation).
         """
-        return cast(FaissIndexProtocol, _SimpleFaissModule._ensure_simple_index(index))
+        return cast("FaissIndexProtocol", _SimpleFaissModule._ensure_simple_index(index))
 
     @staticmethod
     def write_index(index: FaissIndexProtocol, path: str) -> None:
@@ -931,7 +939,7 @@ class _SimpleFaissModule:
             File path for the persisted index.
         """
         simple_index = _SimpleFaissModule._ensure_simple_index(index)
-        vectors_payload = cast(list[list[float]], simple_index._vectors.tolist())
+        vectors_payload = cast("list[list[float]]", simple_index._vectors.tolist())
         payload: dict[str, object] = {
             "dimension": int(simple_index.dimension),
             "vectors": vectors_payload,
@@ -971,7 +979,7 @@ class _SimpleFaissModule:
             raise AgentCatalogSearchError(message)
 
         # Type-narrowed payload for subsequent operations
-        payload: dict[str, object] = cast(dict[str, object], payload_raw)
+        payload: dict[str, object] = cast("dict[str, object]", payload_raw)
         vectors_payload = payload.get("vectors", [])
         vectors = np.asarray(vectors_payload, dtype=np.float32)
         dimension_raw = payload.get("dimension")
@@ -989,7 +997,7 @@ class _SimpleFaissModule:
                 message = "Stored semantic index vectors have an unexpected shape"
                 raise AgentCatalogSearchError(message)
             fallback._vectors = np.ascontiguousarray(vectors, dtype=np.float32)
-        return cast(FaissIndexProtocol, fallback)
+        return cast("FaissIndexProtocol", fallback)
 
     @staticmethod
     def normalize_l2(vectors: VectorArray) -> None:
@@ -1228,7 +1236,7 @@ def build_document_from_payload(
     docfacts_payload = symbol.get("docfacts")
     # Type-narrow docfacts_payload: only pass if it's a Mapping
     docfacts_input: Mapping[str, JsonLike] | None = (
-        cast(Mapping[str, JsonLike], docfacts_payload)
+        cast("Mapping[str, JsonLike]", docfacts_payload)
         if isinstance(docfacts_payload, Mapping)
         else None
     )
@@ -1582,7 +1590,7 @@ def _resolve_semantic_index_metadata(
         )
     # Type cast for return - semantic_meta is validated as Mapping above
     semantic_meta_typed: CatalogMapping = cast(
-        CatalogMapping,
+        "CatalogMapping",
         semantic_meta,
     )
     return semantic_meta_typed, index_path, mapping_path
@@ -1612,7 +1620,7 @@ def _load_row_lookup(
         raise AgentCatalogSearchError(message)
     # Type-narrowed payload for subsequent operations
     mapping_payload: CatalogMapping = cast(
-        CatalogMapping,
+        "CatalogMapping",
         mapping_payload_raw,
     )
     symbols_payload = mapping_payload.get("symbols")
@@ -1663,7 +1671,7 @@ def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
         raise AgentCatalogSearchError(
             message, cause=exc, context={"model_name": model_name}
         ) from exc
-    return cast(EmbeddingModelProtocol, model)
+    return cast("EmbeddingModelProtocol", model)
 
 
 def _resolve_embedding_model(
@@ -1715,7 +1723,7 @@ def _encode_query(
 
 def _extract_semantic_metadata(raw_meta: CatalogMapping) -> PrimitiveMapping:
     return cast(
-        PrimitiveMapping,
+        "PrimitiveMapping",
         {
             key: value
             for key, value in raw_meta.items()
@@ -1756,8 +1764,8 @@ def _scores_from_indices(
 
     query_rows = np.asarray(indices[0, :], dtype=np.int64, order="C")
     score_rows = np.asarray(distances[0, :], dtype=np.float32, order="C")
-    row_sequence = cast(Sequence[int], query_rows.tolist())
-    score_sequence = cast(Sequence[float], score_rows.tolist())
+    row_sequence = cast("Sequence[int]", query_rows.tolist())
+    score_sequence = cast("Sequence[float]", score_rows.tolist())
     row_list: list[int] = [int(value) for value in row_sequence]
     score_list: list[float] = [float(value) for value in score_sequence]
     scores: dict[str, float] = {}
@@ -1895,7 +1903,7 @@ def search_catalog(
     search_config = catalog.get("search")
     alpha_value, candidate_limit = resolve_search_parameters(
         cast(
-            CatalogMapping | None,
+            "CatalogMapping | None",
             search_config if isinstance(search_config, Mapping) else None,
         ),
         opts,

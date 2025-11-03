@@ -14,25 +14,25 @@ import logging
 import math
 import re
 from collections import Counter, defaultdict
-from collections.abc import Iterable, Sequence
 from pathlib import Path
-from re import Pattern
-from types import ModuleType
 from typing import TYPE_CHECKING, BinaryIO, Final, Protocol, cast
-
-if TYPE_CHECKING:
-    pass
 
 from kgfoundry_common.config import load_config
 from kgfoundry_common.errors import DeserializationError
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.safe_pickle_v2 import (
     SignedPickleWrapper,
     UnsafeSerializationError,
     load_unsigned_legacy,
 )
 from kgfoundry_common.serialization import deserialize_json, serialize_json
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from re import Pattern
+    from types import ModuleType
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
 
 TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
 
@@ -78,7 +78,7 @@ def _load_unsigned_payload(handle: BinaryIO, legacy_path: Path) -> dict[str, Jso
         msg = f"Invalid legacy pickle payload: expected dict, got {type(payload_obj)}"
         raise DeserializationError(msg)
 
-    return cast(dict[str, JsonValue], payload_obj)
+    return cast("dict[str, JsonValue]", payload_obj)
 
 
 def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
@@ -103,7 +103,7 @@ def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
                             f"Invalid signed legacy payload: expected dict, got {type(payload_obj)}"
                         )
                         raise DeserializationError(msg)
-                    payload = cast(dict[str, JsonValue], payload_obj)
+                    payload = cast("dict[str, JsonValue]", payload_obj)
             else:
                 logger.warning(
                     "Missing signing key; using unsigned legacy pickle loader",
@@ -330,7 +330,7 @@ class PureImpactIndex:
         list[str]
             Describe return value.
         """
-        matches = cast(list[str], TOKEN_RE.findall(text))
+        matches = cast("list[str]", TOKEN_RE.findall(text))
         return [token.lower() for token in matches]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
@@ -413,7 +413,7 @@ class PureImpactIndex:
                 if not isinstance(data_raw, dict):
                     msg = f"Invalid index data format: expected dict, got {type(data_raw)}"
                     raise DeserializationError(msg)
-                data_dict = cast(dict[str, JsonValue], data_raw)
+                data_dict = cast("dict[str, JsonValue]", data_raw)
         elif legacy_path.exists():
             data_dict = _load_legacy_metadata(legacy_path)
             logger.warning("Loaded legacy pickle index. Consider migrating to JSON format.")
@@ -427,7 +427,7 @@ class PureImpactIndex:
         postings_val: JsonValue = data_dict.get("postings", {})
 
         # Type narrowing and conversion
-        self.df = cast(dict[str, int], df_val) if isinstance(df_val, dict) else {}
+        self.df = cast("dict[str, int]", df_val) if isinstance(df_val, dict) else {}
         self.N = int(n_val) if isinstance(n_val, (int, float)) else 0
         # postings is dict[str, dict[str, float]] - need to convert nested dict values
         if isinstance(postings_val, dict):
@@ -537,7 +537,7 @@ class LuceneImpactIndex:
         try:
             lucene_search_module: ModuleType = importlib.import_module("pyserini.search.lucene")
             lucene_impact_searcher_cls = cast(
-                LuceneImpactSearcherFactory,
+                "LuceneImpactSearcherFactory",
                 lucene_search_module.LuceneImpactSearcher,
             )
         except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency

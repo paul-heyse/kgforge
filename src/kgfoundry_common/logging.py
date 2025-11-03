@@ -18,14 +18,13 @@ import json
 import logging
 import sys
 import time
-from collections.abc import Mapping
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
-from types import TracebackType
 from typing import TYPE_CHECKING, Any, Final, Self, cast
 
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.types import JsonValue
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.types import JsonValue
 
 __all__ = [
     "CorrelationContext",
@@ -315,6 +314,8 @@ class JsonFormatter(logging.Formatter):
 
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from types import TracebackType
 
     class _LoggerAdapterBase:  # pragma: no cover - typing helper
         """Typing helper matching logging.LoggerAdapter interface."""
@@ -428,7 +429,7 @@ class LoggerAdapter(_LoggerAdapterBase):
 
     def debug(self, msg: object, *args: object, **kwargs: object) -> None:
         """Log a debug message with structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
@@ -453,7 +454,7 @@ class LoggerAdapter(_LoggerAdapterBase):
 
     def info(self, msg: object, *args: object, **kwargs: object) -> None:
         """Log an info message with structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
@@ -478,7 +479,7 @@ class LoggerAdapter(_LoggerAdapterBase):
 
     def warning(self, msg: object, *args: object, **kwargs: object) -> None:
         """Log a warning message with structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
@@ -503,7 +504,7 @@ class LoggerAdapter(_LoggerAdapterBase):
 
     def error(self, msg: object, *args: object, **kwargs: object) -> None:
         """Log an error message with structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
@@ -534,14 +535,14 @@ class LoggerAdapter(_LoggerAdapterBase):
         **kwargs: object,
     ) -> None:
         """Log an error with traceback using structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         if "exc_info" not in kwargs_dict or kwargs_dict["exc_info"] is False:
             kwargs_dict["exc_info"] = exc_info
         self.error(msg, *args, **kwargs_dict)
 
     def critical(self, msg: object, *args: object, **kwargs: object) -> None:
         """Log a critical message with structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
@@ -566,7 +567,7 @@ class LoggerAdapter(_LoggerAdapterBase):
 
     def log(self, level: int, msg: object, *args: object, **kwargs: object) -> None:
         """Log a message at the given level with structured fields."""
-        kwargs_dict = cast(dict[str, Any], kwargs)
+        kwargs_dict = cast("dict[str, Any]", kwargs)
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}

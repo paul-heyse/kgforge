@@ -12,20 +12,24 @@ from __future__ import annotations
 import importlib.util
 import inspect
 import sys
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from unittest import mock
 
 import pytest
 from docs._scripts.shared import detect_environment
 from docs._types.griffe import (
     GriffeFacade,
-    GriffeNode,
     build_facade,
     get_autoapi_loader,
     get_sphinx_loader,
 )
 
 from kgfoundry_common.errors import ArtifactDependencyError
+
+if TYPE_CHECKING:
+    from docs._types.griffe import (
+        GriffeNode,
+    )
 
 # Skip all tests if griffe is not available
 griffe = pytest.importorskip("griffe")
@@ -219,7 +223,7 @@ class TestGriffeNodeProtocol:
     @pytest.fixture(name="test_node")
     def _test_node(self) -> GriffeNode:
         """Load a real Griffe node for testing."""
-        return cast(GriffeNode, griffe.load("pathlib"))
+        return cast("GriffeNode", griffe.load("pathlib"))
 
     def test_node_has_path_property(self, test_node: GriffeNode) -> None:
         """Verify loaded node has path property."""

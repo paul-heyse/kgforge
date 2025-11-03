@@ -8,7 +8,7 @@ import os
 import sys
 import time
 import uuid
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -22,6 +22,8 @@ from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
 from kgfoundry_common.problem_details import JsonValue
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from kgfoundry.agent_catalog.search import (
         MetricsProvider,
         SearchOptions,
@@ -40,13 +42,6 @@ else:
     build_faceted_search_options = catalog_search.build_faceted_search_options
     build_default_search_options = catalog_search.build_default_search_options
 
-
-if TYPE_CHECKING:
-    pass
-
-
-if TYPE_CHECKING:
-    pass
 
 CommandHandler = Callable[[AgentCatalogClient, argparse.Namespace], None]
 
@@ -112,7 +107,7 @@ def _build_success_payload(
     metadata_payload: dict[str, JsonValue] = {}
     return {
         "query": query,
-        "results": cast(JsonValue, results_payload),
+        "results": cast("JsonValue", results_payload),
         "total": len(results),
         "took_ms": int(duration_seconds * 1000),
         "metadata": metadata_payload,
@@ -208,7 +203,7 @@ def _parse_facets(raw: list[str]) -> dict[str, str]:
 
 def _extract_facet_args(namespace: argparse.Namespace) -> list[str]:
     """Return CLI facet arguments as a list of strings."""
-    raw_value = cast(list[str] | None, getattr(namespace, "facet", None))
+    raw_value = cast("list[str] | None", getattr(namespace, "facet", None))
     if raw_value is None:
         return []
     return raw_value
@@ -529,7 +524,7 @@ def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         message = f"Unknown symbol: {symbol_id}"
         raise CatalogctlError(message)
     # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
-    _render_json(cast(dict[str, JsonValue], symbol.model_dump()))
+    _render_json(cast("dict[str, JsonValue]", symbol.model_dump()))
 
 
 def _cmd_find_callers(client: AgentCatalogClient, args: argparse.Namespace) -> None:
@@ -578,7 +573,7 @@ def _cmd_change_impact(client: AgentCatalogClient, args: argparse.Namespace) -> 
     """
     symbol_id: str = args.symbol_id
     # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
-    _render_json(cast(dict[str, JsonValue], client.change_impact(symbol_id).model_dump()))
+    _render_json(cast("dict[str, JsonValue]", client.change_impact(symbol_id).model_dump()))
 
 
 def _cmd_suggest_tests(client: AgentCatalogClient, args: argparse.Namespace) -> None:
@@ -653,7 +648,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
                         duration_seconds=duration,
                         correlation_id=correlation_id,
                     ),
-                    problem=cast(dict[str, JsonValue], problem),
+                    problem=cast("dict[str, JsonValue]", problem),
                 )
                 _render_json(envelope)
             else:
@@ -661,17 +656,14 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
             log_adapter.exception("Search failed", exc_info=exc)
             return
 
-        query = cast(str, args.query)
-        k_value = max(1, cast(int, args.k))
+        query = cast("str", args.query)
+        k_value = max(1, cast("int", args.k))
         try:
             # model_dump returns dict[str, object] - cast immediately to avoid Any expression
             # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]
             results: list[SearchResult] = search_catalog(
                 cast(
-                    Mapping[
-                        str,
-                        str | int | float | bool | list[object] | dict[str, object] | None,
-                    ],
+                    "Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]",
                     client.catalog.model_dump(),
                 ),
                 request=SearchRequest(
@@ -697,7 +689,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
                 _render_json(envelope)
             else:
                 # asdict returns dict[str, Any], cast to JsonValue since SearchResult is JSON-serializable
-                _render_json([cast(dict[str, JsonValue], asdict(result)) for result in results])
+                _render_json([cast("dict[str, JsonValue]", asdict(result)) for result in results])
             log_adapter.info(
                 "Search completed", extra={"status": "success", "result_count": len(results)}
             )
@@ -705,7 +697,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
             duration = time.perf_counter() - start_time
             problem_details = exc.to_problem_details(instance="urn:cli:agent_catalog:search")
             if use_envelope:
-                problem_payload = cast(dict[str, JsonValue], problem_details)
+                problem_payload = cast("dict[str, JsonValue]", problem_details)
                 errors_payload = _build_error_entries(exc, problem_payload)
                 envelope = _build_cli_envelope(
                     EnvelopeContext(
@@ -719,7 +711,7 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
                 )
                 _render_json(envelope)
             else:
-                _render_error(str(exc), problem=cast(dict[str, JsonValue], problem_details))
+                _render_error(str(exc), problem=cast("dict[str, JsonValue]", problem_details))
             log_adapter.exception("Search failed", exc_info=exc)
             raise
 
@@ -744,17 +736,14 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
     with with_fields(
         logger, operation="cli_explain_ranking", correlation_id=correlation_id, status="started"
     ) as log_adapter:
-        query = cast(str, args.query)
-        k_value = max(1, cast(int, args.k))
+        query = cast("str", args.query)
+        k_value = max(1, cast("int", args.k))
         try:
             # model_dump returns dict[str, object] - cast immediately to avoid Any expression
             # Cast to expected search_catalog type: Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]
             results: list[SearchResult] = search_catalog(
                 cast(
-                    Mapping[
-                        str,
-                        str | int | float | bool | list[object] | dict[str, object] | None,
-                    ],
+                    "Mapping[str, str | int | float | bool | list[object] | dict[str, object] | None]",
                     client.catalog.model_dump(),
                 ),
                 request=SearchRequest(
@@ -780,7 +769,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
                 _render_json(envelope)
             else:
                 # asdict returns dict[str, Any], cast to JsonValue since SearchResult is JSON-serializable
-                _render_json([cast(dict[str, JsonValue], asdict(result)) for result in results])
+                _render_json([cast("dict[str, JsonValue]", asdict(result)) for result in results])
             log_adapter.info(
                 "Explain ranking completed",
                 extra={"status": "success", "result_count": len(results)},
@@ -791,7 +780,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
                 instance="urn:cli:agent_catalog:explain-ranking"
             )
             if use_envelope:
-                problem_payload = cast(dict[str, JsonValue], problem_details)
+                problem_payload = cast("dict[str, JsonValue]", problem_details)
                 errors_payload = _build_error_entries(exc, problem_payload)
                 envelope = _build_cli_envelope(
                     EnvelopeContext(
@@ -805,7 +794,7 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
                 )
                 _render_json(envelope)
             else:
-                _render_error(str(exc), problem=cast(dict[str, JsonValue], problem_details))
+                _render_error(str(exc), problem=cast("dict[str, JsonValue]", problem_details))
             log_adapter.exception("Explain ranking failed", exc_info=exc)
             raise
 
@@ -850,11 +839,11 @@ def main(argv: list[str] | None = None) -> int:
     set_correlation_id(correlation_id)
     start_time = time.perf_counter()
 
-    command_name = cast(str, getattr(args, "command", ""))
-    handler = cast(CommandHandler | None, getattr(args, "command_handler", None))
+    command_name = cast("str", getattr(args, "command", ""))
+    handler = cast("CommandHandler | None", getattr(args, "command_handler", None))
     if handler is None:
         _raise_unknown_command_error(command_name)
-    command_handler = cast(CommandHandler, handler)
+    command_handler = cast("CommandHandler", handler)
 
     with with_fields(
         logger,
@@ -911,7 +900,7 @@ def main(argv: list[str] | None = None) -> int:
                 correlation_id=correlation_id,
             )
             if use_envelope:
-                problem_payload = cast(dict[str, JsonValue], problem_details)
+                problem_payload = cast("dict[str, JsonValue]", problem_details)
                 _emit_problem_response(
                     exc=exc,
                     problem=problem_payload,
@@ -922,7 +911,7 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 _emit_problem_response(
                     exc=exc,
-                    problem=cast(dict[str, JsonValue], problem_details),
+                    problem=cast("dict[str, JsonValue]", problem_details),
                     context=error_context,
                     use_envelope=False,
                     render_problem_to_stderr=True,
@@ -941,7 +930,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             if use_envelope:
                 problem_payload = cast(
-                    dict[str, JsonValue],
+                    "dict[str, JsonValue]",
                     {
                         "type": "https://kgfoundry.dev/problems/runtime-error",
                         "title": "Internal Error",

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools.docstring_builder.io import read_baseline_version
 from tools.docstring_builder.paths import (
@@ -14,8 +14,12 @@ from tools.docstring_builder.paths import (
     REPO_ROOT,
     SCHEMA_DIFF_PATH,
 )
-from tools.docstring_builder.pipeline_types import ProcessingOptions
 from tools.drift_preview import DocstringDriftEntry, write_docstring_drift, write_html_diff
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from tools.docstring_builder.pipeline_types import ProcessingOptions
 
 
 @dataclass(slots=True)

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Validate Sphinx-Gallery examples used throughout the kgfoundry docs."""
 
 from __future__ import annotations
@@ -8,13 +7,15 @@ import ast
 import inspect
 import re
 import sys
-from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from re import Pattern
-from typing import Final, cast
+from typing import TYPE_CHECKING, Final, cast
 
 from tools._shared.logging import get_logger
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from re import Pattern
 
 LOGGER = get_logger(__name__)
 
@@ -129,7 +130,7 @@ def check_custom_labels(docstring: str) -> list[str]:
     Sphinx-Gallery generates its own anchors; any ``.. _gallery_*:`` labels
     should be removed to avoid duplicates.
     """
-    return cast(list[str], CUSTOM_LABEL_PATTERN.findall(docstring))
+    return cast("list[str]", CUSTOM_LABEL_PATTERN.findall(docstring))
 
 
 def _has_tags_directive(docstring: str) -> bool:
@@ -285,10 +286,10 @@ def _parse_args(argv: list[str]) -> GalleryOptions:
         help="Reserved for future automatic fixes.",
     )
     parsed = parser.parse_args(argv)
-    examples_dir = cast(Path, parsed.examples_dir)
-    strict_flag = bool(cast(bool, parsed.strict))
-    verbose_flag = bool(cast(bool, parsed.verbose))
-    fix_flag = bool(cast(bool, parsed.fix))
+    examples_dir = cast("Path", parsed.examples_dir)
+    strict_flag = bool(cast("bool", parsed.strict))
+    verbose_flag = bool(cast("bool", parsed.verbose))
+    fix_flag = bool(cast("bool", parsed.fix))
     return GalleryOptions(
         examples_dir=examples_dir,
         strict=strict_flag,

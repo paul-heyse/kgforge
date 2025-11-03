@@ -8,40 +8,18 @@ import json
 import os
 import time
 from collections import Counter
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from operator import itemgetter
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from tools.docstring_builder.builder_types import (
-    DocstringBuildRequest,
     DocstringBuildResult,
-    ExitStatus,
-    LoggerLike,
 )
-from tools.docstring_builder.cache import BuilderCache
-from tools.docstring_builder.config import BuilderConfig, ConfigSelection
-from tools.docstring_builder.diff_manager import DiffManager
-from tools.docstring_builder.docfacts import DOCFACTS_VERSION, DocFact
-from tools.docstring_builder.docfacts_coordinator import DocfactsCoordinator
-from tools.docstring_builder.file_processor import FileProcessor
+from tools.docstring_builder.docfacts import DOCFACTS_VERSION
 from tools.docstring_builder.io import dependents_for, hash_file
-from tools.docstring_builder.ir import IRDocstring
 from tools.docstring_builder.manifest_builder import ManifestContext, write_manifest
-from tools.docstring_builder.metrics import MetricsRecorder
 from tools.docstring_builder.models import (
-    CacheSummary,
-    CliResult,
-    DocfactsReport,
-    ErrorReport,
-    FileReport,
-    InputHash,
-    ObservabilityReport,
-    PluginReport,
-    RunStatus,
-    RunSummary,
-    StatusCounts,
     build_cli_result_skeleton,
     validate_cli_output,
 )
@@ -56,10 +34,42 @@ from tools.docstring_builder.paths import (
 from tools.docstring_builder.pipeline_types import (
     ErrorEnvelope,
     FileOutcome,
-    ProcessingOptions,
 )
-from tools.docstring_builder.plugins import PluginManager
-from tools.docstring_builder.policy import PolicyEngine, PolicyReport
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from tools.docstring_builder.builder_types import (
+        DocstringBuildRequest,
+        ExitStatus,
+        LoggerLike,
+    )
+    from tools.docstring_builder.cache import BuilderCache
+    from tools.docstring_builder.config import BuilderConfig, ConfigSelection
+    from tools.docstring_builder.diff_manager import DiffManager
+    from tools.docstring_builder.docfacts import DocFact
+    from tools.docstring_builder.docfacts_coordinator import DocfactsCoordinator
+    from tools.docstring_builder.file_processor import FileProcessor
+    from tools.docstring_builder.ir import IRDocstring
+    from tools.docstring_builder.metrics import MetricsRecorder
+    from tools.docstring_builder.models import (
+        CacheSummary,
+        CliResult,
+        DocfactsReport,
+        ErrorReport,
+        FileReport,
+        InputHash,
+        ObservabilityReport,
+        PluginReport,
+        RunStatus,
+        RunSummary,
+        StatusCounts,
+    )
+    from tools.docstring_builder.pipeline_types import (
+        ProcessingOptions,
+    )
+    from tools.docstring_builder.plugins import PluginManager
+    from tools.docstring_builder.policy import PolicyEngine, PolicyReport
 
 
 def _repo_relative_path(path: Path) -> str:
@@ -86,6 +96,7 @@ def _coerce_int(value: object) -> int:
 
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
     from typing import Protocol
 
     from tools.docstring_builder.models import ProblemDetails as ModelProblemDetails

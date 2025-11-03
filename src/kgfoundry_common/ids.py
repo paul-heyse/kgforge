@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import base64
 import hashlib
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["urn_chunk", "urn_doc_from_text"]
 

@@ -11,21 +11,22 @@ import logging
 import math
 import re
 from collections import defaultdict
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from importlib import import_module
 from pathlib import Path
-from re import Pattern
 from typing import TYPE_CHECKING, Final, Protocol, cast
 
-if TYPE_CHECKING:
-    pass
-
 from kgfoundry_common.errors import DeserializationError
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Sequence
+    from re import Pattern
+
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ def _load_json_metadata(metadata_path: Path, schema_path: Path) -> dict[str, Jso
     if not isinstance(data_raw, dict):
         msg = f"Invalid index data format: expected dict, got {type(data_raw)}"
         raise DeserializationError(msg)
-    return cast(dict[str, JsonValue], data_raw)
+    return cast("dict[str, JsonValue]", data_raw)
 
 
 __navmap__: Final[NavMap] = {
@@ -247,7 +248,7 @@ class PurePythonBM25:
         list[str]
             Lowercased tokens extracted from the text.
         """
-        matches = cast(list[str], TOKEN_RE.findall(text))
+        matches = cast("list[str]", TOKEN_RE.findall(text))
         return [token.lower() for token in matches]
 
     def _create_doc(
@@ -371,14 +372,16 @@ class PurePythonBM25:
         if not isinstance(payload, dict):
             msg = f"Invalid pickle data format: expected dict, got {type(payload)}"
             raise DeserializationError(msg)
-        return cast(dict[str, JsonValue], payload)
+        return cast("dict[str, JsonValue]", payload)
 
     def _initialize_from_payload(self, data: Mapping[str, JsonValue]) -> None:
         self._apply_scalar_metadata(data)
         self.docs = self._build_docs_from_metadata(data)
         postings_val = data.get("postings", {})
         self.postings = (
-            cast(dict[str, dict[str, int]], postings_val) if isinstance(postings_val, dict) else {}
+            cast("dict[str, dict[str, int]]", postings_val)
+            if isinstance(postings_val, dict)
+            else {}
         )
 
     def _apply_scalar_metadata(self, data: Mapping[str, JsonValue]) -> None:
@@ -388,11 +391,13 @@ class PurePythonBM25:
         self.b = float(b_val) if isinstance(b_val, (int, float)) else 0.4
         field_boosts_val = data.get("field_boosts", _DEFAULT_FIELD_BOOSTS)
         if isinstance(field_boosts_val, Mapping):
-            self.field_boosts = _normalize_field_boosts(cast(Mapping[str, float], field_boosts_val))
+            self.field_boosts = _normalize_field_boosts(
+                cast("Mapping[str, float]", field_boosts_val)
+            )
         else:
             self.field_boosts = dict(_DEFAULT_FIELD_BOOSTS)
         df_val = data.get("df", {})
-        self.df = cast(dict[str, int], df_val) if isinstance(df_val, dict) else {}
+        self.df = cast("dict[str, int]", df_val) if isinstance(df_val, dict) else {}
         n_val = data.get("N", 0)
         avgdl_val = data.get("avgdl", 0.0)
         self.N = int(n_val) if isinstance(n_val, (int, float)) else 0
@@ -419,7 +424,7 @@ class PurePythonBM25:
                 tf_map = (
                     {
                         str(term): int(freq)
-                        for term, freq in cast(dict[object, object], tf_raw).items()
+                        for term, freq in cast("dict[object, object]", tf_raw).items()
                         if isinstance(term, str) and isinstance(freq, (int, float))
                     }
                     if isinstance(tf_raw, dict)
@@ -435,7 +440,7 @@ class PurePythonBM25:
 
         docs_val = data.get("docs", {})
         if isinstance(docs_val, dict):
-            return cast(dict[str, BM25Doc], docs_val)
+            return cast("dict[str, BM25Doc]", docs_val)
         return {}
 
     def _idf(self, term: str) -> float:
@@ -633,18 +638,18 @@ def _load_lucene_indexer_factory() -> LuceneIndexerFactory:
     except Exception as exc:  # pragma: no cover - depends on optional dependency
         msg = "pyserini.index.lucene module is unavailable"
         raise RuntimeError(msg) from exc
-    candidate_raw = getattr(module, "LuceneIndexer", None)  # type: ignore[misc]
-    if not isinstance(candidate_raw, type):  # type: ignore[misc]  # pragma: no cover - defensive branch
+    candidate_raw = module.__dict__.get("LuceneIndexer")
+    if not isinstance(candidate_raw, type):  # pragma: no cover - defensive branch
         msg = "pyserini index module is missing 'LuceneIndexer'"
         raise TypeError(msg)
-    candidate_obj = cast(type[object], candidate_raw)
-    candidate_callable = cast(Callable[[str], object], candidate_obj)
+    candidate_obj = cast("type[object]", candidate_raw)
+    candidate_callable = cast("Callable[[str], object]", candidate_obj)
 
     def factory(index_directory: str) -> LuceneIndexerProtocol:
         instance_obj = candidate_callable(index_directory)
-        return cast(LuceneIndexerProtocol, instance_obj)
+        return cast("LuceneIndexerProtocol", instance_obj)
 
-    return cast(LuceneIndexerFactory, factory)
+    return cast("LuceneIndexerFactory", factory)
 
 
 def _load_lucene_searcher_factory() -> LuceneSearcherFactory:
@@ -653,18 +658,18 @@ def _load_lucene_searcher_factory() -> LuceneSearcherFactory:
     except Exception as exc:  # pragma: no cover - depends on optional dependency
         msg = "pyserini.search.lucene module is unavailable"
         raise RuntimeError(msg) from exc
-    candidate_raw = getattr(module, "LuceneSearcher", None)  # type: ignore[misc]
-    if not isinstance(candidate_raw, type):  # type: ignore[misc]  # pragma: no cover - defensive branch
+    candidate_raw = module.__dict__.get("LuceneSearcher")
+    if not isinstance(candidate_raw, type):  # pragma: no cover - defensive branch
         msg = "pyserini search module is missing 'LuceneSearcher'"
         raise TypeError(msg)
-    candidate_obj = cast(type[object], candidate_raw)
-    candidate_callable = cast(Callable[[str], object], candidate_obj)
+    candidate_obj = cast("type[object]", candidate_raw)
+    candidate_callable = cast("Callable[[str], object]", candidate_obj)
 
     def factory(index_directory: str) -> LuceneSearcherProtocol:
         instance_obj = candidate_callable(index_directory)
-        return cast(LuceneSearcherProtocol, instance_obj)
+        return cast("LuceneSearcherProtocol", instance_obj)
 
-    return cast(LuceneSearcherFactory, factory)
+    return cast("LuceneSearcherFactory", factory)
 
 
 def get_bm25(

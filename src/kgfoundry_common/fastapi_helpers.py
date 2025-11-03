@@ -11,17 +11,22 @@ from __future__ import annotations
 
 import asyncio
 import time
-from collections.abc import Awaitable, Callable
-from typing import TypeVar, cast
+from collections.abc import Callable
+from typing import TYPE_CHECKING, TypeVar, cast
 
-from fastapi import Depends, FastAPI, Request
-from fastapi.params import Depends as DependsMarker
+from fastapi import Depends
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request as StarletteRequest
-from starlette.responses import Response
-from starlette.types import ASGIApp
 
 from kgfoundry_common.logging import get_correlation_id, get_logger, with_fields
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable
+
+    from fastapi import FastAPI, Request
+    from fastapi.params import Depends as DependsMarker
+    from starlette.requests import Request as StarletteRequest
+    from starlette.responses import Response
+    from starlette.types import ASGIApp
 
 __all__ = [
     "DEFAULT_TIMEOUT_SECONDS",
@@ -85,7 +90,7 @@ def typed_dependency[T](
             return result
 
     marker: DependsMarker = Depends(_instrumented)
-    return cast(object, marker)
+    return cast("object", marker)
 
 
 def typed_exception_handler(
@@ -103,7 +108,7 @@ def typed_exception_handler(
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
             exception_name = cast(
-                str,
+                "str",
                 getattr(exception_type, "__name__", exception_type.__class__.__name__),
             )
             log.info(
@@ -129,7 +134,7 @@ def typed_exception_handler(
             )
             return result
 
-    handler_callable = cast(Callable[[Request, Exception], Awaitable[Response]], _wrapped)
+    handler_callable = cast("Callable[[Request, Exception], Awaitable[Response]]", _wrapped)
     app.add_exception_handler(exception_type, handler_callable)
 
 

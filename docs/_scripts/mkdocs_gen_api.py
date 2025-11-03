@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol, cast, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
 import mkdocs_gen_files
-from docs._scripts import shared
 from tools import get_logger
+
+from docs._scripts import shared
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -59,15 +63,15 @@ def _render_node(node: DocumentableNode, destination: Path) -> RenderedPage:
 
 
 def _documentable_members(node: DocumentableNode) -> Iterable[DocumentableNode]:
-    members_attr = cast(object, getattr(node, "members", None))
+    members_attr = cast("object", getattr(node, "members", None))
     if not isinstance(members_attr, Mapping):
         return ()
-    members = cast(Mapping[str, object], members_attr)
+    members = cast("Mapping[str, object]", members_attr)
     filtered: list[DocumentableNode] = []
     for member in members.values():
-        member_node = cast(DocumentableNode, member)
-        is_package = cast(bool, getattr(member_node, "is_package", False))
-        is_module = cast(bool, getattr(member_node, "is_module", False))
+        member_node = cast("DocumentableNode", member)
+        is_package = cast("bool", getattr(member_node, "is_package", False))
+        is_module = cast("bool", getattr(member_node, "is_module", False))
         if is_package or is_module:
             filtered.append(member_node)
     return tuple(filtered)
@@ -84,7 +88,7 @@ def generate_api_reference(
     pages: list[RenderedPage] = [_render_index(target)]
 
     for package in packages:
-        module = cast(DocumentableNode, loader.load(package))
+        module = cast("DocumentableNode", loader.load(package))
         pages.append(_render_node(module, target))
         pages.extend(_render_node(member, target) for member in _documentable_members(module))
 

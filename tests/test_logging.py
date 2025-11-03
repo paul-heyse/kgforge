@@ -4,21 +4,26 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Mapping
 from io import StringIO
-from typing import Final, cast
-
-from _pytest.logging import LogCaptureFixture
+from typing import TYPE_CHECKING, Final, cast
 
 from kgfoundry_common.logging import (
     CorrelationContext,
     JsonFormatter,
-    LoggerAdapter,
     get_correlation_id,
     get_logger,
     set_correlation_id,
     with_fields,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from _pytest.logging import LogCaptureFixture
+
+    from kgfoundry_common.logging import (
+        LoggerAdapter,
+    )
 
 
 def parse_log_record(raw: str) -> dict[str, object]:
@@ -118,8 +123,8 @@ def test_log_success_method(caplog: LogCaptureFixture) -> None:
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
-    assert cast(str, getattr(record, "status", None)) == "success"
-    assert cast(str, getattr(record, "operation", None)) == "build_index"
+    assert cast("str", getattr(record, "status", None)) == "success"
+    assert cast("str", getattr(record, "operation", None)) == "build_index"
 
 
 def test_log_failure_method(caplog: LogCaptureFixture) -> None:
@@ -136,8 +141,8 @@ def test_log_failure_method(caplog: LogCaptureFixture) -> None:
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
-    assert cast(str, getattr(record, "status", None)) == "error"
-    assert cast(str, getattr(record, "operation", None)) == "save_data"
+    assert cast("str", getattr(record, "status", None)) == "error"
+    assert cast("str", getattr(record, "operation", None)) == "save_data"
 
 
 def test_log_io_method(caplog: LogCaptureFixture) -> None:
@@ -155,7 +160,7 @@ def test_log_io_method(caplog: LogCaptureFixture) -> None:
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
-    assert cast(float, getattr(record, "duration_ms", None)) == 500.0
+    assert cast("float", getattr(record, "duration_ms", None)) == 500.0
 
 
 STATUS_CASES: Final[tuple[tuple[int, str], ...]] = (
@@ -174,7 +179,7 @@ def test_status_inferred_from_level(caplog: LogCaptureFixture) -> None:
         logger.log(log_level, "Test message")
         assert len(caplog.records) == 1
         record = caplog.records[0]
-        assert cast(str, getattr(record, "status", None)) == expected_status
+        assert cast("str", getattr(record, "status", None)) == expected_status
 
 
 def test_correlation_context_sets_and_clears_id() -> None:
@@ -210,8 +215,8 @@ def test_with_fields_context_manager(caplog: LogCaptureFixture) -> None:
 
     assert len(caplog.records) == 1
     record = caplog.records[0]
-    assert cast(str, getattr(record, "correlation_id", None)) == "req789"
-    assert cast(str, getattr(record, "operation", None)) == "search"
+    assert cast("str", getattr(record, "correlation_id", None)) == "req789"
+    assert cast("str", getattr(record, "operation", None)) == "search"
 
 
 def test_correlation_id_propagates_through_logger(
@@ -225,7 +230,7 @@ def test_correlation_id_propagates_through_logger(
     try:
         logger.info("Test message")
         record = caplog.records[0]
-        assert cast(str, getattr(record, "correlation_id", None)) == "req-prop-123"
+        assert cast("str", getattr(record, "correlation_id", None)) == "req-prop-123"
     finally:
         set_correlation_id(None)
 
@@ -238,5 +243,5 @@ def test_adapter_merges_extra_fields(caplog: LogCaptureFixture) -> None:
     logger.info("Test", extra={"service": "api", "endpoint": "/search"})
 
     record = caplog.records[0]
-    assert cast(str, getattr(record, "service", None)) == "api"
-    assert cast(str, getattr(record, "endpoint", None)) == "/search"
+    assert cast("str", getattr(record, "service", None)) == "api"
+    assert cast("str", getattr(record, "endpoint", None)) == "/search"

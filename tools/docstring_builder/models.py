@@ -22,17 +22,14 @@ Key goals addressed by these models:
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Final, Literal, NotRequired, Protocol, Required, TypedDict, cast
+from typing import TYPE_CHECKING, Final, Literal, NotRequired, Protocol, Required, TypedDict, cast
 
 from kgfoundry_common.jsonschema_utils import (
-    Draft202012ValidatorProtocol,
     ValidationError,
-    ValidationErrorProtocol,
     create_draft202012_validator,
 )
 from tools._shared.problem_details import (
@@ -40,6 +37,14 @@ from tools._shared.problem_details import (
     SchemaProblemDetailsParams,
     build_schema_problem_details,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from kgfoundry_common.jsonschema_utils import (
+        Draft202012ValidatorProtocol,
+        ValidationErrorProtocol,
+    )
 
 JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
@@ -649,10 +654,10 @@ def make_cli_result(  # noqa: PLR0913, C901, PLR0912
 
 
 _DOCFACTS_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
-    cast(dict[str, JsonValue], json.loads(_DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")))
+    cast("dict[str, JsonValue]", json.loads(_DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")))
 )
 _CLI_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
-    cast(dict[str, JsonValue], json.loads(_CLI_SCHEMA_PATH.read_text(encoding="utf-8")))
+    cast("dict[str, JsonValue]", json.loads(_CLI_SCHEMA_PATH.read_text(encoding="utf-8")))
 )
 
 
@@ -686,7 +691,7 @@ def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
                 extensions={"schemaVersion": schema_version or ""},
             )
         )
-        problem_payload = cast(ProblemDetails, problem)
+        problem_payload = cast("ProblemDetails", problem)
         detail_message = str(problem_payload.get("detail", "DocFacts schema validation failed"))
         raise SchemaViolationError(detail_message, problem=problem_payload) from exc
 
@@ -713,7 +718,7 @@ def validate_cli_output(payload: CliResult) -> None:
                 extensions={"schemaVersion": schema_version or ""},
             )
         )
-        problem_payload = cast(ProblemDetails, problem)
+        problem_payload = cast("ProblemDetails", problem)
         detail_message = str(problem_payload.get("detail", "CLI schema validation failed"))
         raise SchemaViolationError(detail_message, problem=problem_payload) from exc
 
@@ -733,7 +738,7 @@ def _normalise_parameter(parameter: Mapping[str, object]) -> DocfactsParameter:
     entry["default"] = str(default_value) if default_value is not None else None
     kind_value = parameter.get("kind")
     if isinstance(kind_value, str) and kind_value in _PARAMETER_KINDS:
-        entry["kind"] = cast(ParameterKind, kind_value)
+        entry["kind"] = cast("ParameterKind", kind_value)
     else:
         entry["kind"] = "positional_or_keyword"
     return entry
@@ -743,7 +748,9 @@ def _normalise_return(value: Mapping[str, object]) -> DocfactsReturn:
     kind_raw = str(value.get("kind", "returns"))
     entry: DocfactsReturn = {
         "kind": (
-            cast(Literal["returns", "yields"], kind_raw) if kind_raw in _RETURN_KINDS else "returns"
+            cast("Literal['returns', 'yields']", kind_raw)
+            if kind_raw in _RETURN_KINDS
+            else "returns"
         ),
     }
     annotation = value.get("annotation")
@@ -766,7 +773,7 @@ def _build_docfacts_entry(fact: DocFactLike) -> DocfactsEntry:
     return {
         "qname": fact.qname,
         "module": fact.module,
-        "kind": cast(SymbolKind, fact.kind) if fact.kind in _SYMBOL_KINDS else "function",
+        "kind": cast("SymbolKind", fact.kind) if fact.kind in _SYMBOL_KINDS else "function",
         "filepath": fact.filepath,
         "lineno": fact.lineno,
         "end_lineno": fact.end_lineno,
@@ -854,7 +861,7 @@ def build_cli_result_skeleton(status: RunStatus) -> CliResult:
 
 
 def _json_pointer_from(error: ValidationErrorProtocol) -> str | None:
-    raw_path = cast(Sequence[object], getattr(error, "absolute_path", ()))
+    raw_path = cast("Sequence[object]", getattr(error, "absolute_path", ()))
     tokens: list[str] = []
     for part in raw_path:
         if part is None:
@@ -867,13 +874,13 @@ def _json_pointer_from(error: ValidationErrorProtocol) -> str | None:
 
 def _coerce_parameter_kind(kind: str | None) -> ParameterKind:
     if kind in _PARAMETER_KINDS:
-        return cast(ParameterKind, kind)
+        return cast("ParameterKind", kind)
     return "positional_or_keyword"
 
 
 def _coerce_symbol_kind(kind: str | None) -> SymbolKind:
     if kind in _SYMBOL_KINDS:
-        return cast(SymbolKind, kind)
+        return cast("SymbolKind", kind)
     return "function"
 
 

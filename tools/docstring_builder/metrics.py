@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from kgfoundry_common.prometheus import CounterLike, HistogramLike
-from tools.docstring_builder.builder_types import ExitStatus
+if TYPE_CHECKING:
+    from kgfoundry_common.prometheus import CounterLike, HistogramLike
+    from tools.docstring_builder.builder_types import ExitStatus
 
 
 class _Histogram(Protocol):

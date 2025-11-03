@@ -41,28 +41,35 @@ import argparse
 import json
 import logging
 import sys
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+from tools import (
+    get_logger,
+    observe_tool_run,
+)
+from tools._shared.proc import ToolExecutionError
 
 from docs._scripts import shared
 from docs._scripts.validation import validate_against_schema
 from docs.types.artifacts import (
-    JsonPayload,
-    SymbolDeltaPayload,
-    SymbolIndexArtifacts,
     symbol_delta_from_json,
     symbol_delta_to_payload,
     symbol_index_from_json,
     symbol_index_to_payload,
 )
-from tools import (
-    get_logger,
-    observe_tool_run,
-)
-from tools._shared.problem_details import ProblemDetailsDict
-from tools._shared.proc import ToolExecutionError
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from tools._shared.problem_details import ProblemDetailsDict
+
+    from docs.types.artifacts import (
+        JsonPayload,
+        SymbolDeltaPayload,
+        SymbolIndexArtifacts,
+    )
 
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
@@ -163,7 +170,7 @@ def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
         raise ArtifactValidationError(message, artifact_name="symbols.json")
 
     try:
-        raw_data: JsonPayload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        raw_data: JsonPayload = cast("JsonPayload", json.loads(path.read_text(encoding="utf-8")))
         artifacts = symbol_index_from_json(raw_data)
     except (ValueError, TypeError, json.JSONDecodeError) as e:
         message = f"Failed to parse symbol index: {e}"
@@ -205,7 +212,7 @@ def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
         raise ArtifactValidationError(message, artifact_name="symbols.delta.json")
 
     try:
-        raw_data: JsonPayload = cast(JsonPayload, json.loads(path.read_text(encoding="utf-8")))
+        raw_data: JsonPayload = cast("JsonPayload", json.loads(path.read_text(encoding="utf-8")))
         payload = symbol_delta_from_json(raw_data)
     except (ValueError, TypeError, json.JSONDecodeError) as e:
         message = f"Failed to parse symbol delta: {e}"
@@ -261,7 +268,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Artifact names to validate (default: all)",
     )
     args = parser.parse_args(argv)
-    artifact_names_from_args: list[str] | None = cast(list[str] | None, args.artifacts)
+    artifact_names_from_args: list[str] | None = cast("list[str] | None", args.artifacts)
 
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)

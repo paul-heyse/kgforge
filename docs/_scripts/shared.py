@@ -3,17 +3,15 @@
 from __future__ import annotations
 
 import json
-import logging
 import os
 import sys
-from collections.abc import Callable
 from contextlib import suppress
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol, cast
 
-from tools import StructuredLoggerAdapter, get_logger, with_fields
+from tools import get_logger, with_fields
 from tools.detect_pkg import detect_packages, detect_primary
 from tools.griffe_utils import resolve_griffe
 
@@ -37,7 +35,11 @@ __all__ = [
 LOGGER = get_logger(__name__)
 
 if TYPE_CHECKING:
+    import logging
+    from collections.abc import Callable
+
     from griffe import Object as GriffeRuntimeObject
+    from tools import StructuredLoggerAdapter
 
     GriffeObject = GriffeRuntimeObject
 else:
@@ -90,7 +92,7 @@ class WarningLogger(Protocol):
 
 
 def _loader_factory() -> Callable[..., GriffeLoader]:
-    return cast(Callable[..., GriffeLoader], resolve_griffe().loader_type)
+    return cast("Callable[..., GriffeLoader]", resolve_griffe().loader_type)
 
 
 @lru_cache(maxsize=1)
@@ -237,7 +239,7 @@ def build_warning_logger(
     >>> logger.warning("Operation started", extra={"status": "pending"})
     """
     logger = make_logger(operation, artifact=artifact)
-    return cast(WarningLogger, logger)
+    return cast("WarningLogger", logger)
 
 
 def safe_json_serialize(
@@ -273,7 +275,7 @@ def safe_json_serialize(
     >>> success
     True
     """
-    dest_logger: WarningLogger = logger or cast(WarningLogger, LOGGER)
+    dest_logger: WarningLogger = logger or cast("WarningLogger", LOGGER)
     temp_path = path.with_suffix(path.suffix + ".tmp")
 
     try:
@@ -323,7 +325,7 @@ def safe_json_deserialize(
     >>> isinstance(data, dict)
     True
     """
-    dest_logger: WarningLogger = logger or cast(WarningLogger, LOGGER)
+    dest_logger: WarningLogger = logger or cast("WarningLogger", LOGGER)
 
     try:
         if not path.exists():

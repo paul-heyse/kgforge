@@ -7,11 +7,12 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from prefect import flow, task
 
-from kgfoundry_common.navmap_types import NavMap
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = ["e2e_flow", "t_echo"]
 

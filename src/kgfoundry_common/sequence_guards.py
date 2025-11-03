@@ -23,8 +23,7 @@ When sequence is empty, raises a Problem Details error:
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from kgfoundry_common.errors import VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
@@ -32,6 +31,9 @@ from kgfoundry_common.problem_details import (
     build_problem_details,
     render_problem,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 logger = get_logger(__name__)
 

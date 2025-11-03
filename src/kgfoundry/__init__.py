@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import sys
 from importlib import import_module
-from types import ModuleType
 from typing import TYPE_CHECKING
 
 _ALIASES: dict[str, str] = {
@@ -52,9 +51,12 @@ if __debug__:
     if expected != configured:
         missing = sorted(expected.difference(configured))
         extra = sorted(configured.difference(expected))
-        raise RuntimeError(f"kgfoundry exports mismatch. missing={missing!r} extra={extra!r}")
+        message = f"kgfoundry exports mismatch. missing={missing!r} extra={extra!r}"
+        raise RuntimeError(message)
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     kgfoundry_common: ModuleType = import_module("kgfoundry_common")
     docling: ModuleType = import_module("kgfoundry.docling")
     download: ModuleType = import_module("kgfoundry.download")

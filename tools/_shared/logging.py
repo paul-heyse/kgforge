@@ -20,8 +20,7 @@ Examples
 
 from __future__ import annotations
 
-import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from kgfoundry_common.logging import (
     LoggerAdapter,
@@ -30,7 +29,10 @@ from kgfoundry_common.logging import (
     get_logger as _get_logger_base,
 )
 
-__all__ = ["LogValue", "StructuredLoggerAdapter", "get_logger", "with_fields"]
+if TYPE_CHECKING:
+    import logging
+
+__all__ = ["LogValue", "LoggerAdapter", "StructuredLoggerAdapter", "get_logger", "with_fields"]
 
 # Type alias for log values (same as Any, but more explicit)
 type LogValue = Any

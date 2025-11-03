@@ -1,5 +1,3 @@
-# ruff: noqa: PLC2701
-
 """Public facade re-exporting typed helpers for documentation tooling.
 
 This module wraps the internal ``docs._types`` package so that other modules

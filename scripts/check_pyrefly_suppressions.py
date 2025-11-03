@@ -27,10 +27,12 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 
 class _ParsedArgs(argparse.Namespace):
@@ -103,7 +105,7 @@ def _parse_args(argv: Sequence[str] | None) -> _ParsedArgs:
         help="Exit with code 0 even if suppressions found (dry-run mode)",
     )
     parsed = parser.parse_args(argv)
-    return cast(_ParsedArgs, parsed)
+    return cast("_ParsedArgs", parsed)
 
 
 def _iter_python_files(target: Path) -> Iterable[Path]:
@@ -171,7 +173,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parse_args(argv)
 
     try:
-        scan_result = _scan_targets(cast(Sequence[Path], args.paths))
+        scan_result = _scan_targets(cast("Sequence[Path]", args.paths))
     except FileNotFoundError as exc:
         sys.stderr.write(f"error: {exc}\n")
         return 2

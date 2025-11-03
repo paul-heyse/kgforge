@@ -59,9 +59,9 @@ def resolve_griffe() -> GriffeAPI:
         dataclasses_module = None
 
     if loader_module is not None:
-        loader_cls = cast(GriffeLoaderType, loader_module.GriffeLoader)
+        loader_cls = cast("GriffeLoaderType", loader_module.GriffeLoader)
     else:
-        loader_cls = cast(GriffeLoaderType, griffe_module.GriffeLoader)
+        loader_cls = cast("GriffeLoaderType", griffe_module.GriffeLoader)
 
     symbols_source = dataclasses_module if dataclasses_module else griffe_module
     class_attr: object = symbols_source.Class
@@ -69,10 +69,10 @@ def resolve_griffe() -> GriffeAPI:
     module_attr: object = symbols_source.Module
     object_attr: object = griffe_module.Object
 
-    class_cls = cast(type, class_attr)
-    function_cls = cast(type, function_attr)
-    module_cls = cast(type, module_attr)
-    object_cls = cast(type, object_attr)
+    class_cls = cast("type", class_attr)
+    function_cls = cast("type", function_attr)
+    module_cls = cast("type", module_attr)
+    object_cls = cast("type", object_attr)
 
     _GRIFFE_CACHE.instance = GriffeAPI(
         package=griffe_module,

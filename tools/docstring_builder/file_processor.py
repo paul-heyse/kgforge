@@ -3,33 +3,40 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from importlib import import_module
-from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from tools.docstring_builder.builder_types import ExitStatus, LoggerLike
-from tools.docstring_builder.cache import BuilderCache
+from tools.docstring_builder.builder_types import ExitStatus
 from tools.docstring_builder.config import BuilderConfig
-from tools.docstring_builder.docfacts import DocFact, build_docfacts
+from tools.docstring_builder.docfacts import build_docfacts
 from tools.docstring_builder.harvest import HarvestResult, harvest_file
 from tools.docstring_builder.io import matches_patterns
 from tools.docstring_builder.ir import IRDocstring
 from tools.docstring_builder.models import DocstringBuilderError
 from tools.docstring_builder.observability import record_operation_metrics
 from tools.docstring_builder.paths import REPO_ROOT
-from tools.docstring_builder.pipeline_types import FileOutcome, ProcessingOptions
+from tools.docstring_builder.pipeline_types import FileOutcome
 from tools.docstring_builder.plugins import PluginManager
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import SemanticResult
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from tools.docstring_builder.builder_types import LoggerLike
+    from tools.docstring_builder.cache import BuilderCache
+    from tools.docstring_builder.docfacts import DocFact
+    from tools.docstring_builder.pipeline_types import ProcessingOptions
 
 try:  # pragma: no cover - optional dependency at runtime
     from libcst import ParserSyntaxError as _ParserSyntaxError
 except ModuleNotFoundError:  # pragma: no cover - defensive guard for optional import
     _PARSER_SYNTAX_ERRORS: tuple[type[BaseException], ...] = ()
 else:
-    _PARSER_SYNTAX_ERRORS = cast(tuple[type[BaseException], ...], (_ParserSyntaxError,))
+    _PARSER_SYNTAX_ERRORS = cast("tuple[type[BaseException], ...]", (_ParserSyntaxError,))
 
 _HARVEST_ERRORS: tuple[type[BaseException], ...] = (
     *_PARSER_SYNTAX_ERRORS,
@@ -49,7 +56,7 @@ ApplyEditsCallable = Callable[
 
 def _load_apply_edits() -> ApplyEditsCallable:
     module = import_module("tools.docstring_builder.apply")
-    return cast(ApplyEditsCallable, module.apply_edits)
+    return cast("ApplyEditsCallable", module.apply_edits)
 
 
 @dataclass(slots=True)

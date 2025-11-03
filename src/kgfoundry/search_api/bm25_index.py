@@ -13,7 +13,7 @@ from kgfoundry.namespace_bridge import (
 from search_api.bm25_index import BM25Doc, BM25Index, toks
 
 __all__ = ["BM25Doc", "BM25Index", "toks"]
-_namespace = cast(dict[str, object], globals())
+_namespace = cast("dict[str, object]", globals())
 namespace_attach(_module, _namespace, __all__)
 
 

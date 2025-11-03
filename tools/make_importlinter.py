@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from tools._shared.logging import get_logger
 from tools._shared.proc import run_tool
 from tools.detect_pkg import detect_primary
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Sequence
 
 LOGGER = get_logger(__name__)
 

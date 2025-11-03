@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import inspect
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Literal, Protocol, TypeGuard, cast, runtime_checkable
+from typing import TYPE_CHECKING, Literal, Protocol, TypeGuard, cast, runtime_checkable
 
 import libcst as cst
 
-from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.models import SymbolResolutionError
 from tools.griffe_utils import resolve_griffe
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+    from pathlib import Path
+
+    from tools.docstring_builder.config import BuilderConfig
 
 try:  # Import lazily so unit tests can patch when griffe is unavailable.
     _GRIFFE_API = resolve_griffe()
@@ -78,10 +81,10 @@ class GriffeLoaderFactoryLike(Protocol):
     def __call__(self, *, search_paths: Sequence[str]) -> GriffeLoaderInstanceLike: ...
 
 
-ClassType = cast(type, _GRIFFE_API.class_type)
-FunctionType = cast(type, _GRIFFE_API.function_type)
-ModuleType = cast(type, _GRIFFE_API.module_type)
-GriffeLoaderFactory = cast(GriffeLoaderFactoryLike, _GRIFFE_API.loader_type)
+ClassType = cast("type", _GRIFFE_API.class_type)
+FunctionType = cast("type", _GRIFFE_API.function_type)
+ModuleType = cast("type", _GRIFFE_API.module_type)
+GriffeLoaderFactory = cast("GriffeLoaderFactoryLike", _GRIFFE_API.loader_type)
 
 
 def _is_griffe_class(obj: object) -> TypeGuard[GriffeClassLike]:
@@ -109,7 +112,7 @@ _KIND_LOOKUP: dict[str, inspect._ParameterKind] = {
 
 def _safe_getattr(value: object, attr: str) -> object | None:
     try:
-        attr_value = cast(object, getattr(value, attr))
+        attr_value = cast("object", getattr(value, attr))
     except AttributeError:  # pragma: no cover - defensive fallback
         return None
     return attr_value
@@ -204,11 +207,11 @@ def _module_name(root: Path, file_path: Path) -> str:
 
 def _load_module(module_name: str, search_paths: Sequence[str]) -> GriffeModuleLike:
     loader = GriffeLoaderFactory(search_paths=tuple(search_paths))
-    load_candidate = cast(Callable[[str], object] | None, getattr(loader, "load_module", None))
+    load_candidate = cast("Callable[[str], object] | None", getattr(loader, "load_module", None))
     if callable(load_candidate):
         load_fn: Callable[[str], object] = load_candidate
     else:
-        load_fallback = cast(Callable[[str], object] | None, getattr(loader, "load", None))
+        load_fallback = cast("Callable[[str], object] | None", getattr(loader, "load", None))
         if not callable(load_fallback):  # pragma: no cover - defensive fallback
             message = "Griffe loader is missing a callable 'load' method"
             raise SymbolResolutionError(message)
@@ -235,7 +238,7 @@ def _expr_to_str(value: object | None) -> str | None:
         return value
     as_string = _safe_getattr(value, "as_string")
     if callable(as_string):
-        as_string_callable = cast(Callable[[], object], as_string)
+        as_string_callable = cast("Callable[[], object]", as_string)
         try:
             candidate = as_string_callable()
         except (TypeError, ValueError):  # pragma: no cover - defensive fallback

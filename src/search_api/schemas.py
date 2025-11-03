@@ -7,13 +7,15 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from pydantic import ConfigDict, Field
 
-from kgfoundry_common.navmap_types import NavMap
-from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from kgfoundry_common.navmap_types import NavMap
+    from kgfoundry_common.problem_details import JsonValue
 
 __all__ = ["SearchRequest", "SearchResponse", "SearchResult"]
 

@@ -18,19 +18,25 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
-from typing import Protocol, cast, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
-from tools._shared.logging import StructuredLoggerAdapter, get_logger
+from tools._shared.logging import get_logger
 from tools._shared.metrics import ToolRunObservation, observe_tool_run
 from tools._shared.problem_details import (
-    ProblemDetailsDict,
     tool_digest_mismatch_problem_details,
     tool_disallowed_problem_details,
     tool_failure_problem_details,
     tool_missing_problem_details,
     tool_timeout_problem_details,
 )
-from tools._shared.settings import ToolRuntimeSettings, get_runtime_settings
+from tools._shared.settings import get_runtime_settings
+
+if TYPE_CHECKING:
+    from tools._shared.logging import StructuredLoggerAdapter
+    from tools._shared.problem_details import (
+        ProblemDetailsDict,
+    )
+    from tools._shared.settings import ToolRuntimeSettings
 
 
 class CompletedProcessProtocol(Protocol):
@@ -50,8 +56,8 @@ class TimeoutExpiredProtocol(Protocol):
 
 
 _subprocess_module = import_module("sub" + "process")
-TimeoutExpired = cast(type[TimeoutError], _subprocess_module.TimeoutExpired)
-_run_subprocess = cast(Callable[..., CompletedProcessProtocol], _subprocess_module.run)
+TimeoutExpired = cast("type[TimeoutError]", _subprocess_module.TimeoutExpired)
+_run_subprocess = cast("Callable[..., CompletedProcessProtocol]", _subprocess_module.run)
 
 Command = Sequence[str]
 Environment = Mapping[str, str]
@@ -313,7 +319,7 @@ class ProcessRunner:
             except TimeoutExpired as exc:
                 observation.failure("timeout", timed_out=True)
                 problem = tool_timeout_problem_details(command=command, timeout=timeout)
-                timeout_exc = cast(TimeoutExpiredProtocol, exc)
+                timeout_exc = cast("TimeoutExpiredProtocol", exc)
                 stdout_text = _decode_stream(timeout_exc.stdout)
                 stderr_text = _decode_stream(timeout_exc.stderr)
                 message = "Subprocess timed out"

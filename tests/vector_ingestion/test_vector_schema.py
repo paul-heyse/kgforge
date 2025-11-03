@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from kgfoundry_common.jsonschema_utils import (
-    Draft202012ValidatorProtocol,
     ValidationError,
 )
+
+if TYPE_CHECKING:
+    from kgfoundry_common.jsonschema_utils import (
+        Draft202012ValidatorProtocol,
+    )
 
 
 def test_vector_schema_accepts_canonical_payload(

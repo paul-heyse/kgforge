@@ -6,8 +6,8 @@ import json
 import logging
 import threading
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Final, TypedDict, cast
+from pathlib import Path  # noqa: TC003
+from typing import Final, Protocol, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
@@ -71,10 +71,7 @@ def _new_document(
 ) -> CacheDocument:
     """Create a :class:`CacheDocument` with schema-aligned keyword casing."""
     payload_entries: dict[str, CacheEntry]
-    if entries is None:
-        payload_entries = {}
-    else:
-        payload_entries = dict(entries)
+    payload_entries = {} if entries is None else dict(entries)
 
     payload: _CacheDocumentInit = {
         "schemaVersion": schema_version,
@@ -84,6 +81,96 @@ def _new_document(
     if generated_at is not None:
         payload["generatedAt"] = generated_at
     return CacheDocument(**payload)
+
+
+class DocstringBuilderCache(Protocol):
+    """Public cache interface for docstring builder operations.
+
+    This Protocol defines the contract for any object that implements
+    docstring caching. Implementations must track file modification times
+    and configuration hashes to determine whether regeneration is needed.
+
+    Attributes
+    ----------
+    path : Path
+        The file path where cache metadata is persisted.
+    """
+
+    @property
+    def path(self) -> Path:
+        """Path where cache metadata is persisted.
+
+        Returns
+        -------
+        Path
+            File path for cache storage.
+        """
+        ...
+
+    def needs_update(self, file_path: Path, config_hash: str) -> bool:
+        """Check whether a file needs docstring regeneration.
+
+        Compares the file's modification time and configuration hash against
+        cached values. Returns True if the file is missing from the cache,
+        the configuration has changed, or the file has been modified since
+        it was last processed.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file to check.
+        config_hash : str
+            SHA256 hash of the configuration used for processing.
+
+        Returns
+        -------
+        bool
+            True if the file needs regeneration, False otherwise.
+
+        Examples
+        --------
+        >>> # cache.needs_update(Path("src/module.py"), "hash123")
+        True
+        """
+        ...
+
+    def update(self, file_path: Path, config_hash: str) -> None:
+        """Record that a file has been processed.
+
+        Updates the cache with the current modification time and configuration
+        hash for the given file. Should be called after successfully processing
+        a file to avoid re-processing on the next run.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file that was processed.
+        config_hash : str
+            SHA256 hash of the configuration used for processing.
+
+        Examples
+        --------
+        >>> # cache.update(Path("src/module.py"), "hash123")
+        """
+        ...
+
+    def write(self) -> None:
+        """Persist cache entries to disk.
+
+        Synchronously writes the in-memory cache state to the file
+        specified by the `path` property. Should be called after all
+        processing is complete to ensure the cache is persisted.
+
+        Raises
+        ------
+        IOError
+            If the cache file cannot be written.
+
+        Examples
+        --------
+        >>> # cache.write()
+        """
+        ...
 
 
 class BuilderCache:
@@ -107,7 +194,7 @@ class BuilderCache:
             self._load_legacy_payload(raw_payload)
             return
 
-        payload_dict = cast(dict[str, object], decoded)
+        payload_dict = cast("dict[str, object]", decoded)
         try:
             validate_tools_payload(payload_dict, DOCSTRING_CACHE_SCHEMA)
         except (FileNotFoundError, SchemaValidationError, DeserializationError) as exc:
@@ -150,7 +237,7 @@ class BuilderCache:
         """Persist cache entries to disk."""
         with self._lock:
             payload = cast(
-                dict[str, object],
+                "dict[str, object]",
                 self._document.model_dump(by_alias=True, exclude_none=False),
             )
         validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)
@@ -185,7 +272,7 @@ class BuilderCache:
     def _load_legacy_payload(self, raw_payload: str) -> None:
         """Load and normalise legacy cache payloads without schema metadata."""
         try:
-            legacy_entries = cast(dict[str, dict[str, object]], json.loads(raw_payload))
+            legacy_entries = cast("dict[str, dict[str, object]]", json.loads(raw_payload))
         except json.JSONDecodeError as exc:
             self._handle_load_error("Invalid cache payload", exc)
             return
@@ -256,7 +343,7 @@ def to_payload(document: CacheDocument) -> dict[str, object]:
     dict[str, object]
         Payload dictionary suitable for JSON serialization.
     """
-    return cast(dict[str, object], document.model_dump(by_alias=True))
+    return cast("dict[str, object]", document.model_dump(by_alias=True))
 
 
 def validate_document(document: CacheDocument) -> None:
@@ -280,6 +367,7 @@ __all__ = [
     "BuilderCache",
     "CacheDocument",
     "CacheEntry",
+    "DocstringBuilderCache",
     "from_payload",
     "to_payload",
     "validate_document",
