@@ -37,6 +37,7 @@ Faiss-related coverage:
 - `opentelemetry` — Suite of stubs removed on 2025-11-03. Optional tracing helpers now rely on `kgfoundry_common.opentelemetry_types`, which exposes Protocols and safe loaders aligned with the runtime SDK/APIs.
 - `autoapi` / `sphinx-autoapi` — Stubs removed on 2025-11-03. Sphinx now loads the runtime parser through `docs._types.autoapi_parser.coerce_parser_class`, and optional dependency wiring in `docs._types.sphinx_optional` resolves the Parser type directly from `autoapi._parser`.
 - `astroid` — Stubs removed on 2025-11-03. The docs build now uses `docs._types.astroid_facade` to coerce runtime manager/builder classes into typed facades, so Sphinx integration is stub-free.
+- `pytestarch>=4.0.1` — Stubs removed on 2025-11-03. Architecture enforcement now depends on `tools.types_facade` which loads the runtime `pytestarch` helpers with typed protocols.
 
 We now rely on the community wheels `types-jsonschema` and `types-networkx` (added to the
 tooling extras on 2025-11-02), so the local `jsonschema` and `networkx` stubs have been
@@ -48,7 +49,6 @@ type information, allowing us to drop the local `pyarrow` shims.
 | Package | Stub paths | Status | Suggested action |
 | --- | --- | --- | --- |
 | `pyserini>=1.2.0` | `stubs/pyserini/**` | no `py.typed` | Audited 2025-11-02 — stubs mirror Lucene search/index surfaces we consume; retain until upstream ships typing. |
-| `pytestarch>=4.0.1` | `stubs/pytestarch/**` | no types | Audited 2025-11-02 — narrowed to rule/query surfaces used by architecture checks; retain until upstream typed. |
 | `auto-generated tempfile wrapper` | `stubs/tempfile/__init__.pyi` | overrides stdlib | Audited 2025-11-02 — mirrors stdlib signature while preserving wrapper typing; keep while helper exists. |
 
 ## 3. Local-only / Intentional Stubs

@@ -118,10 +118,11 @@ def _load_libcuvs() -> LoadLibraryFn | None:
     if module is None:
         return None
 
-    candidate = getattr(module, "load_library", None)
-    if candidate is None or not callable(candidate):
-        return None
-    return cast(LoadLibraryFn, candidate)
+    if hasattr(module, "load_library"):
+        candidate: object = module.load_library
+        if callable(candidate):
+            return cast(LoadLibraryFn, candidate)
+    return None
 
 
 _typed_load_cuvs = _load_libcuvs()
@@ -130,15 +131,22 @@ if _typed_load_cuvs is not None:  # pragma: no cover - optional dependency
 else:  # pragma: no cover - optional dependency
     logger.debug("cuVS library not available; continuing with FAISS CPU helpers")
 
-try:  # pragma: no cover - optional dependency
-    import faiss as _faiss_module
-except (ImportError, ModuleNotFoundError, OSError) as exc:  # pragma: no cover - optional dependency
-    logger.debug("FAISS import failed: %s", exc)
-    faiss: FaissModuleProtocol | None = None
-    HAVE_FAISS = False
-else:
-    faiss = cast(FaissModuleProtocol, _faiss_module)
-    HAVE_FAISS = True
+
+def _load_faiss_module() -> FaissModuleProtocol | None:
+    try:  # pragma: no cover - optional dependency
+        module = importlib.import_module("faiss")
+    except (
+        ImportError,
+        ModuleNotFoundError,
+        OSError,
+    ) as exc:  # pragma: no cover - optional dependency
+        logger.debug("FAISS import failed: %s", exc)
+        return None
+    return cast(FaissModuleProtocol, module)
+
+
+faiss = _load_faiss_module()
+HAVE_FAISS = faiss is not None
 
 
 @dataclass

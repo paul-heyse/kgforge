@@ -748,11 +748,11 @@ class _LegacyFaissModule(Protocol):
 
     read_index: Callable[[str], FaissIndexProtocol]
 
-    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol: ...
+    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol: ...  # noqa: N802
 
-    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol: ...
+    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol: ...  # noqa: N802
 
-    def normalize_L2(self, vectors: VectorArray) -> None: ...
+    def normalize_L2(self, vectors: VectorArray) -> None: ...  # noqa: N802
 
 
 class _FaissModuleAdapter:

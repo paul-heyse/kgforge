@@ -249,17 +249,16 @@ class ParquetVectorWriter:
         pyarrow.lib.schema
             Describe return value.
         """
-        return pa.schema(
-            [
-                pa.field("chunk_id", pa.string()),
-                pa.field("model", pa.dictionary(pa.int32(), pa.string())),
-                pa.field("run_id", pa.dictionary(pa.int32(), pa.string())),
-                pa.field("vocab_ids", pa.list_(pa.int32())),
-                pa.field("weights", pa.list_(pa.float32())),
-                pa.field("nnz", pa.int16()),
-                pa.field("created_at", pa.timestamp("ms")),
-            ]
+        splade_fields = (
+            pa.field("chunk_id", pa.string()),
+            pa.field("model", pa.dictionary(pa.int32(), pa.string())),
+            pa.field("run_id", pa.dictionary(pa.int32(), pa.string())),
+            pa.field("vocab_ids", pa.list_(pa.int32())),
+            pa.field("weights", pa.list_(pa.float32())),
+            pa.field("nnz", pa.int16()),
+            pa.field("created_at", pa.timestamp("ms")),
         )
+        return pa.schema(splade_fields)
 
     def write_splade(
         self,
@@ -352,29 +351,23 @@ class ParquetChunkWriter:
         pyarrow.lib.schema
             Describe return value.
         """
-        return pa.schema(
-            [
-                pa.field("chunk_id", pa.string()),
-                pa.field("doc_id", pa.string()),
-                pa.field("section", pa.string()),
-                pa.field("start_char", pa.int32()),
-                pa.field("end_char", pa.int32()),
-                pa.field(
-                    "doctags_span",
-                    pa.struct(
-                        [
-                            pa.field("node_id", pa.string()),
-                            pa.field("start", pa.int32()),
-                            pa.field("end", pa.int32()),
-                        ]
-                    ),
-                    nullable=True,
-                ),
-                pa.field("text", pa.string()),
-                pa.field("tokens", pa.int32()),
-                pa.field("created_at", pa.timestamp("ms")),
-            ]
+        doctags_fields = (
+            pa.field("node_id", pa.string()),
+            pa.field("start", pa.int32()),
+            pa.field("end", pa.int32()),
         )
+        chunk_fields = (
+            pa.field("chunk_id", pa.string()),
+            pa.field("doc_id", pa.string()),
+            pa.field("section", pa.string()),
+            pa.field("start_char", pa.int32()),
+            pa.field("end_char", pa.int32()),
+            pa.field("doctags_span", pa.struct(doctags_fields), nullable=True),
+            pa.field("text", pa.string()),
+            pa.field("tokens", pa.int32()),
+            pa.field("created_at", pa.timestamp("ms")),
+        )
+        return pa.schema(chunk_fields)
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
         """Describe   init  .

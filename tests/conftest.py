@@ -57,6 +57,10 @@ class MetricFamily(Protocol):
     samples: Sequence[MetricSample] | Iterable[MetricSample]
 
 
+class SkipReturnedUnexpectedlyError(RuntimeError):
+    """Raised when control reaches code after `pytest.skip`."""
+
+
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest by setting up Python path for src packages.
 
@@ -127,12 +131,12 @@ def prometheus_registry() -> CollectorRegistry:
 @fixture
 def otel_span_exporter() -> SpanExporterProtocol:
     """Provide an in-memory OpenTelemetry span exporter for testing."""
-    exporter_cls = load_in_memory_span_exporter_cls()
-    if exporter_cls is None:
-        pytest.skip("OpenTelemetry span exporter required for observability tests")
-        raise RuntimeError("OpenTelemetry span exporter unavailable")
-    exporter: SpanExporterProtocol = exporter_cls()
-    return exporter
+    exporter_factory = load_in_memory_span_exporter_cls()
+    if exporter_factory is None:
+        skip_reason = "OpenTelemetry span exporter required for observability tests"
+        pytest.skip(skip_reason)
+        raise SkipReturnedUnexpectedlyError
+    return exporter_factory()
 
 
 @fixture
@@ -140,10 +144,11 @@ def otel_tracer_provider(
     otel_span_exporter: SpanExporterProtocol,
 ) -> Iterator[TracerProviderProtocol]:
     """Provide an OpenTelemetry tracer provider configured with in-memory exporter."""
-    tracer_provider_cls = load_tracer_provider_cls()
-    if tracer_provider_cls is None:
-        pytest.skip("OpenTelemetry SDK required for observability tests")
-        raise RuntimeError("OpenTelemetry SDK unavailable")
+    tracer_provider_factory = load_tracer_provider_cls()
+    if tracer_provider_factory is None:
+        skip_reason = "OpenTelemetry SDK required for observability tests"
+        pytest.skip(skip_reason)
+        raise SkipReturnedUnexpectedlyError
 
     otel_trace_mod = pytest.importorskip(
         "opentelemetry.trace",
@@ -151,7 +156,7 @@ def otel_tracer_provider(
     )
     assert isinstance(otel_trace_mod, ModuleType)
 
-    provider: TracerProviderProtocol = tracer_provider_cls()
+    provider = tracer_provider_factory()
     span_processor = _SimpleSpanProcessor(otel_span_exporter)
     provider.add_span_processor(span_processor)
     set_tracer_provider = cast(
@@ -308,8 +313,9 @@ class _SimpleSpanProcessor:
     def on_start(self, span: SpanProtocol, parent_context: object | None = None) -> None:
         """No-op start hook to satisfy span processor protocol."""
 
-    def force_flush(self, timeout_millis: int = 0) -> bool:
+    def force_flush(self, timeout_millis: int | None = None) -> bool:
         """Flush spans immediately (noop)."""
+        del timeout_millis
         return True
 
     def on_end(self, span: SpanProtocol) -> None:

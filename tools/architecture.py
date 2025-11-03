@@ -16,11 +16,13 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from pytestarch import LayeredArchitecture, get_evaluable_architecture
-from pytestarch.pytestarch import EvaluableArchitecture
-from pytestarch.query_language import layered_architecture_rule
-
-ModuleNameFilter = layered_architecture_rule.ModuleNameFilter
+from tools.types_facade import (
+    EvaluableArchitecture,
+    LayeredArchitectureProtocol,
+    get_evaluable_architecture,
+    new_layered_architecture,
+    new_module_name_filter,
+)
 
 TOOLS_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_ROOT.parent
@@ -76,7 +78,7 @@ def _match_modules(modules: Iterable[str], patterns: Sequence[str]) -> set[str]:
 
 def _build_layered_architecture(
     modules: Sequence[str],
-) -> tuple[LayeredArchitecture, list[str], list[str], list[str]]:
+) -> tuple[LayeredArchitectureProtocol, list[str], list[str], list[str]]:
     """Build the layered architecture and return the classified module groups."""
     domain_modules = sorted(_match_modules(modules, DOMAIN_PATTERNS))
 
@@ -91,7 +93,7 @@ def _build_layered_architecture(
     adapter_modules = [module for module in adapter_modules if module not in ADAPTER_BASE_PACKAGES]
     io_modules = sorted(cli_candidates - set(domain_modules) - set(adapter_modules))
 
-    architecture = LayeredArchitecture()
+    architecture = new_layered_architecture()
     architecture.layer("domain").containing_modules(domain_modules)
     architecture.layer("adapters").containing_modules(adapter_modules)
     architecture.layer("io_cli").containing_modules(io_modules)
@@ -101,7 +103,7 @@ def _build_layered_architecture(
 def _load_tooling_architecture(
     root: Path | None = None,
 ) -> tuple[
-    LayeredArchitecture,
+    LayeredArchitectureProtocol,
     list[str],
     list[str],
     list[str],
@@ -127,8 +129,8 @@ def _collect_violations(
     if not sources or not targets:
         return []
     dependencies = evaluable.get_dependencies(
-        [ModuleNameFilter(name=module) for module in sources],
-        [ModuleNameFilter(name=module) for module in targets],
+        [new_module_name_filter(module) for module in sources],
+        [new_module_name_filter(module) for module in targets],
     )
     violations: list[str] = []
     for edges in dependencies.values():

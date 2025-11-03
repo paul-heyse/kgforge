@@ -16,7 +16,7 @@ Examples
 from __future__ import annotations
 
 from importlib import import_module
-from typing import Protocol, TypeAlias, cast, runtime_checkable
+from typing import Protocol, cast, runtime_checkable
 
 from docs._types.astroid_facade import AstroidManagerProtocol
 from docs._types.autoapi_parser import AutoapiParserProtocol, coerce_parser_class
@@ -54,10 +54,10 @@ class MissingDependencyError(ImportError):
         self.module_name = module_name
 
 
-AutoapiParserFacade: TypeAlias = type[AutoapiParserProtocol]
+type AutoapiParserFacade = type[AutoapiParserProtocol]
 
 
-AstroidManagerFacade: TypeAlias = AstroidManagerProtocol
+type AstroidManagerFacade = AstroidManagerProtocol
 
 
 @runtime_checkable
