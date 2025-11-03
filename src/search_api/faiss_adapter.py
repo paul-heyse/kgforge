@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import importlib
 import logging
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Final, TypeGuard, cast
@@ -97,11 +98,36 @@ def _as_optional_str(value: object) -> str:
 
 MIN_FACTORY_DIMENSION: Final[int] = 64
 
-try:  # pragma: no cover - optional dependency
-    from libcuvs import load_library as _load_cuvs
+LoadLibraryFn = Callable[..., None]
 
-    _load_cuvs()
-except (ImportError, RuntimeError, OSError):  # pragma: no cover - optional dependency
+
+def _load_libcuvs() -> LoadLibraryFn | None:
+    module_names = ("libcuvs", "libcuvs_cu13")
+    module = None
+    for name in module_names:
+        try:
+            module = importlib.import_module(name)
+        except (ImportError, ModuleNotFoundError):  # pragma: no cover - optional dependency
+            continue
+        except (RuntimeError, OSError):  # pragma: no cover - optional dependency
+            logger.debug("Failed to import %%s: runtime error", name)
+            continue
+        else:
+            break
+
+    if module is None:
+        return None
+
+    candidate = getattr(module, "load_library", None)
+    if candidate is None or not callable(candidate):
+        return None
+    return cast(LoadLibraryFn, candidate)
+
+
+_typed_load_cuvs = _load_libcuvs()
+if _typed_load_cuvs is not None:  # pragma: no cover - optional dependency
+    _typed_load_cuvs()
+else:  # pragma: no cover - optional dependency
     logger.debug("cuVS library not available; continuing with FAISS CPU helpers")
 
 try:  # pragma: no cover - optional dependency

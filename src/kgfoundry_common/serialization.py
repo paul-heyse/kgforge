@@ -24,15 +24,19 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
 
-import jsonschema
-from jsonschema.exceptions import SchemaError, ValidationError
-
 from kgfoundry_common.errors import (
     DeserializationError,
     SchemaValidationError,
     SerializationError,
 )
 from kgfoundry_common.fs import atomic_write, read_text, write_text
+from kgfoundry_common.jsonschema_utils import (
+    SchemaError,
+    ValidationError,
+)
+from kgfoundry_common.jsonschema_utils import (
+    validate as jsonschema_validate,
+)
 from kgfoundry_common.logging import get_logger
 
 # JSON Schema type (from jsonschema stubs: Mapping[str, object])
@@ -164,12 +168,12 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     """
     schema_obj = _load_schema_cached(schema_path)
     try:
-        jsonschema.validate(instance=payload, schema=schema_obj)
+        jsonschema_validate(instance=payload, schema=schema_obj)
     except ValidationError as exc:
-        msg = f"Schema validation failed: {exc.message}"
+        msg = f"Schema validation failed: {exc}"
         raise SchemaValidationError(msg) from exc
     except SchemaError as exc:
-        msg = f"Invalid schema: {exc.message}"
+        msg = f"Invalid schema: {exc}"
         raise SchemaValidationError(msg) from exc
 
 
@@ -295,9 +299,9 @@ def serialize_json(
             # For non-Mapping objects, load schema and validate directly
             schema_obj = _load_schema_cached(schema_path)
             try:
-                jsonschema.validate(instance=obj, schema=schema_obj)
+                jsonschema_validate(instance=obj, schema=schema_obj)
             except ValidationError as exc:
-                msg = f"Schema validation failed: {exc.message}"
+                msg = f"Schema validation failed: {exc}"
                 raise SchemaValidationError(msg) from exc
 
         # Serialize object
@@ -389,12 +393,12 @@ def _validate_json_against_schema(obj: object, schema_path: Path) -> None:
         # For non-Mapping objects, load schema and validate directly
         schema_obj = _load_schema_cached(schema_path)
         try:
-            jsonschema.validate(instance=obj, schema=schema_obj)
+            jsonschema_validate(instance=obj, schema=schema_obj)
         except ValidationError as exc:
-            msg = f"Schema validation failed: {exc.message}"
+            msg = f"Schema validation failed: {exc}"
             raise SchemaValidationError(msg) from exc
         except SchemaError as exc:
-            msg = f"Invalid schema: {exc.message}"
+            msg = f"Invalid schema: {exc}"
             raise SchemaValidationError(msg) from exc
 
 

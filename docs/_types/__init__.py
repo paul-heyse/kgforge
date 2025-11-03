@@ -39,8 +39,13 @@ from docs._types.artifacts import (
     symbol_index_from_json,
     symbol_index_to_payload,
 )
+from docs._types.astroid_facade import (
+    AstroidBuilderProtocol,
+    AstroidManagerProtocol,
+    coerce_astroid_builder_class,
+    coerce_astroid_manager_class,
+)
 from docs._types.griffe import (
-    AutoapiParserFacade,
     GriffeFacade,
     GriffeNode,
     LoaderFacade,
@@ -49,6 +54,7 @@ from docs._types.griffe import (
 )
 from docs._types.sphinx_optional import (
     AstroidManagerFacade,
+    AutoapiParserFacade,
     MissingDependencyError,
     OptionalDependencies,
     load_optional_dependencies,
@@ -56,7 +62,9 @@ from docs._types.sphinx_optional import (
 
 __all__ = [
     "ArtifactValidationError",
+    "AstroidBuilderProtocol",
     "AstroidManagerFacade",
+    "AstroidManagerProtocol",
     "AutoapiParserFacade",
     "GriffeFacade",
     "GriffeNode",
@@ -73,6 +81,8 @@ __all__ = [
     "SymbolIndexArtifacts",
     "SymbolIndexRow",
     "build_facade",
+    "coerce_astroid_builder_class",
+    "coerce_astroid_manager_class",
     "dump_symbol_delta",
     "dump_symbol_index",
     "load_optional_dependencies",

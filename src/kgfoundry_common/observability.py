@@ -16,10 +16,15 @@ import time
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Final, Literal, Protocol, cast
+from typing import Final, Literal, cast
 
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.opentelemetry_types import (
+    StatusCodeProtocol,
+    TraceRuntime,
+    load_trace_runtime,
+)
 from kgfoundry_common.prometheus import (
     CollectorRegistry,
     CounterLike,
@@ -29,33 +34,10 @@ from kgfoundry_common.prometheus import (
     get_default_registry,
 )
 
-
-class _TraceAPI(Protocol):
-    def get_tracer(self, name: str) -> Tracer: ...
-
-
-if TYPE_CHECKING:  # pragma: no cover - typing only
-    from opentelemetry.trace import Status as OTStatus
-    from opentelemetry.trace import StatusCode as OTStatusCode
-    from opentelemetry.trace import Tracer
-else:  # pragma: no cover - runtime fallback when dependency missing
-    OTStatus = Any
-    OTStatusCode = Any
-    Tracer = Any
-
-
-trace_api: _TraceAPI | None
-Status: type[OTStatus] | None
-StatusCode: type[OTStatusCode] | None
-try:  # pragma: no cover - optional dependency guard
-    from opentelemetry import trace as _trace_module
-    from opentelemetry.trace import Status, StatusCode
-except ImportError:  # pragma: no cover - optional dependency guard
-    trace_api = None
-    Status = None
-    StatusCode = None
-else:
-    trace_api = cast(_TraceAPI, _trace_module)
+trace_runtime: TraceRuntime = load_trace_runtime()
+trace_api = trace_runtime.api
+Status = trace_runtime.status_factory
+StatusCode = trace_runtime.status_codes
 
 
 __all__ = [
@@ -319,5 +301,6 @@ def start_span(
         except Exception as exc:  # pragma: no cover - requires OpenTelemetry at runtime
             span.record_exception(exc)
             if Status is not None and StatusCode is not None:
-                span.set_status(Status(StatusCode.ERROR))
+                error_code: StatusCodeProtocol = StatusCode.ERROR
+                span.set_status(Status(error_code))
             raise

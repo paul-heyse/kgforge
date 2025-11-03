@@ -14,8 +14,11 @@ from uuid import UUID
 
 import numpy as np
 import pytest
-from jsonschema import Draft202012Validator
 
+from kgfoundry_common.jsonschema_utils import (
+    Draft202012ValidatorProtocol,
+    create_draft202012_validator,
+)
 from kgfoundry_common.schema_helpers import load_schema
 from kgfoundry_common.types import JsonValue
 from kgfoundry_common.vector_types import VectorMatrix
@@ -46,12 +49,12 @@ vector_schema: Callable[[Path], dict[str, JsonValue]] = pytest.fixture(scope="se
 )
 
 
-def _vector_validator(vector_schema: dict[str, JsonValue]) -> Draft202012Validator:
+def _vector_validator(vector_schema: dict[str, JsonValue]) -> Draft202012ValidatorProtocol:
     """Provide a cached JSON Schema validator for vector payloads."""
-    return Draft202012Validator(vector_schema)
+    return create_draft202012_validator(vector_schema)
 
 
-vector_validator: Callable[[dict[str, JsonValue]], Draft202012Validator] = pytest.fixture(
+vector_validator: Callable[[dict[str, JsonValue]], Draft202012ValidatorProtocol] = pytest.fixture(
     scope="session"
 )(_vector_validator)
 

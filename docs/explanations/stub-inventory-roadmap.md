@@ -25,11 +25,18 @@ their inline annotations cover the symbols we use.
 | `docstring-parser` | `stubs/docstring_parser/**` | `py.typed` present | ✅ Removed on 2025-11-02 — docstring builder suite covers upstream typing. |
 | `libcst>=1.4.0` | `stubs/libcst/__init__.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — codemods run against inline typing. |
 | `msgspec`, `prometheus-client` (tool extra) | same as above | see above | ✅ Removed on 2025-11-02 — tooling extras aligned with runtime clean-up. |
-| `opentelemetry` suite | `stubs/opentelemetry/**` | `py.typed` present | ✅ Removed on 2025-11-02 — tracing helpers now type-check against upstream SDK annotations. |
-| `faiss>=1.12.0` | `stubs/faiss/__init__.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — ingestion pipeline relies on upstream binary wheel typing. |
+| `opentelemetry` suite | `stubs/opentelemetry/**` | `py.typed` present | ✅ Removed on 2025-11-03 — replaced with `kgfoundry_common.opentelemetry_types` Protocols and lazy loaders. |
 | `importlinter>=2.0` | `stubs/importlinter/**` | `py.typed` present | ✅ Removed on 2025-11-02 — architecture checks import upstream types directly. |
 | `pytest>=8.3` | `stubs/pytest/__init__.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — fixture overloads now covered by upstream typing. |
 | `tempfile` shim | `stubs/tempfile/__init__.pyi` | stdlib typing sufficient | ✅ Removed on 2025-11-02 — reliance on extra keyword dropped in favour of upstream signature. |
+
+Faiss-related coverage:
+
+- `faiss>=1.12.0` — Stub removed on 2025-11-03. Runtime bindings remain untyped, so `search_api.types.wrap_faiss_module` now adapts the module to the [`FaissModuleProtocol`](../../src/search_api/types.py) used across the vector store. GPU helpers continue to flow through the typed helper layer.
+- `libcuvs` — Stub removed on 2025-11-03. The optional import in `search_api.faiss_adapter` now casts the loaded callable to `Callable[..., None]`, eliminating the placeholder stub while preserving type safety.
+- `opentelemetry` — Suite of stubs removed on 2025-11-03. Optional tracing helpers now rely on `kgfoundry_common.opentelemetry_types`, which exposes Protocols and safe loaders aligned with the runtime SDK/APIs.
+- `autoapi` / `sphinx-autoapi` — Stubs removed on 2025-11-03. Sphinx now loads the runtime parser through `docs._types.autoapi_parser.coerce_parser_class`, and optional dependency wiring in `docs._types.sphinx_optional` resolves the Parser type directly from `autoapi._parser`.
+- `astroid` — Stubs removed on 2025-11-03. The docs build now uses `docs._types.astroid_facade` to coerce runtime manager/builder classes into typed facades, so Sphinx integration is stub-free.
 
 We now rely on the community wheels `types-jsonschema` and `types-networkx` (added to the
 tooling extras on 2025-11-02), so the local `jsonschema` and `networkx` stubs have been
@@ -40,15 +47,9 @@ type information, allowing us to drop the local `pyarrow` shims.
 
 | Package | Stub paths | Status | Suggested action |
 | --- | --- | --- | --- |
-| `pyserini>=1.2.0` | `stubs/pyserini/**` | no `py.typed` | Preserve stubs (package is optional and untyped); align Protocols with runtime surface. |
-| `faiss` (GPU optional) | `stubs/faiss/__init__.pyi` | binary wheels only | Keep; required for optional FAISS ingestion path and cuVS integration. |
-| `libcuvs` | `stubs/libcuvs/__init__.pyi` | project-specific wrapper | Keep; compiled library lacks typing. |
-| `autoapi`, `sphinx-autoapi` | `stubs/autoapi/**`, `stubs/sphinx_autoapi/*.pyi` | no `py.typed` | Keep; local stubs trimmed to the parser/setup surface we exercise while we track upstream typing. |
-| `astroid>=4.0.0` | `stubs/astroid/**` | no `py.typed` | Retain slim manager/builder stubs until astroid ships types (planned but not released). |
-| `pytestarch>=4.0.1` | `stubs/pytestarch/**` | no types | Keep; upstream typing backlog. |
-| `importlinter` | `stubs/importlinter/**` | minimal runtime typing | Keep stub but consider contributing upstream hints. |
-| `auto-generated tempfile wrapper` | `stubs/tempfile/__init__.pyi` | overrides stdlib | Keep for now; ensures our context manager helpers remain typed while mirroring the stdlib signature. |
-| `opentelemetry-*` | `stubs/opentelemetry/**` | our curated API surface | Keep; upstream annotations are incomplete for the symbols we consume. |
+| `pyserini>=1.2.0` | `stubs/pyserini/**` | no `py.typed` | Audited 2025-11-02 — stubs mirror Lucene search/index surfaces we consume; retain until upstream ships typing. |
+| `pytestarch>=4.0.1` | `stubs/pytestarch/**` | no types | Audited 2025-11-02 — narrowed to rule/query surfaces used by architecture checks; retain until upstream typed. |
+| `auto-generated tempfile wrapper` | `stubs/tempfile/__init__.pyi` | overrides stdlib | Audited 2025-11-02 — mirrors stdlib signature while preserving wrapper typing; keep while helper exists. |
 
 ## 3. Local-only / Intentional Stubs
 
@@ -61,7 +62,7 @@ type information, allowing us to drop the local `pyarrow` shims.
 ## 4. Execution Plan
 
 1. **Batch removal PR** for the “Ready to drop” set. Delete stubs, run full static gates, and backfill any missing Protocols (e.g., counter/histogram helpers) with small local helper protocols if needed.
-2. **Open upstream issues** for key “Needs follow-up” packages (autoapi, astroid, pyserini, etc.) referencing our use cases. Track outcomes in this document.
+2. **Open upstream issues** for key “Needs follow-up” packages (pyserini, pytestarch, etc.) referencing our use cases. Track outcomes in this document.
 3. **Monitor dependency bumps**: add a lint/check that warns if a stub exists alongside a dependency that now exposes `py.typed`.
 4. **Doc updates**: document the policy in `docs/contributing/typing.md` so future contributors evaluate new stubs against this inventory.
 

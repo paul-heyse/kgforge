@@ -27,10 +27,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import NoReturn, TypedDict, cast, overload
 
-import jsonschema
-from jsonschema.exceptions import SchemaError, ValidationError
-
 from kgfoundry_common.fs import read_text
+from kgfoundry_common.jsonschema_utils import (
+    Draft202012Validator,
+    SchemaError,
+    ValidationError,
+    ValidationErrorProtocol,
+)
+from kgfoundry_common.jsonschema_utils import (
+    validate as jsonschema_validate,
+)
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.types import JsonPrimitive, JsonValue
 
@@ -165,9 +171,9 @@ def _load_schema_impl() -> JsonSchema:
 
     # Validate against JSON Schema 2020-12 meta-schema
     try:
-        jsonschema.Draft202012Validator.check_schema(schema_obj)
+        Draft202012Validator.check_schema(schema_obj)
     except SchemaError as exc:
-        msg = f"Invalid Problem Details schema: {exc.message}"
+        msg = f"Invalid Problem Details schema: {exc}"
         raise ProblemDetailsValidationError(msg) from exc
 
     return schema_obj
@@ -212,16 +218,17 @@ def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:
     """
     schema = _load_schema()
     try:
-        jsonschema.validate(instance=payload, schema=schema)
+        jsonschema_validate(instance=payload, schema=schema)
     except ValidationError as exc:
-        errors = [exc.message]
-        if exc.absolute_path:
-            path_str = ".".join(str(p) for p in exc.absolute_path)
+        error_details = cast(ValidationErrorProtocol, exc)
+        errors = [error_details.message]
+        if error_details.absolute_path:
+            path_str = ".".join(str(p) for p in error_details.absolute_path)
             errors.append(f"at path: {path_str}")
         msg = f"Problem Details validation failed: {'; '.join(errors)}"
         raise ProblemDetailsValidationError(msg, validation_errors=errors) from exc
     except SchemaError as exc:
-        msg = f"Invalid schema: {exc.message}"
+        msg = f"Invalid schema: {exc}"
         raise ProblemDetailsValidationError(msg) from exc
 
 
@@ -283,7 +290,7 @@ def _coerce_exception_params(*args: object, **kwargs: object) -> ExceptionProble
     exc_obj = args[0]
     if not isinstance(exc_obj, Exception):
         _type_error("problem_from_exception() first argument must be an Exception instance")
-    exc: Exception = cast(Exception, exc_obj)
+    exc = cast(Exception, exc_obj)
 
     if "detail" in kwargs:
         _type_error("problem_from_exception() does not accept a 'detail' argument")

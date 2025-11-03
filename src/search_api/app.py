@@ -34,9 +34,7 @@ from collections.abc import Awaitable, Callable, Mapping
 from pathlib import Path
 from typing import Annotated, Final, cast
 
-import jsonschema
 from fastapi import FastAPI, Header, HTTPException
-from jsonschema.exceptions import ValidationError as SchemaValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import JSONResponse, Response
@@ -52,6 +50,15 @@ from kgfoundry_common.errors import (
     VectorSearchError,
 )
 from kgfoundry_common.errors.http import register_problem_details_handler
+from kgfoundry_common.jsonschema_utils import (
+    ValidationError as JsonSchemaValidationError,
+)
+from kgfoundry_common.jsonschema_utils import (
+    ValidationErrorProtocol,
+)
+from kgfoundry_common.jsonschema_utils import (
+    validate as jsonschema_validate,
+)
 from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
 from kgfoundry_common.navmap_types import NavMap
 from kgfoundry_common.observability import MetricsProvider, observe_duration
@@ -299,23 +306,27 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
 
         # Validate against schema
         try:
-            jsonschema.validate(instance=response_body, schema=self.schema)
-        except SchemaValidationError as exc:
+            jsonschema_validate(instance=response_body, schema=self.schema)
+        except JsonSchemaValidationError as exc:
             with with_fields(logger, operation="response_validation") as log_adapter:
+                error_details = cast(ValidationErrorProtocol, exc)
                 log_adapter.exception(
                     "Response validation failed",
                     extra={
                         "status": "error",
-                        "validation_error": exc.message,
-                        "path": str(exc.path),
+                        "validation_error": error_details.message,
+                        "path": "/".join(str(part) for part in error_details.path),
                     },
                 )
             # Return Problem Details for validation failure
-            error_msg = f"Response validation failed: {exc.message}"
+            error_msg = f"Response validation failed: {error_details.message}"
             problem = SerializationError(
                 error_msg,
                 cause=exc,
-                context={"schema_path": str(self.schema_path), "validation_path": str(exc.path)},
+                context={
+                    "schema_path": str(self.schema_path),
+                    "validation_path": "/".join(str(part) for part in error_details.path),
+                },
             )
             problem_response = JSONResponse(
                 content=problem.to_problem_details(),

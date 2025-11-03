@@ -18,12 +18,16 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-import jsonschema
-from jsonschema import ValidationError
-from jsonschema.exceptions import SchemaError
-
 from kgfoundry_common.errors import DeserializationError, SerializationError
 from kgfoundry_common.fs import read_text
+from kgfoundry_common.jsonschema_utils import (
+    Draft202012Validator,
+    SchemaError,
+    ValidationError,
+)
+from kgfoundry_common.jsonschema_utils import (
+    validate as jsonschema_validate,
+)
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.pydantic import BaseModel
@@ -79,9 +83,9 @@ def load_schema(schema_path: Path) -> dict[str, JsonValue]:
 
     # Validate against JSON Schema 2020-12 meta-schema
     try:
-        jsonschema.Draft202012Validator.check_schema(schema_obj)
+        Draft202012Validator.check_schema(schema_obj)
     except SchemaError as exc:
-        msg = f"Invalid JSON Schema 2020-12 in {schema_path}: {exc.message}"
+        msg = f"Invalid JSON Schema 2020-12 in {schema_path}: {exc}"
         raise DeserializationError(msg) from exc
 
     return schema_obj
@@ -120,12 +124,12 @@ def validate_model_against_schema(
         data: dict[str, JsonValue] = cast(
             dict[str, JsonValue], model_instance.model_dump(mode="json")
         )
-        jsonschema.validate(instance=data, schema=schema)
+        jsonschema_validate(instance=data, schema=schema)
     except ValidationError as exc:
-        msg = f"Model instance does not match schema: {exc.message}"
+        msg = f"Model instance does not match schema: {exc}"
         raise SerializationError(msg) from exc
     except SchemaError as exc:
-        msg = f"Invalid schema: {exc.message}"
+        msg = f"Invalid schema: {exc}"
         raise SerializationError(msg) from exc
 
 
@@ -193,9 +197,9 @@ def assert_model_roundtrip(
         schema_obj = load_schema(schema_path)
         # Validate example against schema
         try:
-            jsonschema.validate(instance=example_data, schema=schema_obj)
+            jsonschema_validate(instance=example_data, schema=schema_obj)
         except ValidationError as exc:
-            msg = f"Example JSON does not match schema: {exc.message}"
+            msg = f"Example JSON does not match schema: {exc}"
             raise DeserializationError(msg) from exc
 
     # Deserialize example into model instance
