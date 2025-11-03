@@ -212,7 +212,9 @@ class TestIndexingErrorHandling:
         problem_raw: object = json.loads(payload_str)
         assert isinstance(problem_raw, dict)
         problem = cast(dict[str, object], problem_raw)
-        errors_raw = problem.get("errors")
+        extensions_raw = problem.get("extensions")
+        assert isinstance(extensions_raw, dict)
+        errors_raw = cast(dict[str, object] | None, extensions_raw.get("errors"))
         assert isinstance(errors_raw, dict)
         errors_field: dict[str, object] = {str(key): value for key, value in errors_raw.items()}
 

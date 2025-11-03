@@ -11,10 +11,15 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
+import inspect
 import sys
+from collections.abc import Callable
+from importlib import import_module
 from pathlib import Path
 from types import ModuleType
-from typing import Final, cast
+from typing import Final, Protocol, cast, no_type_check
+
+from click.testing import Result
 
 REPO_ROOT: Final[Path] = Path(__file__).resolve().parent.parent
 SRC_PATH: Final[Path] = REPO_ROOT / "src"
@@ -22,6 +27,22 @@ SRC_PATH: Final[Path] = REPO_ROOT / "src"
 
 class _BootstrapState:
     bootstrapped: bool = False
+
+
+@no_type_check
+def _load_cli_runner_cls() -> type[_CliRunnerProtocol] | None:
+    try:
+        testing_module = import_module("typer.testing")
+    except ImportError:  # pragma: no cover - typer not installed
+        return None
+
+    candidate_obj: object | None = getattr(testing_module, "CliRunner", None)
+    if candidate_obj is None or not isinstance(candidate_obj, type):
+        return None
+    runner_cls_obj = cast(type[_CliRunnerProtocol], candidate_obj)
+    if not hasattr(runner_cls_obj, "invoke"):
+        return None
+    return runner_cls_obj
 
 
 def ensure_src_path() -> None:
@@ -56,3 +77,40 @@ def load_optional_attr(module_name: str, attr_name: str) -> object | None:
 
 # Ensure the src layout is active as soon as the bootstrap module is imported.
 ensure_src_path()
+
+
+class _CliRunnerProtocol(Protocol):
+    def invoke(self, *args: object, **kwargs: object) -> Result:
+        """Invoke the CLI with the provided arguments."""
+        ...
+
+
+@no_type_check
+def _patch_cli_runner_mix_stderr() -> None:
+    """Allow ``CliRunner.invoke`` to accept ``mix_stderr`` across Click versions."""
+    if False:  # TYPE_CHECKING is removed, so this check is always False
+        return
+
+    cli_runner_cls = _load_cli_runner_cls()
+    if cli_runner_cls is None:
+        return
+
+    if hasattr(cli_runner_cls.invoke, "__kgfoundry_mixstderr__"):
+        return
+
+    signature = inspect.signature(cli_runner_cls.invoke)
+    if "mix_stderr" in signature.parameters:
+        return
+
+    invoke_attr = cast(object, cli_runner_cls.invoke)
+    invoke_callable = cast(Callable[..., Result], invoke_attr)
+
+    def invoke(self: object, *invoke_args: object, **invoke_kwargs: object) -> Result:
+        invoke_kwargs.pop("mix_stderr", None)
+        return invoke_callable(self, *invoke_args, **invoke_kwargs)
+
+    invoke.__kgfoundry_mixstderr__ = True
+    cli_runner_cls.invoke = cast(Callable[..., Result], invoke)
+
+
+_patch_cli_runner_mix_stderr()

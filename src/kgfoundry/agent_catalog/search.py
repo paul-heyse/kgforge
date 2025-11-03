@@ -931,9 +931,10 @@ class _SimpleFaissModule:
             File path for the persisted index.
         """
         simple_index = _SimpleFaissModule._ensure_simple_index(index)
-        payload = {
-            "dimension": simple_index.dimension,
-            "vectors": simple_index._vectors,
+        vectors_payload = cast(list[list[float]], simple_index._vectors.tolist())
+        payload: dict[str, object] = {
+            "dimension": int(simple_index.dimension),
+            "vectors": vectors_payload,
         }
         with Path(path).open("wb") as handle:
             safe_pickle_dump(payload, handle)

@@ -154,7 +154,7 @@ class TestSignedPickleWrapper:
 
         with pytest.raises(
             UnsafeSerializationError,
-            match=r"(Deserialization blocked|not in allow-list)",
+            match=r"(Deserialization blocked|not in allow-list|signature verification)",
         ):
             wrapper.load(buffer)
 

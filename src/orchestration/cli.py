@@ -14,7 +14,7 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import TYPE_CHECKING, Final, Protocol, cast
+from typing import TYPE_CHECKING, Annotated, Final, Protocol, cast
 from uuid import uuid4
 
 import typer
@@ -205,7 +205,7 @@ def _get_bm25_index_path(index_dir: Path, backend: str) -> Path:
     return index_dir / "pure_bm25.pkl" if backend == "pure" else index_dir / "bm25_index"
 
 
-def _build_bm25_index(config: BM25BuildConfig) -> None:
+def _build_bm25_index(config: BM25BuildConfig) -> str:
     """Build BM25 index from configuration.
 
     Parameters
@@ -223,14 +223,37 @@ def _build_bm25_index(config: BM25BuildConfig) -> None:
         If JSON parsing fails.
     RuntimeError
         If index building fails.
+
+    Returns
+    -------
+    str
+        Backend identifier that successfully produced the index.
     """
     docs = _load_bm25_documents(config.chunks_path)
     idx = get_bm25(config.backend, config.index_dir, k1=0.9, b=0.4)
+    backend_used = config.backend
     try:
         idx.build(docs)
+    except RuntimeError as exc:
+        if config.backend != "lucene":
+            raise
+        logger.warning(
+            "Lucene backend unavailable; falling back to pure Python implementation",
+            extra={"operation": "index_bm25", "error": type(exc).__name__},
+            exc_info=exc,
+        )
+        fallback = get_bm25("pure", config.index_dir, k1=0.9, b=0.4)
+        try:
+            fallback.build(docs)
+        except Exception as fallback_exc:  # pragma: no cover - defensive fallback path
+            msg = "Failed to build BM25 index with fallback backend"
+            raise RuntimeError(msg) from fallback_exc
+        return "pure"
     except (AttributeError, ValueError, KeyError) as exc:
         msg = f"Failed to build BM25 index: {exc}"
         raise RuntimeError(msg) from exc
+    else:
+        return backend_used
 
 
 _VECTOR_SCHEMA_PATH = (
@@ -286,11 +309,15 @@ def _build_vector_problem_details(
     instance: str,
 ) -> ProblemDetails:
     """Create Problem Details payload for vector ingestion failures."""
-    problem_extensions: dict[str, JsonValue] = {
+    validation_errors = cast(list[JsonValue], list(errors))
+    errors_payload: dict[str, JsonValue] = {
         "schema_id": _VECTOR_SCHEMA_ID,
         "vector_path": vector_path,
+        "validation_errors": validation_errors,
+    }
+    problem_extensions: dict[str, JsonValue] = {
         "correlation_id": correlation_id,
-        "validation_errors": list(errors),
+        "errors": errors_payload,
     }
 
     return build_problem_details(
@@ -313,9 +340,9 @@ def load_vector_batch_from_json(vectors_path: str) -> VectorBatch:
     with vectors_file.open("r", encoding="utf-8") as file_obj:
         payload: object = json.load(file_obj)
 
-    if not isinstance(payload, Sequence):
+    if not isinstance(payload, Sequence) or isinstance(payload, (str, bytes)):
         msg = "Dense vectors payload must be a sequence of mapping objects"
-        raise TypeError(msg)
+        raise VectorValidationError(msg, errors=[msg])
 
     _validate_vector_payload(payload)
     records = cast(Iterable[Mapping[str, object]], payload)
@@ -340,9 +367,9 @@ def _prepare_index_directory(index_path: str) -> None:
 
 # [nav:anchor index_bm25]
 def index_bm25(
-    chunks_parquet: str = typer.Argument(..., help="Path to Parquet/JSONL with chunks"),
-    backend: str = typer.Option("lucene", help="lucene|pure"),
-    index_dir: str = typer.Option("./_indices/bm25", help="Output index directory"),
+    chunks_parquet: Annotated[str, typer.Argument(..., help="Path to Parquet/JSONL with chunks")],
+    backend: Annotated[str, typer.Option(help="lucene|pure")] = "lucene",
+    index_dir: Annotated[str, typer.Option(help="Output index directory")] = "./_indices/bm25",
 ) -> None:
     """Build BM25 index from chunk data.
 
@@ -373,15 +400,39 @@ def index_bm25(
 
     try:
         _prepare_index_directory(config.index_dir)
-        _build_bm25_index(config)
-        typer.echo(f"BM25 index built at {config.index_dir} using backend={config.backend}")
-    except (TypeError, json.JSONDecodeError, FileNotFoundError) as exc:
+        logger.info(
+            "Building BM25 index",
+            extra={
+                "operation": "index_bm25",
+                "backend": backend,
+                "chunks_path": chunks_parquet,
+            },
+        )
+        backend_used = _build_bm25_index(config)
+        typer.echo(f"BM25 index built at {config.index_dir} using backend={backend_used}")
+        logger.info(
+            "BM25 index build completed",
+            extra={
+                "operation": "index_bm25",
+                "backend": backend_used,
+                "path": index_dir,
+                "chunks_path": chunks_parquet,
+            },
+        )
+    except FileNotFoundError as exc:
         logger.exception(
             "Document loading failed",
             extra={"operation": "index_bm25", "error": type(exc).__name__},
         )
         typer.echo(f"Error loading documents: {exc}", err=True)
-        raise typer.Exit(code=1) from exc
+        raise
+    except (TypeError, json.JSONDecodeError) as exc:
+        logger.exception(
+            "Document loading failed",
+            extra={"operation": "index_bm25", "error": type(exc).__name__},
+        )
+        typer.echo(f"Error loading documents: {exc}", err=True)
+        raise
     except RuntimeError as exc:
         logger.exception(
             "BM25 index build failed",
@@ -391,14 +442,27 @@ def index_bm25(
         raise typer.Exit(code=1) from exc
 
 
+def _index_bm25_cli(
+    chunks_parquet: Annotated[str, typer.Argument(..., help="Path to Parquet/JSONL with chunks")],
+    backend: Annotated[str, typer.Option(help="lucene|pure", show_default=True)] = "lucene",
+    index_dir: Annotated[
+        str,
+        typer.Option(help="Output index directory", show_default=True),
+    ] = "./_indices/bm25",
+) -> None:
+    index_bm25(chunks_parquet, backend, index_dir)
+
+
 # [nav:anchor index_faiss]
 def index_faiss(
-    dense_vectors: str = typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
-    index_path: str = typer.Option(
-        "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)"
-    ),
-    factory: str = typer.Option("Flat", help="FAISS factory string"),
-    metric: str = typer.Option("ip", help="Metric: 'ip' or 'l2'"),
+    dense_vectors: Annotated[
+        str, typer.Argument(..., help="Path to dense vectors JSON (skeleton)")
+    ],
+    index_path: Annotated[
+        str, typer.Option(help="Output index (CPU .idx)")
+    ] = "./_indices/faiss/shard_000.idx",
+    factory: Annotated[str, typer.Option(help="FAISS factory string")] = "Flat",
+    metric: Annotated[str, typer.Option(help="Metric: 'ip' or 'l2'")] = "ip",
 ) -> None:
     r"""Build FAISS index from dense vectors.
 
@@ -460,19 +524,23 @@ def index_faiss(
             "Building FAISS index",
             extra={
                 "operation": "index_faiss",
-                "factory": config.factory,
-                "metric": config.metric,
+                "factory": factory,
+                "metric": metric,
                 "vectors": batch.count,
                 "dimension": batch.dimension,
                 "correlation_id": correlation_id,
             },
         )
 
-        index_data = {
-            "keys": list(batch.ids),
-            "vectors": batch.matrix,
-            "factory": config.factory,
-            "metric": config.metric,
+        matrix_rows = cast(list[list[float]], batch.matrix.tolist())
+        vectors_payload: list[list[float]] = [
+            [float(component) for component in row] for row in matrix_rows
+        ]
+        index_data: dict[str, object] = {
+            "keys": [str(vector_id) for vector_id in batch.ids],
+            "vectors": vectors_payload,
+            "factory": factory,
+            "metric": metric,
         }
         with Path(config.index_path).open("wb") as file_obj:
             safe_pickle.dump(index_data, file_obj)
@@ -481,11 +549,21 @@ def index_faiss(
             "Index saved successfully",
             extra={
                 "operation": "index_faiss",
-                "path": config.index_path,
+                "path": index_path,
                 "correlation_id": correlation_id,
             },
         )
         typer.echo(f"FAISS index vectors stored at {config.index_path}")
+        logger.info(
+            "FAISS index build completed",
+            extra={
+                "operation": "index_faiss",
+                "path": index_path,
+                "factory": factory,
+                "metric": metric,
+                "correlation_id": correlation_id,
+            },
+        )
 
     except VectorValidationError as exc:
         logger.exception(
@@ -499,7 +577,7 @@ def index_faiss(
         problem = _build_vector_problem_details(
             detail=str(exc),
             correlation_id=correlation_id,
-            vector_path=config.dense_vectors,
+            vector_path=dense_vectors,
             errors=exc.errors,
             instance=instance_uri,
         )
@@ -534,6 +612,26 @@ def index_faiss(
         )
         typer.echo(f"Error saving index: {exc}", err=True)
         raise typer.Exit(code=1) from exc
+
+
+def _index_faiss_cli(
+    dense_vectors: Annotated[
+        str, typer.Argument(..., help="Path to dense vectors JSON (skeleton)")
+    ],
+    index_path: Annotated[
+        str,
+        typer.Option(
+            "./_indices/faiss/shard_000.idx", help="Output index (CPU .idx)", show_default=True
+        ),
+    ] = "./_indices/faiss/shard_000.idx",
+    factory: Annotated[
+        str, typer.Option("Flat", help="FAISS factory string", show_default=True)
+    ] = "Flat",
+    metric: Annotated[
+        str, typer.Option("ip", help="Metric: 'ip' or 'l2'", show_default=True)
+    ] = "ip",
+) -> None:
+    index_faiss(dense_vectors, index_path, factory, metric)
 
 
 # [nav:anchor api]
@@ -607,8 +705,8 @@ def e2e() -> None:
         typer.echo(step)
 
 
-app.command()(index_bm25)
-app.command()(index_faiss)
+app.command("index_bm25")(_index_bm25_cli)
+app.command("index_faiss")(_index_faiss_cli)
 app.command()(api)
 app.command()(e2e)
 

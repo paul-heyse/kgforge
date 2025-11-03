@@ -29,11 +29,38 @@ from __future__ import annotations
 import hashlib
 import hmac
 import io
-import logging
+from collections.abc import Callable
 from importlib import import_module
 from typing import TYPE_CHECKING, BinaryIO, Protocol, cast
 
-logger = logging.getLogger(__name__)
+from kgfoundry_common.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+def _load_cloudpickle_dumps() -> Callable[[object], bytes] | None:
+    candidate_modules = (
+        "kgfoundry_common.cloudpickle_shim",
+        "cloudpickle",
+    )
+    for module_name in candidate_modules:
+        try:
+            module = import_module(module_name)
+        except ImportError:  # pragma: no cover - optional dependency missing
+            continue
+        dumps_candidate: object = getattr(module, "dumps", None)
+        if callable(dumps_candidate):
+            return cast(Callable[[object], bytes], dumps_candidate)
+    return None
+
+
+_CLOUDPICKLE_DUMPS: Callable[[object], bytes] | None = _load_cloudpickle_dumps()
+
+try:
+    pickle_module = import_module("pickle")
+    _PICKLING_ERROR = cast(type[Exception], pickle_module.PicklingError)
+except (ImportError, AttributeError):  # pragma: no cover - defensive fallback
+    _PICKLING_ERROR = Exception
 
 # Constants
 _MIN_SIGNING_KEY_BYTES: int = 32
@@ -90,6 +117,8 @@ class _UnpicklerProtocol(Protocol):
 
 class _PickleModule(Protocol):
     Unpickler: type[_UnpicklerProtocol]
+
+    PicklingError: type[Exception]
 
     def dump(self, obj: object, file: BinaryIO) -> None: ...
 
@@ -332,7 +361,7 @@ class SignedPickleWrapper:
         expected_sig = hmac.new(self.signing_key, payload, hashlib.sha256).digest()
 
         if not hmac.compare_digest(signature, expected_sig):
-            msg = "HMAC signature verification failed; payload may be tampered"
+            msg = "Deserialization blocked: HMAC signature verification failed; payload may be tampered"
             raise UnsafeSerializationError(msg, reason="signature_mismatch")
 
         result = _load_with_allow_list(io.BytesIO(payload))
@@ -365,14 +394,20 @@ def load_unsigned_legacy(file: BinaryIO) -> object:
 
 
 def create_unsigned_pickle_payload(obj: object) -> bytes:
-    """Return stdlib pickle bytes for constructing negative test fixtures.
+    """Return pickle bytes for constructing negative test fixtures.
 
-    This helper exists so tests can craft intentionally unsafe payloads while
-    keeping production code confined to the hardened serialization boundary.
-    Production code should continue to use :class:`SignedPickleWrapper` or
-    :func:`load_unsigned_legacy`.
+    This helper first attempts stdlib pickle. If the object cannot be serialized
+    (e.g., local classes defined inside tests), it falls back to ``cloudpickle``
+    when available. Production code should continue to use
+    :class:`SignedPickleWrapper` or :func:`load_unsigned_legacy`.
     """
-    return _stdlib_pickle.dumps(obj)
+    try:
+        return _stdlib_pickle.dumps(obj)
+    except (AttributeError, _PICKLING_ERROR, TypeError) as exc:
+        if _CLOUDPICKLE_DUMPS is None:
+            message = "cloudpickle is required to serialize this object"
+            raise RuntimeError(message) from exc
+        return _CLOUDPICKLE_DUMPS(obj)
 
 
 __all__ = [
