@@ -364,8 +364,20 @@ def load_unsigned_legacy(file: BinaryIO) -> object:
     return _load_with_allow_list(buffer)
 
 
+def create_unsigned_pickle_payload(obj: object) -> bytes:
+    """Return stdlib pickle bytes for constructing negative test fixtures.
+
+    This helper exists so tests can craft intentionally unsafe payloads while
+    keeping production code confined to the hardened serialization boundary.
+    Production code should continue to use :class:`SignedPickleWrapper` or
+    :func:`load_unsigned_legacy`.
+    """
+    return _stdlib_pickle.dumps(obj)
+
+
 __all__ = [
     "SignedPickleWrapper",
     "UnsafeSerializationError",
+    "create_unsigned_pickle_payload",
     "load_unsigned_legacy",
 ]

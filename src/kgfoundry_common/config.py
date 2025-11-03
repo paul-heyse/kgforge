@@ -16,9 +16,9 @@ from __future__ import annotations
 import base64
 import functools
 from functools import lru_cache
-from typing import Final
+from typing import Final, Self
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings
 
 from kgfoundry_common.logging import get_logger
@@ -108,25 +108,25 @@ class AppSettings(BaseSettings):
     log_level: str = Field(
         default="INFO",
         description="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
-        validation_alias="LOG_LEVEL",
+        validation_alias=AliasChoices("LOG_LEVEL", "log_level"),
     )
 
     log_format: str = Field(
         default="json",
         description="Logging format ('json' or 'text')",
-        validation_alias="LOG_FORMAT",
+        validation_alias=AliasChoices("LOG_FORMAT", "log_format"),
     )
 
     signing_key: str | None = Field(
         default=None,
         description="HMAC signing key for secure pickle (base64-encoded, ≥32 bytes recommended)",
-        validation_alias="SIGNING_KEY",
+        validation_alias=AliasChoices("SIGNING_KEY", "signing_key"),
     )
 
     subprocess_timeout: int = Field(
         default=300,
         description="Default timeout for subprocess operations in seconds",
-        validation_alias="SUBPROCESS_TIMEOUT",
+        validation_alias=AliasChoices("SUBPROCESS_TIMEOUT", "subprocess_timeout"),
         ge=1,
         le=3600,
     )
@@ -134,12 +134,33 @@ class AppSettings(BaseSettings):
     request_timeout: int = Field(
         default=30,
         description="Default timeout for network requests in seconds",
-        validation_alias="REQUEST_TIMEOUT",
+        validation_alias=AliasChoices("REQUEST_TIMEOUT", "request_timeout"),
         ge=1,
         le=3600,
     )
 
-    model_config = {"frozen": True, "case_sensitive": False}
+    model_config = {"frozen": True, "case_sensitive": False, "populate_by_name": True}
+
+    @classmethod
+    def model_validate(
+        cls,
+        obj: object,
+        *,
+        strict: bool | None = None,
+        from_attributes: bool | None = None,
+        context: dict[str, object] | None = None,
+    ) -> Self:
+        """Validate ``obj`` returning ``cls`` while normalising pydantic errors."""
+        try:
+            return super().model_validate(
+                obj,
+                strict=strict,
+                from_attributes=from_attributes,
+                context=context,
+            )
+        except ValidationError as exc:
+            message = _format_validation_error(exc)
+            raise ValueError(message) from exc
 
     @field_validator("log_level")
     @classmethod
@@ -312,3 +333,14 @@ def load_config(reload: bool = False) -> AppSettings:
         _load_config_cached.cache_clear()
 
     return _load_config_cached()
+
+
+def _format_validation_error(exc: ValidationError) -> str:
+    """Return the most helpful message from a pydantic ``ValidationError``."""
+    errors = exc.errors()
+    if errors:
+        primary = errors[0]
+        msg = primary.get("msg")
+        if isinstance(msg, str) and msg:
+            return msg
+    return str(exc)

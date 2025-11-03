@@ -4,14 +4,17 @@ from __future__ import annotations
 
 import io
 import os
-import pickle  # noqa: S403
 from collections.abc import Callable
 from typing import TYPE_CHECKING, ParamSpec, TypeVar, cast
 
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from kgfoundry_common.safe_pickle_v2 import SignedPickleWrapper, UnsafeSerializationError
+from kgfoundry_common.safe_pickle_v2 import (
+    SignedPickleWrapper,
+    UnsafeSerializationError,
+    create_unsigned_pickle_payload,
+)
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -139,7 +142,7 @@ class TestSignedPickleWrapper:
             pass
 
         obj = CustomClass()
-        pickled = pickle.dumps(obj)
+        pickled = create_unsigned_pickle_payload(obj)
 
         # Try to load it - should fail due to allow-list
         key = os.urandom(32)

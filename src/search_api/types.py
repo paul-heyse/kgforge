@@ -749,16 +749,13 @@ class _LegacyFaissModule(Protocol):
     METRIC_L2: int
 
     index_factory: Callable[[int, str, int], FaissIndexProtocol]
-
     write_index: Callable[[FaissIndexProtocol, str], None]
-
     read_index: Callable[[str], FaissIndexProtocol]
 
-    def IndexFlatIP(self, dimension: int) -> FaissIndexProtocol: ...  # noqa: N802
-
-    def IndexIDMap2(self, index: FaissIndexProtocol) -> FaissIndexProtocol: ...  # noqa: N802
-
-    def normalize_L2(self, vectors: VectorArray) -> None: ...  # noqa: N802
+    #: Legacy camelCase constructors exposed by upstream FAISS bindings.
+    IndexFlatIP: Callable[[int], FaissIndexProtocol]
+    IndexIDMap2: Callable[[FaissIndexProtocol], FaissIndexProtocol]
+    normalize_L2: Callable[[VectorArray], None]
 
 
 class _FaissModuleAdapter:
