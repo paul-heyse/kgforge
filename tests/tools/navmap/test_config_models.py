@@ -7,7 +7,9 @@ and enforce their constraints.
 from __future__ import annotations
 
 import tempfile
+from dataclasses import FrozenInstanceError
 from pathlib import Path
+from typing import cast
 
 import pytest
 from tools.navmap.config import NavmapRepairOptions, NavmapStripOptions
@@ -42,8 +44,8 @@ class TestNavmapRepairOptions:
     def test_is_frozen(self) -> None:
         """Verify config is immutable."""
         options = NavmapRepairOptions()
-        with pytest.raises(AttributeError):
-            options.apply = True  # type: ignore[misc]
+        with pytest.raises(FrozenInstanceError):
+            cast("object", options).apply = True
 
     def test_both_flags_can_be_combined(self) -> None:
         """Verify apply and emit_json can be used together."""
@@ -81,8 +83,8 @@ class TestNavmapStripOptions:
     def test_is_frozen(self) -> None:
         """Verify config is immutable."""
         options = NavmapStripOptions()
-        with pytest.raises(AttributeError):
-            options.dry_run = False  # type: ignore[misc]
+        with pytest.raises(FrozenInstanceError):
+            cast("object", options).dry_run = False
 
     def test_flags_combination_both_true(self) -> None:
         """Verify both flags can be True simultaneously."""
@@ -106,7 +108,8 @@ class TestConfigComparison:
         strip = NavmapStripOptions()
         assert isinstance(repair, NavmapRepairOptions)
         assert isinstance(strip, NavmapStripOptions)
-        assert not isinstance(repair, NavmapStripOptions)
+        assert type(repair) is NavmapRepairOptions
+        assert type(strip) is NavmapStripOptions
 
     def test_repair_has_root_attribute(self) -> None:
         """Verify NavmapRepairOptions has root attribute."""

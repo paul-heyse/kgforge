@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from typing import cast
 
 import pytest
@@ -12,6 +13,7 @@ from kgfoundry_common.problem_details import (
     render_problem,
     validate_problem_details,
 )
+from kgfoundry_common.types import JsonValue
 
 
 class TestConfigurationErrorWithDetails:
@@ -82,7 +84,10 @@ class TestConfigurationErrorWithDetails:
     def test_with_details_keyword_only(self) -> None:
         """Test that with_details requires keyword arguments."""
         with pytest.raises(TypeError):
-            ConfigurationError.with_details("field", "issue")  # type: ignore[misc]
+            invalid_call = cast(
+                "Callable[..., ConfigurationError]", ConfigurationError.with_details
+            )
+            invalid_call("field", "issue")
 
     def test_with_details_special_characters(self) -> None:
         """Test with_details with special characters in field and issue."""
@@ -175,8 +180,7 @@ class TestBuildConfigurationProblem:
             issue="Schema validation failed",
         )
         problem = build_configuration_problem(error)
-        # Cast to the expected Mapping type - validate_problem_details will verify the schema
-        validate_problem_details(cast("object", problem))  # type: ignore[arg-type]
+        validate_problem_details(cast("Mapping[str, JsonValue]", problem))
 
     def test_build_configuration_problem_multiple_fields(self) -> None:
         """Test Problem Details with multi-field error context."""

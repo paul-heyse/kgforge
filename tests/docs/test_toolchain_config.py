@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
+from typing import cast
 
 import pytest
 from docs.toolchain.config import DocsDeltaConfig, DocsSymbolIndexConfig
@@ -52,7 +53,7 @@ class TestDocsSymbolIndexConfig:
         """Verify config is immutable (frozen dataclass)."""
         config = DocsSymbolIndexConfig()
         with pytest.raises(FrozenInstanceError):
-            config.output_format = "yaml"  # type: ignore[misc]
+            cast("object", config).output_format = "yaml"
 
     def test_all_formats(self) -> None:
         """Verify all valid output formats are accepted."""
@@ -107,7 +108,7 @@ class TestDocsDeltaConfig:
         """Verify config is immutable (frozen dataclass)."""
         config = DocsDeltaConfig()
         with pytest.raises(FrozenInstanceError):
-            config.severity_threshold = "error"  # type: ignore[misc]
+            cast("object", config).severity_threshold = "error"
 
     def test_all_thresholds(self) -> None:
         """Verify all valid severity thresholds are accepted."""
@@ -136,7 +137,8 @@ class TestConfigComparison:
         """Verify configs are different types."""
         index_config = DocsSymbolIndexConfig()
         delta_config = DocsDeltaConfig()
-        assert type(index_config) is not type(delta_config)
+        assert index_config.__class__ is DocsSymbolIndexConfig
+        assert delta_config.__class__ is DocsDeltaConfig
 
     def test_index_has_output_format(self) -> None:
         """Verify DocsSymbolIndexConfig has output_format."""

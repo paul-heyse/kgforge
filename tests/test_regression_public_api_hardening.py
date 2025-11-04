@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import tempfile
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from tools.docstring_builder.cache import DocstringBuilderCache
@@ -131,7 +131,7 @@ class TestConfigurationModelValidation:
 
             # Should not be able to modify
             with pytest.raises(AttributeError):
-                config.dense_vectors = "other.json"  # type: ignore[misc]
+                cast("Any", config).dense_vectors = "other.json"
 
     def test_configuration_error_with_details_keyword_only(self) -> None:
         """Verify ConfigurationError.with_details uses keyword-only parameters."""
@@ -145,7 +145,7 @@ class TestConfigurationModelValidation:
 
         # Should fail with positional args
         with pytest.raises(TypeError):
-            ConfigurationError.with_details("test", "issue")  # type: ignore[misc]
+            cast("Any", ConfigurationError.with_details)("test", "issue")
 
 
 class TestNewPublicAPI:
@@ -218,7 +218,7 @@ class TestAPIConsistency:
 
             # Frozen dataclass should raise on modification
             with pytest.raises(AttributeError):
-                config.factory = "OPQ64,IVF8192,PQ64"  # type: ignore[misc]
+                cast("Any", config).factory = "OPQ64,IVF8192,PQ64"
 
     def test_configuration_models_use_keyword_only(self) -> None:
         """Verify configuration models are accessible and work correctly."""

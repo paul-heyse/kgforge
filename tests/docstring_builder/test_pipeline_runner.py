@@ -159,12 +159,12 @@ def _build_pipeline_config(
     class CoordinatorFactory:
         """Factory for creating DocfactsCoordinator instances."""
 
-        def __call__(self, is_check: bool) -> DocfactsCoordinator:  # noqa: FBT001
+        def __call__(self, *, check_mode: bool) -> DocfactsCoordinator:
             """Create coordinator with appropriate status based on mode.
 
             Parameters
             ----------
-            is_check : bool
+            check_mode : bool
                 If True, use check status; otherwise use 'success'.
 
             Returns
@@ -173,7 +173,7 @@ def _build_pipeline_config(
                 A stub coordinator with appropriate status.
 
             """
-            status = docfacts_status if is_check else "success"
+            status = docfacts_status if check_mode else "success"
             return cast(
                 "DocfactsCoordinator",
                 _StubDocfactsCoordinator(status=status, message=docfacts_message),

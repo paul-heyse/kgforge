@@ -68,13 +68,13 @@ class TestLoggingCacheGetFormatter:
         """Test that get_formatter returns a logging.Formatter."""
         cache = get_logging_cache()
         formatter = cache.get_formatter()
-        assert isinstance(formatter, logging.Formatter)  # type: ignore[misc]
+        assert isinstance(formatter, logging.Formatter)
 
     def test_returns_json_formatter(self) -> None:
         """Test that get_formatter returns a JsonFormatter."""
         cache = get_logging_cache()
         formatter = cache.get_formatter()
-        assert isinstance(formatter, JsonFormatter)  # type: ignore[misc]
+        assert isinstance(formatter, JsonFormatter)
 
     def test_returns_cached_instance(self) -> None:
         """Test that get_formatter returns same instance on repeated calls."""
@@ -127,7 +127,7 @@ class TestLoggingCacheClear:
         cache.clear()
         # Should not raise any exceptions
         formatter = cache.get_formatter()
-        assert isinstance(formatter, logging.Formatter)  # type: ignore[misc]
+        assert isinstance(formatter, logging.Formatter)
 
 
 class TestLoggingCacheIntegration:

@@ -157,13 +157,13 @@ class GriffeFacade(Protocol):
 class _GriffeLoaderAdapter:
     """Adapter wrapping a Griffe loader."""
 
-    def __init__(self, griffe_loader: object) -> None:
+    def __init__(self, griffe_loader: LoaderFacade) -> None:
         """Initialize with a Griffe loader."""
         self._loader = griffe_loader
 
     def load(self, package: str) -> GriffeNode:
         """Delegate to the Griffe loader."""
-        return self._loader.load(package)  # type: ignore[no-any-return, attr-defined, misc]
+        return self._loader.load(package)
 
 
 class _DefaultMemberIterator:
@@ -227,7 +227,7 @@ def build_facade(env: BuildEnvironment) -> GriffeFacade:
         logger.exception("Griffe initialization failed", extra={"reason": str(exc)})
         raise ArtifactDependencyError(msg) from exc
 
-    adapter = _GriffeLoaderAdapter(griffe_loader)
+    adapter = _GriffeLoaderAdapter(cast("LoaderFacade", griffe_loader))
     return _TypedGriffeFacade(adapter)
 
 

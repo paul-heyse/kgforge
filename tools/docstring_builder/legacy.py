@@ -42,6 +42,15 @@ if TYPE_CHECKING:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_ROOT = REPO_ROOT / "src"
 
+
+def configure_roots(repo_root: Path, src_root: Path) -> None:
+    """Override the repository and source roots used by legacy helpers."""
+    global REPO_ROOT  # noqa: PLW0603 - module-level configuration hook
+    global SRC_ROOT  # noqa: PLW0603 - module-level configuration hook
+    REPO_ROOT = repo_root
+    SRC_ROOT = src_root
+
+
 STANDARD_METHOD_EXTENDED_SUMMARIES = _STANDARD_METHOD_EXTENDED_SUMMARIES
 
 
@@ -548,6 +557,7 @@ __all__ = [
     "annotation_to_text",
     "build_docstring",
     "build_examples",
+    "configure_roots",
     "detect_raises",
     "extended_summary",
     "is_magic",

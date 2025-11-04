@@ -161,6 +161,10 @@ class SymbolHarvest:
     is_generator: bool
 
 
+def _new_cst_index() -> dict[str, cst.CSTNode]:
+    return {}
+
+
 @dataclass(slots=True)
 class HarvestResult:
     """Container mapping harvested symbols to CST nodes."""
@@ -168,7 +172,7 @@ class HarvestResult:
     module: str
     filepath: Path
     symbols: list[SymbolHarvest]
-    cst_index: dict[str, cst.CSTNode] = field(default_factory=dict)
+    cst_index: dict[str, cst.CSTNode] = field(default_factory=_new_cst_index)
 
 
 def _module_name(root: Path, file_path: Path) -> str:
@@ -265,6 +269,81 @@ def _iter_parameters(function: GriffeFunctionLike) -> Iterator[ParameterHarvest]
         )
 
 
+def _collect_class_symbol(
+    class_obj: GriffeClassLike,
+    module_name: str,
+    file_path: Path,
+    config: BuilderConfig,
+    prefix: list[str],
+) -> Iterator[SymbolHarvest]:
+    name = class_obj.name
+    qname = ".".join([module_name, *prefix, name])
+    docstring = _docstring_value(class_obj.docstring)
+    owned = docstring is None or config.ownership_marker in docstring
+    if qname in config.package_settings.opt_out:
+        owned = False
+    col_offset = class_obj.col_offset if class_obj.col_offset is not None else 0
+    end_lineno = class_obj.endlineno
+    decorators_tuple = tuple(class_obj.decorators)
+    lineno = class_obj.lineno if class_obj.lineno is not None else 1
+    yield SymbolHarvest(
+        qname=qname,
+        module=module_name,
+        kind="class",
+        parameters=[],
+        return_annotation=None,
+        docstring=docstring,
+        owned=owned,
+        filepath=file_path,
+        lineno=lineno,
+        end_lineno=end_lineno,
+        col_offset=col_offset,
+        decorators=_decorator_names(decorators_tuple),
+        is_async=False,
+        is_generator=False,
+    )
+    yield from _walk_members(class_obj, module_name, file_path, config, [*prefix, name])
+
+
+def _collect_function_symbol(
+    function_obj: GriffeFunctionLike,
+    module_name: str,
+    file_path: Path,
+    config: BuilderConfig,
+    prefix: list[str],
+) -> Iterator[SymbolHarvest]:
+    name = function_obj.name
+    qname = ".".join([module_name, *prefix, name])
+    parameters = list(_iter_parameters(function_obj))
+    docstring = _docstring_value(function_obj.docstring)
+    owned = docstring is None or config.ownership_marker in docstring
+    if qname in config.package_settings.opt_out:
+        owned = False
+    return_annotation_obj = function_obj.return_annotation or function_obj.returns
+    col_offset = function_obj.col_offset if function_obj.col_offset is not None else 0
+    end_lineno = function_obj.endlineno
+    decorators_tuple = tuple(function_obj.decorators)
+    is_async = function_obj.is_async
+    is_generator = function_obj.is_generator
+    lineno = function_obj.lineno if function_obj.lineno is not None else 1
+    yield SymbolHarvest(
+        qname=qname,
+        module=module_name,
+        kind="method" if prefix else "function",
+        parameters=parameters,
+        return_annotation=_annotation_to_str(return_annotation_obj),
+        docstring=docstring,
+        owned=owned,
+        filepath=file_path,
+        lineno=lineno,
+        end_lineno=end_lineno,
+        col_offset=col_offset,
+        decorators=_decorator_names(decorators_tuple),
+        is_async=is_async,
+        is_generator=is_generator,
+    )
+
+
 def _collect_symbols(
     obj: object,
     module_name: str,
@@ -272,62 +351,24 @@ def _collect_symbols(
     config: BuilderConfig,
     prefix: list[str] | None = None,
 ) -> Iterator[SymbolHarvest]:
-    prefix = prefix or []
+    prefix_list: list[str] = prefix if prefix is not None else []
     if _is_griffe_class(obj):
-        qname = ".".join([module_name, *prefix, obj.name])
-        docstring = _docstring_value(obj.docstring)
-        owned = (docstring and config.ownership_marker in docstring) or docstring is None
-        if qname in config.package_settings.opt_out:
-            owned = False
-        col_offset = getattr(obj, "col_offset", 0) or 0
-        yield SymbolHarvest(
-            qname=qname,
-            module=module_name,
-            kind="class",
-            parameters=[],
-            return_annotation=None,
-            docstring=docstring,
-            owned=owned,
-            filepath=file_path,
-            lineno=obj.lineno or 1,
-            end_lineno=obj.endlineno,
-            col_offset=col_offset,
-            decorators=_decorator_names(tuple(obj.decorators)),
-            is_async=False,
-            is_generator=False,
-        )
-        yield from _walk_members(obj, module_name, file_path, config, [*prefix, obj.name])
+        class_obj: GriffeClassLike = obj
+        yield from _collect_class_symbol(class_obj, module_name, file_path, config, prefix_list)
         return
     if _is_griffe_function(obj):
-        qname = ".".join([module_name, *prefix, obj.name])
-        parameters = list(_iter_parameters(obj))
-        docstring = _docstring_value(obj.docstring)
-        owned = (docstring and config.ownership_marker in docstring) or docstring is None
-        if qname in config.package_settings.opt_out:
-            owned = False
-        return_annotation_obj = getattr(obj, "return_annotation", None) or getattr(
-            obj, "returns", None
-        )
-        col_offset = getattr(obj, "col_offset", 0) or 0
-        yield SymbolHarvest(
-            qname=qname,
-            module=module_name,
-            kind="method" if prefix else "function",
-            parameters=parameters,
-            return_annotation=_annotation_to_str(return_annotation_obj),
-            docstring=docstring,
-            owned=owned,
-            filepath=file_path,
-            lineno=obj.lineno or 1,
-            end_lineno=obj.endlineno,
-            col_offset=col_offset,
-            decorators=_decorator_names(tuple(obj.decorators)),
-            is_async=bool(getattr(obj, "is_async", False)),
-            is_generator=bool(getattr(obj, "is_generator", False)),
+        function_obj: GriffeFunctionLike = obj
+        yield from _collect_function_symbol(
+            function_obj,
+            module_name,
+            file_path,
+            config,
+            prefix_list,
         )
         return
     if _is_griffe_module(obj):
-        yield from _walk_members(obj, module_name, file_path, config, prefix)
+        module_obj: GriffeModuleLike = obj
+        yield from _walk_members(module_obj, module_name, file_path, config, prefix_list)
 
 
 def _walk_members(

@@ -157,10 +157,8 @@ def _atomic_write(target: Path, content: str, *, encoding: str = "utf-8") -> Non
             tmp_file.flush()
             os.fsync(tmp_file.fileno())
             temp_path = Path(tmp_file.name)
-        if temp_path is None:
-            msg = "Temporary file path not captured during atomic write"
-            raise RuntimeError(msg)
-        Path(temp_path).replace(target)
+        assert temp_path is not None
+        temp_path.replace(target)
     finally:
         if temp_path is not None and temp_path.exists():
             temp_path.unlink()

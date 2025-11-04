@@ -149,7 +149,7 @@ class TestPluginValidation:
             load_plugins(
                 config,
                 tmp_path,
-                builtin=[MyProtocol],  # type: ignore[list-item]
+                builtin=cast("Sequence[Any]", [MyProtocol]),
             )
 
     def test_accepts_concrete_class(self, tmp_path: Path) -> None:
@@ -160,7 +160,7 @@ class TestPluginValidation:
         manager = load_plugins(
             config,
             tmp_path,
-            builtin=[DataclassFieldDocPlugin],  # type: ignore[list-item]
+            builtin=cast("Sequence[Any]", [DataclassFieldDocPlugin]),
         )
 
         assert len(manager.transformers) == 1

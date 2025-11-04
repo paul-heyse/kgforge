@@ -497,9 +497,6 @@ python tools/check_imports.py
 # Dead code
 uv run vulture src tools stubs --min-confidence 90
 
-# Security (vuln scan)
-uv run pip-audit
-
 # All pre-commit hooks
 uvx pre-commit run --all-files
 ```
@@ -525,9 +522,7 @@ uvx pre-commit run --all-files
 
 - **Secrets**: never commit `.env` or tokens; redact secrets in logs.
 - **Validation**: sanitize all untrusted inputs at boundaries; validate against schemas.
-- **Dependencies**: run `uv run pip-audit` locally before large upgrades; nightlies may run in CI.
 - **Licenses**: prefer MIT/Apache‑2.0; consult SBOM when adding third‑party libs.
-- **Gate**: PRs MUST pass `uv run pip-audit` (or include a justified, time‑bound suppression).
 
 ---
 

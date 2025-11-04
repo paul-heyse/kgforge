@@ -543,13 +543,12 @@ def build_configuration_problem(
     message: str = msg_value if isinstance(msg_value, str) else str(config_error)
 
     # Get http_status - expect int, default to 500
-    http_status: int = cast("int", getattr(config_error, "http_status", 500))
+    http_attr: object = getattr(config_error, "http_status", 500)
+    http_status: int = http_attr if isinstance(http_attr, int) else 500
 
     # Get code value - should be ErrorCode enum with .value attribute
     code_obj: object = getattr(config_error, "code", None)
-    value_attr: object | None = (
-        getattr(code_obj, "value", None) if hasattr(code_obj, "value") else None
-    )
+    value_attr: object = getattr(code_obj, "value", None)
     code_value: str = value_attr if isinstance(value_attr, str) else "configuration-error"
 
     return build_problem_details(

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import Protocol, cast
 
 import pytest
 import tools.docstring_builder.orchestrator as orchestrator_module
@@ -18,12 +18,13 @@ from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config_models import DocstringBuildConfig
 from tools.docstring_builder.orchestrator import run_build, run_legacy
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
+
+class _AnyCallable(Protocol):
+    def __call__(self, *args: object, **kwargs: object) -> object: ...
 
 
 def _call_untyped_run_build(*args: object, **kwargs: object) -> object:
-    untyped: Callable[..., object] = cast("Callable[..., object]", run_build)
+    untyped = cast("_AnyCallable", run_build)
     return untyped(*args, **kwargs)
 
 

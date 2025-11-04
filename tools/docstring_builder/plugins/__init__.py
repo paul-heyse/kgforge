@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 import logging
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from importlib import metadata
 from inspect import isclass
@@ -39,7 +39,6 @@ from tools.docstring_builder.plugins.normalize_numpy_params import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
     from pathlib import Path
 
     from tools.docstring_builder.config import BuilderConfig
@@ -86,7 +85,7 @@ class PluginConfigurationError(DocstringBuilderError):
 
 
 def _extract_stage(source: object, default: str | None = "unknown") -> str | None:
-    stage_attr = getattr(source, "stage", default)
+    stage_attr: object = getattr(source, "stage", default)
     if isinstance(stage_attr, str):
         return stage_attr
     return default
@@ -284,7 +283,8 @@ def _validate_callable_signature(
     # Use typed inspection module instead of raw inspect
     has_required_params: bool
     try:
-        has_required_params = has_required_parameters(cast("Callable[..., object]", factory))
+        callable_factory = cast("Callable[[], object]", factory)
+        has_required_params = has_required_parameters(callable_factory)
     except (ValueError, TypeError) as exc:
         msg = f"Could not inspect factory signature for {name!r}"
         raise PluginRegistryError(
@@ -324,13 +324,12 @@ def _is_protocol_class(candidate: object) -> bool:
     """
     if not inspect.isclass(candidate):
         return False
-    # Check for typing_extensions.Protocol marker
-    # getattr on dynamic attributes returns Any per Python's type system
-    return bool(
-        hasattr(candidate, "__protocol_attrs__")
-        or hasattr(candidate, "_is_protocol")
-        or getattr(candidate, "__mro_entries__", None) is not None
-    )
+    type_candidate = cast("type[object]", candidate)
+    has_protocol_attrs = hasattr(type_candidate, "__protocol_attrs__")
+    protocol_flag_attr: object = getattr(type_candidate, "_is_protocol", False)
+    is_protocol_flag = bool(protocol_flag_attr)
+    has_mro_entries = hasattr(type_candidate, "__mro_entries__")
+    return bool(has_protocol_attrs or is_protocol_flag or has_mro_entries)
 
 
 def _is_abstract_class(candidate: object) -> bool:
@@ -348,8 +347,9 @@ def _is_abstract_class(candidate: object) -> bool:
     """
     if not inspect.isclass(candidate):
         return False
-    # getattr on dynamic attributes returns Any per Python's type system
-    return bool(getattr(candidate, "__abstractmethods__", None))
+    type_candidate = cast("type[object]", candidate)
+    abstract_methods: object | None = getattr(type_candidate, "__abstractmethods__", None)
+    return bool(abstract_methods)
 
 
 def _instantiate_plugin_from_factory(
@@ -432,9 +432,9 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
 
     # If it's a class, check if it's Protocol or abstract
     if isclass(candidate):
-        if _is_protocol_class(candidate):
-            # getattr on dynamic attributes returns Any per Python's type system
-            stage = _extract_stage(candidate)
+        plugin_class = cast("type[object]", candidate)
+        if _is_protocol_class(plugin_class):
+            stage = _extract_stage(plugin_class)
             message = f"Cannot register Protocol class {name!r} as plugin"
             raise PluginRegistryError(
                 message,
@@ -444,9 +444,8 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
                     "reason": "is-protocol",
                 },
             )
-        if _is_abstract_class(candidate):
-            # getattr on dynamic attributes returns Any per Python's type system
-            stage = _extract_stage(candidate)
+        if _is_abstract_class(plugin_class):
+            stage = _extract_stage(plugin_class)
             message = f"Cannot register abstract class {name!r} as plugin"
             raise PluginRegistryError(
                 message,
@@ -457,7 +456,7 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
                 },
             )
         # It's a concrete class, treat as factory
-        return cast("PluginFactoryCandidateT", candidate)
+        return cast("PluginFactoryCandidateT", plugin_class)
 
     # If it's callable, treat as factory
     if callable(candidate):

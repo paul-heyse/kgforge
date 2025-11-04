@@ -442,10 +442,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         all_violations.extend(violations)
 
     # Output results
+    json_attr: object = getattr(args, "json", False)
+    list_attr: object = getattr(args, "list", False)
     output = format_violations(
         all_violations,
-        json_output=bool(getattr(args, "json", False)),
-        list_output=bool(getattr(args, "list", False)),
+        json_output=bool(json_attr),
+        list_output=bool(list_attr),
     )
     sys.stdout.write(output + "\n")
 

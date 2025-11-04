@@ -258,6 +258,6 @@ class TestDoctest:
         """Verify the build_facade doctest example works."""
         env = detect_environment()
         facade = build_facade(env)
-        node = facade.loader.load("kgfoundry")  # type: ignore[attr-defined]
+        node = facade.loader.load("kgfoundry")
         # Should not raise and should return something
         assert node is not None
