@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from tools._shared.error_codes import format_error_message
 from tools._shared.logging import get_logger
 from tools._shared.proc import ToolExecutionError, run_tool
 
@@ -23,7 +24,11 @@ def run_builder(extra_args: list[str] | None = None) -> None:
     try:
         run_tool(cmd, timeout=20.0, check=True)
     except ToolExecutionError as exc:
-        LOGGER.exception("Docstring builder failed")
+        details = exc.stderr.strip() if getattr(exc, "stderr", "") else ""
+        LOGGER.exception(
+            format_error_message("KGF-DOC-BLD-001", "Docstring builder failed", details=details),
+            extra={"error_code": "KGF-DOC-BLD-001"},
+        )
         raise SystemExit(exc.returncode if exc.returncode is not None else 1) from exc
 
 
