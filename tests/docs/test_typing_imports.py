@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from docs.scripts.testing import clear_lazy_import_caches
 
 DOCS_SCRIPTS = [
     Path(__file__).parent.parent.parent / "docs" / "_scripts",
@@ -57,6 +58,7 @@ class TestDocsScriptsTypingImports:
             to_remove = [m for m in sys.modules if m.startswith("docs._scripts")]
             for m in to_remove:
                 del sys.modules[m]
+            clear_lazy_import_caches()
 
     def test_docs_scripts_have_postponed_annotations(self) -> None:
         """Verify all docs scripts have `from __future__ import annotations`."""

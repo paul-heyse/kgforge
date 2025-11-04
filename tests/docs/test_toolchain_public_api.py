@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from importlib import import_module
 
-import docs.toolchain.build_symbol_index
-import docs.toolchain.symbol_delta
-import docs.toolchain.validate_artifacts
 import pytest
 from docs.toolchain.build_symbol_index import build_symbol_index
 from docs.toolchain.config import DocsDeltaConfig, DocsSymbolIndexConfig
@@ -103,20 +101,23 @@ class TestAPITypeEnforcement:
 class TestAPIExports:
     """Test that APIs are properly exported."""
 
+    @staticmethod
+    def _module_exports(module_name: str) -> Sequence[str]:
+        module = import_module(module_name)
+        exports_obj: object = getattr(module, "__all__", ())
+        return exports_obj if isinstance(exports_obj, Sequence) else ()
+
     def test_build_symbol_index_in_all(self) -> None:
         """Verify build_symbol_index is in __all__."""
-        exports_obj: object = getattr(docs.toolchain.build_symbol_index, "__all__", ())
-        exports = exports_obj if isinstance(exports_obj, Sequence) else ()
+        exports = self._module_exports("docs.toolchain.build_symbol_index")
         assert "build_symbol_index" in exports
 
     def test_compute_delta_in_all(self) -> None:
         """Verify compute_delta is in __all__."""
-        exports_obj: object = getattr(docs.toolchain.symbol_delta, "__all__", ())
-        exports = exports_obj if isinstance(exports_obj, Sequence) else ()
+        exports = self._module_exports("docs.toolchain.symbol_delta")
         assert "compute_delta" in exports
 
     def test_validate_artifacts_in_all(self) -> None:
         """Verify validate_artifacts is in __all__."""
-        exports_obj: object = getattr(docs.toolchain.validate_artifacts, "__all__", ())
-        exports = exports_obj if isinstance(exports_obj, Sequence) else ()
+        exports = self._module_exports("docs.toolchain.validate_artifacts")
         assert "validate_artifacts" in exports
