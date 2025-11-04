@@ -13,15 +13,17 @@ from pathlib import Path
 
 import pytest
 
+from tests.helpers import load_attribute, load_module
+
 
 class TestPostponedAnnotations:
     """Verify postponed annotations are present in core modules."""
 
     def test_kgfoundry_common_typing_has_postponed_annotations(self) -> None:
         """kgfoundry_common.typing uses postponed annotations."""
-        import kgfoundry_common.typing  # noqa: PLC0415
+        module = load_module("kgfoundry_common.typing")
 
-        source_file = kgfoundry_common.typing.__file__
+        source_file = module.__file__
         assert source_file is not None
 
         content = Path(source_file).read_text(encoding="utf-8")
@@ -29,9 +31,9 @@ class TestPostponedAnnotations:
 
     def test_tools_typing_has_postponed_annotations(self) -> None:
         """tools.typing uses postponed annotations."""
-        import tools.typing  # noqa: PLC0415
+        module = load_module("tools.typing")
 
-        source_file = tools.typing.__file__
+        source_file = module.__file__
         assert source_file is not None
 
         content = Path(source_file).read_text(encoding="utf-8")
@@ -41,9 +43,9 @@ class TestPostponedAnnotations:
         """docs.typing uses postponed annotations."""
         # This may not be installed, so check if it exists
         try:
-            import docs.typing  # noqa: PLC0415
+            module = load_module("docs.typing")
 
-            source_file = docs.typing.__file__
+            source_file = module.__file__
             assert source_file is not None
 
             content = Path(source_file).read_text(encoding="utf-8")
@@ -57,50 +59,37 @@ class TestTypingFacadeModules:
 
     def test_kgfoundry_common_typing_exports_gate_import(self) -> None:
         """gate_import is available from canonical source."""
-        from kgfoundry_common.typing import gate_import  # noqa: PLC0415
+        gate_import = load_attribute("kgfoundry_common.typing", "gate_import")
 
         assert callable(gate_import)
 
     def test_kgfoundry_common_typing_exports_safe_get_type(self) -> None:
         """safe_get_type is available from canonical source."""
-        from kgfoundry_common.typing import safe_get_type  # noqa: PLC0415
+        safe_get_type = load_attribute("kgfoundry_common.typing", "safe_get_type")
 
         assert callable(safe_get_type)
 
     def test_kgfoundry_common_typing_exports_type_aliases(self) -> None:
         """Type aliases are accessible."""
-        from kgfoundry_common.typing import (  # noqa: PLC0415
-            JSONValue,
-            NavMap,
-            ProblemDetails,
-            SymbolID,
-        )
+        module = load_module("kgfoundry_common.typing")
 
-        assert NavMap is not None
-        assert ProblemDetails is not None
-        assert JSONValue is not None
-        assert SymbolID is not None
+        for name in ["JSONValue", "NavMap", "ProblemDetails", "SymbolID"]:
+            assert getattr(module, name) is not None
 
     def test_tools_typing_re_exports_facade(self) -> None:
         """tools.typing re-exports from canonical source."""
-        from tools.typing import gate_import as tools_gate_import  # noqa: PLC0415
+        tools_module = load_module("tools.typing")
+        common_module = load_module("kgfoundry_common.typing")
 
-        from kgfoundry_common.typing import gate_import as canonical_gate_import  # noqa: PLC0415
-
-        # Should be the same function
-        assert tools_gate_import is canonical_gate_import
+        assert tools_module.gate_import is common_module.gate_import
 
     def test_docs_typing_re_exports_facade(self) -> None:
         """docs.typing re-exports from canonical source."""
         try:
-            from docs.typing import gate_import as docs_gate_import  # noqa: PLC0415
+            docs_module = load_module("docs.typing")
+            common_module = load_module("kgfoundry_common.typing")
 
-            from kgfoundry_common.typing import (  # noqa: PLC0415
-                gate_import as canonical_gate_import,
-            )
-
-            # Should be the same function
-            assert docs_gate_import is canonical_gate_import
+            assert docs_module.gate_import is common_module.gate_import
         except ImportError:
             pytest.skip("docs.typing not in Python path")
 
@@ -110,9 +99,9 @@ class TestTypeOnlyImportGuarding:
 
     def test_facade_has_type_checking_block(self) -> None:
         """kgfoundry_common.typing has TYPE_CHECKING guards."""
-        import kgfoundry_common.typing  # noqa: PLC0415
+        module = load_module("kgfoundry_common.typing")
 
-        source_file = kgfoundry_common.typing.__file__
+        source_file = module.__file__
         assert source_file is not None
 
         content = Path(source_file).read_text(encoding="utf-8")
@@ -122,9 +111,9 @@ class TestTypeOnlyImportGuarding:
 
     def test_no_eager_numpy_import_in_facade(self) -> None:
         """Numpy is not imported at module level in source."""
-        import kgfoundry_common.typing  # noqa: PLC0415
+        module = load_module("kgfoundry_common.typing")
 
-        source_file = kgfoundry_common.typing.__file__
+        source_file = module.__file__
         assert source_file is not None
 
         content = Path(source_file).read_text(encoding="utf-8")
@@ -147,7 +136,8 @@ class TestRuntimeImportSafety:
 
     def test_gate_import_missing_module_raises_import_error(self) -> None:
         """gate_import raises ImportError for missing modules."""
-        from kgfoundry_common.typing import gate_import  # noqa: PLC0415
+        gate_import = load_attribute("kgfoundry_common.typing", "gate_import")
+        assert callable(gate_import)
 
         with pytest.raises(ImportError) as exc_info:
             gate_import("nonexistent_module_xyz", "test")
@@ -156,15 +146,15 @@ class TestRuntimeImportSafety:
 
     def test_safe_get_type_missing_module_returns_none(self) -> None:
         """safe_get_type returns None gracefully for missing modules."""
-        from kgfoundry_common.typing import safe_get_type  # noqa: PLC0415
-
+        safe_get_type = load_attribute("kgfoundry_common.typing", "safe_get_type")
+        assert callable(safe_get_type)
         result = safe_get_type("nonexistent_module_xyz", "SomeType")
         assert result is None
 
     def test_safe_get_type_respects_default(self) -> None:
         """safe_get_type uses provided default value."""
-        from kgfoundry_common.typing import safe_get_type  # noqa: PLC0415
-
+        safe_get_type = load_attribute("kgfoundry_common.typing", "safe_get_type")
+        assert callable(safe_get_type)
         default = "my_fallback"
         result = safe_get_type("nonexistent", "Type", default=default)
         assert result == default
@@ -177,7 +167,7 @@ class TestCLIEntryPointImportClean:
     def test_apply_postponed_annotations_imports_clean(self) -> None:
         """tools.lint.apply_postponed_annotations is importable."""
         try:
-            import tools.lint.apply_postponed_annotations  # noqa: F401, PLC0415
+            load_module("tools.lint.apply_postponed_annotations")
         except ImportError as e:
             pytest.fail(f"Failed to import apply_postponed_annotations: {e}")
 
@@ -185,6 +175,6 @@ class TestCLIEntryPointImportClean:
     def test_check_typing_gates_imports_clean(self) -> None:
         """tools.lint.check_typing_gates is importable."""
         try:
-            import tools.lint.check_typing_gates  # noqa: F401, PLC0415
+            load_module("tools.lint.check_typing_gates")
         except ImportError as e:
             pytest.fail(f"Failed to import check_typing_gates: {e}")

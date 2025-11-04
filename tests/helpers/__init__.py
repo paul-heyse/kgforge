@@ -13,9 +13,13 @@ from tests.helpers.immutability import (
     assert_frozen_attributes,
     assert_frozen_mutation,
 )
+from tests.helpers.importing import load_attribute, load_module, load_typed_attribute
 
 __all__ = [
     "assert_frozen_attribute",
     "assert_frozen_attributes",
     "assert_frozen_mutation",
+    "load_attribute",
+    "load_module",
+    "load_typed_attribute",
 ]

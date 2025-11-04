@@ -24,26 +24,21 @@ def load_module(module_name: str) -> ModuleType:
     module_name : str
         Dotted name of the module to import.
     """
-
     return import_module(module_name)
 
 
 def load_attribute(module_name: str, attribute: str) -> object:
     """Load ``attribute`` from ``module_name`` and return the value."""
-
     module = load_module(module_name)
     return getattr(module, attribute)
 
 
 def load_typed_attribute(module_name: str, attribute: str, expected_type: type[T]) -> T:
     """Load ``attribute`` and ensure it matches ``expected_type`` at runtime."""
-
     value = load_attribute(module_name, attribute)
     if not isinstance(value, expected_type):
         message = (
-            f"{module_name}.{attribute} expected {expected_type!r} "
-            f"but received {type(value)!r}"
+            f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
         )
         raise TypeError(message)
-    return cast(T, value)
-
+    return cast("T", value)

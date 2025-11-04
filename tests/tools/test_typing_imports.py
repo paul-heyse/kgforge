@@ -12,6 +12,7 @@ import ast
 from pathlib import Path
 
 import pytest
+from tests.helpers import load_module
 
 TOOLS_DIRS = [
     Path(__file__).parent.parent.parent / "tools" / "docstring_builder",
@@ -146,23 +147,21 @@ class TestToolsTypingFacade:
 
     def test_tools_typing_facade_is_available(self) -> None:
         """Verify tools.typing module exists and provides helpers."""
-        import tools.typing  # noqa: PLC0415
+        module = load_module("tools.typing")
 
-        # Verify key re-exports from tools.typing
         expected_attrs = ["gate_import", "TYPE_CHECKING"]
         for attr in expected_attrs:
-            assert hasattr(tools.typing, attr), f"tools.typing should provide {attr} helper"
+            assert hasattr(module, attr), f"tools.typing should provide {attr} helper"
 
     def test_tools_typing_re_exports_common_typing(self) -> None:
         """Verify tools.typing re-exports from kgfoundry_common.typing."""
-        import tools.typing  # noqa: PLC0415
-
-        import kgfoundry_common.typing  # noqa: PLC0415
+        tools_typing = load_module("tools.typing")
+        common_typing = load_module("kgfoundry_common.typing")
 
         # Verify some key symbols are exported
         for symbol in ["NavMap", "ProblemDetails"]:
-            assert hasattr(tools.typing, symbol), f"tools.typing should re-export {symbol}"
-            assert getattr(tools.typing, symbol) == getattr(kgfoundry_common.typing, symbol), (
+            assert hasattr(tools_typing, symbol), f"tools.typing should re-export {symbol}"
+            assert getattr(tools_typing, symbol) == getattr(common_typing, symbol), (
                 f"tools.typing.{symbol} should be identical to kgfoundry_common.typing.{symbol}"
             )
 
@@ -180,7 +179,7 @@ class TestToolsTypingFacade:
 def test_tools_modules_importable(module_name: str) -> None:
     """Test that key tools modules can be imported successfully."""
     try:
-        __import__(module_name)
+        load_module(module_name)
     except ImportError as exc:
         pytest.fail(f"Failed to import {module_name}: {exc}")
 
