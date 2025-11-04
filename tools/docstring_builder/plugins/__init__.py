@@ -23,10 +23,7 @@ from tools.docstring_builder.models import (
     DocstringBuilderError,
     PluginExecutionError,
 )
-from tools.docstring_builder.plugins._inspection import (
-    get_signature,
-    has_required_parameters,
-)
+from tools.docstring_builder.plugins._inspection import get_signature, has_required_parameters
 from tools.docstring_builder.plugins.base import (
     DocstringBuilderPlugin,
     DocstringPayload,
@@ -50,9 +47,8 @@ if TYPE_CHECKING:
 
     from tools.docstring_builder.config import BuilderConfig
     from tools.docstring_builder.harvest import HarvestResult
-    from tools.docstring_builder.plugins.base import (
-        PluginStage,
-    )
+    from tools.docstring_builder.plugins._inspection import InspectableCallable
+    from tools.docstring_builder.plugins.base import PluginStage
     from tools.docstring_builder.schema import DocstringEdit
     from tools.docstring_builder.semantics import SemanticResult
 
@@ -290,7 +286,7 @@ def _validate_callable_signature(
     # Use typed inspection module instead of raw inspect
     has_required_params: bool
     try:
-        callable_factory = cast("Callable[[], object]", factory)
+        callable_factory = cast("InspectableCallable", factory)
         has_required_params = has_required_parameters(callable_factory)
     except (ValueError, TypeError) as exc:
         msg = f"Could not inspect factory signature for {name!r}"

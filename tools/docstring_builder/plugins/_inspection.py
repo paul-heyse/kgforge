@@ -13,6 +13,7 @@ from typing import Protocol
 from tools.docstring_builder.parameters import ParameterKind, normalize_parameter_kind
 
 __all__ = [
+    "InspectableCallable",
     "ParameterInfo",
     "get_signature",
     "has_required_parameters",
