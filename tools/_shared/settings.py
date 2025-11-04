@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, Final
 
 from pydantic import Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -25,8 +25,6 @@ from tools._shared.problem_details import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-
-    from pydantic.fields import FieldInfo
 
     from tools._shared.problem_details import (
         JsonValue,
@@ -158,12 +156,13 @@ class ToolRuntimeSettings(BaseSettings):
     @classmethod
     def _normalise_allowlist(cls, value: object) -> tuple[str, ...]:
         if value is None:
-            fields = cast("Mapping[str, FieldInfo]", cls.model_fields)
-            default_field = fields.get("exec_allowlist")
+            default_field = cls.model_fields.get("exec_allowlist")
             if default_field is None:
                 return ()
-            default_value: object = default_field.default
+            default_value: object = getattr(default_field, "default", ())
             if isinstance(default_value, tuple):
+                return tuple(str(part) for part in default_value)
+            if isinstance(default_value, (list, set)):
                 return tuple(str(part) for part in default_value)
             return ()
         if isinstance(value, str):

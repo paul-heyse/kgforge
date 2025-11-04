@@ -44,17 +44,21 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, NoReturn, Protocol, cast
 
 
 class _Comparable(Protocol):
-    def __lt__(self, other: _Comparable, /) -> bool: ...
+    def __lt__(self, other: _Comparable, /) -> bool:
+        _protocol_stub("__lt__", self, other)
 
-    def __le__(self, other: _Comparable, /) -> bool: ...
+    def __le__(self, other: _Comparable, /) -> bool:
+        _protocol_stub("__le__", self, other)
 
-    def __gt__(self, other: _Comparable, /) -> bool: ...
+    def __gt__(self, other: _Comparable, /) -> bool:
+        _protocol_stub("__gt__", self, other)
 
-    def __ge__(self, other: _Comparable, /) -> bool: ...
+    def __ge__(self, other: _Comparable, /) -> bool:
+        _protocol_stub("__ge__", self, other)
 
 
 ParseVersionFn = Callable[[str], _Comparable]
@@ -66,6 +70,16 @@ except ImportError:
     _PARSE_VERSION = None
 else:
     _PARSE_VERSION = cast("ParseVersionFn", _parse_version)
+
+
+def _protocol_stub(method: str, *args: object) -> NoReturn:
+    """Raise ``NotImplementedError`` when a structural protocol leaks to runtime."""
+    message = (
+        f"Comparable protocol method '{method}' must be implemented by the returned object. "
+        f"Received args={args!r}."
+    )
+    raise NotImplementedError(message)
+
 
 # Unused imports removed; TYPE_CHECKING used only for module-level identity
 

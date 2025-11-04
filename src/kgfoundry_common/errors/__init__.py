@@ -15,7 +15,7 @@ Examples
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, NoReturn, Protocol, cast
 
 from kgfoundry_common.errors.codes import BASE_TYPE_URI, ErrorCode, get_type_uri
 from kgfoundry_common.errors.exceptions import (
@@ -51,13 +51,20 @@ from kgfoundry_common.errors.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from kgfoundry_common.navmap_types import NavMap
 
 # Structural protocols for optional FastAPI integration. We keep the
 # expectations minimal so the package does not need FastAPI installed for
 # static analysis while preserving typed call signatures.
+
+
+def _protocol_stub(method: str, *args: object, **kwargs: object) -> NoReturn:
+    """Raise ``NotImplementedError`` when a structural protocol leaks to runtime."""
+    message = (
+        f"FastAPI protocol method '{method}' must be implemented by the concrete app. "
+        f"Received args={args!r}, kwargs={kwargs!r}."
+    )
+    raise NotImplementedError(message)
 
 
 class RequestProtocol(Protocol):
@@ -70,17 +77,24 @@ class JSONResponseProtocol(Protocol):
     status_code: int
 
 
+class ExceptionHandlerProtocol(Protocol):
+    """Structural type for FastAPI exception handlers."""
+
+    def __call__(self, *args: object, **kwargs: object) -> object: ...
+
+
 class FastAPIProtocol(Protocol):
     """Structural type for FastAPI application instances."""
 
     def add_exception_handler(
         self,
         exception_class: type[BaseException],
-        handler: Callable[..., object],
+        handler: ExceptionHandlerProtocol,
         *,
         name: str | None = None,
     ) -> None:
         """Register an exception handler."""
+        _protocol_stub("add_exception_handler", self, exception_class, handler, name=name)
 
 
 class ProblemDetailsResponse(Protocol):

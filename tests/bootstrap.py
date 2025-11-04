@@ -90,9 +90,6 @@ class _CliRunnerProtocol(Protocol):
 @no_type_check
 def _patch_cli_runner_mix_stderr() -> None:
     """Allow ``CliRunner.invoke`` to accept ``mix_stderr`` across Click versions."""
-    if False:  # TYPE_CHECKING is removed, so this check is always False
-        return
-
     cli_runner_cls = _load_cli_runner_cls()
     if cli_runner_cls is None:
         return
