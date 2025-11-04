@@ -118,7 +118,7 @@ class ToolRuntimeSettings(BaseSettings):
             "uv",
             "git",
             "ruff",
-            "mypy",
+            "pyright",
             "pytest",
             "doctoc",
             "docformatter",

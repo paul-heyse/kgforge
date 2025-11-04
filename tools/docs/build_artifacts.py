@@ -94,10 +94,6 @@ STEP_TIMEOUTS: dict[str, float] = {
     "observability": 120.0,
     "schemas": 180.0,
     "docs-validation": 120.0,
-    "agent-catalog": 300.0,
-    "agent-api": 120.0,
-    "agent-portal": 180.0,
-    "agent-analytics": 120.0,
 }
 
 STEP_ERROR_CODES: dict[str, str] = {

@@ -2,7 +2,7 @@
 
 This module orchestrates lexical and vector search across the catalog payload.
 Vector operations rely on the typed helpers in
-``kgfoundry_common.numpy_typing`` so that downstream consumers (and mypy) can
+``kgfoundry_common.numpy_typing`` so that downstream consumers (and static type checkers) can
 reason about the ndarray shapes involved. The resulting scores conform to the
 ``schema/models/search_result.v1.json`` schema.
 
@@ -1026,7 +1026,7 @@ class _SimpleFaissModule:
 def _with_cache(func: Callable[[], FaissModuleProtocol]) -> Callable[[], FaissModuleProtocol]:
     """Cache a parameterless factory function.
 
-    Wraps functools.cache with proper type annotations to avoid mypy issues
+    Wraps functools.cache with proper type annotations to avoid type checker issues
     with incomplete functools stubs.
 
     Parameters

@@ -677,7 +677,8 @@ class AgentCatalogBuilder:
         )
         coverage_entry = self._coverage_map.get(qname)
         quality = Quality(
-            mypy_status="unknown",
+            pyright_status="unknown",
+            pyrefly_status="unknown",
             ruff_rules=[],
             pydoclint_parity=None,
             docstring_coverage=(

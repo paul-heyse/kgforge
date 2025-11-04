@@ -374,12 +374,15 @@ def _check_python_version() -> list[str]:
     return []
 
 
-def _check_mypy_configuration(config_path: Path) -> list[str]:
+def _check_pyright_configuration(config_path: Path) -> list[str]:
     if not config_path.exists():
-        return ["mypy.ini not found; run bootstrap to generate it."]
-    content = config_path.read_text(encoding="utf-8")
-    if "mypy_path = src:stubs" not in content:
-        return ["mypy.ini must set 'mypy_path = src:stubs'."]
+        return ["pyrightconfig.jsonc not found; run bootstrap to generate it."]
+    try:
+        content = config_path.read_text(encoding="utf-8")
+    except OSError as exc:  # pragma: no cover - defensive guard for doctor command
+        return [f"Unable to read pyrightconfig.jsonc: {exc}."]
+    if '"typeCheckingMode": "strict"' not in content:
+        return ['pyrightconfig.jsonc must set "typeCheckingMode": "strict".']
     return []
 
 
@@ -526,7 +529,7 @@ def _finalize_doctor(issues: Sequence[str], drift_status: int) -> int:
 def _collect_doctor_checks(args: argparse.Namespace) -> tuple[list[str], int]:
     issues: list[str] = []
     issues.extend(_check_python_version())
-    issues.extend(_check_mypy_configuration(REPO_ROOT / "mypy.ini"))
+    issues.extend(_check_pyright_configuration(REPO_ROOT / "pyrightconfig.jsonc"))
     issues.extend(_check_stub_packages(("stubs/griffe", "stubs/libcst", "stubs/mkdocs_gen_files")))
     issues.extend(_check_optional_dependencies(("griffe", "libcst")))
     issues.extend(

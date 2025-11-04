@@ -2,7 +2,7 @@
 
 This module defines PEP 544 protocols for FAISS-compatible vector search
 and typed result structures using TypedDict/dataclass. All protocols and
-types are fully typed to enable mypy strict checking.
+types are fully typed to enable Pyright and Pyrefly strict checking.
 
 Examples
 --------

@@ -3,8 +3,8 @@
 This module centralises the strongly typed intermediate representations used by the
 docstring builder as well as the structures emitted through the CLI when the
 ``--json`` flag is enabled.  The definitions here are designed to remove the
-dynamic ``dict[str, Any]`` payloads that currently trigger Ruff and mypy errors
-throughout ``tools/docstring_builder``.  None of the existing modules import this
+dynamic ``dict[str, Any]`` payloads that currently trigger Ruff and static type
+checker errors throughout ``tools/docstring_builder``.  None of the existing modules import this
 file yet; it establishes the target shapes that follow-up refactors will adopt.
 
 Key goals addressed by these models:
@@ -15,7 +15,7 @@ Key goals addressed by these models:
 * A small exception taxonomy that preserves error causality and surfaces RFC 9457
   Problem Details payloads for downstream tooling.
 * Enumerations and literals that document permissible values, closing the gaps
-  responsible for the observed mypy ``Any`` propagation and Ruff ``BLE001``/``T201``
+  responsible for the observed ``Any`` propagation in static analyzers and Ruff ``BLE001``/``T201``
   findings.
 """
 

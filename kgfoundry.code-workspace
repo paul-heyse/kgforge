@@ -14,7 +14,6 @@
       "**/.venv": false,
       "**/__pycache__": true,
       "**/.ruff_cache": true,
-      "**/.mypy_cache": true,
       "node_modules": true,
       "build": true,
       "dist": true,
@@ -80,7 +79,7 @@
       "ms-python.python",
       "ms-python.vscode-pylance",
       "charliermarsh.ruff",
-      "ms-python.mypy-type-checker",
+      "ms-pyright.pyright",
       "EditorConfig.EditorConfig",
       "streetsidesoftware.code-spell-checker",
       "tamasfe.even-better-toml",
@@ -147,9 +146,9 @@
         "problemMatcher": []
       },
       {
-        "label": "type: mypy",
+        "label": "type: pyright",
         "type": "shell",
-        "command": "mypy .",
+        "command": "pyright --warnings --pythonversion=3.13",
         "problemMatcher": []
       },
       {

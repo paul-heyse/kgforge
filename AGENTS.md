@@ -9,7 +9,7 @@
 2. [Environment Setup (Agent‑grade, deterministic)](#environment-setup-agentgrade-deterministic)
 3. [Source‑of‑Truth Index](#source-of-truth-index)
 4. [Code Formatting & Style (Ruff is canonical)](#code-formatting--style-ruff-is-canonical)
-5. [Type Checking (pyright strict, pyrefly sharp, mypy strict)](#type-checking-pyright-strict-pyrefly-sharp-mypy-strict)
+5. [Type Checking (pyright strict, pyrefly sharp)](#type-checking-pyright-strict-pyrefly-sharp)
 6. [Docstrings (NumPy style; enforced; runnable)](#docstrings-numpy-style-enforced-runnable)
 7. [Testing Standards (markers, coverage, GPU hygiene)](#testing-standards-markers-coverage-gpu-hygiene)
 8. [Data Contracts (JSON Schema 2020‑12 / OpenAPI 3.2)](#data-contracts-json-schema-2020-12--openapi-32)
@@ -47,7 +47,6 @@
   uv run ruff format && uv run ruff check --fix
   uv run pyright --warnings --pythonversion=3.13
   uv run pyrefly check
-  uv run mypy --config-file mypy.ini
   uv run vulture src tools stubs --min-confidence 90
   uv run pytest -q
   uv run pip-audit
@@ -59,7 +58,7 @@
 
 ### Quality checks (zero-error mandate)
 
-For all code blocks that you make edits to, please check for pyright, mypy, pyrefly, and Ruff errors or warnings and ensure that by the time you have concluded your edits in a code block there are zero errors in any of those four categories. Your error checking and resolution should not solely focus on your scope, all errors in the files that you have made edits in are part of the scope of your review when implementing a change and should be fully resolved before you conclude your work. Under no circumstances should you ever suppress errors, even stylistic Ruff errors. Instead of suppressing errors, derive a structural solution that causally addresses the source of the error, even if it is intensive to implement. All of your code designs and implementation work should be structural, holistic, and best-in-class, guided by the following principles:
+For all code blocks that you make edits to, please check for pyright, pyrefly, and Ruff errors or warnings and ensure that by the time you have concluded your edits in a code block there are zero errors in any of those categories. Your error checking and resolution should not solely focus on your scope, all errors in the files that you have made edits in are part of the scope of your review when implementing a change and should be fully resolved before you conclude your work. Under no circumstances should you ever suppress errors, even stylistic Ruff errors. Instead of suppressing errors, derive a structural solution that causally addresses the source of the error, even if it is intensive to implement. All of your code designs and implementation work should be structural, holistic, and best-in-class, guided by the following principles:
 
 #### Principles for your code design and implementation
 
@@ -87,9 +86,9 @@ For all code blocks that you make edits to, please check for pyright, mypy, pyre
 
 ##### 4) Type safety
 
-* Project is **type-clean** under **pyright** (strict mode), **pyrefly** (sharp checks), and **mypy** (strict baseline).
+* Project is **type-clean** under **pyright** (strict mode), **pyrefly** (sharp checks).
 * Prefer `Protocol`/`TypedDict`/PEP 695 generics over `Any`; minimize `cast` and justify any `# type: ignore[...]`.
-* **Verify:** all three checkers pass; no unexplained ignores.
+* **Verify:** both checkers pass; no unexplained ignores.
 
 ##### 5) Logging & errors
 
@@ -215,7 +214,7 @@ Read these first when editing configs or debugging local vs CI drift:
 
 ---
 
-## Type Checking (pyright strict, pyrefly sharp, mypy strict)
+## Type Checking (pyright strict, pyrefly sharp)
 
 - **Static analysis (strict mode):**
   ```bash
