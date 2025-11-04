@@ -94,7 +94,8 @@ class Anchors(CatalogStruct):
 class Quality(CatalogStruct):
     """Quality signals for a symbol."""
 
-    mypy_status: str
+    pyright_status: str
+    pyrefly_status: str
     ruff_rules: list[str]
     pydoclint_parity: bool | None = None
     docstring_coverage: float | None = None

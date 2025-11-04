@@ -70,8 +70,6 @@ dependencies = [
     "typer>=0.19.2",
     "rich",
     "tqdm>=4.67.1",
-    "mypy>=1.11.0",
-    "mypy-extensions>=1.0.0",
     "black[jupyter]>=25.9.0",
     "ruff>=0.14.2",
     "prefect>=3.4.25",
@@ -208,7 +206,6 @@ dependencies = [
     "types-MarkupSafe",
     "types-maxminddb",
     "types-mock",
-    "types-mypy-extensions",
     "types-mysqlclient",
     "types-nanoid",
     "types-nanoleafapi",
@@ -736,10 +733,10 @@ min_confidence = 90
 # Include the whitelist module so intentionally referenced names stay marked as used.
 paths = ["src", "tools", "stubs", "vulture_whitelist.py"]
 
-# Keep this aligned with your Ruff/mypy excludes.
+# Keep this aligned with your Ruff excludes.
 exclude = [
   ".git/*", ".hg/*", ".venv", ".venv/*", ".venv/**", "**/.venv/**",
-  ".mypy_cache/*", ".ruff_cache/*", ".pytest_cache/*",
+  ".ruff_cache/*", ".pytest_cache/*",
   "build/*", "dist/*", "node_modules/*",
   "docs/_build/*", "site/*",
   "faiss/*",

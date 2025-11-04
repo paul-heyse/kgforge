@@ -45,7 +45,8 @@ lint:
 	$(UV_RUN) ruff check --select I $(LINT_TARGETS)
 	$(UV_RUN) ruff check $(LINT_TARGETS)
 	$(UV_RUN) ruff format --check $(FMT_TARGETS)
-	$(UV_RUN) mypy src
+	$(UV_RUN) pyright --warnings --pythonversion=3.13
+	$(UV_RUN) pyrefly check
 
 lint-gpu-gates:
 	$(PY) tools/lint/check_gpu_marks.py
@@ -53,7 +54,7 @@ lint-gpu-gates:
 lint-docs:
 	$(UVX) pydoclint --style numpy src
 	$(UV_RUN) python -m tools.docstring_builder.cli check --diff
-	$(UVX) mypy --strict src
+	$(UV_RUN) pyright --warnings --pythonversion=3.13
 	@if [ "$(RUN_DOCS_TESTS)" = "1" ]; then \
 		uv run pytest tests/docs; \
 	else \
@@ -61,7 +62,7 @@ lint-docs:
 	fi
 
 clean:
-	rm -rf .venv .mypy_cache .ruff_cache .pytest_cache dist build
+	rm -rf .venv .ruff_cache .pytest_cache dist build
 
 mock:
 	$(PY) -m tests.mock_servers.run_all

@@ -54,8 +54,11 @@ class QualityModel(BaseModel):
 
     Parameters
     ----------
-    mypy_status : str | NoneType, optional
-        Describe ``mypy_status``.
+    pyright_status : str | NoneType, optional
+        Describe ``pyright_status``.
+        Defaults to ``None``.
+    pyrefly_status : str | NoneType, optional
+        Describe ``pyrefly_status``.
         Defaults to ``None``.
     ruff_rules : list[str], optional
         Describe ``ruff_rules``.
@@ -71,7 +74,8 @@ class QualityModel(BaseModel):
         Defaults to ``None``.
     """
 
-    mypy_status: str | None = None
+    pyright_status: str | None = None
+    pyrefly_status: str | None = None
     ruff_rules: list[str] = Field(default_factory=list)
     pydoclint_parity: bool | None = None
     docstring_coverage: float | None = None

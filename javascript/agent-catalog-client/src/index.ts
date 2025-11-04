@@ -9,7 +9,8 @@ export interface Anchors {
 }
 
 export interface Quality {
-  mypy_status?: string | null;
+  pyright_status?: string | null;
+  pyrefly_status?: string | null;
   ruff_rules?: string[];
   pydoclint_parity?: boolean | null;
   docstring_coverage?: number | null;

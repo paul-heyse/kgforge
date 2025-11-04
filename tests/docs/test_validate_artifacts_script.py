@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, cast
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
@@ -22,15 +23,15 @@ if TYPE_CHECKING:
 
 validate_symbol_index = cast(
     "ValidateSymbolIndexFn",
-    getattr(validate_artifacts, "validate_symbol_index"),
+    validate_artifacts.validate_symbol_index,
 )
 validate_symbol_delta = cast(
     "ValidateSymbolDeltaFn",
-    getattr(validate_artifacts, "validate_symbol_delta"),
+    validate_artifacts.validate_symbol_delta,
 )
 ArtifactValidationError = cast(
     "type[ArtifactValidationErrorType]",
-    getattr(validate_artifacts, "ArtifactValidationError"),
+    validate_artifacts.ArtifactValidationError,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]

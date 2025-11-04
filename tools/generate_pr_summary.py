@@ -74,8 +74,8 @@ STATUS_ICONS: Final[Mapping[StatusLiteral, str]] = {
 
 DEFAULT_CHECKS: Final[tuple[CheckStatus, ...]] = (
     CheckStatus("Ruff format & lint", "pass"),
+    CheckStatus("pyright strict", "pass"),
     CheckStatus("pyrefly check", "pass"),
-    CheckStatus("mypy strict", "pass"),
     CheckStatus("pytest", "pass"),
     CheckStatus("doctests", "pass"),
     CheckStatus("import-linter", "pass"),
