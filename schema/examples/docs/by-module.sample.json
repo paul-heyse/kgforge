@@ -1,0 +1,9 @@
+{
+  "pkg.module": [
+    "pkg.module.Class",
+    "pkg.module.func"
+  ],
+  "pkg": [
+    "pkg.helper"
+  ]
+}
