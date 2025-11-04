@@ -37,3 +37,13 @@ def test_generate_summary_lists_all_codemod_logs(tmp_path: Path) -> None:
     assert "`codemod.log`" in summary
     assert "`codemod_r7.log`" in summary
     assert summary.count("Codemod execution log") == 2
+
+
+def test_generate_summary_with_empty_checks_emits_only_headers(tmp_path: Path) -> None:
+    """Explicit empty checks should result in no table rows beyond the header."""
+    snapshot = collect_artifact_snapshot(tmp_path)
+    summary = generate_summary(snapshot=snapshot, checks=())
+
+    table_lines = [line for line in summary.splitlines() if line.startswith("|")]
+
+    assert table_lines == ["| Check | Status |", "|-------|--------|"]
