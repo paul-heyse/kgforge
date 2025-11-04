@@ -22,8 +22,6 @@ def test_render_signature_includes_none_default() -> None:
     assert "= None" in docstring
 """Tests for docstring rendering behaviour."""
 
-from tools.docstring_builder.render import render_docstring
-from tools.docstring_builder.schema import DocstringSchema
 
 
 def test_render_docstring_preserves_special_characters() -> None:
