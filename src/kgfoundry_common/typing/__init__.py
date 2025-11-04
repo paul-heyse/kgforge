@@ -37,7 +37,6 @@ postponed annotations (PEP 563) eliminate eager evaluation.
 
 JSON Schema 2020-12 examples and validation helpers are exported here for
 cross-package use; see `kgfoundry_common.jsonschema_utils` for validators.
-
 """
 
 from __future__ import annotations
@@ -157,7 +156,6 @@ def gate_import(
     --------
     >>> np = gate_import("numpy", "array manipulation")
     >>> arr = np.zeros((10,))
-
     """
     # Attempt import
     try:
@@ -211,7 +209,6 @@ def safe_get_type(
     >>> ndarray_type = safe_get_type("numpy", "ndarray")
     >>> if ndarray_type is not None:
     ...     pass  # Do something with the type
-
     """
     try:
         module = __import__(module_name, fromlist=[type_name])
@@ -240,7 +237,6 @@ def resolve_numpy() -> object:
     ------
     ImportError
         If numpy is not installed.
-
     """
     warnings.warn(
         "resolve_numpy() is deprecated; use gate_import('numpy', ...) instead",
@@ -265,7 +261,6 @@ def resolve_fastapi() -> object:
     ------
     ImportError
         If fastapi is not installed.
-
     """
     warnings.warn(
         "resolve_fastapi() is deprecated; use gate_import('fastapi', ...) instead",
@@ -290,7 +285,6 @@ def resolve_faiss() -> object:
     ------
     ImportError
         If faiss is not installed.
-
     """
     warnings.warn(
         "resolve_faiss() is deprecated; use gate_import('faiss', ...) instead",

@@ -160,8 +160,8 @@ else:  # pragma: no cover - runtime import keeps Ruff S403 quiet
 class _SafeUnpickler(_StdlibUnpickler):
     """Unpickler enforcing allow-list of safe types.
 
-    This prevents arbitrary code execution by restricting deserialization
-    to primitive types and basic containers.
+    This prevents arbitrary code execution by restricting deserialization to primitive types and
+    basic containers.
     """
 
     def __init__(

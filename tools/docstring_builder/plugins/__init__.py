@@ -60,9 +60,26 @@ _LOGGER = get_logger(__name__)
 PayloadT = TypeVar("PayloadT")
 ResultT = TypeVar("ResultT")
 
-type PluginInstance = DocstringBuilderPlugin[object, object] | LegacyPluginProtocol
+type PluginInstance = DocstringBuilderPlugin[t.Any, t.Any] | LegacyPluginProtocol
 type PluginFactoryCandidateT = PluginFactory[PluginInstance] | Callable[[], PluginInstance]
 type RegisteredPlugin = HarvesterPlugin | TransformerPlugin | FormatterPlugin | LegacyPluginAdapter
+
+
+def _empty_harvester_list() -> list[HarvesterPlugin]:
+    return []
+
+
+def _empty_transformer_list() -> list[TransformerPlugin]:
+    return []
+
+
+def _empty_formatter_list() -> list[FormatterPlugin]:
+    return []
+
+
+def _empty_str_list() -> list[str]:
+    return []
+
 
 _PLUGIN_RUNTIME_ERRORS: tuple[type[Exception], ...] = (
     RuntimeError,
@@ -100,12 +117,12 @@ class PluginManager:
 
     config: BuilderConfig
     repo_root: Path
-    harvesters: list[HarvesterPlugin] = field(default_factory=list)
-    transformers: list[TransformerPlugin] = field(default_factory=list)
-    formatters: list[FormatterPlugin] = field(default_factory=list)
-    available: list[str] = field(default_factory=list)
-    disabled: list[str] = field(default_factory=list)
-    skipped: list[str] = field(default_factory=list)
+    harvesters: list[HarvesterPlugin] = field(default_factory=_empty_harvester_list)
+    transformers: list[TransformerPlugin] = field(default_factory=_empty_transformer_list)
+    formatters: list[FormatterPlugin] = field(default_factory=_empty_formatter_list)
+    available: list[str] = field(default_factory=_empty_str_list)
+    disabled: list[str] = field(default_factory=_empty_str_list)
+    skipped: list[str] = field(default_factory=_empty_str_list)
 
     _lock: threading.RLock = field(default_factory=threading.RLock, init=False)
 
@@ -328,11 +345,8 @@ def _is_protocol_class(candidate: object) -> bool:
     if not inspect.isclass(candidate):
         return False
     type_candidate = cast("type[object]", candidate)
-    has_protocol_attrs = hasattr(type_candidate, "__protocol_attrs__")
     protocol_flag_attr: object = getattr(type_candidate, "_is_protocol", False)
-    is_protocol_flag = bool(protocol_flag_attr)
-    has_mro_entries = hasattr(type_candidate, "__mro_entries__")
-    return bool(has_protocol_attrs or is_protocol_flag or has_mro_entries)
+    return bool(protocol_flag_attr)
 
 
 def _is_abstract_class(candidate: object) -> bool:
@@ -385,7 +399,7 @@ def _instantiate_plugin_from_factory(
     _validate_factory_signature(factory, name, stage)
 
     try:
-        instance: object = factory()
+        instance = factory()
     except _PLUGIN_CONFIGURATION_ERRORS as exc:
         message = f"Failed to invoke factory for plugin {name!r}"
         raise PluginRegistryError(
@@ -398,7 +412,7 @@ def _instantiate_plugin_from_factory(
             },
         ) from exc
 
-    return cast("PluginInstance", instance)
+    return instance
 
 
 def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
@@ -423,13 +437,19 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
     stage: PluginStage | object
 
     # If it's already a plugin instance, wrap it
-    if _is_registered_plugin(candidate) or _is_legacy_plugin(candidate):
-        # Wrap the instance in a factory
-        instance = candidate
+    if _is_registered_plugin(candidate):
+        plugin_instance: RegisteredPlugin = candidate
 
-        # Return a callable that returns the instance
         def factory() -> PluginInstance:
-            return cast("PluginInstance", instance)
+            return plugin_instance
+
+        return factory
+
+    if _is_legacy_plugin(candidate):
+        legacy_instance: LegacyPluginProtocol = candidate
+
+        def factory() -> PluginInstance:
+            return legacy_instance
 
         return factory
 
@@ -547,6 +567,8 @@ def _register_plugin(manager: PluginManager, plugin: RegisteredPlugin) -> None:
 
 
 def _is_registered_plugin(candidate: object) -> TypeGuard[RegisteredPlugin]:
+    if inspect.isclass(candidate):
+        return False
     return isinstance(
         candidate,
         (HarvesterPlugin, TransformerPlugin, FormatterPlugin, LegacyPluginAdapter),
@@ -554,6 +576,8 @@ def _is_registered_plugin(candidate: object) -> TypeGuard[RegisteredPlugin]:
 
 
 def _is_legacy_plugin(candidate: object) -> TypeGuard[LegacyPluginProtocol]:
+    if inspect.isclass(candidate):
+        return False
     return isinstance(candidate, LegacyPluginProtocol)
 
 

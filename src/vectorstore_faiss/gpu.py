@@ -51,9 +51,9 @@ logger = logging.getLogger(__name__)
 class FaissGpuIndex:
     """Small GPU-aware facade that delegates to :mod:`search_api.faiss_gpu`.
 
-    The facade keeps GPU initialisation idempotent by caching the detected
-    context. If GPUs or cuVS helpers are unavailable, the CPU index is returned
-    unchanged, ensuring safe fallbacks without caller intervention.
+    The facade keeps GPU initialisation idempotent by caching the detected context. If GPUs or cuVS
+    helpers are unavailable, the CPU index is returned unchanged, ensuring safe fallbacks without
+    caller intervention.
     """
 
     faiss_module: FaissModuleProtocol
@@ -70,9 +70,9 @@ class FaissGpuIndex:
     def prepare(self, trained_index: FaissIndexProtocol) -> FaissIndexProtocol:
         """Clone ``trained_index`` to GPU when possible and set search parameters.
 
-        The method is safe to call repeatedly; once a GPU index has been
-        prepared it is reused on subsequent invocations. Any failures during
-        cloning or configuration are logged and the CPU index is returned.
+        The method is safe to call repeatedly; once a GPU index has been prepared it is reused on
+        subsequent invocations. Any failures during cloning or configuration are logged and the CPU
+        index is returned.
         """
         if not self.use_gpu:
             logger.debug("GPU acceleration disabled; using CPU index only")

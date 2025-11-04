@@ -108,8 +108,7 @@ class LoggingCache(Protocol):
     def clear(self) -> None:
         """Clear all cached entries and reset state.
 
-        This method clears formatter caches and any other
-        logging-related cached state.
+        This method clears formatter caches and any other logging-related cached state.
         """
         ...
 
@@ -1035,9 +1034,8 @@ def measure_duration() -> tuple[float, float]:
 class _DefaultLoggingCache:
     """Default implementation of LoggingCache protocol.
 
-    This class provides a simple cache for logging formatters and
-    configuration. It implements the LoggingCache protocol and can be
-    retrieved via get_logging_cache().
+    This class provides a simple cache for logging formatters and configuration. It implements the
+    LoggingCache protocol and can be retrieved via get_logging_cache().
     """
 
     def __init__(self) -> None:

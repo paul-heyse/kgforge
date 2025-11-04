@@ -315,9 +315,9 @@ def spawn_text_process(
 ) -> TextProcess:
     """Spawn a long-lived subprocess with hardened command checks.
 
-    The command is resolved through the shared allow-list policy to ensure the
-    executable path is trusted, and the environment is sanitised to drop
-    inherited state that could affect tooling deterministically.
+    The command is resolved through the shared allow-list policy to ensure the executable path is
+    trusted, and the environment is sanitised to drop inherited state that could affect tooling
+    deterministically.
     """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(

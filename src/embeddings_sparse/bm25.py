@@ -306,7 +306,9 @@ class PurePythonBM25:
         serialize_json(self._metadata_payload(), _BM25_SCHEMA_PATH, metadata_path)
 
     def load(self) -> None:
-        """Load an existing BM25 index from disk with schema validation and checksum verification."""
+        """Load an existing BM25 index from disk with schema validation and checksum
+        verification.
+        """
         payload = self._read_metadata()
         self._initialize_from_payload(payload)
 

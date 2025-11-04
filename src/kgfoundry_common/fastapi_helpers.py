@@ -1,10 +1,9 @@
 """Typed FastAPI helper utilities with structured logging and timeouts.
 
-The helpers in this module wrap FastAPI primitives so that dependency
-injection, middleware, and exception handlers retain precise type
-information while also emitting kgfoundry-standard structured logs and
-respecting correlation identifiers. All operations enforce a configurable
-timeout to prevent runaway tasks inside the request lifecycle.
+The helpers in this module wrap FastAPI primitives so that dependency injection, middleware, and
+exception handlers retain precise type information while also emitting kgfoundry-standard structured
+logs and respecting correlation identifiers. All operations enforce a configurable timeout to
+prevent runaway tasks inside the request lifecycle.
 """
 
 from __future__ import annotations

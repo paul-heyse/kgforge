@@ -325,7 +325,6 @@ def fetch_all(
     -------
     list[tuple[object, ...]]
         Describe return value.
-
     """
     relation = execute(
         conn,

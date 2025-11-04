@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from types import ModuleType
-from typing import TYPE_CHECKING, TypedDict, cast
+from typing import TYPE_CHECKING
 
 import pytest
 import tools.check_stub_parity as stub_parity
@@ -13,16 +13,6 @@ from kgfoundry_common.errors import ConfigurationError
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-
-class StubParityIssue(TypedDict):
-    missing_symbols: list[str]
-
-
-class StubParityContext(TypedDict):
-    issue_count: int
-    error_count: int
-    issues: list[StubParityIssue]
 
 
 def _register_runtime_module(name: str, exports: tuple[str, ...]) -> None:
@@ -65,7 +55,10 @@ def test_run_stub_parity_checks_success(tmp_path: Path) -> None:
     stub_path = tmp_path / f"{module_name}.pyi"
     stub_path.write_text("def foo() -> None: ...\n", encoding="utf-8")
 
-    stub_parity.run_stub_parity_checks([(module_name, stub_path)])
+    report = stub_parity.run_stub_parity_checks([(module_name, stub_path)])
+
+    assert report.issue_count == 0
+    assert not report.has_issues
 
 
 def test_run_stub_parity_checks_raises_with_context(tmp_path: Path) -> None:
@@ -80,10 +73,18 @@ def test_run_stub_parity_checks_raises_with_context(tmp_path: Path) -> None:
         stub_parity.run_stub_parity_checks([(module_name, stub_path)])
 
     context = excinfo.value.context
-    assert context is not None
-    context_dict = cast("StubParityContext", context)
-    assert context_dict["issue_count"] == 1
-    assert context_dict["error_count"] == 1
-    issues = context_dict["issues"]
-    issue = issues[0]
-    assert issue["missing_symbols"] == ["foo"]
+    expected_context = {
+        "issue_count": 1,
+        "error_count": 1,
+        "issues": [
+            {
+                "module": module_name,
+                "stub_path": str(stub_path),
+                "missing_symbols": ["foo"],
+                "extra_symbols": ["bar"],
+                "any_usages": [],
+            }
+        ],
+    }
+
+    assert context == expected_context

@@ -72,8 +72,7 @@
     "cSpell.words": [
       "AutoAPI","DocTags","Docling","OpenAlex","Qwen","SPLADE","FAISS",
       "DuckDB","vLLM","PyLucene","cuVS","kgfoundry"
-    ],
-    "semgrep.scan.onlyGitDirty": false
+    ]
   },
 
   "extensions": {
@@ -157,13 +156,55 @@
         "label": "test: all",
         "type": "shell",
         "command": "pytest -q",
-        "problemMatcher": "$pytest"
+        "problemMatcher": [
+          {
+            "owner": "pytest",
+            "fileLocation": [
+              "relative",
+              "${workspaceFolder:kgfoundry}"
+            ],
+            "pattern": [
+              {
+                "regexp": "^(.*\\.py):(\\d+): (.*)$",
+                "file": 1,
+                "line": 2,
+                "message": 3
+              },
+              {
+                "regexp": "^E +(.+)$",
+                "message": 1,
+                "loop": true
+              }
+            ]
+          }
+        ]
       },
       {
         "label": "test: smoke (search_api)",
         "type": "shell",
         "command": "pytest -q tests/smoke/test_search_api_smoke.py",
-        "problemMatcher": "$pytest"
+        "problemMatcher": [
+          {
+            "owner": "pytest",
+            "fileLocation": [
+              "relative",
+              "${workspaceFolder:kgfoundry}"
+            ],
+            "pattern": [
+              {
+                "regexp": "^(.*\\.py):(\\d+): (.*)$",
+                "file": 1,
+                "line": 2,
+                "message": 3
+              },
+              {
+                "regexp": "^E +(.+)$",
+                "message": 1,
+                "loop": true
+              }
+            ]
+          }
+        ]
       },
       {
         "label": "docs: live (site)",

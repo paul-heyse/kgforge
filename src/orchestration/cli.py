@@ -1,7 +1,7 @@
 """Orchestration CLI commands for kgfoundry stack.
 
-This module provides command-line interface for building indexes (BM25, FAISS)
-and running end-to-end pipelines using Prefect orchestration.
+This module provides command-line interface for building indexes (BM25, FAISS) and running end-to-
+end pipelines using Prefect orchestration.
 """
 
 from __future__ import annotations

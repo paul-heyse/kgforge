@@ -1,8 +1,8 @@
 """Search service layer for orchestration and ranking.
 
-This module provides typed service-layer functions for search operations,
-including reciprocal rank fusion, knowledge graph boosting, and result
-deduplication. All functions include structured logging and metrics.
+This module provides typed service-layer functions for search operations, including reciprocal rank
+fusion, knowledge graph boosting, and result deduplication. All functions include structured logging
+and metrics.
 """
 
 from __future__ import annotations

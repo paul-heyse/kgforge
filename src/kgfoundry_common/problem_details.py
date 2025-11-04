@@ -77,8 +77,8 @@ _SCHEMA_PATH = Path(__file__).parent.parent.parent / "schema" / "common" / "prob
 class ProblemDetails(TypedDict, total=False):
     """TypedDict for RFC 9457 Problem Details responses.
 
-    This is a partial TypedDict (total=False) where all fields are optional,
-    allowing for flexible payload construction with validation.
+    This is a partial TypedDict (total=False) where all fields are optional, allowing for flexible
+    payload construction with validation.
     """
 
     type: str
