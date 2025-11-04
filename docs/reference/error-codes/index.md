@@ -27,7 +27,7 @@ extend this registry using the same naming scheme.
 | `KGF-DOC-BLD-011` | Navmap integrity check failed | documentation | validation | error | Navmap validation detected drift. Ensure navigation artifacts are regenerated and up to date. |
 | `KGF-DOC-BLD-020` | Symbol index build failed | documentation | build | error | AutoAPI symbol index generation failed. Investigate import errors or missing modules. |
 | `KGF-DOC-BLD-021` | Symbol delta build failed | documentation | build | error | Symbol delta computation failed. Ensure symbol index artifacts exist and rerun `docs/_scripts/symbol_delta.py`. |
-| `KGF-DOC-BLD-030` | Test map build failed | documentation | build | error | Test map artifacts could not be generated. Run `uv run python tools/docs/build_test_map.py --verbose`. |
+| `KGF-DOC-BLD-030` | Test map build failed | documentation | build | error | Test map artifacts could not be generated. Run `uv run python tools/docs/build_test_map.py` (configure via `TESTMAP_*` environment variables). |
 | `KGF-DOC-BLD-040` | Observability scan failed | documentation | validation | error | Observability configuration scan exited with errors. Verify observability manifests. |
 | `KGF-DOC-BLD-050` | Schema export failed | documentation | build | error | Exporting schemas failed. Confirm schema definitions and associated models compile. |
 | `KGF-DOC-BLD-060` | Graph build failed | documentation | build | error | Dependency graph generation timed out or crashed. Ensure graph tooling (pydeps, pyreverse) is installed. |
