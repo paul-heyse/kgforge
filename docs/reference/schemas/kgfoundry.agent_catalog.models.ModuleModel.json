@@ -413,7 +413,7 @@
       "type": "object"
     }
   },
-  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.ModuleModel.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.agent_catalog.models.ModuleModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Representation of a module within a package.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nname : str\n    Describe ``name``.\nqualified : str\n    Describe ``qualified``.\nsource : dict[str, str]\n    Describe ``source``.\npages : dict[str, str | NoneType]\n    Describe ``pages``.\nimports : list[str], optional\n    Describe ``imports``.\n    Defaults to ``<factory>``.\nsymbols : list[SymbolModel], optional\n    Describe ``symbols``.\n    Defaults to ``<factory>``.\ngraph : ModuleGraphModel\n    Describe ``graph``.",
   "examples": [

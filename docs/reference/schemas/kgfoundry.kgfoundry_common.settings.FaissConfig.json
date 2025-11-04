@@ -1,5 +1,5 @@
 {
-  "$id": "https://kgfoundry/schemas/kgfoundry.kgfoundry_common.settings.FaissConfig.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.kgfoundry_common.settings.FaissConfig.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "FAISS index configuration (``KGFOUNDRY_FAISS_*`` namespace).",

@@ -1,5 +1,5 @@
 {
-  "$id": "https://kgfoundry/schemas/kgfoundry.kgfoundry_common.settings.SearchConfig.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.kgfoundry_common.settings.SearchConfig.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Configuration for the hybrid search service (``KGFOUNDRY_SEARCH_*``).",

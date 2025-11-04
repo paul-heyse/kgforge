@@ -601,7 +601,7 @@
       "type": "object"
     }
   },
-  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.AgentCatalogModel.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.agent_catalog.models.AgentCatalogModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Top-level representation of the Agent Catalog.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nversion : str\n    Describe ``version``.\ngenerated_at : str\n    Describe ``generated_at``.\nrepo : dict[str, str]\n    Describe ``repo``.\nlink_policy : dict[str, object]\n    Describe ``link_policy``.\nartifacts : dict[str, object]\n    Describe ``artifacts``.\npackages : list[PackageModel], optional\n    Describe ``packages``.\n    Defaults to ``<factory>``.\nshards : ShardsModel | NoneType, optional\n    Describe ``shards``.\n    Defaults to ``None``.\nsemantic_index : SemanticIndexModel | NoneType, optional\n    Describe ``semantic_index``.\n    Defaults to ``None``.\nsearch : dict[str, object] | NoneType, optional\n    Describe ``search``.\n    Defaults to ``None``.",
   "examples": [
