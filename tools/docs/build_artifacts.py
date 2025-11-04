@@ -6,6 +6,7 @@ import os
 import sys
 from pathlib import Path
 
+from kgfoundry_common.logging import setup_logging
 from tools._shared.error_codes import format_error_message
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
@@ -27,6 +28,7 @@ def _pythonpath_env() -> dict[str, str]:
 
 
 LOGGER = get_logger(__name__)
+setup_logging()
 
 STEPS: list[tuple[str, list[str], str]] = [
     (
@@ -83,6 +85,21 @@ STEPS: list[tuple[str, list[str], str]] = [
     ),
 ]
 
+STEP_TIMEOUTS: dict[str, float] = {
+    "docstrings": 120.0,
+    "navmap": 60.0,
+    "test-map": 60.0,
+    "symbol-index": 300.0,
+    "symbol-delta": 120.0,
+    "observability": 120.0,
+    "schemas": 180.0,
+    "docs-validation": 120.0,
+    "agent-catalog": 300.0,
+    "agent-api": 120.0,
+    "agent-portal": 180.0,
+    "agent-analytics": 120.0,
+}
+
 STEP_ERROR_CODES: dict[str, str] = {
     "docstrings": "KGF-DOC-BLD-001",
     "navmap": "KGF-DOC-BLD-010",
@@ -99,9 +116,10 @@ def _run_step(name: str, command: list[str], message: str) -> int:
     """Execute a single artefact regeneration step."""
     log_adapter = with_fields(LOGGER, operation=name, command=command)
     try:
+        timeout = STEP_TIMEOUTS.get(name, 60.0)
         result = run_tool(
             command,
-            timeout=20.0,
+            timeout=timeout,
             cwd=REPO_ROOT,
             env=_pythonpath_env(),
             check=False,
