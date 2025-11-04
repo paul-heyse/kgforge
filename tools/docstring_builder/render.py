@@ -26,7 +26,7 @@ else:
             return lambda _filename=None: False
 
 
-_TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignature\n---------\n{{ signature }}{% endif %}{% if schema.extended %}\n\n{{ schema.extended }}{% endif %}{% if schema.parameters %}\n\nParameters\n----------\n{% for parameter in schema.parameters %}{{ parameter.display_name or parameter.name }} : {{ parameter.annotation or 'Any' }}{% if parameter.optional %}, optional{% endif %}{% if parameter.default %}, by default {{ parameter.default }}{% endif %}\n    {{ parameter.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.returns %}\n\n{% set has_yields = schema.returns|selectattr('kind', 'equalto', 'yields')|list|length > 0 %}{% if has_yields %}Yields\n------\n{% else %}Returns\n-------\n{% endif %}{% for entry in schema.returns %}{{ entry.annotation or 'Any' }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.raises %}\n\nRaises\n------\n{% for entry in schema.raises %}{{ entry.exception }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.notes %}\n\nNotes\n-----\n{% for note in schema.notes %}{{ note }}\n{% endfor %}{% endif %}{% if schema.see_also %}\n\nSee Also\n--------\n{% for link in schema.see_also %}{{ link }}\n{% endfor %}{% endif %}{% if schema.examples %}\n\nExamples\n--------\n{% for example in schema.examples %}{{ example }}\n{% endfor %}{% endif %}"""
+_TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignature\n---------\n{{ signature }}{% endif %}{% if schema.extended %}\n\n{{ schema.extended }}{% endif %}{% if schema.parameters %}\n\nParameters\n----------\n{% for parameter in schema.parameters %}{{ parameter.display_name or parameter.name }} : {{ parameter.annotation or 'Any' }}{% if parameter.optional %}, optional{% endif %}{% if parameter.default is not none %}, by default {{ format_default(parameter.default) }}{% endif %}\n    {{ parameter.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.returns %}\n\n{% set has_yields = schema.returns|selectattr('kind', 'equalto', 'yields')|list|length > 0 %}{% if has_yields %}Yields\n------\n{% else %}Returns\n-------\n{% endif %}{% for entry in schema.returns %}{{ entry.annotation or 'Any' }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.raises %}\n\nRaises\n------\n{% for entry in schema.raises %}{{ entry.exception }}\n    {{ entry.description or 'Description forthcoming.' }}\n{% endfor %}{% endif %}{% if schema.notes %}\n\nNotes\n-----\n{% for note in schema.notes %}{{ note }}\n{% endfor %}{% endif %}{% if schema.see_also %}\n\nSee Also\n--------\n{% for link in schema.see_also %}{{ link }}\n{% endfor %}{% endif %}{% if schema.examples %}\n\nExamples\n--------\n{% for example in schema.examples %}{{ example }}\n{% endfor %}{% endif %}"""
 
 
 def _build_environment() -> Environment:
@@ -53,12 +53,18 @@ def render_docstring(
 ) -> str:
     """Render the provided schema to a concrete docstring string."""
     signature = _build_signature(schema) if include_signature else ""
-    rendered = _TEMPLATE_OBJ.render(schema=schema, marker=marker, signature=signature)
+    rendered = _TEMPLATE_OBJ.render(
+        schema=schema,
+        marker=marker,
+        signature=signature,
+        format_default=_format_default,
+    )
     return rendered.strip() + "\n"
 
 
 def write_template_to(path: Path) -> None:
     """Persist the default template to disk for debugging purposes."""
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(_TEMPLATE, encoding="utf-8")
 
 
@@ -78,11 +84,21 @@ def _format_parameters(parameters: Iterable[ParameterDoc]) -> Iterable[tuple[str
         entry = token
         if parameter.annotation:
             entry += f": {parameter.annotation}"
-        if parameter.default is not None:
-            entry += f" = {parameter.default}"
+        default = _format_default(parameter.default)
+        if default is not None:
+            entry += f" = {default}"
         elif parameter.optional:
             entry += " = ..."
         yield parameter.kind, entry
+
+
+def _format_default(value: str | None) -> str | None:
+    """Return the display form for ``value`` within docstrings."""
+    if value is None:
+        return None
+    if not value:
+        return '""'
+    return value
 
 
 def _group_parameters(
