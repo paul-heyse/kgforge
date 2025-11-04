@@ -2,14 +2,14 @@
 
 Our documentation toolchain refactor removed the structured `msgspec` models and
 typed loader facades that previously enforced type safety. The immediate fallout
-is visible in mypy: over fifty errors now flag `Any` flows through the symbol
+is visible in pyright: over fifty errors now flag `Any` flows through the symbol
 index builders, schema validators, MkDocs generator, and `docs/conf.py`. Those
 errors are symptoms of a broader gap—JSON artifacts are no longer backed by
 first-class models, optional dependency wiring leaks `Any`, and CLI error paths
 raise generic `ToolExecutionError` instances without typed envelopes. The docs
 quality hardening change partially addressed configuration and logging, but the
 loss of typed boundaries leaves us short of the repository’s strict Ruff, Pyrefly,
-and mypy gates.
+and pyright gates.
 
 ## What Changes
 
@@ -27,7 +27,7 @@ and mypy gates.
     facade to eliminate lingering `Any` usage.
   - Establish typed logger adapters that satisfy the `WarningLogger` protocol so
     shared helpers (`resolve_git_sha`, metrics hooks) accept structured loggers
-    without mypy complaints.
+    without pyright complaints.
 - **Validation & CLI ergonomics**
   - Refine `docs/_scripts/validation.py` and `docs/_scripts/validate_artifacts.py`
     so they operate on the typed payload models, introduce a dedicated
@@ -42,7 +42,7 @@ and mypy gates.
 - **Quality gates & documentation**
   - Update contributor docs to describe the typed artifact workflow and ensure
     `make artifacts` continues to validate schemas. Run the full Ruff → Pyrefly →
-    mypy → pytest → schema validation loop as part of acceptance.
+    pyright → pytest → schema validation loop as part of acceptance.
 - **Execution tracking**
   - Follow the fully expanded checklist in `tasks.md`, which now contains
     checkbox-tracked subtasks for every deliverable (model scaffolding, facade
@@ -62,5 +62,5 @@ and mypy gates.
 - **Rollout considerations**: land the typed models and loader facades first, then
   refactor writers and validation, followed by the `docs/conf.py` cleanup. Ensure
   no step regresses existing docs generation or schema outputs; gate merge on
-  clean Ruff, Pyrefly, mypy, pytest, and schema validation results.
+  clean Ruff, Pyrefly, pyright, pytest, and schema validation results.
 

@@ -27,7 +27,7 @@ All quality gates passing:
 ```bash
 ✓ ruff format && ruff check --fix     (20+ files, 0 issues)
 ✓ pyrefly check                       (0 errors across modified modules)
-✓ mypy --config-file mypy.ini         (0 errors across modified modules)
+✓ pyright --config-file pyright.ini         (0 errors across modified modules)
 ✓ pytest -q                           (48 passed in 0.36s)
 ✓ openspec validate --strict          (valid)
 ```
@@ -108,7 +108,7 @@ All quality gates passing:
    ```bash
    uv run ruff format && uv run ruff check --fix
    uv run pyrefly check
-   uv run mypy --config-file mypy.ini
+   uv run pyright --warnings --pythonversion=3.13
    python scripts/check_pyrefly_suppressions.py src/
    ```
 
@@ -158,7 +158,7 @@ All quality gates passing:
 ## Regression Monitoring
 
 **Post-Merge Checks (24–48 hours):**
-- [ ] Monitor CI pyrefly/mypy pass rates
+- [ ] Monitor CI pyrefly/pyright pass rates
 - [ ] Check for any flaky suppression check failures
 - [ ] Review any new issues opened by downstream tooling
 - [ ] Validate that optional dependency fallbacks (GPU, FAISS) still work

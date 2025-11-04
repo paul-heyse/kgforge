@@ -252,7 +252,7 @@
   - Update subsystem READMEs with before/after code snippets.
 
 - [ ] 6.4 Quality gates and artifacts.
-  - Run in order: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, `make artifacts`, `python tools/check_new_suppressions.py src`, `python tools/check_imports.py`.
+  - Run in order: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, `make artifacts`, `python tools/check_new_suppressions.py src`, `python tools/check_imports.py`.
   - Store command outputs in `openspec/changes/public-api-hardening-phase1/artifacts/quality-gate/`.
 
 - [ ] 6.5 Post-merge follow-up.

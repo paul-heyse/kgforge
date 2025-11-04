@@ -5,7 +5,7 @@ The docstring-builder plugin stack currently relies on pyrefly suppressions wher
 - Redesign `DocstringBuilderPlugin` and the stage-specific Protocols as fully generic interfaces so harvester, transformer, and formatter plugins advertise the payload types they accept and return.
 - Update the plugin manager, legacy adapter, and built-in plugins to propagate those generics, removing `pyrefly: ignore` suppressions and eliminating `Any` flows in orchestration code.
 - Refresh stubs and contributor guidance so external plugins can adopt the stronger contract without runtime surprises.
-- Extend lint/type coverage to assert that `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` pass with no suppressions for `tools/docstring_builder/plugins/**`.
+- Extend lint/type coverage to assert that `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` pass with no suppressions for `tools/docstring_builder/plugins/**`.
 
 
 ## Impact

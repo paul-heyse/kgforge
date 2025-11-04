@@ -4,7 +4,7 @@ The system SHALL expose typed FAISS vectorstore surfaces whose runtime exports a
 
 #### Scenario: Namespace bridge satisfies type checkers
 - **GIVEN** the repository with updated stubs under `stubs/vectorstore_faiss` and `stubs/search_api`
-- **WHEN** `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` execute
+- **WHEN** `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` execute
 - **THEN** no missing-module-attribute or not-a-type errors are reported for `kgfoundry.vectorstore_faiss.gpu` or `kgfoundry.search_api.faiss_adapter`
 
 #### Scenario: Stub contract mirrors runtime exports

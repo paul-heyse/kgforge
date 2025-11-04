@@ -12,5 +12,5 @@ Despite recent hardening, 97 `pyrefly` suppressions remain scattered across the 
 ## Impact
 - **Affected specs:** `code-quality`
 - **Affected code:** `tools/_shared/**`, `tools/**/observability.py`, `src/search_api/faiss_adapter.py`, `src/vectorstore_faiss/gpu.py`, `src/kgfoundry_common/**`, `docs/_scripts/**`, `site/_scripts/**`, `stubs/**`, build scripts, and governance automation.
-- **Rollout:** Execute the detailed task plan incrementally, validating each cluster with ` uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini`. Coordinate with search, tooling, and docs teams for GPU/dependency-specific checks; no behavioural regressions are expected.
+- **Rollout:** Execute the detailed task plan incrementally, validating each cluster with ` uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, and `uv run pyright --warnings --pythonversion=3.13`. Coordinate with search, tooling, and docs teams for GPU/dependency-specific checks; no behavioural regressions are expected.
 

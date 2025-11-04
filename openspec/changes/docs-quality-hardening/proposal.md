@@ -2,7 +2,7 @@
 
 The documentation toolchain (`docs/conf.py` plus the generators in `docs/_scripts/`) still relies on
 dynamic typing, ad-hoc JSON construction, and permissive logging that bypass our production quality
-gates. Outstanding Ruff, Pyrefly, and mypy violations illustrate broader issues: configuration is
+gates. Outstanding Ruff, Pyrefly, and pyright violations illustrate broader issues: configuration is
 scattered across environment lookups, Griffe loaders are instantiated with `Any`, data payloads lack
 schemas, and failure paths do not emit the RFC 9457 envelopes mandated elsewhere in the stack. The
 resulting drift blocks strict type enforcement, complicates observability, and risks breakage for the
@@ -41,7 +41,7 @@ Agent Catalog and Portal builds.
   - Record metrics/tracing via shared adapters (contextvars-driven correlation IDs, `observe_tool_run`) so
     docs builds are observable across automation pipelines.
 - **Verification Loop**
-  - Mandate Ruff, Pyrefly, mypy, schema validation
+  - Mandate Ruff, Pyrefly, pyright, schema validation
 
 ## Impact
 
@@ -50,5 +50,5 @@ Agent Catalog and Portal builds.
 - **Affected code:** `docs/conf.py`, `docs/_scripts/shared.py`, `docs/_scripts/build_symbol_index.py`,
   `docs/_scripts/mkdocs_gen_api.py`, `docs/_scripts/symbol_delta.py`, and supporting schema directories.
 - **Rollout:** Ship iteratively behind the shared helper and schema validation work. No feature flags are
-  required, but all scripts must pass strict Ruff/Pyrefly/mypy gates
+  required, but all scripts must pass strict Ruff/Pyrefly/pyright gates
 

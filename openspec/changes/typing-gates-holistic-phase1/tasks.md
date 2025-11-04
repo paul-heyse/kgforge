@@ -28,7 +28,7 @@
 - [x] 2.2 Verify runtime determinism without optional deps.
   - Execute representative CLIs (`docs/_scripts/build_symbol_index.py`, `tools/navmap/build_navmap.py`, `orchestration/cli.py`) in an environment missing FAISS/FastAPI, asserting graceful behaviour.
 - [x] 2.3 Expand lint/typing test matrix.
-  - Run `uv run ruff check`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` across updated modules, ensuring zero regressions.
+  - Run `uv run ruff check`, `uv run pyrefly check`, and `uv run pyright --warnings --pythonversion=3.13` across updated modules, ensuring zero regressions.
   - Execute `python -m tools.lint.check_typing_gates --diff` within CI to prove no unguarded imports remain.
 - [ ] 2.4 Doctest/xdoctest validation.
   - Ensure doctest examples continue to execute with postponed annotations and façade imports, updating examples where necessary.

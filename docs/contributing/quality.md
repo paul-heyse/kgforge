@@ -6,13 +6,13 @@ and docfacts in sync before raising a pull request. The commands below assume
 
 ## 1. Refresh typing stubs and overrides
 
-We vendor third-party typings under `stubs/` to keep mypy in strict mode even
+We vendor third-party typings under `stubs/` to keep pyright in strict mode even
 when upstream packages do not ship annotations. Regenerate the overlays before
-upgrading dependencies or when `mypy` starts warning about missing attributes:
+upgrading dependencies or when `pyright` starts warning about missing attributes:
 
 ```bash
 # Generate fresh stubs into a scratch directory
-uv run python -m mypy.stubgen \
+uv run python -m pyright.stubgen \
   --package networkx --package pytest \
   --output stubs/_generated
 
@@ -24,7 +24,7 @@ rm -rf stubs/_generated
 The `rsync` step mirrors the generated files over the maintained overlays so
 that custom edits (for example, `typing.Any` fallbacks) remain reviewable in the
 diff. Commit the resulting changes under `stubs/` alongside any manual fixes
-required to satisfy `mypy --strict`.
+required to satisfy `pyright --strict`.
 
 ## 2. Regenerate documentation artefacts
 
@@ -137,7 +137,7 @@ Use the chained lint target to replicate the documentation checks that run in
 CI after you regenerate artefacts:
 
 ```bash
-make lint-docs            # pydoclint + docstring-builder diff + mypy strict
+make lint-docs            # pydoclint + docstring-builder diff + pyright strict
 RUN_DOCS_TESTS=1 make lint-docs  # (optional) exercises tests/docs via pytest
 ```
 

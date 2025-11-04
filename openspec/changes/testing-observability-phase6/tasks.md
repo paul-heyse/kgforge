@@ -30,10 +30,10 @@
 - [ ] 1.10 Execute iterative quality gates.
   - After tests and docstrings updated, run `uv run pytest -q tests/agent_catalog tests/orchestration tests/kgfoundry_common tests/search_api`.
   - Run `uv run pytest --doctest-modules kgfoundry` to confirm doctest coverage.
-  - Check telemetry packages with `uv run pyrefly check` and `uv run mypy --config-file mypy.ini`.
+  - Check telemetry packages with `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13`.
 
 ## 2. Final Verification
 - [ ] 2.1 Capture coverage metrics (if feasible) focusing on new tests.
-- [ ] 2.2 Execute full suite: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, `make artifacts`.
+- [ ] 2.2 Execute full suite: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, `make artifacts`.
 - [ ] 2.3 Assemble release notes summarizing new test coverage, telemetry expectations, and Problem Details validation.
 

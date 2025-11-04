@@ -34,9 +34,9 @@
 - [ ] 1.11 Execute iterative quality gates.
   - After serialization changes, run `uv run ruff check src/kgfoundry_common/serialization.py` and targeted tests.
   - After subprocess/network updates, run `uv run pytest -q tests/orchestration tests/search_client`.
-  - Ensure `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` remain clean.
+  - Ensure `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` remain clean.
 
 ## 2. Final Verification
-- [ ] 2.1 Execute full command suite: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, `make artifacts`.
+- [ ] 2.1 Execute full command suite: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, `make artifacts`.
 - [ ] 2.2 Produce release notes summarizing serialization changes, timeout defaults, and configuration requirements; include migration checklist.
 

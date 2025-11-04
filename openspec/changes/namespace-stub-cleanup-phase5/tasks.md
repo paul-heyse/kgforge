@@ -26,11 +26,11 @@
   - Provide step-by-step instructions for adding new exports and updating stubs.
 - [ ] 1.8 Execute targeted quality gates.
   - Run `uv run ruff check src/kgfoundry/_namespace_proxy.py` and `uv run ruff check stubs/kgfoundry/agent_catalog/search.pyi`.
-  - Execute `uv run pyrefly check src/kgfoundry/_namespace_proxy.py stubs/kgfoundry/agent_catalog/search.pyi` and `uv run mypy --config-file mypy.ini src/kgfoundry/agent_catalog` to ensure clean results.
+  - Execute `uv run pyrefly check src/kgfoundry/_namespace_proxy.py stubs/kgfoundry/agent_catalog/search.pyi` and `uv run pyright --warnings --pythonversion=3.13 src/kgfoundry/agent_catalog` to ensure clean results.
   - After cleanup, run the full test suite (`uv run pytest -q`) focusing on namespace-dependent tests.
 
 ## 2. Verification & Artifact Updates
 - [ ] 2.1 Regenerate docs if namespace changes affect examples (`make artifacts`).
 - [ ] 2.2 Update release notes / changelog to mention namespace/stub alignment, including guidance for downstream tooling.
-- [ ] 2.3 Final validation run: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, confirm no new suppressions.
+- [ ] 2.3 Final validation run: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, confirm no new suppressions.
 

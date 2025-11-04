@@ -21,16 +21,16 @@
 - [x] **1.5 Align orchestration and legacy pipelines**
   - [x] Update `tools/docstring_builder/orchestrator.py`, `tools/docstring_builder/legacy.py`, and `tools/docstring_builder/__init__.py` to consume the generic `PluginManager` without casts, ensuring CLI/status reporting continues to use typed models and RFC 9457 envelopes.
   - [x] Verify retry/idempotency semantics in orchestrator flows remain intact and documented, leveraging existing `tools._shared.proc` helpers for subprocess execution.
-  - [x] Remove any lingering `pyrefly` or `mypy` ignores introduced for plugin payloads, replacing them with precise typing or helper utilities.
+  - [x] Remove any lingering `pyrefly` or `pyright` ignores introduced for plugin payloads, replacing them with precise typing or helper utilities.
 
 - [x] **1.6 Refresh stubs and type-checker surfaces**
   - [x] Regenerate or hand-edit `stubs/tools/docstring_builder/plugins/*.pyi` (and related stub files) to mirror the new generic signatures so external consumers receive accurate typing information.
   - [x] Update `stubs/tools/docstring_builder/__init__.pyi` and top-level exports to reflect the refined API, keeping annotations in sync with the runtime modules.
-  - [x] Review `mypy.ini` / `pyrefly.toml` to drop suppressions for plugin modules and ensure the strict baseline enforces the new contract.
+  - [x] Review `pyright.ini` / `pyrefly.toml` to drop suppressions for plugin modules and ensure the strict baseline enforces the new contract.
 
 ## 2. Testing
 - [x] 2.1 Run `uv run ruff check --fix`.
 - [x] 2.2 Run `uv run pyrefly check` and confirm suppressions for `tools/docstring_builder/plugins/**` are removed.
-- [x] 2.3 Run `uv run mypy --config-file mypy.ini` with focus on `tools/docstring_builder`.
+- [x] 2.3 Run `uv run pyright --warnings --pythonversion=3.13` with focus on `tools/docstring_builder`.
 
 

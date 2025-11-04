@@ -144,7 +144,7 @@ type checking for Griffe's public APIs.
 ```bash
 # Type checking
 pyright stubs/
-mypy stubs/
+pyright stubs/
 # Runtime verification
 pytest tests/griffe_stubs_test.py
 ```

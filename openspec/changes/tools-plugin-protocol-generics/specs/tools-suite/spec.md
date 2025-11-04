@@ -10,7 +10,7 @@ Docstring-builder plugins SHALL declare generic input/output payload types so st
 #### Scenario: Plugin manager preserves typing and observability
 - **GIVEN** the plugin manager helpers in `tools/docstring_builder/plugins/__init__.py`
 - **WHEN** built-in plugins execute via the manager during `uv run pytest -q tools/docstring_builder`
-- **THEN** payloads remain strongly typed throughout invocation, structured error logs capture `plugin`, `stage`, and `file_path`, and no `cast` operations are required to satisfy pyrefly or mypy
+- **THEN** payloads remain strongly typed throughout invocation, structured error logs capture `plugin`, `stage`, and `file_path`, and no `cast` operations are required to satisfy pyrefly or pyright
 
 #### Scenario: Legacy plugins remain compatible
 - **GIVEN** a legacy plugin using the pre-generic `run` API wrapped by `LegacyPluginAdapter`

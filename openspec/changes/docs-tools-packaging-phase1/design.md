@@ -6,7 +6,7 @@ Docs tooling evolved organically with standalone scripts housed in `docs/_script
 
 - Ruff `INP001` violations because directories lack `__init__.py`, leaving implicit namespace packages.
 - Mixed executable permissions (`EXE001`, `EXE002`, `EXE005`) where some scripts have shebangs but are not executable or vice versa.
-- Downstream imports that reach into private modules, triggering `SLF001` warnings and making pyright/mypy resolution brittle.
+- Downstream imports that reach into private modules, triggering `SLF001` warnings and making pyright/pyright resolution brittle.
 - Optional dependency groups in `pyproject.toml` that reference scripts rather than packages, limiting reuse of shared helpers.
 
 Formalizing docs and tooling as packages unlocks stronger import-linter contracts, simplifies typing-gate enforcement, and clarifies public APIs for consumers.
@@ -66,7 +66,7 @@ Formalizing docs and tooling as packages unlocks stronger import-linter contract
 
 4.2 **Import-linter contract** – define `docs-toolchain-public` and `tools-cli-public` contracts preventing runtime packages from importing deprecated modules. Integrate into CI and pre-commit.
 
-4.3 **Lint & typing** – run full gate (`uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pyright --warnings --pythonversion=3.13`) after restructuring. Add targeted pytest suites verifying CLI behaviour and docstring coverage.
+4.3 **Lint & typing** – run full gate (`uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pyright --warnings --pythonversion=3.13`) after restructuring. Add targeted pytest suites verifying CLI behaviour and docstring coverage.
 
 ## Risks & Mitigations
 

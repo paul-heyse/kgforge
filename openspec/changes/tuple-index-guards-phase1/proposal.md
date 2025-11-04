@@ -25,7 +25,7 @@ Problem Details emission, and regression tests that verify empty-input handling.
 - **Contracts:** Emit RFC 9457 Problem Details with correlation IDs for empty-input
   failures; observability metrics/logging must reflect the guarded behavior.
 - **Delivery:** Implement on branch `openspec/tuple-index-guards-phase1`, exercising the
-  full quality-gate loop (`ruff`, `pyright`, `pyrefly`, `mypy`, `pytest`, `make artifacts`).
+  full quality-gate loop (`ruff`, `pyright`, `pyrefly`, `pyright`, `pytest`, `make artifacts`).
 
 ## Acceptance
 - [ ] All tuple indexing hot paths include explicit sequence checks that raise

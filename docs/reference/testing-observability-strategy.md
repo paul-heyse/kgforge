@@ -267,7 +267,7 @@ uv run pytest -q tests/ --cov=src --cov-report=html
 uv run pytest --doctest-modules src/
 
 # Type checking (no errors allowed)
-uv run pyrefly check && uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13 && uv run pyrefly check
 
 # Linting (no suppressions)
 uv run ruff format && uv run ruff check --fix
@@ -277,7 +277,7 @@ uv run ruff format && uv run ruff check --fix
 
 - **Precommit**: `ruff format` + `ruff check`
 - **Lint**: Full Ruff suite
-- **Types**: `pyrefly check` + `mypy --strict`
+- **Types**: `pyrefly check` + `pyright --strict`
 - **Tests**: `pytest -q` with coverage ≥ 90%
 - **Docs**: `make artifacts && git diff --exit-code`
 

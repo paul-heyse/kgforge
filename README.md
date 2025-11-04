@@ -61,7 +61,7 @@ uv sync --extra gpu            # installs GPU dependencies
 - **Extras**: Set `KGFOUNDRY_UV_EXTRAS=gpu` (comma-separated) or remove `.venv/.uv-extras/gpu`
   / export `KGFOUNDRY_DISABLE_GPU_EXTRA=1` to opt-out after a CUDA install.
 - **Namespace consolidation**: All public APIs are available under the `kgfoundry.*` namespace (e.g., `from kgfoundry import vectorstore_faiss`). The namespace proxy automatically resolves submodules on first access.
-- Pre-commit with ruff/black/mypy; strict typing by default.
+- Pre-commit with ruff/pyright/pyrefly; strict typing by default.
 - **Running tests**: Ensure the repository is importable before invoking pytest. Either install the package in editable mode (`uv pip install -e .`) or prefix commands with `PYTHONPATH=src` (for example, `PYTHONPATH=src uv run pytest -q`).
 - Package README generation: `python tools/gen_readmes.py` (see
   [Automated Documentation](README-AUTOMATED-DOCUMENTATION.md#readme-generation-toolsgen_readmespy)

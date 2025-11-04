@@ -38,7 +38,7 @@
   - Add doctest/xdoctest examples to helper docstrings demonstrating basic usage and error handling.
 - [ ] 1.10 Execute targeted quality gates during development.
   - After code updates, run `uv run ruff check src/kgfoundry/agent_catalog` to catch regressions early.
-  - Use `uv run pyrefly check src/kgfoundry/agent_catalog` and `uv run mypy --config-file mypy.ini src/kgfoundry/agent_catalog` to confirm type cleanliness before moving on to schema changes.
+  - Use `uv run pyrefly check src/kgfoundry/agent_catalog` and `uv run pyright --warnings --pythonversion=3.13 src/kgfoundry/agent_catalog` to confirm type cleanliness before moving on to schema changes.
   - Capture outputs for inclusion in the final PR checklist.
 
 ## 2. Schemas & Documentation

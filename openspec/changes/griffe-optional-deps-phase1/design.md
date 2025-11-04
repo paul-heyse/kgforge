@@ -62,5 +62,5 @@
 4. Add CLI smoke tests and unit tests covering missing dependency scenarios, verifying error output
    and metrics logging.
 5. Update docstrings, README, and docs site to reference install extras; include doctest examples.
-6. Run full quality gates (`ruff`, `pyright`, `pyrefly`, `mypy`, `pytest`, `make artifacts`).
+6. Run full quality gates (`ruff`, `pyright`, `pyrefly`, `pyright`, `pytest`, `make artifacts`).
 

@@ -8,7 +8,7 @@
 - Integrated `pydoclint` into the development workflow and pre-commit hooks for parameter/return parity.
 - Introduced `tools/navmap/strip_navmap_sections.py` to purge legacy `NavMap:` blocks.
 - Documented new requirements in `docs/how-to/contributing.md` and `docs/explanations/numpy-docstring-migration.md`.
-- Added `make lint-docs` and corresponding CI coverage to enforce docstring diffs, DocFacts parity, and strict mypy checks.
+- Added `make lint-docs` and corresponding CI coverage to enforce docstring diffs, DocFacts parity, and strict pyright + pyrefly checks.
 - **Namespace consolidation**: All public APIs are now accessible via the unified `kgfoundry.*` namespace (e.g., `from kgfoundry import vectorstore_faiss`). The namespace proxy automatically resolves submodules on first access, eliminating duplicate top-level package imports.
 - **GPU extras**: GPU-specific dependencies (FAISS GPU, cuVS, PyTorch, vLLM, etc.) are now isolated in the `gpu` extra. Install with `uv sync --extra gpu` or `pip install kgfoundry[gpu]`. This keeps the base installation lightweight while enabling optional GPU acceleration.
 - **Tooling automation**: Added import-linter contracts, suppression guard script (`tools/check_new_suppressions.py`), and PR summary generator (`tools/generate_pr_summary.py`) for improved code quality enforcement.

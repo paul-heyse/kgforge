@@ -122,7 +122,7 @@ Final verification runs:
 ```bash
 uv run ruff format && uv run ruff check --fix  # Zero FBT/SLF in target modules
 uv run pyrefly check      # Type safety verified
-uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13
 uv run pyright --warnings --pythonversion=3.13
 uv run pytest -q          # All tests passing
 python -m tools.check_imports  # Architectural boundaries enforced

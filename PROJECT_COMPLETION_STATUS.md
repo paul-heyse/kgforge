@@ -104,7 +104,7 @@ python -m tools.lint.check_typing_gates src/ tools/ docs/
 
 # Full quality gate
 uv run ruff format && uv run ruff check --fix
-uv run pyright && uv run mypy && uv run pytest
+uv run pyright && uv run pyrefly && uv run pytest
 ```
 
 ---
@@ -134,7 +134,7 @@ uv run pyright && uv run mypy && uv run pytest
    - Test coverage comprehensive
 
 2. **Quality Assured** ✅
-   - All new code passes Ruff, Pyright, MyPy
+   - All new code passes Ruff, Pyright, Pyrefly
    - 55 tests passing (100%)
    - No unguarded imports in new modules
    - Type-safe implementation throughout

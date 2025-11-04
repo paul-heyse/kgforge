@@ -1,6 +1,6 @@
 """Typed facades for jsonschema usage across the codebase.
 
-This module centralizes imports from :mod:`jsonschema` so that mypy sees
+This module centralizes imports from :mod:`jsonschema` so that static type checkers see
 concrete types instead of ``Any``.  The upstream stubs expose several
 untyped entry points (e.g. :class:`Draft202012Validator`,
 :func:`jsonschema.validate`), so we wrap them with Protocol-based casts and

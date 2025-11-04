@@ -21,7 +21,7 @@ Pyrefly currently reports 97 suppressed diagnostics across the codebase.  The ma
 1. **Observability sweep**
    - Ensure all modules producing metrics/logs/traces import the shared `tools/_shared/prometheus.py` helpers.
    - Update module docstrings/examples, confirm structured logging fields, and document optional dependency fallbacks.
-   - Run the static-check trio (`ruff`, `pyrefly`, `mypy`) across `tools/_shared`, docstring builder, docs tooling, and navmap packages after each batch.
+   - Run the static-check trio (`ruff`, `pyrefly`, `pyright`) across `tools/_shared`, docstring builder, docs tooling, and navmap packages after each batch.
 2. **FAISS/cuVS adapters**
    - Expand FAISS/libcuvs stubs to cover GPU helpers and serialization entry points.
    - Introduce NumPy typing utilities and refactor adapters to consume them while guarding optional dependencies.
@@ -29,14 +29,14 @@ Pyrefly currently reports 97 suppressed diagnostics across the codebase.  The ma
 3. **FastAPI & settings**
    - Enhance FastAPI/Starlette stubs and add typed wrappers for middleware/dependency registration.
    - Refactor app/error modules plus settings to leverage the wrappers and emit consistent Problem Details.
-   - Re-run `ruff`/`pyrefly`/`mypy` for `src/search_api` and `kgfoundry_common` after each milestone.
+   - Re-run `ruff`/`pyrefly`/`pyright` for `src/search_api` and `kgfoundry_common` after each milestone.
 4. **Agent catalog math**
    - Implement shared NumPy helpers, refactor catalog modules to consume them, and ensure schema references remain accurate.
    - Provide doctest-driven examples for ranking/idempotency scenarios and verify static checks over the catalog package.
 5. **Tooling scripts & docs**
    - Create typed facades for DuckDB/config handling inside `docs/_scripts/shared.py` and refactor dependent scripts/CLIs.
    - Ensure CLI entry points expose typed `main` functions, structured logging, and safe path handling.
-   - Execute static checks (`ruff`, `pyrefly`, `mypy`) targeting docs and site scripts; refresh contributor docs.
+   - Execute static checks (`ruff`, `pyrefly`, `pyright`) targeting docs and site scripts; refresh contributor docs.
 6. **Audit & guardrails**
    - Implement the suppression manifest script, integrate it into pre-commit/CI, and update contributor guidelines.
    - Run a final static-check sweep to confirm no suppressions remain and document escalation procedures for future exceptions.
@@ -47,8 +47,8 @@ Pyrefly currently reports 97 suppressed diagnostics across the codebase.  The ma
 - **Large diff surface** – typed wrappers touch several modules; stage workstreams and run targeted gates per cluster to keep changes reviewable.
 
 ## Testing Strategy
-- Static analysis as the primary safety net: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` scoped to each workstream and globally before merge.
+- Static analysis as the primary safety net: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, and `uv run pyright --warnings --pythonversion=3.13` scoped to each workstream and globally before merge.
 - Doctest/xdoctest snippets embedded in modules where examples add value (observability helpers, FAISS wrappers, NumPy utilities).
-- Optional dependency rotations: run pyrefly/mypy in CPU-only environments and with GPU extras to validate fallback paths.
+- Optional dependency rotations: run pyrefly/pyright in CPU-only environments and with GPU extras to validate fallback paths.
 - Manual smoke runs (as needed) for doc builders/navmap repair/search API GPU flows, but no new pytest suites are introduced under this change.
 

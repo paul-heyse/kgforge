@@ -38,7 +38,7 @@
 - [x] 2.3 Validate schemas via `python docs/_scripts/validate_artifacts.py`
 - [x] 2.4 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.5 `uv run pyrefly check`
-- [x] 2.6 `uv run mypy --config-file mypy.ini`
+- [x] 2.6 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.7 `uv run ruff format && uv run ruff check --fix`
 
 ## 3. Docs & Artifacts

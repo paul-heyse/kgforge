@@ -28,6 +28,6 @@
 - [x] 2.3 `uv run ruff format && uv run ruff check --fix`
 - [x] 2.4 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.5 `uv run pyrefly check`
-- [x] 2.6 `uv run mypy --config-file mypy.ini`
+- [x] 2.6 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.7 Schema validation: All Problem Details payloads conform to RFC 9457
 

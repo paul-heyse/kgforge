@@ -9,7 +9,7 @@ The system SHALL enable postponed evaluation of annotations for every module wit
 
 #### Scenario: Type checkers run without optional dependencies
 - **GIVEN** a virtual environment lacking FAISS, FastAPI, and other optional extras
-- **WHEN** `uv run pyright --warnings --pythonversion=3.13` and `uv run mypy --config-file mypy.ini` execute
+- **WHEN** `uv run pyright --warnings --pythonversion=3.13` and `uv run pyright --warnings --pythonversion=3.13` execute
 - **THEN** both commands succeed without import errors attributable to type-hint evaluation, demonstrating postponed annotations remove eager imports
 
 ### Requirement: Sanctioned Typing Façade

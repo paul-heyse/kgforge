@@ -195,7 +195,7 @@ python -m tools.lint.check_typing_gates src/ tools/ docs/
 # Full quality gate
 uv run ruff format && uv run ruff check --fix
 uv run pyright --pythonversion=3.13
-uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13
 uv run pytest -q
 ```
 

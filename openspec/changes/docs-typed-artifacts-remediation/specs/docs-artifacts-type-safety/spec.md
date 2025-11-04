@@ -24,7 +24,7 @@ schema drift detection, and strict type gates across the docs toolchain.
 4. **Problem Details** – Validation failures MUST surface RFC 9457 Problem
    Details with extensions describing the artifact, schema version, and JSON
    pointer for the failing field.
-5. **Quality gates** – Ruff, Pyrefly, and mypy MUST run cleanly across the docs
+5. **Quality gates** – Ruff, Pyrefly, and pyright MUST run cleanly across the docs
    scripts and supporting types. Missing type coverage fails the capability.
 6. **Execution tracking** – The associated change record MUST maintain a
    checkbox-tracked task list covering model scaffolding, facade wiring,
@@ -71,5 +71,5 @@ raising exceptions.
 typed facade
 
 *Then* it MUST raise a descriptive `ImportError` (or logged warning) explaining
-the missing dependency while keeping mypy type coverage intact.
+the missing dependency while keeping pyright type coverage intact.
 

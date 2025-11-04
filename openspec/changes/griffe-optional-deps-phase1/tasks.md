@@ -33,7 +33,7 @@
 - [x] 2.4 `uv run ruff format && uv run ruff check --fix` → All checks passed
 - [x] 2.5 `uv run pyright --warnings --pythonversion=3.13` → 0 errors, 0 warnings
 - [x] 2.6 `uv run pyrefly check` → 0 errors  
-- [x] 2.7 `uv run mypy --config-file mypy.ini` → No issues found
+- [x] 2.7 `uv run pyright --warnings --pythonversion=3.13` → No issues found
 - [x] 2.8 Integration verification complete - no drift detected
 
 ## Implementation Summary

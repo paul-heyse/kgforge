@@ -44,7 +44,7 @@ Eliminate all remaining `pyrefly` suppressions by standardising typed facades ac
 
 ## Test Plan
 
-- Static analysis gates: `uv run ruff check --fix` on touched packages; `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` across `tools`, `src/search_api`, `src/vectorstore_faiss`, `src/kgfoundry_common`, `docs/_scripts`, and `site/_scripts`.
+- Static analysis gates: `uv run ruff check --fix` on touched packages; `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` across `tools`, `src/search_api`, `src/vectorstore_faiss`, `src/kgfoundry_common`, `docs/_scripts`, and `site/_scripts`.
 - Table-driven pytest modules covering FAISS GPU toggles, FastAPI exception wiring, and agent catalog vector helpers; add doctest/xdoctest snippets for new observability and NumPy helper APIs.
 - Validate Problem Details and schema changes via existing schema lint tooling plus new round-trip tests for `DocGenSettings` serialisation.
 - Run `scripts/check_pyrefly_suppressions.py` in CI and locally to confirm zero unmanaged suppressions; ensure failure path exercised in unit tests with temporary files.

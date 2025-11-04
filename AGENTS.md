@@ -180,7 +180,7 @@ For all code blocks that you make edits to, please check for pyright, pyrefly, a
   If you are having difficulties with reaching the directory even after running `scripts/bootstrap.sh` please attempt to run the bash command "/bin/bash -lc 'pwd && ls -la'"
 
 - **Remote container / devcontainer:** follow [Link Policy for Remote Editors](#link-policy-for-remote-editors) so deep links open correctly from generated artifacts.
-- **Do not** duplicate tool configs across files. `mypy.ini` and `pyrefly.toml` are canonical; `pyproject.toml` is canonical for Ruff and packaging.
+- **Do not** duplicate tool configs across files. `pyrightconfig.jsonc` and `pyrefly.toml` are canonical; `pyproject.toml` is canonical for Ruff and packaging.
 
 ---
 
@@ -190,7 +190,7 @@ Read these first when editing configs or debugging local vs CI drift:
 
 - **Formatting & lint:** `pyproject.toml` → `[tool.ruff]`, `[tool.ruff.lint]`
 - **Dead code scanning:** `pyproject.toml` → `[tool.vulture]`, `.github/workflows/ci-vulture.yml`, `vulture_whitelist.py`
-- **Types:** `mypy.ini` (single source), `pyrefly.toml` (single source), `pyrightconfig.jsonc` (strict pyright)
+- **Types:** `pyrefly.toml` (single source), `pyrightconfig.jsonc` (strict pyright)
 - **Tests:** `pytest.ini` (markers, doctest/xdoctest config)
 - **Docs / Artifacts:** `tools/docs/build_artifacts.py`, `make artifacts`, outputs under `docs/_build/**`, `site/_build/**`
 - **Nav & Catalog:** `tools/navmap/*`, `docs/_build/agent_catalog.json`, `site/_build/agent/` (Agent Portal)
@@ -224,10 +224,6 @@ Read these first when editing configs or debugging local vs CI drift:
   ```bash
   uv run pyrefly check
   ```
-- **Soundness (strict baseline):**
-  ```bash
-  uv run mypy --config-file mypy.ini
-  ```
 - **Rules of engagement:**
   - Pyright runs in strict mode (`pyrightconfig.jsonc`); update execution environments when adding new roots.
   - No untyped **public** APIs.
@@ -235,7 +231,7 @@ Read these first when editing configs or debugging local vs CI drift:
   - Every `# type: ignore[...]` requires a comment **why** + a ticket reference.
   - Narrow exceptions; HTTP surfaces return **RFC 9457 Problem Details**.
 
-**“Type-clean” means pyright, pyrefly, **and** mypy all pass.**
+**“Type-clean” means pyright and pyrefly both pass.**
 
 ---
 
@@ -420,7 +416,7 @@ Example `PATH_MAP`:
 2. Define/update **JSON Schema** for any boundary payloads.
 3. Implement **typed** public API; write pure logic first, I/O later.
 4. Add **parametrized tests** (happy paths, edges, negative cases).
-5. Run quality gates (format → lint → pyrefly → mypy → pytest).
+5. Run quality gates (format → lint → pyright → pyrefly → pytest).
 6. `make artifacts` and commit regenerated docs/nav/catalog.
 
 **Done when:** all gates green; PR includes design note, schemas, and runnable examples.
@@ -454,8 +450,8 @@ Example `PATH_MAP`:
 **Checklist (paste outputs):**
 ```
 [ ] uv run ruff format && uv run ruff check --fix
+[ ] uv run pyright --warnings --pythonversion=3.13
 [ ] uv run pyrefly check
-[ ] uv run mypy --config-file mypy.ini
 [ ] uv run pytest -q
 [ ] make artifacts && git diff --exit-code
 [ ] python tools/check_new_suppressions.py src
@@ -477,10 +473,9 @@ Example `PATH_MAP`:
 # Format & lint
 uv run ruff format && uv run ruff check --fix
 
-# Types (sharp first, then soundness)
+# Types (pyright strict + pyrefly sharp)
 uv run pyright --warnings --pythonversion=3.13
 uv run pyrefly check
-uv run mypy --config-file mypy.ini
 
 # Tests (incl. doctests/xdoctest via pytest.ini)
 uv run pytest -q
@@ -510,10 +505,10 @@ uvx pre-commit run --all-files
 ## Troubleshooting (for Agents)
 
 - **Ruff vs Black conflicts**: We use **Ruff only**; remove Black changes, re-run Ruff.
-- **Third‑party typing gaps**: prefer small typed facades (`Protocol`, `TypedDict`) or `stubs/` + `mypy_path`, not `Any`.
+- **Third‑party typing gaps**: prefer small typed facades (`Protocol`, `TypedDict`) or `stubs/` alongside the stub configuration in `pyrightconfig.jsonc`, not `Any`.
 - **Docs drift keeps appearing**: run `make artifacts` from a **clean** tree; ensure `docs/_build/**` isn’t ignored; commit regenerated files.
 - **Editor links open wrong path**: verify `PATH_MAP` and `EDITOR_URI_TEMPLATE`; rebuild artifacts.
-- **Slow CI**: check cache restore logs for `uv`, `ruff`, `mypy`. If keys miss, verify `uv.lock` & Python version detection step.
+- **Slow CI**: check cache restore logs for `uv`, `ruff`, `pyright`. If keys miss, verify `uv.lock` & Python version detection step.
 
 ---
 
@@ -531,7 +526,7 @@ uvx pre-commit run --all-files
 - **Tests**: `tests/**` (mirrors `src`)
 - **Docs & site**: `docs/**`, `site/**`
 - **Generated artifacts**: `docs/_build/**`, `site/_build/**` → **do not hand‑edit**
-- **Stubs**: `stubs/**` for local type shims (referenced by `mypy_path`)
+- **Stubs**: `stubs/**` for local type shims (referenced by `stubPath`)
 
 ---
 
@@ -539,8 +534,8 @@ uvx pre-commit run --all-files
 
 - **Job order**: precommit → lint → types → tests → docs
 - **OS matrix**: lint/types on linux + macOS; tests on linux (expand later if needed)
-- **Caches**: `~/.cache/uv`, `~/.cache/ruff`, `.mypy_cache` keyed on OS + Python + lock/config
-- **Artifacts**: docs site, Agent Portal, coverage, JUnit, (optional) mypy HTML are uploaded for each run
+- **Caches**: `~/.cache/uv`, `~/.cache/ruff` keyed on OS + Python + lock/config
+- **Artifacts**: docs site, Agent Portal, coverage, JUnit are uploaded for each run
 - **Branch protection (recommended)**: require `precommit`, `lint`, `types`, `tests` to merge
 
 ---
