@@ -8,6 +8,7 @@ a usable cache instance.
 from __future__ import annotations
 
 import logging
+from logging import Formatter
 
 from kgfoundry_common.logging import (
     JsonFormatter,
@@ -68,7 +69,7 @@ class TestLoggingCacheGetFormatter:
         """Test that get_formatter returns a logging.Formatter."""
         cache = get_logging_cache()
         formatter = cache.get_formatter()
-        assert isinstance(formatter, logging.Formatter)
+        assert isinstance(formatter, Formatter)
 
     def test_returns_json_formatter(self) -> None:
         """Test that get_formatter returns a JsonFormatter."""
@@ -127,7 +128,7 @@ class TestLoggingCacheClear:
         cache.clear()
         # Should not raise any exceptions
         formatter = cache.get_formatter()
-        assert isinstance(formatter, logging.Formatter)
+        assert isinstance(formatter, Formatter)
 
 
 class TestLoggingCacheIntegration:

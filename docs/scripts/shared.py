@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import cache
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
@@ -28,14 +29,13 @@ __all__ = [
 ]
 
 
-_MODULE_CACHE: ModuleType | None = None
-
-
+@cache
 def _load_module() -> ModuleType:
-    global _MODULE_CACHE
-    if _MODULE_CACHE is None:
-        _MODULE_CACHE = import_module(MODULE_PATH)
-    return _MODULE_CACHE
+    return import_module(MODULE_PATH)
+
+
+def clear_cache() -> None:
+    _load_module.cache_clear()
 
 
 def __getattr__(name: str) -> object:

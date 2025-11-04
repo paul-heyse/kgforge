@@ -18,7 +18,7 @@ Examples
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
 from docs._scripts import shared
 from kgfoundry_common.errors import ArtifactDependencyError

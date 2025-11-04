@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import ast
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -144,6 +145,92 @@ def apply_postponed_annotations(content: str) -> str:
     return import_line + body
 
 
+@dataclass(frozen=True, slots=True)
+class RewriteConfig:
+    """Configuration describing how a module should be rewritten."""
+
+    path: Path
+    check_only: bool
+    encoding: str = "utf-8"
+
+
+@dataclass(frozen=True, slots=True)
+class RewritePlan:
+    """Plan capturing original and rewritten module contents."""
+
+    config: RewriteConfig
+    original: str
+    updated: str
+
+    @property
+    def has_changes(self) -> bool:
+        """Return True when the rewritten content differs from the original."""
+        return self.original != self.updated
+
+
+def _parse_rewrite_config(path: Path, *, check_only: bool) -> RewriteConfig:
+    """Create rewrite configuration for ``path``."""
+    return RewriteConfig(path=path, check_only=check_only)
+
+
+def _update_imports(config: RewriteConfig) -> RewritePlan:
+    """Compute rewritten content for the provided configuration."""
+    original = config.path.read_text(encoding=config.encoding)
+    updated = apply_postponed_annotations(original)
+    return RewritePlan(config=config, original=original, updated=updated)
+
+
+def _write_back(plan: RewritePlan) -> bool:
+    """Persist rewritten content when changes are detected."""
+    if not plan.has_changes:
+        return False
+    if plan.config.check_only:
+        return True
+    plan.config.path.write_text(plan.updated, encoding=plan.config.encoding)
+    return True
+
+
+def rewrite_file(path: Path, *, check_only: bool) -> bool:
+    """Rewrite a Python file and return True when the content changes."""
+    config = _parse_rewrite_config(path, check_only=check_only)
+    plan = _update_imports(config)
+    return _write_back(plan)
+
+
+def _normalize_directories(raw_directories: Sequence[Path]) -> list[Path]:
+    """Normalize user-provided directories, defaulting to ``src/``."""
+    return list(raw_directories) if raw_directories else [Path("src")]
+
+
+def _aggregate_results(
+    directories: Sequence[Path],
+    *,
+    check_only: bool,
+    logger: LoggerAdapter,
+) -> tuple[int, int, int]:
+    """Process each directory and return aggregate statistics."""
+    total_processed = 0
+    total_modified = 0
+    total_errors = 0
+
+    for directory in directories:
+        if not directory.exists():
+            msg = f"Directory not found: {directory}"
+            logger.warning(msg)
+            continue
+
+        processed, modified, errors = process_directory(
+            directory,
+            check_only=check_only,
+            logger=logger,
+        )
+        total_processed += processed
+        total_modified += modified
+        total_errors += errors
+
+    return total_processed, total_modified, total_errors
+
+
 def process_directory(
     root: Path,
     *,
@@ -183,12 +270,9 @@ def process_directory(
 
         processed += 1
         try:
-            content = fpath.read_text(encoding="utf-8")
-            new_content = apply_postponed_annotations(content)
+            changed = rewrite_file(fpath, check_only=check_only)
 
-            if new_content != content:
-                if not check_only:
-                    fpath.write_text(new_content, encoding="utf-8")
+            if changed:
                 modified += 1
                 relpath = fpath.relative_to(root)
                 active_logger.info("  %s: annotations added", relpath)
@@ -236,29 +320,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     logger = get_logger(__name__)
 
-    total_processed = 0
-    total_modified = 0
-    total_errors = 0
     check_attr: object = getattr(args, "check_only", False)
     check_flag = bool(check_attr)
 
-    # Cast for type safety (argparse.Namespace.directories is typed as Any)
     raw_directories = cast("Sequence[Path]", getattr(args, "directories", ()))
-    directories = list(raw_directories) if raw_directories else [Path("src")]
-    for directory in directories:
-        if not directory.exists():
-            msg = f"Directory not found: {directory}"
-            logger.warning(msg)
-            continue
-
-        processed, modified, errors = process_directory(
-            directory,
-            check_only=check_flag,
-            logger=logger,
-        )
-        total_processed += processed
-        total_modified += modified
-        total_errors += errors
+    directories = _normalize_directories(raw_directories)
+    total_processed, total_modified, total_errors = _aggregate_results(
+        directories,
+        check_only=check_flag,
+        logger=logger,
+    )
 
     # Summary
     mode = "(CHECK-ONLY)" if check_flag else "(MODIFIED)"

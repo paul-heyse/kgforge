@@ -7,9 +7,8 @@ to eliminate the 'Any' types that come from its type stubs.
 from __future__ import annotations
 
 import inspect as stdlib_inspect
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import ParamSpec, TypeVar
+from typing import Protocol
 
 from tools.docstring_builder.parameters import ParameterKind, normalize_parameter_kind
 
@@ -20,8 +19,11 @@ __all__ = [
 ]
 
 
-P = ParamSpec("P")
-R = TypeVar("R")
+class InspectableCallable(Protocol):
+    """Callable protocol that avoids propagating ``Any`` types."""
+
+    def __call__(self, *args: object, **kwargs: object) -> object:
+        """Invoke the callable."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,7 +43,7 @@ class ParameterInfo:
     """True if parameter accepts **kwargs."""
 
 
-def get_signature(func: Callable[P, R]) -> list[ParameterInfo]:
+def get_signature(func: InspectableCallable) -> list[ParameterInfo]:
     """Get typed parameter information without Any types.
 
     Parameters
@@ -89,7 +91,7 @@ def get_signature(func: Callable[P, R]) -> list[ParameterInfo]:
     return params
 
 
-def has_required_parameters(func: Callable[P, R]) -> bool:
+def has_required_parameters(func: InspectableCallable) -> bool:
     """Check if a callable has required (non-default, non-*args/**kwargs) parameters.
 
     Parameters

@@ -22,12 +22,15 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any, Final, Protocol, Self, cast, runtime_checkable
 
+type FormatterType = logging.Formatter
+
 if TYPE_CHECKING:
     from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.types import JsonValue
 
 __all__ = [
     "CorrelationContext",
+    "FormatterType",
     "JsonFormatter",
     "LogContextExtra",
     "LoggerAdapter",
@@ -79,7 +82,7 @@ class LoggingCache(Protocol):
 
     Methods
     -------
-    get_formatter() -> logging.Formatter
+    get_formatter() -> JsonFormatter
         Get or create a cached JSON formatter instance.
     clear() -> None
         Clear all cached entries and reset state.
@@ -92,12 +95,12 @@ class LoggingCache(Protocol):
     >>> assert isinstance(cache, LoggingCache)
     """
 
-    def get_formatter(self) -> logging.Formatter:
+    def get_formatter(self) -> JsonFormatter:
         """Get or create a cached JSON formatter instance.
 
         Returns
         -------
-        logging.Formatter
+        JsonFormatter
             A JsonFormatter instance from cache or newly created.
         """
         ...
@@ -478,6 +481,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        extra = cast("dict[str, Any]", extra)
         # Handle LogContextExtra dataclass: convert to dict if needed
         if isinstance(self.extra, LogContextExtra):
             for key, value in self.extra.to_dict().items():
@@ -503,6 +507,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        extra = cast("dict[str, Any]", extra)
         # Handle LogContextExtra dataclass: convert to dict if needed
         if isinstance(self.extra, LogContextExtra):
             for key, value in self.extra.to_dict().items():
@@ -528,6 +533,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        extra = cast("dict[str, Any]", extra)
         # Handle LogContextExtra dataclass: convert to dict if needed
         if isinstance(self.extra, LogContextExtra):
             for key, value in self.extra.to_dict().items():
@@ -553,6 +559,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        extra = cast("dict[str, Any]", extra)
         # Handle LogContextExtra dataclass: convert to dict if needed
         if isinstance(self.extra, LogContextExtra):
             for key, value in self.extra.to_dict().items():
@@ -591,6 +598,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        extra = cast("dict[str, Any]", extra)
         # Handle LogContextExtra dataclass: convert to dict if needed
         if isinstance(self.extra, LogContextExtra):
             for key, value in self.extra.to_dict().items():
@@ -616,6 +624,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         extra = kwargs_dict.get("extra", {})
         if not isinstance(extra, dict):
             extra = {}
+        extra = cast("dict[str, Any]", extra)
         # Handle LogContextExtra dataclass: convert to dict if needed
         if isinstance(self.extra, LogContextExtra):
             for key, value in self.extra.to_dict().items():
@@ -1035,12 +1044,12 @@ class _DefaultLoggingCache:
         """Initialize the logging cache."""
         self._formatter_cache: JsonFormatter | None = None
 
-    def get_formatter(self) -> logging.Formatter:
+    def get_formatter(self) -> JsonFormatter:
         """Get or create a cached JSON formatter instance.
 
         Returns
         -------
-        logging.Formatter
+        JsonFormatter
             A JsonFormatter instance from cache or newly created.
         """
         if self._formatter_cache is None:

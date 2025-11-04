@@ -13,14 +13,14 @@ Task: Phase 2, Task 2.5 - Surface compliance metrics
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, cast
-
-import pytest
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 from tools.lint.typing_gate_metrics import TypingGateMetrics, ViolationRecord
+
+from tests.helpers import assert_frozen_attribute
 
 
 class TestViolationRecord:
@@ -47,8 +47,7 @@ class TestViolationRecord:
             module_name="numpy",
             lineno=42,
         )
-        with pytest.raises(AttributeError):
-            cast("Any", record).lineno = 100
+        assert_frozen_attribute(record, "lineno", value=100)
 
 
 class TestTypingGateMetrics:

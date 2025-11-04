@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from functools import cache
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
@@ -13,33 +14,33 @@ MODULE_PATH = "docs._scripts.symbol_delta"
 
 __all__: tuple[str, ...] = ()
 
-
-_MODULE_CACHE: ModuleType | None = None
-_EXPORTS_CACHE: tuple[str, ...] | None = None
+_DEFAULT_ALL: tuple[str, ...] = tuple(__all__)
 
 
+@cache
 def _load_module() -> ModuleType:
-    global _MODULE_CACHE
-    if _MODULE_CACHE is None:
-        _MODULE_CACHE = import_module(MODULE_PATH)
-    return _MODULE_CACHE
+    return import_module(MODULE_PATH)
 
 
+@cache
 def _export_names() -> tuple[str, ...]:
-    global _EXPORTS_CACHE
-    if _EXPORTS_CACHE is not None:
-        return _EXPORTS_CACHE
-
     module = _load_module()
     exports_obj: object | None = getattr(module, "__all__", None)
     if isinstance(exports_obj, Iterable) and not isinstance(exports_obj, (str, bytes)):
-        exports: tuple[str, ...] = tuple(str(name) for name in exports_obj)
+        candidates = cast("Iterable[object]", exports_obj)
+        exports: tuple[str, ...] = tuple(str(name) for name in candidates)
     else:
         exports = tuple(name for name in dir(module) if not name.startswith("_"))
     namespace = cast("dict[str, object]", globals())
     namespace["__all__"] = list(exports)
-    _EXPORTS_CACHE = exports
     return exports
+
+
+def clear_cache() -> None:
+    _load_module.cache_clear()
+    _export_names.cache_clear()
+    namespace = cast("dict[str, object]", globals())
+    namespace["__all__"] = list(_DEFAULT_ALL)
 
 
 def __getattr__(name: str) -> object:

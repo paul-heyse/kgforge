@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import FrozenInstanceError
+import typing as t
 from io import StringIO
+from typing import TYPE_CHECKING
 
-import pytest
 from tools.docstring_builder.models import (
     CLI_SCHEMA_ID,
     CLI_SCHEMA_VERSION,
@@ -27,6 +27,10 @@ from kgfoundry_common.logging import (
     get_correlation_id,
     with_fields,
 )
+from tests.helpers import assert_frozen_attribute
+
+if TYPE_CHECKING:
+    from kgfoundry_common.problem_details import ProblemDetails
 
 
 class TestLogContextExtraImmutability:
@@ -36,8 +40,7 @@ class TestLogContextExtraImmutability:
         """Frozen dataclass prevents field mutation."""
         ctx = LogContextExtra(correlation_id="req-123", operation="search")
         # Attempting to mutate should raise FrozenInstanceError
-        with pytest.raises(FrozenInstanceError):
-            ctx.correlation_id = "req-456"  # type: ignore[misc]
+        assert_frozen_attribute(ctx, "correlation_id", value="req-456")
 
     def test_with_methods_return_new_instances(self) -> None:
         """with_* methods return new instances, not modify in place."""
@@ -73,7 +76,7 @@ class TestLogContextExtraConversion:
     def test_to_dict_excludes_none_values(self) -> None:
         """to_dict excludes None fields to avoid verbose logs."""
         ctx = LogContextExtra(correlation_id="req-123", operation="search", status=None)
-        data: dict[str, str | float | None] = ctx.to_dict()
+        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
 
         assert data == {"correlation_id": "req-123", "operation": "search"}
         assert "status" not in data
@@ -81,7 +84,7 @@ class TestLogContextExtraConversion:
     def test_to_dict_empty_context(self) -> None:
         """Empty context converts to empty dict."""
         ctx = LogContextExtra()
-        data: dict[str, str | float | None] = ctx.to_dict()
+        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
         assert data == {}
 
     def test_to_dict_all_fields(self) -> None:
@@ -94,7 +97,7 @@ class TestLogContextExtraConversion:
             service="docs-pipeline",
             endpoint="/api/docs",
         )
-        data: dict[str, str | float | None] = ctx.to_dict()
+        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
 
         assert len(data) == 6
         assert data.get("correlation_id") == "req-123"
@@ -130,7 +133,7 @@ class TestLoggerAdapterWithLogContextExtra:
         adapter.info("Test message")
 
         output = stream.getvalue().strip()
-        parsed: dict[str, object] = json.loads(output)
+        parsed = t.cast("dict[str, object]", json.loads(output))
         assert parsed.get("correlation_id") == "req-123"
         assert parsed.get("operation") == "search"
         assert parsed.get("message") == "Test message"
@@ -166,7 +169,7 @@ class TestSafeAccessorPatterns:
     def test_get_with_default(self) -> None:
         """Dict.get() works for safely accessing optional fields."""
         ctx = LogContextExtra(correlation_id="req-123")
-        data: dict[str, str | float | None] = ctx.to_dict()
+        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
 
         # Safe access with .get()
         correlation: str | float | None = data.get("correlation_id")
@@ -178,7 +181,7 @@ class TestSafeAccessorPatterns:
     def test_optional_field_in_to_dict(self) -> None:
         """Check presence of optional field before access."""
         ctx = LogContextExtra(operation="search")
-        data: dict[str, str | float | None] = ctx.to_dict()
+        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
 
         # Use ternary for clarity
         problem: str | float | None = data.get("problem")
@@ -201,12 +204,20 @@ class TestErrorReportConstructor:
 
     def test_make_error_report_with_optional_problem(self) -> None:
         """Optional problem field can be included."""
-        problem = {"status": 500, "title": "Internal Error"}
+        problem = t.cast(
+            "ProblemDetails",
+            {
+                "type": "https://kgfoundry.dev/problems/internal-error",
+                "title": "Internal Error",
+                "status": 500,
+                "detail": "Failed",
+            },
+        )
         error = make_error_report(
             file="test.py",
             status="error",
             message="Failed",
-            problem=problem,  # type: ignore[arg-type]
+            problem=problem,
         )
 
         assert error.get("problem") == problem

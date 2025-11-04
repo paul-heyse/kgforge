@@ -7,12 +7,11 @@ and enforce their constraints.
 from __future__ import annotations
 
 import tempfile
-from dataclasses import FrozenInstanceError
 from pathlib import Path
-from typing import cast
 
-import pytest
 from tools.navmap.config import NavmapRepairOptions, NavmapStripOptions
+
+from tests.helpers import assert_frozen_attribute
 
 
 class TestNavmapRepairOptions:
@@ -44,8 +43,7 @@ class TestNavmapRepairOptions:
     def test_is_frozen(self) -> None:
         """Verify config is immutable."""
         options = NavmapRepairOptions()
-        with pytest.raises(FrozenInstanceError):
-            cast("object", options).apply = True
+        assert_frozen_attribute(options, "apply", value=True)
 
     def test_both_flags_can_be_combined(self) -> None:
         """Verify apply and emit_json can be used together."""
@@ -83,8 +81,7 @@ class TestNavmapStripOptions:
     def test_is_frozen(self) -> None:
         """Verify config is immutable."""
         options = NavmapStripOptions()
-        with pytest.raises(FrozenInstanceError):
-            cast("object", options).dry_run = False
+        assert_frozen_attribute(options, "dry_run", value=False)
 
     def test_flags_combination_both_true(self) -> None:
         """Verify both flags can be True simultaneously."""

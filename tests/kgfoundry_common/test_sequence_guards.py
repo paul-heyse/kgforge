@@ -6,49 +6,85 @@ structured logs, metrics, and RFC 9457 Problem Details.
 
 from __future__ import annotations
 
+import typing
+from typing import Protocol
+
 import pytest
 
 from kgfoundry_common.errors import VectorSearchError
-from kgfoundry_common.sequence_guards import (
-    first_or_error,
-    first_or_error_multi_device,
-)
+from kgfoundry_common.sequence_guards import first_or_error, first_or_error_multi_device
+
+
+class SequenceGuard(Protocol):
+    """Protocol describing the generic sequence guard callable contract."""
+
+    def __call__(
+        self,
+        sequence: typing.Sequence[object],
+        *,
+        context: str,
+        operation: str = ...,
+    ) -> object: ...
+
+
+class MultiDeviceGuard(Protocol):
+    """Protocol describing the multi-device guard callable contract."""
+
+    def __call__(
+        self,
+        sequence: typing.Sequence[object],
+        *,
+        context: str = ...,
+        operation: str = ...,
+    ) -> object: ...
+
+
+@pytest.fixture(name="sequence_guard")
+def sequence_guard_fixture() -> SequenceGuard:
+    """Provide a typed fixture for the generic sequence guard."""
+    return first_or_error
+
+
+@pytest.fixture(name="multi_device_guard")
+def multi_device_guard_fixture() -> MultiDeviceGuard:
+    """Provide a typed fixture for the multi-device sequence guard."""
+    return first_or_error_multi_device
 
 
 class TestFirstOrError:
     """Tests for first_or_error guard function."""
 
-    def test_valid_sequence_returns_first_element(self) -> None:
+    def test_valid_sequence_returns_first_element(self, sequence_guard: SequenceGuard) -> None:
         """Verify first_or_error returns first element for non-empty sequence."""
         devices = [0, 1, 2]
-        result = first_or_error(devices, context="test_devices")
+        result = sequence_guard(devices, context="test_devices")
         assert result == 0
 
-    def test_valid_tuple_returns_first_element(self) -> None:
+    def test_valid_tuple_returns_first_element(self, sequence_guard: SequenceGuard) -> None:
         """Verify first_or_error works with tuples."""
         devices = (10, 20, 30)
-        result = first_or_error(devices, context="test_tuple")
+        result = sequence_guard(devices, context="test_tuple")
         assert result == 10
 
-    def test_single_element_sequence(self) -> None:
+    def test_single_element_sequence(self, sequence_guard: SequenceGuard) -> None:
         """Verify single-element sequence returns that element."""
         devices = [42]
-        result = first_or_error(devices, context="single_element")
+        result = sequence_guard(devices, context="single_element")
         assert result == 42
 
-    def test_empty_list_raises_vector_search_error(self) -> None:
+    def test_empty_list_raises_vector_search_error(self, sequence_guard: SequenceGuard) -> None:
         """Verify empty list raises VectorSearchError with Problem Details."""
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error([], context="empty_devices")
+            sequence_guard([], context="empty_devices")
 
         error = exc_info.value
         assert "empty" in str(error).lower()
         assert "sequence is empty" in str(error)
 
-    def test_empty_tuple_raises_vector_search_error(self) -> None:
+    def test_empty_tuple_raises_vector_search_error(self, sequence_guard: SequenceGuard) -> None:
         """Verify empty tuple raises VectorSearchError."""
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error((), context="gpu_devices")
+            sequence_guard((), context="gpu_devices")
 
         error = exc_info.value
         assert "empty" in str(error).lower()
@@ -61,82 +97,84 @@ class TestFirstOrError:
             "",  # empty string is a sequence
         ],
     )
-    def test_various_empty_sequences_raise_error(self, empty_seq: object) -> None:
+    def test_various_empty_sequences_raise_error(
+        self, sequence_guard: SequenceGuard, empty_seq: typing.Sequence[object]
+    ) -> None:
         """Verify various empty sequence types raise VectorSearchError."""
         with pytest.raises(VectorSearchError):
-            first_or_error(empty_seq, context="various_sequences")  # type: ignore[arg-type]
+            sequence_guard(empty_seq, context="various_sequences")
 
-    def test_error_includes_context_information(self) -> None:
+    def test_error_includes_context_information(self, sequence_guard: SequenceGuard) -> None:
         """Verify error message includes provided context."""
         context_str = "my_special_context"
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error([], context=context_str)
+            sequence_guard([], context=context_str)
 
         error_msg = str(exc_info.value)
         assert context_str in error_msg
 
-    def test_custom_operation_parameter(self) -> None:
+    def test_custom_operation_parameter(self, sequence_guard: SequenceGuard) -> None:
         """Verify custom operation parameter is accepted and used."""
         operation = "custom_gpu_operation"
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error([], context="gpu", operation=operation)
+            sequence_guard([], context="gpu", operation=operation)
 
         # Error should be raised without issues
         assert exc_info.value is not None
 
-    def test_preserves_element_type(self) -> None:
+    def test_preserves_element_type(self, sequence_guard: SequenceGuard) -> None:
         """Verify first_or_error preserves the type of returned element."""
         strings = ["hello", "world"]
-        result = first_or_error(strings, context="strings")
+        result = sequence_guard(strings, context="strings")
         assert isinstance(result, str)
         assert result == "hello"
 
-    def test_sequence_length_check(self) -> None:
+    def test_sequence_length_check(self, sequence_guard: SequenceGuard) -> None:
         """Verify guard correctly identifies empty vs. non-empty."""
         # Non-empty should work
-        assert first_or_error([1], context="c") == 1
+        assert sequence_guard([1], context="c") == 1
 
         # Empty should fail
         with pytest.raises(VectorSearchError):
-            first_or_error([], context="c")
+            sequence_guard([], context="c")
 
 
 class TestFirstOrErrorMultiDevice:
     """Tests for first_or_error_multi_device specialized variant."""
 
-    def test_valid_devices_returns_first(self) -> None:
+    def test_valid_devices_returns_first(self, multi_device_guard: MultiDeviceGuard) -> None:
         """Verify multi-device variant returns first element."""
         gpu_indices = [0, 1, 2]
-        result = first_or_error_multi_device(gpu_indices)
+        result = multi_device_guard(gpu_indices)
         assert result == 0
 
-    def test_empty_devices_raises_error(self) -> None:
+    def test_empty_devices_raises_error(self, multi_device_guard: MultiDeviceGuard) -> None:
         """Verify empty device list raises VectorSearchError."""
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error_multi_device([])
+            multi_device_guard([])
 
         error = exc_info.value
         assert "FAISS GPU cloning failed" in str(error)
         assert "empty" in str(error).lower()
 
-    def test_custom_context_parameter(self) -> None:
+    def test_custom_context_parameter(self, multi_device_guard: MultiDeviceGuard) -> None:
         """Verify custom context is used in error message."""
         custom_context = "my_gpu_list"
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error_multi_device([], context=custom_context)
+            multi_device_guard([], context=custom_context)
 
         error_msg = str(exc_info.value)
         assert custom_context in error_msg
 
-    def test_single_device(self) -> None:
+    def test_single_device(self, multi_device_guard: MultiDeviceGuard) -> None:
         """Verify single device in list returns correctly."""
-        result = first_or_error_multi_device([42])
+        result = multi_device_guard([42])
         assert result == 42
 
-    def test_error_mentions_gpu_context(self) -> None:
+    def test_error_mentions_gpu_context(self, multi_device_guard: MultiDeviceGuard) -> None:
         """Verify error specifically mentions GPU/FAISS context."""
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error_multi_device([])
+            multi_device_guard([])
 
         error_msg = str(exc_info.value)
         # Should mention FAISS or GPU context
@@ -151,27 +189,32 @@ class TestFirstOrErrorMultiDevice:
             (range(5), 0),
         ],
     )
-    def test_various_valid_sequences(self, devices: object, expected: object) -> None:
+    def test_various_valid_sequences(
+        self,
+        multi_device_guard: MultiDeviceGuard,
+        devices: typing.Sequence[object],
+        expected: object,
+    ) -> None:
         """Verify multi-device works with various sequence types."""
-        result: object = first_or_error_multi_device(devices)  # type: ignore[arg-type]
+        result: object = multi_device_guard(devices)
         assert result == expected
 
 
 class TestErrorObservability:
     """Tests for observability aspects of guards (logs, metrics)."""
 
-    def test_error_is_vector_search_error_type(self) -> None:
+    def test_error_is_vector_search_error_type(self, sequence_guard: SequenceGuard) -> None:
         """Verify guard raises the correct exception type."""
         with pytest.raises(VectorSearchError):
-            first_or_error([], context="test")
+            sequence_guard([], context="test")
 
         # Guard should raise VectorSearchError, not generic IndexError or ValueError
         # This is verified by the pytest.raises above
 
-    def test_preserves_exception_cause_chain(self) -> None:
+    def test_preserves_exception_cause_chain(self, sequence_guard: SequenceGuard) -> None:
         """Verify exception cause chain is clean (raised from None)."""
         with pytest.raises(VectorSearchError) as exc_info:
-            first_or_error([], context="test")
+            sequence_guard([], context="test")
 
         # Cause should be None (raised from None)
         assert exc_info.value.__cause__ is None
@@ -191,14 +234,19 @@ class TestErrorObservability:
 class TestFirstOrErrorParametrized:
     """Parametrized tests for comprehensive coverage."""
 
-    def test_sequence_behavior(self, seq_type: str, seq_value: object) -> None:
+    def test_sequence_behavior(
+        self,
+        sequence_guard: SequenceGuard,
+        seq_type: str,
+        seq_value: typing.Sequence[object],
+    ) -> None:
         """Comprehensive parametrized test for various sequences."""
         if seq_type.startswith("empty"):
             # Empty sequences should raise
             with pytest.raises(VectorSearchError):
-                first_or_error(seq_value, context="test")  # type: ignore[arg-type]
+                sequence_guard(seq_value, context="test")
         else:
             # Non-empty sequences should return first element
-            result: object = first_or_error(seq_value, context="test")  # type: ignore[arg-type]
+            result: object = sequence_guard(seq_value, context="test")
             # Verify it returned something (the first element)
             assert result is not None

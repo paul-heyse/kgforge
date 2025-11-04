@@ -12,10 +12,10 @@ from kgfoundry_common.problem_details import (
     build_configuration_problem,
     validate_problem_details,
 )
-from kgfoundry_common.types import JsonValue
+from kgfoundry_common.types import JsonValue, ProblemDetails
 
 
-def _load_sample_payload() -> dict[str, object]:
+def _load_sample_payload() -> dict[str, JsonValue]:
     """Load the sample payload JSON file."""
     sample_path = (
         Path(__file__).parent.parent.parent
@@ -25,7 +25,17 @@ def _load_sample_payload() -> dict[str, object]:
         / "public-api-invalid-config.json"
     )
     with Path(sample_path).open(encoding="utf-8") as f:
-        return cast("dict[str, object]", json.load(f))
+        return cast("dict[str, JsonValue]", json.load(f))
+
+
+def _as_problem_dict(problem: ProblemDetails) -> dict[str, object]:
+    """Return a mutable dictionary view of the problem details payload."""
+    return cast("dict[str, object]", problem)
+
+
+def _as_problem_mapping(problem: ProblemDetails) -> Mapping[str, JsonValue]:
+    """Return a mapping view for schema validation assertions."""
+    return cast("Mapping[str, JsonValue]", problem)
 
 
 class TestConfigurationProblemSchema:
@@ -87,7 +97,7 @@ class TestConfigurationProblemSchema:
             hint="Provide a positive integer value for timeout in seconds",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
 
         # Verify structure matches sample
         assert problem_dict["type"] == "https://kgfoundry.dev/problems/configuration-error"
@@ -117,7 +127,7 @@ class TestConfigurationProblemSchemaParity:
                 hint=hint,
             )
             problem = build_configuration_problem(error)
-            validate_problem_details(cast("Mapping[str, JsonValue]", problem))
+            validate_problem_details(_as_problem_mapping(problem))
 
     def test_sample_and_generated_both_have_extensions(self) -> None:
         """Test that both sample and generated problems use extensions field."""
@@ -128,7 +138,7 @@ class TestConfigurationProblemSchemaParity:
             issue="Test issue",
         )
         generated = build_configuration_problem(error)
-        generated_dict = cast("dict[str, object]", generated)
+        generated_dict = _as_problem_dict(generated)
 
         assert "extensions" in sample
         assert "extensions" in generated_dict
@@ -145,7 +155,7 @@ class TestConfigurationProblemSchemaParity:
             issue="Test issue",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
 
         instance = problem_dict.get("instance", "")
         assert str(instance).startswith("urn:")

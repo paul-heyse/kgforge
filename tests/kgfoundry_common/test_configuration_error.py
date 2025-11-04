@@ -13,7 +13,17 @@ from kgfoundry_common.problem_details import (
     render_problem,
     validate_problem_details,
 )
-from kgfoundry_common.types import JsonValue
+from kgfoundry_common.types import JsonValue, ProblemDetails
+
+
+def _as_problem_dict(problem: ProblemDetails) -> dict[str, object]:
+    """Cast problem details to a mutable dictionary for assertions."""
+    return cast("dict[str, object]", problem)
+
+
+def _as_problem_mapping(problem: ProblemDetails) -> Mapping[str, JsonValue]:
+    """Cast problem details to a mapping for schema validation."""
+    return cast("Mapping[str, JsonValue]", problem)
 
 
 class TestConfigurationErrorWithDetails:
@@ -83,10 +93,11 @@ class TestConfigurationErrorWithDetails:
 
     def test_with_details_keyword_only(self) -> None:
         """Test that with_details requires keyword arguments."""
+        invalid_call = cast(
+            "Callable[..., ConfigurationError]",
+            ConfigurationError.with_details,
+        )
         with pytest.raises(TypeError):
-            invalid_call = cast(
-                "Callable[..., ConfigurationError]", ConfigurationError.with_details
-            )
             invalid_call("field", "issue")
 
     def test_with_details_special_characters(self) -> None:
@@ -110,7 +121,7 @@ class TestBuildConfigurationProblem:
             issue="Must be positive",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         assert isinstance(problem, dict)
         assert problem_dict["type"] == "https://kgfoundry.dev/problems/configuration-error"
         assert problem_dict["title"] == "Configuration Error"
@@ -126,7 +137,7 @@ class TestBuildConfigurationProblem:
             hint="Use 1-65535",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         assert "extensions" in problem_dict
         extensions = cast("dict[str, object]", problem_dict["extensions"])
         assert "validation" in extensions
@@ -140,7 +151,7 @@ class TestBuildConfigurationProblem:
             issue="Invalid protocol",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         assert problem_dict["instance"] == "urn:config:validation"
 
     def test_build_configuration_problem_code(self) -> None:
@@ -150,7 +161,7 @@ class TestBuildConfigurationProblem:
             issue="Invalid value",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         assert "code" in problem_dict
         assert problem_dict["code"] == "configuration-error"
 
@@ -161,7 +172,7 @@ class TestBuildConfigurationProblem:
             issue="Validation failed",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         assert "extensions" in problem_dict
         extensions = cast("dict[str, object]", problem_dict["extensions"])
         assert extensions["exception_type"] == "ConfigurationError"
@@ -180,7 +191,7 @@ class TestBuildConfigurationProblem:
             issue="Schema validation failed",
         )
         problem = build_configuration_problem(error)
-        validate_problem_details(cast("Mapping[str, JsonValue]", problem))
+        validate_problem_details(_as_problem_mapping(problem))
 
     def test_build_configuration_problem_multiple_fields(self) -> None:
         """Test Problem Details with multi-field error context."""
@@ -192,12 +203,10 @@ class TestBuildConfigurationProblem:
             },
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
-        assert "validation" in cast("dict[str, object]", problem_dict.get("extensions", {}))
-        validation_ctx = cast(
-            "dict[str, object]",
-            cast("dict[str, object]", problem_dict.get("extensions", {})).get("validation"),
-        )
+        problem_dict = _as_problem_dict(problem)
+        extensions = cast("dict[str, object]", problem_dict.get("extensions", {}))
+        assert "validation" in extensions
+        validation_ctx = cast("dict[str, object]", extensions.get("validation"))
         assert "field_1" in str(validation_ctx)
         assert "field_2" in str(validation_ctx)
 
@@ -209,7 +218,7 @@ class TestBuildConfigurationProblem:
             hint="Use user@domain.com",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         # The detail should contain info about the field
         detail_value = problem_dict.get("detail", "")
         assert "email" in str(detail_value) or "email" in str(problem_dict)
@@ -221,7 +230,7 @@ class TestBuildConfigurationProblem:
             issue="Must be non-negative",
         )
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         assert problem_dict["status"] == 500
 
 
@@ -250,7 +259,7 @@ class TestConfigurationErrorIntegration:
         )
         assert error.__cause__ is original_error
         problem = build_configuration_problem(error)
-        problem_dict = cast("dict[str, object]", problem)
+        problem_dict = _as_problem_dict(problem)
         extensions = cast("dict[str, object]", problem_dict.get("extensions", {}))
         assert "validation" in extensions
 
@@ -264,6 +273,6 @@ class TestConfigurationErrorIntegration:
         problems = [build_configuration_problem(e) for e in errors]
         assert len(problems) == 3
         for problem in problems:
-            problem_dict = cast("dict[str, object]", problem)
+            problem_dict = _as_problem_dict(problem)
             assert problem_dict["type"] == "https://kgfoundry.dev/problems/configuration-error"
             assert problem_dict["status"] == 500

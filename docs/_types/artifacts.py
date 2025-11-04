@@ -113,7 +113,7 @@ import json
 from collections.abc import Mapping as MappingABC
 from typing import TYPE_CHECKING, Annotated, cast
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from docs._types.alignment import (
     SYMBOL_DELTA_CHANGE_FIELDS,
@@ -131,6 +131,7 @@ from kgfoundry_common.errors import (
 # Type aliases matching RFC 7159 JSON structure
 type JsonPrimitive = str | int | float | bool | None
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
 type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
@@ -445,8 +446,19 @@ class SymbolDeltaPayload(BaseModel):
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
-            return tuple(v)
-        return ()
+            changes: list[SymbolDeltaChange] = []
+            raw_entries = cast("list[object] | tuple[object, ...]", v)
+            entries = tuple(raw_entries)
+            for index, entry in enumerate(entries):
+                coerced = _coerce_delta_change(entry, artifact="symbol-delta", index=index)
+                changes.append(coerced)
+            return tuple(changes)
+        changed_field = "changed"
+        raise _validation_error(
+            changed_field,
+            "a sequence of change mappings",
+            artifact="symbol-delta",
+        )
 
     model_config = {"frozen": True}
 
@@ -553,47 +565,59 @@ def _coerce_optional_int(
     raise _validation_error(field, "an integer", artifact=artifact, row=row)
 
 
+def _coerce_delta_change(
+    entry: object,
+    *,
+    artifact: str,
+    index: int,
+) -> SymbolDeltaChange:
+    """Coerce a single change entry into a SymbolDeltaChange instance."""
+    symbol_delta_cls: type[SymbolDeltaChange] = SymbolDeltaChange
+    if isinstance(entry, symbol_delta_cls):
+        return entry
+
+    if isinstance(entry, MappingABC):
+        mapping: dict[str, object] = {}
+        for key, value in entry.items():
+            if not isinstance(key, str):
+                key_field = f"changed[{index}] key"
+                raise _validation_error(key_field, "a string", artifact=artifact)
+            mapping[key] = value
+
+        validator = cast(
+            "Callable[[dict[str, object]], SymbolDeltaChange]",
+            symbol_delta_cls.model_validate,
+        )
+
+        try:
+            return validator(mapping)
+        except ValidationError as exc:  # pragma: no cover - propagated with context
+            indexed_field = f"changed[{index}]"
+            raise _validation_error(
+                indexed_field,
+                "a valid symbol delta change",
+                artifact=artifact,
+            ) from exc
+
+    indexed_field = f"changed[{index}]"
+    raise _validation_error(
+        indexed_field,
+        "a mapping describing the change",
+        artifact=artifact,
+    )
+
+
 def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaChange, ...]:
     """Coerce value to tuple of SymbolDeltaChange."""
     if value is None:
         return ()
     if isinstance(value, (list, tuple)):
         changes: list[SymbolDeltaChange] = []
-        for index, entry in enumerate(cast("list[object] | tuple[object, ...]", value)):
-            # Try to handle as already-instantiated SymbolDeltaChange
-            if hasattr(entry, "__pydantic_core_schema__"):
-                # Likely a Pydantic model; try direct append
-                try:
-                    changes.append(cast("SymbolDeltaChange", entry))
-                    continue
-                except (TypeError, ValueError):
-                    pass
-
-            # Try to handle as mapping (dict-like)
-            if isinstance(entry, MappingABC):
-                try:
-                    entry_dict: dict[str, object] = dict(cast("MappingABC[str, object]", entry))
-                    validated_change = cast(
-                        "SymbolDeltaChange",
-                        SymbolDeltaChange.model_validate(entry_dict),
-                    )
-                    changes.append(validated_change)
-                except Exception as exc:  # pragma: no cover - defensive guard
-                    indexed_field = f"changed[{index}]"
-                    raise _validation_error(
-                        indexed_field,
-                        "a valid change mapping",
-                        artifact=artifact,
-                    ) from exc
-                continue
-
-            # Unknown entry type
-            indexed_field = f"changed[{index}]"
-            raise _validation_error(
-                indexed_field,
-                "a mapping describing the change",
-                artifact=artifact,
-            )
+        raw_entries = cast("list[object] | tuple[object, ...]", value)
+        entries = tuple(raw_entries)
+        for index, entry in enumerate(entries):
+            coerced = _coerce_delta_change(entry, artifact=artifact, index=index)
+            changes.append(coerced)
         return tuple(changes)
     changed_field = "changed"
     raise _validation_error(
