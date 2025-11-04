@@ -17,6 +17,7 @@ from __future__ import annotations
 import ast
 import importlib
 import sys
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
@@ -24,10 +25,10 @@ from typing import TYPE_CHECKING, TypedDict, cast
 from kgfoundry_common.errors import ConfigurationError
 from tools._shared.logging import get_logger
 
+LOGGER = get_logger(__name__)
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-LOGGER = get_logger(__name__)
 
 __all__ = (
     "StubEvaluationResult",
@@ -128,6 +129,10 @@ class StubParityIssueRecord:
         )
 
 
+def _issue_sort_key(issue: StubParityIssueRecord) -> tuple[str, str]:
+    return (issue.module, issue.stub_path.as_posix())
+
+
 @dataclass(frozen=True, slots=True)
 class StubParityReport:
     """Aggregate summary of stub parity evaluation results."""
@@ -136,8 +141,7 @@ class StubParityReport:
 
     def __post_init__(self) -> None:
         """Stabilize internal storage for downstream consumers."""
-        normalized: tuple[StubParityIssueRecord, ...] = tuple(self.issues)
-        object.__setattr__(self, "issues", normalized)
+        object.__setattr__(self, "issues", _normalize_issues(self.issues))
 
     @property
     def issue_count(self) -> int:
@@ -161,15 +165,16 @@ class StubParityReport:
     @classmethod
     def from_context(cls, context: StubParityContext) -> StubParityReport:
         """Reconstruct a report from Problem Details context."""
-        issues = [StubParityIssueRecord.from_context_entry(entry) for entry in context["issues"]]
-        report = cls(issues=tuple(issues))
-        if (
-            report.issue_count != context["issue_count"]
-            or report.error_count != context["error_count"]
-        ):
+        issues = tuple(
+            StubParityIssueRecord.from_context_entry(entry) for entry in context["issues"]
+        )
+        report = cls(issues=issues)
+        expected_issue_count = context["issue_count"]
+        expected_error_count = context["error_count"]
+        if report.issue_count != expected_issue_count or report.error_count != expected_error_count:
             message = (
                 "Stub parity context mismatch: "
-                f"expected counts ({context['issue_count']}, {context['error_count']}), "
+                f"expected counts ({expected_issue_count}, {expected_error_count}), "
                 f"got ({report.issue_count}, {report.error_count})."
             )
             raise ValueError(message)
@@ -375,7 +380,7 @@ def run_stub_parity_checks(checks: list[tuple[str, Path]]) -> StubParityReport:
 
 def build_stub_parity_context(report: StubParityReport) -> StubParityContext:
     """Construct the canonical stub parity context payload."""
-    issues: list[StubParityIssueEntry] = [issue.to_context_entry() for issue in report.issues]
+    issues = [issue.to_context_entry() for issue in report.issues]
 
     return {
         "issue_count": report.issue_count,
@@ -387,16 +392,21 @@ def build_stub_parity_context(report: StubParityReport) -> StubParityContext:
 def _extract_stub_parity_report(error: ConfigurationError) -> StubParityReport | None:
     """Normalize the context associated with a stub parity failure."""
     raw_context = error.context
-    if not raw_context:
+    if not isinstance(raw_context, Mapping):
         return None
 
     try:
         context = cast("StubParityContext", dict(raw_context))
-        report = StubParityReport.from_context(context)
+        return StubParityReport.from_context(context)
     except (KeyError, TypeError, ValueError):
         LOGGER.exception("Failed to parse stub parity context")
         return None
-    return report
+
+
+def _normalize_issues(
+    issues: Iterable[StubParityIssueRecord],
+) -> tuple[StubParityIssueRecord, ...]:
+    return tuple(sorted(issues, key=_issue_sort_key))
 
 
 def main() -> int:
@@ -409,7 +419,6 @@ def main() -> int:
         ("kgfoundry.agent_catalog.search", stubs_dir / "agent_catalog" / "search.pyi"),
     ]
 
-    report: StubParityReport
     try:
         run_stub_parity_checks(modules_to_check)
     except ConfigurationError as error:
@@ -417,45 +426,34 @@ def main() -> int:
         if extracted_report is None:
             LOGGER.exception("FAILED: Stub parity issues detected")
             return 1
-        report = extracted_report
-    else:
-        LOGGER.info("SUCCESS: All checks passed")
-        return 0
 
-    LOGGER.error(
-        "FAILED: %s issue(s) found",
-        report.error_count,
-        extra={"error_count": report.error_count},
-    )
+        issues_payload = [
+            {
+                "module": issue.module,
+                "stub_path": str(issue.stub_path),
+                "missing_symbols": list(issue.missing_symbols),
+                "extra_symbols": list(issue.extra_symbols),
+                "any_usages": [
+                    {"line": line_number, "preview": preview}
+                    for line_number, preview in issue.any_usages
+                ],
+            }
+            for issue in extracted_report.issues
+        ]
 
-    for issue in report.issues:
-        module_name = issue.module
-        LOGGER.error("Module: %s", module_name, extra={"module_name": module_name})
-        if issue.missing_symbols:
-            LOGGER.error(
-                "  Missing in stub: %s",
-                list(issue.missing_symbols),
-                extra={"module_name": module_name, "missing_symbols": list(issue.missing_symbols)},
-            )
-        if issue.extra_symbols:
-            LOGGER.info(
-                "  Extra in stub (OK if intentional): %s",
-                list(issue.extra_symbols),
-                extra={"module_name": module_name, "extra_symbols": list(issue.extra_symbols)},
-            )
-        for line_number, preview in issue.any_usages:
-            LOGGER.error(
-                "  Any at line %s: %s",
-                line_number,
-                preview,
-                extra={
-                    "module_name": module_name,
-                    "line": line_number,
-                    "preview": preview,
-                },
-            )
+        LOGGER.exception(
+            "FAILED: %s stub parity issue(s) found",
+            extracted_report.error_count,
+            extra={
+                "error_count": extracted_report.error_count,
+                "issue_count": extracted_report.issue_count,
+                "issues": issues_payload,
+            },
+        )
+        return 1
 
-    return 1
+    LOGGER.info("SUCCESS: All checks passed")
+    return 0
 
 
 if __name__ == "__main__":

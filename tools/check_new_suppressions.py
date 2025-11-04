@@ -18,6 +18,7 @@ import io
 import re
 import sys
 import tokenize
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -27,7 +28,7 @@ from kgfoundry_common.errors import ConfigurationError
 from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping, Sequence
+    from collections.abc import Iterable, Sequence
 
 LOGGER = get_logger(__name__)
 
@@ -93,12 +94,7 @@ class SuppressionGuardReport:
 
     def __post_init__(self) -> None:
         """Validate report invariants and normalize internal state."""
-        sorted_files = sorted(self.files, key=_guard_file_sort_key)
-        object.__setattr__(
-            self,
-            "files",
-            cast("tuple[SuppressionGuardFileReport, ...]", tuple(sorted_files)),
-        )
+        object.__setattr__(self, "files", _normalize_file_reports(self.files))
 
     @property
     def violations(self) -> Mapping[Path, tuple[SuppressionViolation, ...]]:
@@ -130,14 +126,11 @@ class SuppressionGuardReport:
                 bucket = aggregated.setdefault(file_report.path, [])
                 bucket.extend(file_report.violations)
 
-        if not aggregated:
-            return cls(files=())
-
-        merged_files = tuple(
+        normalized_files = tuple(
             SuppressionGuardFileReport(path=path, violations=tuple(violations))
             for path, violations in aggregated.items()
         )
-        return cls(files=merged_files)
+        return cls(files=normalized_files)
 
     @classmethod
     def from_context(cls, context: SuppressionGuardContext) -> SuppressionGuardReport:
@@ -147,10 +140,11 @@ class SuppressionGuardReport:
         )
 
         report = cls(files=files)
-        if report.violation_count != context["violation_count"]:
+        expected_count = context["violation_count"]
+        if report.violation_count != expected_count:
             message = (
                 "Suppression guard context mismatch: "
-                f"expected {context['violation_count']} violations, "
+                f"expected {expected_count} violations, "
                 f"computed {report.violation_count}."
             )
             raise ValueError(message)
@@ -166,12 +160,7 @@ class SuppressionGuardFileReport:
 
     def __post_init__(self) -> None:
         """Normalize violation ordering for deterministic comparisons."""
-        ordered = sorted(self.violations, key=_violation_sort_key)
-        object.__setattr__(
-            self,
-            "violations",
-            cast("tuple[SuppressionViolation, ...]", tuple(ordered)),
-        )
+        object.__setattr__(self, "violations", _normalize_violations(self.violations))
 
     def to_context_entry(self) -> SuppressionGuardFileEntry:
         """Return a serializable representation for Problem Details."""
@@ -203,14 +192,26 @@ class SuppressionGuardFileReport:
 
 def _guard_file_sort_key(report: SuppressionGuardFileReport) -> str:
     """Return a deterministic sort key for file reports."""
-
     return report.path.as_posix()
 
 
 def _violation_sort_key(violation: SuppressionViolation) -> int:
     """Return a deterministic sort key for individual violations."""
-
     return violation.line_number
+
+
+def _normalize_file_reports(
+    files: Iterable[SuppressionGuardFileReport],
+) -> tuple[SuppressionGuardFileReport, ...]:
+    """Return files sorted by path for deterministic behavior."""
+    return tuple(sorted(files, key=_guard_file_sort_key))
+
+
+def _normalize_violations(
+    violations: Iterable[SuppressionViolation],
+) -> tuple[SuppressionViolation, ...]:
+    """Return violations sorted by ascending line number."""
+    return tuple(sorted(violations, key=_violation_sort_key))
 
 
 def _iter_suppression_comments(content: str) -> Sequence[tuple[int, str]]:
@@ -313,16 +314,15 @@ def build_guard_context(report: SuppressionGuardReport) -> SuppressionGuardConte
 def _extract_guard_report(error: ConfigurationError) -> SuppressionGuardReport | None:
     """Normalize the context payload attached to a suppression guard error."""
     raw_context = error.context
-    if not raw_context:
+    if not isinstance(raw_context, Mapping):
         return None
 
     try:
         context = cast("SuppressionGuardContext", dict(raw_context))
-        report = SuppressionGuardReport.from_context(context)
+        return SuppressionGuardReport.from_context(context)
     except (KeyError, TypeError, ValueError):
         LOGGER.exception("Failed to parse suppression guard context")
         return None
-    return report
 
 
 def main(argv: Sequence[str] | None = None) -> int:
