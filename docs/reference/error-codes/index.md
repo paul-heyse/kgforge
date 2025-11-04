@@ -23,7 +23,7 @@ extend this registry using the same naming scheme.
 | `KGF-DOC-BLD-012` | Gallery validation failed | documentation | validation | error | `tools/validate_gallery.py` detected inconsistencies. Run the script with `--verbose` to inspect failing examples. |
 | `KGF-DOC-BLD-013` | Example doctest suite failed | documentation | tests | error | Gallery doctests did not pass. Review the pytest output and update the affected examples. |
 | `KGF-DOC-BLD-015` | README generation failed | documentation | build | error | Automated README generation or doctoc execution failed. Run `uv run python tools/gen_readmes.py` manually for diagnostics. |
-| `KGF-DOC-BLD-010` | Navmap generation failed | documentation | build | error | Navigation map regeneration failed. Run `uv run python tools/navmap/build_navmap.py --verbose` for details. |
+| `KGF-DOC-BLD-010` | Navmap generation failed | documentation | build | error | Navigation map regeneration failed. Run `uv run python tools/navmap/build_navmap.py` to rewrite the canonical artifact (use `--write` to direct the output elsewhere). |
 | `KGF-DOC-BLD-011` | Navmap integrity check failed | documentation | validation | error | Navmap validation detected drift. Ensure navigation artifacts are regenerated and up to date. |
 | `KGF-DOC-BLD-020` | Symbol index build failed | documentation | build | error | AutoAPI symbol index generation failed. Investigate import errors or missing modules. |
 | `KGF-DOC-BLD-021` | Symbol delta build failed | documentation | build | error | Symbol delta computation failed. Ensure symbol index artifacts exist and rerun `docs/_scripts/symbol_delta.py`. |
