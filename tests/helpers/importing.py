@@ -45,9 +45,8 @@ def load_typed_attribute[T](module_name: str, attribute: str, expected_type: typ
         Raised when the attribute does not match ``expected_type``.
     """
     value = load_attribute(module_name, attribute)
-    if not isinstance(value, expected_type):
-        message = (
-            f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
-        )
-        raise TypeError(message)
-    return value
+    if isinstance(value, expected_type):
+        return value
+
+    message = f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
+    raise TypeError(message)

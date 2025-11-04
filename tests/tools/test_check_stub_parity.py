@@ -67,6 +67,23 @@ def test_run_stub_parity_checks_success(tmp_path: Path) -> None:
     assert not report.has_issues
 
 
+def test_report_from_context_validates_counts(tmp_path: Path) -> None:
+    """from_context should reject mismatched issue/error counts."""
+    module_name = "stub_parity_mismatch"
+    _register_runtime_module(module_name, ("foo",))
+    stub_path = tmp_path / f"{module_name}.pyi"
+    stub_path.write_text("def bar() -> None: ...\n", encoding="utf-8")
+
+    report = run_stub_parity_checks([(module_name, stub_path)])
+    context = build_stub_parity_context(report)
+    context["issue_count"] = 0
+
+    message_pattern = r"expected counts \(0, [0-9]+\), got"
+
+    with pytest.raises(ValueError, match=message_pattern):
+        StubParityReport.from_context(context)
+
+
 def test_run_stub_parity_checks_raises_with_context(tmp_path: Path) -> None:
     """Missing runtime exports should surface through `ConfigurationError` context."""
     module_name = "stub_parity_missing"

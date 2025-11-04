@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from tools.check_new_suppressions import (
+    SuppressionGuardReport,
     build_guard_context,
     check_directory,
     resolve_target_directories,
@@ -43,6 +44,21 @@ def test_run_suppression_guard_allows_ticket_metadata(tmp_path: Path) -> None:
     report = run_suppression_guard([tmp_path])
     assert report.is_clean
     assert report.violation_count == 0
+
+
+@pytest.mark.parametrize("violation_count", [(-1,), (42,)])
+def test_report_from_context_validates_violation_count(
+    tmp_path: Path, violation_count: int
+) -> None:
+    """from_context should reject mismatched violation counts."""
+    _write(tmp_path, "module.py", "# type: ignore\n")
+
+    report = check_directory(tmp_path)
+    context = build_guard_context(report)
+    context["violation_count"] = violation_count
+
+    with pytest.raises(ValueError, match=r"expected [0-9]+ violations, computed [0-9]+"):
+        SuppressionGuardReport.from_context(context)
 
 
 def test_resolve_target_directories_validates_input(tmp_path: Path) -> None:
