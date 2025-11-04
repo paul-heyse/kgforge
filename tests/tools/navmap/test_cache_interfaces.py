@@ -6,8 +6,9 @@ import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tools.navmap.build_navmap import ModuleInfo  # noqa: TC002
 from tools.navmap.cache import NavmapCollectorCache, NavmapRepairCache
-from tools.navmap.repair_navmaps import ModuleInfo, RepairResult  # noqa: TC002
+from tools.navmap.repair_navmaps import RepairResult
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

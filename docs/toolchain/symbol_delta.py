@@ -6,15 +6,20 @@ indices using typed configuration objects instead of positional arguments.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from docs.toolchain.config import DocsDeltaConfig
 
 
+SymbolIndex = Mapping[str, Mapping[str, object]]
+SymbolDelta = Mapping[str, object]
+
+
 def compute_delta(
-    *, config: DocsDeltaConfig, baseline: dict[str, object], current: dict[str, object]
-) -> dict[str, object]:
+    *, config: DocsDeltaConfig, baseline: SymbolIndex, current: SymbolIndex
+) -> SymbolDelta:
     """Compute a delta between symbol indices with typed configuration.
 
     This is the new public API for computing symbol deltas that accepts a typed
@@ -24,14 +29,14 @@ def compute_delta(
     ----------
     config : DocsDeltaConfig
         Typed configuration controlling delta computation behavior.
-    baseline : dict[str, object]
+    baseline : Mapping[str, Mapping[str, object]]
         The baseline symbol index to compare against.
-    current : dict[str, object]
+    current : Mapping[str, Mapping[str, object]]
         The current symbol index to compare.
 
     Returns
     -------
-    dict[str, object]
+    Mapping[str, object]
         Delta containing removals, modifications, and additions.
 
     Examples

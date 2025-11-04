@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import tempfile
 from dataclasses import FrozenInstanceError
+from typing import Any, cast
 
 import pytest
 
@@ -53,7 +54,7 @@ class TestIndexCliConfig:
                 metric="ip",
             )
             with pytest.raises(FrozenInstanceError):
-                config.dense_vectors = "other.json"  # type: ignore[misc]
+                cast("Any", config).dense_vectors = "other.json"
 
     def test_equality(self) -> None:
         """Test equality comparison."""
@@ -118,7 +119,7 @@ class TestArtifactValidationConfig:
         """Test that ArtifactValidationConfig is frozen."""
         config = ArtifactValidationConfig()
         with pytest.raises(FrozenInstanceError):
-            config.strict_mode = False  # type: ignore[misc]
+            cast("Any", config).strict_mode = False
 
     def test_equality(self) -> None:
         """Test equality comparison."""

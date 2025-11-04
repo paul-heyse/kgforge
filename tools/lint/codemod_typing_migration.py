@@ -10,14 +10,11 @@ from __future__ import annotations
 
 import argparse
 import logging
+from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import cast
 
 import libcst as cst
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
 
 logger = logging.getLogger(__name__)
 
@@ -174,7 +171,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # Collect all Python files
     python_files: list[Path] = []
-    for path_arg in args.paths:
+    raw_paths = cast("Sequence[Path]", getattr(args, "paths", ()))
+    for path_arg in raw_paths:
         if path_arg.is_file() and path_arg.suffix == ".py":
             python_files.append(path_arg)
         elif path_arg.is_dir():

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from functools import lru_cache
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
@@ -15,13 +14,22 @@ MODULE_PATH = "docs._scripts.validate_artifacts"
 __all__: tuple[str, ...] = ()
 
 
-@lru_cache(maxsize=1)
+_MODULE_CACHE: ModuleType | None = None
+_EXPORTS_CACHE: tuple[str, ...] | None = None
+
+
 def _load_module() -> ModuleType:
-    return import_module(MODULE_PATH)
+    global _MODULE_CACHE
+    if _MODULE_CACHE is None:
+        _MODULE_CACHE = import_module(MODULE_PATH)
+    return _MODULE_CACHE
 
 
-@lru_cache(maxsize=1)
 def _export_names() -> tuple[str, ...]:
+    global _EXPORTS_CACHE
+    if _EXPORTS_CACHE is not None:
+        return _EXPORTS_CACHE
+
     module = _load_module()
     exports_obj: object | None = getattr(module, "__all__", None)
     if isinstance(exports_obj, Iterable) and not isinstance(exports_obj, (str, bytes)):
@@ -30,6 +38,7 @@ def _export_names() -> tuple[str, ...]:
         exports = tuple(name for name in dir(module) if not name.startswith("_"))
     namespace = cast("dict[str, object]", globals())
     namespace["__all__"] = list(exports)
+    _EXPORTS_CACHE = exports
     return exports
 
 

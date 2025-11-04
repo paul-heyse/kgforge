@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import cast
 
@@ -11,6 +12,7 @@ from kgfoundry_common.problem_details import (
     build_configuration_problem,
     validate_problem_details,
 )
+from kgfoundry_common.types import JsonValue
 
 
 def _load_sample_payload() -> dict[str, object]:
@@ -48,8 +50,7 @@ class TestConfigurationProblemSchema:
     def test_sample_payload_validates_against_schema(self) -> None:
         """Test that the sample payload validates against the schema."""
         payload = _load_sample_payload()
-        # Should not raise
-        validate_problem_details(cast("object", payload))  # type: ignore[arg-type]
+        validate_problem_details(cast("Mapping[str, JsonValue]", payload))
 
     def test_sample_payload_has_required_fields(self) -> None:
         """Test that sample payload contains all required Problem Details fields."""
@@ -116,8 +117,7 @@ class TestConfigurationProblemSchemaParity:
                 hint=hint,
             )
             problem = build_configuration_problem(error)
-            # Should not raise
-            validate_problem_details(cast("object", problem))  # type: ignore[arg-type]
+            validate_problem_details(cast("Mapping[str, JsonValue]", problem))
 
     def test_sample_and_generated_both_have_extensions(self) -> None:
         """Test that both sample and generated problems use extensions field."""

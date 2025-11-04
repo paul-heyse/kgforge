@@ -10,7 +10,8 @@ from pathlib import Path  # noqa: TC003
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from tools.navmap.repair_navmaps import ModuleInfo, RepairResult
+    from tools.navmap.build_navmap import ModuleInfo
+    from tools.navmap.repair_navmaps import RepairResult
 
 
 @runtime_checkable

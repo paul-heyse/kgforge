@@ -133,9 +133,7 @@ type JsonPrimitive = str | int | float | bool | None
 if TYPE_CHECKING:
     from pathlib import Path
 
-    type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
-else:
-    JsonValue = object  # type: ignore[assignment, misc]
+type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
 
 type JsonPayload = dict[str, JsonValue] | list[JsonValue]
 
@@ -575,8 +573,11 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
             if isinstance(entry, MappingABC):
                 try:
                     entry_dict: dict[str, object] = dict(cast("MappingABC[str, object]", entry))
-                    # Pydantic model_validate is correct; MyPy can't infer return type
-                    changes.append(SymbolDeltaChange.model_validate(entry_dict))  # type: ignore[misc]
+                    validated_change = cast(
+                        "SymbolDeltaChange",
+                        SymbolDeltaChange.model_validate(entry_dict),
+                    )
+                    changes.append(validated_change)
                 except Exception as exc:  # pragma: no cover - defensive guard
                     indexed_field = f"changed[{index}]"
                     raise _validation_error(

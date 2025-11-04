@@ -7,17 +7,21 @@ to eliminate the 'Any' types that come from its type stubs.
 from __future__ import annotations
 
 import inspect as stdlib_inspect
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import ParamSpec, TypeVar
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
+from tools.docstring_builder.parameters import ParameterKind, normalize_parameter_kind
 
 __all__ = [
     "ParameterInfo",
     "get_signature",
     "has_required_parameters",
 ]
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,7 +41,7 @@ class ParameterInfo:
     """True if parameter accepts **kwargs."""
 
 
-def get_signature(func: Callable[..., object]) -> list[ParameterInfo]:
+def get_signature(func: Callable[P, R]) -> list[ParameterInfo]:
     """Get typed parameter information without Any types.
 
     Parameters
@@ -62,11 +66,16 @@ def get_signature(func: Callable[..., object]) -> list[ParameterInfo]:
         raise ValueError(message) from exc
 
     params: list[ParameterInfo] = []
+
     for param_name, param in sig.parameters.items():
         # Get attributes without accessing Any-typed values directly
-        has_default = param.default is not stdlib_inspect.Parameter.empty
-        is_var_pos = param.kind is stdlib_inspect.Parameter.VAR_POSITIONAL
-        is_var_kw = param.kind is stdlib_inspect.Parameter.VAR_KEYWORD
+        empty_value: object = getattr(param, "empty", object())
+        default_value: object = getattr(param, "default", empty_value)
+        has_default = default_value is not empty_value
+        kind_attr: object | None = getattr(param, "kind", None)
+        kind = normalize_parameter_kind(kind_attr)
+        is_var_pos = kind is ParameterKind.VAR_POSITIONAL
+        is_var_kw = kind is ParameterKind.VAR_KEYWORD
 
         params.append(
             ParameterInfo(
@@ -80,7 +89,7 @@ def get_signature(func: Callable[..., object]) -> list[ParameterInfo]:
     return params
 
 
-def has_required_parameters(func: Callable[..., object]) -> bool:
+def has_required_parameters(func: Callable[P, R]) -> bool:
     """Check if a callable has required (non-default, non-*args/**kwargs) parameters.
 
     Parameters

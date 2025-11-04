@@ -116,8 +116,32 @@ if TYPE_CHECKING:
             """Return a Problem Details payload for the supplied context."""
             ...  # Protocol stub body (required for TYPE_CHECKING)
 
+    class DocfactsCoordinatorFactory(Protocol):
+        """Callable signature for constructing Docfacts coordinators."""
+
+        def __call__(self, *, check_mode: bool) -> DocfactsCoordinator:
+            """Return a coordinator configured for the requested mode."""
+            ...
+
 else:
     ProblemDetailsBuilder = Callable
+    DocfactsCoordinatorFactory = Callable
+
+
+def _new_error_envelopes() -> list[ErrorEnvelope]:
+    return []
+
+
+def _new_file_reports() -> list[FileReport]:
+    return []
+
+
+def _new_ir_list() -> list[IRDocstring]:
+    return []
+
+
+def _new_preview_list() -> list[tuple[Path, str]]:
+    return []
 
 
 @dataclass(slots=True)
@@ -130,12 +154,12 @@ class PipelineState:
     changed_count: int = 0
     cache_hits: int = 0
     cache_misses: int = 0
-    errors: list[ErrorEnvelope] = field(default_factory=list)
-    file_reports: list[FileReport] = field(default_factory=list)
-    all_ir: list[IRDocstring] = field(default_factory=list)
+    errors: list[ErrorEnvelope] = field(default_factory=_new_error_envelopes)
+    file_reports: list[FileReport] = field(default_factory=_new_file_reports)
+    all_ir: list[IRDocstring] = field(default_factory=_new_ir_list)
     docfacts_checked: bool = False
     docfacts_payload_text: str | None = None
-    diff_previews: list[tuple[Path, str]] = field(default_factory=list)
+    diff_previews: list[tuple[Path, str]] = field(default_factory=_new_preview_list)
 
 
 @dataclass(slots=True, frozen=True)
@@ -163,7 +187,7 @@ class PipelineConfig:
     file_processor: FileProcessor
     record_docfacts: Callable[[Iterable[DocFact], Path], None]
     filter_docfacts: Callable[[], list[DocFact]]
-    docfacts_coordinator_factory: Callable[[bool], DocfactsCoordinator]
+    docfacts_coordinator_factory: DocfactsCoordinatorFactory
     plugin_manager: PluginManager | None
     policy_engine: PolicyEngine
     metrics: MetricsRecorder

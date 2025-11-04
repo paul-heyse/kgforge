@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import docs.toolchain.build_symbol_index
 import docs.toolchain.symbol_delta
 import docs.toolchain.validate_artifacts
@@ -10,6 +12,8 @@ from docs.toolchain.build_symbol_index import build_symbol_index
 from docs.toolchain.config import DocsDeltaConfig, DocsSymbolIndexConfig
 from docs.toolchain.symbol_delta import compute_delta
 from docs.toolchain.validate_artifacts import validate_artifacts
+
+SymbolIndexMap = dict[str, dict[str, str]]
 
 
 class TestBuildSymbolIndexAPI:
@@ -41,8 +45,8 @@ class TestComputeDeltaAPI:
     def test_requires_keyword_only_arguments(self) -> None:
         """Verify compute_delta requires keyword-only arguments."""
         config = DocsDeltaConfig()
-        baseline = {"a": {"name": "A"}}
-        current = {"a": {"name": "A"}, "b": {"name": "B"}}
+        baseline: SymbolIndexMap = {"a": {"name": "A"}}
+        current: SymbolIndexMap = {"a": {"name": "A"}, "b": {"name": "B"}}
         # Should raise NotImplementedError, not TypeError for arguments
         with pytest.raises(NotImplementedError, match="placeholder"):
             compute_delta(config=config, baseline=baseline, current=current)
@@ -50,8 +54,8 @@ class TestComputeDeltaAPI:
     def test_accepts_typed_config_and_indices(self) -> None:
         """Verify compute_delta accepts typed parameters."""
         config = DocsDeltaConfig(include_removals=False)
-        baseline = {}
-        current = {}
+        baseline: SymbolIndexMap = {}
+        current: SymbolIndexMap = {}
         with pytest.raises(NotImplementedError):
             compute_delta(config=config, baseline=baseline, current=current)
 
@@ -89,8 +93,8 @@ class TestAPITypeEnforcement:
     def test_compute_delta_signature(self) -> None:
         """Verify compute_delta has correct signature."""
         config = DocsDeltaConfig()
-        baseline = {}
-        current = {}
+        baseline: SymbolIndexMap = {}
+        current: SymbolIndexMap = {}
         # Keyword-only parameter enforcement
         with pytest.raises(NotImplementedError):
             compute_delta(config=config, baseline=baseline, current=current)
@@ -101,12 +105,18 @@ class TestAPIExports:
 
     def test_build_symbol_index_in_all(self) -> None:
         """Verify build_symbol_index is in __all__."""
-        assert "build_symbol_index" in docs.toolchain.build_symbol_index.__all__
+        exports_obj: object = getattr(docs.toolchain.build_symbol_index, "__all__", ())
+        exports = exports_obj if isinstance(exports_obj, Sequence) else ()
+        assert "build_symbol_index" in exports
 
     def test_compute_delta_in_all(self) -> None:
         """Verify compute_delta is in __all__."""
-        assert "compute_delta" in docs.toolchain.symbol_delta.__all__
+        exports_obj: object = getattr(docs.toolchain.symbol_delta, "__all__", ())
+        exports = exports_obj if isinstance(exports_obj, Sequence) else ()
+        assert "compute_delta" in exports
 
     def test_validate_artifacts_in_all(self) -> None:
         """Verify validate_artifacts is in __all__."""
-        assert "validate_artifacts" in docs.toolchain.validate_artifacts.__all__
+        exports_obj: object = getattr(docs.toolchain.validate_artifacts, "__all__", ())
+        exports = exports_obj if isinstance(exports_obj, Sequence) else ()
+        assert "validate_artifacts" in exports

@@ -22,7 +22,7 @@ from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsig
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Sequence
+    from collections.abc import Iterable, Sequence
     from re import Pattern
 
     from kgfoundry_common.navmap_types import NavMap
@@ -638,18 +638,14 @@ def _load_lucene_indexer_factory() -> LuceneIndexerFactory:
     except Exception as exc:  # pragma: no cover - depends on optional dependency
         msg = "pyserini.index.lucene module is unavailable"
         raise RuntimeError(msg) from exc
-    candidate_raw = module.__dict__.get("LuceneIndexer")
-    if not isinstance(candidate_raw, type):  # pragma: no cover - defensive branch
+    candidate_callable = cast(
+        "LuceneIndexerFactory | None",
+        getattr(module, "LuceneIndexer", None),
+    )
+    if candidate_callable is None:  # pragma: no cover - defensive branch
         msg = "pyserini index module is missing 'LuceneIndexer'"
         raise TypeError(msg)
-    candidate_obj = cast("type[object]", candidate_raw)
-    candidate_callable = cast("Callable[[str], object]", candidate_obj)
-
-    def factory(index_directory: str) -> LuceneIndexerProtocol:
-        instance_obj = candidate_callable(index_directory)
-        return cast("LuceneIndexerProtocol", instance_obj)
-
-    return cast("LuceneIndexerFactory", factory)
+    return candidate_callable
 
 
 def _load_lucene_searcher_factory() -> LuceneSearcherFactory:
@@ -658,18 +654,14 @@ def _load_lucene_searcher_factory() -> LuceneSearcherFactory:
     except Exception as exc:  # pragma: no cover - depends on optional dependency
         msg = "pyserini.search.lucene module is unavailable"
         raise RuntimeError(msg) from exc
-    candidate_raw = module.__dict__.get("LuceneSearcher")
-    if not isinstance(candidate_raw, type):  # pragma: no cover - defensive branch
+    candidate_callable = cast(
+        "LuceneSearcherFactory | None",
+        getattr(module, "LuceneSearcher", None),
+    )
+    if candidate_callable is None:  # pragma: no cover - defensive branch
         msg = "pyserini search module is missing 'LuceneSearcher'"
         raise TypeError(msg)
-    candidate_obj = cast("type[object]", candidate_raw)
-    candidate_callable = cast("Callable[[str], object]", candidate_obj)
-
-    def factory(index_directory: str) -> LuceneSearcherProtocol:
-        instance_obj = candidate_callable(index_directory)
-        return cast("LuceneSearcherProtocol", instance_obj)
-
-    return cast("LuceneSearcherFactory", factory)
+    return candidate_callable
 
 
 def get_bm25(

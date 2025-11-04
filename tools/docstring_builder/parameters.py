@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
 from enum import Enum
 
 __all__ = [
@@ -43,31 +42,25 @@ _STRING_TO_KIND: dict[str, ParameterKind] = {
     "variadic_keyword": ParameterKind.VAR_KEYWORD,
 }
 
-_INSPECT_TO_KIND: dict[object, ParameterKind] = {
-    inspect.Parameter.POSITIONAL_ONLY: ParameterKind.POSITIONAL_ONLY,
-    inspect.Parameter.POSITIONAL_OR_KEYWORD: ParameterKind.POSITIONAL_OR_KEYWORD,
-    inspect.Parameter.VAR_POSITIONAL: ParameterKind.VAR_POSITIONAL,
-    inspect.Parameter.KEYWORD_ONLY: ParameterKind.KEYWORD_ONLY,
-    inspect.Parameter.VAR_KEYWORD: ParameterKind.VAR_KEYWORD,
-}
-
 
 def normalize_parameter_kind(value: object) -> ParameterKind:
     """Coerce arbitrary kind objects into :class:`ParameterKind`."""
     if isinstance(value, ParameterKind):
         return value
-    if value in _INSPECT_TO_KIND:
-        return _INSPECT_TO_KIND[value]
-    if isinstance(value, inspect.Parameter):
-        return _INSPECT_TO_KIND.get(value.kind, ParameterKind.POSITIONAL_OR_KEYWORD)
 
-    name = _coerce_str(getattr(value, "name", None))
+    kind_attr: object | None = getattr(value, "kind", None)
+    if kind_attr is not None and kind_attr is not value:
+        return normalize_parameter_kind(kind_attr)
+
+    name_attr: object | None = getattr(value, "name", None)
+    name = _coerce_str(name_attr)
     if name is not None:
         kind = _STRING_TO_KIND.get(name)
         if kind is not None:
             return kind
 
-    token = _coerce_str(getattr(value, "value", None))
+    value_attr: object | None = getattr(value, "value", None)
+    token = _coerce_str(value_attr)
     if token is not None:
         kind = _STRING_TO_KIND.get(token)
         if kind is not None:

@@ -6,9 +6,11 @@ import contextlib
 import tempfile
 from dataclasses import FrozenInstanceError
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 from tools.navmap.api import repair_all_with_config, repair_module_with_config
+from tools.navmap.build_navmap import ModuleInfo
 from tools.navmap.config import NavmapRepairOptions
 from tools.navmap.repair_navmaps import RepairResult
 
@@ -52,7 +54,7 @@ class TestConfigBasedAPIUsage:
             # Should not raise TypeError about argument types
             with contextlib.suppress(TypeError, AttributeError, ValueError):
                 repair_module_with_config(
-                    info=None,  # type: ignore[arg-type]
+                    info=cast("ModuleInfo", None),
                     options=options,
                 )
 
@@ -70,7 +72,7 @@ class TestConfigValidation:
         """Verify config objects are immutable (frozen dataclass)."""
         config = NavmapRepairOptions(apply=True)
         with pytest.raises(FrozenInstanceError):
-            config.apply = False  # type: ignore[misc]
+            cast("Any", config).apply = False
 
     def test_config_defaults(self) -> None:
         """Verify config defaults are correct."""
@@ -95,7 +97,7 @@ class TestAPITypeEnforcement:
         options = NavmapRepairOptions(apply=False)
         with contextlib.suppress(TypeError, AttributeError, ValueError):
             repair_module_with_config(
-                info=None,  # type: ignore[arg-type]
+                info=cast("ModuleInfo", None),
                 options=options,
             )
 

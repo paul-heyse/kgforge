@@ -736,7 +736,7 @@ paths = ["src", "tools", "stubs", "vulture_whitelist.py"]
 
 # Keep this aligned with your Ruff/mypy excludes.
 exclude = [
-  ".git/*", ".hg/*", ".venv/*",
+  ".git/*", ".hg/*", ".venv", ".venv/*", ".venv/**", "**/.venv/**",
   ".mypy_cache/*", ".ruff_cache/*", ".pytest_cache/*",
   "build/*", "dist/*", "node_modules/*",
   "docs/_build/*", "site/*",

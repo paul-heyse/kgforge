@@ -462,35 +462,43 @@ autoapi_ignore: list[str] = [
 ]
 
 
-class KgAutoapiParser(AutoapiParserCls):  # type: ignore[misc]
-    """Parser that resolves module namespaces without mutating private APIs."""
+def _build_autoapi_parser(base: type[AutoapiParserProtocol]) -> type[AutoapiParserProtocol]:
+    """Return AutoAPI parser subclass with namespace-aware file parsing."""
 
-    def _parse_file(  # pragma: no cover - compatibility shim
-        self,
-        file_path: str,
-        condition: Callable[[str], bool],
-    ) -> object:
-        path = Path(file_path)
-        module_parts: collections.deque[str] = collections.deque()
-        if path.name not in {"__init__.py", "__init__.pyi"}:
-            module_parts.append(path.stem)
-        parent = path.parent
-        while str(parent) and condition(str(parent)):
-            module_parts.appendleft(parent.name)
-            parent = parent.parent
+    class KgAutoapiParser(base):
+        """Parser that resolves module namespaces without mutating private APIs."""
 
-        module_name = ".".join(module_parts)
-        manager = AstroidManagerCls()
-        builder_class = AstroidBuilderCls
-        try:
-            builder = builder_class(manager)
-        except TypeError:
-            builder = builder_class()
-        node = builder.file_build(file_path, module_name)
-        return self.parse(node)
+        def _parse_file(  # pragma: no cover - compatibility shim
+            self,
+            file_path: str,
+            condition: Callable[[str], bool],
+        ) -> object:
+            path = Path(file_path)
+            module_parts: collections.deque[str] = collections.deque()
+            if path.name not in {"__init__.py", "__init__.pyi"}:
+                module_parts.append(path.stem)
+            parent = path.parent
+            while str(parent) and condition(str(parent)):
+                module_parts.appendleft(parent.name)
+                parent = parent.parent
+
+            module_name = ".".join(module_parts)
+            manager = AstroidManagerCls()
+            builder_class = AstroidBuilderCls
+            try:
+                builder = builder_class(manager)
+            except TypeError:
+                builder = builder_class()
+            node = builder.file_build(file_path, module_name)
+            return self.parse(node)
+
+    return cast("type[AutoapiParserProtocol]", KgAutoapiParser)
 
 
-autoapi_parser.Parser = KgAutoapiParser
+KgAutoapiParser = _build_autoapi_parser(AutoapiParserCls)
+
+
+cast("Any", autoapi_parser).Parser = KgAutoapiParser
 AutoapiParserCls = KgAutoapiParser
 
 # Show type hints nicely

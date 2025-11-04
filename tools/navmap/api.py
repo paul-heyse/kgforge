@@ -10,8 +10,9 @@ import warnings
 from pathlib import Path  # noqa: TC003
 
 from tools.navmap import repair_navmaps
+from tools.navmap.build_navmap import ModuleInfo  # noqa: TC001
 from tools.navmap.config import NavmapRepairOptions  # noqa: TC001
-from tools.navmap.repair_navmaps import ModuleInfo, RepairResult  # noqa: TC001
+from tools.navmap.repair_navmaps import RepairExecutionConfig, RepairResult  # noqa: TC001
 
 __all__ = [
     "repair_all_legacy",
@@ -48,7 +49,11 @@ def repair_module_with_config(
     >>> options = NavmapRepairOptions(apply=True)
     >>> # result = repair_module_with_config(module_info, options=options)
     """
-    return repair_navmaps.repair_module(info, apply=options.apply)
+    execution = RepairExecutionConfig(
+        apply_changes=options.apply,
+        emit_json=options.emit_json,
+    )
+    return repair_navmaps.repair_module(info, execution=execution)
 
 
 def repair_all_with_config(
@@ -80,8 +85,12 @@ def repair_all_with_config(
     >>> options = NavmapRepairOptions(apply=False)
     >>> # results = repair_all_with_config(root=Path("src"), options=options)
     """
-    target_root = root or repair_navmaps.SRC
-    return repair_navmaps.repair_all(target_root, apply=options.apply)
+    target_root = root or options.root or repair_navmaps.SRC
+    execution = RepairExecutionConfig(
+        apply_changes=options.apply,
+        emit_json=options.emit_json,
+    )
+    return repair_navmaps.repair_all(target_root, execution=execution)
 
 
 def repair_all_legacy(*, root: Path, apply: bool) -> list[RepairResult]:
@@ -110,4 +119,5 @@ def repair_all_legacy(*, root: Path, apply: bool) -> list[RepairResult]:
         "Use repair_all_with_config(root=..., options=NavmapRepairOptions(...)) instead."
     )
     warnings.warn(msg, DeprecationWarning, stacklevel=2)
-    return repair_navmaps.repair_all(root, apply=apply)
+    execution = RepairExecutionConfig(apply_changes=apply, emit_json=False)
+    return repair_navmaps.repair_all(root, execution=execution)

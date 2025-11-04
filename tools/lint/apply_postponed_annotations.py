@@ -239,6 +239,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     total_processed = 0
     total_modified = 0
     total_errors = 0
+    check_attr: object = getattr(args, "check_only", False)
+    check_flag = bool(check_attr)
 
     # Cast for type safety (argparse.Namespace.directories is typed as Any)
     raw_directories = cast("Sequence[Path]", getattr(args, "directories", ()))
@@ -251,7 +253,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         processed, modified, errors = process_directory(
             directory,
-            check_only=bool(getattr(args, "check_only", False)),
+            check_only=check_flag,
             logger=logger,
         )
         total_processed += processed
@@ -259,7 +261,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         total_errors += errors
 
     # Summary
-    mode = "(CHECK-ONLY)" if bool(getattr(args, "check_only", False)) else "(MODIFIED)"
+    mode = "(CHECK-ONLY)" if check_flag else "(MODIFIED)"
     summary_msg = (
         f"Summary {mode}: processed={total_processed}, "
         f"modified={total_modified}, errors={total_errors}"
