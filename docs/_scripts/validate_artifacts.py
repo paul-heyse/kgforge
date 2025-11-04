@@ -77,6 +77,7 @@ type ReverseLookupPayload = dict[str, list[str]]
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
 SETTINGS = shared.load_settings()
+SCHEMA_ROOT = ENV.root / "schema" / "docs"
 
 BASE_LOGGER = get_logger(__name__)
 VALIDATION_LOG = shared.make_logger(
@@ -150,6 +151,9 @@ class ArtifactCheck:
     codec: Callable[[object], object]
 
 
+def _resolve_schema(name: str) -> Path:
+    """Return the absolute path to a documentation schema file."""
+    return SCHEMA_ROOT / name
 def _schema_path(filename: str) -> Path:
     """Return the absolute path to a docs schema file."""
     return ENV.root / "schema" / "docs" / filename
@@ -184,6 +188,7 @@ def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
         message = f"Failed to parse symbol index: {e}"
         raise ArtifactValidationError(message, artifact_name="symbols.json") from e
 
+    schema = _resolve_schema("symbol-index.schema.json")
     schema = _schema_path("symbol-index.schema.json")
     try:
         validate_against_schema(symbol_index_to_payload(artifacts), schema, artifact="symbols.json")
@@ -226,6 +231,7 @@ def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
         message = f"Failed to parse symbol delta: {e}"
         raise ArtifactValidationError(message, artifact_name="symbols.delta.json") from e
 
+    schema = _resolve_schema("symbol-delta.schema.json")
     schema = _schema_path("symbol-delta.schema.json")
     try:
         validate_against_schema(
