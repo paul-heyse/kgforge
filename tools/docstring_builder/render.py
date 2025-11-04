@@ -10,11 +10,12 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from pathlib import Path
 
-    from jinja2.runtime import Undefined
+    from jinja2 import Undefined
     from jinja2.utils import select_autoescape
 
     from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 else:
+    Undefined = StrictUndefined
     try:
         from jinja2.utils import select_autoescape
     except ImportError:
@@ -27,7 +28,7 @@ _TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignatu
 
 
 def _build_environment() -> Environment:
-    undefined_cls = cast("type[Undefined]", StrictUndefined)
+    undefined_cls: type[Undefined] = StrictUndefined
     return Environment(
         undefined=undefined_cls,
         trim_blocks=False,
