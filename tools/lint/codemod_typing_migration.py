@@ -92,7 +92,7 @@ class TypingFacadeMigrator(cst.CSTTransformer):
     @override
     def leave_ImportFrom(
         self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
-    ) -> cst.ImportFrom | cst.RemovalSentinel:
+    ) -> cst.ImportFrom | cst.RemovalSentinel | cst.FlattenSentinel[cst.BaseSmallStatement]:
         del original_node
         return self._transform_import_from(updated_node)
 
