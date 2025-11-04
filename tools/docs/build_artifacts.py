@@ -6,6 +6,7 @@ import os
 import sys
 from pathlib import Path
 
+from tools._shared.error_codes import format_error_message
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
 
@@ -82,6 +83,17 @@ STEPS: list[tuple[str, list[str], str]] = [
     ),
 ]
 
+STEP_ERROR_CODES: dict[str, str] = {
+    "docstrings": "KGF-DOC-BLD-001",
+    "navmap": "KGF-DOC-BLD-010",
+    "test-map": "KGF-DOC-BLD-030",
+    "symbol-index": "KGF-DOC-BLD-020",
+    "symbol-delta": "KGF-DOC-BLD-021",
+    "observability": "KGF-DOC-BLD-040",
+    "schemas": "KGF-DOC-BLD-050",
+    "docs-validation": "KGF-DOC-BLD-105",
+}
+
 
 def _run_step(name: str, command: list[str], message: str) -> int:
     """Execute a single artefact regeneration step."""
@@ -103,15 +115,27 @@ def _run_step(name: str, command: list[str], message: str) -> int:
                 log_adapter.error(
                     "[artifacts] %s stderr captured", name, extra={"stderr": result.stderr}
                 )
+            code = STEP_ERROR_CODES.get(name, "KGF-DOC-BLD-105")
             log_adapter.error(
-                "[artifacts] %s failed (exit %d)",
-                name,
-                result.returncode,
-                extra={"returncode": result.returncode},
+                format_error_message(
+                    code,
+                    f"Artifact step '{name}' failed",
+                    details=(result.stderr or result.stdout or "").strip(),
+                ),
+                extra={"error_code": code, "returncode": result.returncode},
             )
             return result.returncode
     except ToolExecutionError as exc:
-        log_adapter.exception("[artifacts] %s failed", name)
+        code = STEP_ERROR_CODES.get(name, "KGF-DOC-BLD-105")
+        details = getattr(exc, "stderr", "")
+        log_adapter.exception(
+            format_error_message(
+                code,
+                f"Artifact step '{name}' raised ToolExecutionError",
+                details=details,
+            ),
+            extra={"error_code": code},
+        )
         return exc.returncode if exc.returncode is not None else 1
     else:
         log_adapter.info(message)
