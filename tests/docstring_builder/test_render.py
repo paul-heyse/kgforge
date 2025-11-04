@@ -20,8 +20,9 @@ def test_render_signature_includes_none_default() -> None:
     docstring = render_docstring(schema, marker="<!-- marker -->", include_signature=True)
 
     assert "= None" in docstring
-"""Tests for docstring rendering behaviour."""
 
+
+"""Tests for docstring rendering behaviour."""
 
 
 def test_render_docstring_preserves_special_characters() -> None:

@@ -22,32 +22,60 @@ if TYPE_CHECKING:
 class ModuleInfoProtocol(Protocol):
     """Protocol interface for ModuleInfo at runtime."""
 
-    path: Path
-    name: str
+    @property
+    def path(self) -> Path:
+        """Absolute path to the module."""
+        ...
+
+    @property
+    def module(self) -> str:
+        """Dotted module name."""
+        ...
 
 
 class NavmapRepairOptionsProtocol(Protocol):
     """Protocol interface for NavmapRepairOptions at runtime."""
 
-    root: Path | None
-    apply: bool
-    emit_json: bool
+    @property
+    def root(self) -> Path | None:
+        """Root directory for navmap traversal."""
+        ...
+
+    @property
+    def apply(self) -> bool:
+        """Whether repairs should be written to disk."""
+        ...
+
+    @property
+    def emit_json(self) -> bool:
+        """Whether execution emits JSON output."""
+        ...
 
 
 class RepairResultProtocol(Protocol):
     """Protocol interface for RepairResult at runtime."""
 
-    module: Path
-    messages: list[str]
-    changed: bool
-    applied: bool
+    @property
+    def module(self) -> Path: ...
+
+    @property
+    def messages(self) -> list[str]: ...
+
+    @property
+    def changed(self) -> bool: ...
+
+    @property
+    def applied(self) -> bool: ...
 
 
 class RepairExecutionConfigProtocol(Protocol):
     """Protocol interface for RepairExecutionConfig at runtime."""
 
-    apply_changes: bool
-    emit_json: bool
+    @property
+    def apply_changes(self) -> bool: ...
+
+    @property
+    def emit_json(self) -> bool: ...
 
 
 def repair_module_with_config(

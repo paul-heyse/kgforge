@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from types import ModuleType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict, cast
 
 import pytest
 import tools.check_stub_parity as stub_parity
@@ -15,9 +15,19 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+class StubParityIssue(TypedDict):
+    missing_symbols: list[str]
+
+
+class StubParityContext(TypedDict):
+    issue_count: int
+    error_count: int
+    issues: list[StubParityIssue]
+
+
 def _register_runtime_module(name: str, exports: tuple[str, ...]) -> None:
     module = ModuleType(name)
-    module.__all__ = exports
+    module.__all__ = list(exports)
 
     def _placeholder(*args: object, **kwargs: object) -> None:  # noqa: ARG001
         return None
@@ -70,7 +80,9 @@ def test_run_stub_parity_checks_raises_with_context(tmp_path: Path) -> None:
 
     context = excinfo.value.context
     assert context is not None
-    assert context["issue_count"] == 1
-    assert context["error_count"] == 1
-    issue = context["issues"][0]
+    context_dict = cast("StubParityContext", context)
+    assert context_dict["issue_count"] == 1
+    assert context_dict["error_count"] == 1
+    issues = context_dict["issues"]
+    issue = issues[0]
     assert issue["missing_symbols"] == ["foo"]
