@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import pytest
+from docs.scripts import validate_artifacts as validate_artifacts_module
 from docs.scripts.validation import validate_against_schema
 from docs.types.artifacts import (
     JsonValue,
@@ -17,12 +18,32 @@ from docs.types.artifacts import (
 )
 from tools import ToolExecutionError
 
+type ReverseLookup = dict[str, tuple[str, ...]]
+
+ArtifactValidationError = cast(
+    "type[Exception]",
+    validate_artifacts_module.ArtifactValidationError,
+)
+validate_by_file_lookup = cast(
+    "ValidateLookup",
+    validate_artifacts_module.validate_by_file_lookup,
+)
+validate_by_module_lookup = cast(
+    "ValidateLookup",
+    validate_artifacts_module.validate_by_module_lookup,
+)
+
+
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
 
     from docs.types.artifacts import (
         JsonPayload,
     )
+
+    type ValidateLookup = Callable[[Path], ReverseLookup]
+else:
+    ValidateLookup = object
 
 JsonObject = dict[str, JsonValue]
 JsonArray = list[JsonValue]
@@ -30,8 +51,11 @@ JsonArray = list[JsonValue]
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SYMBOL_SCHEMA = REPO_ROOT / "schema/docs/symbol-index.schema.json"
 DELTA_SCHEMA = REPO_ROOT / "schema/docs/symbol-delta.schema.json"
+REVERSE_SCHEMA = REPO_ROOT / "schema/docs/symbol-reverse-lookup.schema.json"
 SYMBOL_EXAMPLE = REPO_ROOT / "schema/examples/docs/symbol-index.sample.json"
 DELTA_EXAMPLE = REPO_ROOT / "schema/examples/docs/symbol-delta.sample.json"
+BY_FILE_EXAMPLE = REPO_ROOT / "schema/examples/docs/by-file.sample.json"
+BY_MODULE_EXAMPLE = REPO_ROOT / "schema/examples/docs/by-module.sample.json"
 
 
 def _load(path: Path) -> JsonPayload:
@@ -105,6 +129,36 @@ class TestSymbolDeltaValidation:
                 invalid_payload,
                 DELTA_SCHEMA,
                 artifact="symbols.delta.json",
+            )
+
+
+class TestReverseLookupValidation:
+    """Tests for reverse lookup artifact validation."""
+
+    def test_by_file_sample_validates(self) -> None:
+        """Test that the by-file example validates successfully."""
+        payload = _load(BY_FILE_EXAMPLE)
+        validate_against_schema(payload, REVERSE_SCHEMA, artifact="by_file.json")
+
+    def test_by_module_sample_validates(self) -> None:
+        """Test that the by-module example validates successfully."""
+        payload = _load(BY_MODULE_EXAMPLE)
+        validate_against_schema(payload, REVERSE_SCHEMA, artifact="by_module.json")
+
+    def test_reverse_lookup_rejects_non_object(self) -> None:
+        """Test that reverse lookup payloads must be JSON objects."""
+        invalid_payload = cast("JsonPayload", ["not", "a", "mapping"])
+        with pytest.raises(ToolExecutionError):
+            validate_against_schema(invalid_payload, REVERSE_SCHEMA, artifact="by_file.json")
+
+    def test_reverse_lookup_rejects_non_string_values(self) -> None:
+        """Test that reverse lookup entries must be arrays of strings."""
+        payload: JsonObject = {
+            "pkg.module": cast("JsonValue", ["pkg.symbol", 123]),
+        }
+        with pytest.raises(ToolExecutionError):
+            validate_against_schema(
+                cast("JsonPayload", payload), REVERSE_SCHEMA, artifact="by_module.json"
             )
 
 
@@ -197,6 +251,29 @@ class TestMalformedPayloads:
             validate_against_schema(
                 cast("JsonPayload", payload), SYMBOL_SCHEMA, artifact="symbols.json"
             )
+
+
+class TestValidateArtifactsHelpers:
+    """Tests for helper functions in docs.scripts.validate_artifacts."""
+
+    def test_validate_by_file_lookup_returns_tuples(self, tmp_path: Path) -> None:
+        """Validate helper converts list payloads into tuple mappings."""
+        payload = {"pkg/module.py": ["pkg.symbol"]}
+        path = tmp_path / "by_file.json"
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+        result = validate_by_file_lookup(path)
+
+        assert result == {"pkg/module.py": ("pkg.symbol",)}
+
+    def test_validate_by_module_lookup_rejects_bad_entries(self, tmp_path: Path) -> None:
+        """Validate helper raises when payload contains invalid entries."""
+        payload = {"pkg": ["valid", 42]}
+        path = tmp_path / "by_module.json"
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+        with pytest.raises(ArtifactValidationError):
+            validate_by_module_lookup(path)
 
     def test_symbol_index_missing_required_kind(self) -> None:
         """Test that missing kind field is rejected."""
