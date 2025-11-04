@@ -18,6 +18,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, Literal
@@ -112,11 +113,7 @@ def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot
     dist_sdists = len(list(dist_dir.glob("*.tar.gz"))) if dist_dir.exists() else 0
     codemod_logs = tuple(
         sorted(
-            (
-                path.name
-                for path in root.glob("codemod*.log")
-                if path.is_file()
-            ),
+            (path.name for path in root.glob("codemod*.log") if path.is_file()),
             key=_codemod_log_sort_key,
         )
     )
@@ -134,14 +131,12 @@ def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot
     )
 
 
-def _append_section(lines: list[str], heading: str, entries: Iterable[str]) -> None:
-    """Append a markdown heading and bullet entries to ``lines``."""
-    lines.append(heading)
-    lines.extend(entries)
-    lines.append("")
+# Type alias for artifact entry generation strategies
+ArtifactEntryStrategy = Callable[[ArtifactSnapshot], list[str]]
 
 
-def _test_result_entries(snapshot: ArtifactSnapshot) -> list[str]:
+def _generate_test_result_entries(snapshot: ArtifactSnapshot) -> list[str]:
+    """Generate entries for test result artifacts."""
     entries: list[str] = []
     if snapshot.coverage_xml:
         entries.append("- ✅ Coverage XML: `coverage.xml`")
@@ -154,7 +149,8 @@ def _test_result_entries(snapshot: ArtifactSnapshot) -> list[str]:
     return entries
 
 
-def _documentation_entries(snapshot: ArtifactSnapshot) -> list[str]:
+def _generate_documentation_entries(snapshot: ArtifactSnapshot) -> list[str]:
+    """Generate entries for documentation artifacts."""
     entries: list[str] = []
     if snapshot.docs_build:
         entries.append("- ✅ Docs build: `docs/_build/`")
@@ -167,7 +163,8 @@ def _documentation_entries(snapshot: ArtifactSnapshot) -> list[str]:
     return entries
 
 
-def _schema_entries(snapshot: ArtifactSnapshot) -> list[str]:
+def _generate_schema_entries(snapshot: ArtifactSnapshot) -> list[str]:
+    """Generate entries for schema artifacts."""
     entries = [
         "- ✅ Schema directory exists" if snapshot.schema_dir else "- ⚪ Schema directory missing"
     ]
@@ -176,7 +173,8 @@ def _schema_entries(snapshot: ArtifactSnapshot) -> list[str]:
     return entries
 
 
-def _build_entries(snapshot: ArtifactSnapshot) -> list[str]:
+def _generate_build_entries(snapshot: ArtifactSnapshot) -> list[str]:
+    """Generate entries for build artifacts."""
     entries: list[str] = []
     if snapshot.dist_wheels:
         entries.append(f"- ✅ Wheels: {snapshot.dist_wheels} file(s)")
@@ -187,42 +185,106 @@ def _build_entries(snapshot: ArtifactSnapshot) -> list[str]:
     return entries
 
 
+def _append_section(lines: list[str], heading: str, entries: Iterable[str]) -> None:
+    """Append a markdown heading and bullet entries to ``lines``."""
+    lines.append(heading)
+    lines.extend(entries)
+    lines.append("")
+
+
+class SummaryGenerator:
+    """Service for generating PR summary markdown with dependency injection."""
+
+    def __init__(
+        self,
+        test_strategy: ArtifactEntryStrategy | None = None,
+        docs_strategy: ArtifactEntryStrategy | None = None,
+        schema_strategy: ArtifactEntryStrategy | None = None,
+        build_strategy: ArtifactEntryStrategy | None = None,
+    ) -> None:
+        """Initialize summary generator with artifact entry strategies.
+
+        Parameters
+        ----------
+        test_strategy : Callable[[ArtifactSnapshot], list[str]] | None
+            Function to generate test result entries. Defaults to internal implementation.
+        docs_strategy : Callable[[ArtifactSnapshot], list[str]] | None
+            Function to generate documentation entries. Defaults to internal implementation.
+        schema_strategy : Callable[[ArtifactSnapshot], list[str]] | None
+            Function to generate schema entries. Defaults to internal implementation.
+        build_strategy : Callable[[ArtifactSnapshot], list[str]] | None
+            Function to generate build entries. Defaults to internal implementation.
+        """
+        self._test_strategy = test_strategy or _generate_test_result_entries
+        self._docs_strategy = docs_strategy or _generate_documentation_entries
+        self._schema_strategy = schema_strategy or _generate_schema_entries
+        self._build_strategy = build_strategy or _generate_build_entries
+
+    def generate(
+        self,
+        snapshot: ArtifactSnapshot | None = None,
+        checks: Sequence[CheckStatus] | None = None,
+    ) -> str:
+        """Generate PR summary markdown."""
+        lines: list[str] = ["# Quality Gates Summary", ""]
+        artifact_snapshot = snapshot or collect_artifact_snapshot()
+
+        _append_section(lines, "## 📊 Test Results", self._test_strategy(artifact_snapshot))
+        _append_section(
+            lines,
+            "## 📚 Documentation & Artifacts",
+            self._docs_strategy(artifact_snapshot),
+        )
+        _append_section(
+            lines,
+            "## 🔍 Schema Validation",
+            self._schema_strategy(artifact_snapshot),
+        )
+        _append_section(lines, "## 📦 Build Artifacts", self._build_strategy(artifact_snapshot))
+
+        lines.append("## ✅ Quality Gates")
+        lines.append("")
+        lines.append("| Check | Status |")
+        lines.append("|-------|--------|")
+        resolved_checks = DEFAULT_CHECKS if checks is None else checks
+        lines.extend(check.to_row() for check in resolved_checks)
+        lines.append("")
+
+        if artifact_snapshot.codemod_logs:
+            _append_section(
+                lines,
+                "## 🔧 Codemod Logs",
+                tuple(
+                    f"- ✅ Codemod execution log: `{filename}`"
+                    for filename in artifact_snapshot.codemod_logs
+                ),
+            )
+
+        return "\n".join(lines)
+
+
 def generate_summary(
     snapshot: ArtifactSnapshot | None = None,
     checks: Sequence[CheckStatus] | None = None,
 ) -> str:
     """Generate PR summary markdown."""
-    lines: list[str] = ["# Quality Gates Summary", ""]
-    artifact_snapshot = snapshot or collect_artifact_snapshot()
+    generator = SummaryGenerator()
+    return generator.generate(snapshot=snapshot, checks=checks)
 
-    _append_section(lines, "## 📊 Test Results", _test_result_entries(artifact_snapshot))
-    _append_section(
-        lines,
-        "## 📚 Documentation & Artifacts",
-        _documentation_entries(artifact_snapshot),
-    )
-    _append_section(lines, "## 🔍 Schema Validation", _schema_entries(artifact_snapshot))
-    _append_section(lines, "## 📦 Build Artifacts", _build_entries(artifact_snapshot))
 
-    lines.append("## ✅ Quality Gates")
-    lines.append("")
-    lines.append("| Check | Status |")
-    lines.append("|-------|--------|")
-    resolved_checks = DEFAULT_CHECKS if checks is None else checks
-    lines.extend(check.to_row() for check in resolved_checks)
-    lines.append("")
+class SummaryWriter:
+    """Service for writing summary output to file or stdout."""
 
-    if artifact_snapshot.codemod_logs:
-        _append_section(
-            lines,
-            "## 🔧 Codemod Logs",
-            tuple(
-                f"- ✅ Codemod execution log: `{filename}`"
-                for filename in artifact_snapshot.codemod_logs
-            ),
-        )
+    @staticmethod
+    def write_to_file(path: Path, content: str) -> None:
+        """Write summary content to file, creating parent directories if needed."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"{content}\n", encoding="utf-8")
 
-    return "\n".join(lines)
+    @staticmethod
+    def write_to_stdout(content: str) -> None:
+        """Write summary content to stdout."""
+        sys.stdout.write(f"{content}\n")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -230,11 +292,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     del argv
     summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
     summary = generate_summary()
+    writer = SummaryWriter()
+
     if summary_file:
         try:
             output_path = Path(summary_file)
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_text(f"{summary}\n", encoding="utf-8")
+            writer.write_to_file(output_path, summary)
         except OSError:
             LOGGER.exception(
                 "Error writing summary",
@@ -255,7 +318,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "GITHUB_STEP_SUMMARY not set, writing to stdout",
         extra={"operation": "generate_pr_summary"},
     )
-    sys.stdout.write(f"{summary}\n")
+    writer.write_to_stdout(summary)
     return 0
 
 

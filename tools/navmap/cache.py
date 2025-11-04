@@ -6,10 +6,11 @@ metadata and repair results during navmap operations.
 
 from __future__ import annotations
 
-from pathlib import Path  # noqa: TC003
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from tools.navmap.build_navmap import ModuleInfo
     from tools.navmap.repair_navmaps import RepairResult
 

@@ -4,14 +4,29 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
-from tools.navmap.build_navmap import ModuleInfo  # noqa: TC002
 from tools.navmap.cache import NavmapCollectorCache, NavmapRepairCache
-from tools.navmap.repair_navmaps import RepairResult
+
+from tests.helpers import load_attribute
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    from tools.navmap.build_navmap import ModuleInfo
+    from tools.navmap.repair_navmaps import RepairResult
+
+    ModuleInfoType = type[ModuleInfo]
+    RepairResultType = type[RepairResult]
+
+# Load concrete implementations at module level to avoid TC002 violations
+# These are runtime variables, not types - use string literals in type annotations
+_ModuleInfoClass = cast("ModuleInfoType", load_attribute("tools.navmap.build_navmap", "ModuleInfo"))
+ModuleInfoClass = _ModuleInfoClass  # Runtime class, use "ModuleInfo" in type annotations
+_RepairResultClass = cast(
+    "RepairResultType", load_attribute("tools.navmap.repair_navmaps", "RepairResult")
+)
+RepairResultClass = _RepairResultClass  # Runtime class, use "RepairResult" in type annotations
 
 
 class MockCollectorCache:
@@ -105,7 +120,7 @@ class TestNavmapRepairCacheProtocol:
     def test_record_repair_callable(self) -> None:
         """Verify record_repair method is callable."""
         cache: NavmapRepairCache = MockRepairCache()
-        result = RepairResult(
+        result = RepairResultClass(
             module=Path("test.py"),
             messages=["test"],
             changed=False,
@@ -129,10 +144,10 @@ class TestNavmapRepairCacheProtocol:
         """Verify summary returns correct statistics."""
         cache = MockRepairCache()
         cache.record_repair(
-            RepairResult(module=Path("a.py"), messages=[], changed=True, applied=True)
+            RepairResultClass(module=Path("a.py"), messages=[], changed=True, applied=True)
         )
         cache.record_repair(
-            RepairResult(module=Path("b.py"), messages=[], changed=False, applied=False)
+            RepairResultClass(module=Path("b.py"), messages=[], changed=False, applied=False)
         )
         summary = cache.summary()
         assert summary["total"] == 2
@@ -167,7 +182,7 @@ class TestCacheInterfaceContracts:
         """Verify repair cache can record multiple results."""
         cache = MockRepairCache()
         results = [
-            RepairResult(module=Path(f"{i}.py"), messages=[], changed=False, applied=False)
+            RepairResultClass(module=Path(f"{i}.py"), messages=[], changed=False, applied=False)
             for i in range(3)
         ]
         for result in results:

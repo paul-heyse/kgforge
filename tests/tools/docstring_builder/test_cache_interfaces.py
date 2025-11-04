@@ -8,8 +8,21 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
-from tools.docstring_builder.cache import BuilderCache, DocstringBuilderCache  # noqa: TC002
+from tests.helpers import load_attribute
+
+if TYPE_CHECKING:
+    from tools.docstring_builder.cache import BuilderCache, DocstringBuilderCache
+
+    BuilderCacheType = type[BuilderCache]
+
+# Load concrete implementation at module level to avoid TC002 violations
+# This is a runtime variable, not a type - use TYPE_CHECKING import in annotations
+_BuilderCacheClass = cast(
+    "BuilderCacheType", load_attribute("tools.docstring_builder.cache", "BuilderCache")
+)
+BuilderCacheClass = _BuilderCacheClass  # Runtime class, use "BuilderCache" in type annotations
 
 
 class TestCacheProtocol:
@@ -19,21 +32,21 @@ class TestCacheProtocol:
         """Verify BuilderCache can be used as DocstringBuilderCache."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache: DocstringBuilderCache = BuilderCache(cache_path)
+            cache: DocstringBuilderCache = BuilderCacheClass(cache_path)
             assert cache is not None
 
     def test_cache_path_property(self) -> None:
         """Verify cache.path property works."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache = BuilderCache(cache_path)
+            cache = BuilderCacheClass(cache_path)
             assert cache.path == cache_path
 
     def test_cache_needs_update_new_file(self) -> None:
         """Verify needs_update returns True for new files."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache = BuilderCache(cache_path)
+            cache = BuilderCacheClass(cache_path)
 
             # Create a test file
             test_file = Path(tmpdir) / "test.py"
@@ -46,7 +59,7 @@ class TestCacheProtocol:
         """Verify update marks file as not needing update."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache = BuilderCache(cache_path)
+            cache = BuilderCacheClass(cache_path)
 
             # Create a test file
             test_file = Path(tmpdir) / "test.py"
@@ -65,7 +78,7 @@ class TestCacheProtocol:
         """Verify needs_update returns True when config changes."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache = BuilderCache(cache_path)
+            cache = BuilderCacheClass(cache_path)
 
             # Create a test file
             test_file = Path(tmpdir) / "test.py"
@@ -82,7 +95,7 @@ class TestCacheProtocol:
         """Verify cache.write() persists to disk."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache = BuilderCache(cache_path)
+            cache = BuilderCacheClass(cache_path)
 
             # Create a test file
             test_file = Path(tmpdir) / "test.py"
@@ -96,7 +109,7 @@ class TestCacheProtocol:
             assert cache_path.exists()
 
             # Load new cache instance from file
-            new_cache = BuilderCache(cache_path)
+            new_cache = BuilderCacheClass(cache_path)
 
             # Verify it has the same entries
             assert new_cache.needs_update(test_file, "hash123") is False
@@ -109,7 +122,7 @@ class TestCacheProtocolContract:
         """Verify BuilderCache satisfies structural typing (Protocol)."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            builder_cache = BuilderCache(cache_path)
+            builder_cache = BuilderCacheClass(cache_path)
 
             # Assign to Protocol type - this verifies structural typing
             cache: DocstringBuilderCache = builder_cache
@@ -124,7 +137,7 @@ class TestCacheProtocolContract:
         """Verify all cache protocol methods are callable."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cache_path = Path(tmpdir) / "cache.json"
-            cache: DocstringBuilderCache = BuilderCache(cache_path)
+            cache: DocstringBuilderCache = BuilderCacheClass(cache_path)
 
             test_file = Path(tmpdir) / "test.py"
             test_file.write_text("# test")

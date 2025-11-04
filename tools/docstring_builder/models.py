@@ -505,6 +505,24 @@ class ObservabilityReport(TypedDict, total=False):
     driftPreviews: dict[str, str]
 
 
+class CliResultOptionalFields(TypedDict, total=False):
+    """Optional fields for CliResult construction."""
+
+    subcommand: str
+    durationSeconds: float
+    files: list[FileReport]
+    errors: list[ErrorReport]
+    summary: RunSummary
+    policy: PolicyReport
+    baseline: str
+    cache: CacheSummary
+    inputs: dict[str, InputHash]
+    plugins: PluginReport
+    docfacts: DocfactsReport
+    observability: ObservabilityReport
+    problem: ProblemDetails
+
+
 class CliResult(TypedDict, total=False):
     """Fully-typed structure matching ``schema/tools/docstring_builder_cli.json``.
 
@@ -544,25 +562,66 @@ class CliResult(TypedDict, total=False):
     problem: NotRequired[ProblemDetails]
 
 
-def make_cli_result(  # noqa: PLR0913, C901, PLR0912
+def _build_required_fields(
     status: str,
     command: str,
     *,
     schema_version: str = CLI_SCHEMA_VERSION,
     schema_id: str = CLI_SCHEMA_ID,
-    subcommand: str | None = None,
-    duration_seconds: float | None = None,
-    files: list[FileReport] | None = None,
-    errors: list[ErrorReport] | None = None,
-    summary: RunSummary | None = None,
-    policy: PolicyReport | None = None,
-    baseline: str | None = None,
-    cache: CacheSummary | None = None,
-    inputs: dict[str, InputHash] | None = None,
-    plugins: PluginReport | None = None,
-    docfacts: DocfactsReport | None = None,
-    observability: ObservabilityReport | None = None,
-    problem: ProblemDetails | None = None,
+) -> dict[str, str]:
+    """Build required fields for CliResult.
+
+    Parameters
+    ----------
+    status : str
+        Result status ("success", "violation", "config", "error").
+    command : str
+        Primary CLI command executed.
+    schema_version : str, optional
+        Schema version. Defaults to ``CLI_SCHEMA_VERSION``.
+    schema_id : str, optional
+        Schema URI. Defaults to ``CLI_SCHEMA_ID``.
+
+    Returns
+    -------
+    dict[str, str]
+        Required fields dictionary.
+    """
+    return {
+        "schemaVersion": schema_version,
+        "schemaId": schema_id,
+        "status": status,
+        "generatedAt": datetime.now(tz=UTC).isoformat(timespec="seconds"),
+        "command": command,
+    }
+
+
+def _add_optional_fields(
+    result: CliResult, optional: CliResultOptionalFields | None = None
+) -> None:
+    """Add optional fields to CliResult if provided.
+
+    Parameters
+    ----------
+    result : CliResult
+        Result dictionary to modify in-place.
+    optional : CliResultOptionalFields | None, optional
+        Optional fields dictionary. Defaults to ``None``.
+    """
+    if optional is None:
+        return
+    for key, value in optional.items():
+        if value is not None:
+            result[key] = value  # type: ignore[literal-required]
+
+
+def make_cli_result(
+    status: str,
+    command: str,
+    *,
+    schema_version: str = CLI_SCHEMA_VERSION,
+    schema_id: str = CLI_SCHEMA_ID,
+    optional: CliResultOptionalFields | None = None,
 ) -> CliResult:
     """Construct a CliResult with required fields and optional extended details.
 
@@ -576,32 +635,8 @@ def make_cli_result(  # noqa: PLR0913, C901, PLR0912
         Schema version. Defaults to ``CLI_SCHEMA_VERSION``.
     schema_id : str, optional
         Schema URI. Defaults to ``CLI_SCHEMA_ID``.
-    subcommand : str | None, optional
-        Secondary subcommand if applicable. Defaults to ``None``.
-    duration_seconds : float | None, optional
-        Total execution duration in seconds. Defaults to ``None``.
-    files : list[FileReport] | None, optional
-        Per-file processing results. Defaults to ``None``.
-    errors : list[ErrorReport] | None, optional
-        Aggregated error reports. Defaults to ``None``.
-    summary : RunSummary | None, optional
-        Aggregated run statistics. Defaults to ``None``.
-    policy : PolicyReport | None, optional
-        Policy validation results. Defaults to ``None``.
-    baseline : str | None, optional
-        Baseline hash or reference. Defaults to ``None``.
-    cache : CacheSummary | None, optional
-        Cache metadata. Defaults to ``None``.
-    inputs : dict[str, InputHash] | None, optional
-        Input file hashes for reproducibility. Defaults to ``None``.
-    plugins : PluginReport | None, optional
-        Plugin execution status. Defaults to ``None``.
-    docfacts : DocfactsReport | None, optional
-        DocFacts validation results. Defaults to ``None``.
-    observability : ObservabilityReport | None, optional
-        Observability metrics and logs. Defaults to ``None``.
-    problem : ProblemDetails | None, optional
-        RFC 9457 Problem Details for failures. Defaults to ``None``.
+    optional : CliResultOptionalFields | None, optional
+        Optional fields dictionary. Defaults to ``None``.
 
     Returns
     -------
@@ -610,46 +645,19 @@ def make_cli_result(  # noqa: PLR0913, C901, PLR0912
 
     Examples
     --------
-    >>> result = make_cli_result(status="success", command="build", subcommand="docstrings")
+    >>> result = make_cli_result(status="success", command="build")
     >>> result["status"]
     'success'
+    >>> optional = {"subcommand": "docstrings"}
+    >>> result = make_cli_result(status="success", command="build", optional=optional)
+    >>> result.get("subcommand")
+    'docstrings'
     """
-    result: CliResult = {
-        "schemaVersion": schema_version,
-        "schemaId": schema_id,
-        "status": status,
-        "generatedAt": datetime.now(tz=UTC).isoformat(timespec="seconds"),
-        "command": command,
-    }
-
-    # Add optional fields with proper type narrowing
-    if subcommand is not None:
-        result["subcommand"] = subcommand
-    if duration_seconds is not None:
-        result["durationSeconds"] = duration_seconds
-    if files is not None:
-        result["files"] = files
-    if errors is not None:
-        result["errors"] = errors
-    if summary is not None:
-        result["summary"] = summary
-    if policy is not None:
-        result["policy"] = policy
-    if baseline is not None:
-        result["baseline"] = baseline
-    if cache is not None:
-        result["cache"] = cache
-    if inputs is not None:
-        result["inputs"] = inputs
-    if plugins is not None:
-        result["plugins"] = plugins
-    if docfacts is not None:
-        result["docfacts"] = docfacts
-    if observability is not None:
-        result["observability"] = observability
-    if problem is not None:
-        result["problem"] = problem
-
+    result: CliResult = cast(
+        "CliResult",
+        _build_required_fields(status, command, schema_version=schema_version, schema_id=schema_id),
+    )
+    _add_optional_fields(result, optional)
     return result
 
 

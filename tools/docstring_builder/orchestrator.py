@@ -50,7 +50,7 @@ import warnings
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from importlib import import_module
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Protocol, cast
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
@@ -133,8 +133,24 @@ if TYPE_CHECKING:
     from tools.docstring_builder.pipeline_types import ProcessingOptions
     from tools.docstring_builder.plugins import PluginManager
     from tools.docstring_builder.semantics import SemanticResult
+
+    class LegacyBuilderSignature(Protocol):
+        """Protocol describing the deprecated legacy docstring builder callback signature.
+
+        This protocol documents the variadic argument pattern that the legacy API
+        accepted. The actual implementation is deprecated and raises NotImplementedError.
+        """
+
+        def __call__(
+            self,
+            *args: object,
+            **kwargs: object,
+        ) -> DocstringBuildResult:
+            """Legacy callback signature accepting variadic arguments."""
+            ...
 else:  # pragma: no cover - runtime fallback preserves import laziness
     PipelineContextBuilderType = type[object]
+    LegacyBuilderSignature = type[object]
 
 
 def _load_pipeline_context_builder() -> type[PipelineContextBuilderType]:
@@ -683,9 +699,24 @@ def run_build(
     raise NotImplementedError(msg)
 
 
+class LegacyBuilderSignature(Protocol):
+    """Protocol describing the deprecated legacy docstring builder callback signature.
+
+    This protocol documents the variadic argument pattern that the legacy API
+    accepted. The actual implementation is deprecated and raises NotImplementedError.
+    """
+
+    def __call__(
+        self,
+        *args: object,
+        **kwargs: object,
+    ) -> DocstringBuildResult:
+        """Legacy callback signature accepting variadic arguments."""
+
+
 def run_legacy(
-    *args: object,  # noqa: ARG001
-    **kwargs: object,  # noqa: ARG001
+    *args: object,
+    **kwargs: object,
 ) -> DocstringBuildResult:
     """Deprecate legacy API for docstring builder in favor of typed config.
 
@@ -698,19 +729,31 @@ def run_legacy(
     Parameters
     ----------
     *args
-        Positional arguments (deprecated).
+        Positional arguments (deprecated, accepted for backward compatibility only).
     **kwargs
-        Keyword arguments (deprecated).
+        Keyword arguments (deprecated, accepted for backward compatibility only).
 
     Returns
     -------
     DocstringBuildResult
         Summary plus metrics from the build run.
 
+    Raises
+    ------
+    NotImplementedError
+        Always raised as this function is a placeholder and not yet implemented.
+
     Warns
     -----
     DeprecationWarning
         Always emitted to guide users to the new API.
+
+    Notes
+    -----
+    This function accepts any arguments for backward compatibility with legacy
+    callers. The arguments are logged for debugging purposes but are not used
+    since the function raises NotImplementedError. Migrate to :func:`run_build`
+    with typed :class:`DocstringBuildConfig` objects.
     """
     msg = (
         "run_legacy() is deprecated and will be removed in a future release. "
@@ -718,6 +761,20 @@ def run_legacy(
         "DocstringBuildConfig objects."
     )
     warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
+    # Log arguments for debugging/diagnostic purposes (structural use of variadic args)
+    if args:
+        _LOGGER.debug(
+            "Legacy API called with %d positional argument(s)",
+            len(args),
+            extra={"legacy_args_count": len(args)},
+        )
+    if kwargs:
+        _LOGGER.debug(
+            "Legacy API called with %d keyword argument(s)",
+            len(kwargs),
+            extra={"legacy_kwargs_count": len(kwargs), "legacy_kwargs_keys": list(kwargs.keys())},
+        )
 
     # This is a placeholder that would delegate to run_docstring_builder
     # or other legacy behavior

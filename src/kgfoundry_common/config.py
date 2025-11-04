@@ -1,5 +1,3 @@
-# ruff: noqa: PLR0913
-
 """Configuration helpers shared across kgfoundry.
 
 This module provides typed configuration management via pydantic_settings.BaseSettings,
@@ -16,8 +14,9 @@ Examples
 from __future__ import annotations
 
 import base64
+from collections.abc import Mapping
 from functools import lru_cache
-from typing import TYPE_CHECKING, Final, Literal, Self, cast
+from typing import TYPE_CHECKING, Final, Literal, Self, TypedDict, cast
 
 from pydantic import AliasChoices, Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings
@@ -27,7 +26,7 @@ from kgfoundry_common.types import JsonPrimitive, JsonValue
 
 if TYPE_CHECKING:
     import functools
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Sequence
 
     from kgfoundry_common.navmap_types import NavMap
 
@@ -37,6 +36,22 @@ logger = get_logger(__name__)
 
 # Security constants
 _MIN_SIGNING_KEY_BYTES: Final[int] = 32  # Minimum recommended key length
+
+
+class ModelValidateOptions(TypedDict, total=False):
+    """Options for model validation, encapsulating multiple parameters.
+
+    This TypedDict groups validation parameters to reduce argument count
+    in model_validate while maintaining compatibility with parent signature.
+    """
+
+    strict: bool | None
+    extra: Literal["allow", "ignore", "forbid"] | None
+    from_attributes: bool | None
+    context: Mapping[str, object] | None
+    by_alias: bool | None
+    by_name: bool | None
+
 
 __navmap__: Final[NavMap] = {
     "title": "kgfoundry_common.config",
@@ -148,7 +163,7 @@ class AppSettings(BaseSettings):
     model_config = {"frozen": True, "case_sensitive": False, "populate_by_name": True}
 
     @classmethod
-    def model_validate(
+    def model_validate(  # noqa: PLR0913
         cls,
         obj: object,
         *,
@@ -159,18 +174,59 @@ class AppSettings(BaseSettings):
         by_alias: bool | None = None,
         by_name: bool | None = None,
     ) -> Self:
-        """Validate ``obj`` returning ``cls`` while normalising pydantic errors."""
-        try:
-            obj_param = obj
-            context_param = context
-            return super().model_validate(
-                obj_param,
+        """Validate ``obj`` returning ``cls`` while normalising pydantic errors.
+
+        This method overrides the parent signature to normalize ValidationError
+        exceptions. The many parameters are required to match the parent API,
+        but internal logic is encapsulated in helper functions.
+
+        Note: PLR0913 suppression is required here because this method must match
+        the parent class signature from pydantic, which has 7 parameters total.
+        The actual validation logic is delegated to ``_validate_with_options``
+        which has only 2 parameters, reducing complexity.
+        """
+        return cls._validate_with_options(
+            obj,
+            ModelValidateOptions(
                 strict=strict,
                 extra=extra,
                 from_attributes=from_attributes,
-                context=context_param,
+                context=context,
                 by_alias=by_alias,
                 by_name=by_name,
+            ),
+        )
+
+    @classmethod
+    def _validate_with_options(cls, obj: object, options: ModelValidateOptions) -> Self:
+        """Encapsulate validation logic with reduced parameter count.
+
+        Parameters
+        ----------
+        obj : object
+            Object to validate.
+        options : ModelValidateOptions
+            Validation options dictionary.
+
+        Returns
+        -------
+        Self
+            Validated instance.
+
+        Raises
+        ------
+        ValueError
+            If validation fails with normalized error message.
+        """
+        try:
+            return super().model_validate(
+                obj,
+                strict=options.get("strict"),
+                extra=options.get("extra"),
+                from_attributes=options.get("from_attributes"),
+                context=options.get("context"),
+                by_alias=options.get("by_alias"),
+                by_name=options.get("by_name"),
             )
         except ValidationError as exc:
             message = _format_validation_error(exc)

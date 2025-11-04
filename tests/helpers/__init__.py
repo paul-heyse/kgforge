@@ -14,12 +14,20 @@ from tests.helpers.immutability import (
     assert_frozen_mutation,
 )
 from tests.helpers.importing import load_attribute, load_module, load_typed_attribute
+from tests.helpers.typing_facades import (
+    load_facade_attribute,
+    load_facade_attribute_typed,
+    load_facade_module,
+)
 
 __all__ = [
     "assert_frozen_attribute",
     "assert_frozen_attributes",
     "assert_frozen_mutation",
     "load_attribute",
+    "load_facade_attribute",
+    "load_facade_attribute_typed",
+    "load_facade_module",
     "load_module",
     "load_typed_attribute",
 ]

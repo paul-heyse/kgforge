@@ -7,25 +7,54 @@ wrapping existing functions while maintaining backward compatibility.
 from __future__ import annotations
 
 import warnings
-from pathlib import Path  # noqa: TC003
+from typing import TYPE_CHECKING, Protocol, cast
 
 from tools.navmap import repair_navmaps
-from tools.navmap.build_navmap import ModuleInfo  # noqa: TC001
-from tools.navmap.config import NavmapRepairOptions  # noqa: TC001
-from tools.navmap.repair_navmaps import RepairExecutionConfig, RepairResult  # noqa: TC001
+from tools.navmap.repair_navmaps import RepairExecutionConfig
 
-__all__ = [
-    "repair_all_legacy",
-    "repair_all_with_config",
-    "repair_module_with_config",
-]
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from tools.navmap.build_navmap import ModuleInfo
+    from tools.navmap.config import NavmapRepairOptions
+
+
+class ModuleInfoProtocol(Protocol):
+    """Protocol interface for ModuleInfo at runtime."""
+
+    path: Path
+    name: str
+
+
+class NavmapRepairOptionsProtocol(Protocol):
+    """Protocol interface for NavmapRepairOptions at runtime."""
+
+    root: Path | None
+    apply: bool
+    emit_json: bool
+
+
+class RepairResultProtocol(Protocol):
+    """Protocol interface for RepairResult at runtime."""
+
+    module: Path
+    messages: list[str]
+    changed: bool
+    applied: bool
+
+
+class RepairExecutionConfigProtocol(Protocol):
+    """Protocol interface for RepairExecutionConfig at runtime."""
+
+    apply_changes: bool
+    emit_json: bool
 
 
 def repair_module_with_config(
-    info: ModuleInfo,
+    info: ModuleInfoProtocol,
     *,
-    options: NavmapRepairOptions,
-) -> RepairResult:
+    options: NavmapRepairOptionsProtocol,
+) -> RepairResultProtocol:
     """Repair a module's navmap metadata with typed configuration.
 
     This is the new public API for module repair that accepts a typed
@@ -33,14 +62,14 @@ def repair_module_with_config(
 
     Parameters
     ----------
-    info : ModuleInfo
+    info : ModuleInfoProtocol
         Metadata describing the target module discovered by ``build_navmap``.
-    options : NavmapRepairOptions
+    options : NavmapRepairOptionsProtocol
         Typed configuration controlling repair behavior.
 
     Returns
     -------
-    RepairResult
+    RepairResultProtocol
         Outcome describing emitted messages alongside change and apply flags.
 
     Examples
@@ -49,18 +78,21 @@ def repair_module_with_config(
     >>> options = NavmapRepairOptions(apply=True)
     >>> # result = repair_module_with_config(module_info, options=options)
     """
+    typed_options = cast("NavmapRepairOptions", options)
     execution = RepairExecutionConfig(
-        apply_changes=options.apply,
-        emit_json=options.emit_json,
+        apply_changes=typed_options.apply,
+        emit_json=typed_options.emit_json,
     )
-    return repair_navmaps.repair_module(info, execution=execution)
+    typed_info = cast("ModuleInfo", info)
+    result = repair_navmaps.repair_module(typed_info, execution=execution)
+    return cast("RepairResultProtocol", result)
 
 
 def repair_all_with_config(
     *,
     root: Path | None = None,
-    options: NavmapRepairOptions,
-) -> list[RepairResult]:
+    options: NavmapRepairOptionsProtocol,
+) -> list[RepairResultProtocol]:
     """Repair every module under a root directory with typed configuration.
 
     This is the new public API for batch repair that accepts a typed
@@ -70,12 +102,12 @@ def repair_all_with_config(
     ----------
     root : Path | None, optional
         Directory tree to scan. Defaults to project src/ if None.
-    options : NavmapRepairOptions
+    options : NavmapRepairOptionsProtocol
         Typed configuration controlling repair behavior (apply, etc.).
 
     Returns
     -------
-    list[RepairResult]
+    list[RepairResultProtocol]
         List of repair results for all modules found under root.
 
     Examples
@@ -85,15 +117,17 @@ def repair_all_with_config(
     >>> options = NavmapRepairOptions(apply=False)
     >>> # results = repair_all_with_config(root=Path("src"), options=options)
     """
-    target_root = root or options.root or repair_navmaps.SRC
+    typed_options = cast("NavmapRepairOptions", options)
+    target_root = root or typed_options.root or repair_navmaps.SRC
     execution = RepairExecutionConfig(
-        apply_changes=options.apply,
-        emit_json=options.emit_json,
+        apply_changes=typed_options.apply,
+        emit_json=typed_options.emit_json,
     )
-    return repair_navmaps.repair_all(target_root, execution=execution)
+    results = repair_navmaps.repair_all(target_root, execution=execution)
+    return cast("list[RepairResultProtocol]", results)
 
 
-def repair_all_legacy(*, root: Path, apply: bool) -> list[RepairResult]:
+def repair_all_legacy(*, root: Path, apply: bool) -> list[RepairResultProtocol]:
     """Deprecate legacy repair_all API in favor of typed configuration.
 
     .. deprecated::
@@ -111,7 +145,7 @@ def repair_all_legacy(*, root: Path, apply: bool) -> list[RepairResult]:
 
     Returns
     -------
-    list[RepairResult]
+    list[RepairResultProtocol]
         List of repair results for all modules found.
     """
     msg = (
@@ -120,4 +154,12 @@ def repair_all_legacy(*, root: Path, apply: bool) -> list[RepairResult]:
     )
     warnings.warn(msg, DeprecationWarning, stacklevel=2)
     execution = RepairExecutionConfig(apply_changes=apply, emit_json=False)
-    return repair_navmaps.repair_all(root, execution=execution)
+    results = repair_navmaps.repair_all(root, execution=execution)
+    return cast("list[RepairResultProtocol]", results)
+
+
+__all__ = [
+    "repair_all_legacy",
+    "repair_all_with_config",
+    "repair_module_with_config",
+]
