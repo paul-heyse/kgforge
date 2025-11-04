@@ -184,7 +184,8 @@ def generate_summary(
     lines.append("")
     lines.append("| Check | Status |")
     lines.append("|-------|--------|")
-    lines.extend(check.to_row() for check in (checks or DEFAULT_CHECKS))
+    resolved_checks = DEFAULT_CHECKS if checks is None else checks
+    lines.extend(check.to_row() for check in resolved_checks)
     lines.append("")
 
     if artifact_snapshot.codemod_logs:
