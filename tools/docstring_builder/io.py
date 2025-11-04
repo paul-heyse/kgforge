@@ -79,36 +79,53 @@ def module_to_path(module: str, *, repo_root: Path = REPO_ROOT) -> Path | None:
         return None
 
     parts = module.split(".")
-    search_roots: list[Path] = [Path("src"), Path("tools")]
-    docs_dir = repo_root / "docs"
-    if docs_dir.exists():
-        search_roots.append(Path("docs"))
-
     fallback: Path | None = None
-    for root in search_roots:
-        if parts and parts[0] == root.name:
-            relative = Path(*parts)
-        else:
-            relative = root.joinpath(*parts)
-        file_candidate = repo_root / relative
-        if file_candidate.suffix:
-            return file_candidate
-        file_path = file_candidate.with_suffix(".py")
-        if file_path.exists():
-            return file_path
-        package_init = file_candidate / "__init__.py"
-        if package_init.exists():
-            return package_init
+
+    for relative in _iter_search_candidates(parts, repo_root):
+        resolved, candidate_fallback = _resolve_module_candidate(relative, repo_root)
+        if resolved is not None:
+            return resolved
         if fallback is None:
-            fallback = file_path
+            fallback = candidate_fallback
 
     if fallback is not None:
         return fallback
 
-    file_candidate = repo_root.joinpath(*parts)
-    if file_candidate.suffix:
-        return file_candidate
-    return file_candidate.with_suffix(".py")
+    return _default_module_path(parts, repo_root)
+
+
+def _iter_search_candidates(parts: Sequence[str], repo_root: Path) -> tuple[Path, ...]:
+    roots: list[Path] = [Path("src"), Path("tools")]
+    if (repo_root / "docs").exists():
+        roots.append(Path("docs"))
+    return tuple(_resolve_relative(parts, root) for root in roots)
+
+
+def _resolve_relative(parts: Sequence[str], root: Path) -> Path:
+    if parts and parts[0] == root.name:
+        return Path(*parts)
+    return root.joinpath(*parts)
+
+
+def _resolve_module_candidate(relative: Path, repo_root: Path) -> tuple[Path | None, Path]:
+    candidate = repo_root / relative
+    if candidate.suffix:
+        return candidate, candidate
+
+    module_file = candidate.with_suffix(".py")
+    if module_file.exists():
+        return module_file, module_file
+
+    package_init = candidate / "__init__.py"
+    if package_init.exists():
+        return package_init, module_file
+
+    return None, module_file
+
+
+def _default_module_path(parts: Sequence[str], repo_root: Path) -> Path:
+    candidate = repo_root.joinpath(*parts)
+    return candidate if candidate.suffix else candidate.with_suffix(".py")
 
 
 def module_name_from_path(path: Path, *, repo_root: Path = REPO_ROOT) -> str:

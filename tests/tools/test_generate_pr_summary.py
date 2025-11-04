@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from tools.generate_pr_summary import collect_artifact_snapshot, generate_summary
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def test_collect_artifact_snapshot_detects_numbered_codemod_logs(tmp_path) -> None:
+
+def test_collect_artifact_snapshot_detects_numbered_codemod_logs(tmp_path: Path) -> None:
     """Snapshot should include all codemod log files with numeric suffixes."""
     (tmp_path / "codemod.log").write_text("root run\n")
     (tmp_path / "codemod_r1.log").write_text("run 1\n")
@@ -21,7 +26,7 @@ def test_collect_artifact_snapshot_detects_numbered_codemod_logs(tmp_path) -> No
     )
 
 
-def test_generate_summary_lists_all_codemod_logs(tmp_path) -> None:
+def test_generate_summary_lists_all_codemod_logs(tmp_path: Path) -> None:
     """Rendered summary should include every detected codemod log entry."""
     for name in ("codemod.log", "codemod_r7.log"):
         (tmp_path / name).write_text("log contents\n")
