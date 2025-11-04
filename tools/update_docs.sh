@@ -5,11 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-VENV="$ROOT/.venv"
-BIN="$VENV/bin"
-
-if [[ ! -x "$BIN/python" ]]; then
-  echo "error: missing virtual environment at .venv/; run 'make bootstrap' first." >&2
+if ! command -v uv >/dev/null 2>&1; then
+  echo "error: missing 'uv'; run './scripts/bootstrap.sh' first." >&2
   exit 1
 fi
 
@@ -27,17 +24,20 @@ else
   export PYTHONPATH
 fi
 export SPHINXOPTS="-W"
-PY="$BIN/python"
 
 run() {
   printf '\n→ %s\n' "$*" >&2
   "$@"
 }
 
+uv_run() {
+  run uv run "$@"
+}
+
 ensure_tools() {
   local missing_tools=()
   for tool in doq docformatter pydocstyle pydoclint docstr-coverage; do
-    if [[ ! -x "$BIN/$tool" ]]; then
+    if ! uv run --which "$tool" >/dev/null 2>&1; then
       missing_tools+=("$tool")
     fi
   done
@@ -50,7 +50,7 @@ ensure_tools() {
 
 ensure_tools
 
-if [[ ! -x "$BIN/mkdocs" ]]; then
+if ! uv run --which mkdocs >/dev/null 2>&1; then
   echo "error: missing 'mkdocs'; run 'uv sync --frozen' (or './scripts/bootstrap.sh')." >&2
   exit 1
 fi
@@ -74,24 +74,25 @@ export GRAPH_FAIL_ON_CYCLES=0
 export GRAPH_FAIL_ON_LAYER=0
 
 run make docstrings
-if ! run "$PY" tools/validate_gallery.py; then
+if ! uv_run python tools/validate_gallery.py; then
   echo "Gallery validation failed. Fix errors before building docs." >&2
   exit 1
 fi
+
 run make readmes
-run "$PY" tools/update_navmaps.py
-run "$PY" tools/navmap/build_navmap.py
-run "$PY" tools/navmap/check_navmap.py
-run "$BIN"/pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples
+uv_run python tools/update_navmaps.py
+uv_run python tools/navmap/build_navmap.py
+uv_run python tools/navmap/check_navmap.py
+uv_run pytest -q --xdoctest --xdoctest-options=ELLIPSIS,IGNORE_WHITESPACE,NORMALIZE_WHITESPACE --xdoctest-modules --xdoctest-glob='examples/*.py' examples
 run make symbols
-run "$PY" tools/docs/build_test_map.py
-run "$PY" tools/docs/scan_observability.py
-run "$PY" tools/docs/export_schemas.py
-run "$PY" tools/docs/build_graphs.py
+uv_run python tools/docs/build_test_map.py
+uv_run python tools/docs/scan_observability.py
+uv_run python tools/docs/export_schemas.py
+uv_run python tools/docs/build_graphs.py
 run make html
 run make json
 if [[ $BUILD_MKDOCS -eq 1 ]]; then
-  run "$BIN/mkdocs" build --config-file mkdocs.yml
+  uv_run mkdocs build --config-file mkdocs.yml
 fi
 run make build_agent_catalog
 
