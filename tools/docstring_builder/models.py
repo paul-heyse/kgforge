@@ -54,6 +54,7 @@ CLI_SCHEMA_ID: Final = "https://kgfoundry.dev/schema/docstring-builder-cli.json"
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DOCFACTS_SCHEMA_PATH = _REPO_ROOT / "docs" / "_build" / "schema_docfacts.json"
+_DOCFACTS_SCHEMA_FALLBACK = _REPO_ROOT / "schema" / "docs" / "schema_docfacts.json"
 _CLI_SCHEMA_PATH = _REPO_ROOT / "schema" / "tools" / "docstring_builder_cli.json"
 
 
@@ -707,8 +708,26 @@ def make_cli_result(
     return cast("CliResult", result_fields)
 
 
+def _load_docfacts_schema() -> dict[str, JsonValue]:
+    try:
+        schema_text = _DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        try:
+            fallback_text = _DOCFACTS_SCHEMA_FALLBACK.read_text(encoding="utf-8")
+        except FileNotFoundError as fallback_exc:  # pragma: no cover - defensive guard
+            message = "DocFacts schema missing at %s and fallback %s" % (
+                _DOCFACTS_SCHEMA_PATH,
+                _DOCFACTS_SCHEMA_FALLBACK,
+            )
+            raise RuntimeError(message) from fallback_exc
+        _DOCFACTS_SCHEMA_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _DOCFACTS_SCHEMA_PATH.write_text(fallback_text, encoding="utf-8")
+        schema_text = fallback_text
+    return cast("dict[str, JsonValue]", json.loads(schema_text))
+
+
 _DOCFACTS_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
-    cast("dict[str, JsonValue]", json.loads(_DOCFACTS_SCHEMA_PATH.read_text(encoding="utf-8")))
+    _load_docfacts_schema()
 )
 _CLI_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
     cast("dict[str, JsonValue]", json.loads(_CLI_SCHEMA_PATH.read_text(encoding="utf-8")))
