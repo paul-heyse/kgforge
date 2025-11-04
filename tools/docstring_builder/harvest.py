@@ -213,7 +213,7 @@ def _load_module(module_name: str, search_paths: Sequence[str]) -> GriffeModuleL
 
 def _expr_to_str(value: object | None) -> str | None:
     if value is None:
-        return None
+        return "None"
     if isinstance(value, str):
         return value
     as_string = _safe_getattr(value, "as_string")
@@ -236,6 +236,8 @@ def _expr_to_str(value: object | None) -> str | None:
 
 
 def _annotation_to_str(annotation: object | None) -> str | None:
+    if annotation is None:
+        return None
     return _expr_to_str(annotation)
 
 
