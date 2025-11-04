@@ -354,19 +354,19 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--test-map",
         type=Path,
-        default=Path("site/_build/test_map.json"),
+        default=Path("docs/_build/test_map.json"),
         help="Path to test map JSON artifact.",
     )
     parser.add_argument(
         "--test-map-coverage",
         type=Path,
-        default=Path("site/_build/test_map_coverage.json"),
+        default=Path("docs/_build/test_map_coverage.json"),
         help="Path to test map coverage JSON artifact.",
     )
     parser.add_argument(
         "--test-map-summary",
         type=Path,
-        default=Path("site/_build/test_map_summary.json"),
+        default=Path("docs/_build/test_map_summary.json"),
         help="Path to test map summary JSON artifact.",
     )
     parser.add_argument(
