@@ -1,4 +1,3 @@
-# ruff: noqa: N999 - numeric prefix required for gallery ordering
 """Quickstart - minimal import smoke test.
 ======================================
 
