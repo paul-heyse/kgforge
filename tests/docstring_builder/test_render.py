@@ -1,6 +1,8 @@
 """Tests for docstring rendering utilities."""
 
-from tools.docstring_builder.render import render_docstring
+from pathlib import Path
+
+from tools.docstring_builder.render import render_docstring, write_template_to
 from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
 
 
@@ -22,9 +24,6 @@ def test_render_signature_includes_none_default() -> None:
     assert "= None" in docstring
 
 
-"""Tests for docstring rendering behaviour."""
-
-
 def test_render_docstring_preserves_special_characters() -> None:
     """Docstring rendering should not HTML-escape schema content."""
     schema = DocstringSchema(summary="Return <value> 'untouched'.")
@@ -32,3 +31,30 @@ def test_render_docstring_preserves_special_characters() -> None:
 
     assert "<value>" in rendered
     assert "'untouched'" in rendered
+
+
+def test_render_docstring_includes_falsey_default() -> None:
+    """Docstring parameter sections must include empty-string defaults."""
+    parameter = ParameterDoc(
+        name="title",
+        annotation="str",
+        description="Title for the resource.",
+        optional=True,
+        default="",
+    )
+    schema = DocstringSchema(summary="Return a title.", parameters=[parameter])
+
+    rendered = render_docstring(schema=schema, marker="[generated]")
+
+    assert ", by default " in rendered
+
+
+def test_write_template_to_creates_parent_directories(tmp_path: Path) -> None:
+    """Persisting the template should succeed even for nested destinations."""
+    destination = tmp_path / "nested" / "template.jinja"
+
+    write_template_to(destination)
+
+    assert destination.exists()
+    contents = destination.read_text(encoding="utf-8")
+    assert "{{ schema.summary }}" in contents
