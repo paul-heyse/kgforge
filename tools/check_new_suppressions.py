@@ -27,7 +27,7 @@ from kgfoundry_common.errors import ConfigurationError
 from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Iterable, Mapping, Sequence
 
 LOGGER = get_logger(__name__)
 
@@ -35,6 +35,7 @@ LOGGER = get_logger(__name__)
 __all__ = (
     "SuppressionGuardContext",
     "SuppressionGuardFileEntry",
+    "SuppressionGuardFileReport",
     "SuppressionGuardReport",
     "SuppressionGuardViolationEntry",
     "SuppressionViolation",
@@ -88,24 +89,28 @@ class SuppressionGuardContext(TypedDict):
 class SuppressionGuardReport:
     """Aggregate results for a suppression guard run."""
 
-    violations: Mapping[Path, tuple[SuppressionViolation, ...]]
+    files: tuple[SuppressionGuardFileReport, ...]
 
     def __post_init__(self) -> None:
-        """Freeze the violation mapping to an immutable proxy."""
-        normalized: dict[Path, tuple[SuppressionViolation, ...]] = {
-            path: tuple(entries) for path, entries in self.violations.items()
-        }
-        proxy = MappingProxyType(normalized)
+        """Validate report invariants and normalize internal state."""
+        sorted_files = sorted(self.files, key=_guard_file_sort_key)
         object.__setattr__(
             self,
-            "violations",
-            cast("Mapping[Path, tuple[SuppressionViolation, ...]]", proxy),
+            "files",
+            cast("tuple[SuppressionGuardFileReport, ...]", tuple(sorted_files)),
         )
+
+    @property
+    def violations(self) -> Mapping[Path, tuple[SuppressionViolation, ...]]:
+        """Expose violations keyed by path for backwards compatibility."""
+        mapping = {file_report.path: file_report.violations for file_report in self.files}
+        proxy = MappingProxyType(mapping)
+        return cast("Mapping[Path, tuple[SuppressionViolation, ...]]", proxy)
 
     @property
     def violation_count(self) -> int:
         """Return the total number of violations discovered."""
-        return sum(len(entries) for entries in self.violations.values())
+        return sum(len(report.violations) for report in self.files)
 
     @property
     def is_clean(self) -> bool:
@@ -115,6 +120,97 @@ class SuppressionGuardReport:
     def to_context(self) -> SuppressionGuardContext:
         """Render the report as structured problem details context."""
         return build_guard_context(self)
+
+    @classmethod
+    def merge(cls, reports: Iterable[SuppressionGuardReport]) -> SuppressionGuardReport:
+        """Merge multiple reports into a single aggregate."""
+        aggregated: dict[Path, list[SuppressionViolation]] = {}
+        for report in reports:
+            for file_report in report.files:
+                bucket = aggregated.setdefault(file_report.path, [])
+                bucket.extend(file_report.violations)
+
+        if not aggregated:
+            return cls(files=())
+
+        merged_files = tuple(
+            SuppressionGuardFileReport(path=path, violations=tuple(violations))
+            for path, violations in aggregated.items()
+        )
+        return cls(files=merged_files)
+
+    @classmethod
+    def from_context(cls, context: SuppressionGuardContext) -> SuppressionGuardReport:
+        """Build a report instance from a context payload."""
+        files = tuple(
+            SuppressionGuardFileReport.from_context_entry(entry) for entry in context["files"]
+        )
+
+        report = cls(files=files)
+        if report.violation_count != context["violation_count"]:
+            message = (
+                "Suppression guard context mismatch: "
+                f"expected {context['violation_count']} violations, "
+                f"computed {report.violation_count}."
+            )
+            raise ValueError(message)
+        return report
+
+
+@dataclass(frozen=True, slots=True)
+class SuppressionGuardFileReport:
+    """Collection of violations for a specific file."""
+
+    path: Path
+    violations: tuple[SuppressionViolation, ...]
+
+    def __post_init__(self) -> None:
+        """Normalize violation ordering for deterministic comparisons."""
+        ordered = sorted(self.violations, key=_violation_sort_key)
+        object.__setattr__(
+            self,
+            "violations",
+            cast("tuple[SuppressionViolation, ...]", tuple(ordered)),
+        )
+
+    def to_context_entry(self) -> SuppressionGuardFileEntry:
+        """Return a serializable representation for Problem Details."""
+        return {
+            "file": str(self.path),
+            "violations": [
+                {
+                    "line": violation.line_number,
+                    "preview": violation.line_preview,
+                }
+                for violation in self.violations
+            ],
+        }
+
+    @classmethod
+    def from_context_entry(cls, entry: SuppressionGuardFileEntry) -> SuppressionGuardFileReport:
+        """Hydrate a file report from its Problem Details entry."""
+        path = Path(entry["file"]).resolve()
+        violations = tuple(
+            SuppressionViolation(
+                path=path,
+                line_number=item["line"],
+                line_preview=item["preview"],
+            )
+            for item in entry["violations"]
+        )
+        return cls(path=path, violations=violations)
+
+
+def _guard_file_sort_key(report: SuppressionGuardFileReport) -> str:
+    """Return a deterministic sort key for file reports."""
+
+    return report.path.as_posix()
+
+
+def _violation_sort_key(violation: SuppressionViolation) -> int:
+    """Return a deterministic sort key for individual violations."""
+
+    return violation.line_number
 
 
 def _iter_suppression_comments(content: str) -> Sequence[tuple[int, str]]:
@@ -155,14 +251,13 @@ def check_file(file_path: Path) -> tuple[SuppressionViolation, ...]:
 
 def check_directory(directory: Path) -> SuppressionGuardReport:
     """Return per-file suppressions lacking ``TICKET:`` metadata."""
-    violations: dict[Path, tuple[SuppressionViolation, ...]] = {}
+    files = tuple(
+        SuppressionGuardFileReport(path=py_file.resolve(), violations=file_violations)
+        for py_file in sorted(directory.rglob("*.py"))
+        if (file_violations := check_file(py_file))
+    )
 
-    for py_file in sorted(directory.rglob("*.py")):
-        file_violations = check_file(py_file)
-        if file_violations:
-            violations[py_file] = file_violations
-
-    return SuppressionGuardReport(violations=violations)
+    return SuppressionGuardReport(files=files)
 
 
 def resolve_target_directories(paths: Sequence[str]) -> list[Path]:
@@ -198,12 +293,8 @@ def resolve_target_directories(paths: Sequence[str]) -> list[Path]:
 
 def run_suppression_guard(directories: Sequence[Path]) -> SuppressionGuardReport:
     """Run suppression guard on the given directories."""
-    aggregated: dict[Path, tuple[SuppressionViolation, ...]] = {}
-    for directory in directories:
-        report = check_directory(directory)
-        aggregated.update(report.violations)
-
-    final_report = SuppressionGuardReport(violations=aggregated)
+    reports = [check_directory(directory) for directory in directories]
+    final_report = SuppressionGuardReport.merge(reports)
 
     if not final_report.is_clean:
         message = f"Found {final_report.violation_count} suppression(s) without TICKET: tags"
@@ -214,34 +305,24 @@ def run_suppression_guard(directories: Sequence[Path]) -> SuppressionGuardReport
 
 def build_guard_context(report: SuppressionGuardReport) -> SuppressionGuardContext:
     """Construct structured context payload for Problem Details reporting."""
-    files: list[SuppressionGuardFileEntry] = []
-    for file_path, file_violations in sorted(report.violations.items()):
-        files.append(
-            {
-                "file": str(file_path),
-                "violations": [
-                    {
-                        "line": violation.line_number,
-                        "preview": violation.line_preview,
-                    }
-                    for violation in file_violations
-                ],
-            }
-        )
+    files = [file_report.to_context_entry() for file_report in report.files]
 
-    return {
-        "violation_count": report.violation_count,
-        "files": files,
-    }
+    return {"violation_count": report.violation_count, "files": files}
 
 
-def _extract_guard_context(error: ConfigurationError) -> SuppressionGuardContext | None:
+def _extract_guard_report(error: ConfigurationError) -> SuppressionGuardReport | None:
     """Normalize the context payload attached to a suppression guard error."""
-    context = dict(error.context or {})
-    expected_keys = {"violation_count", "files"}
-    if not expected_keys.issubset(context):
+    raw_context = error.context
+    if not raw_context:
         return None
-    return cast("SuppressionGuardContext", context)
+
+    try:
+        context = cast("SuppressionGuardContext", dict(raw_context))
+        report = SuppressionGuardReport.from_context(context)
+    except (KeyError, TypeError, ValueError):
+        LOGGER.exception("Failed to parse suppression guard context")
+        return None
+    return report
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -257,41 +338,39 @@ def main(argv: Sequence[str] | None = None) -> int:
         LOGGER.exception("Failed to resolve suppression guard target directories")
         return 1
 
-    report_context: SuppressionGuardContext
     try:
         run_suppression_guard(directories)
     except ConfigurationError as error:
-        extracted_context = _extract_guard_context(error)
-        if extracted_context is None:
+        report = _extract_guard_report(error)
+        if report is None:
             LOGGER.exception("❌ Found suppressions without TICKET: tags")
             return 1
-        report_context = extracted_context
     else:
         LOGGER.info("✅ All suppressions include TICKET: tags")
         return 0
 
     LOGGER.error(
         "❌ Found suppressions without TICKET: tags",
-        extra={"violation_count": report_context.get("violation_count", 0)},
+        extra={"violation_count": report.violation_count},
     )
 
     cwd = Path.cwd()
-    for file_entry in report_context.get("files", []):
-        file_path = Path(file_entry["file"])
+    for file_report in report.files:
+        file_path = file_report.path
         try:
             rel_path = file_path.relative_to(cwd)
         except ValueError:
             rel_path = file_path
         LOGGER.error("%s:", rel_path, extra={"path": str(rel_path)})
-        for violation in file_entry["violations"]:
+        for violation in file_report.violations:
             LOGGER.error(
                 "  Line %s: %s",
-                violation["line"],
-                violation["preview"],
+                violation.line_number,
+                violation.line_preview,
                 extra={
                     "path": str(rel_path),
-                    "line": violation["line"],
-                    "line_preview": violation["preview"],
+                    "line": violation.line_number,
+                    "line_preview": violation.line_preview,
                 },
             )
 
