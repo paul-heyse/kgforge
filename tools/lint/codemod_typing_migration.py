@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import libcst as cst
 
@@ -104,20 +104,47 @@ class TypingFacadeMigrator(cst.CSTTransformer):
             result = cst.Attribute(value=result, attr=cst.Name(part))
         return result
 
+    def leave_ImportFrom(
+        self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
+    ) -> cst.ImportFrom | cst.RemovalSentinel:
+        """LibCST visitor method for ImportFrom nodes (CamelCase naming required by protocol).
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
+        This method delegates to the snake_case implementation to maintain
+        consistency while satisfying LibCST's visitor protocol naming requirements.
 
-    LeaveImportFromFunc = Callable[
-        [TypingFacadeMigrator, cst.ImportFrom, cst.ImportFrom],
-        cst.ImportFrom | cst.RemovalSentinel,
-    ]
-    LeaveCallFunc = Callable[[TypingFacadeMigrator, cst.Call, cst.Call], cst.Call]
+        Parameters
+        ----------
+        original_node : cst.ImportFrom
+            Original node from LibCST visitor protocol.
+        updated_node : cst.ImportFrom
+            Updated node from LibCST visitor protocol.
 
-TypingFacadeMigrator.leave_ImportFrom = cast(
-    "LeaveImportFromFunc", TypingFacadeMigrator.leave_import_from
-)
-TypingFacadeMigrator.leave_Call = cast("LeaveCallFunc", TypingFacadeMigrator.leave_call)
+        Returns
+        -------
+        cst.ImportFrom | cst.RemovalSentinel
+            Transformed node or removal sentinel.
+        """
+        return self.leave_import_from(original_node, updated_node)
+
+    def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
+        """LibCST visitor method for Call nodes (CamelCase naming required by protocol).
+
+        This method delegates to the snake_case implementation to maintain
+        consistency while satisfying LibCST's visitor protocol naming requirements.
+
+        Parameters
+        ----------
+        original_node : cst.Call
+            Original node from LibCST visitor protocol.
+        updated_node : cst.Call
+            Updated node from LibCST visitor protocol.
+
+        Returns
+        -------
+        cst.Call
+            Transformed call node.
+        """
+        return self.leave_call(original_node, updated_node)
 
 
 def run_codemod_on_file(file_path: Path) -> bool:

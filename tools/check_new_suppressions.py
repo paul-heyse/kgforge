@@ -31,6 +31,9 @@ if TYPE_CHECKING:
 
 LOGGER = get_logger(__name__)
 
+# Minimum required command-line arguments (script name + directory)
+_MIN_REQUIRED_ARGS = 2
+
 # Regex patterns for suppression markers and ticket tags within a comment token.
 SUPPRESSION_MARKER = re.compile(
     r"#\s*(?:type\s*:\s*ignore|noqa(?:\s*[:\s][\w,]+)?)",
@@ -170,7 +173,7 @@ def run_suppression_guard(directories: list[Path]) -> None:
 
 def main() -> int:
     """Check source files for untracked suppressions."""
-    if len(sys.argv) < 2:
+    if len(sys.argv) < _MIN_REQUIRED_ARGS:
         LOGGER.error("Usage: python tools/check_new_suppressions.py <directory>")
         return 1
 

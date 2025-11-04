@@ -662,6 +662,7 @@ runtime-evaluated-base-classes = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+# Blanket suppressions for most test files
 "tests/**" = [
     "D100",
     "D101",
@@ -678,16 +679,17 @@ runtime-evaluated-base-classes = [
     "T20",
     "PLR6301",  # pytest test classes require instance methods for test isolation
 ]
+# tests/kgfoundry_common tests have proper docstrings and annotations - no blanket suppressions needed
+# Explicitly exclude from blanket suppression (empty list = no suppressions)
+"tests/kgfoundry_common/**" = []
 "tests/test_namespace_proxy.py" = ["PLC2701", "TID251", "TRY003", "EM101"]  # Tests of internal _namespace_proxy module
 "tests/docs/test_griffe_facade.py" = ["PLC2701"]  # Tests of docs._types and docs._scripts facades; imports from private modules expected
 "**/*.pyi" = ["PIE790"]  # Stub files require ... literals
-"tools/check_new_suppressions.py" = ["T201", "BLE001", "SIM102", "PLR2004"]  # CLI script: print is OK, Exception catch for file I/O
-"tools/check_stub_parity.py" = ["T201"]  # CLI script: print is OK for user-facing diagnostic output
-"src/search_api/bm25_index.py" = ["S608"]  # DuckDB read_parquet() paths from trusted sources (DB queries/config), not user input
 "src/kgfoundry/tooling_bridge.py" = ["PLC2701", "TID251"]
 "docs/_types/**" = ["PLC2701"]  # docs._types is a special module namespace for typed facades
 "docs/_scripts/**" = ["PLC2701"]  # docs._scripts is internal tooling; importing from docs._types and tools._shared is expected
 "docs/types/artifacts.py" = ["PLC2701"]  # docs/types is a facade re-exporting from private docs._types module
+"tools/lint/codemod_typing_migration.py" = ["N802"]  # LibCST visitor protocol requires CamelCase method names (leave_ImportFrom, leave_Call)
 # New: Façade modules are allowed to import from private sources (controlled re-export)
 "src/kgfoundry_common/typing/__init__.py" = []  # Canonical typing façade
 "tools/typing/__init__.py" = []  # Tooling typing façade

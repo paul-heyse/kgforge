@@ -127,7 +127,7 @@ For all code blocks that you make edits to, please check for pyright, mypy, pyre
 * **Never** use `eval/exec` or untrusted `pickle`/`yaml.load` (use `safe_load`).
 * Validate/sanitize all untrusted inputs; prevent path traversal with `pathlib` and whitelists.
 * Run a vuln scan (e.g., `pip-audit`) on dependency changes; pin ranges sensibly.
-* **Verify:** secret scanner clean; `pip-audit` clean; inputs validated in tests.
+* **Verify:** `pip-audit` clean; inputs validated in tests.
 
 ##### 11) Packaging & distribution
 

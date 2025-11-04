@@ -6,8 +6,6 @@ and emit Problem Details envelopes consistent with
 ``schema/examples/tools/problem_details/tool-execution-error.json``.
 """
 
-# ruff: noqa: TID252
-
 from __future__ import annotations
 
 import logging
@@ -15,7 +13,7 @@ from importlib import import_module
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Final, cast
 
-from ._shared.cli import (
+from tools._shared.cli import (
     CLI_ENVELOPE_SCHEMA_ID,
     CLI_ENVELOPE_SCHEMA_VERSION,
     CliEnvelope,
@@ -29,13 +27,13 @@ from ._shared.cli import (
     render_cli_envelope,
     validate_cli_envelope,
 )
-from ._shared.logging import (
+from tools._shared.logging import (
     StructuredLoggerAdapter,
     get_logger,
     with_fields,
 )
-from ._shared.metrics import ToolRunObservation, observe_tool_run
-from ._shared.problem_details import (
+from tools._shared.metrics import ToolRunObservation, observe_tool_run
+from tools._shared.problem_details import (
     ExceptionProblemDetailsParams,
     ProblemDetailsDict,
     ProblemDetailsParams,
@@ -52,7 +50,7 @@ from ._shared.problem_details import (
     tool_missing_problem_details,
     tool_timeout_problem_details,
 )
-from ._shared.proc import (
+from tools._shared.proc import (
     ProcessRunner,
     ToolExecutionError,
     ToolRunResult,
@@ -60,13 +58,13 @@ from ._shared.proc import (
     run_tool,
     set_process_runner,
 )
-from ._shared.schema import validate_tools_payload
-from ._shared.settings import (
+from tools._shared.schema import validate_tools_payload
+from tools._shared.settings import (
     SettingsError,
     ToolRuntimeSettings,
     get_runtime_settings,
 )
-from ._shared.validation import (
+from tools._shared.validation import (
     ValidationError,
     require_directory,
     require_file,
@@ -77,8 +75,8 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, MutableMapping
     from types import ModuleType
 
-    from . import codemods, docs, docstring_builder, gen_readmes, generate_pr_summary, navmap
-    from .docs import build_agent_api, build_agent_catalog
+    from tools import codemods, docs, docstring_builder, gen_readmes, generate_pr_summary, navmap
+    from tools.docs import build_agent_api, build_agent_catalog
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 

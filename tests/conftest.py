@@ -1,5 +1,3 @@
-# ruff: noqa: E402
-
 """Shared pytest fixtures for table-driven testing and observability validation.
 
 This module provides reusable fixtures for:
@@ -28,15 +26,10 @@ from prometheus_client.registry import CollectorRegistry
 
 from tests.bootstrap import ensure_src_path
 
+# Ensure src path is available before importing kgfoundry_common modules
+# Note: ensure_src_path() is idempotent and already called by importing tests.bootstrap,
+# but we call it explicitly here for clarity and to ensure it runs before lazy imports
 ensure_src_path()
-
-from kgfoundry_common.opentelemetry_types import (
-    load_in_memory_span_exporter_cls,
-    load_tracer_provider_cls,
-)
-from kgfoundry_common.problem_details import (
-    JsonValue,
-)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -48,6 +41,7 @@ if TYPE_CHECKING:
         SpanProtocol,
         TracerProviderProtocol,
     )
+    from kgfoundry_common.problem_details import JsonValue
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -104,8 +98,20 @@ if TYPE_CHECKING:  # pragma: no cover - typing support only
 else:
     fixture = pytest.fixture
 
-# Type aliases
-ProblemDetailsDict = dict[str, JsonValue]
+
+# Type aliases - use lazy import for JsonValue to avoid E402
+def _get_json_value() -> object:
+    """Lazy import JsonValue after path setup."""
+    from kgfoundry_common.problem_details import JsonValue  # noqa: PLC0415
+
+    return JsonValue
+
+
+if TYPE_CHECKING:
+    ProblemDetailsDict = dict[str, JsonValue]
+else:
+    _JsonValue = _get_json_value()
+    ProblemDetailsDict = dict[str, _JsonValue]
 
 
 class MetricSample(Protocol):
@@ -191,6 +197,11 @@ def prometheus_registry() -> CollectorRegistry:
 @fixture
 def otel_span_exporter() -> SpanExporterProtocol:
     """Provide an in-memory OpenTelemetry span exporter for testing."""
+    # Lazy import after path setup to avoid E402
+    from kgfoundry_common.opentelemetry_types import (  # noqa: PLC0415
+        load_in_memory_span_exporter_cls,
+    )
+
     exporter_factory = load_in_memory_span_exporter_cls()
     if exporter_factory is None:
         skip_reason = "OpenTelemetry span exporter required for observability tests"
@@ -204,6 +215,11 @@ def otel_tracer_provider(
     otel_span_exporter: SpanExporterProtocol,
 ) -> Iterator[TracerProviderProtocol]:
     """Provide an OpenTelemetry tracer provider configured with in-memory exporter."""
+    # Lazy import after path setup to avoid E402
+    from kgfoundry_common.opentelemetry_types import (  # noqa: PLC0415
+        load_tracer_provider_cls,
+    )
+
     tracer_provider_factory = load_tracer_provider_cls()
     if tracer_provider_factory is None:
         skip_reason = "OpenTelemetry SDK required for observability tests"
@@ -261,7 +277,9 @@ def load_problem_details_example(example_name: str) -> ProblemDetailsDict:
         msg = f"Problem Details example not found: {example_path}"
         raise FileNotFoundError(msg)
 
-    return cast("ProblemDetailsDict", json.loads(example_path.read_text(encoding="utf-8")))
+    # Lazy import JsonValue after path setup to avoid E402
+
+    return cast("dict[str, JsonValue]", json.loads(example_path.read_text(encoding="utf-8")))
 
 
 @fixture

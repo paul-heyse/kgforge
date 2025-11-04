@@ -9,12 +9,12 @@ Task: Phase 2, Task 2.2 - Harden import-linter & Ruff gates
 
 from __future__ import annotations
 
-import subprocess  # noqa: S404
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from tools.shared.proc import ToolExecutionError, run_tool
 
 if TYPE_CHECKING:
     from collections.abc import Sequence  # noqa: F401
@@ -39,12 +39,20 @@ class TestImportLinterTypingContract:
 
         """
         try:
-            result = subprocess.run(  # noqa: S603
+            result = run_tool(
                 [sys.executable, "-m", "import_linter", "--config", str(config_path)],
-                capture_output=True,
-                text=True,
                 check=False,
             )
+        except ToolExecutionError as exc:
+            # ToolExecutionError wraps subprocess failures; re-raise as FileNotFoundError
+            # to match the original behavior for pytest.skip
+            if exc.problem is not None:
+                problem_type = exc.problem.get("type")
+                if isinstance(problem_type, str) and (
+                    "missing" in problem_type.lower() or "executable" in problem_type.lower()
+                ):
+                    pytest.skip("import-linter not found in PATH")
+            raise
         except FileNotFoundError:
             pytest.skip("import-linter not found in PATH")
         else:
