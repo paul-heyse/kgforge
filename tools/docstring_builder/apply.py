@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, cast, overload
 
 import libcst as cst
 
+from kgfoundry_common.errors import ConfigurationError
 from tools.docstring_builder.config_models import DocstringApplyConfig
 
 if TYPE_CHECKING:
@@ -146,6 +147,7 @@ def _atomic_write(target: Path, content: str, *, encoding: str = "utf-8") -> Non
     """Persist content atomically, replacing the target file."""
     target.parent.mkdir(parents=True, exist_ok=True)
     temp_path: Path | None = None
+    temp_name: str | None = None
     try:
         with tempfile.NamedTemporaryFile(
             mode="w",
@@ -156,8 +158,17 @@ def _atomic_write(target: Path, content: str, *, encoding: str = "utf-8") -> Non
             tmp_file.write(content)
             tmp_file.flush()
             os.fsync(tmp_file.fileno())
-            temp_path = Path(tmp_file.name)
-        assert temp_path is not None
+            temp_name = tmp_file.name
+        if not temp_name:
+            message = "Atomic write failed to materialize temporary file"
+            raise ConfigurationError(
+                message,
+                context={
+                    "target_path": str(target),
+                    "encoding": encoding,
+                },
+            )
+        temp_path = Path(temp_name)
         temp_path.replace(target)
     finally:
         if temp_path is not None and temp_path.exists():

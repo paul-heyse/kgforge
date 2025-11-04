@@ -7,12 +7,9 @@ are correctly implemented with proper defaults, immutability, and type safety.
 from __future__ import annotations
 
 import tempfile
-from dataclasses import FrozenInstanceError
-from typing import Any, cast
-
-import pytest
 
 from orchestration.config import ArtifactValidationConfig, IndexCliConfig
+from tests.helpers import assert_frozen_attribute
 
 
 class TestIndexCliConfig:
@@ -53,8 +50,7 @@ class TestIndexCliConfig:
                 factory="Flat",
                 metric="ip",
             )
-            with pytest.raises(FrozenInstanceError):
-                cast("Any", config).dense_vectors = "other.json"
+            assert_frozen_attribute(config, "dense_vectors", value="other.json")
 
     def test_equality(self) -> None:
         """Test equality comparison."""
@@ -118,8 +114,7 @@ class TestArtifactValidationConfig:
     def test_immutability(self) -> None:
         """Test that ArtifactValidationConfig is frozen."""
         config = ArtifactValidationConfig()
-        with pytest.raises(FrozenInstanceError):
-            cast("Any", config).strict_mode = False
+        assert_frozen_attribute(config, "strict_mode", value=False)
 
     def test_equality(self) -> None:
         """Test equality comparison."""

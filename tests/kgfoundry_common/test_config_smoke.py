@@ -15,7 +15,8 @@ from kgfoundry_common.config import AppSettings
 
 def make_settings(**overrides: object) -> AppSettings:
     """Construct AppSettings using typed overrides."""
-    return AppSettings.model_validate(overrides)  # type: ignore[misc]
+    overrides_dict: dict[str, object] = dict(overrides)
+    return AppSettings.from_dict(overrides_dict)
 
 
 class TestConfigurationValidation:

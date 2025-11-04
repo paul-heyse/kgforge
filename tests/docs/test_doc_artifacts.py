@@ -316,9 +316,9 @@ class TestByteIdenticalRoundTrip:
         # Normalize whitespace and compare
         original_normalized = json.dumps(original_payload, sort_keys=True, indent=2)
         reserialized_normalized = json.dumps(reserialized, sort_keys=True, indent=2)
-        assert (
-            original_normalized == reserialized_normalized
-        ), "Symbol index round-trip is not byte-identical"
+        assert original_normalized == reserialized_normalized, (
+            "Symbol index round-trip is not byte-identical"
+        )
 
     def test_symbol_delta_round_trip_byte_identical(self) -> None:
         """Test that symbol delta round-trip produces byte-identical JSON.
@@ -337,9 +337,9 @@ class TestByteIdenticalRoundTrip:
         # Normalize whitespace and compare
         original_normalized = json.dumps(original_payload, sort_keys=True, indent=2)
         reserialized_normalized = json.dumps(reserialized, sort_keys=True, indent=2)
-        assert (
-            original_normalized == reserialized_normalized
-        ), "Symbol delta round-trip is not byte-identical"
+        assert original_normalized == reserialized_normalized, (
+            "Symbol delta round-trip is not byte-identical"
+        )
 
     def test_symbol_index_validation_preserves_ordering(self) -> None:
         """Test that codec preserves field ordering from schema examples."""

@@ -12,6 +12,7 @@ from kgfoundry_common.errors import ConfigurationError, KgFoundryError
 from kgfoundry_common.logging import LoggingCache, get_logging_cache
 from kgfoundry_common.problem_details import build_configuration_problem
 from orchestration.config import IndexCliConfig
+from tests.helpers import assert_frozen_attribute
 
 
 class TestCacheProtocolAccess:
@@ -130,8 +131,7 @@ class TestConfigurationModelValidation:
             )
 
             # Should not be able to modify
-            with pytest.raises(AttributeError):
-                cast("Any", config).dense_vectors = "other.json"
+            assert_frozen_attribute(config, "dense_vectors", value="other.json")
 
     def test_configuration_error_with_details_keyword_only(self) -> None:
         """Verify ConfigurationError.with_details uses keyword-only parameters."""
@@ -217,8 +217,11 @@ class TestAPIConsistency:
             )
 
             # Frozen dataclass should raise on modification
-            with pytest.raises(AttributeError):
-                cast("Any", config).factory = "OPQ64,IVF8192,PQ64"
+            assert_frozen_attribute(
+                config,
+                "factory",
+                value="OPQ64,IVF8192,PQ64",
+            )
 
     def test_configuration_models_use_keyword_only(self) -> None:
         """Verify configuration models are accessible and work correctly."""

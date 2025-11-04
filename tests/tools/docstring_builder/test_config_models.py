@@ -18,6 +18,7 @@ from tools.docstring_builder.config_models import (
 )
 
 from kgfoundry_common.errors import ConfigurationError
+from tests.helpers import assert_frozen_attribute
 
 
 class TestCachePolicy:
@@ -90,8 +91,7 @@ class TestDocstringBuildConfig:
     def test_config_is_frozen(self) -> None:
         """Verify configuration dataclass is frozen."""
         config = DocstringBuildConfig()
-        with pytest.raises(AttributeError):
-            object.__setattr__(config, "emit_diff", False)
+        assert_frozen_attribute(config, "emit_diff", value=False)
 
     @pytest.mark.parametrize(
         "cache_policy",
@@ -142,8 +142,7 @@ class TestFileProcessConfig:
     def test_config_is_frozen(self) -> None:
         """Verify file process config is immutable."""
         config = FileProcessConfig()
-        with pytest.raises(AttributeError):
-            object.__setattr__(config, "max_errors_per_file", 20)
+        assert_frozen_attribute(config, "max_errors_per_file", value=20)
 
     @pytest.mark.parametrize("max_errors", [1, 5, 10, 100])
     def test_positive_max_errors_accepted(self, max_errors: int) -> None:
@@ -197,8 +196,7 @@ class TestDocstringApplyConfig:
     def test_config_is_frozen(self) -> None:
         """Verify apply config is immutable."""
         config = DocstringApplyConfig()
-        with pytest.raises(AttributeError):
-            object.__setattr__(config, "write_changes", False)
+        assert_frozen_attribute(config, "write_changes", value=False)
 
 
 class TestConfigurationErrorContext:

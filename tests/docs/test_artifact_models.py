@@ -411,6 +411,62 @@ class TestSymbolDeltaPayload:
         assert delta.removed == ("pkg.old_func",)
         assert len(delta.changed) == 1
 
+    def test_delta_changed_accepts_model_instance(self) -> None:
+        """Test that already-instantiated SymbolDeltaChange entries are preserved."""
+        change = SymbolDeltaChange(
+            path="pkg.mod.func",
+            before={"signature": "(x: int)"},
+            after={"signature": "(x: int, y: str)"},
+            reasons=("signature_changed",),
+        )
+        payload = cast(
+            "JsonPayload",
+            {
+                "changed": [change],
+            },
+        )
+
+        delta = symbol_delta_from_json(payload)
+
+        assert len(delta.changed) == 1
+        assert delta.changed[0] is change
+
+    def test_delta_changed_coerces_mapping_entry(self) -> None:
+        """Test that mapping entries are validated into SymbolDeltaChange models."""
+        payload = cast(
+            "JsonPayload",
+            {
+                "changed": [
+                    {
+                        "path": "pkg.mod.func",
+                        "before": {"signature": "(x: int)"},
+                        "after": {"signature": "(x: int, y: str)"},
+                        "reasons": ["signature_changed"],
+                    }
+                ],
+            },
+        )
+
+        delta = symbol_delta_from_json(payload)
+
+        assert len(delta.changed) == 1
+        change = delta.changed[0]
+        assert isinstance(change, SymbolDeltaChange)
+        assert change.path == "pkg.mod.func"
+        assert change.reasons == ("signature_changed",)
+
+    def test_delta_changed_rejects_invalid_entry(self) -> None:
+        """Test that invalid change entries raise ArtifactValidationError."""
+        payload = cast(
+            "JsonPayload",
+            {
+                "changed": ["invalid-entry"],
+            },
+        )
+
+        with pytest.raises(ArtifactValidationError):
+            symbol_delta_from_json(payload)
+
 
 class TestSymbolDeltaRoundTrip:
     """Tests for SymbolDeltaPayload round-trip serialization."""

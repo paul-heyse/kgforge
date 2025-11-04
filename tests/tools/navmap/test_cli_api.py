@@ -4,17 +4,18 @@ from __future__ import annotations
 
 import contextlib
 import tempfile
-from dataclasses import FrozenInstanceError
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, cast
 
-import pytest
 from tools.navmap.api import repair_all_with_config, repair_module_with_config
-from tools.navmap.build_navmap import ModuleInfo
 from tools.navmap.config import NavmapRepairOptions
 from tools.navmap.repair_navmaps import RepairResult
 
 from kgfoundry_common.errors import ConfigurationError
+from tests.helpers import assert_frozen_attribute
+
+if TYPE_CHECKING:
+    from tools.navmap.build_navmap import ModuleInfo
 
 
 class TestConfigBasedAPIUsage:
@@ -71,8 +72,7 @@ class TestConfigValidation:
     def test_config_immutability(self) -> None:
         """Verify config objects are immutable (frozen dataclass)."""
         config = NavmapRepairOptions(apply=True)
-        with pytest.raises(FrozenInstanceError):
-            cast("Any", config).apply = False
+        assert_frozen_attribute(config, "apply", value=False)
 
     def test_config_defaults(self) -> None:
         """Verify config defaults are correct."""

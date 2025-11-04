@@ -5,11 +5,18 @@ from __future__ import annotations
 import inspect
 import logging
 import threading
-from collections.abc import Callable, Iterable, Sequence
+import typing as t
 from dataclasses import dataclass, field
 from importlib import metadata
 from inspect import isclass
 from typing import TYPE_CHECKING, TypeGuard, TypeVar, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Sequence
+else:
+    Callable = t.Callable
+    Iterable = t.Iterable
+    Sequence = t.Sequence
 
 from tools._shared.logging import get_logger
 from tools.docstring_builder.models import (

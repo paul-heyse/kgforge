@@ -20,7 +20,7 @@ from tools.docstring_builder.plugins.dataclass_fields import DataclassFieldDocPl
 from kgfoundry_common.errors import KgFoundryError
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Mapping, Sequence
     from pathlib import Path
 
 

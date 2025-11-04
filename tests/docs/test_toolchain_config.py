@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import FrozenInstanceError
-from typing import cast
-
 import pytest
 from docs.toolchain.config import DocsDeltaConfig, DocsSymbolIndexConfig
+
+from tests.helpers import assert_frozen_attribute
 
 
 class TestDocsSymbolIndexConfig:
@@ -52,8 +51,7 @@ class TestDocsSymbolIndexConfig:
     def test_immutability(self) -> None:
         """Verify config is immutable (frozen dataclass)."""
         config = DocsSymbolIndexConfig()
-        with pytest.raises(FrozenInstanceError):
-            cast("object", config).output_format = "yaml"
+        assert_frozen_attribute(config, "output_format", value="yaml")
 
     def test_all_formats(self) -> None:
         """Verify all valid output formats are accepted."""
@@ -107,8 +105,7 @@ class TestDocsDeltaConfig:
     def test_immutability(self) -> None:
         """Verify config is immutable (frozen dataclass)."""
         config = DocsDeltaConfig()
-        with pytest.raises(FrozenInstanceError):
-            cast("object", config).severity_threshold = "error"
+        assert_frozen_attribute(config, "severity_threshold", value="error")
 
     def test_all_thresholds(self) -> None:
         """Verify all valid severity thresholds are accepted."""

@@ -269,6 +269,59 @@ class AppSettings(BaseSettings):
 
         return value
 
+    @classmethod
+    def from_dict(
+        cls,
+        values: Mapping[str, object] | None = None,
+        *,
+        context: Mapping[str, object] | None = None,
+    ) -> Self:
+        """Construct ``AppSettings`` from a mapping of overrides.
+
+        This helper accepts a dictionary of configuration values—mirroring the
+        structure provided by environment variables—and returns a fully validated
+        ``AppSettings`` instance. It ensures keys are strings, preserves the
+        original mapping order, and routes validation errors through the same
+        normalization logic as ``model_validate`` so callers receive user-facing
+        messages.
+
+        Parameters
+        ----------
+        values : Mapping[str, object] | None, optional
+            Mapping of configuration overrides. Keys must be strings that match
+            the canonical field names used by ``AppSettings``. Defaults to an
+            empty mapping when ``None`` is supplied.
+        context : Mapping[str, object] | None, optional
+            Optional Pydantic context forwarded to ``model_validate``.
+
+        Returns
+        -------
+        AppSettings
+            Validated configuration settings.
+
+        Raises
+        ------
+        TypeError
+            If any key in ``values`` is not a string.
+        ValueError
+            If validation fails; error messages match ``AppSettings`` field
+            validators.
+        """
+        normalized: dict[str, object] = {}
+
+        if values is not None:
+            mapping_values = cast("Mapping[object, object]", values)
+            for key_obj, value in mapping_values.items():
+                if not isinstance(key_obj, str):
+                    message = (
+                        "AppSettings.from_dict requires string keys; "
+                        f"received key of type {type(key_obj).__name__}"
+                    )
+                    raise TypeError(message)
+                normalized[key_obj] = value
+
+        return cls.model_validate(normalized, context=context)
+
 
 def _load_config_impl() -> AppSettings:
     """Load and validate application configuration from environment.
