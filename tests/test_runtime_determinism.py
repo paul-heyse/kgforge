@@ -10,7 +10,7 @@ This module verifies that typing gates are correctly implemented:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, TypeGuard
 
 import pytest
 
@@ -18,6 +18,16 @@ from tests.helpers import load_attribute, load_module
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+
+def _is_callable(value: object) -> TypeGuard[Callable[..., object]]:
+    return callable(value)
+
+
+def _require_callable(value: object, label: str) -> Callable[..., object]:
+    if not _is_callable(value):
+        pytest.fail(f"{label} is not callable")
+    return value
 
 
 class TestPostponedAnnotations:
@@ -56,20 +66,14 @@ class TestTypingFacadeModules:
     def test_kgfoundry_common_typing_exports_gate_import(self) -> None:
         """gate_import is available from canonical source."""
         gate_import_raw = load_attribute("kgfoundry_common.typing", "gate_import")
-        # Type narrowing: verify callable at runtime, then cast
-        if not callable(gate_import_raw):
-            pytest.fail("gate_import is not callable")
-        gate_import = cast("Callable[..., object]", gate_import_raw)
-        assert callable(gate_import)
+        gate_import = _require_callable(gate_import_raw, "gate_import")
+        assert _is_callable(gate_import)
 
     def test_kgfoundry_common_typing_exports_safe_get_type(self) -> None:
         """safe_get_type is available from canonical source."""
         safe_get_type_raw = load_attribute("kgfoundry_common.typing", "safe_get_type")
-        # Type narrowing: verify callable at runtime, then cast
-        if not callable(safe_get_type_raw):
-            pytest.fail("safe_get_type is not callable")
-        safe_get_type = cast("Callable[..., object]", safe_get_type_raw)
-        assert callable(safe_get_type)
+        safe_get_type = _require_callable(safe_get_type_raw, "safe_get_type")
+        assert _is_callable(safe_get_type)
 
     def test_kgfoundry_common_typing_exports_type_aliases(self) -> None:
         """Type aliases are accessible."""
@@ -80,25 +84,19 @@ class TestTypingFacadeModules:
             # Type narrowing: verify attribute exists and is not None
             if attr_value is None:
                 pytest.fail(f"{module.__name__}.{name} is None or missing")
-            # Cast to object after None check to satisfy type checker
-            typed_value = cast("object", attr_value)
-            assert typed_value is not None
+            assert attr_value is not None
 
     def test_tools_typing_re_exports_facade(self) -> None:
         """tools.typing re-exports from canonical source."""
         tools_module = load_module("tools.typing")
         common_module = load_module("kgfoundry_common.typing")
 
-        # Type narrowing: use getattr with callable check, then cast
         tools_gate_import = getattr(tools_module, "gate_import", None)
         common_gate_import = getattr(common_module, "gate_import", None)
         if tools_gate_import is None or common_gate_import is None:
             pytest.fail("gate_import not found in modules")
-        # Verify they are callable (type guard) before accessing identity
-        if not (callable(tools_gate_import) and callable(common_gate_import)):
-            pytest.fail("gate_import is not callable")
-        typed_tools = cast("Callable[..., object]", tools_gate_import)
-        typed_common = cast("Callable[..., object]", common_gate_import)
+        typed_tools = _require_callable(tools_gate_import, "tools.typing.gate_import")
+        typed_common = _require_callable(common_gate_import, "kgfoundry_common.typing.gate_import")
         assert typed_tools is typed_common
 
     def test_docs_typing_re_exports_facade(self) -> None:
@@ -107,16 +105,14 @@ class TestTypingFacadeModules:
             docs_module = load_module("docs.typing")
             common_module = load_module("kgfoundry_common.typing")
 
-            # Type narrowing: use getattr with callable check, then cast
             docs_gate_import = getattr(docs_module, "gate_import", None)
             common_gate_import = getattr(common_module, "gate_import", None)
             if docs_gate_import is None or common_gate_import is None:
                 pytest.fail("gate_import not found in modules")
-            # Verify they are callable (type guard) before accessing identity
-            if not (callable(docs_gate_import) and callable(common_gate_import)):
-                pytest.fail("gate_import is not callable")
-            typed_docs = cast("Callable[..., object]", docs_gate_import)
-            typed_common = cast("Callable[..., object]", common_gate_import)
+            typed_docs = _require_callable(docs_gate_import, "docs.typing.gate_import")
+            typed_common = _require_callable(
+                common_gate_import, "kgfoundry_common.typing.gate_import"
+            )
             assert typed_docs is typed_common
         except ImportError:
             pytest.skip("docs.typing not in Python path")
@@ -165,11 +161,7 @@ class TestRuntimeImportSafety:
     def test_gate_import_missing_module_raises_import_error(self) -> None:
         """gate_import raises ImportError for missing modules."""
         gate_import_raw = load_attribute("kgfoundry_common.typing", "gate_import")
-        # Type narrowing: verify callable at runtime, then cast
-        if not callable(gate_import_raw):
-            pytest.fail("gate_import is not callable")
-        gate_import = cast("Callable[..., object]", gate_import_raw)
-        assert callable(gate_import)
+        gate_import = _require_callable(gate_import_raw, "gate_import")
 
         with pytest.raises(ImportError) as exc_info:
             gate_import("nonexistent_module_xyz", "test")
@@ -179,11 +171,7 @@ class TestRuntimeImportSafety:
     def test_safe_get_type_missing_module_returns_none(self) -> None:
         """safe_get_type returns None gracefully for missing modules."""
         safe_get_type_raw = load_attribute("kgfoundry_common.typing", "safe_get_type")
-        # Type narrowing: verify callable at runtime, then cast
-        if not callable(safe_get_type_raw):
-            pytest.fail("safe_get_type is not callable")
-        safe_get_type = cast("Callable[..., object]", safe_get_type_raw)
-        assert callable(safe_get_type)
+        safe_get_type = _require_callable(safe_get_type_raw, "safe_get_type")
         result_raw = safe_get_type("nonexistent_module_xyz", "SomeType")
         # Type narrowing: verify None type
         if result_raw is not None:
@@ -193,11 +181,7 @@ class TestRuntimeImportSafety:
     def test_safe_get_type_respects_default(self) -> None:
         """safe_get_type uses provided default value."""
         safe_get_type_raw = load_attribute("kgfoundry_common.typing", "safe_get_type")
-        # Type narrowing: verify callable at runtime, then cast
-        if not callable(safe_get_type_raw):
-            pytest.fail("safe_get_type is not callable")
-        safe_get_type = cast("Callable[..., object]", safe_get_type_raw)
-        assert callable(safe_get_type)
+        safe_get_type = _require_callable(safe_get_type_raw, "safe_get_type")
         default = "my_fallback"
         result_raw = safe_get_type("nonexistent", "Type", default=default)
         # Type narrowing: verify result matches default type

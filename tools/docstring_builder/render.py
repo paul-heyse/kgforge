@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 from jinja2 import Environment, StrictUndefined
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Iterable
     from pathlib import Path
 
-    from jinja2 import Undefined
+    from jinja2 import Template, Undefined
     from jinja2.utils import select_autoescape
 
     from tools.docstring_builder.schema import DocstringSchema, ParameterDoc
@@ -20,7 +20,7 @@ else:
         from jinja2.utils import select_autoescape
     except ImportError:
         # Fallback for older jinja2 versions
-        def select_autoescape(**_kwargs: object) -> Callable[[str | None], bool]:
+        def select_autoescape(**_kwargs: object):
             return lambda _filename=None: False
 
 
@@ -40,7 +40,7 @@ def _build_environment() -> Environment:
 
 
 _ENV = _build_environment()
-_TEMPLATE_OBJ = _ENV.from_string(_TEMPLATE)
+_TEMPLATE_OBJ: Template = _ENV.from_string(_TEMPLATE)
 
 
 def render_docstring(
@@ -51,8 +51,8 @@ def render_docstring(
 ) -> str:
     """Render the provided schema to a concrete docstring string."""
     signature = _build_signature(schema) if include_signature else ""
-    rendered = _TEMPLATE_OBJ.render(schema=schema, marker=marker, signature=signature).strip()
-    return rendered + "\n"
+    rendered = _TEMPLATE_OBJ.render(schema=schema, marker=marker, signature=signature)
+    return rendered.strip() + "\n"
 
 
 def write_template_to(path: Path) -> None:
@@ -118,25 +118,25 @@ def _group_parameters(
 def _compose_signature(groups: dict[str, list[str] | str | None]) -> str:
     """Return the rendered signature string for grouped parameters."""
     parts: list[str] = []
-    pos_only = cast("list[str]", groups.get("positional_only", []))
+    pos_only = groups.get("positional_only", [])
     if pos_only:
         parts.append(", ".join(pos_only) + " /")
 
-    pos_or_kw = cast("list[str]", groups.get("positional_or_keyword", []))
+    pos_or_kw = groups.get("positional_or_keyword", [])
     if pos_or_kw:
         parts.append(", ".join(pos_or_kw))
 
-    var_positional = cast("str | None", groups.get("var_positional"))
+    var_positional = groups.get("var_positional")
     if var_positional:
         parts.append(var_positional)
 
-    kw_only = cast("list[str]", groups.get("keyword_only", []))
+    kw_only = groups.get("keyword_only", [])
     if kw_only:
         if not var_positional:
             parts.append("*")
         parts.append(", ".join(kw_only))
 
-    var_keyword = cast("str | None", groups.get("var_keyword"))
+    var_keyword = groups.get("var_keyword")
     if var_keyword:
         parts.append(var_keyword)
 
