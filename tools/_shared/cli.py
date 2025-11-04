@@ -1,4 +1,3 @@
-# ruff: noqa: N815
 """Typed CLI envelope models and helpers."""
 
 from __future__ import annotations
@@ -11,6 +10,7 @@ from typing import TYPE_CHECKING, Literal, cast
 import msgspec
 from msgspec import UNSET, Struct, structs
 
+from kgfoundry_common.typing import gate_import
 from tools._shared.schema import validate_tools_payload
 
 CliStatus = Literal["success", "violation", "config", "error"]
@@ -52,18 +52,23 @@ if TYPE_CHECKING:
     class CliEnvelope:
         """Typed representation of ``schema/tools/cli_envelope.json``."""
 
-        schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
-        schemaId: str = CLI_ENVELOPE_SCHEMA_ID
-        generatedAt: str = field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
+        schema_version: str = CLI_ENVELOPE_SCHEMA_VERSION
+        schema_id: str = CLI_ENVELOPE_SCHEMA_ID
+        generated_at: str = field(default_factory=lambda: datetime.now(tz=UTC).isoformat())
         status: CliStatus = "success"
         command: str = ""
         subcommand: str = ""
-        durationSeconds: float = 0.0
+        duration_seconds: float = 0.0
         files: list[CliFileResult] = field(default_factory=list)
         errors: list[CliErrorEntry] = field(default_factory=list)
         problem: ProblemDetailsDict | UnsetType = UNSET
 
 else:
+    problem_details_module = gate_import(
+        "tools._shared.problem_details",
+        "CLI envelope problem details typing",
+    )
+    ProblemDetailsDict = problem_details_module.ProblemDetailsDict
 
     class CliFileResult(Struct, kw_only=True):
         """Individual file processing result emitted by tooling CLIs."""
@@ -93,13 +98,22 @@ else:
     class CliEnvelope(Struct, kw_only=True):
         """Typed representation of ``schema/tools/cli_envelope.json``."""
 
-        schemaVersion: str = CLI_ENVELOPE_SCHEMA_VERSION
-        schemaId: str = CLI_ENVELOPE_SCHEMA_ID
-        generatedAt: str = msgspec.field(default_factory=_default_generated_at)
+        schema_version: str = msgspec.field(
+            default=CLI_ENVELOPE_SCHEMA_VERSION,
+            name="schemaVersion",
+        )
+        schema_id: str = msgspec.field(
+            default=CLI_ENVELOPE_SCHEMA_ID,
+            name="schemaId",
+        )
+        generated_at: str = msgspec.field(
+            default_factory=_default_generated_at,
+            name="generatedAt",
+        )
         status: CliStatus = "success"
         command: str = ""
         subcommand: str = ""
-        durationSeconds: float = 0.0
+        duration_seconds: float = msgspec.field(default=0.0, name="durationSeconds")
         files: list[CliFileResult] = msgspec.field(default_factory=_default_files)
         errors: list[CliErrorEntry] = msgspec.field(default_factory=_default_errors)
         problem: ProblemDetailsDict | UnsetType = UNSET
@@ -193,14 +207,14 @@ class CliEnvelopeBuilder:
             if TYPE_CHECKING:
                 self.envelope = dataclass_replace(
                     self.envelope,
-                    durationSeconds=float(duration_seconds),
+                    duration_seconds=float(duration_seconds),
                 )
             else:
                 self.envelope = cast(
                     "CliEnvelope",
                     structs.replace(
                         self.envelope,
-                        durationSeconds=float(duration_seconds),
+                        duration_seconds=float(duration_seconds),
                     ),
                 )
         validate_cli_envelope(self.envelope)

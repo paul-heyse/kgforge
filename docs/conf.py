@@ -37,7 +37,13 @@ from typing import (
 import certifi
 from docutils.parsers.rst import Directive
 from sphinx.application import Sphinx
+from sphinx_gallery.sorting import ExplicitOrder
 from tools import ProblemDetailsParams, build_problem_details, get_logger
+from tools.docs.gallery_manifest import (
+    GalleryManifestError,
+    explicit_order,
+    load_gallery_manifest,
+)
 from tools.griffe_utils import resolve_griffe
 
 from docs.types_facade import (
@@ -538,12 +544,28 @@ viewcode_line_numbers = True
 suppress_warnings = ["myst.header", "misc.restructuredtext"]
 
 EXAMPLES_DIR = (DOCS_DIR.parent / "examples").resolve()
+GALLERY_MANIFEST_PATH = DOCS_DIR / "gallery" / "manifest.json"
+_GALLERY_MANIFEST_ERROR = "Unable to load gallery manifest"
+
+try:
+    GALLERY_MANIFEST = load_gallery_manifest(GALLERY_MANIFEST_PATH)
+except GalleryManifestError as exc:  # pragma: no cover - validated in CI builds
+    LOGGER.exception(
+        "Failed to load gallery manifest",
+        extra={
+            "status": "gallery_manifest_error",
+            "manifest_path": str(GALLERY_MANIFEST_PATH),
+        },
+    )
+    raise RuntimeError(_GALLERY_MANIFEST_ERROR) from exc
+
+GALLERY_EXAMPLE_FILENAMES = explicit_order(GALLERY_MANIFEST)
 
 sphinx_gallery_conf = {
     "examples_dirs": str(EXAMPLES_DIR),
     "gallery_dirs": "gallery",
     "filename_pattern": r".*\.py",
-    "within_subsection_order": "FileNameSortKey",
+    "within_subsection_order": ExplicitOrder(GALLERY_EXAMPLE_FILENAMES),
     "download_all_examples": True,
     "remove_config_comments": True,
     "doc_module": tuple(_PACKAGES),

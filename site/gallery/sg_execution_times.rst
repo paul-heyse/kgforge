@@ -32,13 +32,13 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_00_quickstart.py` (``00_quickstart.py``)
+  * - :ref:`sphx_glr_gallery_quickstart.py` (``quickstart.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_10_data_contracts_minimal.py` (``10_data_contracts_minimal.py``)
+  * - :ref:`sphx_glr_gallery_data_contracts_minimal.py` (``data_contracts_minimal.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_20_search_smoke.py` (``20_search_smoke.py``)
+  * - :ref:`sphx_glr_gallery_search_smoke.py` (``search_smoke.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery__utils.py` (``_utils.py``)

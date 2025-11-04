@@ -23,10 +23,10 @@ pull the ``.py`` or ``.ipynb`` versions and adapt them to your needs.
 
 .. only:: html
 
-  .. image:: /gallery/images/thumb/sphx_glr_00_quickstart_thumb.png
+  .. image:: /gallery/images/thumb/sphx_glr_quickstart_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_00_quickstart.py`
+  :ref:`sphx_glr_gallery_quickstart.py`
 
 .. raw:: html
 
@@ -40,10 +40,10 @@ pull the ``.py`` or ``.ipynb`` versions and adapt them to your needs.
 
 .. only:: html
 
-  .. image:: /gallery/images/thumb/sphx_glr_10_data_contracts_minimal_thumb.png
+  .. image:: /gallery/images/thumb/sphx_glr_data_contracts_minimal_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_10_data_contracts_minimal.py`
+  :ref:`sphx_glr_gallery_data_contracts_minimal.py`
 
 .. raw:: html
 
@@ -57,10 +57,10 @@ pull the ``.py`` or ``.ipynb`` versions and adapt them to your needs.
 
 .. only:: html
 
-  .. image:: /gallery/images/thumb/sphx_glr_20_search_smoke_thumb.png
+  .. image:: /gallery/images/thumb/sphx_glr_search_smoke_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_20_search_smoke.py`
+  :ref:`sphx_glr_gallery_search_smoke.py`
 
 .. raw:: html
 
@@ -95,9 +95,9 @@ pull the ``.py`` or ``.ipynb`` versions and adapt them to your needs.
 .. toctree::
    :hidden:
 
-   /gallery/00_quickstart
-   /gallery/10_data_contracts_minimal
-   /gallery/20_search_smoke
+   /gallery/quickstart
+   /gallery/data_contracts_minimal
+   /gallery/search_smoke
    /gallery/_utils
 
 
