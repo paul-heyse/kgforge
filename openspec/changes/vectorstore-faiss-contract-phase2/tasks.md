@@ -8,7 +8,7 @@
 - [ ] 1.3 Synchronise namespace bridge exports.
   - Update `src/kgfoundry/vectorstore_faiss/gpu.py` so `__all__` re-exports aliases in sorted order, refresh module docstrings with ownership notes, ensure `namespace_attach` populates each alias, and run `uv run ruff check` to confirm cleanliness.
 - [ ] 1.4 Harden `search_api.faiss_adapter` typing.
-  - Remove `# mypy: ignore-errors`, import aliases, replace raw `NDArray` typings, add explicit return annotations, and document raised exceptions (`IndexBuildError`, `VectorSearchError`).
+  - Remove `# pyright: ignore-errors`, import aliases, replace raw `NDArray` typings, add explicit return annotations, and document raised exceptions (`IndexBuildError`, `VectorSearchError`).
 - [ ] 1.5 Align FAISS protocols.
   - Update `src/search_api/types.py` so protocol signatures reference the aliases, rename helpers to satisfy Ruff naming, and expand docstrings covering normalized vectors and concurrency notes.
 - [ ] 1.6 Refresh stub surfaces.
@@ -32,14 +32,14 @@
 - [ ] 1.15 Update inline documentation.
   - Revise module docstrings/`__navmap__` metadata to mention factory, schema, metrics, and Problem Details; confirm NumPy-style sections and doctest-ready examples exist.
 - [ ] 1.16 Run targeted quality gates before tests.
-  - Execute `uv run ruff format && uv run ruff check` and `uv run pyrefly check`/`uv run mypy --config-file mypy.ini` scoped to `vectorstore_faiss`, `search_api`, and `orchestration` modules to ensure lint/type cleanliness before expanding tests.
+  - Execute `uv run ruff format && uv run ruff check` and `uv run pyrefly check`/`uv run pyright --warnings --pythonversion=3.13` scoped to `vectorstore_faiss`, `search_api`, and `orchestration` modules to ensure lint/type cleanliness before expanding tests.
 
 ## 2. Testing
 
 - [ ] 2.1 Establish foundational fixtures.
   - Create `tests/vectorstore/conftest.py` providing normalized vector fixtures, temporary directories, Prometheus registries, mocked GPU contexts, and deterministic correlation ID generators.
 - [ ] 2.2 Verify type alignment inside tests.
-  - Mirror runtime aliases in tests, import `FloatArray`/`VecArray`, and run `uv run mypy --config-file mypy.ini tests/vectorstore` to confirm zero ignores.
+  - Mirror runtime aliases in tests, import `FloatArray`/`VecArray`, and run `uv run pyright --warnings --pythonversion=3.13 tests/vectorstore` to confirm zero ignores.
 - [ ] 2.3 Author CPU vs GPU parity tests.
   - Parameterize accelerator mode over `{"cpu", "gpu"}`, build indexes via the factory, assert result parity within tolerance, and skip GPU cases gracefully when bindings/hardware absent.
 - [ ] 2.4 Exercise CLI behaviour end-to-end.

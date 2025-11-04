@@ -2,11 +2,11 @@
 
 ## Context
 
-Phase 1 upgrades replaced msgspec structs with Pydantic models but left the FAISS vectorstore surface divergent. Namespace bridges (`kgfoundry.vectorstore_faiss`, `kgfoundry.search_api.faiss_adapter`) expose symbols that no longer exist (`FloatArray`, `VecArray`), triggering pyrefly/mypy failures. The orchestration CLI still instantiates a legacy `FaissGpuIndex` with nonexistent methods, so Ruff flags dead code and complexity while index builds rely on untyped dictionaries, ad-hoc logging, and no Prometheus metrics. GPU vs CPU parity is untested, persistence lacks a schema, and error handling cannot emit Problem Details payloads consistent with our taxonomy.
+Phase 1 upgrades replaced msgspec structs with Pydantic models but left the FAISS vectorstore surface divergent. Namespace bridges (`kgfoundry.vectorstore_faiss`, `kgfoundry.search_api.faiss_adapter`) expose symbols that no longer exist (`FloatArray`, `VecArray`), triggering pyrefly/pyright failures. The orchestration CLI still instantiates a legacy `FaissGpuIndex` with nonexistent methods, so Ruff flags dead code and complexity while index builds rely on untyped dictionaries, ad-hoc logging, and no Prometheus metrics. GPU vs CPU parity is untested, persistence lacks a schema, and error handling cannot emit Problem Details payloads consistent with our taxonomy.
 
 ## Goals
 
-- Restore a unified, typed FAISS contract that passes Ruff, pyrefly, and mypy without suppressions.
+- Restore a unified, typed FAISS contract that passes Ruff, pyrefly, and pyright without suppressions.
 - Provide dependency-injected factories that build both CPU and GPU adapters while documenting timeout and idempotency semantics.
 - Instrument CLI index builds with structured logging, Prometheus counters/histograms, and Problem Details error payloads.
 - Define JSON Schema for persisted FAISS manifests and add regression tests covering CPU/GPU parity, failure modes, and round-trip persistence.
@@ -30,10 +30,10 @@ Phase 1 upgrades replaced msgspec structs with Pydantic models but left the FAIS
 
 ### 1. Type surface remediation
 
-1. Inventory the current exports in `src/vectorstore_faiss/gpu.py`, `src/kgfoundry/vectorstore_faiss/gpu.py`, `src/search_api/faiss_adapter.py`, and `src/search_api/faiss_gpu.py`, capturing every pyrefly/mypy error linked to missing aliases.
+1. Inventory the current exports in `src/vectorstore_faiss/gpu.py`, `src/kgfoundry/vectorstore_faiss/gpu.py`, `src/search_api/faiss_adapter.py`, and `src/search_api/faiss_gpu.py`, capturing every pyrefly/pyright error linked to missing aliases.
 2. Implement `FloatArray`, `IntArray`, `StrArray`, and `VecArray` in `src/vectorstore_faiss/gpu.py` using `numpy.typing.NDArray`, add NumPy-style docstrings, and publish them via `__all__`.
 3. Synchronise namespace bridges by updating `src/kgfoundry/vectorstore_faiss/gpu.py` (`__all__`, docstrings, `namespace_attach`) and confirming Ruff compliance.
-4. Remove the blanket `# mypy: ignore-errors` from `src/search_api/faiss_adapter.py`, replace raw `NDArray` annotations with the typed aliases, and add precise return/exception annotations across helper methods.
+4. Remove the blanket `# pyright: ignore-errors` from `src/search_api/faiss_adapter.py`, replace raw `NDArray` annotations with the typed aliases, and add precise return/exception annotations across helper methods.
 5. Refresh protocol definitions in `src/search_api/types.py` so method signatures use the new aliases and naming satisfies Ruff’s PEP 8 checks.
 6. Align stub packages (`stubs/vectorstore_faiss/gpu.pyi`, `stubs/search_api/faiss_adapter.pyi`) with the runtime exports, ensuring docstrings and `__all__` mirror implementation state.
 
@@ -70,7 +70,7 @@ Phase 1 upgrades replaced msgspec structs with Pydantic models but left the FAIS
 ### 6. Quality gates & validation
 
 1. After implementation and test updates, run `uv run ruff format && uv run ruff check --fix` scoped to touched paths.
-2. Execute `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` for `src/vectorstore_faiss`, `src/search_api`, and `src/orchestration`, confirming no suppressions are necessary.
+2. Execute `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` for `src/vectorstore_faiss`, `src/search_api`, and `src/orchestration`, confirming no suppressions are necessary.
 3. Run `pytest -q` (with GPU tests auto-skipping when unsupported) alongside `uv run python -m tests.observability.test_prometheus --faiss-index` to capture telemetry coverage.
 4. Regenerate docs/artifacts only if schema examples require publication, verifying `make artifacts && git diff --exit-code` remains clean.
 5. Document command outputs and observability screenshots/logs in the PR checklist to evidence compliance.
@@ -83,7 +83,7 @@ Phase 1 upgrades replaced msgspec structs with Pydantic models but left the FAIS
 
 ## Migration
 
-1. Implement type surface and stub fixes; verify pyrefly/mypy pass.
+1. Implement type surface and stub fixes; verify pyrefly/pyright pass.
 2. Introduce factory abstraction and refactor CLI; add observability instrumentation.
 3. Define schema, Problem Details sample, and integrate with persistence helpers.
 4. Add regression tests and ensure they pass locally (CPU) and on GPU-enabled staging.

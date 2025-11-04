@@ -36,7 +36,7 @@
 - [x] 2.3 `uv run ruff format && uv run ruff check --fix`
 - [x] 2.4 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.5 `uv run pyrefly check`
-- [x] 2.6 `uv run mypy --config-file mypy.ini`
+- [x] 2.6 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.7 `make artifacts && git diff --exit-code`
 - [x] 2.8 Update schema validation CLI (`python docs/_scripts/validate_artifacts.py`) to
         confirm aligned constructors

@@ -29,7 +29,7 @@ Problem Details payloads with correlation IDs per our observability standards.
   structured logging metadata; logging context schemas effectively become frozen data
   structures.
 - **Delivery:** Implement under branch `openspec/typed-dict-hygiene-phase1` with full
-  quality gates (`ruff`, `pyright`, `pyrefly`, `mypy`, `pytest`, `make artifacts`).
+  quality gates (`ruff`, `pyright`, `pyrefly`, `pyright`, `pytest`, `make artifacts`).
 
 ## Acceptance
 - [ ] `LogContextExtra`, `ErrorReport`, and `CliResult` are represented via frozen

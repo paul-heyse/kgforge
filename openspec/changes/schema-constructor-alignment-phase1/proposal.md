@@ -27,7 +27,7 @@ examples authoritative.
 - **Contracts:** JSON Schemas remain the source of truth; alignment enforces canonical
   field names and Problem Details semantics for validation errors.
 - **Delivery:** Implement on branch `openspec/schema-constructor-alignment-phase1` with the
-  full quality-gate loop (`ruff`, `pyright`, `pyrefly`, `mypy`, `pytest`, `make artifacts`).
+  full quality-gate loop (`ruff`, `pyright`, `pyrefly`, `pyright`, `pytest`, `make artifacts`).
 
 ## Acceptance
 - [ ] All constructor invocations use canonical schema field names; legacy casing is only

@@ -60,6 +60,6 @@
 
 ## Verification
 
-- [ ] After completing each phase, run `uv run ruff check --fix`, `uv run pyrefly check`, and `uv run mypy --config-file mypy.ini` before starting the next tranche.
+- [ ] After completing each phase, run `uv run ruff check --fix`, `uv run pyrefly check`, and `uv run pyright --warnings --pythonversion=3.13` before starting the next tranche.
 - [ ] Once layering changes land, ensure `python tools/make_importlinter.py --check` passes as part of the local gate.
 

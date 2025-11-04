@@ -78,12 +78,12 @@ openspec validate <change-id> --strict
 1. Read `proposal.md`, (optional) `design.md`, and `tasks.md`.
 2. Execute tasks in order (check off as you go).
 3. Keep data contracts in sync (see [Data contracts](#data-contracts--schema-policy)).
-4. Run local quality gates (Ruff → pyrefly → mypy → pytest → artifacts).
+4. Run local quality gates (Ruff → pyrefly → pyright → pytest → artifacts).
 
 **Gates**
 ```bash
 uv run ruff format && uv run ruff check --fix
-uv run pyrefly check && uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13 && uv run pyrefly check
 uv run pytest -q
 make artifacts && git diff --exit-code
 openspec validate <change-id> --strict
@@ -293,14 +293,14 @@ rg -n "^#|^## |^### Requirement:|^#### Scenario:" openspec
   - Link to `openspec/changes/<change-id>/proposal.md`
   - Snapshot of `tasks.md` progress (checked boxes)
   - Summary of delta operations per capability
-  - CI artifact links (docs, portal, coverage, mypy report)
+  - CI artifact links (docs, portal, coverage, pyright report)
 - **CI gates** (required to merge):
-  - precommit → lint (Ruff) → types (pyrefly + mypy) → tests → docs
+  - precommit → lint (Ruff) → types (pyright + pyrefly) → tests → docs
   - `openspec validate <change-id> --strict` runs in CI and must pass
 - **Artifacts**:
   - Docs site & Agent Portal uploaded for preview
   - Coverage and JUnit uploaded for quick triage
-  - (Optional) mypy HTML report uploaded for type issues
+  - (Optional) pyright HTML report uploaded for type issues
 
 ---
 
@@ -320,7 +320,7 @@ Every implementation task must begin with a **four‑item design note** in the P
 3) **Data/Schema contracts** — what changes and where the schema lives
 4) **Test plan** — how we prove it works (unit, integration, doctest examples)
 
-Agents must paste **command outputs** for: `ruff`, `pyrefly`, `mypy`, `pytest`, and `openspec validate`.
+Agents must paste **command outputs** for: `ruff`, `pyrefly`, `pyright`, `pytest`, and `openspec validate`.
 
 ---
 
@@ -474,7 +474,7 @@ openspec validate <change-id> --strict
 
 # Quality gates
 uv run ruff format && uv run ruff check --fix
-uv run pyrefly check && uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13 && uv run pyrefly check
 uv run pytest -q
 make artifacts && git diff --exit-code
 

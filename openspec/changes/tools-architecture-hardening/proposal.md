@@ -30,13 +30,13 @@ The tools stack still depends on implicit namespace bridges, oversized adapters,
   - Replace untyped payloads (docstring edits, navmap documents, analytics envelopes) with msgspec structs or frozen dataclasses and expose schema emission helpers from `tools._shared.schema`.
   - Provide legacy conversion helpers so orchestrators validate incoming payloads against the new models before processing, ensuring schema compliance and typed boundaries.
 
-Each phase will conclude by running the existing gate trio (`uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`) before progressing to the next, keeping the architecture refactor incremental and reversible.
+Each phase will conclude by running the existing gate trio (`uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`) before progressing to the next, keeping the architecture refactor incremental and reversible.
 
 ## Impact
 
 - **Affected specs:** `openspec/specs/tools-runtime` and `openspec/specs/tools-navmap` will be updated to encode the new layering, typed payloads, and configuration requirements.
 - **Affected code:** `tools/__init__.py`, `tools/docs/__init__.py`, `tools/_shared/**`, `tools/docstring_builder/**`, `tools/docs/**`, `tools/navmap/**`, `kgfoundry/_namespace_proxy.py`, and `stubs/tools/**`.
-- **Rollout:** Deliver phases sequentially, verifying Ruff, pyrefly, and mypy after each tranche. No additional documentation or testing scope is introduced beyond the pre-commit checks already in place.
+- **Rollout:** Deliver phases sequentially, verifying Ruff, pyrefly, and pyright after each tranche. No additional documentation or testing scope is introduced beyond the pre-commit checks already in place.
 
 
 Original message describing scope:
@@ -44,7 +44,7 @@ Original message describing scope:
 Assessment
 ruff check src reports 177 violations: missing/incorrect docstrings (D101, D417), unsafe APIs (S403, S113, BLE001), complexity hotspots (C901, PLR091x), None ordering (RUF036), private import bridges (PLC2701), and outdated typing forms (UP0xx).
 pyrefly check fails with 139 errors, principally missing modules across the tools.* namespace plus signature mismatches when calling kgfoundry.agent_catalog.search.search_catalog from tooling.
-mypy --config-file mypy.ini src is already clean; we need to keep it that way while resolving the other gates.
+pyright --config-file pyright.ini src is already clean; we need to keep it that way while resolving the other gates.
 Phase 0 – Source-of-truth & packaging hygiene (Principles 1, 7, 11)
 Promote tools/ into a first-class package: add explicit pyproject.toml optional-extra, ensure __init__.py exports the intended API, and wire it into sys.path via pyproject rather than ad-hoc namespace bridges.
 Consolidate namespace-bridging helpers (kgfoundry/_namespace_proxy) into a dedicated adapter module with public wrappers so consumers stop importing private names (PLC2701 errors in namespace_bridge, search_client, vectorstore_faiss).
@@ -73,7 +73,7 @@ Build table-driven pytest suites for each refactored module, covering happy path
 Add doctest/xdoctest coverage for docstring examples, verifying they align with schemas and logging outputs.
 Implement observability helpers to emit structured logs, Prometheus metrics, and OpenTelemetry spans for critical operations; add regression tests ensuring failure paths produce logs + counters + spans.
 Phase 7 – Verification & rollout
-Execute the full gate: uv run ruff format && uv run ruff check --fix, uv run pyrefly check, uv run mypy --config-file mypy.ini src, uv run pytest -q, make artifacts && git diff --exit-code, python tools/check_new_suppressions.py src, python tools/check_imports.py, uv run pip-audit.
+Execute the full gate: uv run ruff format && uv run ruff check --fix, uv run pyrefly check, uv run pyright --warnings --pythonversion=3.13 src, uv run pytest -q, make artifacts && git diff --exit-code, python tools/check_new_suppressions.py src, python tools/check_imports.py, uv run pip-audit.
 Treat plan execution as a multi-PR initiative; document progress in openspec/changes/tools-hardening-phase-4 to keep spec, schemas, and code in sync.
 After stabilization, tighten CI (fail-fast on lint/type regressions) and publish migration notes/CHANGELOG entries for any API changes.
 Next Checks

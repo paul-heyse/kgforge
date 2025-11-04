@@ -64,7 +64,7 @@
         helper returning an adapter whose `warning` signature matches the protocol.
   - [ ] **2.2.b** Update all call sites (`resolve_git_sha`, artifact writers, validation CLI) to use the
         helper; ensure structured context (`operation`, `artifact`, `status`) is preserved.
-  - [ ] **2.2.c** Verify via mypy that the helper satisfies the protocol and remove redundant casts.
+  - [ ] **2.2.c** Verify via pyright that the helper satisfies the protocol and remove redundant casts.
 
 - [ ] **2.3** Extract optional dependency shims for Sphinx (Astroid, AutoAPI, docstring
       overrides) into `docs/_types/sphinx_optional.py` and update `docs/conf.py` to
@@ -102,12 +102,12 @@
   - [ ] **3.2.d** Integrate doctest/xdoctest snippets demonstrating CLI usage in contributor docs.
 
 - [ ] **3.3** Update contributor documentation to describe the typed artifact workflow and
-      confirm `make artifacts` validates all payloads. Verify Ruff, Pyrefly, mypy,
+      confirm `make artifacts` validates all payloads. Verify Ruff, Pyrefly, pyright,
       pytest, and schema validations are clean before marking the change complete.
   - [ ] **3.3.a** Amend `docs/contributing/quality.md` (and related pages) with sections covering the new
         `_types` modules, validation CLI, and sample Problem Details output; ensure examples are
         copy-ready.
-  - [ ] **3.3.b** Run the full quality gate sequence (`ruff check --fix`, `pyrefly`, `mypy`, `pytest`,
+  - [ ] **3.3.b** Run the full quality gate sequence (`ruff check --fix`, `pyrefly`, `pyright`, `pytest`,
         `make artifacts`) and capture command outputs for the PR template.
   - [ ] **3.3.c** Execute `openspec validate docs-typed-artifacts-remediation --strict` prior to submission
         and archive outputs for reviewers.

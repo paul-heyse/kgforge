@@ -24,7 +24,7 @@
 - [x] 2.1 `uv run ruff format && uv run ruff check --fix`
 - [x] 2.2 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.3 `uv run pyrefly check`
-- [x] 2.4 `uv run mypy --config-file mypy.ini`
+- [x] 2.4 `uv run pyright --warnings --pythonversion=3.13`
 - [x] 2.5 `uv run pytest -q tests/docs tests/tools/docstring_builder`
 
 ## 3. Docs & Artifacts

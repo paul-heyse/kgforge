@@ -39,7 +39,7 @@ Vector ingestion currently lives at the orchestration and search API boundaries.
    - Custom exception `class VectorValidationError(ValueError)` with failure metadata
    - NumPy-style docstrings + doctest examples that mirror schema examples.
 2. Replace ad-hoc type hints in `orchestration.cli` and `search_api.vectorstore_factory` with imports from the shared module. Remove all `# type: ignore` entries related to vector typing.
-3. Update stub packages (`stubs/kgfoundry_common/vector_types.pyi`, `stubs/orchestration/cli.pyi`, `stubs/search_api/vectorstore_factory.pyi` if present) to match runtime exports and keep pyrefly/mypy consistent.
+3. Update stub packages (`stubs/kgfoundry_common/vector_types.pyi`, `stubs/orchestration/cli.pyi`, `stubs/search_api/vectorstore_factory.pyi` if present) to match runtime exports and keep pyrefly/pyright consistent.
 
 ### 2. Schema & validation integration
 
@@ -71,7 +71,7 @@ Vector ingestion currently lives at the orchestration and search API boundaries.
 2. Implement unit tests (`tests/vector_ingestion/test_vector_types.py`) covering:
    - Successful coercion from lists/tuples/numpy arrays.
    - Rejection of ragged vectors, empty vectors, non-numeric values.
-   - TypeGuard behaviour (`assert_vector_matrix`) to satisfy mypy.
+   - TypeGuard behaviour (`assert_vector_matrix`) to satisfy pyright.
 3. Add schema round-trip tests verifying sample payloads validate and invalid ones fail with descriptive messages.
 4. Build Typer CLI integration tests ensuring both success path (valid dataset) and failure path (invalid dataset) produce expected outputs, exit codes, and logs (can assert using `caplog`).
 5. Ensure doctest/xdoctest covers new NumPy-style examples in `vector_types` module.
@@ -85,7 +85,7 @@ Vector ingestion currently lives at the orchestration and search API boundaries.
 ### 6. Quality gates & validation
 
 1. Run targeted `uv run ruff format && uv run ruff check --fix` for touched modules.
-2. Execute `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` to confirm zero suppressions.
+2. Execute `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` to confirm zero suppressions.
 3. Run new regression suite with `uv run pytest -q tests/vector_ingestion -q` (plus CLI integration). Document results for PR template.
 4. Validate schema/meta with `jsonschema -i <example> schema/vector-ingestion/vector-batch.v1.schema.json` or project equivalent.
 5. Update `openspec` validation via `openspec validate vector-ingestion-typed-arrays-phase1 --strict` prior to PR.

@@ -22,7 +22,7 @@ openspec/changes/example-change/
    ```bash
    openspec validate <your-change-id> --strict
    uv run ruff format && uv run ruff check --fix
-   uv run pyrefly check && uv run mypy --config-file mypy.ini
+   uv run pyright --warnings --pythonversion=3.13 && uv run pyrefly check
    uv run pytest -q
    make artifacts && git diff --exit-code
    ```

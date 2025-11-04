@@ -2,7 +2,7 @@
 
 This directory contains local type stub packages used by the docstring tooling. The
 stubs intentionally mirror only the attributes we exercise in tests and runtime code
-so that mypy can check those surfaces without depending on upstream packages
+so that pyright can check those surfaces without depending on upstream packages
 shipping official typings.
 
 ## Contributing guidelines
@@ -20,4 +20,4 @@ shipping official typings.
   upstream drift early.
 
 Following these guidelines keeps the stub packages maintainable while providing the
-type coverage needed for strict mypy runs.
+type coverage needed for strict pyright + pyrefly runs.

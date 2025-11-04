@@ -592,7 +592,7 @@ def _load_shard_packages(
         if not isinstance(entry, dict):
             continue
 
-        # isinstance check narrows type - mypy understands this
+        # isinstance check narrows type - static type checkers understand this
         entry_dict: dict[str, JsonValue] = entry
         shard_path_raw = entry_dict.get("path", "")
 

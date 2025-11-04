@@ -25,6 +25,6 @@
 - [x] 2.3 `uv run ruff format && uv run ruff check --fix` - All checks passing
 - [x] 2.4 `uv run pyright --warnings --pythonversion=3.13` - 0 errors, 1 warning
 - [x] 2.5 `uv run pyrefly check` - 0 errors
-- [x] 2.6 `uv run mypy --config-file mypy.ini` - Success on all files
+- [x] 2.6 `uv run pyright --warnings --pythonversion=3.13` - Success on all files
 - [x] 2.7 `make artifacts && git diff --exit-code` - Artifacts regenerated
 

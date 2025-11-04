@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Capture current ingestion gaps.
   - Inventory all `# type: ignore` directives and numpy usages under `orchestration`, `search_api`, and `kgfoundry_common` related to vector ingestion.
-  - Record failing pyrefly/mypy diagnostics as a baseline snapshot.
+  - Record failing pyrefly/pyright diagnostics as a baseline snapshot.
 - [ ] 1.2 Implement shared vector contract module.
   - Add `src/kgfoundry_common/vector_types.py` with `VectorId`, `VectorMatrix`, `VectorBatch`, validation helpers, and `VectorValidationError`.
   - Create matching stubs under `stubs/kgfoundry_common/vector_types.pyi`.
@@ -57,7 +57,7 @@
 - [ ] 4.2 Coordinate downstream adoption.
   - Notify teams consuming vector ingestion outputs, offering validation scripts and timeline.
 - [ ] 4.3 Final quality gates.
-  - Record outputs of `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, `make artifacts && git diff --exit-code`, `openspec validate vector-ingestion-typed-arrays-phase1 --strict` in the PR checklist.
+  - Record outputs of `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, `make artifacts && git diff --exit-code`, `openspec validate vector-ingestion-typed-arrays-phase1 --strict` in the PR checklist.
 - [ ] 4.4 Production enablement.
   - Roll out to production ingestion jobs with monitoring on Problem Details count and ingestion latency; define rollback plan in case of regression.
 

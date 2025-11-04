@@ -4,7 +4,7 @@ Tooling packages SHALL expose explicit, documented public APIs whose exports mat
 
 #### Scenario: Curated exports match stubs
 - **GIVEN** `tools/__init__.py`, `tools/docs/__init__.py`, and related package initialisers
-- **WHEN** `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` execute
+- **WHEN** `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` execute
 - **THEN** all public symbols originate from curated `__all__` lists, align with `stubs/tools/**`, and no `PLC2701` private-import violations appear
 
 #### Scenario: Namespace bridge is confined

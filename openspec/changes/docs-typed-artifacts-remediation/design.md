@@ -6,7 +6,7 @@ and shared loader facades. Landing this change reinstates strict type safety for
 artifact is emitted through schema-backed helpers, and hardens `docs/conf.py`
 against optional dependency drift. The effort replaces ad-hoc dictionary logic
 and scattered casts with reusable modules under `docs/_types/`, restoring clean
-Ruff/Pyrefly/mypy gates while preserving the observability and configuration
+Ruff/Pyrefly/pyright gates while preserving the observability and configuration
 enhancements shipped previously.
 
 This remediation emphasises three pillars:
@@ -240,7 +240,7 @@ def main(argv: Sequence[str] | None = None) -> int: ...
 - **Integration** – run `make artifacts` in CI (and locally) ensuring writers use
   the new helpers and the validation step reports `status=validated` logs.
 - **Type gates** – enforce clean `uv run pyrefly check` and
-  `uv run mypy --config-file mypy.ini` results for `docs/**`, `docs/_types/**`,
+  `uv run pyright --warnings --pythonversion=3.13` results for `docs/**`, `docs/_types/**`,
   and `tests/docs/**`.
 - **Optional dependency coverage** – targeted tests (or doctest snippets) in
   `tests/docs/test_conf_optional.py` verifying `docs/conf.py` pathways when

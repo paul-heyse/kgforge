@@ -19,7 +19,7 @@
 - [ ] Logger adapter and helpers expose typed APIs, auto-attach `NullHandler`, and produce structured records validated by new tests.
 - [ ] Configuration layer uses `pydantic_settings`, documents all environment overrides, and fails fast on invalid values.
 - [ ] Problem Details, errors, and serialization modules raise typed exceptions with preserved causes, avoid unsafe formatting, and rely on `time.monotonic()` for durations.
-- [ ] Updated Problem Details examples and doc snippets match generated payloads; quality gates (Ruff, pyrefly, mypy, pytest, artifacts) pass without new suppressions.
+- [ ] Updated Problem Details examples and doc snippets match generated payloads; quality gates (Ruff, pyright, pyrefly, pytest, artifacts) pass without new suppressions.
 
 ## Out of Scope
 - Refactoring application-specific logging consumers outside `kgfoundry_common`.

@@ -26,7 +26,7 @@
 - [x] 2.3 `uv run ruff format && uv run ruff check --fix` → All checks passed
 - [x] 2.4 `uv run pyright --warnings --pythonversion=3.13` → 0 errors (strict mode)
 - [x] 2.5 `uv run pyrefly check` → 0 errors (semantic checks)
-- [x] 2.6 `uv run mypy --config-file mypy.ini` → MyPy errors reduced and documented
+- [x] 2.6 `uv run pyright --warnings --pythonversion=3.13` → MyPy errors reduced and documented
   - Created typed inspection module to wrap stdlib `inspect` and eliminate Any types
   - Remaining ~20 MyPy errors are from `getattr()` on dynamic plugin attributes
   - These are structural Python typing limitations (PEP 484 known issue)

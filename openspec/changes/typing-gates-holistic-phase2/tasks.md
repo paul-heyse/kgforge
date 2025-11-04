@@ -44,7 +44,7 @@
   - Validate that success paths complete and failure paths emit canonical Problem Details payloads; capture structured logs using `kgfoundry_common.logging`.
 
 - [ ] 2.4 Expand static analysis matrix.
-  - After each codemod batch, run `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, and `uv run pyright --warnings --pythonversion=3.13` scoped to touched packages; log results in change artifacts.
+  - After each codemod batch, run `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, and `uv run pyright --warnings --pythonversion=3.13` scoped to touched packages; log results in change artifacts.
   - Ensure doctest/xdoctest suites covering migrated modules continue to pass.
 
 - [ ] 2.5 Surface compliance metrics.

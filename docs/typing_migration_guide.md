@@ -37,7 +37,7 @@ If you're working on a module that needs updating:
    ```bash
    uv run ruff format && uv run ruff check --fix
    uv run pyright --warnings --pythonversion=3.13
-   uv run mypy --config-file mypy.ini
+   uv run pyrefly check
    python -m tools.lint.check_typing_gates .
    ```
 
@@ -149,7 +149,7 @@ python -m tools.lint.check_typing_gates --json tools/ docs/
 2. **Type checking** must pass:
    ```bash
    uv run pyright --warnings --pythonversion=3.13
-   uv run mypy --config-file mypy.ini
+   uv run pyrefly check
    uv run pyrefly check
    ```
 

@@ -152,7 +152,7 @@ Repeat steps analogous to Phase 1 for `tools/navmap`:
 3. Run full quality gates sequentially:
    - `uv run ruff format && uv run ruff check --fix`
    - `uv run pyrefly check`
-   - `uv run mypy --config-file mypy.ini`
+   - `uv run pyright --warnings --pythonversion=3.13`
    - `uv run pyright --warnings --pythonversion=3.13`
    - `uv run pytest -q`
    - `make artifacts`

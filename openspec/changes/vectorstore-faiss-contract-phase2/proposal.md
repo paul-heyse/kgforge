@@ -1,5 +1,5 @@
 ## Why
-FAISS orchestration currently fails static analysis: Ruff flags 137 violations across vectorstore and CLI modules, while pyrefly and mypy report missing attributes (`FloatArray`, `VecArray`) and constructor mismatches in the namespace bridges. The `index_faiss` CLI calls methods that do not exist on the runtime adapter, leaving GPU/CPU parity untested and observability gaps (no metrics, unstructured logs, undocumented timeouts). Without a hardened contract the CLI cannot guarantee idempotent, typed index builds or deliver reliable telemetry.
+FAISS orchestration currently fails static analysis: Ruff flags 137 violations across vectorstore and CLI modules, while pyright and pyrefly report missing attributes (`FloatArray`, `VecArray`) and constructor mismatches in the namespace bridges. The `index_faiss` CLI calls methods that do not exist on the runtime adapter, leaving GPU/CPU parity untested and observability gaps (no metrics, unstructured logs, undocumented timeouts). Without a hardened contract the CLI cannot guarantee idempotent, typed index builds or deliver reliable telemetry.
 
 ## What Changes
 - [x] **ADDED**: `vectorstore/faiss` capability spec codifying typed aliases, factory orchestration guarantees, observability requirements, and regression coverage expectations.
@@ -17,7 +17,7 @@ FAISS orchestration currently fails static analysis: Ruff flags 137 violations a
 - **Operational rollout:** ship as a single change guarded by configuration toggles (accelerator selection, timeout budgets). Validate CPU-only and GPU-enabled environments in staging before enabling observability dashboards; publish migration notes detailing schema versions and new env vars.
 
 - [ ] Ruff (`uv run ruff format && uv run ruff check --fix`) reports zero violations across `vectorstore_faiss`, `search_api`, and `orchestration` modules.
-- [ ] Pyrefly and mypy complete cleanly for the affected packages with no new suppressions; namespace bridges expose resolved aliases to both analyzers.
+- [ ] Pyrefly and pyright complete cleanly for the affected packages with no new suppressions; namespace bridges expose resolved aliases to both analyzers.
 - [ ] `pytest -q` executes the parametrized regression suite, demonstrating CPU/GPU parity, timeout/error handling, manifest validation, metrics emission, and Problem Details output.
 - [ ] Manifest schema validates against the 2020-12 meta-schema and Problem Details example renders via CLI/factory errors; docstrings include runnable examples documenting timeouts and idempotency.
 - [ ] Prometheus counters (`kgfoundry_index_build_total`) and histograms (`kgfoundry_index_build_duration_seconds`) surface in smoke tests (`uv run python -m tests.observability.test_prometheus --faiss-index`) with expected labels populated.
@@ -36,7 +36,7 @@ FAISS orchestration currently fails static analysis: Ruff flags 137 violations a
   **Mitigation:** emit logs at INFO with bounded payloads, use async-safe Prometheus client, and benchmark for regression budget.
 
 ## Alternatives Considered
-- Reinstating broad `# type: ignore` directives on namespace bridges — rejected because it masks real API drift and keeps pyrefly/mypy red.
+- Reinstating broad `# type: ignore` directives on namespace bridges — rejected because it masks real API drift and keeps pyrefly/pyright red.
 - Embedding FAISS calls directly in the CLI rather than factories — rejected; factories enable testing, DI, and observability injection per design principles.
 - Treating CLI observability as a separate phase — rejected to ensure telemetry, schema, and type safety land together, preventing future divergence.
 

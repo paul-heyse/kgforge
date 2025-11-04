@@ -18,7 +18,7 @@
 ## Acceptance
 <!-- What must be true for reviewers to accept this change? Keep it objective. -->
 - [ ] Scenarios under `specs/<capability>/spec.md` pass as written
-- [ ] Quality gates all green (Ruff, pyrefly, mypy, pytest, artifacts)
+- [ ] Quality gates all green (Ruff, pyright, pyrefly, pytest, artifacts)
 - [ ] Docs & Agent Portal updated (links verified)
 
 ## Out of Scope

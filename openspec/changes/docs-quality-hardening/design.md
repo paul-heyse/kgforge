@@ -1,7 +1,7 @@
 ## Context
 
 The docs toolchain is the final consumer-facing pipeline that renders API references, symbol indices, and
-nav data. It currently skirts type enforcement and schema policies, leaving residual Ruff/Pyrefly/mypy debt
+nav data. It currently skirts type enforcement and schema policies, leaving residual Ruff/Pyrefly/pyright debt
 and inconsistent logging. This design note captures the implementation shape before coding begins.
 
 ## Goals / Non-Goals
@@ -44,7 +44,7 @@ and inconsistent logging. This design note captures the implementation shape bef
      `make artifacts` completion.
 
 4. **Test Plan**
-   - Static analysis: `uv run ruff check docs`, `uv run pyrefly check docs`, `uv run mypy --config-file mypy.ini docs`.
+   - Static analysis: `uv run ruff check docs`, `uv run pyrefly check docs`, `uv run pyright --warnings --pythonversion=3.13 docs`.
    - Schema validation: new `docs/_scripts/validate_artifacts.py` invoked directly and through `make artifacts`.
 
 

@@ -176,7 +176,7 @@ uv run ruff format && uv run ruff check --fix
 
 # Type checks
 uv run pyrefly check
-uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13
 
 # Tests
 uv run pytest -q
@@ -233,7 +233,7 @@ def process_data(data: Any) -> Any: ...  # Defeats type safety goal
 python tools/check_stub_parity.py
 
 # Check specific module
-uv run mypy --config-file mypy.ini src/kgfoundry/agent_catalog/search.py
+uv run pyright --warnings --pythonversion=3.13 src/kgfoundry/agent_catalog/search.py
 uv run pyrefly check src/kgfoundry/agent_catalog/search.py
 
 # Run namespace tests
@@ -246,7 +246,7 @@ uv run pytest tests/test_namespace_proxy.py -v
 # Complete pre-commit checks
 uv run ruff format && uv run ruff check --fix
 uv run pyrefly check
-uv run mypy --config-file mypy.ini
+uv run pyright --warnings --pythonversion=3.13
 uv run pytest -q
 ```
 
@@ -289,5 +289,5 @@ def function() -> SomeType | None: ...  # OK in TYPE_CHECKING context
 
 - [PEP 484 - Type Hints](https://peps.python.org/pep-0484/)
 - [PEP 561 - Distributing Type Information](https://peps.python.org/pep-0561/)
-- [Mypy Documentation](https://mypy.readthedocs.io/)
+- [Mypy Documentation](https://pyright.readthedocs.io/)
 - [Pyrefly Documentation](https://github.com/pyrefly/pyrefly)

@@ -170,7 +170,7 @@ If validation fails, check:
 If plugins fail:
 
 1. **Protocol conformance**: Ensure plugins implement all required methods
-2. **Type errors**: Use `mypy` and `pyrefly` to check plugin types
+2. **Type errors**: Use `pyright` and `pyrefly` to check plugin types
 3. **Compatibility shim**: Check deprecation warnings for migration guidance
 
 ### Performance

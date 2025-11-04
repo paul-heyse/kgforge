@@ -48,6 +48,6 @@ The system SHALL move imports to module top level (with justified exceptions), e
 
 #### Scenario: Type hints modernized
 - **GIVEN** the refactored modules
-- **WHEN** mypy and Ruff analyze them
+- **WHEN** pyright and Ruff analyze them
 - **THEN** no `typing.Dict`/`typing.List` usage remains; generics and Protocols are used where appropriate, and stubs align with implementation.
 

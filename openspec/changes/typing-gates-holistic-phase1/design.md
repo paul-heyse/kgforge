@@ -57,7 +57,7 @@ Ruff, Pyright, and MyPy jointly report >700 violations tied to type-only imports
 ## Migration
 1. Land façade modules and helpers behind feature flags; publish short-term compatibility shims.
 2. Roll postponed annotations and TYPE_CHECKING conversions in batches (docs, tools, runtime) with targeted Ruff gating per batch.
-3. After each batch, run full quality gates: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`, and the new `python -m tools.lint.check_typing_gates`.
+3. After each batch, run full quality gates: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`, and the new `python -m tools.lint.check_typing_gates`.
 4. Update documentation and announce new patterns via `openspec` change notes.
 5. Remove compatibility shims and enforce façade usage once CI proves stable for two consecutive releases.
 

@@ -3,7 +3,7 @@ The current docstring-builder plugin stack defines a base `DocstringBuilderPlugi
 
 ## Goals / Non-Goals
 - **Goals**
-  - Model plugin stages with precise generics so pyrefly and mypy can validate the full execution pipeline without ignores.
+  - Model plugin stages with precise generics so pyright and pyrefly can validate the full execution pipeline without ignores.
   - Preserve runtime compatibility for existing plugins, including the legacy adapter and default plugin catalogue.
   - Document the stricter API so contributors can migrate confidently.
 - **Non-Goals**
@@ -20,7 +20,7 @@ The current docstring-builder plugin stack defines a base `DocstringBuilderPlugi
 
 ## Risks / Trade-offs
 - **Third-party plugin breakage** — Plugins outside the repo must update annotations (and potentially method signatures) to match the new generics. Mitigated by documenting the migration path and providing a temporary compatibility type alias.
-- **Manager regression** — Changing helper signatures could introduce runtime bugs if not covered by tests. Mitigate with targeted unit tests and integration smoke tests (`uv run pyrefly check`, `uv run mypy`).
+- **Manager regression** — Changing helper signatures could introduce runtime bugs if not covered by tests. Mitigate with targeted unit tests and integration smoke tests (`uv run pyright --warnings --pythonversion=3.13`, `uv run pyrefly check`).
 - **Stubs drift** — Failure to update `.pyi` files would reintroduce type mismatches. Mitigate via checklists in tasks and reviewer gates.
 
 ## Migration

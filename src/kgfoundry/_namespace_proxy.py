@@ -111,7 +111,7 @@ def namespace_exports(module: ModuleType) -> list[str]:
     """Return the public export list for ``module`` respecting ``__all__``."""
     exports: object = getattr(module, "__all__", None)
     if isinstance(exports, (list, tuple, set)):
-        # Cast narrowed iterable to ensure mypy can infer str() return
+        # Cast narrowed iterable to ensure static type checkers can infer str() return
         return [str(item) for item in cast("Iterable[object]", exports)]
     return [attr for attr in dir(module) if not attr.startswith("_")]
 

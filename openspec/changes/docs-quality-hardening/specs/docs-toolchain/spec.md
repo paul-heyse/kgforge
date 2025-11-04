@@ -2,7 +2,7 @@
 
 ### Requirement: Schema-Validated Typed Docs Pipeline
 The documentation toolchain SHALL generate symbol indices, deltas, and API content through typed helpers that
-enforce JSON Schema 2020-12 contracts, structured logging, and strict static analysis (Ruff, Pyrefly, mypy)
+enforce JSON Schema 2020-12 contracts, structured logging, and strict static analysis (Ruff, Pyrefly, pyright)
 before artifacts are published.
 
 #### Scenario: Symbol index generation succeeds
@@ -10,7 +10,7 @@ before artifacts are published.
 - **WHEN** `docs/_scripts/build_symbol_index.py` runs during `make artifacts`
 - **THEN** the script validates the resulting payload against `schema/docs/symbol-index.schema.json`
 - **AND** emits structured logs with `operation` and `artifact` metadata
-- **AND** Ruff, Pyrefly, and mypy checks for `docs/` report zero errors
+- **AND** Ruff, Pyrefly, and pyright checks for `docs/` report zero errors
 
 #### Scenario: Delta computation emits problem details on failure
 - **GIVEN** a missing or corrupt historical snapshot when `docs/_scripts/symbol_delta.py` executes

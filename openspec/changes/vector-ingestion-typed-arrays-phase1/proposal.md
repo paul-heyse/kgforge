@@ -1,5 +1,5 @@
 ## Why
-Vector ingestion surfaces still rely on `NDArray[Any, dtype[Any]]` annotations and ad-hoc JSON parsing, forcing mypy suppressions (`# type: ignore[type-arg]`) in `orchestration.cli` and surfacing `Any` throughout `search_api.vectorstore_factory`. The absence of a shared vector contract permits ragged payloads, silently coerces wrong dtypes, and prevents Problem Details emission when ingestion fails. Without a canonical JSON Schema or structured validation helpers, operators cannot diagnose malformed datasets and static analyzers cannot guarantee safety.
+Vector ingestion surfaces still rely on `NDArray[Any, dtype[Any]]` annotations and ad-hoc JSON parsing, forcing pyright suppressions (`# type: ignore[type-arg]`) in `orchestration.cli` and surfacing `Any` throughout `search_api.vectorstore_factory`. The absence of a shared vector contract permits ragged payloads, silently coerces wrong dtypes, and prevents Problem Details emission when ingestion fails. Without a canonical JSON Schema or structured validation helpers, operators cannot diagnose malformed datasets and static analyzers cannot guarantee safety.
 
 ## What Changes
 - [x] **ADDED**: Capability spec `vector-ingestion/typed-arrays` defining typed vector batch contracts, schema validation, Problem Details surfaces, and regression coverage expectations.

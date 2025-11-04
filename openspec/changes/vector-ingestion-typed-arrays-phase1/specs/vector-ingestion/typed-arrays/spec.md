@@ -4,7 +4,7 @@ The system SHALL expose a shared `kgfoundry_common.vector_types` module that def
 
 #### Scenario: Type checkers accept vector helpers
 - **GIVEN** the repository with the new `kgfoundry_common.vector_types` module and corresponding stub exports
-- **WHEN** `uv run pyrefly check` and `uv run mypy --config-file mypy.ini` execute over `kgfoundry_common`, `search_api`, and `orchestration`
+- **WHEN** `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13` execute over `kgfoundry_common`, `search_api`, and `orchestration`
 - **THEN** neither tool reports `Any`-propagating annotations nor requires `# type: ignore` directives for vector ingestion boundaries
 
 #### Scenario: Runtime validation enforces dtype and shape

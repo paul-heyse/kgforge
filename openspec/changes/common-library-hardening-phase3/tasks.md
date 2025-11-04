@@ -33,7 +33,7 @@
 - [x] 1.10 Expand tests.
   - Add new pytest modules under `tests/kgfoundry_common/test_logging.py` and `tests/kgfoundry_common/test_config.py` with parametrized scenarios (happy path, missing env, invalid type, structured log output).
   - Add doctest/xdoctest coverage to `pyproject.toml` targets if not already included; ensure examples pass.
-  - Run targeted commands: `uv run ruff check src/kgfoundry_common`, `uv run pyrefly check src/kgfoundry_common`, `uv run mypy --config-file mypy.ini src/kgfoundry_common`, `uv run pytest -q tests/kgfoundry_common -q` after completing updates.
+  - Run targeted commands: `uv run ruff check src/kgfoundry_common`, `uv run pyrefly check src/kgfoundry_common`, `uv run pyright --warnings --pythonversion=3.13 src/kgfoundry_common`, `uv run pytest -q tests/kgfoundry_common -q` after completing updates.
 
 ## 2. Reference Docs & Artifacts
 - [x] 2.1 Update documentation snippets.

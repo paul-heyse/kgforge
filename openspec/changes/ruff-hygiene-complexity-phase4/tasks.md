@@ -34,7 +34,7 @@
   - Ensure tests cover Windows vs POSIX paths when migrating to `pathlib`.
 - [ ] 1.11 Run focused quality gates iteratively.
   - After each module refactor, execute `uv run ruff check <module> --select C901,PLR091*` to confirm improvements.
-  - Run `uv run pyrefly check <module>` and `uv run mypy --config-file mypy.ini <module>` to maintain type safety.
+  - Run `uv run pyrefly check <module>` and `uv run pyright --warnings --pythonversion=3.13 <module>` to maintain type safety.
   - Capture before/after metrics for inclusion in the PR.
 
 ## 2. Documentation & Verification
@@ -44,6 +44,6 @@
 - [ ] 2.2 Regenerate artifacts as needed.
   - Run `make artifacts` to ensure documentation changes render correctly; inspect diffs for unintended changes.
 - [ ] 2.3 Final quality sweep.
-  - Execute full command set: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`, `uv run pytest -q`.
+  - Execute full command set: `uv run ruff format && uv run ruff check --fix`, `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`, `uv run pytest -q`.
   - Verify no new suppressions, and Problem Details examples remain consistent.
 

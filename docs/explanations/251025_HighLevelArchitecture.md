@@ -860,7 +860,7 @@ def hybrid_search(query: str, k: int) -> list[dict]:
 * **Retrieval**: nDCG@10 ≥ 0.50 (baseline), Recall@1K ≥ 0.85.
 * **Linker**: F1 ≥ 0.70 on a labeled set; **ECE ≤ 0.08** after isotonic calibration.
 * **Latency**: p95 search **< 300 ms** (top‑10); p50 chunk→embed throughput tracked.
-* **CI**: Unit tests (mypy, ruff), golden tests, nightly 1k‑doc mini‑pipeline; fail on regressions.
+* **CI**: Unit tests (pyright, ruff), golden tests, nightly 1k‑doc mini‑pipeline; fail on regressions.
 
 ---
 
@@ -955,7 +955,7 @@ def hybrid_search(query: str, k: int) -> list[dict]:
 
 ## 25) Coding standards & best‑in‑class Python practices
 
-* **Static typing** everywhere (`mypy --strict`).
+* **Static typing** everywhere (`pyright --strict`).
 * **Pydantic v2** for all externalized contracts; validate at boundaries only.
 * **Dataclasses/NamedTuples** for internal‑only small records on hot paths.
 * **Pure functions** for transformations; side effects behind adapters.
@@ -995,7 +995,7 @@ def hybrid_search(query: str, k: int) -> list[dict]:
 | **Observability**                         | Log schema, metric names, labels, exemplar traces, dashboards unspecified.                                                          | Ops readiness.                                | Define **metrics** (names, types), **logs** (JSON schema), **traces** (span names & attributes); provide Grafana panels JSON. (§B16)                                                                      |
 | **Failure handling**                      | Error taxonomy, retry matrices, poison‑pill protocol, quarantine dirs not fixed.                                                    | Robustness under real corpora.                | Standard error classes; retry/backoff tables; quarantine locations; incident log table and CLI. (§B17)                                                                                                    |
 | **Security & licensing**                  | Key storage, license enforcement points, audit fields not formalized.                                                               | Compliance and reproducibility.               | `.env` for secrets; license filters in downloader; persist license string and OA source; audit table records provenance; API keys in env; localhost binding. (§B18)                                       |
-| **Project structure & code quality**      | Pre‑commit, linters, typing level, docstrings, ADRs, contribution workflow not locked.                                              | Team velocity & consistency.                  | Pre‑commit (ruff, black, mypy‑strict), conventional commits, ADR template, mkdocs site, contribution guide, codeowners. (§B19)                                                                            |
+| **Project structure & code quality**      | Pre‑commit, linters, typing level, docstrings, ADRs, contribution workflow not locked.                                              | Team velocity & consistency.                  | Pre‑commit (ruff, black, pyright strict + pyrefly), conventional commits, ADR template, mkdocs site, contribution guide, codeowners. (§B19)                                                                            |
 | **Local dev & bootstrap**                 | No exact bootstrap steps and Make targets.                                                                                          | Fast onboarding.                              | Provide `scripts/bootstrap.sh`, `Makefile` targets, systemd units for vLLM + Nginx, folder layout creation. (§B20)                                                                                        |
 | **Performance SLAs**                      | Hard SLAs and perf targets partially stated.                                                                                        | Planning & regression gates.                  | SLAs/SLOs formalized per stage; CI gates with thresholds; perf budgets by stage. (§B21)                                                                                                                   |
 
@@ -1265,7 +1265,7 @@ def hybrid_search(query: str, k: int) -> list[dict]:
 
 ### B19. Code quality & governance
 
-* **Pre-commit**: `ruff`, `black`, `mypy --strict`, `pyupgrade`, `docstr-coverage` (docstring coverage).
+* **Pre-commit**: `ruff`, `black`, `pyright --strict`, `pyupgrade`, `docstr-coverage` (docstring coverage).
 * **Type discipline**: `from __future__ import annotations`, Protocol/ABC for interfaces, `Final` constants.
 * **Docs**: `mkdocs` site with API docs (pdoc or mkdocstrings), how‑to guides, and ADRs (`/docs/adr/0001-...md`).
 * **Conventional commits** and **semantic versioning** per package.

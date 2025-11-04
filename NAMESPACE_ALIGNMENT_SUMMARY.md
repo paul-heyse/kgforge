@@ -248,7 +248,7 @@ SUCCESS: All checks passed
 2. **Add to `__all__`** in the module
 3. **Update the stub** in `stubs/kgfoundry/module_name.pyi`
 4. **Run parity check**: `python tools/check_stub_parity.py`
-5. **Verify types**: `uv run mypy --config-file mypy.ini`
+5. **Verify types**: `uv run pyright --warnings --pythonversion=3.13`
 
 ### Registering a New Symbol (if using NamespaceRegistry)
 
@@ -263,7 +263,7 @@ registry.register(
 
 ```bash
 python tools/check_stub_parity.py  # Verify stubs match runtime
-uv run mypy --config-file mypy.ini  # Type checking
+uv run pyright --warnings --pythonversion=3.13  # Type checking
 uv run pytest tests/test_namespace_proxy.py -v  # Regression tests
 ```
 

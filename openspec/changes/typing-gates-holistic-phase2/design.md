@@ -30,7 +30,7 @@ Phase 1 introduced postponed annotations, typing façades, and lint tooling, but
 3. Stage codemods by subsystem (docs, tools, runtime, tests) to simplify review and rollback.
 
 ### 2. Façade Adoption & Shim Removal
-1. Apply codemods to each subsystem, running Ruff/pyright/mypy after each batch.
+1. Apply codemods to each subsystem, running Ruff/pyright/pyrefly after each batch.
 2. Update stubs and namespace bridges to reference façade modules directly; align `__all__` lists and documentation.
 3. Remove compatibility shims, replacing them with explicit `ImportError` guidance.
 

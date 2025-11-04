@@ -34,7 +34,7 @@
   - Assert metrics counters/histograms update via `MetricsRecorder`; validate structured logging fields emitted by helpers using `caplog`.
 - [ ] 2.5 Quality gates
   - Run `uv run ruff format && uv run ruff check --fix`.
-  - Run `uv run pyrefly check` and `uv run mypy --config-file mypy.ini`.
+  - Run `uv run pyrefly check` and `uv run pyright --warnings --pythonversion=3.13`.
   - Run `uv run pytest -q` for entire suite.
   - Run `make artifacts && git diff --exit-code`.
   - Run `python tools/check_new_suppressions.py src` and `python tools/check_imports.py`.

@@ -16,7 +16,7 @@ The docstring builder orchestrator has grown into a 1,300+ line module that viol
 - **Docs**: Updated module docstrings/ownership markers; potential Agent Catalog/Nav artifacts regenerated.
 - **Quality Gates**:
   - Ruff: `uv run ruff format && uv run ruff check --fix`
-  - Types: `uv run pyrefly check`, `uv run mypy --config-file mypy.ini`
+  - Types: `uv run pyrefly check`, `uv run pyright --warnings --pythonversion=3.13`
   - Tests: `uv run pytest -q`
   - Docs/Artifacts: `make artifacts && git diff --exit-code`
   - Suppression guard: `python tools/check_new_suppressions.py src`
