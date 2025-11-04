@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import logging
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import libcst as cst
 
@@ -105,8 +105,19 @@ class TypingFacadeMigrator(cst.CSTTransformer):
         return result
 
 
-TypingFacadeMigrator.leave_ImportFrom = cast("object", TypingFacadeMigrator.leave_import_from)
-TypingFacadeMigrator.leave_Call = cast("object", TypingFacadeMigrator.leave_call)
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    LeaveImportFromFunc = Callable[
+        [TypingFacadeMigrator, cst.ImportFrom, cst.ImportFrom],
+        cst.ImportFrom | cst.RemovalSentinel,
+    ]
+    LeaveCallFunc = Callable[[TypingFacadeMigrator, cst.Call, cst.Call], cst.Call]
+
+TypingFacadeMigrator.leave_ImportFrom = cast(
+    "LeaveImportFromFunc", TypingFacadeMigrator.leave_import_from
+)
+TypingFacadeMigrator.leave_Call = cast("LeaveCallFunc", TypingFacadeMigrator.leave_call)
 
 
 def run_codemod_on_file(file_path: Path) -> bool:

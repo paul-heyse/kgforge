@@ -1,4 +1,3 @@
-# ruff: noqa: N999 - numeric prefix required for gallery ordering
 """Data contracts - schema export smoke.
 ====================================
 
