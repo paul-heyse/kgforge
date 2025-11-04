@@ -27,7 +27,8 @@ class StubParityContext(TypedDict):
 
 def _register_runtime_module(name: str, exports: tuple[str, ...]) -> None:
     module = ModuleType(name)
-    module.__all__ = list(exports)
+    module_dict: dict[str, object] = module.__dict__
+    module_dict["__all__"] = list(exports)
 
     def _placeholder(*args: object, **kwargs: object) -> None:  # noqa: ARG001
         return None

@@ -29,7 +29,7 @@ Load with type checking:
 from __future__ import annotations
 
 from importlib import import_module
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -137,4 +137,5 @@ def load_facade_attribute_typed[T](module_name: str, attribute: str, expected_ty
             f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
         )
         raise TypeError(message)
-    return cast("T", value)
+    assert isinstance(value, expected_type)
+    return value

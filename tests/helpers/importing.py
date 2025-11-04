@@ -10,7 +10,7 @@ the lazy-loading guarantees required by the façade modules documented in
 from __future__ import annotations
 
 from importlib import import_module
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -42,4 +42,5 @@ def load_typed_attribute[T](module_name: str, attribute: str, expected_type: typ
             f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
         )
         raise TypeError(message)
-    return cast("T", value)
+    assert isinstance(value, expected_type)
+    return value
