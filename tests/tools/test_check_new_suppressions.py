@@ -46,7 +46,7 @@ def test_run_suppression_guard_allows_ticket_metadata(tmp_path: Path) -> None:
     assert report.violation_count == 0
 
 
-@pytest.mark.parametrize("violation_count", [(-1,), (42,)])
+@pytest.mark.parametrize("violation_count", [-1, 42])
 def test_report_from_context_validates_violation_count(
     tmp_path: Path, violation_count: int
 ) -> None:
@@ -57,7 +57,7 @@ def test_report_from_context_validates_violation_count(
     context = build_guard_context(report)
     context["violation_count"] = violation_count
 
-    with pytest.raises(ValueError, match=r"expected [0-9]+ violations, computed [0-9]+"):
+    with pytest.raises(ValueError, match=r"expected -?\d+ violations, computed \d+"):
         SuppressionGuardReport.from_context(context)
 
 

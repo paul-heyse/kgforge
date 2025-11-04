@@ -1,7 +1,7 @@
 """Public API for navmap repair operations with typed configuration.
 
-This module provides the new typed configuration-based API for navmap repairs,
-wrapping existing functions while maintaining backward compatibility.
+This module provides the new typed configuration-based API for navmap repairs, wrapping existing
+functions while maintaining backward compatibility.
 """
 
 from __future__ import annotations

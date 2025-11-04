@@ -313,12 +313,8 @@ def build_guard_context(report: SuppressionGuardReport) -> SuppressionGuardConte
 
 def _extract_guard_report(error: ConfigurationError) -> SuppressionGuardReport | None:
     """Normalize the context payload attached to a suppression guard error."""
-    raw_context = error.context
-    if not isinstance(raw_context, Mapping):
-        return None
-
     try:
-        context = cast("SuppressionGuardContext", dict(raw_context))
+        context = cast("SuppressionGuardContext", dict(error.context))
         return SuppressionGuardReport.from_context(context)
     except (KeyError, TypeError, ValueError):
         LOGGER.exception("Failed to parse suppression guard context")

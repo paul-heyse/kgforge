@@ -1,8 +1,8 @@
 """Identify canonical kgfoundry packages for repository automation.
 
-This script scans the repository layout to discover eligible package directories and
-orders them so helper tools can consistently select a primary target. It mirrors the
-behaviour of the historical shell script while filtering out non-package utilities.
+This script scans the repository layout to discover eligible package directories and orders them so
+helper tools can consistently select a primary target. It mirrors the behaviour of the historical
+shell script while filtering out non-package utilities.
 """
 
 from __future__ import annotations

@@ -51,9 +51,9 @@ def parse_args(argv: Sequence[str] | None = None) -> DocstringArgs:
 def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     """Yield ``(path, lineno, text)`` tuples for every docstring in ``path``.
 
-    The generator emits the file path, starting line number, and raw docstring
-    text for module, class, and function definitions, mirroring the locations that
-    Ruff and other documentation tools inspect.
+    The generator emits the file path, starting line number, and raw docstring text for module,
+    class, and function definitions, mirroring the locations that Ruff and other documentation tools
+    inspect.
     """
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)

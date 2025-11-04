@@ -1084,7 +1084,7 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
                     module=r"faiss.*",
                 )
                 module = importlib.import_module(module_name)
-        except ImportError as exc:  # pragma: no cover - runtime guard
+        except Exception as exc:  # pragma: no cover - runtime guard
             failures.append(f"{module_name}: {exc}")
             continue
         has_index_builder = hasattr(module, "IndexFlatIP") or hasattr(module, "index_flat_ip")

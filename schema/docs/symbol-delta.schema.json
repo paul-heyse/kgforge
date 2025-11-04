@@ -41,7 +41,7 @@
   "$defs": {
     "jsonValue": {
       "description": "Generic JSON value used for before/after subsets",
-      "oneOf": [
+      "anyOf": [
         {"type": "string"},
         {"type": "number"},
         {"type": "integer"},

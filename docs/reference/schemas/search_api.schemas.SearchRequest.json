@@ -1,7 +1,48 @@
 {
+  "$defs": {
+    "JsonPrimitive": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JsonPrimitive"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        }
+      ]
+    }
+  },
   "$id": "https://kgfoundry/schemas/search_api.schemas.SearchRequest.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Describe SearchRequest.\n\n<!-- auto:docstring-builder v1 -->\n\nthe behaviour it provides to callers. Callers interact with\nvalidated data through this model.\n\nParameters\n----------\nquery : str\n    Describe ``query``.\nk : int, optional\n    Describe ``k``.\n    Defaults to ``10``.\nfilters : dict[str, object] | None, optional\n    Describe ``filters``.\n    Defaults to ``None``.\nexplain : bool, optional\n    Describe ``explain``.\n    Defaults to ``False``.",
+  "additionalProperties": false,
+  "description": "Describe SearchRequest.\n\n<!-- auto:docstring-builder v1 -->\n\nthe behaviour it provides to callers. Callers interact with\nvalidated data through this model.\n\nParameters\n----------\nquery : str\n    Describe ``query``.\nk : int, optional\n    Describe ``k``.\n    Defaults to ``10``.\nfilters : dict[str, object] | NoneType, optional\n    Describe ``filters``.\n    Defaults to ``None``.\nexplain : bool, optional\n    Describe ``explain``.\n    Defaults to ``False``.\n\nExamples\n--------\n>>> from pathlib import Path\n>>> from kgfoundry_common.schema_helpers import assert_model_roundtrip\n>>> example_path = (\n...     Path(__file__).parent.parent.parent\n...     / \"schema\"\n...     / \"examples\"\n...     / \"search_api\"\n...     / \"search_request.v1.json\"\n... )\n>>> assert_model_roundtrip(SearchRequest, example_path)",
   "examples": [
     {
       "explain": false,
@@ -19,7 +60,9 @@
     "filters": {
       "anyOf": [
         {
-          "additionalProperties": true,
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
           "type": "object"
         },
         {

@@ -76,26 +76,6 @@ STEPS: list[tuple[str, list[str], str]] = [
         "[schemas] exported API schemas",
     ),
     (
-        "agent-catalog",
-        [sys.executable, "tools/docs/build_agent_catalog.py"],
-        "[agent] generated docs/_build/agent_catalog.json",
-    ),
-    (
-        "agent-api",
-        [sys.executable, "tools/docs/build_agent_api.py"],
-        "[agent] generated docs/_build/agent_api_openapi.json",
-    ),
-    (
-        "agent-portal",
-        [sys.executable, "tools/docs/render_agent_portal.py"],
-        "[agent] rendered site/_build/agent/index.html",
-    ),
-    (
-        "agent-analytics",
-        [sys.executable, "tools/docs/build_agent_analytics.py"],
-        "[agent] wrote docs/_build/analytics.json",
-    ),
-    (
         "docs-validation",
         [sys.executable, "docs/_scripts/validate_artifacts.py"],
         "[docs] validated docs/_build JSON artefacts",

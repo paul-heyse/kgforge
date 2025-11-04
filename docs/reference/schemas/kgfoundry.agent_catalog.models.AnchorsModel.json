@@ -1,4 +1,44 @@
 {
+  "$defs": {
+    "JsonPrimitive": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JsonPrimitive"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        }
+      ]
+    }
+  },
   "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.AnchorsModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Source anchor metadata for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nstart_line : int | NoneType, optional\n    Describe ``start_line``.\n    Defaults to ``None``.\nend_line : int | NoneType, optional\n    Describe ``end_line``.\n    Defaults to ``None``.\ncst_fingerprint : str | NoneType, optional\n    Describe ``cst_fingerprint``.\n    Defaults to ``None``.\nremap_order : list[dict[str, object]], optional\n    Describe ``remap_order``.\n    Defaults to ``<factory>``.",
@@ -37,7 +77,9 @@
     },
     "remap_order": {
       "items": {
-        "additionalProperties": true,
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
         "type": "object"
       },
       "title": "Remap Order",

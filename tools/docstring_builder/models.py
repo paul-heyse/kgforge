@@ -72,11 +72,12 @@ class DocstringBuilderError(RuntimeError):
     """Base exception for docstring builder failures."""
 
 
-@dataclass(slots=True)
 class SchemaViolationError(DocstringBuilderError):
     """Raised when generated payloads do not satisfy the published schema."""
 
-    problem: ProblemDetails | None = None
+    __slots__ = ("problem",)
+
+    problem: ProblemDetails | None
 
     def __init__(self, message: str, *, problem: ProblemDetails | None = None) -> None:
         super().__init__(message)
@@ -223,7 +224,6 @@ PROBLEM_DETAILS_EXAMPLE: ProblemDetails = {
         "symbol": "kg.module.function",
     },
 }
-
 """Example Problem Details payload conforming to RFC 9457.
 
 Examples

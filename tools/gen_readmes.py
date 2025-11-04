@@ -1,8 +1,8 @@
 """Render repository documentation into distributable README files.
 
-The script composes package README pages that align with the content hosted on
-kgfoundry.dev by invoking the shared documentation rendering utilities. It ensures
-local packages contain synchronized summaries, badges, and metadata for publishing.
+The script composes package README pages that align with the content hosted on kgfoundry.dev by
+invoking the shared documentation rendering utilities. It ensures local packages contain
+synchronized summaries, badges, and metadata for publishing.
 """
 
 from __future__ import annotations
@@ -786,8 +786,8 @@ def bucket_for(node: GriffeObjectLike) -> str:
 def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: ReadmeConfig) -> str | None:
     """Render a Markdown bullet for ``node`` including navigation links.
 
-    The output includes GitHub links, optional editor URIs, and badges derived
-    from the NavMap, matching the style published on kgfoundry.dev.
+    The output includes GitHub links, optional editor URIs, and badges derived from the NavMap,
+    matching the style published on kgfoundry.dev.
     """
     qname = node.path
     summary = summarize(node)

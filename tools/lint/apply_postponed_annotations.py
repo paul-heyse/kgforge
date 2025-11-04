@@ -25,7 +25,6 @@ It respects module docstrings, encoding declarations, and shebang lines.
 
     # Check without modifying (dry-run)
     python -m tools.lint.apply_postponed_annotations --check-only src/
-
 """
 
 from __future__ import annotations
@@ -65,7 +64,6 @@ def extract_header_and_body(content: str) -> tuple[str, str]:
     -------
     tuple[str, str]
         (header_section, remaining_body)
-
     """
     lines = content.split("\n")
     header_lines: list[str] = []
@@ -125,7 +123,6 @@ def apply_postponed_annotations(content: str) -> str:
     -------
     str
         Modified content with postponed annotations inserted.
-
     """
     if has_postponed_annotations(content):
         return content
@@ -252,7 +249,6 @@ def process_directory(
     -------
     tuple[int, int, int]
         (files_processed, files_modified, errors)
-
     """
     active_logger = logger or get_logger(__name__)
 
@@ -297,7 +293,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     -------
     int
         Exit code (0 = success, non-zero = failure).
-
     """
     if argv is None:
         argv = sys.argv[1:]

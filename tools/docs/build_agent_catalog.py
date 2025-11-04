@@ -1110,7 +1110,19 @@ class AgentCatalogBuilder:
         if not documents:
             return None
         texts = [document.text for document in documents]
-        model = _load_embedding_model(self.embedding_model)
+        try:
+            model = _load_embedding_model(self.embedding_model)
+        except CatalogBuildError as exc:
+            logger.warning(
+                "Semantic indexing disabled: %s",
+                exc,
+                extra={
+                    "operation": "semantic_index",
+                    "status": "skipped",
+                    "embedding_model": self.embedding_model,
+                },
+            )
+            return None
         try:
             embeddings = model.encode(
                 texts,

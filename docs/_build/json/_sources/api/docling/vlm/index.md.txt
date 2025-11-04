@@ -1,3 +1,0 @@
-# `docling.vlm`
-
-::: docling.vlm

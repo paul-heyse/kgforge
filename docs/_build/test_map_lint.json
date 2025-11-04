@@ -3,7 +3,7 @@
     "severity": "error",
     "symbol": "*",
     "rule": "untested_public_budget",
-    "message": "Untested public symbols 428 exceed budget 5",
+    "message": "Untested public symbols 510 exceed budget 5",
     "module": "*",
     "file": "*"
   }

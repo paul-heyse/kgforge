@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import importlib
 import json
+import logging
 import os
 import shutil
 import sys
@@ -25,6 +26,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 
+from kgfoundry_common.logging import setup_logging
 from tools import (
     ToolExecutionError,
     ToolRunResult,
@@ -97,6 +99,7 @@ DEFAULT_EDGE_COLOR = "#a0aec0"
 CYCLE_EDGE_COLOR = "#e53e3e"
 EDGE_HIGHLIGHT_WIDTH = "2.5"
 EDGE_NORMAL_WIDTH = "1.2"
+SUBPROCESS_TIMEOUT_SECONDS = 240.0
 
 LayerConfig = Mapping[str, object]
 AnalysisResult = dict[str, object]
@@ -292,7 +295,7 @@ def sh(
     *,
     cwd: Path | None = None,
     check: bool = True,
-    timeout: float = 30.0,
+    timeout: float = SUBPROCESS_TIMEOUT_SECONDS,
 ) -> ToolRunResult:
     """Run a subprocess command using secure run_tool wrapper.
 
@@ -2049,8 +2052,8 @@ def _load_allowlist(path: str) -> dict[str, object]:
     """
     file_path = resolve_path(path, strict=False)
     if not file_path.exists():
-        message = f"Allowlist '{file_path}' does not exist"
-        raise SharedValidationError(message)
+        LOGGER.warning("Allowlist '%s' does not exist; continuing with empty allowlist", file_path)
+        return {}
     if not file_path.is_file():
         message = f"Allowlist '{file_path}' must be a file"
         raise SharedValidationError(message)
@@ -2220,6 +2223,10 @@ def main() -> None:
     >>> main()  # doctest: +ELLIPSIS
     """
     args = parse_args()
+
+    if not logging.getLogger().handlers:
+        log_level = logging.INFO if args.verbose else logging.WARNING
+        setup_logging(level=log_level)
 
     _validate_runtime_dependencies()
 

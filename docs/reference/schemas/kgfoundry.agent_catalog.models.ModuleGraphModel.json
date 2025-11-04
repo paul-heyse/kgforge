@@ -1,4 +1,44 @@
 {
+  "$defs": {
+    "JsonPrimitive": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JsonPrimitive"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        }
+      ]
+    }
+  },
   "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.ModuleGraphModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Graph adjacency lists for a module.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nimports : list[str], optional\n    Describe ``imports``.\n    Defaults to ``<factory>``.\ncalls : list[dict[str, object]], optional\n    Describe ``calls``.\n    Defaults to ``<factory>``.",
@@ -11,7 +51,9 @@
   "properties": {
     "calls": {
       "items": {
-        "additionalProperties": true,
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
         "type": "object"
       },
       "title": "Calls",

@@ -17,7 +17,6 @@ from __future__ import annotations
 import ast
 import importlib
 import sys
-from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
@@ -391,12 +390,8 @@ def build_stub_parity_context(report: StubParityReport) -> StubParityContext:
 
 def _extract_stub_parity_report(error: ConfigurationError) -> StubParityReport | None:
     """Normalize the context associated with a stub parity failure."""
-    raw_context = error.context
-    if not isinstance(raw_context, Mapping):
-        return None
-
     try:
-        context = cast("StubParityContext", dict(raw_context))
+        context = cast("StubParityContext", dict(error.context))
         return StubParityReport.from_context(context)
     except (KeyError, TypeError, ValueError):
         LOGGER.exception("Failed to parse stub parity context")

@@ -137,8 +137,8 @@ if TYPE_CHECKING:
     class LegacyBuilderSignature(Protocol):
         """Protocol describing the deprecated legacy docstring builder callback signature.
 
-        This protocol documents the variadic argument pattern that the legacy API
-        accepted. The actual implementation is deprecated and raises NotImplementedError.
+        This protocol documents the variadic argument pattern that the legacy API accepted. The
+        actual implementation is deprecated and raises NotImplementedError.
         """
 
         def __call__(

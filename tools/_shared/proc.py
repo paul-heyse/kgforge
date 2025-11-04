@@ -33,8 +33,8 @@ def get_process_runner() -> ProcessRunner:
 def set_process_runner(runner: ProcessRunner) -> None:
     """Replace the global process runner used by :func:`run_tool`.
 
-    Intended for advanced scenarios (e.g. tests) where dependency injection is
-    required. Callers should restore the previous runner when finished.
+    Intended for advanced scenarios (e.g. tests) where dependency injection is required. Callers
+    should restore the previous runner when finished.
     """
     _PROCESS_STATE.runner = runner
 
