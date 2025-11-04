@@ -320,7 +320,7 @@
       "type": "object"
     }
   },
-  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.SymbolModel.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.agent_catalog.models.SymbolModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Catalog entry for a concrete symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nqname : str\n    Describe ``qname``.\nkind : str\n    Describe ``kind``.\nsymbol_id : str\n    Describe ``symbol_id``.\ndocfacts : dict[str, object] | NoneType, optional\n    Describe ``docfacts``.\n    Defaults to ``None``.\nanchors : AnchorsModel\n    Describe ``anchors``.\nquality : QualityModel\n    Describe ``quality``.\nmetrics : MetricsModel\n    Describe ``metrics``.\nagent_hints : AgentHintsModel\n    Describe ``agent_hints``.\nchange_impact : ChangeImpactModel\n    Describe ``change_impact``.\nexemplars : list[dict[str, object]], optional\n    Describe ``exemplars``.\n    Defaults to ``<factory>``.",
   "examples": [

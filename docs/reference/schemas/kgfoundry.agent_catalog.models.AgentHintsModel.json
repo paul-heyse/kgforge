@@ -1,5 +1,5 @@
 {
-  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.AgentHintsModel.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.agent_catalog.models.AgentHintsModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Structured hints for downstream agents.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nintent_tags : list[str], optional\n    Describe ``intent_tags``.\n    Defaults to ``<factory>``.\nsafe_ops : list[str], optional\n    Describe ``safe_ops``.\n    Defaults to ``<factory>``.\ntests_to_run : list[str], optional\n    Describe ``tests_to_run``.\n    Defaults to ``<factory>``.\nperf_budgets : list[str], optional\n    Describe ``perf_budgets``.\n    Defaults to ``<factory>``.\nbreaking_change_notes : list[str], optional\n    Describe ``breaking_change_notes``.\n    Defaults to ``<factory>``.",
   "examples": [

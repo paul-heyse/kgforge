@@ -59,6 +59,12 @@ from docs.types.artifacts import (
     symbol_index_from_json,
     symbol_index_to_payload,
 )
+from kgfoundry_common.errors import (
+    ArtifactDeserializationError as CoreArtifactDeserializationError,
+)
+from kgfoundry_common.errors import (
+    ArtifactValidationError as CoreArtifactValidationError,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -154,6 +160,8 @@ class ArtifactCheck:
 def _resolve_schema(name: str) -> Path:
     """Return the absolute path to a documentation schema file."""
     return SCHEMA_ROOT / name
+
+
 def _schema_path(filename: str) -> Path:
     """Return the absolute path to a docs schema file."""
     return ENV.root / "schema" / "docs" / filename
@@ -187,6 +195,16 @@ def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
     except (ValueError, TypeError, json.JSONDecodeError) as e:
         message = f"Failed to parse symbol index: {e}"
         raise ArtifactValidationError(message, artifact_name="symbols.json") from e
+    except (
+        CoreArtifactValidationError,
+        CoreArtifactDeserializationError,
+    ) as exc:
+        problem = exc.to_problem_details()
+        raise ArtifactValidationError(
+            str(exc),
+            artifact_name="symbols.json",
+            problem=problem,
+        ) from exc
 
     schema = _resolve_schema("symbol-index.schema.json")
     schema = _schema_path("symbol-index.schema.json")
@@ -230,6 +248,16 @@ def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
     except (ValueError, TypeError, json.JSONDecodeError) as e:
         message = f"Failed to parse symbol delta: {e}"
         raise ArtifactValidationError(message, artifact_name="symbols.delta.json") from e
+    except (
+        CoreArtifactValidationError,
+        CoreArtifactDeserializationError,
+    ) as exc:
+        problem = exc.to_problem_details()
+        raise ArtifactValidationError(
+            str(exc),
+            artifact_name="symbols.delta.json",
+            problem=problem,
+        ) from exc
 
     schema = _resolve_schema("symbol-delta.schema.json")
     schema = _schema_path("symbol-delta.schema.json")
