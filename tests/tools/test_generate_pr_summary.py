@@ -26,6 +26,21 @@ def test_collect_artifact_snapshot_detects_numbered_codemod_logs(tmp_path: Path)
     )
 
 
+def test_collect_artifact_snapshot_orders_double_digit_logs(tmp_path: Path) -> None:
+    """Codemod logs should be sorted using natural order for numeric suffixes."""
+    (tmp_path / "codemod_r10.log").write_text("run 10\n")
+    (tmp_path / "codemod.log").write_text("root run\n")
+    (tmp_path / "codemod_r2.log").write_text("run 2\n")
+
+    snapshot = collect_artifact_snapshot(tmp_path)
+
+    assert snapshot.codemod_logs == (
+        "codemod.log",
+        "codemod_r2.log",
+        "codemod_r10.log",
+    )
+
+
 def test_generate_summary_lists_all_codemod_logs(tmp_path: Path) -> None:
     """Rendered summary should include every detected codemod log entry."""
     for name in ("codemod.log", "codemod_r7.log"):
