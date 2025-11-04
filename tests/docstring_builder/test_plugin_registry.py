@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, Protocol, cast
 import pytest
 from tools.docstring_builder.config import BuilderConfig
 from tools.docstring_builder.plugins import (
-    PluginConfigurationError,
     load_plugins,
 )
 from tools.docstring_builder.plugins.base import (
@@ -145,7 +144,7 @@ class TestPluginValidation:
             stage: str
 
         # This should fail because MyProtocol is a Protocol
-        with pytest.raises(PluginConfigurationError):
+        with pytest.raises(PluginRegistryError):
             load_plugins(
                 config,
                 tmp_path,

@@ -7,22 +7,17 @@ when required fields are missing or invalid.
 from __future__ import annotations
 
 import base64
-from typing import TYPE_CHECKING
 
 import pytest
 
-from kgfoundry_common import config
-
-if TYPE_CHECKING:
-    from kgfoundry_common.config import AppSettings
+from kgfoundry_common.config import AppSettings
 
 
 def make_settings(**overrides: object) -> AppSettings:
     """Construct AppSettings using typed overrides."""
     overrides_dict: dict[str, object] = dict(overrides)
-    settings_cls = config.AppSettings
-    factory = settings_cls.from_dict
-    return factory(overrides_dict)
+    app_settings_cls: type[AppSettings] = AppSettings
+    return app_settings_cls.from_dict(overrides_dict)
 
 
 class TestConfigurationValidation:

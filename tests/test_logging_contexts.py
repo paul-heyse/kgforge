@@ -8,9 +8,8 @@ from __future__ import annotations
 
 import json
 import logging
-import typing as t
 from io import StringIO
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from tools.docstring_builder.models import (
     CLI_SCHEMA_ID,
@@ -31,6 +30,8 @@ from tests.helpers import assert_frozen_attribute
 
 if TYPE_CHECKING:
     from kgfoundry_common.problem_details import ProblemDetails
+else:  # pragma: no cover - runtime stand-in for typing alias
+    ProblemDetails = dict[str, object]
 
 
 class TestLogContextExtraImmutability:
@@ -76,7 +77,7 @@ class TestLogContextExtraConversion:
     def test_to_dict_excludes_none_values(self) -> None:
         """to_dict excludes None fields to avoid verbose logs."""
         ctx = LogContextExtra(correlation_id="req-123", operation="search", status=None)
-        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
+        data = cast("dict[str, str | float | None]", ctx.to_dict())
 
         assert data == {"correlation_id": "req-123", "operation": "search"}
         assert "status" not in data
@@ -84,7 +85,7 @@ class TestLogContextExtraConversion:
     def test_to_dict_empty_context(self) -> None:
         """Empty context converts to empty dict."""
         ctx = LogContextExtra()
-        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
+        data = cast("dict[str, str | float | None]", ctx.to_dict())
         assert data == {}
 
     def test_to_dict_all_fields(self) -> None:
@@ -97,7 +98,7 @@ class TestLogContextExtraConversion:
             service="docs-pipeline",
             endpoint="/api/docs",
         )
-        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
+        data = cast("dict[str, str | float | None]", ctx.to_dict())
 
         assert len(data) == 6
         assert data.get("correlation_id") == "req-123"
@@ -133,7 +134,7 @@ class TestLoggerAdapterWithLogContextExtra:
         adapter.info("Test message")
 
         output = stream.getvalue().strip()
-        parsed = t.cast("dict[str, object]", json.loads(output))
+        parsed = cast("dict[str, object]", json.loads(output))
         assert parsed.get("correlation_id") == "req-123"
         assert parsed.get("operation") == "search"
         assert parsed.get("message") == "Test message"
@@ -169,7 +170,7 @@ class TestSafeAccessorPatterns:
     def test_get_with_default(self) -> None:
         """Dict.get() works for safely accessing optional fields."""
         ctx = LogContextExtra(correlation_id="req-123")
-        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
+        data = cast("dict[str, str | float | None]", ctx.to_dict())
 
         # Safe access with .get()
         correlation: str | float | None = data.get("correlation_id")
@@ -181,7 +182,7 @@ class TestSafeAccessorPatterns:
     def test_optional_field_in_to_dict(self) -> None:
         """Check presence of optional field before access."""
         ctx = LogContextExtra(operation="search")
-        data = t.cast("dict[str, str | float | None]", ctx.to_dict())
+        data = cast("dict[str, str | float | None]", ctx.to_dict())
 
         # Use ternary for clarity
         problem: str | float | None = data.get("problem")
@@ -204,7 +205,7 @@ class TestErrorReportConstructor:
 
     def test_make_error_report_with_optional_problem(self) -> None:
         """Optional problem field can be included."""
-        problem = t.cast(
+        problem = cast(
             "ProblemDetails",
             {
                 "type": "https://kgfoundry.dev/problems/internal-error",

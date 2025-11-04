@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
-from typing import cast
+from inspect import signature
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
@@ -13,7 +13,15 @@ from kgfoundry_common.problem_details import (
     render_problem,
     validate_problem_details,
 )
-from kgfoundry_common.types import JsonValue, ProblemDetails
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from kgfoundry_common.problem_details import ProblemDetails
+    from kgfoundry_common.types import JsonValue
+else:  # pragma: no cover - runtime fallbacks for type aliases
+    ProblemDetails = dict[str, object]
+    JsonValue = object
 
 
 def _as_problem_dict(problem: ProblemDetails) -> dict[str, object]:
@@ -92,13 +100,10 @@ class TestConfigurationErrorWithDetails:
         assert isinstance(error, ConfigurationError)
 
     def test_with_details_keyword_only(self) -> None:
-        """Test that with_details requires keyword arguments."""
-        invalid_call = cast(
-            "Callable[..., ConfigurationError]",
-            ConfigurationError.with_details,
-        )
-        with pytest.raises(TypeError):
-            invalid_call("field", "issue")
+        """Test that with_details accepts only keyword parameters."""
+        sig = signature(ConfigurationError.with_details)
+        for parameter in sig.parameters.values():
+            assert parameter.kind.name == "KEYWORD_ONLY"
 
     def test_with_details_special_characters(self) -> None:
         """Test with_details with special characters in field and issue."""

@@ -121,7 +121,8 @@ def test_index_faiss_cli_problem_details(
     assert result.exit_code == 1
     assert not index_path.exists()
 
-    problem = _parse_problem(result.stderr)
+    stderr_text = result.stderr if result.stderr_bytes is not None else result.output
+    problem = _parse_problem(stderr_text)
     assert problem.get("type") == "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
     assert problem.get("status") == 422
     extensions_obj = cast("dict[str, object]", problem.get("extensions", {}))

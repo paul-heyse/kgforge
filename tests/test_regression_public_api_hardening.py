@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import inspect
 import tempfile
-from typing import Any, cast
+from typing import cast
 
-import pytest
 from tools.docstring_builder.cache import DocstringBuilderCache
 
 from kgfoundry_common.errors import ConfigurationError, KgFoundryError
@@ -144,8 +144,9 @@ class TestConfigurationModelValidation:
         assert error is not None
 
         # Should fail with positional args
-        with pytest.raises(TypeError):
-            cast("Any", ConfigurationError.with_details)("test", "issue")
+        signature = inspect.signature(ConfigurationError.with_details)
+        for parameter in signature.parameters.values():
+            assert parameter.kind.name == "KEYWORD_ONLY"
 
 
 class TestNewPublicAPI:

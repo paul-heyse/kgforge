@@ -10,15 +10,17 @@ from __future__ import annotations
 
 import argparse
 import logging
-from collections.abc import Sequence
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import libcst as cst
 
 logger = logging.getLogger(__name__)
 
 MIN_MODULE_PARTS = 2
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class TypingFacadeMigrator(cst.CSTTransformer):

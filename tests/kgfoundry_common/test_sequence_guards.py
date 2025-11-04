@@ -6,8 +6,13 @@ structured logs, metrics, and RFC 9457 Problem Details.
 
 from __future__ import annotations
 
-import typing
-from typing import Protocol
+from collections.abc import Sequence as TypingSequence
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+else:
+    Sequence = TypingSequence
 
 import pytest
 
@@ -20,7 +25,7 @@ class SequenceGuard(Protocol):
 
     def __call__(
         self,
-        sequence: typing.Sequence[object],
+        sequence: Sequence[object],
         *,
         context: str,
         operation: str = ...,
@@ -32,7 +37,7 @@ class MultiDeviceGuard(Protocol):
 
     def __call__(
         self,
-        sequence: typing.Sequence[object],
+        sequence: Sequence[object],
         *,
         context: str = ...,
         operation: str = ...,
@@ -98,7 +103,7 @@ class TestFirstOrError:
         ],
     )
     def test_various_empty_sequences_raise_error(
-        self, sequence_guard: SequenceGuard, empty_seq: typing.Sequence[object]
+        self, sequence_guard: SequenceGuard, empty_seq: Sequence[object]
     ) -> None:
         """Verify various empty sequence types raise VectorSearchError."""
         with pytest.raises(VectorSearchError):
@@ -192,7 +197,7 @@ class TestFirstOrErrorMultiDevice:
     def test_various_valid_sequences(
         self,
         multi_device_guard: MultiDeviceGuard,
-        devices: typing.Sequence[object],
+        devices: Sequence[object],
         expected: object,
     ) -> None:
         """Verify multi-device works with various sequence types."""
@@ -238,7 +243,7 @@ class TestFirstOrErrorParametrized:
         self,
         sequence_guard: SequenceGuard,
         seq_type: str,
-        seq_value: typing.Sequence[object],
+        seq_value: Sequence[object],
     ) -> None:
         """Comprehensive parametrized test for various sequences."""
         if seq_type.startswith("empty"):
