@@ -813,9 +813,9 @@ faiss = { index = "wheelhouse" }
 #xformers = { index = "wheelhouse" }
 
 # point torch packages to the *named* PyTorch cu130 index
-torch = [       { index = "pytorch-cu130" } ]
-torchvision = [ { index = "pytorch-cu130" } ]
-torchaudio = [  { index = "pytorch-cu130" } ]
+torch = [       { index = "pytorch-cu129" } ]
+torchvision = [ { index = "pytorch-cu129" } ]
+torchaudio = [  { index = "pytorch-cu129" } ]
 
 
 # Define named indexes uv can use.
@@ -842,7 +842,7 @@ explicit = true
 
 # NEW — define the cu130 index *by name*, then reference it above
 [[tool.uv.index]]
-name = "pytorch-cu130"
+name = "pytorch-cu129"
 url  = "https://download.pytorch.org/whl/cu129"
 explicit = true
 
