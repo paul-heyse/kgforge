@@ -48,7 +48,7 @@ NAVMAP = ROOT / "site" / "_build" / "navmap" / "navmap.json"
 DRIFT_OUT = ROOT / "docs" / "_build" / "schema_drift.json"
 
 JSON_SCHEMA_DIALECT = "https://json-schema.org/draft/2020-12/schema"
-DEFAULT_BASE_URL = os.getenv("SCHEMA_BASE_URL", "https://kgfoundry/schemas")
+DEFAULT_BASE_URL = os.getenv("SCHEMA_BASE_URL", "https://kgfoundry.dev/schemas")
 
 
 def _load_pandera_module() -> ModuleType | None:
@@ -382,6 +382,17 @@ def _inject_versions(schema: dict[str, object], versions: Mapping[str, object] |
         schema.update(versions)
 
 
+def _preserve_versions(schema: dict[str, object], previous: Mapping[str, object] | None) -> None:
+    """Carry forward version metadata when no navigation data is available."""
+    if previous is None:
+        return
+
+    for field in ("x-version-introduced", "x-deprecated-in"):
+        if field in schema or field not in previous:
+            continue
+        schema[field] = previous[field]
+
+
 # --------------------------- drift summarizer ---------------------------
 
 
@@ -580,7 +591,7 @@ def _parse_args(argv: Sequence[str] | None) -> Cfg:
     parser.add_argument(
         "--base-url",
         default=DEFAULT_BASE_URL,
-        help="Base URL for $id (default: env SCHEMA_BASE_URL or https://kgfoundry/schemas)",
+        help="Base URL for $id (default: env SCHEMA_BASE_URL or https://kgfoundry.dev/schemas)",
     )
     parser.add_argument(
         "--by-alias", action="store_true", help="Generate Pydantic schemas using field aliases"
@@ -672,6 +683,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         produced_paths.add(path)
 
         previous = _load_existing_schema(path)
+        _preserve_versions(data, previous)
         if cfg.check_drift:
             if not _schemas_match(previous, data):
                 _record_drift(path, previous, data, drift_summaries)

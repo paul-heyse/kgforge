@@ -1,5 +1,5 @@
 {
-  "$id": "https://kgfoundry/schemas/kgfoundry.kgfoundry_common.settings.SparseEmbeddingConfig.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.kgfoundry_common.settings.SparseEmbeddingConfig.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Sparse embedding configuration (``KGFOUNDRY_SPARSE_EMBEDDING_*``).",

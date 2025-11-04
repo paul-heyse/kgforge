@@ -178,7 +178,7 @@
       "type": "object"
     }
   },
-  "$id": "https://kgfoundry/schemas/kgfoundry.kgfoundry_common.settings.RuntimeSettings.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.kgfoundry_common.settings.RuntimeSettings.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Aggregate runtime configuration loaded from environment variables.",
