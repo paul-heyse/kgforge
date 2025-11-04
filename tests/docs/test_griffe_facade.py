@@ -243,12 +243,23 @@ class TestGriffeNodeProtocol:
 
     def test_node_properties_accessible(self, test_node: GriffeNode) -> None:
         """Verify commonly accessed node properties exist and are accessible."""
-        # These should not raise AttributeError
-        path = test_node.path  # noqa: F841
-        members = test_node.members  # noqa: F841
-        kind = test_node.kind  # noqa: F841
+        # Verify properties exist and are accessible (should not raise AttributeError)
+        assert hasattr(test_node, "path")
+        path = test_node.path
+        assert isinstance(path, str)
+        assert len(path) > 0
+
+        assert hasattr(test_node, "members")
+        members = test_node.members
+        assert isinstance(members, dict)
+
+        assert hasattr(test_node, "kind")
+        kind = test_node.kind
+        assert kind is None or isinstance(kind, str)
+
         if hasattr(test_node, "lineno"):
-            lineno = test_node.lineno  # noqa: F841
+            lineno = test_node.lineno
+            assert lineno is None or isinstance(lineno, int)
 
 
 class TestDoctest:

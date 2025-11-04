@@ -699,21 +699,6 @@ def run_build(
     raise NotImplementedError(msg)
 
 
-class LegacyBuilderSignature(Protocol):
-    """Protocol describing the deprecated legacy docstring builder callback signature.
-
-    This protocol documents the variadic argument pattern that the legacy API
-    accepted. The actual implementation is deprecated and raises NotImplementedError.
-    """
-
-    def __call__(
-        self,
-        *args: object,
-        **kwargs: object,
-    ) -> DocstringBuildResult:
-        """Legacy callback signature accepting variadic arguments."""
-
-
 def run_legacy(
     *args: object,
     **kwargs: object,

@@ -13,9 +13,9 @@ from msgspec import UNSET, Struct, structs
 from kgfoundry_common.typing import gate_import
 from tools._shared.schema import validate_tools_payload
 
-CliStatus = Literal["success", "violation", "config", "error"]
-CliFileStatus = Literal["success", "skipped", "error", "violation"]
-CliErrorStatus = Literal["error", "violation", "config"]
+type CliStatus = Literal["success", "violation", "config", "error"]
+type CliFileStatus = Literal["success", "skipped", "error", "violation"]
+type CliErrorStatus = Literal["error", "violation", "config"]
 
 CLI_ENVELOPE_SCHEMA = "cli_envelope.json"
 CLI_ENVELOPE_SCHEMA_VERSION = "1.0.0"

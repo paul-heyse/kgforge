@@ -8,6 +8,7 @@ for implementation specifics.
 from __future__ import annotations
 
 import math
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +16,7 @@ from typing import TYPE_CHECKING, Final, cast
 
 import duckdb
 
-from kgfoundry_common.errors import DeserializationError
+from kgfoundry_common.errors import ConfigurationError, DeserializationError
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 from registry.duckdb_helpers import fetch_all, fetch_one
@@ -55,6 +56,99 @@ __navmap__: Final[NavMap] = {
 }
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
+
+
+def _validate_parquet_path(
+    path: str | Path,
+    *,
+    allowed_roots: list[Path] | None = None,
+    must_exist: bool = True,
+) -> Path:
+    """Validate and resolve parquet path against allowlist to prevent path traversal.
+
+    Parameters
+    ----------
+    path : str | Path
+        Path to validate (may be relative or absolute).
+    allowed_roots : list[Path] | None, optional
+        List of allowed root directories. If None, uses environment variable
+        PARQUET_ROOT or default /data/parquet.
+    must_exist : bool, optional
+        If True, require path to exist. If False, only validate it's within
+        allowed directory. Defaults to True.
+
+    Returns
+    -------
+    Path
+        Resolved absolute path that is within an allowed directory.
+
+    Raises
+    ------
+    ConfigurationError
+        If path resolves outside allowed directories or contains invalid characters.
+    ValueError
+        If path cannot be resolved or (when must_exist=True) is not accessible.
+
+    Notes
+    -----
+    This function prevents path traversal attacks by:
+    1. Resolving paths to absolute paths using Path.resolve()
+    2. Checking resolved path is within allowed root directories
+    3. Validating path exists and is accessible (when must_exist=True)
+    4. Rejecting paths with unsafe patterns (.., symlinks outside allowed roots)
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> _validate_parquet_path("/data/parquet/chunks", allowed_roots=[Path("/data/parquet")])
+    Path('/data/parquet/chunks')
+
+    >>> _validate_parquet_path("../../../etc/passwd", allowed_roots=[Path("/data/parquet")])
+    Traceback (most recent call last):
+        ...
+    ConfigurationError: Path resolves outside allowed directories
+    """
+    candidate = Path(path).expanduser()
+
+    # Resolve to absolute path to prevent path traversal
+    try:
+        resolved = candidate.resolve(strict=must_exist)
+    except (OSError, RuntimeError) as exc:
+        msg = f"Invalid parquet path: {path}"
+        raise ValueError(msg) from exc
+
+    # Determine allowed roots
+    if allowed_roots is None:
+        parquet_root_env = os.getenv("PARQUET_ROOT", "/data/parquet")
+        allowed_roots = [Path(parquet_root_env).resolve()]
+
+    # Validate path is within allowed directory
+    is_allowed = False
+    for allowed_root in allowed_roots:
+        allowed_resolved = allowed_root.resolve()
+        try:
+            # Check if resolved path is within allowed root
+            resolved.relative_to(allowed_resolved)
+            is_allowed = True
+            break
+        except ValueError:
+            # Path is not relative to this allowed root, continue checking
+            continue
+
+    if not is_allowed:
+        allowed_str = ", ".join(str(root) for root in allowed_roots)
+        msg = (
+            f"Path resolves outside allowed directories. "
+            f"Resolved: {resolved}, Allowed roots: {allowed_str}"
+        )
+        raise ConfigurationError(msg)
+
+    # Verify path exists and is accessible (if required)
+    if must_exist and not resolved.exists():
+        msg = f"Parquet path does not exist: {resolved}"
+        raise ValueError(msg)
+
+    return resolved
 
 
 def _as_str(value: object) -> str:
@@ -198,8 +292,9 @@ class BM25Index:
             if not isinstance(root_obj, str):
                 msg = f"Invalid parquet_root type: {type(root_obj)}"
                 raise TypeError(msg)
-            # Parameterize query - use pathlib for safe path construction
-            root_path = Path(root_obj)
+            # Validate and resolve path to prevent path traversal
+            # For pattern matching, we validate the root directory exists
+            root_path = _validate_parquet_path(root_obj, must_exist=True)
             parquet_pattern = str(root_path / "*" / "*.parquet")
             sql = """
                 SELECT c.chunk_id, c.doc_id, coalesce(c.section,''), c.text, coalesce(d.title,'')
@@ -289,12 +384,8 @@ class BM25Index:
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
         try:
-            # Parameterize query - validate and sanitize path input
-            path_obj = Path(path)
-            resolved_path = path_obj.resolve(strict=True)
-            if not resolved_path.exists():
-                msg = f"Parquet path not found: {path}"
-                raise FileNotFoundError(msg)
+            # Validate and resolve path to prevent path traversal
+            resolved_path = _validate_parquet_path(path)
             sql = """
                 SELECT chunk_id,
                        coalesce(doc_id, chunk_id) AS doc_id,

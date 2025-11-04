@@ -22,9 +22,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.errors import ConfigurationError
+from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
+LOGGER = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,8 +55,8 @@ def get_module_exports(module_name: str) -> set[str]:
     """
     try:
         module = importlib.import_module(module_name)
-    except ImportError as e:
-        print(f"ERROR: Could not import {module_name}: {e}")
+    except ImportError:
+        LOGGER.exception("Could not import %s", module_name)
         return set()
 
     # Use __all__ if available, otherwise use dir() filtering
@@ -125,8 +128,8 @@ def get_stub_exports(stub_path: Path) -> set[str]:
 
     try:
         tree = ast.parse(stub_path.read_text(encoding="utf-8"))
-    except SyntaxError as e:
-        print(f"ERROR: Could not parse {stub_path}: {e}")
+    except SyntaxError:
+        LOGGER.exception("Could not parse %s", stub_path)
         return set()
 
     exports = set()
@@ -271,13 +274,15 @@ def main() -> int:
     errors = 0
 
     for module_name, stub_path in modules_to_check:
-        print(f"\nChecking: {module_name}")
-        print("=" * 70)
+        LOGGER.info("Checking: %s", module_name, extra={"module_name": module_name})
+        LOGGER.info("=" * 70)
 
         # Get exports from runtime
         runtime_exports = get_module_exports(module_name)
         if not runtime_exports:
-            print("  ⚠ WARNING: Could not determine runtime exports")
+            LOGGER.warning(
+                "Could not determine runtime exports", extra={"module_name": module_name}
+            )
             continue
 
         # Get exports from stub
@@ -288,30 +293,47 @@ def main() -> int:
         extra_in_stub = stub_exports - runtime_exports
 
         if missing_in_stub:
-            print(f"  ✗ Missing in stub: {sorted(missing_in_stub)}")
+            LOGGER.error(
+                "Missing in stub: %s",
+                sorted(missing_in_stub),
+                extra={"module_name": module_name, "missing_symbols": sorted(missing_in_stub)},
+            )
             errors += 1
         else:
-            print("  ✓ All runtime exports present in stub")
+            LOGGER.info("All runtime exports present in stub", extra={"module_name": module_name})
 
         if extra_in_stub:
-            print(f"  ⚠ Extra in stub (OK if intentional): {sorted(extra_in_stub)}")
+            LOGGER.info(
+                "Extra in stub (OK if intentional): %s",
+                sorted(extra_in_stub),
+                extra={"module_name": module_name, "extra_symbols": sorted(extra_in_stub)},
+            )
 
         # Check for Any usage
         any_usages = check_any_usage(stub_path)
         if any_usages:
-            print(f"  ✗ Found {len(any_usages)} instance(s) of Any:")
+            LOGGER.error(
+                "Found %s instance(s) of Any",
+                len(any_usages),
+                extra={"module_name": module_name, "any_count": len(any_usages)},
+            )
             for line_num, line in any_usages:
-                print(f"      Line {line_num}: {line}")
+                LOGGER.error(
+                    "Line %s: %s",
+                    line_num,
+                    line,
+                    extra={"module_name": module_name, "line": line_num, "preview": line},
+                )
             errors += 1
         else:
-            print("  ✓ No problematic Any types found")
+            LOGGER.info("No problematic Any types found", extra={"module_name": module_name})
 
-    print("\n" + "=" * 70)
+    LOGGER.info("=" * 70)
     if errors:
-        print(f"FAILED: {errors} issue(s) found")
+        LOGGER.error("FAILED: %s issue(s) found", errors, extra={"error_count": errors})
         return 1
 
-    print("SUCCESS: All checks passed")
+    LOGGER.info("SUCCESS: All checks passed")
     return 0
 
 
