@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 from docs.scripts.testing import clear_lazy_import_caches
+from tests.helpers import load_module
 
 DOCS_SCRIPTS = [
     Path(__file__).parent.parent.parent / "docs" / "_scripts",
@@ -200,18 +201,15 @@ class TestDocstringAndMigrationGuidance:
 
     def test_docs_typing_facade_is_available(self) -> None:
         """Verify docs.typing module exists and provides helpers."""
-        import docs.typing  # noqa: PLC0415
+        module = load_module("docs.typing")
 
-        # Verify key re-exports from docs.typing
         expected_attrs = ["gate_import", "TYPE_CHECKING"]
         for attr in expected_attrs:
-            assert hasattr(docs.typing, attr), f"docs.typing should provide {attr} helper"
+            assert hasattr(module, attr), f"docs.typing should provide {attr} helper"
 
     def test_gate_import_is_documented(self) -> None:
         """Verify gate_import helper is documented."""
-        import docs.typing  # noqa: PLC0415
-
-        gate_import = docs.typing.gate_import
+        gate_import = getattr(load_module("docs.typing"), "gate_import")
         assert gate_import.__doc__, "gate_import should have a docstring"
 
 
@@ -228,7 +226,7 @@ class TestDocstringAndMigrationGuidance:
 def test_docs_scripts_importable(module_name: str) -> None:
     """Test that key docs scripts can be imported successfully."""
     try:
-        __import__(module_name)
+        load_module(module_name)
     except ImportError as exc:
         pytest.fail(f"Failed to import {module_name}: {exc}")
 

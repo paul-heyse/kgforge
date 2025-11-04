@@ -286,7 +286,8 @@ def _collect_class_symbol(
         owned = False
     col_offset_value = _safe_getattr(class_obj, "col_offset")
     col_offset = col_offset_value if isinstance(col_offset_value, int) else 0
-    end_lineno = _safe_getattr(class_obj, "endlineno")
+    end_lineno_value = _safe_getattr(class_obj, "endlineno")
+    end_lineno = end_lineno_value if isinstance(end_lineno_value, int) else None
     decorators_tuple = tuple(class_obj.decorators)
     lineno_value = _safe_getattr(class_obj, "lineno")
     lineno = lineno_value if isinstance(lineno_value, int) else 1
@@ -328,7 +329,8 @@ def _collect_function_symbol(
         return_annotation_obj = _safe_getattr(function_obj, "returns")
     col_offset_value = _safe_getattr(function_obj, "col_offset")
     col_offset = col_offset_value if isinstance(col_offset_value, int) else 0
-    end_lineno = _safe_getattr(function_obj, "endlineno")
+    end_lineno_value = _safe_getattr(function_obj, "endlineno")
+    end_lineno = end_lineno_value if isinstance(end_lineno_value, int) else None
     decorators_tuple = tuple(function_obj.decorators)
     is_async = bool(_safe_getattr(function_obj, "is_async"))
     is_generator = bool(_safe_getattr(function_obj, "is_generator"))
