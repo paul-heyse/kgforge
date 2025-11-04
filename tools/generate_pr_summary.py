@@ -61,7 +61,7 @@ class ArtifactSnapshot:
     schema_dir: bool
     dist_wheels: int
     dist_sdists: int
-    codemod_log: bool
+    codemod_logs: tuple[str, ...]
 
 
 STATUS_ICONS: Final[Mapping[StatusLiteral, str]] = {
@@ -95,7 +95,7 @@ def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot
     dist_dir = root / "dist"
     dist_wheels = len(list(dist_dir.glob("*.whl"))) if dist_dir.exists() else 0
     dist_sdists = len(list(dist_dir.glob("*.tar.gz"))) if dist_dir.exists() else 0
-    codemod_log = (root / "codemod.log").is_file()
+    codemod_logs = tuple(sorted(path.name for path in root.glob("codemod*.log") if path.is_file()))
     return ArtifactSnapshot(
         coverage_xml=coverage_xml,
         coverage_html=coverage_html,
@@ -106,7 +106,7 @@ def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot
         schema_dir=schema_dir,
         dist_wheels=dist_wheels,
         dist_sdists=dist_sdists,
-        codemod_log=codemod_log,
+        codemod_logs=codemod_logs,
     )
 
 
@@ -187,11 +187,14 @@ def generate_summary(
     lines.extend(check.to_row() for check in (checks or DEFAULT_CHECKS))
     lines.append("")
 
-    if artifact_snapshot.codemod_log:
+    if artifact_snapshot.codemod_logs:
         _append_section(
             lines,
             "## 🔧 Codemod Logs",
-            ("- ✅ Codemod execution log: `codemod.log`",),
+            tuple(
+                f"- ✅ Codemod execution log: `{filename}`"
+                for filename in artifact_snapshot.codemod_logs
+            ),
         )
 
     return "\n".join(lines)
