@@ -22,7 +22,7 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Any, Final, Protocol, Self, cast, runtime_checkable
 
-type FormatterType = logging.Formatter
+FormatterType: type[logging.Formatter] = logging.Formatter
 
 if TYPE_CHECKING:
     from kgfoundry_common.navmap_types import NavMap

@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from functools import cache
 from importlib import import_module
 from typing import TYPE_CHECKING, cast
 
-if TYPE_CHECKING:
-    from types import ModuleType
+from docs.scripts._module_cache import ModuleExportsCache
 
 MODULE_PATH = "docs._scripts.shared"
 
@@ -28,14 +26,15 @@ __all__ = [
     "safe_json_serialize",
 ]
 
+_CACHE = ModuleExportsCache(MODULE_PATH)
 
-@cache
+
 def _load_module() -> ModuleType:
-    return import_module(MODULE_PATH)
+    return _CACHE.load_module()
 
 
 def clear_cache() -> None:
-    _load_module.cache_clear()
+    _CACHE.reset()
 
 
 def __getattr__(name: str) -> object:
@@ -50,20 +49,22 @@ def __dir__() -> list[str]:
     return sorted(__all__)
 
 
-if TYPE_CHECKING:  # pragma: no cover - typing assistance only
-    from docs._scripts import shared as _shared
+if TYPE_CHECKING:
+    from types import ModuleType
+else:  # pragma: no cover - runtime helper for annotations
+    ModuleType = type(import_module("types"))
 
-    BuildEnvironment = _shared.BuildEnvironment
-    DocsSettings = _shared.DocsSettings
-    GriffeLoader = _shared.GriffeLoader
-    LinkMode = _shared.LinkMode
-    WarningLogger = _shared.WarningLogger
-    build_warning_logger = _shared.build_warning_logger
-    detect_environment = _shared.detect_environment
-    ensure_sys_paths = _shared.ensure_sys_paths
-    load_settings = _shared.load_settings
-    make_loader = _shared.make_loader
-    make_logger = _shared.make_logger
-    resolve_git_sha = _shared.resolve_git_sha
-    safe_json_deserialize = _shared.safe_json_deserialize
-    safe_json_serialize = _shared.safe_json_serialize
+BuildEnvironment: object
+DocsSettings: object
+GriffeLoader: object
+LinkMode: object
+WarningLogger: object
+build_warning_logger: object
+detect_environment: object
+ensure_sys_paths: object
+load_settings: object
+make_loader: object
+make_logger: object
+resolve_git_sha: object
+safe_json_deserialize: object
+safe_json_serialize: object

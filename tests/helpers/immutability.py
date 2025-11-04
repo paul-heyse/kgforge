@@ -19,9 +19,8 @@ Example
 
 from __future__ import annotations
 
-import typing
 from dataclasses import FrozenInstanceError
-from typing import Any, TypeVar
+from typing import Protocol
 
 import pytest
 
@@ -31,22 +30,24 @@ __all__ = [
     "assert_frozen_mutation",
 ]
 
-T = TypeVar("T")
 
-
-def assert_frozen_attribute(obj: object, attr: str, value: Any) -> None:
+def assert_frozen_attribute(obj: object, attr: str, value: object) -> None:
     """Assert that assigning ``value`` to ``attr`` raises ``FrozenInstanceError``."""
     with pytest.raises(FrozenInstanceError):
         setattr(obj, attr, value)
 
 
-def assert_frozen_attributes(obj: object, **updates: Any) -> None:
+def assert_frozen_attributes(obj: object, **updates: object) -> None:
     """Assert that each attribute in ``updates`` rejects reassignment."""
     for name, value in updates.items():
         assert_frozen_attribute(obj, name, value)
 
 
-def assert_frozen_mutation(obj: T, mutate: typing.Callable[[T], Any]) -> None:
+class _Mutator[T](Protocol):
+    def __call__(self, obj: T, /) -> object: ...
+
+
+def assert_frozen_mutation[T](obj: T, mutate: _Mutator[T]) -> None:
     """Assert that executing ``mutate`` on ``obj`` raises ``FrozenInstanceError``."""
     with pytest.raises(FrozenInstanceError):
         mutate(obj)

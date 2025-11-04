@@ -3,16 +3,23 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping
 from pathlib import Path
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.errors import ConfigurationError
 from kgfoundry_common.problem_details import (
     build_configuration_problem,
     validate_problem_details,
 )
-from kgfoundry_common.types import JsonValue, ProblemDetails
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from kgfoundry_common.problem_details import ProblemDetails
+    from kgfoundry_common.types import JsonValue
+else:  # pragma: no cover - runtime stand-ins for type aliases
+    ProblemDetails = dict[str, object]
+    JsonValue = object
 
 
 def _load_sample_payload() -> dict[str, JsonValue]:

@@ -13,6 +13,7 @@ from types import ModuleType
 
 import pytest
 
+import kgfoundry_common.typing as typing_module
 from kgfoundry_common.typing import (
     JSONValue,
     NavMap,
@@ -24,6 +25,23 @@ from kgfoundry_common.typing import (
     resolve_numpy,
     safe_get_type,
 )
+
+
+def _install_fake_faiss(monkeypatch: pytest.MonkeyPatch) -> ModuleType:
+    """Patch gate_import to return a synthetic faiss module during a test."""
+    fake_module = ModuleType("faiss")
+
+    def _patched_gate_import(module_name: str, purpose: str) -> ModuleType:
+        if module_name == "faiss":
+            return fake_module
+        result = gate_import(module_name, purpose)
+        if isinstance(result, ModuleType):
+            return result
+        message = "gate_import returned non-module result"
+        raise AssertionError(message)
+
+    monkeypatch.setattr(typing_module, "gate_import", _patched_gate_import)
+    return fake_module
 
 
 class TestGateImport:
@@ -101,8 +119,9 @@ class TestBackwardCompatibilityShims:
         with pytest.warns(DeprecationWarning, match=r"resolve_fastapi.*deprecated"):
             resolve_fastapi()
 
-    def test_resolve_faiss_emits_deprecation_warning(self) -> None:
+    def test_resolve_faiss_emits_deprecation_warning(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """resolve_faiss() emits a DeprecationWarning."""
+        _install_fake_faiss(monkeypatch)
         with pytest.warns(DeprecationWarning, match=r"resolve_faiss.*deprecated"):
             resolve_faiss()
 
@@ -121,8 +140,9 @@ class TestBackwardCompatibilityShims:
         assert isinstance(fastapi, ModuleType), "resolve_fastapi should return a module"
         assert hasattr(fastapi, "FastAPI"), "fastapi module should have 'FastAPI' attribute"
 
-    def test_resolve_faiss_returns_module(self) -> None:
+    def test_resolve_faiss_returns_module(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """resolve_faiss() returns the faiss module (despite deprecation)."""
+        _install_fake_faiss(monkeypatch)
         with pytest.warns(DeprecationWarning, match=r"deprecated"):
             faiss = resolve_faiss()
         # Just verify we got something that looks like a module
