@@ -11,16 +11,13 @@ from __future__ import annotations
 import argparse
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import libcst as cst
 
 logger = logging.getLogger(__name__)
 
 MIN_MODULE_PARTS = 2
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
 
 
 class TypingFacadeMigrator(cst.CSTTransformer):
@@ -30,7 +27,7 @@ class TypingFacadeMigrator(cst.CSTTransformer):
         """Initialize the transformer."""
         self.modified = False
 
-    def leave_ImportFrom(  # noqa: N802
+    def leave_import_from(
         self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
     ) -> cst.ImportFrom | cst.RemovalSentinel:
         """Replace docs._types imports with docs.types facade imports."""
@@ -60,7 +57,7 @@ class TypingFacadeMigrator(cst.CSTTransformer):
 
         return updated_node
 
-    def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:  # noqa: N802
+    def leave_call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
         """Replace resolve_* shim calls with gate_import."""
         # Note: original_node is needed by libcst visitor protocol
         del original_node
@@ -108,6 +105,10 @@ class TypingFacadeMigrator(cst.CSTTransformer):
         return result
 
 
+TypingFacadeMigrator.leave_ImportFrom = cast("object", TypingFacadeMigrator.leave_import_from)
+TypingFacadeMigrator.leave_Call = cast("object", TypingFacadeMigrator.leave_call)
+
+
 def run_codemod_on_file(file_path: Path) -> bool:
     """Apply the typing facade migration codemod to a file.
 
@@ -137,7 +138,7 @@ def run_codemod_on_file(file_path: Path) -> bool:
     return False
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def main(argv: list[str] | tuple[str, ...] | None = None) -> int:
     """Migrate typing imports to facades.
 
     Transforms:
@@ -146,7 +147,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     Parameters
     ----------
-    argv : Sequence[str] | None, optional
+    argv : list[str] | tuple[str, ...] | None, optional
         Command-line arguments.
 
     Returns
@@ -173,7 +174,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # Collect all Python files
     python_files: list[Path] = []
-    raw_paths = cast("Sequence[Path]", getattr(args, "paths", ()))
+    raw_paths = cast("list[Path]", args.paths)
     for path_arg in raw_paths:
         if path_arg.is_file() and path_arg.suffix == ".py":
             python_files.append(path_arg)

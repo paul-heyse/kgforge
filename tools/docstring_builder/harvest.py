@@ -284,10 +284,12 @@ def _collect_class_symbol(
     owned = docstring is None or config.ownership_marker in docstring
     if qname in config.package_settings.opt_out:
         owned = False
-    col_offset = class_obj.col_offset if class_obj.col_offset is not None else 0
-    end_lineno = class_obj.endlineno
+    col_offset_value = _safe_getattr(class_obj, "col_offset")
+    col_offset = col_offset_value if isinstance(col_offset_value, int) else 0
+    end_lineno = _safe_getattr(class_obj, "endlineno")
     decorators_tuple = tuple(class_obj.decorators)
-    lineno = class_obj.lineno if class_obj.lineno is not None else 1
+    lineno_value = _safe_getattr(class_obj, "lineno")
+    lineno = lineno_value if isinstance(lineno_value, int) else 1
     yield SymbolHarvest(
         qname=qname,
         module=module_name,
@@ -321,13 +323,17 @@ def _collect_function_symbol(
     owned = docstring is None or config.ownership_marker in docstring
     if qname in config.package_settings.opt_out:
         owned = False
-    return_annotation_obj = function_obj.return_annotation or function_obj.returns
-    col_offset = function_obj.col_offset if function_obj.col_offset is not None else 0
-    end_lineno = function_obj.endlineno
+    return_annotation_obj = _safe_getattr(function_obj, "return_annotation")
+    if return_annotation_obj is None:
+        return_annotation_obj = _safe_getattr(function_obj, "returns")
+    col_offset_value = _safe_getattr(function_obj, "col_offset")
+    col_offset = col_offset_value if isinstance(col_offset_value, int) else 0
+    end_lineno = _safe_getattr(function_obj, "endlineno")
     decorators_tuple = tuple(function_obj.decorators)
-    is_async = function_obj.is_async
-    is_generator = function_obj.is_generator
-    lineno = function_obj.lineno if function_obj.lineno is not None else 1
+    is_async = bool(_safe_getattr(function_obj, "is_async"))
+    is_generator = bool(_safe_getattr(function_obj, "is_generator"))
+    lineno_value = _safe_getattr(function_obj, "lineno")
+    lineno = lineno_value if isinstance(lineno_value, int) else 1
     yield SymbolHarvest(
         qname=qname,
         module=module_name,
