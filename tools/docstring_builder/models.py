@@ -523,6 +523,39 @@ class CliResultOptionalFields(TypedDict, total=False):
     problem: ProblemDetails
 
 
+CliResultOptionalKey = Literal[
+    "subcommand",
+    "durationSeconds",
+    "files",
+    "errors",
+    "summary",
+    "policy",
+    "baseline",
+    "cache",
+    "inputs",
+    "plugins",
+    "docfacts",
+    "observability",
+    "problem",
+]
+
+_CLI_OPTIONAL_KEYS: tuple[CliResultOptionalKey, ...] = (
+    "subcommand",
+    "durationSeconds",
+    "files",
+    "errors",
+    "summary",
+    "policy",
+    "baseline",
+    "cache",
+    "inputs",
+    "plugins",
+    "docfacts",
+    "observability",
+    "problem",
+)
+
+
 class CliResult(TypedDict, total=False):
     """Fully-typed structure matching ``schema/tools/docstring_builder_cli.json``.
 
@@ -596,8 +629,18 @@ def _build_required_fields(
     }
 
 
+def _copy_optional_field(
+    result: dict[str, object],
+    optional: CliResultOptionalFields,
+    key: CliResultOptionalKey,
+) -> None:
+    value = optional.get(key)
+    if value is not None:
+        result[key] = value
+
+
 def _add_optional_fields(
-    result: CliResult, optional: CliResultOptionalFields | None = None
+    result: dict[str, object], optional: CliResultOptionalFields | None = None
 ) -> None:
     """Add optional fields to CliResult if provided.
 
@@ -610,9 +653,9 @@ def _add_optional_fields(
     """
     if optional is None:
         return
-    for key, value in optional.items():
-        if value is not None:
-            result[key] = value  # type: ignore[literal-required]
+
+    for key in _CLI_OPTIONAL_KEYS:
+        _copy_optional_field(result, optional, key)
 
 
 def make_cli_result(
@@ -653,12 +696,15 @@ def make_cli_result(
     >>> result.get("subcommand")
     'docstrings'
     """
-    result: CliResult = cast(
-        "CliResult",
-        _build_required_fields(status, command, schema_version=schema_version, schema_id=schema_id),
+    required_fields = _build_required_fields(
+        status,
+        command,
+        schema_version=schema_version,
+        schema_id=schema_id,
     )
-    _add_optional_fields(result, optional)
-    return result
+    result_fields: dict[str, object] = {**required_fields}
+    _add_optional_fields(result_fields, optional)
+    return cast("CliResult", result_fields)
 
 
 _DOCFACTS_VALIDATOR: Final[Draft202012ValidatorProtocol] = create_draft202012_validator(
