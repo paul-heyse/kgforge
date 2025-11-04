@@ -71,6 +71,9 @@ if TYPE_CHECKING:
         SymbolIndexArtifacts,
     )
 
+type ReverseLookup = dict[str, tuple[str, ...]]
+type ReverseLookupPayload = dict[str, list[str]]
+
 ENV = shared.detect_environment()
 shared.ensure_sys_paths(ENV)
 SETTINGS = shared.load_settings()
@@ -151,6 +154,9 @@ class ArtifactCheck:
 def _resolve_schema(name: str) -> Path:
     """Return the absolute path to a documentation schema file."""
     return SCHEMA_ROOT / name
+def _schema_path(filename: str) -> Path:
+    """Return the absolute path to a docs schema file."""
+    return ENV.root / "schema" / "docs" / filename
 
 
 def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
@@ -183,6 +189,7 @@ def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
         raise ArtifactValidationError(message, artifact_name="symbols.json") from e
 
     schema = _resolve_schema("symbol-index.schema.json")
+    schema = _schema_path("symbol-index.schema.json")
     try:
         validate_against_schema(symbol_index_to_payload(artifacts), schema, artifact="symbols.json")
     except ToolExecutionError as e:
@@ -225,6 +232,7 @@ def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
         raise ArtifactValidationError(message, artifact_name="symbols.delta.json") from e
 
     schema = _resolve_schema("symbol-delta.schema.json")
+    schema = _schema_path("symbol-delta.schema.json")
     try:
         validate_against_schema(
             symbol_delta_to_payload(payload), schema, artifact="symbols.delta.json"
@@ -237,6 +245,78 @@ def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
         ) from e
 
     return payload
+
+
+def _load_reverse_lookup(
+    path: Path,
+    *,
+    artifact_name: str,
+    schema_filename: str,
+) -> ReverseLookup:
+    """Load and validate a reverse lookup artifact."""
+    if not path.exists():
+        message = f"Reverse lookup not found: {path}"
+        raise ArtifactValidationError(message, artifact_name=artifact_name)
+
+    try:
+        raw_data: object = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, TypeError, json.JSONDecodeError) as e:
+        message = f"Failed to parse {artifact_name}: {e}"
+        raise ArtifactValidationError(message, artifact_name=artifact_name) from e
+
+    if not isinstance(raw_data, dict):
+        message = f"{artifact_name} must be a JSON object mapping strings to arrays"
+        raise ArtifactValidationError(message, artifact_name=artifact_name)
+
+    payload: ReverseLookupPayload = {}
+    typed_lookup: ReverseLookup = {}
+    for key, value in raw_data.items():
+        if not isinstance(key, str) or not key:
+            message = f"Invalid key in {artifact_name}: {key!r}"
+            raise ArtifactValidationError(message, artifact_name=artifact_name)
+        if not isinstance(value, list):
+            message = f"{artifact_name} values must be arrays of strings"
+            raise ArtifactValidationError(message, artifact_name=artifact_name)
+
+        values: list[str] = []
+        for index, item in enumerate(value):
+            if not isinstance(item, str) or not item:
+                message = f"{artifact_name} entries must be non-empty strings (key={key!r}, index={index})"
+                raise ArtifactValidationError(message, artifact_name=artifact_name)
+            values.append(item)
+
+        payload[key] = values
+        typed_lookup[key] = tuple(values)
+
+    schema = _schema_path(schema_filename)
+    try:
+        validate_against_schema(payload, schema, artifact=artifact_name)
+    except ToolExecutionError as e:
+        raise ArtifactValidationError(
+            str(e),
+            artifact_name=artifact_name,
+            problem=e.problem,
+        ) from e
+
+    return typed_lookup
+
+
+def validate_by_file_lookup(path: Path) -> ReverseLookup:
+    """Validate a by-file reverse lookup JSON file against its schema."""
+    return _load_reverse_lookup(
+        path,
+        artifact_name="by_file.json",
+        schema_filename="symbol-reverse-lookup.schema.json",
+    )
+
+
+def validate_by_module_lookup(path: Path) -> ReverseLookup:
+    """Validate a by-module reverse lookup JSON file against its schema."""
+    return _load_reverse_lookup(
+        path,
+        artifact_name="by_module.json",
+        schema_filename="symbol-reverse-lookup.schema.json",
+    )
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -279,9 +359,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 
-    artifacts_to_check: dict[str, Callable[[Path], SymbolIndexArtifacts | SymbolDeltaPayload]] = {
+    artifacts_to_check: dict[
+        str,
+        Callable[[Path], SymbolIndexArtifacts | SymbolDeltaPayload | ReverseLookup],
+    ] = {
         "symbols.json": validate_symbol_index,
         "symbols.delta.json": validate_symbol_delta,
+        "by_file.json": validate_by_file_lookup,
+        "by_module.json": validate_by_module_lookup,
     }
 
     with observe_tool_run(

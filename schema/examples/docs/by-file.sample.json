@@ -1,0 +1,9 @@
+{
+  "pkg/module.py": [
+    "pkg.module.Class",
+    "pkg.module.func"
+  ],
+  "pkg/__init__.py": [
+    "pkg.helper"
+  ]
+}
