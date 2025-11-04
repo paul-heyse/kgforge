@@ -46,7 +46,24 @@ def test_render_docstring_includes_falsey_default() -> None:
 
     rendered = render_docstring(schema=schema, marker="[generated]")
 
-    assert ", by default " in rendered
+    assert ', by default ""' in rendered
+
+
+def test_render_signature_includes_empty_string_default() -> None:
+    """Signature rendering should quote empty-string defaults."""
+    parameter = ParameterDoc(
+        name="title",
+        annotation="str",
+        description="Title for the resource.",
+        optional=True,
+        default="",
+        kind="positional_or_keyword",
+    )
+    schema = DocstringSchema(summary="Return a title.", parameters=[parameter])
+
+    rendered = render_docstring(schema=schema, marker="[generated]", include_signature=True)
+
+    assert '= ""' in rendered
 
 
 def test_write_template_to_creates_parent_directories(tmp_path: Path) -> None:
