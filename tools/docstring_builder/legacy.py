@@ -7,7 +7,7 @@ import contextvars
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Self, cast
 
 from tools.docstring_builder.apply import apply_edits
 from tools.docstring_builder.config import DEFAULT_MARKER
@@ -59,11 +59,11 @@ class LegacyConfig:
 
     _instance: LegacyConfig | None = None
 
-    def __new__(cls) -> LegacyConfig:
+    def __new__(cls) -> Self:
         """Return singleton instance."""
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+            cls._instance = cast("LegacyConfig", super().__new__(cls))
+        return cast("Self", cls._instance)
 
     @property
     def repo_root(self) -> Path:

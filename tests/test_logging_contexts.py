@@ -29,9 +29,12 @@ from kgfoundry_common.logging import (
 from tests.helpers import assert_frozen_attribute
 
 if TYPE_CHECKING:
+    from tools.docstring_builder.models import CliResultOptionalFields
+
     from kgfoundry_common.problem_details import ProblemDetails
 else:  # pragma: no cover - runtime stand-in for typing alias
     ProblemDetails = dict[str, object]
+    CliResultOptionalFields = dict[str, object]
 
 
 class TestLogContextExtraImmutability:
@@ -241,8 +244,6 @@ class TestCliResultConstructor:
 
     def test_make_cli_result_with_optionals(self) -> None:
         """Helper includes optional fields when provided."""
-        from tools.docstring_builder.models import CliResultOptionalFields
-
         optional: CliResultOptionalFields = {
             "subcommand": "docstrings",
             "durationSeconds": 1.5,

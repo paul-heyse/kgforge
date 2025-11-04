@@ -14,7 +14,8 @@ from pathlib import Path
 
 import pytest
 from docs.scripts.testing import clear_lazy_import_caches
-from tests.helpers import load_module
+
+from tests.helpers import load_attribute, load_module
 
 DOCS_SCRIPTS = [
     Path(__file__).parent.parent.parent / "docs" / "_scripts",
@@ -209,7 +210,7 @@ class TestDocstringAndMigrationGuidance:
 
     def test_gate_import_is_documented(self) -> None:
         """Verify gate_import helper is documented."""
-        gate_import = getattr(load_module("docs.typing"), "gate_import")
+        gate_import = load_attribute("docs.typing", "gate_import")
         assert gate_import.__doc__, "gate_import should have a docstring"
 
 

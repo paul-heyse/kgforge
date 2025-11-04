@@ -29,10 +29,10 @@ Load with type checking:
 from __future__ import annotations
 
 from importlib import import_module
-from types import ModuleType
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, cast
 
-T = TypeVar("T")
+if TYPE_CHECKING:
+    from types import ModuleType
 
 
 def load_facade_module(module_name: str) -> ModuleType:
@@ -93,10 +93,11 @@ def load_facade_attribute(module_name: str, attribute: str) -> object:
     >>> assert callable(gate_import)
     """
     module = load_facade_module(module_name)
-    return getattr(module, attribute)  # type: ignore[misc]
+    attr: object = getattr(module, attribute)
+    return attr
 
 
-def load_facade_attribute_typed(module_name: str, attribute: str, expected_type: type[T]) -> T:
+def load_facade_attribute_typed[T](module_name: str, attribute: str, expected_type: type[T]) -> T:
     """Load an attribute from a façade module with runtime type checking.
 
     Parameters
@@ -136,13 +137,4 @@ def load_facade_attribute_typed(module_name: str, attribute: str, expected_type:
             f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
         )
         raise TypeError(message)
-    # Type narrowing confirmed by isinstance check above
-    return value
-
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    LoadFacadeModuleFunc = Callable[[str], ModuleType]
-    LoadFacadeAttributeFunc = Callable[[str, str], object]
-    LoadFacadeAttributeTypedFunc = Callable[[str, str, type[T]], T]
+    return cast("T", value)

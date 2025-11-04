@@ -3,11 +3,27 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TypedDict, cast
 
 import pytest
 import tools.check_new_suppressions as suppression_guard
 
 from kgfoundry_common.errors import ConfigurationError
+
+
+class SuppressionViolationEntry(TypedDict):
+    line: int
+    preview: str
+
+
+class SuppressionFileEntry(TypedDict):
+    file: str
+    violations: list[SuppressionViolationEntry]
+
+
+class SuppressionContext(TypedDict):
+    violation_count: int
+    files: list[SuppressionFileEntry]
 
 
 def _write(base: Path, name: str, content: str) -> Path:
@@ -25,10 +41,13 @@ def test_run_suppression_guard_detects_missing_ticket(tmp_path: Path) -> None:
 
     context = excinfo.value.context
     assert context is not None
-    assert context["violation_count"] == 1
-    file_entry = context["files"][0]
-    assert Path(file_entry["file"]).name == "module.py"
-    assert file_entry["violations"][0]["line"] == 1
+    context_dict = cast("SuppressionContext", context)
+    assert context_dict["violation_count"] == 1
+    file_entry = context_dict["files"][0]
+    file_path = Path(file_entry["file"])
+    assert file_path.name == "module.py"
+    first_violation = file_entry["violations"][0]
+    assert first_violation["line"] == 1
 
 
 def test_run_suppression_guard_allows_ticket_metadata(tmp_path: Path) -> None:
