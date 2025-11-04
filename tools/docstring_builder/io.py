@@ -77,18 +77,38 @@ def module_to_path(module: str, *, repo_root: Path = REPO_ROOT) -> Path | None:
     """Best-effort mapping from dotted module name to a filesystem path."""
     if not module:
         return None
+
     parts = module.split(".")
-    relative = Path("src", *parts)
-    file_candidate = repo_root / relative
+    search_roots: list[Path] = [Path("src"), Path("tools")]
+    docs_dir = repo_root / "docs"
+    if docs_dir.exists():
+        search_roots.append(Path("docs"))
+
+    fallback: Path | None = None
+    for root in search_roots:
+        if parts and parts[0] == root.name:
+            relative = Path(*parts)
+        else:
+            relative = root.joinpath(*parts)
+        file_candidate = repo_root / relative
+        if file_candidate.suffix:
+            return file_candidate
+        file_path = file_candidate.with_suffix(".py")
+        if file_path.exists():
+            return file_path
+        package_init = file_candidate / "__init__.py"
+        if package_init.exists():
+            return package_init
+        if fallback is None:
+            fallback = file_path
+
+    if fallback is not None:
+        return fallback
+
+    file_candidate = repo_root.joinpath(*parts)
     if file_candidate.suffix:
         return file_candidate
-    file_path = file_candidate.with_suffix(".py")
-    if file_path.exists():
-        return file_path
-    package_init = file_candidate / "__init__.py"
-    if package_init.exists():
-        return package_init
-    return file_path
+    return file_candidate.with_suffix(".py")
 
 
 def module_name_from_path(path: Path, *, repo_root: Path = REPO_ROOT) -> str:
