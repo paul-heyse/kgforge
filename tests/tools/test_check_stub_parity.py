@@ -42,8 +42,8 @@ def test_evaluate_stub_reports_any_usage(tmp_path: Path) -> None:
     outcome = stub_parity.evaluate_stub(module_name, stub_path)
 
     assert outcome.any_usages
-    assert outcome.any_usages[0].line_number == 3
-    assert outcome.has_failures()
+    assert outcome.any_usages[0][0] == 3  # First element is line_number
+    assert outcome.has_errors
 
 
 def test_run_stub_parity_checks_success(tmp_path: Path) -> None:

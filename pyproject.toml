@@ -678,12 +678,11 @@ runtime-evaluated-base-classes = [
     "T20",
     "PLR6301",  # pytest test classes require instance methods for test isolation
 ]
-"tests/test_namespace_proxy.py" = ["PLC0415", "PLC2701", "TID251", "TRY003", "EM101"]  # Tests of internal _namespace_proxy module
+"tests/test_namespace_proxy.py" = ["PLC2701", "TID251", "TRY003", "EM101"]  # Tests of internal _namespace_proxy module
 "tests/docs/test_griffe_facade.py" = ["PLC2701"]  # Tests of docs._types and docs._scripts facades; imports from private modules expected
 "**/*.pyi" = ["PIE790"]  # Stub files require ... literals
 "tools/check_new_suppressions.py" = ["T201", "BLE001", "SIM102", "PLR2004"]  # CLI script: print is OK, Exception catch for file I/O
 "tools/check_stub_parity.py" = ["T201"]  # CLI script: print is OK for user-facing diagnostic output
-"tools/generate_pr_summary.py" = ["T201", "BLE001", "C901", "PLR0915", "TRY300", "SIM115"]  # CLI script: print is OK, complexity acceptable
 "src/search_api/bm25_index.py" = ["S608"]  # DuckDB read_parquet() paths from trusted sources (DB queries/config), not user input
 "src/kgfoundry/tooling_bridge.py" = ["PLC2701", "TID251"]
 "docs/_types/**" = ["PLC2701"]  # docs._types is a special module namespace for typed facades

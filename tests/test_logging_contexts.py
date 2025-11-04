@@ -241,12 +241,13 @@ class TestCliResultConstructor:
 
     def test_make_cli_result_with_optionals(self) -> None:
         """Helper includes optional fields when provided."""
-        result = make_cli_result(
-            status="success",
-            command="build",
-            subcommand="docstrings",
-            duration_seconds=1.5,
-        )
+        from tools.docstring_builder.models import CliResultOptionalFields
+
+        optional: CliResultOptionalFields = {
+            "subcommand": "docstrings",
+            "durationSeconds": 1.5,
+        }
+        result = make_cli_result(status="success", command="build", optional=optional)
 
         assert result["status"] == "success"
         assert result.get("subcommand") == "docstrings"

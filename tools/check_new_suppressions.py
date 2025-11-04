@@ -22,10 +22,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from kgfoundry_common.errors import ConfigurationError
 from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
 
 LOGGER = get_logger(__name__)
 
@@ -90,6 +92,80 @@ def check_directory(directory: Path) -> dict[Path, list[SuppressionViolation]]:
             violations[py_file] = file_violations
 
     return violations
+
+
+def _resolve_target_directories(paths: list[str]) -> list[Path]:
+    """Resolve and validate target directories.
+
+    Parameters
+    ----------
+    paths : list[str]
+        List of directory paths to resolve.
+
+    Returns
+    -------
+    list[Path]
+        List of resolved Path objects.
+
+    Raises
+    ------
+    ConfigurationError
+        If any path doesn't exist or is not a directory.
+    """
+    resolved: list[Path] = []
+    for path_str in paths:
+        path = Path(path_str)
+        if not path.exists():
+            msg = f"Directory does not exist: {path_str}"
+            raise ConfigurationError(msg)
+        if not path.is_dir():
+            msg = f"Path is not a directory: {path_str}"
+            raise ConfigurationError(msg)
+        resolved.append(path.resolve())
+    return resolved
+
+
+def run_suppression_guard(directories: list[Path]) -> None:
+    """Run suppression guard on the given directories.
+
+    Parameters
+    ----------
+    directories : list[Path]
+        List of directories to check.
+
+    Raises
+    ------
+    ConfigurationError
+        If any violations are found. The error context contains violation details.
+    """
+    violations: dict[Path, list[SuppressionViolation]] = {}
+    for directory in directories:
+        dir_violations = check_directory(directory)
+        violations.update(dir_violations)
+
+    if violations:
+        violation_count = sum(len(v) for v in violations.values())
+        files = [
+            {
+                "file": str(file_path),
+                "violations": [
+                    {
+                        "line": v.line_number,
+                        "preview": v.line_preview,
+                    }
+                    for v in file_violations
+                ],
+            }
+            for file_path, file_violations in sorted(violations.items())
+        ]
+        message = f"Found {violation_count} suppression(s) without TICKET: tags"
+        raise ConfigurationError(
+            message,
+            context={
+                "violation_count": violation_count,
+                "files": files,
+            },
+        )
 
 
 def main() -> int:

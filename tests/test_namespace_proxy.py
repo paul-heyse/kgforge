@@ -7,12 +7,41 @@ caching, and error handling without relying on Any types.
 from __future__ import annotations
 
 from types import ModuleType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from tests.helpers import load_attribute
+
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable, MutableMapping
+
+    from kgfoundry._namespace_proxy import NamespaceRegistry
+
+    NamespaceRegistryType = type[NamespaceRegistry]
+
+# Load test dependencies at module level to avoid PLC0415 violations
+# Use string literals in casts to avoid runtime import of Callable
+# Type checker will validate these via TYPE_CHECKING imports above
+NamespaceRegistry = cast(
+    "NamespaceRegistryType", load_attribute("kgfoundry._namespace_proxy", "NamespaceRegistry")
+)
+namespace_exports = cast(
+    "Callable[[ModuleType], list[str]]",
+    load_attribute("kgfoundry._namespace_proxy", "namespace_exports"),
+)
+namespace_attach = cast(
+    "Callable[[ModuleType, MutableMapping[str, object], Iterable[str]], None]",
+    load_attribute("kgfoundry._namespace_proxy", "namespace_attach"),
+)
+namespace_dir = cast(
+    "Callable[[ModuleType, Iterable[str]], list[str]]",
+    load_attribute("kgfoundry._namespace_proxy", "namespace_dir"),
+)
+namespace_getattr = cast(
+    "Callable[[ModuleType, str], object]",
+    load_attribute("kgfoundry._namespace_proxy", "namespace_getattr"),
+)
 
 
 def _set_module_attr(module: ModuleType, name: str, value: object) -> None:
@@ -25,8 +54,6 @@ class TestNamespaceRegistry:
 
     def test_register_and_resolve_single_symbol(self) -> None:
         """Test basic registration and resolution of a symbol."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         test_value = {"key": "value"}
         registry.register("test_symbol", lambda: test_value)
@@ -36,8 +63,6 @@ class TestNamespaceRegistry:
 
     def test_resolve_caches_result(self) -> None:
         """Test that resolved symbols are cached to avoid repeated loader invocations."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         call_count = 0
 
@@ -60,8 +85,6 @@ class TestNamespaceRegistry:
 
     def test_register_duplicate_symbol_raises_error(self) -> None:
         """Test that registering the same symbol twice raises ValueError."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         registry.register("symbol", lambda: "value1")
 
@@ -71,8 +94,6 @@ class TestNamespaceRegistry:
 
     def test_resolve_unregistered_symbol_raises_error(self) -> None:
         """Test that resolving an unregistered symbol raises KeyError."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         registry.register("existing", lambda: "value")
 
@@ -81,8 +102,6 @@ class TestNamespaceRegistry:
 
     def test_resolve_unregistered_lists_available_symbols(self) -> None:
         """Test that KeyError message lists available symbols."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         registry.register("symbol_a", lambda: "a")
         registry.register("symbol_b", lambda: "b")
@@ -93,8 +112,6 @@ class TestNamespaceRegistry:
 
     def test_list_symbols_returns_sorted_names(self) -> None:
         """Test that list_symbols returns symbols in sorted order."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         registry.register("zebra", lambda: "z")
         registry.register("apple", lambda: "a")
@@ -105,15 +122,11 @@ class TestNamespaceRegistry:
 
     def test_list_symbols_empty_registry(self) -> None:
         """Test that list_symbols returns empty list for empty registry."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
         assert registry.list_symbols() == []
 
     def test_resolve_with_exception_in_loader(self) -> None:
         """Test that exceptions in loaders propagate correctly."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
 
         def failing_loader() -> object:
@@ -126,8 +139,6 @@ class TestNamespaceRegistry:
 
     def test_resolve_returns_various_types(self) -> None:
         """Test that resolve works with various object types."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry = NamespaceRegistry()
 
         test_cases: dict[str, object] = {
@@ -156,8 +167,6 @@ class TestNamespaceRegistry:
 
     def test_multiple_registries_independent(self) -> None:
         """Test that multiple registries maintain separate state."""
-        from kgfoundry._namespace_proxy import NamespaceRegistry
-
         registry1 = NamespaceRegistry()
         registry2 = NamespaceRegistry()
 
@@ -173,8 +182,6 @@ class TestNamespaceHelpers:
 
     def test_namespace_exports_with_all_attribute(self) -> None:
         """Test that namespace_exports respects __all__ when present."""
-        from kgfoundry._namespace_proxy import namespace_exports
-
         module = ModuleType("test_module")
         all_exports: list[str] = ["public_func", "public_class"]
 
@@ -191,8 +198,6 @@ class TestNamespaceHelpers:
 
     def test_namespace_exports_without_all_attribute(self) -> None:
         """Test that namespace_exports filters by convention when __all__ missing."""
-        from kgfoundry._namespace_proxy import namespace_exports
-
         module = ModuleType("test_module")
         _set_module_attr(module, "public_attr", "public")
         _set_module_attr(module, "_private_attr", "private")
@@ -203,8 +208,6 @@ class TestNamespaceHelpers:
 
     def test_namespace_attach_populates_target(self) -> None:
         """Test that namespace_attach correctly populates target mapping."""
-        from kgfoundry._namespace_proxy import namespace_attach
-
         module = ModuleType("test_module")
         _set_module_attr(module, "attr1", "value1")
         _set_module_attr(module, "attr2", "value2")
@@ -216,8 +219,6 @@ class TestNamespaceHelpers:
 
     def test_namespace_dir_combines_exports_and_module_attrs(self) -> None:
         """Test that namespace_dir combines exports with non-dunder module attrs."""
-        from kgfoundry._namespace_proxy import namespace_dir
-
         module = ModuleType("test_module")
         _set_module_attr(module, "exported1", "export1")
         _set_module_attr(module, "extra_attr", "extra")
@@ -231,8 +232,6 @@ class TestNamespaceHelpers:
 
     def test_namespace_getattr_returns_attribute(self) -> None:
         """Test that namespace_getattr correctly retrieves attributes."""
-        from kgfoundry._namespace_proxy import namespace_getattr
-
         module = ModuleType("test_module")
         _set_module_attr(module, "test_attr", "test_value")
 

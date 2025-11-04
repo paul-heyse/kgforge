@@ -17,11 +17,24 @@ from __future__ import annotations
 import ast
 import importlib
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
+from kgfoundry_common.errors import ConfigurationError
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
+
+@dataclass(frozen=True, slots=True)
+class StubEvaluationResult:
+    """Result of stub evaluation."""
+
+    missing_symbols: list[str]
+    extra_symbols: list[str]
+    any_usages: list[tuple[int, str]]
+    has_errors: bool
 
 
 def get_module_exports(module_name: str) -> set[str]:
@@ -163,6 +176,86 @@ def check_any_usage(stub_path: Path) -> list[tuple[int, str]]:
                 any_lines.append((line_num, line.strip()))
 
     return any_lines
+
+
+def evaluate_stub(module_name: str, stub_path: Path) -> StubEvaluationResult:
+    """Evaluate a stub file against its runtime module.
+
+    Parameters
+    ----------
+    module_name : str
+        Fully qualified module name.
+    stub_path : Path
+        Path to the stub file.
+
+    Returns
+    -------
+    StubEvaluationResult
+        Evaluation result with missing symbols, extra symbols, and Any usages.
+    """
+    runtime_exports = get_module_exports(module_name)
+    stub_exports = get_stub_exports(stub_path)
+    any_usages = check_any_usage(stub_path)
+
+    missing_symbols = sorted(runtime_exports - stub_exports)
+    extra_symbols = sorted(stub_exports - runtime_exports)
+
+    return StubEvaluationResult(
+        missing_symbols=missing_symbols,
+        extra_symbols=extra_symbols,
+        any_usages=any_usages,
+        has_errors=bool(missing_symbols or any_usages),
+    )
+
+
+def run_stub_parity_checks(checks: list[tuple[str, Path]]) -> None:
+    """Run stub parity checks on multiple module/stub pairs.
+
+    Parameters
+    ----------
+    checks : list[tuple[str, Path]]
+        List of (module_name, stub_path) tuples to check.
+
+    Raises
+    ------
+    ConfigurationError
+        If any checks fail. The error context contains issue details.
+    """
+    issues: list[dict[str, object]] = []
+    error_count = 0
+    issue_count = 0
+
+    for module_name, stub_path in checks:
+        result = evaluate_stub(module_name, stub_path)
+        if result.has_errors:
+            issue_count += 1
+            if result.missing_symbols:
+                error_count += 1
+            if result.any_usages:
+                error_count += 1
+            issues.append(
+                {
+                    "module": module_name,
+                    "stub_path": str(stub_path),
+                    "missing_symbols": result.missing_symbols,
+                    "extra_symbols": result.extra_symbols,
+                    "any_usages": [
+                        {"line": line_num, "preview": preview}
+                        for line_num, preview in result.any_usages
+                    ],
+                }
+            )
+
+    if issues:
+        message = f"Found {issue_count} stub parity issue(s)"
+        raise ConfigurationError(
+            message,
+            context={
+                "issue_count": issue_count,
+                "error_count": error_count,
+                "issues": issues,
+            },
+        )
 
 
 def main() -> int:

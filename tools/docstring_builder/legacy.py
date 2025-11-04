@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import contextvars
 import textwrap
 from dataclasses import dataclass
 from pathlib import Path
@@ -39,16 +40,88 @@ if TYPE_CHECKING:
 
     from tools.docstring_builder.models import ParameterKind
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-SRC_ROOT = REPO_ROOT / "src"
+# Context variables for thread-safe repository metadata access
+_repo_root_ctx: contextvars.ContextVar[Path] = contextvars.ContextVar(
+    "_repo_root_ctx", default=Path(__file__).resolve().parents[2]
+)
+_src_root_ctx: contextvars.ContextVar[Path] = contextvars.ContextVar(
+    "_src_root_ctx", default=Path(__file__).resolve().parents[2] / "src"
+)
+
+
+class LegacyConfig:
+    """Thread-safe singleton for repository metadata configuration.
+
+    Uses contextvars for thread-safe access, allowing per-context overrides
+    while maintaining a default value. This replaces mutable global variables
+    with a structured, testable configuration mechanism.
+    """
+
+    _instance: LegacyConfig | None = None
+
+    def __new__(cls) -> LegacyConfig:
+        """Return singleton instance."""
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    @property
+    def repo_root(self) -> Path:
+        """Get the repository root path for the current context."""
+        return _repo_root_ctx.get()
+
+    @property
+    def src_root(self) -> Path:
+        """Get the source root path for the current context."""
+        return _src_root_ctx.get()
+
+    @classmethod
+    def configure(cls, repo_root: Path, src_root: Path) -> None:
+        """Configure repository roots for the current context.
+
+        Parameters
+        ----------
+        repo_root : Path
+            Repository root directory.
+        src_root : Path
+            Source root directory.
+        """
+        _repo_root_ctx.set(repo_root)
+        _src_root_ctx.set(src_root)
 
 
 def configure_roots(repo_root: Path, src_root: Path) -> None:
-    """Override the repository and source roots used by legacy helpers."""
-    global REPO_ROOT  # noqa: PLW0603 - module-level configuration hook
-    global SRC_ROOT  # noqa: PLW0603 - module-level configuration hook
-    REPO_ROOT = repo_root
-    SRC_ROOT = src_root
+    """Override the repository and source roots used by legacy helpers.
+
+    This function maintains backward compatibility with existing code
+    while delegating to the thread-safe LegacyConfig singleton.
+
+    Parameters
+    ----------
+    repo_root : Path
+        Repository root directory.
+    src_root : Path
+        Source root directory.
+    """
+    LegacyConfig.configure(repo_root, src_root)
+
+
+# Public API: Module-level constants for backward compatibility
+# These delegate to the thread-safe config singleton
+def _get_repo_root() -> Path:
+    """Get repository root from thread-safe config."""
+    return LegacyConfig().repo_root
+
+
+def _get_src_root() -> Path:
+    """Get source root from thread-safe config."""
+    return LegacyConfig().src_root
+
+
+# Module-level accessors that maintain backward compatibility
+# These are computed on each access to support context-local overrides
+REPO_ROOT: Path = _get_repo_root()
+SRC_ROOT: Path = _get_src_root()
 
 
 STANDARD_METHOD_EXTENDED_SUMMARIES = _STANDARD_METHOD_EXTENDED_SUMMARIES
@@ -215,10 +288,13 @@ def parameters_for(node: ast.AST) -> list[DocstringIRParameter]:
 def module_name_for(file_path: Path) -> str:
     """Return the dotted module path for a file."""
     resolved = file_path.resolve()
-    if SRC_ROOT in resolved.parents or resolved == SRC_ROOT:
-        relative = resolved.relative_to(SRC_ROOT)
-    elif REPO_ROOT in resolved.parents or resolved == REPO_ROOT:
-        relative = resolved.relative_to(REPO_ROOT)
+    config = LegacyConfig()
+    src_root = config.src_root
+    repo_root = config.repo_root
+    if src_root in resolved.parents or resolved == src_root:
+        relative = resolved.relative_to(src_root)
+    elif repo_root in resolved.parents or resolved == repo_root:
+        relative = resolved.relative_to(repo_root)
     else:
         relative = resolved
     dotted = ".".join(relative.with_suffix("").parts)
