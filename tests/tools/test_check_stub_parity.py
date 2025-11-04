@@ -78,16 +78,16 @@ def test_report_from_context_validates_counts(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError) as excinfo:
         run_stub_parity_checks([(module_name, stub_path)])
 
-    context = excinfo.value.context
+    context = cast("StubParityContext | None", excinfo.value.context)
     assert context is not None
-    report = StubParityReport.from_context(cast("StubParityContext", context))
-    mutated_context = build_stub_parity_context(report)
+    report = StubParityReport.from_context(context)
+    mutated_context: StubParityContext = build_stub_parity_context(report)
     mutated_context["issue_count"] = 0
 
     message_pattern = r"expected counts \(0, \d+\), got"
 
     with pytest.raises(ValueError, match=message_pattern):
-        StubParityReport.from_context(cast("StubParityContext", mutated_context))
+        StubParityReport.from_context(mutated_context)
 
 
 def test_run_stub_parity_checks_raises_with_context(tmp_path: Path) -> None:
