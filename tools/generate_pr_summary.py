@@ -16,6 +16,7 @@ Examples
 from __future__ import annotations
 
 import os
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -82,6 +83,20 @@ DEFAULT_CHECKS: Final[tuple[CheckStatus, ...]] = (
 )
 
 
+_CODEMOD_LOG_PATTERN = re.compile(r"^(?P<stem>.+?)(?:_r(?P<run>\d+))?\.log$")
+
+
+def _codemod_log_sort_key(filename: str) -> tuple[str, int, str]:
+    """Return a natural sort key for codemod log filenames."""
+    match = _CODEMOD_LOG_PATTERN.match(filename)
+    if match is None:
+        return (filename, -1, filename)
+    stem = match.group("stem")
+    run = match.group("run")
+    run_number = int(run) if run is not None else 0
+    return (stem, run_number, filename)
+
+
 def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot:
     """Inspect ``base_path`` and report which build artifacts exist."""
     root = base_path or Path.cwd()
@@ -95,7 +110,16 @@ def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot
     dist_dir = root / "dist"
     dist_wheels = len(list(dist_dir.glob("*.whl"))) if dist_dir.exists() else 0
     dist_sdists = len(list(dist_dir.glob("*.tar.gz"))) if dist_dir.exists() else 0
-    codemod_logs = tuple(sorted(path.name for path in root.glob("codemod*.log") if path.is_file()))
+    codemod_logs = tuple(
+        sorted(
+            (
+                path.name
+                for path in root.glob("codemod*.log")
+                if path.is_file()
+            ),
+            key=_codemod_log_sort_key,
+        )
+    )
     return ArtifactSnapshot(
         coverage_xml=coverage_xml,
         coverage_html=coverage_html,
