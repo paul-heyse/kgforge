@@ -1,7 +1,7 @@
 """Type aliases for kgfoundry_common.
 
-This module provides shared type definitions without any dependencies,
-avoiding circular imports across the package.
+This module provides shared type definitions without any dependencies, avoiding circular imports
+across the package.
 """
 
 from __future__ import annotations

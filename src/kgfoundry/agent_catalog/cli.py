@@ -70,7 +70,8 @@ class CLIEnvelope(TypedDict, total=False):
 
     &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     schemaVersion: str
@@ -155,7 +156,8 @@ class CatalogctlError(RuntimeError):
 
     &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
 

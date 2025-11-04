@@ -19,7 +19,7 @@ import importlib
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from kgfoundry_common.errors import ConfigurationError
 from tools._shared.logging import get_logger
@@ -28,6 +28,21 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 LOGGER = get_logger(__name__)
+
+__all__ = (
+    "StubEvaluationResult",
+    "StubParityAnyUsageEntry",
+    "StubParityContext",
+    "StubParityIssueEntry",
+    "StubParityReport",
+    "build_stub_parity_context",
+    "check_any_usage",
+    "evaluate_stub",
+    "get_module_exports",
+    "get_stub_exports",
+    "main",
+    "run_stub_parity_checks",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +53,83 @@ class StubEvaluationResult:
     extra_symbols: list[str]
     any_usages: list[tuple[int, str]]
     has_errors: bool
+
+
+class StubParityAnyUsageEntry(TypedDict):
+    """Representation of an Any usage discovered in a stub."""
+
+    line: int
+    preview: str
+
+
+class StubParityIssueEntry(TypedDict):
+    """Structured issue payload for stub parity failures."""
+
+    module: str
+    stub_path: str
+    missing_symbols: list[str]
+    extra_symbols: list[str]
+    any_usages: list[StubParityAnyUsageEntry]
+
+
+class StubParityContext(TypedDict):
+    """Problem Details context emitted for stub parity checks."""
+
+    issue_count: int
+    error_count: int
+    issues: list[StubParityIssueEntry]
+
+
+@dataclass(frozen=True, slots=True)
+class StubParityIssueRecord:
+    """Internal representation for a stub parity issue."""
+
+    module: str
+    stub_path: Path
+    missing_symbols: tuple[str, ...]
+    extra_symbols: tuple[str, ...]
+    any_usages: tuple[tuple[int, str], ...]
+
+    @property
+    def error_count(self) -> int:
+        """Return the number of error categories triggered for this issue."""
+        count = 0
+        if self.missing_symbols:
+            count += 1
+        if self.any_usages:
+            count += 1
+        return count
+
+
+@dataclass(frozen=True, slots=True)
+class StubParityReport:
+    """Aggregate summary of stub parity evaluation results."""
+
+    issues: tuple[StubParityIssueRecord, ...]
+
+    def __post_init__(self) -> None:
+        """Stabilize internal storage for downstream consumers."""
+        normalized: tuple[StubParityIssueRecord, ...] = tuple(self.issues)
+        object.__setattr__(self, "issues", normalized)
+
+    @property
+    def issue_count(self) -> int:
+        """Return the number of issue entries."""
+        return len(self.issues)
+
+    @property
+    def error_count(self) -> int:
+        """Return the total error categories across all issues."""
+        return sum(issue.error_count for issue in self.issues)
+
+    @property
+    def has_issues(self) -> bool:
+        """Return ``True`` if any issues were recorded."""
+        return self.issue_count > 0
+
+    def to_context(self) -> StubParityContext:
+        """Produce a problem details context payload."""
+        return build_stub_parity_context(self)
 
 
 def get_module_exports(module_name: str) -> set[str]:
@@ -211,54 +303,61 @@ def evaluate_stub(module_name: str, stub_path: Path) -> StubEvaluationResult:
     )
 
 
-def run_stub_parity_checks(checks: list[tuple[str, Path]]) -> None:
-    """Run stub parity checks on multiple module/stub pairs.
-
-    Parameters
-    ----------
-    checks : list[tuple[str, Path]]
-        List of (module_name, stub_path) tuples to check.
-
-    Raises
-    ------
-    ConfigurationError
-        If any checks fail. The error context contains issue details.
-    """
-    issues: list[dict[str, object]] = []
-    error_count = 0
-    issue_count = 0
+def run_stub_parity_checks(checks: list[tuple[str, Path]]) -> StubParityReport:
+    """Run stub parity checks on multiple module/stub pairs."""
+    issues: list[StubParityIssueRecord] = []
 
     for module_name, stub_path in checks:
         result = evaluate_stub(module_name, stub_path)
         if result.has_errors:
-            issue_count += 1
-            if result.missing_symbols:
-                error_count += 1
-            if result.any_usages:
-                error_count += 1
             issues.append(
-                {
-                    "module": module_name,
-                    "stub_path": str(stub_path),
-                    "missing_symbols": result.missing_symbols,
-                    "extra_symbols": result.extra_symbols,
-                    "any_usages": [
-                        {"line": line_num, "preview": preview}
-                        for line_num, preview in result.any_usages
-                    ],
-                }
+                StubParityIssueRecord(
+                    module=module_name,
+                    stub_path=stub_path,
+                    missing_symbols=tuple(result.missing_symbols),
+                    extra_symbols=tuple(result.extra_symbols),
+                    any_usages=tuple(result.any_usages),
+                )
             )
 
-    if issues:
-        message = f"Found {issue_count} stub parity issue(s)"
-        raise ConfigurationError(
-            message,
-            context={
-                "issue_count": issue_count,
-                "error_count": error_count,
-                "issues": issues,
-            },
-        )
+    report = StubParityReport(issues=tuple(issues))
+
+    if report.has_issues:
+        message = f"Found {report.issue_count} stub parity issue(s)"
+        raise ConfigurationError(message, context=report.to_context())
+
+    return report
+
+
+def build_stub_parity_context(report: StubParityReport) -> StubParityContext:
+    """Construct the canonical stub parity context payload."""
+    issues: list[StubParityIssueEntry] = [
+        {
+            "module": issue.module,
+            "stub_path": str(issue.stub_path),
+            "missing_symbols": list(issue.missing_symbols),
+            "extra_symbols": list(issue.extra_symbols),
+            "any_usages": [
+                {"line": line_num, "preview": preview} for line_num, preview in issue.any_usages
+            ],
+        }
+        for issue in report.issues
+    ]
+
+    return {
+        "issue_count": report.issue_count,
+        "error_count": report.error_count,
+        "issues": issues,
+    }
+
+
+def _extract_stub_parity_context(error: ConfigurationError) -> StubParityContext | None:
+    """Normalize the context associated with a stub parity failure."""
+    context = dict(error.context or {})
+    expected_keys = {"issue_count", "error_count", "issues"}
+    if not expected_keys.issubset(context):
+        return None
+    return cast("StubParityContext", context)
 
 
 def main() -> int:
@@ -271,70 +370,56 @@ def main() -> int:
         ("kgfoundry.agent_catalog.search", stubs_dir / "agent_catalog" / "search.pyi"),
     ]
 
-    errors = 0
+    context: StubParityContext
+    try:
+        run_stub_parity_checks(modules_to_check)
+    except ConfigurationError as error:
+        extracted_context = _extract_stub_parity_context(error)
+        if extracted_context is None:
+            LOGGER.exception("FAILED: Stub parity issues detected")
+            return 1
+        context = extracted_context
+    else:
+        LOGGER.info("SUCCESS: All checks passed")
+        return 0
 
-    for module_name, stub_path in modules_to_check:
-        LOGGER.info("Checking: %s", module_name, extra={"module_name": module_name})
-        LOGGER.info("=" * 70)
+    LOGGER.error(
+        "FAILED: %s issue(s) found",
+        context.get("error_count", 0),
+        extra={"error_count": context.get("error_count", 0)},
+    )
 
-        # Get exports from runtime
-        runtime_exports = get_module_exports(module_name)
-        if not runtime_exports:
-            LOGGER.warning(
-                "Could not determine runtime exports", extra={"module_name": module_name}
-            )
-            continue
-
-        # Get exports from stub
-        stub_exports = get_stub_exports(stub_path)
-
-        # Compare
-        missing_in_stub = runtime_exports - stub_exports
-        extra_in_stub = stub_exports - runtime_exports
-
-        if missing_in_stub:
+    for issue in context.get("issues", []):
+        module_name = issue.get("module", "<unknown>")
+        LOGGER.error("Module: %s", module_name, extra={"module_name": module_name})
+        missing = issue.get("missing_symbols", [])
+        if missing:
             LOGGER.error(
-                "Missing in stub: %s",
-                sorted(missing_in_stub),
-                extra={"module_name": module_name, "missing_symbols": sorted(missing_in_stub)},
+                "  Missing in stub: %s",
+                missing,
+                extra={"module_name": module_name, "missing_symbols": missing},
             )
-            errors += 1
-        else:
-            LOGGER.info("All runtime exports present in stub", extra={"module_name": module_name})
-
-        if extra_in_stub:
+        extra_symbols = issue.get("extra_symbols", [])
+        if extra_symbols:
             LOGGER.info(
-                "Extra in stub (OK if intentional): %s",
-                sorted(extra_in_stub),
-                extra={"module_name": module_name, "extra_symbols": sorted(extra_in_stub)},
+                "  Extra in stub (OK if intentional): %s",
+                extra_symbols,
+                extra={"module_name": module_name, "extra_symbols": extra_symbols},
             )
-
-        # Check for Any usage
-        any_usages = check_any_usage(stub_path)
-        if any_usages:
+        any_usages = issue.get("any_usages", [])
+        for usage in any_usages:
             LOGGER.error(
-                "Found %s instance(s) of Any",
-                len(any_usages),
-                extra={"module_name": module_name, "any_count": len(any_usages)},
+                "  Any at line %s: %s",
+                usage.get("line"),
+                usage.get("preview"),
+                extra={
+                    "module_name": module_name,
+                    "line": usage.get("line"),
+                    "preview": usage.get("preview"),
+                },
             )
-            for line_num, line in any_usages:
-                LOGGER.error(
-                    "Line %s: %s",
-                    line_num,
-                    line,
-                    extra={"module_name": module_name, "line": line_num, "preview": line},
-                )
-            errors += 1
-        else:
-            LOGGER.info("No problematic Any types found", extra={"module_name": module_name})
 
-    LOGGER.info("=" * 70)
-    if errors:
-        LOGGER.error("FAILED: %s issue(s) found", errors, extra={"error_count": errors})
-        return 1
-
-    LOGGER.info("SUCCESS: All checks passed")
-    return 0
+    return 1
 
 
 if __name__ == "__main__":

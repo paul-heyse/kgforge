@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import logging
 from pathlib import Path
-from typing import cast
+from typing import cast, override
 
 import libcst as cst
 
@@ -27,49 +27,37 @@ class TypingFacadeMigrator(cst.CSTTransformer):
         """Initialize the transformer."""
         self.modified = False
 
-    def leave_import_from(
-        self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
-    ) -> cst.ImportFrom | cst.RemovalSentinel:
-        """Replace docs._types imports with docs.types facade imports."""
-        # Note: original_node is needed by libcst visitor protocol
-        del original_node
-
-        # Check for from docs._types.X import Y
-        if isinstance(updated_node.module, cst.Attribute):
-            module_parts = self._get_module_parts(updated_node.module)
+    def _transform_import_from(self, node: cst.ImportFrom) -> cst.ImportFrom | cst.RemovalSentinel:
+        """Return an updated import replacing private docs types with facades."""
+        if isinstance(node.module, cst.Attribute):
+            module_parts = self._get_module_parts(node.module)
             if (
                 len(module_parts) >= MIN_MODULE_PARTS
                 and module_parts[0] == "docs"
                 and module_parts[1] == "_types"
             ):
-                # Replace with public facade
                 new_parts = ["docs", "types", *module_parts[MIN_MODULE_PARTS:]]
                 new_module = self._build_module(new_parts)
                 self.modified = True
-                return updated_node.with_changes(module=new_module)
+                return node.with_changes(module=new_module)
 
-        # Check for from docs._types import X
-        elif isinstance(updated_node.module, cst.Name):
-            if updated_node.module.value == "docs._types":
-                new_module = cst.Name("docs.types")
-                self.modified = True
-                return updated_node.with_changes(module=new_module)
+        if isinstance(node.module, cst.Name) and node.module.value == "docs._types":
+            new_module = cst.Name("docs.types")
+            self.modified = True
+            return node.with_changes(module=new_module)
 
-        return updated_node
+        return node
 
-    def leave_call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
-        """Replace resolve_* shim calls with gate_import."""
-        # Note: original_node is needed by libcst visitor protocol
-        del original_node
-
+    def _transform_call(self, node: cst.Call) -> cst.Call:
+        """Convert resolve_* shim invocations to gate_import calls."""
         shim_map = {
             "resolve_numpy": ("gate_import", "numpy", "numpy array operations"),
             "resolve_fastapi": ("gate_import", "fastapi", "FastAPI integration"),
             "resolve_faiss": ("gate_import", "faiss", "FAISS vector indexing"),
         }
 
-        if isinstance(updated_node.func, cst.Name):
-            func_name = updated_node.func.value
+        if isinstance(node.func, cst.Name):
+            func_name = node.func.value
             if func_name in shim_map:
                 gate_func, lib_name, usage = shim_map[func_name]
                 new_args = [
@@ -77,12 +65,9 @@ class TypingFacadeMigrator(cst.CSTTransformer):
                     cst.Arg(cst.SimpleString(f'"{usage}"')),
                 ]
                 self.modified = True
-                return updated_node.with_changes(
-                    func=cst.Name(gate_func),
-                    args=new_args,
-                )
+                return node.with_changes(func=cst.Name(gate_func), args=new_args)
 
-        return updated_node
+        return node
 
     @staticmethod
     def _get_module_parts(node: cst.BaseExpression) -> list[str]:
@@ -104,47 +89,17 @@ class TypingFacadeMigrator(cst.CSTTransformer):
             result = cst.Attribute(value=result, attr=cst.Name(part))
         return result
 
+    @override
     def leave_ImportFrom(
         self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
     ) -> cst.ImportFrom | cst.RemovalSentinel:
-        """LibCST visitor method for ImportFrom nodes (CamelCase naming required by protocol).
+        del original_node
+        return self._transform_import_from(updated_node)
 
-        This method delegates to the snake_case implementation to maintain
-        consistency while satisfying LibCST's visitor protocol naming requirements.
-
-        Parameters
-        ----------
-        original_node : cst.ImportFrom
-            Original node from LibCST visitor protocol.
-        updated_node : cst.ImportFrom
-            Updated node from LibCST visitor protocol.
-
-        Returns
-        -------
-        cst.ImportFrom | cst.RemovalSentinel
-            Transformed node or removal sentinel.
-        """
-        return self.leave_import_from(original_node, updated_node)
-
+    @override
     def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
-        """LibCST visitor method for Call nodes (CamelCase naming required by protocol).
-
-        This method delegates to the snake_case implementation to maintain
-        consistency while satisfying LibCST's visitor protocol naming requirements.
-
-        Parameters
-        ----------
-        original_node : cst.Call
-            Original node from LibCST visitor protocol.
-        updated_node : cst.Call
-            Updated node from LibCST visitor protocol.
-
-        Returns
-        -------
-        cst.Call
-            Transformed call node.
-        """
-        return self.leave_call(original_node, updated_node)
+        del original_node
+        return self._transform_call(updated_node)
 
 
 def run_codemod_on_file(file_path: Path) -> bool:

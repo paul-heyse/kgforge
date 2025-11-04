@@ -10,10 +10,12 @@ the lazy-loading guarantees required by the façade modules documented in
 from __future__ import annotations
 
 from importlib import import_module
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     from types import ModuleType
+
+T = TypeVar("T")
 
 
 def load_module(module_name: str) -> ModuleType:
@@ -35,12 +37,17 @@ def load_attribute(module_name: str, attribute: str) -> object:
 
 
 def load_typed_attribute[T](module_name: str, attribute: str, expected_type: type[T]) -> T:
-    """Load ``attribute`` and ensure it matches ``expected_type`` at runtime."""
+    """Load ``attribute`` and ensure it matches ``expected_type`` at runtime.
+
+    Raises
+    ------
+    TypeError
+        Raised when the attribute does not match ``expected_type``.
+    """
     value = load_attribute(module_name, attribute)
     if not isinstance(value, expected_type):
         message = (
             f"{module_name}.{attribute} expected {expected_type!r} but received {type(value)!r}"
         )
         raise TypeError(message)
-    assert isinstance(value, expected_type)
     return value

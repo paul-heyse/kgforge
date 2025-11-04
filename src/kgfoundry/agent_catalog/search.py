@@ -78,8 +78,8 @@ _ALLOWED_FACET_KEYS = frozenset(["package", "module", "kind", "stability"])
 class SearchOptionsPayload(TypedDict, total=False):
     """Typed payload for SearchOptions configuration.
 
-    This TypedDict defines the complete search options with all optional
-    fields. It aligns with JSON Schema definitions and ensures type safety.
+    This TypedDict defines the complete search options with all optional fields. It aligns with JSON
+    Schema definitions and ensures type safety.
     """
 
     alpha: float
@@ -101,8 +101,8 @@ class SearchOptionsOverrides(TypedDict, total=False):
 class SearchDocumentPayload(TypedDict):
     """Typed payload for SearchDocument construction.
 
-    This TypedDict ensures all required fields are present and properly typed,
-    providing parity with the JSON Schema definition for search documents.
+    This TypedDict ensures all required fields are present and properly typed, providing parity with
+    the JSON Schema definition for search documents.
     """
 
     symbol_id: str

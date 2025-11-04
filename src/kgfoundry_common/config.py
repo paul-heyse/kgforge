@@ -41,8 +41,8 @@ _MIN_SIGNING_KEY_BYTES: Final[int] = 32  # Minimum recommended key length
 class ModelValidateOptions(TypedDict, total=False):
     """Options for model validation, encapsulating multiple parameters.
 
-    This TypedDict groups validation parameters to reduce argument count
-    in model_validate while maintaining compatibility with parent signature.
+    This TypedDict groups validation parameters to reduce argument count in model_validate while
+    maintaining compatibility with parent signature.
     """
 
     strict: bool | None

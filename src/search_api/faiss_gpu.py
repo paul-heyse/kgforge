@@ -1,9 +1,8 @@
 """Typed helpers for working with FAISS GPU bindings.
 
-This module hides optional GPU initialisation and cloning logic behind a small
-typed surface so the rest of the search stack can import a single, well-typed
-facade. The helpers are resilient to missing GPU extras and fall back to CPU
-behaviour automatically.
+This module hides optional GPU initialisation and cloning logic behind a small typed surface so the
+rest of the search stack can import a single, well-typed facade. The helpers are resilient to
+missing GPU extras and fall back to CPU behaviour automatically.
 """
 
 from __future__ import annotations
@@ -90,9 +89,9 @@ def detect_gpu_context(
 def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissIndexProtocol:
     """Clone ``index`` onto GPU hardware described by ``context``.
 
-    If GPU helpers are unavailable or cloning fails, the original CPU index is
-    returned. All exceptions are caught and logged at debug level so callers can
-    emit typed Problem Details without leaking driver internals to clients.
+    If GPU helpers are unavailable or cloning fails, the original CPU index is returned. All
+    exceptions are caught and logged at debug level so callers can emit typed Problem Details
+    without leaking driver internals to clients.
     """
     module = context.module
     devices = context.device_ids

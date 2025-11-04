@@ -478,8 +478,8 @@ class VectorSearchResult:
 
         <!-- auto:docstring-builder v1 -->
 
-        This method is called automatically by dataclass after initialization.
-        In frozen dataclasses, we can't modify fields, so validation is limited.
+        This method is called automatically by dataclass after initialization. In frozen
+        dataclasses, we can't modify fields, so validation is limited.
         """
         # Dataclass types are enforced at construction time, so runtime validation
         # is primarily for documentation. The type checker ensures correct usage.
@@ -663,8 +663,8 @@ class AgentSearchQuery:
     explain: bool = False
     """Whether to include explanation metadata in results.
 
-    When True, results include detailed scoring breakdowns and match
-    highlights for debugging and transparency.
+    When True, results include detailed scoring breakdowns and match highlights for debugging and
+    transparency.
     """
 
     def __post_init__(self) -> None:
@@ -690,7 +690,8 @@ class VectorSearchResultTypedDict(TypedDict, total=True):
 
     &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     symbol_id: str
@@ -729,7 +730,8 @@ class AgentSearchResponse(TypedDict, total=True):
 
     &lt;!-- auto:docstring-builder v1 --&gt;
 
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Describe the data structure and how instances collaborate with the surrounding package.
+    Highlight how the class supports nearby modules to guide readers through the codebase.
     """
 
     results: list[VectorSearchResultTypedDict]
