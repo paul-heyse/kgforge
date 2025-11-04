@@ -1,7 +1,7 @@
 """Typed models for navmap documents.
 
-This module provides typed dataclasses and TypedDict definitions for navmap
-structures, ensuring type safety and schema compliance across navmap operations.
+This module provides typed dataclasses and TypedDict definitions for navmap structures, ensuring
+type safety and schema compliance across navmap operations.
 """
 
 from __future__ import annotations

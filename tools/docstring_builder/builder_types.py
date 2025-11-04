@@ -1,10 +1,9 @@
 """Core types and helpers for the docstring builder pipeline.
 
-This module centralises the shared dataclasses and enums that describe the
-docstring builder request/response lifecycle.  Keeping these definitions in a
-single location prevents circular imports between orchestration helpers and the
-CLI entry points while providing typed utilities for status conversion and
-Problem Details emission.
+This module centralises the shared dataclasses and enums that describe the docstring builder
+request/response lifecycle.  Keeping these definitions in a single location prevents circular
+imports between orchestration helpers and the CLI entry points while providing typed utilities for
+status conversion and Problem Details emission.
 """
 
 from __future__ import annotations

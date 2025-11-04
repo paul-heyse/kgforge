@@ -4925,12 +4925,12 @@
       "decorators": [
         "dataclass"
       ],
-      "end_lineno": 175,
+      "end_lineno": 176,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 156,
+      "lineno": 157,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -4986,27 +4986,27 @@
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "doc_id",
           "kind": "positional_or_keyword",
           "name": "doc_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "length",
           "kind": "positional_or_keyword",
           "name": "length",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "dict",
-          "default": null,
+          "default": "None",
           "display_name": "fields",
           "kind": "positional_or_keyword",
           "name": "fields",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "dict",
@@ -5023,12 +5023,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 627,
+      "end_lineno": 633,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 512,
+      "lineno": 518,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5039,23 +5039,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 568,
+      "end_lineno": 574,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 537,
+      "lineno": 543,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "index_dir",
           "kind": "positional_or_keyword",
           "name": "index_dir",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
@@ -5088,31 +5088,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 608,
+      "end_lineno": 614,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 604,
+      "lineno": 610,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "doc_id",
           "kind": "positional_or_keyword",
           "name": "doc_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "fields",
           "kind": "positional_or_keyword",
           "name": "fields",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneBM25._build_lucene_doc",
@@ -5129,23 +5129,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 616,
+      "end_lineno": 622,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 610,
+      "lineno": 616,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "fields",
           "kind": "positional_or_keyword",
           "name": "fields",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneBM25._compose_contents",
@@ -5160,27 +5160,27 @@
     },
     {
       "decorators": [],
-      "end_lineno": 627,
+      "end_lineno": 633,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 618,
+      "lineno": 624,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping[str, str] | None",
-          "default": null,
+          "default": "None",
           "display_name": "fields",
           "kind": "positional_or_keyword",
           "name": "fields",
@@ -5199,12 +5199,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 602,
+      "end_lineno": 608,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 597,
+      "lineno": 603,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5221,23 +5221,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 578,
+      "end_lineno": 584,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 570,
+      "lineno": 576,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Iterable",
-          "default": null,
+          "default": "None",
           "display_name": "docs_iterable",
           "kind": "positional_or_keyword",
           "name": "docs_iterable",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneBM25.build",
@@ -5246,12 +5246,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 583,
+      "end_lineno": 589,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 580,
+      "lineno": 586,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": false,
@@ -5262,31 +5262,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 595,
+      "end_lineno": 601,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 585,
+      "lineno": 591,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping[str, str] | None",
@@ -5309,12 +5309,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 128,
+      "end_lineno": 129,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 126,
+      "lineno": 127,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5325,12 +5325,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 148,
+      "end_lineno": 149,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 147,
+      "lineno": 148,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5341,23 +5341,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 148,
+      "end_lineno": 149,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 148,
+      "lineno": 149,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "index_dir",
           "kind": "positional_or_keyword",
           "name": "index_dir",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneIndexerFactory.__call__",
@@ -5372,12 +5372,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 140,
+      "end_lineno": 141,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 137,
+      "lineno": 138,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5388,23 +5388,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 138,
+      "end_lineno": 139,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 138,
+      "lineno": 139,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "doc",
           "kind": "positional_or_keyword",
           "name": "doc",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneIndexerProtocol.add_doc_dict",
@@ -5413,12 +5413,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 140,
+      "end_lineno": 141,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 140,
+      "lineno": 141,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5429,12 +5429,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 144,
+      "end_lineno": 145,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 143,
+      "lineno": 144,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5445,23 +5445,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 144,
+      "end_lineno": 145,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 144,
+      "lineno": 145,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "index_dir",
           "kind": "positional_or_keyword",
           "name": "index_dir",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneSearcherFactory.__call__",
@@ -5476,12 +5476,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 134,
+      "end_lineno": 135,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 131,
+      "lineno": 132,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5492,31 +5492,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 134,
+      "end_lineno": 135,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 134,
+      "lineno": 135,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneSearcherProtocol.search",
@@ -5531,31 +5531,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 132,
+      "end_lineno": 133,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 132,
+      "lineno": 133,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "float",
-          "default": null,
+          "default": "None",
           "display_name": "k1",
           "kind": "positional_or_keyword",
           "name": "k1",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
-          "default": null,
+          "default": "None",
           "display_name": "b",
           "kind": "positional_or_keyword",
           "name": "b",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.LuceneSearcherProtocol.set_bm25",
@@ -5564,12 +5564,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 508,
+      "end_lineno": 514,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 179,
+      "lineno": 180,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5589,23 +5589,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 232,
+      "end_lineno": 233,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 199,
+      "lineno": 200,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "index_dir",
           "kind": "positional_or_keyword",
           "name": "index_dir",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
@@ -5638,23 +5638,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 399,
+      "end_lineno": 405,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 384,
+      "lineno": 388,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "data",
           "kind": "positional_or_keyword",
           "name": "data",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._apply_scalar_metadata",
@@ -5665,23 +5665,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 439,
+      "end_lineno": 445,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 401,
+      "lineno": 407,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "data",
           "kind": "positional_or_keyword",
           "name": "data",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._build_docs_from_metadata",
@@ -5696,47 +5696,47 @@
     },
     {
       "decorators": [],
-      "end_lineno": 278,
+      "end_lineno": 279,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 253,
+      "lineno": 254,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "doc_id",
           "kind": "positional_or_keyword",
           "name": "doc_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "fields",
           "kind": "positional_or_keyword",
           "name": "fields",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "defaultdict",
-          "default": null,
+          "default": "None",
           "display_name": "df",
           "kind": "positional_or_keyword",
           "name": "df",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "defaultdict",
-          "default": null,
+          "default": "None",
           "display_name": "postings",
           "kind": "positional_or_keyword",
           "name": "postings",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._create_doc",
@@ -5751,23 +5751,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 460,
+      "end_lineno": 466,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 441,
+      "lineno": 447,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "term",
           "kind": "positional_or_keyword",
           "name": "term",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._idf",
@@ -5782,23 +5782,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 382,
+      "end_lineno": 386,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 376,
+      "lineno": 378,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "data",
           "kind": "positional_or_keyword",
           "name": "data",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._initialize_from_payload",
@@ -5809,23 +5809,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 374,
+      "end_lineno": 376,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 363,
+      "lineno": 365,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "legacy_path",
           "kind": "positional_or_keyword",
           "name": "legacy_path",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._load_legacy_payload",
@@ -5845,12 +5845,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 340,
+      "end_lineno": 342,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 312,
+      "lineno": 314,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5867,12 +5867,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 361,
+      "end_lineno": 363,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 342,
+      "lineno": 344,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -5896,23 +5896,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 251,
+      "end_lineno": 252,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 234,
+      "lineno": 235,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "text",
           "kind": "positional_or_keyword",
           "name": "text",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25._tokenize",
@@ -5927,23 +5927,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 305,
+      "end_lineno": 306,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 280,
+      "lineno": 281,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Iterable",
-          "default": null,
+          "default": "None",
           "display_name": "docs_iterable",
           "kind": "positional_or_keyword",
           "name": "docs_iterable",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25.PurePythonBM25.build",
@@ -5952,12 +5952,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 310,
+      "end_lineno": 312,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 307,
+      "lineno": 308,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": false,
@@ -5968,31 +5968,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 508,
+      "end_lineno": 514,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 462,
+      "lineno": 468,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping[str, str] | None",
@@ -6015,12 +6015,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 123,
+      "end_lineno": 124,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 122,
+      "lineno": 123,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -6037,31 +6037,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 60,
+      "end_lineno": 61,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 55,
+      "lineno": 56,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "metadata_path",
           "kind": "positional_or_keyword",
           "name": "metadata_path",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "schema_path",
           "kind": "positional_or_keyword",
           "name": "schema_path",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25._load_json_metadata",
@@ -6081,12 +6081,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 647,
+      "end_lineno": 649,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 630,
+      "lineno": 636,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -6112,12 +6112,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 667,
+      "end_lineno": 665,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 650,
+      "lineno": 652,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
@@ -6143,19 +6143,19 @@
     },
     {
       "decorators": [],
-      "end_lineno": 49,
+      "end_lineno": 50,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 43,
+      "lineno": 44,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping[str, float] | None",
-          "default": null,
+          "default": "None",
           "display_name": "boosts",
           "kind": "positional_or_keyword",
           "name": "boosts",
@@ -6174,23 +6174,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 152,
+      "end_lineno": 153,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 151,
+      "lineno": 152,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "tuple",
-          "default": null,
+          "default": "None",
           "display_name": "item",
           "kind": "positional_or_keyword",
           "name": "item",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "embeddings_sparse.bm25._score_value",
@@ -6205,31 +6205,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 699,
+      "end_lineno": 697,
       "filepath": "src/embeddings_sparse/bm25.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 670,
+      "lineno": 668,
       "module": "embeddings_sparse.bm25",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "backend",
           "kind": "positional_or_keyword",
           "name": "backend",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "index_dir",
           "kind": "positional_or_keyword",
           "name": "index_dir",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
@@ -40417,12 +40417,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 202,
+      "end_lineno": 210,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 167,
+      "lineno": 175,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -40433,23 +40433,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 202,
+      "end_lineno": 210,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 185,
+      "lineno": 193,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Sequence",
-          "default": null,
+          "default": "None",
           "display_name": "sentences",
           "kind": "positional_or_keyword",
           "name": "sentences",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "object",
@@ -40474,12 +40474,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 677,
+      "end_lineno": 685,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 671,
+      "lineno": 679,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -40502,15 +40502,15 @@
       "parameters": [
         {
           "annotation": "list",
-          "default": null,
+          "default": "None",
           "display_name": "documents",
           "kind": "positional_or_keyword",
           "name": "documents",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "tuple[CatalogMapping, Path, Path] | None",
-          "default": null,
+          "default": "None",
           "display_name": "semantic_meta",
           "kind": "positional_or_keyword",
           "name": "semantic_meta",
@@ -40518,7 +40518,7 @@
         },
         {
           "annotation": "CatalogMapping | None",
-          "default": null,
+          "default": "None",
           "display_name": "mapping_payload",
           "kind": "positional_or_keyword",
           "name": "mapping_payload",
@@ -40533,12 +40533,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 223,
+      "end_lineno": 231,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 205,
+      "lineno": 213,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -40561,27 +40561,27 @@
       "parameters": [
         {
           "annotation": "float",
-          "default": null,
+          "default": "None",
           "display_name": "alpha",
           "kind": "positional_or_keyword",
           "name": "alpha",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "candidate_pool",
           "kind": "positional_or_keyword",
           "name": "candidate_pool",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "list",
-          "default": null,
+          "default": "None",
           "display_name": "lexical_fields",
           "kind": "positional_or_keyword",
           "name": "lexical_fields",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.SearchConfig.__init__",
@@ -40592,12 +40592,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 592,
+      "end_lineno": 600,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 540,
+      "lineno": 548,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -40620,47 +40620,47 @@
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "symbol_id",
           "kind": "positional_or_keyword",
           "name": "symbol_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "package",
           "kind": "positional_or_keyword",
           "name": "package",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "module",
           "kind": "positional_or_keyword",
           "name": "module",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "qname",
           "kind": "positional_or_keyword",
           "name": "qname",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "kind",
           "kind": "positional_or_keyword",
           "name": "kind",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str | None",
-          "default": null,
+          "default": "None",
           "display_name": "stability",
           "kind": "positional_or_keyword",
           "name": "stability",
@@ -40668,15 +40668,15 @@
         },
         {
           "annotation": "bool",
-          "default": null,
+          "default": "None",
           "display_name": "deprecated",
           "kind": "positional_or_keyword",
           "name": "deprecated",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str | None",
-          "default": null,
+          "default": "None",
           "display_name": "summary",
           "kind": "positional_or_keyword",
           "name": "summary",
@@ -40684,7 +40684,7 @@
         },
         {
           "annotation": "str | None",
-          "default": null,
+          "default": "None",
           "display_name": "docstring",
           "kind": "positional_or_keyword",
           "name": "docstring",
@@ -40692,7 +40692,7 @@
         },
         {
           "annotation": "int | None",
-          "default": null,
+          "default": "None",
           "display_name": "anchor_start",
           "kind": "positional_or_keyword",
           "name": "anchor_start",
@@ -40700,7 +40700,7 @@
         },
         {
           "annotation": "int | None",
-          "default": null,
+          "default": "None",
           "display_name": "anchor_end",
           "kind": "positional_or_keyword",
           "name": "anchor_end",
@@ -40708,19 +40708,19 @@
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "text",
           "kind": "positional_or_keyword",
           "name": "text",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "collections.Counter",
-          "default": null,
+          "default": "None",
           "display_name": "tokens",
           "kind": "positional_or_keyword",
           "name": "tokens",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
@@ -40737,12 +40737,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 123,
+      "end_lineno": 131,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 116,
+      "lineno": 124,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -40753,12 +40753,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 113,
+      "end_lineno": 121,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 93,
+      "lineno": 101,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -40771,12 +40771,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 259,
+      "end_lineno": 267,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 226,
+      "lineno": 234,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -40852,12 +40852,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 90,
+      "end_lineno": 98,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 85,
+      "lineno": 93,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -40868,12 +40868,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 82,
+      "end_lineno": 90,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 70,
+      "lineno": 78,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -40886,12 +40886,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 164,
+      "end_lineno": 172,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 148,
+      "lineno": 156,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -40914,27 +40914,27 @@
       "parameters": [
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "repo_root",
           "kind": "positional_or_keyword",
           "name": "repo_root",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.SearchRequest.__init__",
@@ -40945,12 +40945,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 643,
+      "end_lineno": 651,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 595,
+      "lineno": 603,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -40973,71 +40973,71 @@
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "symbol_id",
           "kind": "positional_or_keyword",
           "name": "symbol_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
-          "default": null,
+          "default": "None",
           "display_name": "score",
           "kind": "positional_or_keyword",
           "name": "score",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
-          "default": null,
+          "default": "None",
           "display_name": "lexical_score",
           "kind": "positional_or_keyword",
           "name": "lexical_score",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "float",
-          "default": null,
+          "default": "None",
           "display_name": "vector_score",
           "kind": "positional_or_keyword",
           "name": "vector_score",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "package",
           "kind": "positional_or_keyword",
           "name": "package",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "module",
           "kind": "positional_or_keyword",
           "name": "module",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "qname",
           "kind": "positional_or_keyword",
           "name": "qname",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "kind",
           "kind": "positional_or_keyword",
           "name": "kind",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str | None",
-          "default": null,
+          "default": "None",
           "display_name": "stability",
           "kind": "positional_or_keyword",
           "name": "stability",
@@ -41045,15 +41045,15 @@
         },
         {
           "annotation": "bool",
-          "default": null,
+          "default": "None",
           "display_name": "deprecated",
           "kind": "positional_or_keyword",
           "name": "deprecated",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str | None",
-          "default": null,
+          "default": "None",
           "display_name": "summary",
           "kind": "positional_or_keyword",
           "name": "summary",
@@ -41061,7 +41061,7 @@
         },
         {
           "annotation": "str | None",
-          "default": null,
+          "default": "None",
           "display_name": "docstring",
           "kind": "positional_or_keyword",
           "name": "docstring",
@@ -41069,11 +41069,11 @@
         },
         {
           "annotation": "dict",
-          "default": null,
+          "default": "None",
           "display_name": "anchor",
           "kind": "positional_or_keyword",
           "name": "anchor",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.SearchResult.__init__",
@@ -41084,12 +41084,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 657,
+      "end_lineno": 665,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 646,
+      "lineno": 654,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -41112,67 +41112,67 @@
       "parameters": [
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "semantic_meta",
           "kind": "positional_or_keyword",
           "name": "semantic_meta",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "mapping_payload",
           "kind": "positional_or_keyword",
           "name": "mapping_payload",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "index_path",
           "kind": "positional_or_keyword",
           "name": "index_path",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Sequence",
-          "default": null,
+          "default": "None",
           "display_name": "documents",
           "kind": "positional_or_keyword",
           "name": "documents",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "candidate_limit",
           "kind": "positional_or_keyword",
           "name": "candidate_limit",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "set",
-          "default": null,
+          "default": "None",
           "display_name": "candidate_ids",
           "kind": "positional_or_keyword",
           "name": "candidate_ids",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "row_to_document",
           "kind": "positional_or_keyword",
           "name": "row_to_document",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.VectorSearchContext.__init__",
@@ -41264,12 +41264,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 819,
+      "end_lineno": 836,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 685,
+      "lineno": 693,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -41285,23 +41285,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 711,
+      "end_lineno": 719,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 696,
+      "lineno": 704,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "dimension",
           "kind": "positional_or_keyword",
           "name": "dimension",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissIndex.__init__",
@@ -41310,23 +41310,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 740,
+      "end_lineno": 748,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 713,
+      "lineno": 721,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "VectorArray",
-          "default": null,
+          "default": "None",
           "display_name": "vectors",
           "kind": "positional_or_keyword",
           "name": "vectors",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissIndex.add",
@@ -41340,31 +41340,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 772,
+      "end_lineno": 789,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 754,
+      "lineno": 771,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "VectorArray",
-          "default": null,
+          "default": "None",
           "display_name": "vectors",
           "kind": "positional_or_keyword",
           "name": "vectors",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "IndexArray",
-          "default": null,
+          "default": "None",
           "display_name": "ids",
           "kind": "positional_or_keyword",
           "name": "ids",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissIndex.add_with_ids",
@@ -41378,31 +41378,56 @@
     },
     {
       "decorators": [],
-      "end_lineno": 819,
+      "end_lineno": 757,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 774,
+      "lineno": 755,
+      "module": "kgfoundry.agent_catalog.search",
+      "notes": [],
+      "owned": false,
+      "parameters": [
+        {
+          "annotation": "FloatMatrix",
+          "default": "None",
+          "display_name": "vectors",
+          "kind": "positional_or_keyword",
+          "name": "vectors",
+          "optional": true
+        }
+      ],
+      "qname": "kgfoundry.agent_catalog.search._SimpleFaissIndex.load_vectors",
+      "raises": [],
+      "returns": []
+    },
+    {
+      "decorators": [],
+      "end_lineno": 836,
+      "filepath": "src/kgfoundry/agent_catalog/search.py",
+      "is_async": false,
+      "is_generator": false,
+      "kind": "method",
+      "lineno": 791,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "VectorArray",
-          "default": null,
+          "default": "None",
           "display_name": "vectors",
           "kind": "positional_or_keyword",
           "name": "vectors",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissIndex.search",
@@ -41422,23 +41447,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 751,
+      "end_lineno": 768,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 742,
+      "lineno": 759,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "VectorArray",
-          "default": null,
+          "default": "None",
           "display_name": "vectors",
           "kind": "positional_or_keyword",
           "name": "vectors",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissIndex.train",
@@ -41447,12 +41472,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1006,
+      "end_lineno": 1023,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 822,
+      "lineno": 839,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -41536,23 +41561,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 844,
+      "end_lineno": 861,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 839,
+      "lineno": 856,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "dimension",
           "kind": "positional_or_keyword",
           "name": "dimension",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule._create_flat_index",
@@ -41574,23 +41599,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 853,
+      "end_lineno": 870,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 846,
+      "lineno": 863,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "FaissIndexProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "index",
           "kind": "positional_or_keyword",
           "name": "index",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule._ensure_simple_index",
@@ -41612,39 +41637,39 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 898,
+      "end_lineno": 915,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 873,
+      "lineno": 890,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "dimension",
           "kind": "positional_or_keyword",
           "name": "dimension",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "factory_string",
           "kind": "positional_or_keyword",
           "name": "factory_string",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "metric",
           "kind": "positional_or_keyword",
           "name": "metric",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule.index_factory",
@@ -41661,23 +41686,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 871,
+      "end_lineno": 888,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 855,
+      "lineno": 872,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "dimension",
           "kind": "positional_or_keyword",
           "name": "dimension",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule.index_flat_ip",
@@ -41694,23 +41719,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 918,
+      "end_lineno": 935,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 900,
+      "lineno": 917,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "FaissIndexProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "index",
           "kind": "positional_or_keyword",
           "name": "index",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule.index_id_map2",
@@ -41754,23 +41779,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 1006,
+      "end_lineno": 1023,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 994,
+      "lineno": 1011,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "VectorArray",
-          "default": null,
+          "default": "None",
           "display_name": "vectors",
           "kind": "positional_or_keyword",
           "name": "vectors",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule.normalize_l2",
@@ -41781,23 +41806,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 992,
+      "end_lineno": 1009,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 942,
+      "lineno": 959,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "path",
           "kind": "positional_or_keyword",
           "name": "path",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule.read_index",
@@ -41819,31 +41844,31 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 940,
+      "end_lineno": 957,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 920,
+      "lineno": 937,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "FaissIndexProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "index",
           "kind": "positional_or_keyword",
           "name": "index",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "path",
           "kind": "positional_or_keyword",
           "name": "path",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._SimpleFaissModule.write_index",
@@ -41854,12 +41879,12 @@
       "decorators": [
         "dataclass(slots=True)"
       ],
-      "end_lineno": 668,
+      "end_lineno": 676,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 660,
+      "lineno": 668,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -41882,43 +41907,43 @@
       "parameters": [
         {
           "annotation": "EmbeddingModelProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "model",
           "kind": "positional_or_keyword",
           "name": "model",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "batch_size",
           "kind": "positional_or_keyword",
           "name": "batch_size",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "FaissIndexProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "index",
           "kind": "positional_or_keyword",
           "name": "index",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "candidate_limit",
           "kind": "positional_or_keyword",
           "name": "candidate_limit",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "row_lookup",
           "kind": "positional_or_keyword",
           "name": "row_lookup",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._VectorSearchInputs.__init__",
@@ -41927,55 +41952,55 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1829,
+      "end_lineno": 1846,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1806,
+      "lineno": 1823,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "catalog",
           "kind": "positional_or_keyword",
           "name": "catalog",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "SearchRequest",
-          "default": null,
+          "default": "None",
           "display_name": "request",
           "kind": "positional_or_keyword",
           "name": "request",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Sequence",
-          "default": null,
+          "default": "None",
           "display_name": "lexical_candidates",
           "kind": "positional_or_keyword",
           "name": "lexical_candidates",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "candidate_limit",
           "kind": "positional_or_keyword",
           "name": "candidate_limit",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Sequence",
-          "default": null,
+          "default": "None",
           "display_name": "documents",
           "kind": "positional_or_keyword",
           "name": "documents",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._build_vector_search_context",
@@ -41990,35 +42015,35 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1842,
+      "end_lineno": 1859,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1832,
+      "lineno": 1849,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "SearchOptions",
-          "default": null,
+          "default": "None",
           "display_name": "options",
           "kind": "positional_or_keyword",
           "name": "options",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "VectorSearchContext | None",
-          "default": null,
+          "default": "None",
           "display_name": "context",
           "kind": "positional_or_keyword",
           "name": "context",
@@ -42037,39 +42062,39 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1713,
+      "end_lineno": 1730,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1704,
+      "lineno": 1721,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "EmbeddingModelProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "model",
           "kind": "positional_or_keyword",
           "name": "model",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "batch_size",
           "kind": "keyword_only",
           "name": "batch_size",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._encode_query",
@@ -42084,26 +42109,57 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1165,
+      "end_lineno": 1182,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1153,
+      "lineno": 1170,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "symbol",
           "kind": "positional_or_keyword",
           "name": "symbol",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._extract_agent_hints_payload",
+      "raises": [],
+      "returns": [
+        {
+          "annotation": "tuple",
+          "description": "Describe the returned value.",
+          "kind": "returns"
+        }
+      ]
+    },
+    {
+      "decorators": [],
+      "end_lineno": 1213,
+      "filepath": "src/kgfoundry/agent_catalog/search.py",
+      "is_async": false,
+      "is_generator": false,
+      "kind": "function",
+      "lineno": 1199,
+      "module": "kgfoundry.agent_catalog.search",
+      "notes": [],
+      "owned": false,
+      "parameters": [
+        {
+          "annotation": "CatalogMapping",
+          "default": "None",
+          "display_name": "symbol",
+          "kind": "positional_or_keyword",
+          "name": "symbol",
+          "optional": true
+        }
+      ],
+      "qname": "kgfoundry.agent_catalog.search._extract_anchor_lines",
       "raises": [],
       "returns": [
         {
@@ -42120,45 +42176,14 @@
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1182,
-      "module": "kgfoundry.agent_catalog.search",
-      "notes": [],
-      "owned": false,
-      "parameters": [
-        {
-          "annotation": "CatalogMapping",
-          "default": null,
-          "display_name": "symbol",
-          "kind": "positional_or_keyword",
-          "name": "symbol",
-          "optional": false
-        }
-      ],
-      "qname": "kgfoundry.agent_catalog.search._extract_anchor_lines",
-      "raises": [],
-      "returns": [
-        {
-          "annotation": "tuple",
-          "description": "Describe the returned value.",
-          "kind": "returns"
-        }
-      ]
-    },
-    {
-      "decorators": [],
-      "end_lineno": 1179,
-      "filepath": "src/kgfoundry/agent_catalog/search.py",
-      "is_async": false,
-      "is_generator": false,
-      "kind": "function",
-      "lineno": 1168,
+      "lineno": 1185,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Mapping[str, JsonLike] | None",
-          "default": null,
+          "default": "None",
           "display_name": "docfacts",
           "kind": "positional_or_keyword",
           "name": "docfacts",
@@ -42177,23 +42202,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1724,
+      "end_lineno": 1741,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1716,
+      "lineno": 1733,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "raw_meta",
           "kind": "positional_or_keyword",
           "name": "raw_meta",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._extract_semantic_metadata",
@@ -42208,23 +42233,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1729,
+      "end_lineno": 1746,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1727,
+      "lineno": 1744,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "index_path",
           "kind": "positional_or_keyword",
           "name": "index_path",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._load_faiss_index",
@@ -42239,23 +42264,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1630,
+      "end_lineno": 1647,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1591,
+      "lineno": 1608,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "mapping_path",
           "kind": "positional_or_keyword",
           "name": "mapping_path",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._load_row_lookup",
@@ -42275,23 +42300,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1666,
+      "end_lineno": 1683,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1633,
+      "lineno": 1650,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "model_name",
           "kind": "positional_or_keyword",
           "name": "model_name",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._load_sentence_transformer",
@@ -42452,31 +42477,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1746,
+      "end_lineno": 1763,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1732,
+      "lineno": 1749,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "SearchOptions",
-          "default": null,
+          "default": "None",
           "display_name": "options",
           "kind": "positional_or_keyword",
           "name": "options",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "VectorSearchContext",
-          "default": null,
+          "default": "None",
           "display_name": "context",
           "kind": "positional_or_keyword",
           "name": "context",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._prepare_vector_search_inputs",
@@ -42491,31 +42516,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1701,
+      "end_lineno": 1718,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1669,
+      "lineno": 1686,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "SearchOptions",
-          "default": null,
+          "default": "None",
           "display_name": "options",
           "kind": "positional_or_keyword",
           "name": "options",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "PrimitiveMapping",
-          "default": null,
+          "default": "None",
           "display_name": "semantic_meta",
           "kind": "positional_or_keyword",
           "name": "semantic_meta",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._resolve_embedding_model",
@@ -42535,31 +42560,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1588,
+      "end_lineno": 1605,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1541,
+      "lineno": 1558,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "catalog",
           "kind": "positional_or_keyword",
           "name": "catalog",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "repo_root",
           "kind": "positional_or_keyword",
           "name": "repo_root",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._resolve_semantic_index_metadata",
@@ -42626,39 +42651,39 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1770,
+      "end_lineno": 1787,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1749,
+      "lineno": 1766,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "FloatMatrix",
-          "default": null,
+          "default": "None",
           "display_name": "distances",
           "kind": "positional_or_keyword",
           "name": "distances",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "IntVector",
-          "default": null,
+          "default": "None",
           "display_name": "indices",
           "kind": "positional_or_keyword",
           "name": "indices",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "row_lookup",
           "kind": "positional_or_keyword",
           "name": "row_lookup",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._scores_from_indices",
@@ -42675,12 +42700,12 @@
       "decorators": [
         "_with_cache"
       ],
-      "end_lineno": 1039,
+      "end_lineno": 1056,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1028,
+      "lineno": 1045,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
@@ -42697,23 +42722,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1150,
+      "end_lineno": 1167,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1133,
+      "lineno": 1150,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._stringify",
@@ -42728,23 +42753,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1130,
+      "end_lineno": 1147,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1114,
+      "lineno": 1131,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "text",
           "kind": "positional_or_keyword",
           "name": "text",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._tokenize",
@@ -42759,23 +42784,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 364,
+      "end_lineno": 372,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 353,
+      "lineno": 361,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "facets",
           "kind": "positional_or_keyword",
           "name": "facets",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._validate_facets",
@@ -42789,23 +42814,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1025,
+      "end_lineno": 1042,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1009,
+      "lineno": 1026,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Callable",
-          "default": null,
+          "default": "None",
           "display_name": "func",
           "kind": "positional_or_keyword",
           "name": "func",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search._with_cache",
@@ -42820,12 +42845,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 350,
+      "end_lineno": 358,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 262,
+      "lineno": 270,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
@@ -42888,55 +42913,55 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1271,
+      "end_lineno": 1288,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1199,
+      "lineno": 1216,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "package_name",
           "kind": "positional_or_keyword",
           "name": "package_name",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "module_name",
           "kind": "positional_or_keyword",
           "name": "module_name",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "symbol",
           "kind": "positional_or_keyword",
           "name": "symbol",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "symbol_id",
           "kind": "positional_or_keyword",
           "name": "symbol_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "row",
           "kind": "positional_or_keyword",
           "name": "row",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.build_document_from_payload",
@@ -42951,31 +42976,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 435,
+      "end_lineno": 443,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 401,
+      "lineno": 409,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "embedding_model",
           "kind": "keyword_only",
           "name": "embedding_model",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Callable",
-          "default": null,
+          "default": "None",
           "display_name": "model_loader",
           "kind": "keyword_only",
           "name": "model_loader",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping[str, str] | None",
@@ -43006,23 +43031,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 398,
+      "end_lineno": 406,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 367,
+      "lineno": 375,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "facets",
           "kind": "keyword_only",
           "name": "facets",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Unpack",
@@ -43045,39 +43070,39 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1503,
+      "end_lineno": 1520,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1469,
+      "lineno": 1486,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "collections.Counter",
-          "default": null,
+          "default": "None",
           "display_name": "query_tokens",
           "kind": "positional_or_keyword",
           "name": "query_tokens",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Sequence",
-          "default": null,
+          "default": "None",
           "display_name": "documents",
           "kind": "positional_or_keyword",
           "name": "documents",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.compute_lexical_scores",
@@ -43092,39 +43117,39 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1803,
+      "end_lineno": 1820,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1773,
+      "lineno": 1790,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "SearchOptions",
-          "default": null,
+          "default": "None",
           "display_name": "options",
           "kind": "positional_or_keyword",
           "name": "options",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "VectorSearchContext",
-          "default": null,
+          "default": "None",
           "display_name": "context",
           "kind": "positional_or_keyword",
           "name": "context",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.compute_vector_scores",
@@ -43139,31 +43164,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1416,
+      "end_lineno": 1433,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1386,
+      "lineno": 1403,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "SearchDocument",
-          "default": null,
+          "default": "None",
           "display_name": "document",
           "kind": "positional_or_keyword",
           "name": "document",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "facets",
           "kind": "positional_or_keyword",
           "name": "facets",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.document_matches_facets",
@@ -43178,23 +43203,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1360,
+      "end_lineno": 1377,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1322,
+      "lineno": 1339,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "catalog",
           "kind": "positional_or_keyword",
           "name": "catalog",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Mapping[str, int] | None",
@@ -43217,23 +43242,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1319,
+      "end_lineno": 1336,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1274,
+      "lineno": 1291,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "CatalogMapping",
-          "default": null,
+          "default": "None",
           "display_name": "catalog",
           "kind": "positional_or_keyword",
           "name": "catalog",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.iter_symbol_entries",
@@ -43248,23 +43273,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1111,
+      "end_lineno": 1128,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1042,
+      "lineno": 1059,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "purpose",
           "kind": "positional_or_keyword",
           "name": "purpose",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.load_faiss",
@@ -43284,55 +43309,55 @@
     },
     {
       "decorators": [],
-      "end_lineno": 527,
+      "end_lineno": 535,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 438,
+      "lineno": 446,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "symbol_id",
           "kind": "keyword_only",
           "name": "symbol_id",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "package",
           "kind": "keyword_only",
           "name": "package",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "module",
           "kind": "keyword_only",
           "name": "module",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "qname",
           "kind": "keyword_only",
           "name": "qname",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "kind",
           "kind": "keyword_only",
           "name": "kind",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Unpack",
@@ -43418,23 +43443,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1383,
+      "end_lineno": 1400,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1363,
+      "lineno": 1380,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.parse_bool",
@@ -43449,23 +43474,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1437,
+      "end_lineno": 1454,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1419,
+      "lineno": 1436,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.prepare_query_tokens",
@@ -43480,19 +43505,19 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1466,
+      "end_lineno": 1483,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1440,
+      "lineno": 1457,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "CatalogMapping | None",
-          "default": null,
+          "default": "None",
           "display_name": "search_config",
           "kind": "positional_or_keyword",
           "name": "search_config",
@@ -43500,27 +43525,27 @@
         },
         {
           "annotation": "SearchOptions",
-          "default": null,
+          "default": "None",
           "display_name": "options",
           "kind": "positional_or_keyword",
           "name": "options",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "document_count",
           "kind": "positional_or_keyword",
           "name": "document_count",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.resolve_search_parameters",
@@ -43535,31 +43560,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1943,
+      "end_lineno": 1960,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1845,
+      "lineno": 1862,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "catalog",
           "kind": "positional_or_keyword",
           "name": "catalog",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "SearchRequest",
-          "default": null,
+          "default": "None",
           "display_name": "request",
           "kind": "keyword_only",
           "name": "request",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "SearchOptions | None",
@@ -43590,39 +43615,39 @@
     },
     {
       "decorators": [],
-      "end_lineno": 1538,
+      "end_lineno": 1555,
       "filepath": "src/kgfoundry/agent_catalog/search.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 1506,
+      "lineno": 1523,
       "module": "kgfoundry.agent_catalog.search",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "Mapping",
-          "default": null,
+          "default": "None",
           "display_name": "lexical_scores",
           "kind": "positional_or_keyword",
           "name": "lexical_scores",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "Sequence",
-          "default": null,
+          "default": "None",
           "display_name": "documents",
           "kind": "positional_or_keyword",
           "name": "documents",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "candidate_limit",
           "kind": "positional_or_keyword",
           "name": "candidate_limit",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "kgfoundry.agent_catalog.search.select_lexical_candidates",
@@ -97459,12 +97484,12 @@
       "decorators": [
         "dataclass"
       ],
-      "end_lineno": 157,
+      "end_lineno": 158,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 152,
+      "lineno": 153,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -97504,19 +97529,19 @@
       "parameters": [
         {
           "annotation": "list",
-          "default": null,
+          "default": "None",
           "display_name": "ids",
           "kind": "positional_or_keyword",
           "name": "ids",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "FloatMatrix",
-          "default": null,
+          "default": "None",
           "display_name": "matrix",
           "kind": "positional_or_keyword",
           "name": "matrix",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.DenseVecs.__init__",
@@ -97525,12 +97550,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 636,
+      "end_lineno": 642,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 172,
+      "lineno": 173,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -97562,23 +97587,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 206,
+      "end_lineno": 207,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 184,
+      "lineno": 185,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "db_path",
           "kind": "positional_or_keyword",
           "name": "db_path",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "FaissAdapterConfig | None",
@@ -97636,31 +97661,31 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 283,
+      "end_lineno": 289,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 278,
+      "lineno": 284,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "name",
           "kind": "positional_or_keyword",
           "name": "name",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._coerce_bool",
@@ -97682,23 +97707,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 292,
+      "end_lineno": 298,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 285,
+      "lineno": 291,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._coerce_gpu_devices",
@@ -97720,31 +97745,31 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 276,
+      "end_lineno": 282,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 271,
+      "lineno": 277,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "name",
           "kind": "positional_or_keyword",
           "name": "name",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._coerce_int",
@@ -97766,31 +97791,31 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 269,
+      "end_lineno": 275,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 264,
+      "lineno": 270,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "name",
           "kind": "positional_or_keyword",
           "name": "name",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._coerce_str",
@@ -97812,31 +97837,31 @@
       "decorators": [
         "classmethod"
       ],
-      "end_lineno": 262,
+      "end_lineno": 268,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 242,
+      "lineno": 248,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": null,
-          "default": null,
+          "default": "None",
           "display_name": "cls",
           "kind": "positional_or_keyword",
           "name": "cls",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "dict",
-          "default": null,
+          "default": "None",
           "display_name": "legacy_options",
           "kind": "positional_or_keyword",
           "name": "legacy_options",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._config_from_legacy_options",
@@ -97851,31 +97876,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 535,
+      "end_lineno": 541,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 513,
+      "lineno": 519,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "FloatVector",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._cpu_search",
@@ -97892,27 +97917,27 @@
       "decorators": [
         "classmethod"
       ],
-      "end_lineno": 231,
+      "end_lineno": 237,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 221,
+      "lineno": 227,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": null,
-          "default": null,
+          "default": "None",
           "display_name": "cls",
           "kind": "positional_or_keyword",
           "name": "cls",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "FaissAdapterConfig | None",
-          "default": null,
+          "default": "None",
           "display_name": "config",
           "kind": "positional_or_keyword",
           "name": "config",
@@ -97920,11 +97945,11 @@
         },
         {
           "annotation": "dict",
-          "default": null,
+          "default": "None",
           "display_name": "legacy_options",
           "kind": "positional_or_keyword",
           "name": "legacy_options",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._ensure_config_not_mixed",
@@ -98001,12 +98026,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 594,
+      "end_lineno": 600,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 553,
+      "lineno": 559,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -98030,23 +98055,23 @@
       "decorators": [
         "staticmethod"
       ],
-      "end_lineno": 636,
+      "end_lineno": 642,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 596,
+      "lineno": 602,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Path",
-          "default": null,
+          "default": "None",
           "display_name": "source",
           "kind": "positional_or_keyword",
           "name": "source",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._load_from_parquet",
@@ -98097,12 +98122,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 511,
+      "end_lineno": 517,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 500,
+      "lineno": 506,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -98126,27 +98151,27 @@
       "decorators": [
         "classmethod"
       ],
-      "end_lineno": 219,
+      "end_lineno": 225,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 208,
+      "lineno": 214,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": null,
-          "default": null,
+          "default": "None",
           "display_name": "cls",
           "kind": "positional_or_keyword",
           "name": "cls",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "FaissAdapterConfig | None",
-          "default": null,
+          "default": "None",
           "display_name": "config",
           "kind": "positional_or_keyword",
           "name": "config",
@@ -98154,11 +98179,11 @@
         },
         {
           "annotation": "dict",
-          "default": null,
+          "default": "None",
           "display_name": "legacy_options",
           "kind": "positional_or_keyword",
           "name": "legacy_options",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._resolve_config",
@@ -98173,23 +98198,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 551,
+      "end_lineno": 557,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 537,
+      "lineno": 543,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "FaissModuleProtocol",
-          "default": null,
+          "default": "None",
           "display_name": "module",
           "kind": "positional_or_keyword",
           "name": "module",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._resolve_metric",
@@ -98299,31 +98324,31 @@
       "decorators": [
         "classmethod"
       ],
-      "end_lineno": 240,
+      "end_lineno": 246,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 233,
+      "lineno": 239,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": null,
-          "default": null,
+          "default": "None",
           "display_name": "cls",
           "kind": "positional_or_keyword",
           "name": "cls",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "dict",
-          "default": null,
+          "default": "None",
           "display_name": "legacy_options",
           "kind": "positional_or_keyword",
           "name": "legacy_options",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter._validate_legacy_keys",
@@ -98337,12 +98362,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 353,
+      "end_lineno": 359,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 294,
+      "lineno": 300,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -98358,12 +98383,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 413,
+      "end_lineno": 419,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 355,
+      "lineno": 361,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -98383,23 +98408,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 496,
+      "end_lineno": 502,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 466,
+      "lineno": 472,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "str",
-          "default": null,
+          "default": "None",
           "display_name": "index_uri",
           "kind": "positional_or_keyword",
           "name": "index_uri",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "str | None",
@@ -98421,31 +98446,31 @@
     },
     {
       "decorators": [],
-      "end_lineno": 464,
+      "end_lineno": 470,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "method",
-      "lineno": 415,
+      "lineno": 421,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "Sequence[float] | NDArray[np.float32]",
-          "default": null,
+          "default": "None",
           "display_name": "query",
           "kind": "positional_or_keyword",
           "name": "query",
-          "optional": false
+          "optional": true
         },
         {
           "annotation": "int",
-          "default": null,
+          "default": "None",
           "display_name": "k",
           "kind": "positional_or_keyword",
           "name": "k",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter.FaissAdapter.search",
@@ -98471,12 +98496,12 @@
       "decorators": [
         "dataclass(slots=True, frozen=True)"
       ],
-      "end_lineno": 169,
+      "end_lineno": 170,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 160,
+      "lineno": 161,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
@@ -98552,23 +98577,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 96,
+      "end_lineno": 101,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 91,
+      "lineno": 96,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "value",
           "kind": "positional_or_keyword",
           "name": "value",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter._as_optional_str",
@@ -98583,23 +98608,23 @@
     },
     {
       "decorators": [],
-      "end_lineno": 88,
+      "end_lineno": 93,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 78,
+      "lineno": 83,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": false,
       "parameters": [
         {
           "annotation": "object",
-          "default": null,
+          "default": "None",
           "display_name": "candidate",
           "kind": "positional_or_keyword",
           "name": "candidate",
-          "optional": false
+          "optional": true
         }
       ],
       "qname": "search_api.faiss_adapter._is_faiss_index",
@@ -98614,12 +98639,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 145,
+      "end_lineno": 146,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 135,
+      "lineno": 140,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
@@ -98636,12 +98661,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 125,
+      "end_lineno": 130,
       "filepath": "src/search_api/faiss_adapter.py",
       "is_async": false,
       "is_generator": false,
       "kind": "function",
-      "lineno": 104,
+      "lineno": 109,
       "module": "search_api.faiss_adapter",
       "notes": [],
       "owned": true,
@@ -99670,12 +99695,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 108,
+      "end_lineno": 110,
       "filepath": "src/search_api/schemas.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 67,
+      "lineno": 69,
       "module": "search_api.schemas",
       "notes": [],
       "owned": true,
@@ -99686,12 +99711,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 63,
+      "end_lineno": 65,
       "filepath": "src/search_api/schemas.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 48,
+      "lineno": 50,
       "module": "search_api.schemas",
       "notes": [],
       "owned": true,
@@ -99702,12 +99727,12 @@
     },
     {
       "decorators": [],
-      "end_lineno": 165,
+      "end_lineno": 167,
       "filepath": "src/search_api/schemas.py",
       "is_async": false,
       "is_generator": false,
       "kind": "class",
-      "lineno": 112,
+      "lineno": 114,
       "module": "search_api.schemas",
       "notes": [],
       "owned": true,
@@ -104716,8 +104741,8 @@
   ],
   "provenance": {
     "builderVersion": "2.0.0",
-    "commitHash": "1db8a23880b8476a6698230efc054a0a7a6ed5e6",
+    "commitHash": "7af4ce99424d43b83a95914fd8082a3b50d89932",
     "configHash": "914bd6aab31dd9fc63253f16e96d3bca0f7d6636ab97758397fa3732c71318dc",
-    "generatedAt": "2025-11-03T12:02:39-05:00"
+    "generatedAt": "2025-11-04T14:14:04-05:00"
   }
 }

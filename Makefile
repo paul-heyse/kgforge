@@ -1,26 +1,23 @@
 
-.PHONY: bootstrap run api e2e test test-gpu test-cpu fmt lint lint-gpu-gates clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts
+.PHONY: bootstrap run api e2e test test-gpu test-cpu fmt lint lint-gpu-gates clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts build_agent_catalog
 
-VENV := .venv
-PY := $(VENV)/bin/python
-PIP := $(VENV)/bin/pip
-UVICORN := $(VENV)/bin/uvicorn
-PYTEST := $(VENV)/bin/pytest
-PRECOMMIT := $(VENV)/bin/pre-commit
-PKG := $(shell python tools/detect_pkg.py)
-PKGS := $(shell python tools/detect_pkg.py --all)
+UV := uv
+UV_RUN := $(UV) run
+UVX := uvx
+PY := $(UV_RUN) python
+PIP := $(UV_RUN) pip
+UVICORN := $(UV_RUN) uvicorn
+PYTEST := $(UV_RUN) pytest
+PRECOMMIT := $(UV_RUN) pre-commit
+PKG := $(shell $(UV_RUN) python tools/detect_pkg.py)
+PKGS := $(shell $(UV_RUN) python tools/detect_pkg.py --all)
 WATCH_PORT := $(if $(SPHINX_AUTOBUILD_PORT),$(SPHINX_AUTOBUILD_PORT),8000)
 DOCSTRING_DIRS := src tools docs/_scripts
 FMT_TARGETS := src tests tools docs/_scripts
 LINT_TARGETS := $(FMT_TARGETS)
 
 bootstrap:
-	python3 -m venv $(VENV)
-	$(PIP) install -U pip wheel
-	$(PIP) install -U -e ".[dev,docs]"
-	$(PIP) install -U pre-commit
-	$(PRECOMMIT) install
-	$(PY) -m kgfoundry.registry.migrate apply --db /data/catalog/catalog.duckdb --migrations registry/migrations
+	bash scripts/bootstrap.sh
 
 run: api
 api:
@@ -39,24 +36,24 @@ test-cpu:
 	$(PYTEST) -m "not gpu" -q
 
 fmt:
-	$(VENV)/bin/ruff check --select I --fix $(FMT_TARGETS)
-	$(VENV)/bin/ruff check --fix $(FMT_TARGETS)
-	$(VENV)/bin/ruff format $(FMT_TARGETS)
-	$(VENV)/bin/black $(FMT_TARGETS)
+	$(UV_RUN) ruff check --select I --fix $(FMT_TARGETS)
+	$(UV_RUN) ruff check --fix $(FMT_TARGETS)
+	$(UV_RUN) ruff format $(FMT_TARGETS)
+	$(UV_RUN) black $(FMT_TARGETS)
 
 lint:
-	$(VENV)/bin/ruff check --select I $(LINT_TARGETS)
-	$(VENV)/bin/ruff check $(LINT_TARGETS)
-	$(VENV)/bin/ruff format --check $(FMT_TARGETS)
-	$(VENV)/bin/mypy src
+	$(UV_RUN) ruff check --select I $(LINT_TARGETS)
+	$(UV_RUN) ruff check $(LINT_TARGETS)
+	$(UV_RUN) ruff format --check $(FMT_TARGETS)
+	$(UV_RUN) mypy src
 
 lint-gpu-gates:
 	$(PY) tools/lint/check_gpu_marks.py
 
 lint-docs:
-	uvx pydoclint --style numpy src
-	uv run python -m tools.docstring_builder.cli check --diff
-	uvx mypy --strict src
+	$(UVX) pydoclint --style numpy src
+	$(UV_RUN) python -m tools.docstring_builder.cli check --diff
+	$(UVX) mypy --strict src
 	@if [ "$(RUN_DOCS_TESTS)" = "1" ]; then \
 		uv run pytest tests/docs; \
 	else \
@@ -75,9 +72,9 @@ fixture:
 docstrings:
 	$(PY) tools/generate_docstrings.py
 	$(PY) tools/update_navmaps.py
-	$(VENV)/bin/docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i $(DOCSTRING_DIRS) || true
-	$(VENV)/bin/pydocstyle $(DOCSTRING_DIRS)
-	$(VENV)/bin/docstr-coverage --fail-under 90 src
+	$(UV_RUN) docformatter --wrap-summaries=100 --wrap-descriptions=100 -r -i $(DOCSTRING_DIRS) || true
+	$(UV_RUN) pydocstyle $(DOCSTRING_DIRS)
+	$(UV_RUN) docstr-coverage --fail-under 90 src
 
 docfacts-diff:
 	uv run --no-project --with libcst --with griffe python -m tools.docstring_builder.cli --diff-only --all
@@ -88,9 +85,19 @@ stubs-check:
 artifacts:
 	uv run python tools/docs/build_artifacts.py
 
+build_agent_catalog:
+	uv run python tools/docs/build_agent_catalog.py
+	uv run python tools/docs/build_agent_api.py
+	uv run python tools/docs/render_agent_portal.py
+	uv run python tools/docs/build_agent_analytics.py
+
 readmes:
 	$(PY) tools/gen_readmes.py
-	-which doctoc >/dev/null 2>&1 && doctoc src/$(PKG) || echo "Install doctoc to auto-update TOCs."
+	@if $(UV) run --which doctoc >/dev/null 2>&1; then \
+		$(UV_RUN) doctoc src/$(PKG); \
+	else \
+		echo "Install doctoc to auto-update TOCs."; \
+	fi
 
 html:
 	$(PY) -m sphinx -b html -w sphinx-warn.log docs docs/_build/html

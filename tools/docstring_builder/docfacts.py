@@ -188,6 +188,21 @@ def _to_int_or_none(value: object | None) -> int | None:
     return number
 
 
+def _sanitize_lineno(value: int | None) -> int:
+    number = value if isinstance(value, int) else None
+    if number is None or number <= 0:
+        return 1
+    return number
+
+
+def _sanitize_end_lineno(value: int | None) -> int | None:
+    if value is None:
+        return None
+    if value <= 0:
+        return None
+    return value
+
+
 def _iterable_values(value: object | None) -> Iterable[object]:
     if value is None or isinstance(value, (str, bytes)):
         return ()
@@ -241,8 +256,8 @@ def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:
                 module=entry.symbol.module,
                 kind=entry.symbol.kind,
                 filepath=_relative_filepath(entry.symbol.filepath),
-                lineno=entry.symbol.lineno,
-                end_lineno=_to_int_or_none(entry.symbol.end_lineno),
+                lineno=_sanitize_lineno(entry.symbol.lineno),
+                end_lineno=_sanitize_end_lineno(entry.symbol.end_lineno),
                 decorators=list(entry.symbol.decorators),
                 is_async=entry.symbol.is_async,
                 is_generator=entry.symbol.is_generator,

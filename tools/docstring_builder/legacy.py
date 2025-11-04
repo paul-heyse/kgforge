@@ -52,9 +52,9 @@ _src_root_ctx: contextvars.ContextVar[Path] = contextvars.ContextVar(
 class LegacyConfig:
     """Thread-safe singleton for repository metadata configuration.
 
-    Uses contextvars for thread-safe access, allowing per-context overrides
-    while maintaining a default value. This replaces mutable global variables
-    with a structured, testable configuration mechanism.
+    Uses contextvars for thread-safe access, allowing per-context overrides while maintaining a
+    default value. This replaces mutable global variables with a structured, testable configuration
+    mechanism.
     """
 
     _instance: LegacyConfig | None = None

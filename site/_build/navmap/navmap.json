@@ -1,27 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "schemaId": "https://kgfoundry.dev/schema/tools/navmap-document.json",
-  "generatedAt": "2025-11-03T17:26:15.805029+00:00",
-  "commit": "1db8a23880b8476a6698230efc054a0a7a6ed5e6",
+  "generatedAt": "2025-11-04T21:32:22.831590+00:00",
+  "commit": "7af4ce99424d43b83a95914fd8082a3b50d89932",
   "policyVersion": "1",
   "linkMode": "editor",
   "modules": {
-    "__init__": {
-      "path": "src/__init__.py",
-      "exports": [],
-      "sections": [],
-      "sectionLines": {},
-      "anchors": {},
-      "links": {
-        "source": "vscode://file//home/paul/kgfoundry/src/__init__.py"
-      },
-      "meta": {},
-      "moduleMeta": {},
-      "tags": [],
-      "synopsis": "",
-      "seeAlso": [],
-      "deps": []
-    },
     "docling.__init__": {
       "path": "src/docling/__init__.py",
       "exports": [
@@ -41,9 +25,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "canonicalizer": 48,
-        "hybrid": 49,
-        "vlm": 50
+        "canonicalizer": 54,
+        "hybrid": 55,
+        "vlm": 56
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/docling/__init__.py"
@@ -86,7 +70,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "canonicalize_text": 44
+        "canonicalize_text": 45
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/docling/canonicalizer.py"
@@ -119,7 +103,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "HybridChunker": 42
+        "HybridChunker": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/docling/hybrid.py"
@@ -152,7 +136,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "GraniteDoclingVLM": 42
+        "GraniteDoclingVLM": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/docling/vlm.py"
@@ -226,7 +210,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "harvest": 46
+        "harvest": 47
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/download/cli.py"
@@ -259,7 +243,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "OpenAccessHarvester": 84
+        "OpenAccessHarvester": 86
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/download/harvester.py"
@@ -333,7 +317,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "DenseEmbeddingModel": 46
+        "DenseEmbeddingModel": 48
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_dense/base.py"
@@ -366,7 +350,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "Qwen3Embedder": 42
+        "Qwen3Embedder": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_dense/qwen3.py"
@@ -450,8 +434,8 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "SparseEncoder": 48,
-        "SparseIndex": 93
+        "SparseEncoder": 50,
+        "SparseIndex": 95
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/base.py"
@@ -495,9 +479,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "BM25Doc": 155,
-        "PurePythonBM25": 178,
-        "LuceneBM25": 511
+        "BM25Doc": 156,
+        "PurePythonBM25": 179,
+        "LuceneBM25": 517
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/embeddings_sparse/bm25.py"
@@ -667,7 +651,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "MockKG": 42
+        "MockKG": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kg_builder/mock_kg.py"
@@ -700,7 +684,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "Neo4jStore": 42
+        "Neo4jStore": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kg_builder/neo4j_store.py"
@@ -720,14 +704,44 @@
     },
     "kgfoundry.__init__": {
       "path": "src/kgfoundry/__init__.py",
-      "exports": [],
+      "exports": [
+        "docling",
+        "download",
+        "embeddings_dense",
+        "embeddings_sparse",
+        "kg_builder",
+        "kgfoundry_common",
+        "linking",
+        "observability",
+        "ontology",
+        "orchestration",
+        "registry",
+        "search_api",
+        "search_client",
+        "vectorstore_faiss"
+      ],
       "sections": [],
       "sectionLines": {},
       "anchors": {},
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry/__init__.py"
       },
-      "meta": {},
+      "meta": {
+        "docling": {},
+        "download": {},
+        "embeddings_dense": {},
+        "embeddings_sparse": {},
+        "kg_builder": {},
+        "kgfoundry_common": {},
+        "linking": {},
+        "observability": {},
+        "ontology": {},
+        "orchestration": {},
+        "registry": {},
+        "search_api": {},
+        "search_client": {},
+        "vectorstore_faiss": {}
+      },
       "moduleMeta": {},
       "tags": [],
       "synopsis": "",
@@ -1645,6 +1659,7 @@
         "parquet_io",
         "safe_pickle_v2",
         "schema_helpers",
+        "sequence_guards",
         "serialization",
         "settings",
         "subprocess_utils",
@@ -1666,6 +1681,7 @@
             "parquet_io",
             "safe_pickle_v2",
             "schema_helpers",
+            "sequence_guards",
             "serialization",
             "settings",
             "subprocess_utils",
@@ -1675,17 +1691,17 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "config": 8,
-        "errors": 9,
-        "exceptions": 10,
-        "fs": 11,
-        "ids": 12,
-        "logging": 13,
-        "models": 14,
-        "navmap_types": 15,
-        "parquet_io": 16,
-        "safe_pickle_v2": 17,
-        "subprocess_utils": 18
+        "config": 12,
+        "errors": 13,
+        "exceptions": 14,
+        "fs": 15,
+        "ids": 16,
+        "logging": 17,
+        "models": 18,
+        "navmap_types": 19,
+        "parquet_io": 20,
+        "safe_pickle_v2": 21,
+        "subprocess_utils": 22
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/__init__.py"
@@ -1747,6 +1763,11 @@
           "since": "0.1.0"
         },
         "schema_helpers": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "sequence_guards": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
@@ -1832,11 +1853,81 @@
     },
     "kgfoundry_common.errors.__init__": {
       "path": "src/kgfoundry_common/errors/__init__.py",
-      "exports": [],
+      "exports": [
+        "BASE_TYPE_URI",
+        "AgentCatalogSearchError",
+        "ArtifactDependencyError",
+        "ArtifactDeserializationError",
+        "ArtifactModelError",
+        "ArtifactSerializationError",
+        "ArtifactValidationError",
+        "CatalogLoadError",
+        "CatalogSessionError",
+        "ChunkingError",
+        "ConfigurationError",
+        "DeserializationError",
+        "DoclingError",
+        "DownloadError",
+        "EmbeddingError",
+        "ErrorCode",
+        "IndexBuildError",
+        "KgFoundryError",
+        "LinkerCalibrationError",
+        "Neo4jError",
+        "OCRTimeoutError",
+        "OntologyParseError",
+        "RegistryError",
+        "RetryExhaustedError",
+        "SchemaValidationError",
+        "SerializationError",
+        "SettingsError",
+        "SpladeOOMError",
+        "SymbolAttachmentError",
+        "UnsupportedMIMEError",
+        "VectorSearchError",
+        "get_type_uri",
+        "problem_details_response",
+        "register_problem_details_handler"
+      ],
       "sections": [
         {
           "id": "public-api",
-          "symbols": []
+          "symbols": [
+            "BASE_TYPE_URI",
+            "AgentCatalogSearchError",
+            "ArtifactDependencyError",
+            "ArtifactDeserializationError",
+            "ArtifactModelError",
+            "ArtifactSerializationError",
+            "ArtifactValidationError",
+            "CatalogLoadError",
+            "CatalogSessionError",
+            "ChunkingError",
+            "ConfigurationError",
+            "DeserializationError",
+            "DoclingError",
+            "DownloadError",
+            "EmbeddingError",
+            "ErrorCode",
+            "IndexBuildError",
+            "KgFoundryError",
+            "LinkerCalibrationError",
+            "Neo4jError",
+            "OCRTimeoutError",
+            "OntologyParseError",
+            "RegistryError",
+            "RetryExhaustedError",
+            "SchemaValidationError",
+            "SerializationError",
+            "SettingsError",
+            "SpladeOOMError",
+            "SymbolAttachmentError",
+            "UnsupportedMIMEError",
+            "VectorSearchError",
+            "get_type_uri",
+            "problem_details_response",
+            "register_problem_details_handler"
+          ]
         }
       ],
       "sectionLines": {},
@@ -1844,7 +1935,178 @@
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/errors/__init__.py"
       },
-      "meta": {},
+      "meta": {
+        "BASE_TYPE_URI": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "AgentCatalogSearchError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ArtifactDependencyError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ArtifactDeserializationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ArtifactModelError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ArtifactSerializationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ArtifactValidationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "CatalogLoadError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "CatalogSessionError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ChunkingError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ConfigurationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "DeserializationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "DoclingError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "DownloadError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "EmbeddingError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "ErrorCode": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "IndexBuildError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "KgFoundryError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "LinkerCalibrationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "Neo4jError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "OCRTimeoutError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "OntologyParseError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "RegistryError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "RetryExhaustedError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "SchemaValidationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "SerializationError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "SettingsError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "SpladeOOMError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "SymbolAttachmentError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "UnsupportedMIMEError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "VectorSearchError": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "get_type_uri": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "problem_details_response": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "register_problem_details_handler": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        }
+      },
       "moduleMeta": {},
       "tags": [],
       "synopsis": "Exception hierarchy and Problem Details support",
@@ -2034,8 +2296,8 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "DownloadError": 50,
-        "UnsupportedMIMEError": 55
+        "DownloadError": 52,
+        "UnsupportedMIMEError": 57
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/exceptions.py"
@@ -2135,8 +2397,8 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "urn_doc_from_text": 49,
-        "urn_chunk": 72
+        "urn_doc_from_text": 50,
+        "urn_chunk": 73
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/ids.py"
@@ -2195,11 +2457,14 @@
       "path": "src/kgfoundry_common/logging.py",
       "exports": [
         "CorrelationContext",
+        "FormatterType",
         "JsonFormatter",
         "LogContextExtra",
         "LoggerAdapter",
+        "LoggingCache",
         "get_correlation_id",
         "get_logger",
+        "get_logging_cache",
         "measure_duration",
         "set_correlation_id",
         "setup_logging",
@@ -2210,11 +2475,14 @@
           "id": "public-api",
           "symbols": [
             "CorrelationContext",
+            "FormatterType",
             "JsonFormatter",
             "LogContextExtra",
             "LoggerAdapter",
+            "LoggingCache",
             "get_correlation_id",
             "get_logger",
+            "get_logging_cache",
             "measure_duration",
             "set_correlation_id",
             "setup_logging",
@@ -2229,6 +2497,11 @@
       },
       "meta": {
         "CorrelationContext": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "FormatterType": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
@@ -2248,12 +2521,22 @@
           "stability": "stable",
           "since": "0.1.0"
         },
+        "LoggingCache": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
         "get_correlation_id": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
         },
         "get_logger": {
+          "owner": "@kgfoundry-common",
+          "stability": "stable",
+          "since": "0.1.0"
+        },
+        "get_logging_cache": {
           "owner": "@kgfoundry-common",
           "stability": "stable",
           "since": "0.1.0"
@@ -2308,11 +2591,11 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "Id": 64,
-        "Doc": 68,
-        "DoctagsAsset": 145,
-        "Chunk": 179,
-        "LinkAssertion": 215
+        "Id": 66,
+        "Doc": 70,
+        "DoctagsAsset": 147,
+        "Chunk": 181,
+        "LinkAssertion": 217
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/models.py"
@@ -2375,9 +2658,9 @@
       "anchors": {
         "Stability": 14,
         "NavSection": 25,
-        "SymbolMeta": 39,
-        "ModuleMeta": 63,
-        "NavMap": 78
+        "SymbolMeta": 40,
+        "ModuleMeta": 65,
+        "NavMap": 81
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py"
@@ -2529,6 +2812,32 @@
       "seeAlso": [],
       "deps": []
     },
+    "kgfoundry_common.optional_deps": {
+      "path": "src/kgfoundry_common/optional_deps.py",
+      "exports": [
+        "OptionalDependencyError",
+        "safe_import_autoapi",
+        "safe_import_griffe",
+        "safe_import_sphinx"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/optional_deps.py"
+      },
+      "meta": {
+        "OptionalDependencyError": {},
+        "safe_import_autoapi": {},
+        "safe_import_griffe": {},
+        "safe_import_sphinx": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
+      "deps": []
+    },
     "kgfoundry_common.parquet_io": {
       "path": "src/kgfoundry_common/parquet_io.py",
       "exports": [
@@ -2554,11 +2863,11 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "ParquetVectorWriter": 121,
-        "ParquetChunkWriter": 319,
-        "read_table": 427,
-        "read_table_to_dataframe": 487,
-        "validate_table_schema": 540
+        "ParquetVectorWriter": 123,
+        "ParquetChunkWriter": 321,
+        "read_table": 429,
+        "read_table_to_dataframe": 489,
+        "validate_table_schema": 542
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/parquet_io.py"
@@ -2607,6 +2916,7 @@
         "ProblemDetailsDict",
         "ProblemDetailsParams",
         "ProblemDetailsValidationError",
+        "build_configuration_problem",
         "build_problem_details",
         "problem_from_exception",
         "render_problem",
@@ -2627,6 +2937,7 @@
         "ProblemDetailsDict": {},
         "ProblemDetailsParams": {},
         "ProblemDetailsValidationError": {},
+        "build_configuration_problem": {},
         "build_problem_details": {},
         "problem_from_exception": {},
         "render_problem": {},
@@ -2737,6 +3048,28 @@
         "assert_model_roundtrip": {},
         "load_schema": {},
         "validate_model_against_schema": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
+      "deps": []
+    },
+    "kgfoundry_common.sequence_guards": {
+      "path": "src/kgfoundry_common/sequence_guards.py",
+      "exports": [
+        "first_or_error",
+        "first_or_error_multi_device"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/sequence_guards.py"
+      },
+      "meta": {
+        "first_or_error": {},
+        "first_or_error_multi_device": {}
       },
       "moduleMeta": {},
       "tags": [],
@@ -2897,6 +3230,44 @@
       "seeAlso": [],
       "deps": []
     },
+    "kgfoundry_common.typing.__init__": {
+      "path": "src/kgfoundry_common/typing/__init__.py",
+      "exports": [
+        "TYPE_CHECKING",
+        "JSONValue",
+        "NavMap",
+        "ProblemDetails",
+        "SymbolID",
+        "gate_import",
+        "resolve_faiss",
+        "resolve_fastapi",
+        "resolve_numpy",
+        "safe_get_type"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/kgfoundry_common/typing/__init__.py"
+      },
+      "meta": {
+        "TYPE_CHECKING": {},
+        "JSONValue": {},
+        "NavMap": {},
+        "ProblemDetails": {},
+        "SymbolID": {},
+        "gate_import": {},
+        "resolve_faiss": {},
+        "resolve_fastapi": {},
+        "resolve_numpy": {},
+        "safe_get_type": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
+      "seeAlso": [],
+      "deps": []
+    },
     "kgfoundry_common.vector_types": {
       "path": "src/kgfoundry_common/vector_types.py",
       "exports": [
@@ -2985,7 +3356,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "isotonic_calibrate": 42
+        "isotonic_calibrate": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/linking/calibration.py"
@@ -3018,7 +3389,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "Linker": 42
+        "Linker": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/linking/linker.py"
@@ -3155,7 +3526,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "OntologyCatalog": 68
+        "OntologyCatalog": 69
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/ontology/catalog.py"
@@ -3188,7 +3559,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "OntologyLoader": 42
+        "OntologyLoader": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/ontology/loader.py"
@@ -3261,7 +3632,8 @@
         "api",
         "e2e",
         "index_bm25",
-        "index_faiss"
+        "index_faiss",
+        "run_index_faiss"
       ],
       "sections": [
         {
@@ -3270,16 +3642,17 @@
             "api",
             "e2e",
             "index_bm25",
-            "index_faiss"
+            "index_faiss",
+            "run_index_faiss"
           ]
         }
       ],
       "sectionLines": {},
       "anchors": {
-        "index_bm25": 418,
-        "index_faiss": 506,
-        "api": 681,
-        "e2e": 726
+        "index_bm25": 433,
+        "index_faiss": 521,
+        "api": 747,
+        "e2e": 792
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/orchestration/cli.py"
@@ -3304,11 +3677,38 @@
           "owner": "@orchestration",
           "stability": "beta",
           "since": "0.1.0"
+        },
+        "run_index_faiss": {
+          "owner": "@orchestration",
+          "stability": "beta",
+          "since": "0.1.0"
         }
       },
       "moduleMeta": {},
       "tags": [],
       "synopsis": "Prefect command-line entrypoints for orchestration flows",
+      "seeAlso": [],
+      "deps": []
+    },
+    "orchestration.config": {
+      "path": "src/orchestration/config.py",
+      "exports": [
+        "ArtifactValidationConfig",
+        "IndexCliConfig"
+      ],
+      "sections": [],
+      "sectionLines": {},
+      "anchors": {},
+      "links": {
+        "source": "vscode://file//home/paul/kgfoundry/src/orchestration/config.py"
+      },
+      "meta": {
+        "ArtifactValidationConfig": {},
+        "IndexCliConfig": {}
+      },
+      "moduleMeta": {},
+      "tags": [],
+      "synopsis": "",
       "seeAlso": [],
       "deps": []
     },
@@ -3337,12 +3737,12 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "t_prepare_dirs": 82,
-        "t_write_fixture_chunks": 122,
-        "t_write_fixture_dense": 152,
-        "t_write_fixture_splade": 184,
-        "t_register_in_duckdb": 254,
-        "fixture_pipeline": 289
+        "t_prepare_dirs": 85,
+        "t_write_fixture_chunks": 125,
+        "t_write_fixture_dense": 155,
+        "t_write_fixture_splade": 187,
+        "t_register_in_duckdb": 257,
+        "fixture_pipeline": 292
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/orchestration/fixture_flow.py"
@@ -3402,8 +3802,8 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "t_echo": 65,
-        "e2e_flow": 99
+        "t_echo": 66,
+        "e2e_flow": 100
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/orchestration/flows.py"
@@ -3522,7 +3922,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "Registry": 44
+        "Registry": 46
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/api.py"
@@ -3589,7 +3989,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "DuckDBRegistry": 50
+        "DuckDBRegistry": 53
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/duckdb_registry.py"
@@ -3622,7 +4022,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "DuckDBRegistryHelper": 65
+        "DuckDBRegistryHelper": 68
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/helper.py"
@@ -3657,8 +4057,8 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "apply": 49,
-        "main": 94
+        "apply": 51,
+        "main": 96
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/registry/migrate.py"
@@ -3683,28 +4083,101 @@
     },
     "search_api.__init__": {
       "path": "src/search_api/__init__.py",
-      "exports": [],
+      "exports": [
+        "app",
+        "bm25_index",
+        "faiss_adapter",
+        "fixture_index",
+        "fusion",
+        "kg_mock",
+        "schemas",
+        "service",
+        "splade_index",
+        "types"
+      ],
       "sections": [
         {
           "id": "public-api",
-          "symbols": []
+          "symbols": [
+            "app",
+            "bm25_index",
+            "faiss_adapter",
+            "fixture_index",
+            "fusion",
+            "kg_mock",
+            "schemas",
+            "service",
+            "splade_index",
+            "types"
+          ]
         }
       ],
       "sectionLines": {},
       "anchors": {
-        "app": 19,
-        "bm25_index": 20,
-        "faiss_adapter": 21,
-        "fixture_index": 22,
-        "fusion": 23,
-        "kg_mock": 24,
-        "schemas": 25,
-        "service": 26
+        "app": 20,
+        "bm25_index": 21,
+        "faiss_adapter": 22,
+        "fixture_index": 23,
+        "fusion": 24,
+        "kg_mock": 25,
+        "schemas": 26,
+        "service": 27
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/__init__.py"
       },
-      "meta": {},
+      "meta": {
+        "app": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "bm25_index": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "faiss_adapter": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "fixture_index": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "fusion": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "kg_mock": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "schemas": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "service": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "splade_index": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        },
+        "types": {
+          "owner": "@search-api",
+          "stability": "experimental",
+          "since": "0.1.0"
+        }
+      },
       "moduleMeta": {},
       "tags": [],
       "synopsis": "Search service endpoints and retrieval adapters",
@@ -3738,10 +4211,10 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "auth": 403,
-        "healthz": 426,
-        "search": 448,
-        "graph_concepts": 586
+        "auth": 410,
+        "healthz": 433,
+        "search": 455,
+        "graph_concepts": 593
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/app.py"
@@ -3808,9 +4281,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "toks": 65,
-        "BM25Doc": 88,
-        "BM25Index": 123
+        "toks": 162,
+        "BM25Doc": 185,
+        "BM25Index": 220
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/bm25_index.py"
@@ -3975,9 +4448,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "tokenize": 61,
-        "FixtureDoc": 84,
-        "FixtureIndex": 116
+        "tokenize": 64,
+        "FixtureDoc": 87,
+        "FixtureIndex": 119
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/fixture_index.py"
@@ -4020,7 +4493,7 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "rrf_fuse": 42
+        "rrf_fuse": 43
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/fusion.py"
@@ -4057,9 +4530,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "detect_query_concepts": 67,
-        "linked_concepts_for_text": 93,
-        "kg_boost": 119
+        "detect_query_concepts": 69,
+        "linked_concepts_for_text": 95,
+        "kg_boost": 121
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/kg_mock.py"
@@ -4106,9 +4579,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "SearchResponse": 47,
-        "SearchRequest": 66,
-        "SearchResult": 111
+        "SearchResponse": 49,
+        "SearchRequest": 68,
+        "SearchResult": 113
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/schemas.py"
@@ -4157,10 +4630,10 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "rrf_fuse": 54,
-        "apply_kg_boosts": 94,
-        "mmr_deduplicate": 177,
-        "search_service": 225
+        "rrf_fuse": 57,
+        "apply_kg_boosts": 97,
+        "mmr_deduplicate": 180,
+        "search_service": 228
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/service.py"
@@ -4217,9 +4690,9 @@
       ],
       "sectionLines": {},
       "anchors": {
-        "tok": 52,
-        "SpladeDoc": 75,
-        "SpladeIndex": 104
+        "tok": 54,
+        "SpladeDoc": 77,
+        "SpladeIndex": 106
       },
       "links": {
         "source": "vscode://file//home/paul/kgfoundry/src/search_api/splade_index.py"

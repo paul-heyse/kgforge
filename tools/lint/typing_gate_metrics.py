@@ -15,7 +15,6 @@ Usage:
     metrics.record_check(filepath, num_violations)
     snapshot = metrics.to_snapshot()
     metrics.write_snapshot(path)
-
 """
 
 from __future__ import annotations
@@ -74,7 +73,6 @@ class TypingGateMetrics:
             Path to the file checked.
         violations : Sequence[dict[str, object]] | None, optional
             List of violations found in the file (default: None).
-
         """
         self.checks_total += 1
         if violations:
@@ -96,7 +94,6 @@ class TypingGateMetrics:
         -------
         dict[str, object]
             Snapshot containing checks_total, violations_total, violations, and timestamp.
-
         """
         violation_dicts: list[dict[str, object]] = [
             cast("dict[str, object]", asdict(v)) for v in self.violations
@@ -125,7 +122,6 @@ class TypingGateMetrics:
         ----------
         output_path : Path
             Path where the snapshot JSON will be written.
-
         """
         output_path.parent.mkdir(parents=True, exist_ok=True)
         snapshot = self.to_snapshot()
@@ -138,7 +134,6 @@ class TypingGateMetrics:
         -------
         str
             Prometheus-formatted metrics.
-
         """
         lines: list[str] = [
             "# HELP kgfoundry_typing_gate_checks_total Total number of typing gate checks performed",
@@ -157,7 +152,6 @@ class TypingGateMetrics:
         -------
         list[str]
             List of structured log lines (JSON format).
-
         """
         summary_dict: dict[str, object] = {
             "event": "typing_gate_check_complete",

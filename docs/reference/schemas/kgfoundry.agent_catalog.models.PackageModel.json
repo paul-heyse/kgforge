@@ -71,7 +71,9 @@
         },
         "remap_order": {
           "items": {
-            "additionalProperties": true,
+            "additionalProperties": {
+              "$ref": "#/$defs/JsonValue"
+            },
             "type": "object"
           },
           "title": "Remap Order",
@@ -131,7 +133,9 @@
         },
         "tests": {
           "items": {
-            "additionalProperties": true,
+            "additionalProperties": {
+              "$ref": "#/$defs/JsonValue"
+            },
             "type": "object"
           },
           "title": "Tests",
@@ -140,6 +144,44 @@
       },
       "title": "ChangeImpactModel",
       "type": "object"
+    },
+    "JsonPrimitive": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "JsonValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/JsonPrimitive"
+        },
+        {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "array"
+        }
+      ]
     },
     "MetricsModel": {
       "description": "Metric snapshot for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\ncomplexity : float | NoneType, optional\n    Describe ``complexity``.\n    Defaults to ``None``.\nloc : int | NoneType, optional\n    Describe ``loc``.\n    Defaults to ``None``.\nlast_modified : str | NoneType, optional\n    Describe ``last_modified``.\n    Defaults to ``None``.\ncodeowners : list[str], optional\n    Describe ``codeowners``.\n    Defaults to ``<factory>``.\nstability : str | NoneType, optional\n    Describe ``stability``.\n    Defaults to ``None``.\ndeprecated : bool | NoneType, optional\n    Describe ``deprecated``.\n    Defaults to ``None``.",
@@ -220,7 +262,9 @@
       "properties": {
         "calls": {
           "items": {
-            "additionalProperties": true,
+            "additionalProperties": {
+              "$ref": "#/$defs/JsonValue"
+            },
             "type": "object"
           },
           "title": "Calls",
@@ -374,7 +418,9 @@
         "docfacts": {
           "anyOf": [
             {
-              "additionalProperties": true,
+              "additionalProperties": {
+                "$ref": "#/$defs/JsonValue"
+              },
               "type": "object"
             },
             {
@@ -386,7 +432,9 @@
         },
         "exemplars": {
           "items": {
-            "additionalProperties": true,
+            "additionalProperties": {
+              "$ref": "#/$defs/JsonValue"
+            },
             "type": "object"
           },
           "title": "Exemplars",

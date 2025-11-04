@@ -48,7 +48,6 @@ Correct patterns:
     python -m tools.lint.check_typing_gates --diff
     python -m tools.lint.check_typing_gates --json src/ tools/
     python -m tools.lint.check_typing_gates --list src/  # For codemod integration
-
 """
 
 from __future__ import annotations
@@ -102,7 +101,6 @@ class TypeGateVisitor(ast.NodeVisitor):
         ----------
         filepath : Path
             Path to the file being analyzed.
-
         """
         self.filepath = filepath
         self.violations: list[TypeGateViolation] = []
@@ -279,7 +277,6 @@ def check_file(filepath: Path, logger: LoggerAdapter | None = None) -> list[Type
     -------
     list[TypeGateViolation]
         List of violations found.
-
     """
     active_logger = logger or get_logger(__name__)
 
@@ -314,7 +311,6 @@ def check_directory(
     -------
     list[TypeGateViolation]
         All violations found.
-
     """
     active_logger = logger or get_logger(__name__)
 
@@ -355,7 +351,6 @@ def format_violations(
     -------
     str
         Formatted output.
-
     """
     if json_output:
         payload: list[dict[str, object]] = [
@@ -394,7 +389,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     -------
     int
         Exit code (0 = no violations, 1 = violations found).
-
     """
     if argv is None:
         argv = sys.argv[1:]

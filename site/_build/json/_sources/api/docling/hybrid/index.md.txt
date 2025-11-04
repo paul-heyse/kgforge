@@ -1,3 +1,0 @@
-# `docling.hybrid`
-
-::: docling.hybrid

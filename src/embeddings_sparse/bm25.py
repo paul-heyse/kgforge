@@ -307,8 +307,7 @@ class PurePythonBM25:
 
     def load(self) -> None:
         """Load an existing BM25 index from disk with schema validation and checksum
-        verification.
-        """
+        verification."""
         payload = self._read_metadata()
         self._initialize_from_payload(payload)
 

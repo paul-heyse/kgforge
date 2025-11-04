@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import sys
 from types import ModuleType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from tools.check_stub_parity import (
+    StubParityContext,
     StubParityIssueRecord,
     StubParityReport,
     build_stub_parity_context,
@@ -74,14 +75,19 @@ def test_report_from_context_validates_counts(tmp_path: Path) -> None:
     stub_path = tmp_path / f"{module_name}.pyi"
     stub_path.write_text("def bar() -> None: ...\n", encoding="utf-8")
 
-    report = run_stub_parity_checks([(module_name, stub_path)])
-    context = build_stub_parity_context(report)
-    context["issue_count"] = 0
+    with pytest.raises(ConfigurationError) as excinfo:
+        run_stub_parity_checks([(module_name, stub_path)])
 
-    message_pattern = r"expected counts \(0, [0-9]+\), got"
+    context = excinfo.value.context
+    assert context is not None
+    report = StubParityReport.from_context(cast("StubParityContext", context))
+    mutated_context = build_stub_parity_context(report)
+    mutated_context["issue_count"] = 0
+
+    message_pattern = r"expected counts \(0, \d+\), got"
 
     with pytest.raises(ValueError, match=message_pattern):
-        StubParityReport.from_context(context)
+        StubParityReport.from_context(cast("StubParityContext", mutated_context))
 
 
 def test_run_stub_parity_checks_raises_with_context(tmp_path: Path) -> None:

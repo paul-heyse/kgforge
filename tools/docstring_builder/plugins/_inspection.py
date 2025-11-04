@@ -1,7 +1,7 @@
 """Typed introspection module for plugin factory validation.
 
-This module provides a typed wrapper around Python's inspect module
-to eliminate the 'Any' types that come from its type stubs.
+This module provides a typed wrapper around Python's inspect module to eliminate the 'Any' types
+that come from its type stubs.
 """
 
 from __future__ import annotations

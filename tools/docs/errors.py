@@ -1,7 +1,7 @@
 """Error hierarchy for documentation build failures.
 
-This module defines typed exceptions for documentation pipeline failures,
-following RFC 9457 Problem Details patterns.
+This module defines typed exceptions for documentation pipeline failures, following RFC 9457 Problem
+Details patterns.
 """
 
 from __future__ import annotations

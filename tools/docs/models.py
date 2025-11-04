@@ -1,7 +1,7 @@
 """Typed models for documentation pipeline outputs.
 
-This module defines typed dataclasses and protocols for analytics, graphs,
-test maps, and other documentation artifacts.
+This module defines typed dataclasses and protocols for analytics, graphs, test maps, and other
+documentation artifacts.
 """
 
 from __future__ import annotations

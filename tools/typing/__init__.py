@@ -18,7 +18,6 @@ Use this in documentation and tooling scripts:
 
     def build_index(vectors: np.ndarray) -> NavMap[str, ProblemDetails]:
         ...
-
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 """Consolidated CLI tooling for KGFoundry.
 
-This package provides a unified interface for command-line tools including
-documentation builders, navigation map utilities, and code quality checkers.
+This package provides a unified interface for command-line tools including documentation builders,
+navigation map utilities, and code quality checkers.
 """
 
 from __future__ import annotations

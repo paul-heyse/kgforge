@@ -140,12 +140,8 @@ else:  # pragma: no cover - optional dependency
 def _load_faiss_module() -> FaissModuleProtocol | None:
     try:  # pragma: no cover - optional dependency
         module = importlib.import_module("faiss")
-    except (
-        ImportError,
-        ModuleNotFoundError,
-        OSError,
-    ) as exc:  # pragma: no cover - optional dependency
-        logger.debug("FAISS import failed: %s", exc)
+    except Exception as exc:  # pragma: no cover - optional dependency
+        logger.debug("FAISS import failed: %s", exc, exc_info=True)
         return None
     return cast("FaissModuleProtocol", module)
 

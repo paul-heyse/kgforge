@@ -93,5 +93,6 @@ run make json
 if [[ $BUILD_MKDOCS -eq 1 ]]; then
   run "$BIN/mkdocs" build --config-file mkdocs.yml
 fi
+run make build_agent_catalog
 
 printf '\nDocumentation refresh complete.\n' >&2

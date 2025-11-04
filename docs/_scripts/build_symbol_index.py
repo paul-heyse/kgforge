@@ -38,13 +38,23 @@ def _resolve_alias_resolution_error() -> type[Exception]:
     try:
         griffe_module = safe_import_griffe()
     except OptionalDependencyError:
-        return RuntimeError
+        return Exception
+
+    candidates: list[type[Exception] | None] = []
 
     exceptions_module = getattr(griffe_module, "exceptions", None)
-    alias_exc = getattr(exceptions_module, "AliasResolutionError", None)
-    if isinstance(alias_exc, type) and issubclass(alias_exc, Exception):
-        return alias_exc
-    return RuntimeError
+    candidates.append(getattr(exceptions_module, "AliasResolutionError", None))
+
+    internal_module = getattr(griffe_module, "_internal", None)
+    if internal_module is not None:
+        internal_exceptions = getattr(internal_module, "exceptions", None)
+        candidates.append(getattr(internal_exceptions, "AliasResolutionError", None))
+
+    for candidate in candidates:
+        if isinstance(candidate, type) and issubclass(candidate, Exception):
+            return candidate
+
+    return Exception
 
 
 AliasResolutionErrorType = _resolve_alias_resolution_error()
@@ -226,12 +236,28 @@ def _relative_file(node: GriffeNode) -> str | None:
     return None
 
 
-def _normalize_lineno(value: object | None) -> int | None:
+def _coerce_int(value: object | None) -> int | None:
+    if isinstance(value, bool):  # Guard against bool being int subclass
+        return int(value)
     if isinstance(value, int):
         return value
     if isinstance(value, float):
         return int(value)
     return None
+
+
+def _normalize_start_lineno(value: object | None) -> int:
+    number = _coerce_int(value)
+    if number is None or number <= 0:
+        return 1
+    return number
+
+
+def _normalize_end_lineno(value: object | None) -> int | None:
+    number = _coerce_int(value)
+    if number is None or number <= 0:
+        return None
+    return number
 
 
 def _doc_first_paragraph(node: GriffeNode) -> str:
@@ -499,8 +525,8 @@ def _row_from_node(
     package = _package_for(module, path_obj)
     file_rel = _relative_file(node)
 
-    lineno = _normalize_lineno(safe_getattr(node, "lineno"))
-    endlineno = _normalize_lineno(safe_getattr(node, "endlineno"))
+    lineno = _normalize_start_lineno(safe_getattr(node, "lineno"))
+    endlineno = _normalize_end_lineno(safe_getattr(node, "endlineno"))
     span = LineSpan(start=lineno, end=endlineno)
 
     canonical = _canonical_path(node)

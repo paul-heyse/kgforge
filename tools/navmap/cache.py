@@ -1,7 +1,7 @@
 """Public cache interface for navmap operations.
 
-This module provides cache interfaces and implementations for tracking module
-metadata and repair results during navmap operations.
+This module provides cache interfaces and implementations for tracking module metadata and repair
+results during navmap operations.
 """
 
 from __future__ import annotations
@@ -84,8 +84,8 @@ class NavmapCollectorCache(Protocol):
 class NavmapRepairCache(Protocol):
     """Public cache interface for module repair operation tracking.
 
-    This Protocol defines the contract for objects that track the results
-    of repair operations on modules.
+    This Protocol defines the contract for objects that track the results of repair operations on
+    modules.
     """
 
     def record_repair(self, result: RepairResult) -> None:
