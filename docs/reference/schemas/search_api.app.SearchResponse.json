@@ -60,7 +60,7 @@
       "type": "object"
     }
   },
-  "$id": "https://kgfoundry/schemas/search_api.app.SearchResponse.json#",
+  "$id": "https://kgfoundry.dev/schemas/search_api.app.SearchResponse.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Search API response containing results.\n\n<!-- auto:docstring-builder v1 -->\n\nResponse envelope for search API endpoints.\n\nParameters\n----------\n**data : Any\n    Describe ``data``.",

@@ -473,7 +473,7 @@
       "type": "object"
     }
   },
-  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.PackageModel.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.agent_catalog.models.PackageModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Grouping of modules under a package name.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nname : str\n    Describe ``name``.\nmodules : list[ModuleModel], optional\n    Describe ``modules``.\n    Defaults to ``<factory>``.",
   "examples": [

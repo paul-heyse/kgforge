@@ -39,7 +39,7 @@
       ]
     }
   },
-  "$id": "https://kgfoundry/schemas/kgfoundry.agent_catalog.models.ChangeImpactModel.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry.agent_catalog.models.ChangeImpactModel.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "Change impact metadata for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\ncallers : list[str], optional\n    Describe ``callers``.\n    Defaults to ``<factory>``.\ncallees : list[str], optional\n    Describe ``callees``.\n    Defaults to ``<factory>``.\ntests : list[dict[str, object]], optional\n    Describe ``tests``.\n    Defaults to ``<factory>``.\ncodeowners : list[str], optional\n    Describe ``codeowners``.\n    Defaults to ``<factory>``.\nchurn_last_n : int | NoneType, optional\n    Describe ``churn_last_n``.\n    Defaults to ``None``.",
   "examples": [

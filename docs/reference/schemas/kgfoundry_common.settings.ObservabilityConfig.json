@@ -1,5 +1,5 @@
 {
-  "$id": "https://kgfoundry/schemas/kgfoundry_common.settings.ObservabilityConfig.json#",
+  "$id": "https://kgfoundry.dev/schemas/kgfoundry_common.settings.ObservabilityConfig.json#",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "Logging and telemetry toggles (``KGFOUNDRY_*`` namespace).",
