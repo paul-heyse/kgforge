@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Protocol, TypeGuard, cast
 
 import mkdocs_gen_files
+import yaml
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ def _suppress_griffe_errors() -> Iterator[None]:
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
 TOOLS_ROOT = PROJECT_ROOT / "tools"
 SRC_ROOT = PROJECT_ROOT / "src"
+SUITE_ROOT = TOOLS_ROOT / "mkdocs_suite"
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
@@ -122,6 +124,7 @@ PACKAGE_ROOTS: tuple[str, ...] = (
     "vectorstore_faiss",
 )
 API_USAGE_FILE = Path(__file__).with_name("api_usage.json")
+REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
 
 _griffe = importlib.import_module("griffe")
 _load = cast("Callable[..., object]", _griffe.load)
@@ -313,6 +316,22 @@ def _load_api_usage() -> dict[str, list[str]]:
     return json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
 
 
+def _load_registry() -> dict[str, dict[str, object]]:
+    """Return the interface registry payload keyed by identifier."""
+    if not REGISTRY_PATH.exists():
+        return {}
+    with REGISTRY_PATH.open("r", encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle) or {}
+    interfaces = payload.get("interfaces") if isinstance(payload, dict) else {}
+    if not isinstance(interfaces, dict):
+        return {}
+    return {
+        str(identifier): value
+        for identifier, value in interfaces.items()
+        if isinstance(value, dict)
+    }
+
+
 def _module_exports(module: _GriffeModule) -> set[str]:
     """
     Extract export names declared in ``__all__`` for the module.
@@ -467,6 +486,29 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
         json.dump(nav_meta, fd, indent=2)
 
 
+def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
+    """Return a tuple of (label, href) for the provided spec path."""
+    if not isinstance(spec_path, str) or not spec_path:
+        return None, None
+    if spec_path.endswith("openapi-cli.yaml"):
+        return "CLI Spec", "../api/openapi-cli.md"
+    if spec_path.endswith("openapi.yaml"):
+        return "HTTP API", "../api/index.md"
+    rel = Path("..") / spec_path
+    return spec_path, rel.as_posix()
+
+
+def _operation_href(spec_path: object, operation_id: str) -> str | None:
+    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``."""
+    if not operation_id:
+        return None
+    if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
+        return f"../api/openapi-cli.md#operation/{operation_id}"
+    if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
+        return f"../api/index.md#operation/{operation_id}"
+    return None
+
+
 def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts) -> None:
     """Write the relationships section for ``module_path``."""
     outgoing = sorted(facts.imports.get(module_path, set()))
@@ -518,11 +560,79 @@ def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleF
         fd.write(f"### {function_path}\n\n::: {function_path}\n\n")
 
 
+def _write_interfaces(
+    fd: mkdocs_gen_files.files,
+    module_path: str,
+    nav_meta: Mapping[str, Any],
+    registry: Mapping[str, dict[str, object]],
+) -> None:
+    """Emit interface callouts for ``module_path`` if metadata is available."""
+    interfaces = nav_meta.get("interfaces")
+    if not isinstance(interfaces, list) or not interfaces:
+        return
+    rows: list[Mapping[str, object]] = []
+    for entry in interfaces:
+        if isinstance(entry, Mapping):
+            rows.append(entry)
+    if not rows:
+        return
+    fd.write("## Interfaces\n\n")
+    for entry in rows:
+        identifier = str(entry.get("id") or entry.get("entrypoint") or module_path)
+        registry_entry = registry.get(identifier, {})
+        merged: dict[str, object] = {**registry_entry, **entry}
+        fd.write(f"### `{identifier}`\n\n")
+        fd.write(
+            "- **Type:** {type}\n".format(type=merged.get("type") or registry_entry.get("type") or "—")
+        )
+        fd.write(
+            "- **Owner:** {owner}\n".format(
+                owner=merged.get("owner") or registry_entry.get("owner") or "—"
+            )
+        )
+        fd.write(
+            "- **Stability:** {stability}\n".format(
+                stability=merged.get("stability") or registry_entry.get("stability") or "—"
+            )
+        )
+        if description := merged.get("description") or registry_entry.get("description"):
+            fd.write(f"- **Description:** {description}\n")
+        spec_label, spec_href = _spec_href(merged.get("spec") or registry_entry.get("spec"))
+        if spec_href:
+            fd.write(f"- **Spec:** [{spec_label}]({spec_href})\n")
+        elif spec_label:
+            fd.write(f"- **Spec:** {spec_label}\n")
+        problems = merged.get("problem_details") or registry_entry.get("problem_details")
+        if isinstance(problems, list) and problems:
+            fd.write("- **Problem Details:** " + ", ".join(map(str, problems)) + "\n")
+        elif isinstance(problems, str) and problems:
+            fd.write(f"- **Problem Details:** {problems}\n")
+
+        operations = registry_entry.get("operations")
+        if isinstance(operations, Mapping) and operations:
+            fd.write("- **Operations:**\n")
+            for op_key, op_meta in sorted(operations.items()):
+                if not isinstance(op_meta, Mapping):
+                    continue
+                op_id = str(op_meta.get("operation_id") or f"{identifier}.{op_key}")
+                summary = str(op_meta.get("summary") or "")
+                anchor = _operation_href(merged.get("spec") or registry_entry.get("spec"), op_id)
+                if anchor:
+                    fd.write(f"  - [`{op_id}`]({anchor})")
+                else:
+                    fd.write(f"  - `{op_id}`")
+                if summary:
+                    fd.write(f" — {summary}")
+                fd.write("\n")
+        fd.write("\n")
+
+
 def _render_module_page(
     module_path: str,
     module: _GriffeModule,
     nav_meta: Mapping[str, Any],
     facts: ModuleFacts,
+    registry: Mapping[str, dict[str, object]],
 ) -> None:
     """Generate the Markdown page for ``module_path``."""
     page_path = f"modules/{module_path}.md"
@@ -533,6 +643,7 @@ def _render_module_page(
             summary = _first_paragraph(module)
         if summary:
             fd.write(f"{summary}\n\n")
+        _write_interfaces(fd, module_path, nav_meta, registry)
         _write_relationships(fd, module_path, facts)
         _write_related_operations(fd, module_path, facts)
         _write_contents(fd, module_path, facts)
@@ -558,13 +669,14 @@ def main() -> None:
         _write_module_index({})
         return
     api_usage = _load_api_usage()
+    registry = _load_registry()
     facts = _build_relationships(modules, api_usage)
     manifest: dict[str, Any] = {}
     for module_path, module in modules.items():
         nav_meta = _nav_metadata_for_module(module_path, module, facts)
         manifest[module_path] = nav_meta
         _write_navmap_json(module_path, nav_meta)
-        _render_module_page(module_path, module, nav_meta, facts)
+        _render_module_page(module_path, module, nav_meta, facts, registry)
     _write_module_index(modules)
     with mkdocs_gen_files.open("_data/navmaps/manifest.json", "w") as fd:
         json.dump(manifest, fd, indent=2, sort_keys=True)
