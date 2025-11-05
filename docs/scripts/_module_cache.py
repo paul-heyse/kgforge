@@ -26,6 +26,13 @@ class ModuleExportsCache:
     __slots__ = ("_exports", "_module", "_module_path")
 
     def __init__(self, module_path: str) -> None:
+        """Initialize module exports cache.
+
+        Parameters
+        ----------
+        module_path : str
+            Fully qualified module path to cache.
+        """
         self._module_path = module_path
         self._module: ModuleType | None = None
         self._exports: tuple[str, ...] | None = None

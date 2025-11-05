@@ -105,6 +105,22 @@ def _patch_cli_runner_mix_stderr() -> None:
     invoke_callable = cast("Callable[..., Result]", invoke_attr)
 
     def invoke(self: object, *invoke_args: object, **invoke_kwargs: object) -> Result:
+        """Invoke CLI command with mix_stderr parameter removed.
+
+        Parameters
+        ----------
+        self : object
+            CLI runner instance.
+        *invoke_args : object
+            Positional arguments.
+        **invoke_kwargs : object
+            Keyword arguments (mix_stderr removed if present).
+
+        Returns
+        -------
+        Result
+            CLI execution result.
+        """
         invoke_kwargs.pop("mix_stderr", None)
         return invoke_callable(self, *invoke_args, **invoke_kwargs)
 

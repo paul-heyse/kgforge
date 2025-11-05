@@ -93,7 +93,22 @@ pytest_plugins: tuple[str, ...] = ()
 
 if TYPE_CHECKING:  # pragma: no cover - typing support only
 
-    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]:
+        """Create a pytest fixture.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments for pytest.fixture.
+        **kwargs : object
+            Keyword arguments for pytest.fixture.
+
+        Returns
+        -------
+        Callable[[Callable[P, R]], Callable[P, R]]
+            Decorator function for creating fixtures.
+        """
+        ...
 
 else:
     fixture = pytest.fixture
@@ -115,10 +130,28 @@ else:
 
 
 class MetricSample(Protocol):
+    """Protocol for Prometheus metric sample objects.
+
+    Attributes
+    ----------
+    value : float
+        Metric sample value.
+    """
+
     value: float
 
 
 class MetricFamily(Protocol):
+    """Protocol for Prometheus metric family objects.
+
+    Attributes
+    ----------
+    name : str
+        Metric family name.
+    samples : Sequence[MetricSample] | Iterable[MetricSample]
+        Metric samples collection.
+    """
+
     name: str
     samples: Sequence[MetricSample] | Iterable[MetricSample]
 

@@ -122,6 +122,29 @@ class SearchDocumentPayload(TypedDict):
 
 
 class SearchDocumentOverrides(TypedDict, total=False):
+    """Optional overrides for SearchDocument construction.
+
+    All fields are optional and can be used to override default values
+    when creating SearchDocument instances via helper functions.
+
+    Parameters
+    ----------
+    stability : str | None, optional
+        Stability level (e.g., "stable", "experimental").
+    deprecated : bool, optional
+        Whether the symbol is deprecated.
+    summary : str | None, optional
+        Short summary text extracted from docstring.
+    docstring : str | None, optional
+        Full docstring text.
+    anchor_start : int | None, optional
+        Starting line number for source anchor.
+    anchor_end : int | None, optional
+        Ending line number for source anchor.
+    row : int, optional
+        Row index in semantic index mapping.
+    """
+
     stability: str | None
     deprecated: bool
     summary: str | None

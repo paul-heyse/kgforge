@@ -221,6 +221,13 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
     stage: PluginStage
 
     def __init__(self, plugin: LegacyPluginProtocol) -> None:
+        """Initialize legacy plugin adapter.
+
+        Parameters
+        ----------
+        plugin : LegacyPluginProtocol
+            Legacy plugin instance to wrap.
+        """
         stage_candidate: object = getattr(plugin, "stage", None)
         valid_stages: dict[str, PluginStage] = {
             "harvester": "harvester",
@@ -307,16 +314,56 @@ class _LegacyHarvesterAdapter(HarvesterPlugin):
     stage: PluginStage = "harvester"
 
     def __init__(self, adapter: LegacyPluginAdapter) -> None:
+        """Initialize harvester adapter.
+
+        Parameters
+        ----------
+        adapter : LegacyPluginAdapter
+            Base adapter instance.
+        """
         self._adapter = adapter
         self.name = adapter.name
 
     def on_start(self, context: PluginContext) -> None:
+        """Invoke adapter's on_start hook.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        """
         self._adapter.on_start(context)
 
     def on_finish(self, context: PluginContext) -> None:
+        """Invoke adapter's on_finish hook.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        """
         self._adapter.on_finish(context)
 
     def apply(self, context: PluginContext, payload: HarvestResult) -> HarvestResult:
+        """Apply plugin transformation to payload.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        payload : HarvestResult
+            Input harvest result.
+
+        Returns
+        -------
+        HarvestResult
+            Transformed harvest result.
+
+        Raises
+        ------
+        TypeError
+            If plugin returns incorrect type.
+        """
         result = self._adapter.apply(context, payload)
         if not isinstance(result, HarvestResult):
             message = (
@@ -332,16 +379,56 @@ class _LegacyTransformerAdapter(TransformerPlugin):
     stage: PluginStage = "transformer"
 
     def __init__(self, adapter: LegacyPluginAdapter) -> None:
+        """Initialize transformer adapter.
+
+        Parameters
+        ----------
+        adapter : LegacyPluginAdapter
+            Base adapter instance.
+        """
         self._adapter = adapter
         self.name = adapter.name
 
     def on_start(self, context: PluginContext) -> None:
+        """Invoke adapter's on_start hook.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        """
         self._adapter.on_start(context)
 
     def on_finish(self, context: PluginContext) -> None:
+        """Invoke adapter's on_finish hook.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        """
         self._adapter.on_finish(context)
 
     def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
+        """Apply plugin transformation to payload.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        payload : SemanticResult
+            Input semantic result.
+
+        Returns
+        -------
+        SemanticResult
+            Transformed semantic result.
+
+        Raises
+        ------
+        TypeError
+            If plugin returns incorrect type.
+        """
         result = self._adapter.apply(context, payload)
         if not isinstance(result, SemanticResult):
             message = f"Legacy transformer {self.name!r} returned {type(result)!r}; expected SemanticResult"
@@ -355,16 +442,56 @@ class _LegacyFormatterAdapter(FormatterPlugin):
     stage: PluginStage = "formatter"
 
     def __init__(self, adapter: LegacyPluginAdapter) -> None:
+        """Initialize formatter adapter.
+
+        Parameters
+        ----------
+        adapter : LegacyPluginAdapter
+            Base adapter instance.
+        """
         self._adapter = adapter
         self.name = adapter.name
 
     def on_start(self, context: PluginContext) -> None:
+        """Invoke adapter's on_start hook.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        """
         self._adapter.on_start(context)
 
     def on_finish(self, context: PluginContext) -> None:
+        """Invoke adapter's on_finish hook.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        """
         self._adapter.on_finish(context)
 
     def apply(self, context: PluginContext, payload: DocstringEdit) -> DocstringEdit:
+        """Apply plugin transformation to payload.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin execution context.
+        payload : DocstringEdit
+            Input docstring edit.
+
+        Returns
+        -------
+        DocstringEdit
+            Transformed docstring edit.
+
+        Raises
+        ------
+        TypeError
+            If plugin returns incorrect type.
+        """
         result = self._adapter.apply(context, payload)
         if not isinstance(result, DocstringEdit):
             message = (

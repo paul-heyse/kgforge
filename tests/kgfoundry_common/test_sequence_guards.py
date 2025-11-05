@@ -1,7 +1,7 @@
 """Unit tests for sequence access guards.
 
-Tests verify guard helpers prevent IndexError on empty sequences and emit
-structured logs, metrics, and RFC 9457 Problem Details.
+Tests verify guard helpers prevent IndexError on empty sequences and emit structured logs, metrics,
+and RFC 9457 Problem Details.
 """
 
 from __future__ import annotations
@@ -29,7 +29,24 @@ class SequenceGuard(Protocol):
         *,
         context: str,
         operation: str = ...,
-    ) -> object: ...
+    ) -> object:
+        """Guard sequence with context.
+
+        Parameters
+        ----------
+        sequence : Sequence[object]
+            Sequence to guard.
+        context : str
+            Context description.
+        operation : str, optional
+            Operation name.
+
+        Returns
+        -------
+        object
+            First element of sequence.
+        """
+        ...
 
 
 class MultiDeviceGuard(Protocol):
@@ -41,7 +58,24 @@ class MultiDeviceGuard(Protocol):
         *,
         context: str = ...,
         operation: str = ...,
-    ) -> object: ...
+    ) -> object:
+        """Guard sequence for multi-device context.
+
+        Parameters
+        ----------
+        sequence : Sequence[object]
+            Sequence to guard.
+        context : str, optional
+            Context description.
+        operation : str, optional
+            Operation name.
+
+        Returns
+        -------
+        object
+            First element of sequence.
+        """
+        ...
 
 
 @pytest.fixture(name="sequence_guard")
@@ -135,7 +169,10 @@ class TestFirstOrError:
         assert result == "hello"
 
     def test_sequence_length_check(self, sequence_guard: SequenceGuard) -> None:
-        """Verify guard correctly identifies empty vs. non-empty."""
+        """Verify guard correctly identifies empty vs.
+
+        non-empty.
+        """
         # Non-empty should work
         assert sequence_guard([1], context="c") == 1
 

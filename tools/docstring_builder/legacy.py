@@ -137,6 +137,8 @@ class _CollectedSymbol:
 
 @dataclass(slots=True)
 class _RequiredSectionsContext:
+    """Contextual data required to enforce docstring section completeness."""
+
     kind: str
     parameters: Sequence[DocstringIRParameter]
     returns_annotation: str | None
@@ -158,6 +160,13 @@ class _SymbolCollector(ast.NodeVisitor):
     """Collect callable and class symbols for docstring generation."""
 
     def __init__(self, module_name: str) -> None:
+        """Initialize symbol collector.
+
+        Parameters
+        ----------
+        module_name : str
+            Module qualified name.
+        """
         self.module_name = module_name
         self.namespace: list[str] = []
         self.symbols: list[_CollectedSymbol] = []
@@ -166,6 +175,13 @@ class _SymbolCollector(ast.NodeVisitor):
         return ".".join(part for part in [self.module_name, *self.namespace, name] if part)
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Visit class definition and collect symbol.
+
+        Parameters
+        ----------
+        node : ast.ClassDef
+            ClassDef AST node.
+        """
         qname = self._qualify(node.name)
         docstring = ast.get_docstring(node, clean=False)
         self.symbols.append(_CollectedSymbol(qname, node, "class", docstring))
@@ -174,6 +190,13 @@ class _SymbolCollector(ast.NodeVisitor):
         self.namespace.pop()
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        """Visit function definition and collect symbol.
+
+        Parameters
+        ----------
+        node : ast.FunctionDef
+            FunctionDef AST node.
+        """
         qname = self._qualify(node.name)
         docstring = ast.get_docstring(node, clean=False)
         self.symbols.append(_CollectedSymbol(qname, node, "function", docstring))
@@ -182,6 +205,13 @@ class _SymbolCollector(ast.NodeVisitor):
         self.namespace.pop()
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        """Visit async function definition and collect symbol.
+
+        Parameters
+        ----------
+        node : ast.AsyncFunctionDef
+            AsyncFunctionDef AST node.
+        """
         qname = self._qualify(node.name)
         docstring = ast.get_docstring(node, clean=False)
         self.symbols.append(_CollectedSymbol(qname, node, "function", docstring))
@@ -257,6 +287,17 @@ def parameters_for(node: ast.AST) -> list[DocstringIRParameter]:
         *,
         kind: ParameterKind,
     ) -> None:
+        """Process parameter arguments and defaults.
+
+        Parameters
+        ----------
+        items : list[ast.arg]
+            Parameter argument nodes.
+        defaults : Sequence[ast.expr | None]
+            Default value expressions.
+        kind : ParameterKind
+            Parameter kind (positional_only, positional_or_keyword, etc.).
+        """
         padding = len(items) - len(defaults)
         padded_defaults: list[ast.AST | None] = [None] * padding
         padded_defaults.extend(cast("ast.AST | None", default) for default in defaults)

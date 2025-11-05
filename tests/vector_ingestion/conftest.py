@@ -1,8 +1,8 @@
 """Shared fixtures for vector ingestion regression tests.
 
-These fixtures provide canonical payloads, schema validators, and deterministic
-correlation identifiers so the test suite can exercise vector ingestion
-behaviour without repeating setup boilerplate.
+These fixtures provide canonical payloads, schema validators, and deterministic correlation
+identifiers so the test suite can exercise vector ingestion behaviour without repeating setup
+boilerplate.
 """
 
 from __future__ import annotations

@@ -92,6 +92,8 @@ BUILD_MKDOCS=1
 
 SCHEMA_DOCFACTS_PATH="docs/_build/schema_docfacts.json"
 
+SCHEMA_DOCFACTS_CANONICAL="schema/docs/schema_docfacts.json"
+
 # Ensure we rebuild from a clean slate.
 rm -rf docs/_build site
 mkdir -p docs/_build
@@ -110,9 +112,34 @@ export GRAPH_MAX_WORKERS=16
 export GRAPH_FAIL_ON_CYCLES=0
 export GRAPH_FAIL_ON_LAYER=0
 
-announce_stage "KGF-DOC-BLD-005" "Generating DocFacts schema"
-if ! uv_run python -m tools.docstring_builder.cli schema --output "$SCHEMA_DOCFACTS_PATH"; then
-  fail_with_code "KGF-DOC-BLD-005" "DocFacts schema generation failed"
+announce_stage "KGF-DOC-BLD-005" "Synchronizing DocFacts schema"
+KGF_ROOT="$ROOT" uv_run python - <<'PY'
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+from pathlib import Path
+
+root = Path(os.environ["KGF_ROOT"])
+source = root / "schema" / "docs" / "schema_docfacts.json"
+target = root / "docs" / "_build" / "schema_docfacts.json"
+
+if not source.exists():
+    print(f"MISSING_CANONICAL_SCHEMA:{source}", file=sys.stderr)
+    sys.exit(2)
+
+target.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2(source, target)
+PY
+status=$?
+if ((status != 0)); then
+  if ((status == 2)); then
+    fail_with_code "KGF-DOC-ENV-002" "DocFacts schema not found" \
+      "Expected canonical schema at $SCHEMA_DOCFACTS_CANONICAL."
+  else
+    fail_with_code "KGF-DOC-BLD-005" "DocFacts schema synchronization failed"
+  fi
 fi
 complete_stage "KGF-DOC-BLD-005"
 

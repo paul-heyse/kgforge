@@ -23,7 +23,22 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
     from _pytest.logging import LogCaptureFixture
 
-    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+    def fixture(*args: object, **kwargs: object) -> Callable[[Callable[P, R]], Callable[P, R]]:
+        """Create a pytest fixture.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments for pytest.fixture.
+        **kwargs : object
+            Keyword arguments for pytest.fixture.
+
+        Returns
+        -------
+        Callable[[Callable[P, R]], Callable[P, R]]
+            Decorator function for creating fixtures.
+        """
+        ...
 
 else:  # pragma: no cover - pytest provides runtime decorator
     fixture = pytest.fixture
@@ -130,6 +145,7 @@ class TestSignedPickleWrapper:
         """Test that disallowed types are rejected during dump."""
 
         class CustomClass:
+            """Custom class for disallowed type testing."""
             pass
 
         with pytest.raises(ValueError, match="not allowed"):
@@ -140,6 +156,7 @@ class TestSignedPickleWrapper:
 
         # Create a pickle with a disallowed type (manually, for testing)
         class CustomClass:
+            """Custom class for disallowed type testing."""
             pass
 
         obj = CustomClass()

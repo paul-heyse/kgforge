@@ -1,7 +1,7 @@
 """Tests for docstring builder cache interfaces.
 
-This module verifies that the cache Protocol is properly implemented and
-that existing cache implementations satisfy the contract.
+This module verifies that the cache Protocol is properly implemented and that existing cache
+implementations satisfy the contract.
 """
 
 from __future__ import annotations

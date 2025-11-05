@@ -103,6 +103,7 @@ def write_api_page(page: RenderedPage) -> None:
 
 
 def main(packages: Sequence[str] | None = None) -> int:
+    """Generate MkDocs API documentation and return an exit status."""
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 

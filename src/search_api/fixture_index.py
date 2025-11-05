@@ -287,6 +287,18 @@ class FixtureIndex:
 
         # Explicitly type sorted callable to avoid Any
         def key_func(item: tuple[int, float]) -> float:
+            """Extract score from (index, score) tuple for sorting.
+
+            Parameters
+            ----------
+            item : tuple[int, float]
+                Tuple of (index, score).
+
+            Returns
+            -------
+            float
+                Score value.
+            """
             return item[1]
 
         ranked: list[tuple[int, float]] = sorted(enumerate(scores), key=key_func, reverse=True)

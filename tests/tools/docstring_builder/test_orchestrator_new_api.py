@@ -1,8 +1,8 @@
 """Tests for the new public API of the docstring builder orchestrator.
 
-This module tests the typed configuration-based API introduced in Phase 1.2 of
-the public API hardening, verifying that run_build() and run_legacy() functions
-work correctly with the new DocstringBuildConfig and cache interfaces.
+This module tests the typed configuration-based API introduced in Phase 1.2 of the public API
+hardening, verifying that run_build() and run_legacy() functions work correctly with the new
+DocstringBuildConfig and cache interfaces.
 """
 
 from __future__ import annotations

@@ -19,13 +19,29 @@ if TYPE_CHECKING:
 
 
 class _FakeIndex:
+    """Fake FAISS index for testing."""
+
     def __init__(self, label: str) -> None:
+        """Initialize fake index.
+
+        Parameters
+        ----------
+        label : str
+            Label identifier for this index.
+        """
         self.label = label
         self.last_added: VectorArray | None = None
         self.last_added_with_ids: tuple[VectorArray, IndexArray] | None = None
         self.last_trained: VectorArray | None = None
 
     def add(self, vectors: VectorArray) -> None:
+        """Add vectors to index.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Vectors to add.
+        """
         self.last_added = vectors
 
     def search(
@@ -33,24 +49,57 @@ class _FakeIndex:
     ) -> tuple[
         npt.NDArray[np.float32], npt.NDArray[np.int64]
     ]:  # pragma: no cover - minimal protocol stub
+        """Search for nearest neighbors.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Query vectors.
+        k : int
+            Number of neighbors to return.
+
+        Returns
+        -------
+        tuple[npt.NDArray[np.float32], npt.NDArray[np.int64]]
+            Tuple of (distances, indices).
+        """
         distances = np.zeros((vectors.shape[0], k), dtype=np.float32)
         indices = np.zeros((vectors.shape[0], k), dtype=np.int64)
         return distances, indices
 
     def train(self, vectors: VectorArray) -> None:  # pragma: no cover - optional protocol method
+        """Train index on vectors.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Training vectors.
+        """
         self.last_trained = vectors
 
     def add_with_ids(
         self, vectors: VectorArray, ids: IndexArray
     ) -> None:  # pragma: no cover - optional protocol method
+        """Add vectors with explicit IDs.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Vectors to add.
+        ids : IndexArray
+            Vector IDs.
+        """
         self.last_added_with_ids = (vectors, ids)
 
 
 class _LegacyFaissModule:
+    """Mock legacy FAISS module with camelCase names."""
+
     METRIC_INNER_PRODUCT = 0
     METRIC_L2 = 1
 
     def __init__(self) -> None:
+        """Initialize legacy FAISS module mock."""
         self.index_factory_calls: list[tuple[int, str, int]] = []
         self.write_calls: list[tuple[FaissIndexProtocol, str]] = []
         self.read_path: str | None = None
@@ -59,14 +108,45 @@ class _LegacyFaissModule:
         self.index_id_map2_index: FaissIndexProtocol | None = None
 
         def index_flat_ip_impl(dimension: int) -> FaissIndexProtocol:
+            """Create flat IP index.
+
+            Parameters
+            ----------
+            dimension : int
+                Vector dimension.
+
+            Returns
+            -------
+            FaissIndexProtocol
+                Index instance.
+            """
             self.index_flat_ip_dimension = dimension
             return _FakeIndex("flat")
 
         def index_id_map2_impl(index: FaissIndexProtocol) -> FaissIndexProtocol:
+            """Create ID map wrapper.
+
+            Parameters
+            ----------
+            index : FaissIndexProtocol
+                Base index.
+
+            Returns
+            -------
+            FaissIndexProtocol
+                Wrapped index.
+            """
             self.index_id_map2_index = index
             return _FakeIndex("idmap")
 
         def normalize_l2_impl(vectors: VectorArray) -> None:
+            """Normalize vectors to L2 unit length.
+
+            Parameters
+            ----------
+            vectors : VectorArray
+                Vectors to normalize.
+            """
             self.normalize_vectors = vectors
 
         self.IndexFlatIP: Callable[[int], FaissIndexProtocol] = index_flat_ip_impl
@@ -74,49 +154,166 @@ class _LegacyFaissModule:
         self.normalize_L2: Callable[[VectorArray], None] = normalize_l2_impl
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
+        """Create index using factory string.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+        factory_string : str
+            Factory description string.
+        metric : int
+            Distance metric constant.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index instance.
+        """
         self.index_factory_calls.append((dimension, factory_string, metric))
         return _FakeIndex("factory")
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
+        """Write index to file.
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Index to write.
+        path : str
+            Output file path.
+        """
         self.write_calls.append((index, path))
 
     def read_index(self, path: str) -> FaissIndexProtocol:
+        """Read index from file.
+
+        Parameters
+        ----------
+        path : str
+            Input file path.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index instance.
+        """
         self.read_path = path
         return _FakeIndex("read")
 
 
 class _ModernFaissModule:
+    """Mock modern FAISS module with PEP-8 names."""
+
     METRIC_INNER_PRODUCT = 2
     METRIC_L2 = 3
 
     def __init__(self) -> None:
+        """Initialize modern FAISS module mock."""
         self.records: list[tuple[str, object]] = []
 
     def index_flat_ip(self, dimension: int) -> FaissIndexProtocol:
+        """Create flat IP index.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index instance.
+        """
         self.records.append(("flat", dimension))
         return _FakeIndex("flat")
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
+        """Create index using factory string.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+        factory_string : str
+            Factory description string.
+        metric : int
+            Distance metric constant.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index instance.
+        """
         self.records.append(("factory", (dimension, factory_string, metric)))
         return _FakeIndex("factory")
 
     def index_id_map2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
+        """Create ID map wrapper.
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Base index.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Wrapped index.
+        """
         self.records.append(("idmap", index))
         return _FakeIndex("idmap")
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
+        """Write index to file.
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Index to write.
+        path : str
+            Output file path.
+        """
         self.records.append(("write", (index, path)))
 
     def read_index(self, path: str) -> FaissIndexProtocol:
+        """Read index from file.
+
+        Parameters
+        ----------
+        path : str
+            Input file path.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index instance.
+        """
         self.records.append(("read", path))
         return _FakeIndex("read")
 
     def normalize_l2(self, vectors: VectorArray) -> None:
+        """Normalize vectors to L2 unit length.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Vectors to normalize.
+        """
         self.records.append(("normalize", vectors.shape))
 
 
 @pytest.mark.parametrize("dimension", [5, 128])
 def test_wrap_faiss_module_adapts_legacy_surface(dimension: int, tmp_path: Path) -> None:
+    """Test that legacy FAISS module is adapted to modern interface.
+
+    Parameters
+    ----------
+    dimension : int
+        Vector dimension for test.
+    tmp_path : Path
+        Temporary directory for file I/O tests.
+    """
     legacy = _LegacyFaissModule()
     adapted = wrap_faiss_module(legacy)
 
@@ -148,6 +345,7 @@ def test_wrap_faiss_module_adapts_legacy_surface(dimension: int, tmp_path: Path)
 
 
 def test_wrap_faiss_module_returns_pep8_module_directly() -> None:
+    """Test that modern PEP-8 module is returned unchanged."""
     modern = _ModernFaissModule()
     wrapped = wrap_faiss_module(modern)
 

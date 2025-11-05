@@ -1,2 +1,0 @@
-[console_scripts]
-docstokg-hybrid-validation = DocsToKG.HybridSearch.validation:main

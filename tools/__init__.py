@@ -205,6 +205,23 @@ __all__: tuple[str, ...] = (
 
 
 def __getattr__(name: str) -> ModuleType:
+    """Get module attribute via lazy import.
+
+    Parameters
+    ----------
+    name : str
+        Module name to import.
+
+    Returns
+    -------
+    ModuleType
+        Imported module.
+
+    Raises
+    ------
+    AttributeError
+        If the module name is not in MODULE_EXPORTS.
+    """
     if name in MODULE_EXPORTS:
         module = import_module(MODULE_EXPORTS[name])
         namespace = cast("MutableMapping[str, object]", globals())
@@ -216,5 +233,12 @@ def __getattr__(name: str) -> ModuleType:
 
 
 def __dir__() -> list[str]:
+    """Return list of available module attributes.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of attribute names including lazy imports.
+    """
     namespace = cast("MutableMapping[str, object]", globals())
     return sorted({*namespace, *MODULE_EXPORTS.keys()})

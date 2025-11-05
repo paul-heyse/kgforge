@@ -59,6 +59,23 @@ def _load_submodule(name: str) -> ModuleType:
 
 
 def __getattr__(name: str) -> ModuleType:
+    """Get module attribute via lazy import.
+
+    Parameters
+    ----------
+    name : str
+        Module name to import.
+
+    Returns
+    -------
+    ModuleType
+        Imported module.
+
+    Raises
+    ------
+    AttributeError
+        If the module name is not in _SUBMODULES.
+    """
     if name in _SUBMODULES:
         return _load_submodule(name)
     message = f"module '{__name__}' has no attribute '{name}'"
@@ -66,6 +83,13 @@ def __getattr__(name: str) -> ModuleType:
 
 
 def __dir__() -> list[str]:
+    """Return list of available module attributes.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of attribute names including lazy imports.
+    """
     namespace: dict[str, object] = globals()
     namespace_keys: set[str] = set(namespace.keys())
     return sorted({*namespace_keys, *__all__})

@@ -93,11 +93,13 @@ class TypingFacadeMigrator(cst.CSTTransformer):
     def leave_ImportFrom(
         self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
     ) -> cst.ImportFrom | cst.RemovalSentinel | cst.FlattenSentinel[cst.BaseSmallStatement]:
+        """Rewrite ``ImportFrom`` statements using docstring façade rules."""
         del original_node
         return self._transform_import_from(updated_node)
 
     @override
     def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
+        """Rewrite shim calls such as ``resolve_numpy`` to ``gate_import``."""
         del original_node
         return self._transform_call(updated_node)
 

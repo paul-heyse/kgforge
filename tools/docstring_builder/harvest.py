@@ -27,11 +27,15 @@ except (ModuleNotFoundError, AttributeError) as exc:  # pragma: no cover - runti
 
 @runtime_checkable
 class GriffeDocstringLike(Protocol):
+    """Protocol for docstring-like objects."""
+
     value: str
 
 
 @runtime_checkable
 class GriffeParameterLike(Protocol):
+    """Protocol for parameter-like objects."""
+
     name: str
     kind: object
     annotation: object | None
@@ -40,6 +44,8 @@ class GriffeParameterLike(Protocol):
 
 @runtime_checkable
 class GriffeFunctionLike(Protocol):
+    """Protocol for function-like objects."""
+
     name: str
     docstring: GriffeDocstringLike | None
     lineno: int | None
@@ -55,6 +61,8 @@ class GriffeFunctionLike(Protocol):
 
 @runtime_checkable
 class GriffeClassLike(Protocol):
+    """Protocol for class-like objects."""
+
     name: str
     docstring: GriffeDocstringLike | None
     lineno: int | None
@@ -68,18 +76,63 @@ class GriffeClassLike(Protocol):
 
 @runtime_checkable
 class GriffeModuleLike(Protocol):
+    """Protocol for module-like objects."""
+
     name: str
     members: Mapping[str, object]
 
 
 class GriffeLoaderInstanceLike(Protocol):
-    def load(self, module_name: str) -> GriffeModuleLike: ...
+    """Protocol for Griffe loader instances."""
 
-    def load_module(self, module_name: str) -> GriffeModuleLike: ...
+    def load(self, module_name: str) -> GriffeModuleLike:
+        """Load module by name.
+
+        Parameters
+        ----------
+        module_name : str
+            Module name to load.
+
+        Returns
+        -------
+        GriffeModuleLike
+            Loaded module object.
+        """
+        ...
+
+    def load_module(self, module_name: str) -> GriffeModuleLike:
+        """Load module from file path.
+
+        Parameters
+        ----------
+        module_name : str
+            Module name to load.
+
+        Returns
+        -------
+        GriffeModuleLike
+            Loaded module object.
+        """
+        ...
 
 
 class GriffeLoaderFactoryLike(Protocol):
-    def __call__(self, *, search_paths: Sequence[str]) -> GriffeLoaderInstanceLike: ...
+    """Protocol for Griffe loader factory functions."""
+
+    def __call__(self, *, search_paths: Sequence[str]) -> GriffeLoaderInstanceLike:
+        """Create loader instance with search paths.
+
+        Parameters
+        ----------
+        search_paths : Sequence[str]
+            Paths to search for modules.
+
+        Returns
+        -------
+        GriffeLoaderInstanceLike
+            Loader instance.
+        """
+        ...
 
 
 ClassType = cast("type", _GRIFFE_API.class_type)
@@ -395,6 +448,13 @@ def _walk_members(
 
 class _IndexCollector(cst.CSTTransformer):
     def __init__(self, module_name: str) -> None:
+        """Initialize index collector.
+
+        Parameters
+        ----------
+        module_name : str
+            Module qualified name.
+        """
         self.module_name = module_name
         self.namespace: list[str] = []
         self.index: dict[str, cst.CSTNode] = {}
@@ -404,6 +464,18 @@ class _IndexCollector(cst.CSTTransformer):
         return ".".join(piece for piece in pieces if piece)
 
     def visit_classdef(self, node: cst.ClassDef) -> bool:
+        """Visit class definition and index it.
+
+        Parameters
+        ----------
+        node : cst.ClassDef
+            ClassDef CST node.
+
+        Returns
+        -------
+        bool
+            True to continue visiting children.
+        """
         self.namespace.append(node.name.value)
         qualified = self._qualify(node.name.value)
         self.index[qualified] = node
@@ -412,10 +484,36 @@ class _IndexCollector(cst.CSTTransformer):
     def leave_classdef(
         self, _original_node: cst.ClassDef, updated_node: cst.ClassDef
     ) -> cst.CSTNode:
+        """Leave class definition and restore namespace.
+
+        Parameters
+        ----------
+        _original_node : cst.ClassDef
+            Original CST node (unused).
+        updated_node : cst.ClassDef
+            Updated CST node.
+
+        Returns
+        -------
+        cst.CSTNode
+            Updated node.
+        """
         self.namespace.pop()
         return updated_node
 
     def visit_functiondef(self, node: cst.FunctionDef) -> bool:
+        """Visit function definition and index it.
+
+        Parameters
+        ----------
+        node : cst.FunctionDef
+            FunctionDef CST node.
+
+        Returns
+        -------
+        bool
+            True to continue visiting children.
+        """
         self.namespace.append(node.name.value)
         qualified = self._qualify(node.name.value)
         self.index[qualified] = node
@@ -424,6 +522,20 @@ class _IndexCollector(cst.CSTTransformer):
     def leave_functiondef(
         self, _original_node: cst.FunctionDef, updated_node: cst.FunctionDef
     ) -> cst.CSTNode:
+        """Leave function definition and restore namespace.
+
+        Parameters
+        ----------
+        _original_node : cst.FunctionDef
+            Original CST node (unused).
+        updated_node : cst.FunctionDef
+            Updated CST node.
+
+        Returns
+        -------
+        cst.CSTNode
+            Updated node.
+        """
         self.namespace.pop()
         return updated_node
 

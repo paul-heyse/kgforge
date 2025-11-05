@@ -42,19 +42,27 @@ ModuleDependencies = Mapping[str, Sequence[tuple[IdentifierProtocol, IdentifierP
 class ModuleNameFilterProtocol(Protocol):
     """Filter object for selecting modules via pytestarch queries."""
 
-    def __init__(self, name: str) -> None: ...
+    def __init__(self, name: str) -> None:
+        """Construct a filter bound to ``name``."""
+        ...
 
 
 @runtime_checkable
 class LayeredArchitectureProtocol(Protocol):
     """Fluent builder for layered architecture rules."""
 
-    def layer(self, name: str) -> LayeredArchitectureProtocol: ...
+    def layer(self, name: str) -> LayeredArchitectureProtocol:
+        """Return a new builder stage representing ``name``."""
+        ...
 
-    def containing_modules(self, modules: Iterable[str]) -> LayeredArchitectureProtocol: ...
+    def containing_modules(self, modules: Iterable[str]) -> LayeredArchitectureProtocol:
+        """Restrict the current layer to ``modules``."""
+        ...
 
     @property
-    def layer_mapping(self) -> Mapping[str, Sequence[ModuleNameFilterProtocol]]: ...
+    def layer_mapping(self) -> Mapping[str, Sequence[ModuleNameFilterProtocol]]:
+        """Return the configured layer-to-module mapping."""
+        ...
 
 
 @runtime_checkable
@@ -67,7 +75,9 @@ class EvaluableArchitectureProtocol(Protocol):
         self,
         sources: Iterable[ModuleNameFilterProtocol],
         targets: Iterable[ModuleNameFilterProtocol],
-    ) -> ModuleDependencies: ...
+    ) -> ModuleDependencies:
+        """Return dependencies between ``sources`` and ``targets``."""
+        ...
 
 
 def _import(name: str) -> ModuleType:
@@ -78,15 +88,46 @@ class _PytestarchModule(Protocol):
     def get_evaluable_architecture(
         *args: object,
         **kwargs: object,
-    ) -> EvaluableArchitectureProtocol: ...
+    ) -> EvaluableArchitectureProtocol:
+        """Get evaluable architecture instance.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments.
+        **kwargs : object
+            Keyword arguments.
+
+        Returns
+        -------
+        EvaluableArchitectureProtocol
+            Evaluable architecture instance.
+        """
+        ...
 
     def get_evaluable_architecture_for_module_objects(
         *args: object,
         **kwargs: object,
-    ) -> EvaluableArchitectureProtocol: ...
+    ) -> EvaluableArchitectureProtocol:
+        """Get evaluable architecture for module objects.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments.
+        **kwargs : object
+            Keyword arguments.
+
+        Returns
+        -------
+        EvaluableArchitectureProtocol
+            Evaluable architecture instance.
+        """
+        ...
 
 
 def get_layered_architecture_cls() -> type[LayeredArchitectureProtocol]:
+    """Return the pytestarch layered architecture class."""
     module = _import("pytestarch.query_language.layered_architecture_rule")
     candidate_obj = getattr(module, "LayeredArchitecture", _MISSING)
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
@@ -96,6 +137,7 @@ def get_layered_architecture_cls() -> type[LayeredArchitectureProtocol]:
 
 
 def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
+    """Return the pytestarch module-name filter class."""
     module = _import("pytestarch.eval_structure.evaluable_architecture")
     candidate_obj = getattr(module, "ModuleNameFilter", _MISSING)
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
@@ -105,14 +147,17 @@ def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
 
 
 def get_layered_architecture_factory() -> Callable[[], LayeredArchitectureProtocol]:
+    """Return a callable that instantiates the layered architecture builder."""
     return get_layered_architecture_cls()
 
 
 def get_module_name_filter_factory() -> Callable[[str], ModuleNameFilterProtocol]:
+    """Return a callable that creates module-name filters."""
     return get_module_name_filter_cls()
 
 
 def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtocol]:
+    """Return the pytestarch entry-point for evaluable architectures."""
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture"):
         message = "pytestarch module is missing get_evaluable_architecture"
@@ -124,6 +169,7 @@ def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtoc
 def get_evaluable_architecture_for_module_objects_fn() -> Callable[
     ..., EvaluableArchitectureProtocol
 ]:
+    """Return the evaluable-architecture factory for module objects."""
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture_for_module_objects"):
         message = "pytestarch module is missing get_evaluable_architecture_for_module_objects"

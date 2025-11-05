@@ -23,6 +23,18 @@ else:
 
         # Fallback for older jinja2 versions
         def select_autoescape(**_kwargs: object) -> typing.Callable[[str | None], bool]:
+            """Fallback autoescape selector for older jinja2 versions.
+
+            Parameters
+            ----------
+            **_kwargs : object
+                Ignored keyword arguments.
+
+            Returns
+            -------
+            Callable[[str | None], bool]
+                Function that always returns False.
+            """
             return lambda _filename=None: False
 
 

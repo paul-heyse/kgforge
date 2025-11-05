@@ -60,6 +60,15 @@ class ReadmeGenerationError(RuntimeError):
     """Base exception raised when README generation fails."""
 
     def __init__(self, message: str, *, problem: ProblemDetailsDict | None = None) -> None:
+        """Initialize README generation error.
+
+        Parameters
+        ----------
+        message : str
+            Error message.
+        problem : ProblemDetailsDict | None, optional
+            RFC 9457 Problem Details payload.
+        """
         super().__init__(message)
         self.problem = problem
 

@@ -374,7 +374,17 @@ if TYPE_CHECKING:
             self,
             logger: logging.Logger,
             extra: LogContextExtra | Mapping[str, object] | None,
-        ) -> None: ...
+        ) -> None:
+            """Initialize logger adapter.
+
+            Parameters
+            ----------
+            logger : logging.Logger
+                Base logger instance.
+            extra : LogContextExtra | Mapping[str, object] | None, optional
+                Structured fields to inject into log entries.
+            """
+            ...
 
 else:
     _LoggerAdapterBase = logging.LoggerAdapter
@@ -957,12 +967,30 @@ class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
     def __init__(
         self, logger: logging.Logger | LoggerAdapter, fields: Mapping[str, object]
     ) -> None:
+        """Initialize context manager with logger and fields.
+
+        Parameters
+        ----------
+        logger : logging.Logger | LoggerAdapter
+            Base logger to wrap (may already be an adapter).
+        fields : Mapping[str, object]
+            Structured fields to inject into log entries.
+        """
         self._logger = logger
         self._fields = dict(fields)
         self._token: contextvars.Token[str | None] | None = None
         self._adapter: LoggerAdapter | None = None
 
     def __enter__(self) -> LoggerAdapter:
+        """Enter context and return logger adapter with fields.
+
+        Sets correlation_id in contextvars if provided in fields.
+
+        Returns
+        -------
+        LoggerAdapter
+            Logger adapter with structured fields injected.
+        """
         base_logger = (
             self._logger.logger if isinstance(self._logger, LoggerAdapter) else self._logger
         )
@@ -978,6 +1006,22 @@ class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
         exc_value: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> bool | None:
+        """Exit context and restore correlation_id state.
+
+        Parameters
+        ----------
+        exc_type : type[BaseException] | None
+            Exception type if raised, None otherwise.
+        exc_value : BaseException | None
+            Exception value if raised, None otherwise.
+        exc_tb : TracebackType | None
+            Exception traceback if raised, None otherwise.
+
+        Returns
+        -------
+        bool | None
+            None (does not suppress exceptions).
+        """
         if self._token is not None:
             _correlation_id.reset(self._token)
         del exc_type, exc_value, exc_tb

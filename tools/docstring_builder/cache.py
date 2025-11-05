@@ -177,6 +177,13 @@ class BuilderCache:
     """Persist and query cache entries keyed by file path."""
 
     def __init__(self, path: Path) -> None:
+        """Initialize cache with file path.
+
+        Parameters
+        ----------
+        path : Path
+            Path to cache JSON file.
+        """
         self.path = path
         self._document = _new_document()
         self._lock = threading.Lock()

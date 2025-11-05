@@ -56,26 +56,38 @@ class RepairResultProtocol(Protocol):
     """Protocol interface for RepairResult at runtime."""
 
     @property
-    def module(self) -> Path: ...
+    def module(self) -> Path:
+        """Return module path."""
+        ...
 
     @property
-    def messages(self) -> list[str]: ...
+    def messages(self) -> list[str]:
+        """Return repair messages."""
+        ...
 
     @property
-    def changed(self) -> bool: ...
+    def changed(self) -> bool:
+        """Return whether changes were made."""
+        ...
 
     @property
-    def applied(self) -> bool: ...
+    def applied(self) -> bool:
+        """Return whether changes were applied."""
+        ...
 
 
 class RepairExecutionConfigProtocol(Protocol):
     """Protocol interface for RepairExecutionConfig at runtime."""
 
     @property
-    def apply_changes(self) -> bool: ...
+    def apply_changes(self) -> bool:
+        """Return whether to apply changes."""
+        ...
 
     @property
-    def emit_json(self) -> bool: ...
+    def emit_json(self) -> bool:
+        """Return whether to emit JSON output."""
+        ...
 
 
 def repair_module_with_config(

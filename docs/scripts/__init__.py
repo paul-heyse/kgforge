@@ -9,6 +9,23 @@ __all__ = ["validate_against_schema"]
 
 
 def __getattr__(name: str) -> object:
+    """Get module attribute via lazy import.
+
+    Parameters
+    ----------
+    name : str
+        Module name to import.
+
+    Returns
+    -------
+    object
+        Imported attribute.
+
+    Raises
+    ------
+    AttributeError
+        If the attribute name is not found.
+    """
     if name == "validate_against_schema":
         module = import_module("docs.scripts.validation")
         return cast("object", getattr(module, name))
@@ -17,6 +34,13 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
+    """Return list of available module attributes.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of attribute names.
+    """
     return sorted(__all__)
 
 

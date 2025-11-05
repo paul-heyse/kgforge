@@ -1,7 +1,7 @@
 """Tests for the typed namespace registry and proxy helpers.
 
-This module verifies that the NamespaceRegistry provides correct lazy loading,
-caching, and error handling without relying on Any types.
+This module verifies that the NamespaceRegistry provides correct lazy loading, caching, and error
+handling without relying on Any types.
 """
 
 from __future__ import annotations
@@ -67,6 +67,13 @@ class TestNamespaceRegistry:
         call_count = 0
 
         def loader() -> object:
+            """Load symbol with call counting.
+
+            Returns
+            -------
+            object
+                Symbol value with call count.
+            """
             nonlocal call_count
             call_count += 1
             return f"result_{call_count}"
@@ -130,6 +137,18 @@ class TestNamespaceRegistry:
         registry = NamespaceRegistry()
 
         def failing_loader() -> object:
+            """Load symbol that always raises RuntimeError.
+
+            Returns
+            -------
+            object
+                Never returns.
+
+            Raises
+            ------
+            RuntimeError
+                Always raised to simulate loader failure.
+            """
             raise RuntimeError("Loader failed")
 
         registry.register("failing", failing_loader)

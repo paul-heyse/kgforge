@@ -43,7 +43,7 @@
 - [x] 2.1 Run `uv run ruff format && uv run ruff check --fix` on touched paths to ensure style compliance and import hygiene.
 - [x] 2.2 Run `uv run pyrefly check` scoped to each module cluster during refactor and globally before merge.
 - [x] 2.3 Run `uv run pyright --warnings --pythonversion=3.13` for affected packages (`tools`, `src/search_api`, `src/vectorstore_faiss`, `src/kgfoundry_common`).
-- [x] 2.4 Exercise optional dependency fallbacks by running `uv run pyrefly check`/`uv run mypy` in CPU-only environments and with `uv sync --extra gpu` where relevant.
+- [x] 2.4 Exercise optional dependency fallbacks by running `uv run pyrefly check`/`uv run pyright --warnings --pythonversion=3.13` in CPU-only environments and with `uv sync --extra gpu` where relevant.
 
 ## 3. Docs & Artifacts
 - [x] 3.1 Update developer documentation (`openspec/AGENTS.md`, `docs/contributing/quality.md`) describing typed wrappers and suppression policy.

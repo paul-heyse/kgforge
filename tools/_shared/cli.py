@@ -156,6 +156,7 @@ class CliEnvelopeBuilder:
 
     @classmethod
     def create(cls, *, command: str, status: CliStatus, subcommand: str = "") -> CliEnvelopeBuilder:
+        """Instantiate a builder for ``command`` with the provided status."""
         return cls(new_cli_envelope(command=command, status=status, subcommand=subcommand))
 
     def add_file(
@@ -166,6 +167,7 @@ class CliEnvelopeBuilder:
         message: str | None = None,
         problem: ProblemDetailsDict | None = None,
     ) -> None:
+        """Append a file-level result entry to the envelope."""
         self.envelope.files.append(
             CliFileResult(
                 path=path,
@@ -183,6 +185,7 @@ class CliEnvelopeBuilder:
         file: str | None = None,
         problem: ProblemDetailsDict | None = None,
     ) -> None:
+        """Record a build error with optional file attribution."""
         self.envelope.errors.append(
             CliErrorEntry(
                 status=status,
@@ -193,6 +196,7 @@ class CliEnvelopeBuilder:
         )
 
     def set_problem(self, problem: ProblemDetailsDict | None) -> None:
+        """Attach a Problem Details payload to the envelope."""
         replacement: ProblemDetailsDict | UnsetType = problem if problem is not None else UNSET
         if TYPE_CHECKING:
             self.envelope = dataclass_replace(self.envelope, problem=replacement)
@@ -203,6 +207,7 @@ class CliEnvelopeBuilder:
             )
 
     def finish(self, *, duration_seconds: float | None = None) -> CliEnvelope:
+        """Finalize the envelope, validating it before returning."""
         if duration_seconds is not None:
             if TYPE_CHECKING:
                 self.envelope = dataclass_replace(

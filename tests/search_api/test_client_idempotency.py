@@ -40,15 +40,38 @@ class StubHttpClient:
         get_responses: list[StubResponse] | None = None,
         post_responses: list[StubResponse] | None = None,
     ) -> None:
+        """Initialize stub HTTP client.
+
+        Parameters
+        ----------
+        get_responses : list[StubResponse] | None, optional
+            Queue of GET responses.
+        post_responses : list[StubResponse] | None, optional
+            Queue of POST responses.
+        """
         self._get_responses = list(get_responses or [])
         self._post_responses = list(post_responses or [])
         self.get_call_count = 0
         self.post_call_count = 0
 
     def enqueue_get(self, response: StubResponse) -> None:
+        """Enqueue a GET response.
+
+        Parameters
+        ----------
+        response : StubResponse
+            Response to enqueue.
+        """
         self._get_responses.append(response)
 
     def enqueue_post(self, response: StubResponse) -> None:
+        """Enqueue a POST response.
+
+        Parameters
+        ----------
+        response : StubResponse
+            Response to enqueue.
+        """
         self._post_responses.append(response)
 
     def _response_for(self, responses: list[StubResponse], index: int) -> StubResponse:

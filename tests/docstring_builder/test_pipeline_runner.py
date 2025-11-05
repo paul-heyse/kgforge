@@ -171,7 +171,6 @@ def _build_pipeline_config(
             -------
             DocfactsCoordinator
                 A stub coordinator with appropriate status.
-
             """
             status = docfacts_status if check_mode else "success"
             return cast(

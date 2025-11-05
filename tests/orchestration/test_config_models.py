@@ -1,7 +1,7 @@
 """Tests for orchestration configuration models.
 
-This module verifies that IndexCliConfig and ArtifactValidationConfig
-are correctly implemented with proper defaults, immutability, and type safety.
+This module verifies that IndexCliConfig and ArtifactValidationConfig are correctly implemented with
+proper defaults, immutability, and type safety.
 """
 
 from __future__ import annotations

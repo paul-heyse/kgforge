@@ -44,7 +44,24 @@ class _PopenFactory(Protocol):
         args: Sequence[str],
         *_unsafe_args: object,
         **_unsafe_kwargs: object,
-    ) -> TextProcess: ...
+    ) -> TextProcess:
+        """Create subprocess instance.
+
+        Parameters
+        ----------
+        args : Sequence[str]
+            Command arguments.
+        *_unsafe_args : object
+            Additional positional arguments (unsafe, not used).
+        **_unsafe_kwargs : object
+            Additional keyword arguments (unsafe, not used).
+
+        Returns
+        -------
+        TextProcess
+            Process instance with text I/O streams.
+        """
+        ...
 
 
 class _TextProcess(Protocol):
@@ -54,13 +71,38 @@ class _TextProcess(Protocol):
     stdout: io.TextIOBase | None
     stderr: io.TextIOBase | None
 
-    def poll(self) -> int | None: ...
+    def poll(self) -> int | None:
+        """Check if process has terminated.
 
-    def wait(self, timeout: float | None = ...) -> int: ...
+        Returns
+        -------
+        int | None
+            Return code if process has terminated, None otherwise.
+        """
+        ...
 
-    def terminate(self) -> None: ...
+    def wait(self, timeout: float | None = ...) -> int:
+        """Wait for process to terminate.
 
-    def kill(self) -> None: ...
+        Parameters
+        ----------
+        timeout : float | None, optional
+            Maximum time to wait in seconds.
+
+        Returns
+        -------
+        int
+            Process return code.
+        """
+        ...
+
+    def terminate(self) -> None:
+        """Send SIGTERM signal to process."""
+        ...
+
+    def kill(self) -> None:
+        """Send SIGKILL signal to process."""
+        ...
 
 
 TextProcess = _TextProcess
@@ -73,11 +115,39 @@ class _ToolRunResultProtocol(Protocol):
 
 
 class _AllowListPolicyProtocol(Protocol):
-    def resolve(self, executable: str, command: Sequence[str]) -> Path: ...
+    def resolve(self, executable: str, command: Sequence[str]) -> Path:
+        """Resolve executable path using allow-list policy.
+
+        Parameters
+        ----------
+        executable : str
+            Executable name or path.
+        command : Sequence[str]
+            Full command sequence.
+
+        Returns
+        -------
+        Path
+            Resolved executable path.
+        """
+        ...
 
 
 class _EnvironmentPolicyProtocol(Protocol):
-    def build(self, overrides: Mapping[str, str] | None) -> Mapping[str, str]: ...
+    def build(self, overrides: Mapping[str, str] | None) -> Mapping[str, str]:
+        """Build environment mapping with overrides.
+
+        Parameters
+        ----------
+        overrides : Mapping[str, str] | None, optional
+            Environment variable overrides.
+
+        Returns
+        -------
+        Mapping[str, str]
+            Environment variable mapping.
+        """
+        ...
 
 
 class _ProcessRunnerProtocol(Protocol):
@@ -94,11 +164,40 @@ class _RunToolCallable(Protocol):
         env: Mapping[str, str] | None = ...,
         timeout: float | None = ...,
         check: bool = ...,
-    ) -> _ToolRunResultProtocol: ...
+    ) -> _ToolRunResultProtocol:
+        """Execute a tool command.
+
+        Parameters
+        ----------
+        command : Sequence[str]
+            Command to execute.
+        cwd : Path | None, optional
+            Working directory for execution.
+        env : Mapping[str, str] | None, optional
+            Environment variable overrides.
+        timeout : float | None, optional
+            Maximum execution time in seconds.
+        check : bool, optional
+            Whether to raise on non-zero return code.
+
+        Returns
+        -------
+        _ToolRunResultProtocol
+            Execution result with stdout, stderr, and returncode.
+        """
+        ...
 
 
 class _GetProcessRunnerCallable(Protocol):
-    def __call__(self) -> _ProcessRunnerProtocol: ...
+    def __call__(self) -> _ProcessRunnerProtocol:
+        """Get process runner instance.
+
+        Returns
+        -------
+        _ProcessRunnerProtocol
+            Process runner with allowlist and environment policies.
+        """
+        ...
 
 
 class _ToolsSurface(Protocol):
@@ -114,7 +213,24 @@ class _ToolExecutionErrorSurface(Protocol):
 
 
 class _ToolExecutionErrorConstructor(Protocol):
-    def __call__(self, message: str, *, command: Sequence[str], **kwargs: object) -> Exception: ...
+    def __call__(self, message: str, *, command: Sequence[str], **kwargs: object) -> Exception:
+        """Create tool execution error.
+
+        Parameters
+        ----------
+        message : str
+            Error message.
+        command : Sequence[str]
+            Command that failed.
+        **kwargs : object
+            Additional error context.
+
+        Returns
+        -------
+        Exception
+            Exception instance.
+        """
+        ...
 
 
 def _load_tools_surface() -> _ToolsSurface:

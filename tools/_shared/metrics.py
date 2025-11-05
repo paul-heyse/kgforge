@@ -77,6 +77,7 @@ class ToolRunObservation:
     tracing_enabled: bool = True
 
     def __post_init__(self) -> None:
+        """Derive convenience fields after dataclass initialisation."""
         self.tool = Path(self.command[0]).name if self.command else "<unknown>"
 
     def success(self, returncode: int) -> None:

@@ -176,6 +176,13 @@ def load_tracer_provider_cls() -> Callable[[], TracerProviderProtocol] | None:
     provider_factory = cast("Callable[[], object]", provider_raw)
 
     def factory() -> TracerProviderProtocol:
+        """Create and return a TracerProvider instance.
+
+        Returns
+        -------
+        TracerProviderProtocol
+            TracerProvider instance conforming to protocol.
+        """
         provider = provider_factory()
         return cast("TracerProviderProtocol", provider)
 
@@ -195,6 +202,13 @@ def load_in_memory_span_exporter_cls() -> Callable[[], SpanExporterProtocol] | N
     exporter_factory = cast("Callable[[], object]", exporter_raw)
 
     def factory() -> SpanExporterProtocol:
+        """Create and return an InMemorySpanExporter instance.
+
+        Returns
+        -------
+        SpanExporterProtocol
+            SpanExporter instance conforming to protocol.
+        """
         exporter = exporter_factory()
         return cast("SpanExporterProtocol", exporter)
 

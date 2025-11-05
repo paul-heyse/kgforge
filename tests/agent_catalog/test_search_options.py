@@ -40,6 +40,18 @@ def mock_embedding_loader() -> Callable[[str], EmbeddingModelProtocol]:
             return np.full((len(sentences), 10), 0.1, dtype=np.float32)
 
     def loader(_name: str) -> MockEmbeddingModel:
+        """Load mock embedding model.
+
+        Parameters
+        ----------
+        _name : str
+            Model name (ignored).
+
+        Returns
+        -------
+        MockEmbeddingModel
+            Mock embedding model instance.
+        """
         return MockEmbeddingModel()
 
     return loader

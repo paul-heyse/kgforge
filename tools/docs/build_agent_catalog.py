@@ -74,6 +74,15 @@ class ModuleAnalyzer:
     """Collect definitions, imports, and call graph data for a module."""
 
     def __init__(self, module: str, path: Path) -> None:
+        """Initialize module analyzer.
+
+        Parameters
+        ----------
+        module : str
+            Module qualified name.
+        path : Path
+            Path to module source file.
+        """
         self.module = module
         self.path = path
         self.imports: set[str] = set()
@@ -153,6 +162,13 @@ class _DefinitionCollector(ast.NodeVisitor):
     """Collect symbol definitions and imports."""
 
     def __init__(self, module: str) -> None:
+        """Initialize definition collector.
+
+        Parameters
+        ----------
+        module : str
+            Module qualified name.
+        """
         self.module = module
         self.scope: list[str] = []
         self.imports: set[str] = set()
@@ -162,12 +178,26 @@ class _DefinitionCollector(ast.NodeVisitor):
         self.local_name_map: dict[str, str] = {}
 
     def visit_Import(self, node: ast.Import) -> None:
+        """Visit import statement and record imports.
+
+        Parameters
+        ----------
+        node : ast.Import
+            Import AST node.
+        """
         for alias in node.names:
             target = alias.name
             self.imports.add(target)
             self.import_aliases[alias.asname or alias.name] = target
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+        """Visit import-from statement and record imports.
+
+        Parameters
+        ----------
+        node : ast.ImportFrom
+            ImportFrom AST node.
+        """
         module = node.module or ""
         if module:
             self.imports.add(module)
@@ -176,6 +206,13 @@ class _DefinitionCollector(ast.NodeVisitor):
             self.import_aliases[alias.asname or alias.name] = full
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Visit class definition and record symbol.
+
+        Parameters
+        ----------
+        node : ast.ClassDef
+            ClassDef AST node.
+        """
         qname = ".".join([self.module, *self.scope, node.name])
         self.symbol_nodes[qname] = node
         self.symbol_scopes[qname] = tuple(self.scope)
@@ -185,9 +222,23 @@ class _DefinitionCollector(ast.NodeVisitor):
         self.scope.pop()
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        """Visit function definition and record symbol.
+
+        Parameters
+        ----------
+        node : ast.FunctionDef
+            FunctionDef AST node.
+        """
         self._record_function(node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        """Visit async function definition and record symbol.
+
+        Parameters
+        ----------
+        node : ast.AsyncFunctionDef
+            AsyncFunctionDef AST node.
+        """
         self._record_function(node)
 
     def _record_function(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
@@ -212,6 +263,19 @@ class _CallCollector(ast.NodeVisitor):
         import_aliases: Mapping[str, str],
         local_name_map: Mapping[str, str],
     ) -> None:
+        """Initialize call collector.
+
+        Parameters
+        ----------
+        module : str
+            Module qualified name.
+        scope : tuple[str, ...]
+            Current scope path.
+        import_aliases : Mapping[str, str]
+            Map of aliases to fully qualified names.
+        local_name_map : Mapping[str, str]
+            Map of local names to fully qualified names.
+        """
         self.module = module
         self.scope = scope
         self.import_aliases = import_aliases
@@ -219,6 +283,13 @@ class _CallCollector(ast.NodeVisitor):
         self.calls: set[str] = set()
 
     def visit_Call(self, node: ast.Call) -> None:
+        """Visit call expression and record call target.
+
+        Parameters
+        ----------
+        node : ast.Call
+            Call AST node.
+        """
         target = self._resolve_call(node.func)
         if target:
             self.calls.add(target)
@@ -421,6 +492,13 @@ class AgentCatalogBuilder:
     """Builds the agent catalog from documentation artifacts."""
 
     def __init__(self, args: argparse.Namespace) -> None:
+        """Initialize catalog builder with arguments.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            Parsed command-line arguments.
+        """
         self.args = args
         repo_root_arg = cast("Path", args.repo_root)
         self.repo_root = repo_root_arg.resolve()
@@ -1570,12 +1648,48 @@ class _DocstringStripper(ast.NodeTransformer):
     """Remove docstrings from AST nodes."""
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.AST:
+        """Visit function definition and strip docstring.
+
+        Parameters
+        ----------
+        node : ast.FunctionDef
+            FunctionDef AST node.
+
+        Returns
+        -------
+        ast.AST
+            Modified AST node with docstring removed.
+        """
         return self._strip_doc(node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AST:
+        """Visit async function definition and strip docstring.
+
+        Parameters
+        ----------
+        node : ast.AsyncFunctionDef
+            AsyncFunctionDef AST node.
+
+        Returns
+        -------
+        ast.AST
+            Modified AST node with docstring removed.
+        """
         return self._strip_doc(node)
 
     def visit_ClassDef(self, node: ast.ClassDef) -> ast.AST:
+        """Visit class definition and strip docstring.
+
+        Parameters
+        ----------
+        node : ast.ClassDef
+            ClassDef AST node.
+
+        Returns
+        -------
+        ast.AST
+            Modified AST node with docstring removed.
+        """
         return self._strip_doc(node)
 
     def _strip_doc(self, node: DocNode) -> DocNode:

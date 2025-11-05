@@ -36,7 +36,6 @@ class TestImportLinterTypingContract:
         -------
         tuple[int, str, str]
             (exit_code, stdout, stderr)
-
         """
         try:
             result = run_tool(
@@ -61,8 +60,8 @@ class TestImportLinterTypingContract:
     def test_direct_private_module_import_violation(self, tmp_path: Path) -> None:
         """Verify import-linter detects direct private module imports.
 
-        Creates a temporary module that directly imports from docs._types
-        and confirms import-linter reports the violation.
+        Creates a temporary module that directly imports from docs._types and confirms import-linter
+        reports the violation.
         """
         # Create a temporary package that violates the contract
         test_module = tmp_path / "test_violation.py"
@@ -78,8 +77,8 @@ class TestImportLinterTypingContract:
     def test_private_cache_import_violation(self, tmp_path: Path) -> None:
         """Verify import-linter detects docs._cache imports.
 
-        Creates a temporary module that imports from docs._cache
-        and confirms the violation can be detected.
+        Creates a temporary module that imports from docs._cache and confirms the violation can be
+        detected.
         """
         test_module = tmp_path / "test_cache_violation.py"
         test_module.write_text(
@@ -92,8 +91,8 @@ class TestImportLinterTypingContract:
     def test_facade_import_allowed(self, tmp_path: Path) -> None:
         """Verify import-linter allows imports from public typing facades.
 
-        Creates a module that correctly uses the public facade and confirms
-        it does not violate the contract.
+        Creates a module that correctly uses the public facade and confirms it does not violate the
+        contract.
         """
         test_module = tmp_path / "test_facade_ok.py"
         test_module.write_text(

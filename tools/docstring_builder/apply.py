@@ -52,6 +52,7 @@ class _DocstringTransformer(cst.CSTTransformer):
     changed: bool = False
 
     def __post_init__(self) -> None:
+        """Initialize namespace after dataclass initialization."""
         self.namespace: list[str] = []
 
     def _qualify(self, name: str) -> str:
@@ -119,24 +120,76 @@ class _DocstringTransformer(cst.CSTTransformer):
         return node.with_changes(body=new_body)
 
     def visit_classdef(self, node: cst.ClassDef) -> bool:
+        """Visit class definition and track namespace.
+
+        Parameters
+        ----------
+        node : cst.ClassDef
+            ClassDef CST node.
+
+        Returns
+        -------
+        bool
+            True to continue visiting children.
+        """
         self.namespace.append(node.name.value)
         return True
 
     def leave_classdef(
         self, _original_node: cst.ClassDef, updated_node: cst.ClassDef
     ) -> BaseStatement | FlattenSentinel[BaseStatement] | RemovalSentinel:
+        """Leave class definition and inject docstring.
+
+        Parameters
+        ----------
+        _original_node : cst.ClassDef
+            Original CST node (unused).
+        updated_node : cst.ClassDef
+            Updated CST node.
+
+        Returns
+        -------
+        BaseStatement | FlattenSentinel[BaseStatement] | RemovalSentinel
+            Transformed node with docstring injected.
+        """
         qname = self._qualify(updated_node.name.value)
         self.namespace.pop()
         transformed = self._inject_docstring(updated_node, qname)
         return cast("BaseStatement", transformed)
 
     def visit_functiondef(self, node: cst.FunctionDef) -> bool:
+        """Visit function definition and track namespace.
+
+        Parameters
+        ----------
+        node : cst.FunctionDef
+            FunctionDef CST node.
+
+        Returns
+        -------
+        bool
+            True to continue visiting children.
+        """
         self.namespace.append(node.name.value)
         return True
 
     def leave_functiondef(
         self, _original_node: cst.FunctionDef, updated_node: cst.FunctionDef
     ) -> BaseStatement | FlattenSentinel[BaseStatement] | RemovalSentinel:
+        """Leave function definition and inject docstring.
+
+        Parameters
+        ----------
+        _original_node : cst.FunctionDef
+            Original CST node (unused).
+        updated_node : cst.FunctionDef
+            Updated CST node.
+
+        Returns
+        -------
+        BaseStatement | FlattenSentinel[BaseStatement] | RemovalSentinel
+            Transformed node with docstring injected.
+        """
         qname = self._qualify(updated_node.name.value)
         self.namespace.pop()
         transformed = self._inject_docstring(updated_node, qname)

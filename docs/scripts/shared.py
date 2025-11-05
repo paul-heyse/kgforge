@@ -34,10 +34,31 @@ def _load_module() -> ModuleType:
 
 
 def clear_cache() -> None:
+    """Clear the module cache.
+
+    Resets the cached module.
+    """
     _CACHE.reset()
 
 
 def __getattr__(name: str) -> object:
+    """Get module attribute via lazy import.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to import.
+
+    Returns
+    -------
+    object
+        Imported attribute.
+
+    Raises
+    ------
+    AttributeError
+        If the attribute name is not in __all__.
+    """
     if name in __all__:
         module = _load_module()
         return cast("object", getattr(module, name))
@@ -46,6 +67,13 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
+    """Return list of available module attributes.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of attribute names.
+    """
     return sorted(__all__)
 
 

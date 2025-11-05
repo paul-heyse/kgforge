@@ -34,12 +34,33 @@ def _export_names() -> tuple[str, ...]:
 
 
 def clear_cache() -> None:
+    """Clear the module cache and reset exports.
+
+    Resets the cached module and restores the default __all__ list.
+    """
     _CACHE.reset()
     namespace = cast("dict[str, object]", globals())
     namespace["__all__"] = list(_DEFAULT_ALL)
 
 
 def __getattr__(name: str) -> object:
+    """Get module attribute via lazy import.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to import.
+
+    Returns
+    -------
+    object
+        Imported attribute.
+
+    Raises
+    ------
+    AttributeError
+        If the attribute name is not in exports.
+    """
     exports = _export_names()
     if name in exports:
         module = _load_module()
@@ -49,4 +70,11 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
+    """Return list of available module attributes.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of exported attribute names.
+    """
     return sorted(_export_names())

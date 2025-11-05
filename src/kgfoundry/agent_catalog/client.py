@@ -58,6 +58,18 @@ class _SafeFormatDict(dict[str, object]):
     """Dictionary that returns an empty string for missing keys."""
 
     def __missing__(self, key: str) -> object:
+        """Return an empty string for missing keys.
+
+        Parameters
+        ----------
+        key : str
+            Missing dictionary key.
+
+        Returns
+        -------
+        str
+            Empty string ("").
+        """
         return ""
 
 

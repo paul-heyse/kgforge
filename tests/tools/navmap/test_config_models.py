@@ -1,7 +1,7 @@
 """Tests for navmap configuration models.
 
-This module verifies that the navmap configuration objects work correctly
-and enforce their constraints.
+This module verifies that the navmap configuration objects work correctly and enforce their
+constraints.
 """
 
 from __future__ import annotations

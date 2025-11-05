@@ -38,10 +38,12 @@ TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
 
 
 def _default_float_dict() -> defaultdict[str, float]:
+    """Return a defaultdict that produces ``float`` zeros for missing keys."""
     return defaultdict(float)
 
 
 def _score_value(item: tuple[str, float]) -> float:
+    """Extract the score component from a Lucene impact result tuple."""
     return item[1]
 
 
@@ -118,20 +120,32 @@ def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
 
 
 class ImpactHitProtocol(Protocol):
+    """Protocol describing the minimal SPLADE impact hit payload."""
+
     docid: str
     score: float
 
 
 class LuceneImpactSearcherProtocol(Protocol):
-    def __init__(self, index_dir: str, *, query_encoder: str | None = None) -> None: ...
+    """Protocol for Lucene-backed SPLADE searchers."""
 
-    def search(self, query: str, k: int) -> Sequence[ImpactHitProtocol]: ...
+    def __init__(self, index_dir: str, *, query_encoder: str | None = None) -> None:
+        """Initialise the searcher with an index directory and optional encoder."""
+        ...
+
+    def search(self, query: str, k: int) -> Sequence[ImpactHitProtocol]:
+        """Return the top ``k`` SPLADE impact hits for ``query``."""
+        ...
 
 
 class LuceneImpactSearcherFactory(Protocol):
+    """Factory protocol for constructing Lucene SPLADE searchers."""
+
     def __call__(
         self, index_dir: str, *, query_encoder: str | None = None
-    ) -> LuceneImpactSearcherProtocol: ...
+    ) -> LuceneImpactSearcherProtocol:
+        """Build a searcher for ``index_dir`` using an optional query encoder."""
+        ...
 
 
 logger = logging.getLogger(__name__)

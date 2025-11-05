@@ -66,6 +66,13 @@ class CatalogStruct:
     """Base class providing a ``model_dump`` helper."""
 
     def model_dump(self) -> dict[str, object]:
+        """Serialize model to dictionary.
+
+        Returns
+        -------
+        dict[str, object]
+            Dictionary representation with None values stripped.
+        """
         raw = cast("JsonDict", asdict(self))
         return _strip_none(raw)
 

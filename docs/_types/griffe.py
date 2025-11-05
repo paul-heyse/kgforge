@@ -49,8 +49,7 @@ logger = logging.getLogger(__name__)
 class GriffeNode(Protocol):
     """Runtime-checkable protocol for Griffe Object nodes.
 
-    Exposes only the subset of Griffe Object attributes and methods consumed by
-    the docs pipeline.
+    Exposes only the subset of Griffe Object attributes and methods consumed by the docs pipeline.
     """
 
     @property

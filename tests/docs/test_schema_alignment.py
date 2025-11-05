@@ -1,7 +1,7 @@
 """Unit tests for schema alignment helpers.
 
-Tests verify alignment utilities for canonical field validation, legacy payload
-migration, and RFC 9457 Problem Details error handling.
+Tests verify alignment utilities for canonical field validation, legacy payload migration, and RFC
+9457 Problem Details error handling.
 """
 
 from __future__ import annotations
