@@ -32,6 +32,13 @@ class ConceptMeta(TypedDict):
         Human-readable concept label.
     keywords : list[str]
         List of keywords that match this concept.
+
+    Attributes
+    ----------
+    label : str
+        Human-readable concept label.
+    keywords : list[str]
+        List of keywords that match this concept.
     """
 
     label: str

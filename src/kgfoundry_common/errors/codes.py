@@ -49,6 +49,75 @@ class ErrorCode(StrEnum):
     - 6xx: Knowledge Graph & Ontology
     - 7xx: Serialization & Persistence
 
+    Attributes
+    ----------
+    DOWNLOAD_FAILED : str
+        Download operation failed.
+    UNSUPPORTED_MIME : str
+        Unsupported MIME type.
+    INVALID_INPUT : str
+        Invalid input provided.
+    DOCLING_ERROR : str
+        Document parsing error.
+    OCR_TIMEOUT : str
+        OCR operation timed out.
+    CHUNKING_ERROR : str
+        Document chunking error.
+    EMBEDDING_ERROR : str
+        Embedding generation error.
+    INDEX_BUILD_ERROR : str
+        Index build error.
+    SPLADE_OOM : str
+        SPLADE out of memory error.
+    RETRY_EXHAUSTED : str
+        Retry attempts exhausted.
+    SEARCH_INDEX_MISSING : str
+        Search index not found.
+    SEARCH_QUERY_INVALID : str
+        Invalid search query.
+    SEARCH_TIMEOUT : str
+        Search operation timed out.
+    VECTOR_SEARCH_ERROR : str
+        Vector search error.
+    AGENT_CATALOG_SEARCH_ERROR : str
+        Agent catalog search error.
+    CATALOG_LOAD_ERROR : str
+        Catalog load error.
+    SYMBOL_ATTACHMENT_ERROR : str
+        Symbol attachment error.
+    CONFIGURATION_ERROR : str
+        Configuration error.
+    RUNTIME_ERROR : str
+        Runtime error.
+    RESOURCE_UNAVAILABLE : str
+        Resource unavailable.
+    REGISTRY_ERROR : str
+        Registry error.
+    SESSION_ERROR : str
+        Session error.
+    ONTOLOGY_PARSE_ERROR : str
+        Ontology parsing error.
+    LINKER_CALIBRATION_ERROR : str
+        Linker calibration error.
+    NEO4J_ERROR : str
+        Neo4j database error.
+    SERIALIZATION_ERROR : str
+        Serialization error.
+    DESERIALIZATION_ERROR : str
+        Deserialization error.
+    SCHEMA_VALIDATION_ERROR : str
+        Schema validation error.
+    ARTIFACT_SERIALIZATION_ERROR : str
+        Artifact serialization error.
+    ARTIFACT_DESERIALIZATION_ERROR : str
+        Artifact deserialization error.
+    ARTIFACT_VALIDATION_ERROR : str
+        Artifact validation error.
+    ARTIFACT_MODEL_ERROR : str
+        Artifact model error.
+    ARTIFACT_DEPENDENCY_ERROR : str
+        Artifact dependency error.
+
     Examples
     --------
     >>> code = ErrorCode.DOWNLOAD_FAILED

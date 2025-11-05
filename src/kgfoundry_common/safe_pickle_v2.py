@@ -90,16 +90,18 @@ _ALLOWED_TYPES = frozenset(
 class UnsafeSerializationError(ValueError):
     """Raised when serialization validation fails.
 
+    Initializes unsafe serialization error with message and optional reason.
+
     Parameters
     ----------
     message : str
         Error description.
-    reason : str, optional
+    reason : str | None, optional
         Specific reason (e.g., "signature_mismatch", "disallowed_type").
+        Defaults to None.
     """
 
     def __init__(self, message: str, reason: str | None = None) -> None:
-        """Initialize unsafe serialization error."""
         super().__init__(message)
         self.reason = reason
 
@@ -113,23 +115,7 @@ class _UnpicklerProtocol(Protocol):
         encoding: str = ...,
         errors: str = ...,
         buffers: object | None = ...,
-    ) -> None:
-        """Initialize unpickler with file handle.
-
-        Parameters
-        ----------
-        file : BinaryIO
-            Binary file handle to read from.
-        fix_imports : bool, optional
-            Whether to fix imports for Python 2 compatibility.
-        encoding : str, optional
-            Text encoding for Python 2 compatibility.
-        errors : str, optional
-            Error handling mode for encoding.
-        buffers : object | None, optional
-            Buffer protocol support.
-        """
-        ...
+    ) -> None: ...
 
     def load(self) -> object:
         """Load and return unpickled object.
@@ -205,23 +191,7 @@ if TYPE_CHECKING:
             encoding: str = ...,
             errors: str = ...,
             buffers: object | None = ...,
-        ) -> None:
-            """Initialize unpickler with file handle.
-
-            Parameters
-            ----------
-            file : BinaryIO
-                Binary file handle to read from.
-            fix_imports : bool, optional
-                Whether to fix imports for Python 2 compatibility.
-            encoding : str, optional
-                Text encoding for Python 2 compatibility.
-            errors : str, optional
-                Error handling mode for encoding.
-            buffers : object | None, optional
-                Buffer protocol support.
-            """
-            ...
+        ) -> None: ...
 
         def load(self) -> object:
             """Load and return unpickled object.
@@ -266,6 +236,21 @@ class _SafeUnpickler(_StdlibUnpickler):
 
     This prevents arbitrary code execution by restricting deserialization to primitive types and
     basic containers.
+
+    Initializes safe unpickler with file handle.
+
+    Parameters
+    ----------
+    file : BinaryIO
+        Binary file handle to read from.
+    fix_imports : bool, optional
+        Whether to fix imports for Python 2 compatibility. Defaults to True.
+    encoding : str, optional
+        Text encoding for Python 2 compatibility. Defaults to "ASCII".
+    errors : str, optional
+        Error handling mode for encoding. Defaults to "strict".
+    buffers : object | None, optional
+        Buffer protocol support. Defaults to None.
     """
 
     def __init__(
@@ -277,25 +262,6 @@ class _SafeUnpickler(_StdlibUnpickler):
         errors: str = "strict",
         buffers: object | None = None,
     ) -> None:
-        """Initialize safe unpickler with file handle.
-
-        Parameters
-        ----------
-        file : BinaryIO
-            Binary file handle to read from.
-        fix_imports : bool, optional
-            Whether to fix imports for Python 2 compatibility.
-            Defaults to True.
-        encoding : str, optional
-            Text encoding for Python 2 compatibility.
-            Defaults to "ASCII".
-        errors : str, optional
-            Error handling mode for encoding.
-            Defaults to "strict".
-        buffers : object | None, optional
-            Buffer protocol support.
-            Defaults to None.
-        """
         super().__init__(
             file,
             fix_imports=fix_imports,
@@ -418,10 +384,13 @@ class SignedPickleWrapper:
     Combines class allow-listing with HMAC-SHA256 signatures to prevent
     both arbitrary code execution and payload tampering.
 
+    Initializes wrapper with signing key.
+
     Parameters
     ----------
     signing_key : bytes
-        HMAC signing key (≥32 bytes recommended).
+        HMAC signing key (≥32 bytes recommended). A warning is logged if
+        the key is shorter than 32 bytes.
 
     Examples
     --------
@@ -438,7 +407,6 @@ class SignedPickleWrapper:
     """
 
     def __init__(self, signing_key: bytes) -> None:
-        """Initialize wrapper with signing key."""
         if len(signing_key) < _MIN_SIGNING_KEY_BYTES:
             logger.warning("Signing key < 32 bytes; consider using a longer key")
         self.signing_key = signing_key

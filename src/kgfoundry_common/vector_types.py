@@ -52,19 +52,19 @@ VectorId = NewType("VectorId", str)
 
 # [nav:anchor VectorValidationError]
 class VectorValidationError(ValueError):
-    """Raised when vector payloads fail dtype, shape, or schema validation."""
+    """Raised when vector payloads fail dtype, shape, or schema validation.
+
+    Initializes validation error with message and optional error details.
+
+    Parameters
+    ----------
+    message : str
+        Error message describing the validation failure.
+    errors : Sequence[str] | None, optional
+        List of validation error messages. Defaults to None.
+    """
 
     def __init__(self, message: str, *, errors: Sequence[str] | None = None) -> None:
-        """Initialize validation error.
-
-        Parameters
-        ----------
-        message : str
-            Error message.
-        errors : Sequence[str] | None, optional
-            List of validation error messages.
-            Defaults to None.
-        """
         super().__init__(message)
         self.errors: tuple[str, ...] = tuple(errors or (message,))
 
@@ -75,6 +75,13 @@ class VectorBatch:
     """Immutable collection of typed vectors with shared dimensionality.
 
     Parameters
+    ----------
+    ids : tuple[VectorId, ...]
+        Unique identifiers associated with each vector row.
+    matrix : VectorMatrix
+        Two-dimensional ``float32`` matrix whose row count matches ``ids``.
+
+    Attributes
     ----------
     ids : tuple[VectorId, ...]
         Unique identifiers associated with each vector row.

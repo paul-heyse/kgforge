@@ -24,11 +24,11 @@ class Concept:
     Represents a concept in the ontology catalog with an identifier
     and optional human-readable label.
 
-    Parameters
+    Attributes
     ----------
     id : str
         Unique concept identifier (typically a URN).
-    label : str | None, optional
+    label : str | None
         Human-readable label for the concept. Defaults to None.
     """
 
@@ -49,6 +49,9 @@ class OntologyCatalog:
     Provides a simple in-memory catalog for querying knowledge graph
     concepts. Supports neighbor traversal and concept hydration.
 
+    Initializes the ontology catalog with concepts. Builds an internal index
+    mapping concept IDs to concept objects for fast lookup.
+
     Parameters
     ----------
     concepts : list[Concept]
@@ -56,16 +59,6 @@ class OntologyCatalog:
     """
 
     def __init__(self, concepts: list[Concept]) -> None:
-        """Initialize the ontology catalog with concepts.
-
-        Builds an internal index mapping concept IDs to concept objects
-        for fast lookup.
-
-        Parameters
-        ----------
-        concepts : list[Concept]
-            List of concepts to include in the catalog.
-        """
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:

@@ -32,11 +32,6 @@ class NamespaceRegistry:
     This registry encapsulates symbol metadata (name, loader callable) and
     provides typed methods to register and resolve symbols without relying
     on Any types. Loaders are cached to avoid repeated module imports.
-
-    Attributes
-    ----------
-    _registry : dict[str, Callable[[], object]]
-        Mapping of symbol name to lazy loader callable.
     """
 
     _registry: dict[str, Callable[[], object]] = field(default_factory=dict, init=False)

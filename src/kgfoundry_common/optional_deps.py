@@ -54,12 +54,18 @@ class OptionalDependencyError(ArtifactDependencyError):
     This error includes RFC 9457 Problem Details, remediation guidance,
     and correlation IDs for observability.
 
+    Initializes optional dependency error with message, module name, and optional context.
+
     Parameters
     ----------
-    module_name : str
-        Name of the missing module (e.g., "griffe", "autoapi").
-    extra : dict[str, object], optional
-        Additional context fields for Problem Details.
+    message : str
+        Human-readable error message describing the missing dependency.
+    module_name : str, optional
+        Name of the missing module (e.g., "griffe", "autoapi"). Defaults to "".
+    extra : Mapping[str, object] | None, optional
+        Additional context fields for Problem Details. Defaults to None.
+    cause : Exception | None, optional
+        Underlying exception that caused the import failure. Defaults to None.
 
     Examples
     --------
@@ -84,7 +90,6 @@ class OptionalDependencyError(ArtifactDependencyError):
         extra: Mapping[str, object] | None = None,
         cause: Exception | None = None,
     ) -> None:
-        """Initialize optional dependency error."""
         context = dict(extra or {})
         context["module_name"] = module_name
         context["correlation_id"] = str(uuid.uuid4())

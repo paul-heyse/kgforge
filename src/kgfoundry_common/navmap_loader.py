@@ -15,6 +15,11 @@ from typing import Any
 def _candidate_sidecars(package: str) -> list[Path]:
     """Return ordered sidecar file candidates for ``package``.
 
+    Parameters
+    ----------
+    package : str
+        Fully qualified package name to find sidecars for.
+
     Returns
     -------
     list[Path]
@@ -54,6 +59,11 @@ def _candidate_sidecars(package: str) -> list[Path]:
 def _load_sidecar_data(package: str) -> dict[str, Any]:
     """Return metadata loaded from package sidecar files.
 
+    Parameters
+    ----------
+    package : str
+        Fully qualified package name to load sidecar data for.
+
     Returns
     -------
     dict[str, Any]
@@ -68,6 +78,11 @@ def _load_sidecar_data(package: str) -> dict[str, Any]:
 
 def _load_runtime_nav(package: str) -> dict[str, Any]:
     """Return runtime ``__navmap__`` data if available.
+
+    Parameters
+    ----------
+    package : str
+        Fully qualified package name to load runtime navmap for.
 
     Returns
     -------

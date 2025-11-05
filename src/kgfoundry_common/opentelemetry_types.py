@@ -76,8 +76,7 @@ class SpanProcessorProtocol(Protocol):
 class TracerProviderProtocol(Protocol):
     """Tracer provider constructor and helpers used in fixtures."""
 
-    def __init__(self, *args: object, **kwargs: object) -> None:
-        """Initialise the provider with optional configuration."""
+    def __init__(self, *args: object, **kwargs: object) -> None: ...
 
     def get_tracer(
         self,

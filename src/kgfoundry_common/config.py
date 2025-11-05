@@ -71,6 +71,22 @@ class AppSettings(BaseSettings):
     Security fields (HMAC signing key, subprocess/network timeouts) are
     optional but recommended. When provided, they enforce strict validation.
 
+    Attributes
+    ----------
+    log_level : str
+        Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL). Defaults to "INFO".
+    log_format : str
+        Logging format ('json' or 'text'). Defaults to "json".
+    signing_key : str | None
+        HMAC signing key for secure pickle (base64-encoded, ≥32 bytes recommended).
+        Defaults to None.
+    subprocess_timeout : int
+        Default timeout for subprocess operations in seconds. Defaults to 300.
+    request_timeout : int
+        Default timeout for network requests in seconds. Defaults to 30.
+    model_config : ClassVar[dict[str, object]]
+        Pydantic model configuration (frozen=True, case_sensitive=False, populate_by_name=True).
+
     Examples
     --------
     >>> import os
@@ -158,8 +174,8 @@ class AppSettings(BaseSettings):
             Object to validate.
         strict : bool | None
             Whether to use strict mode validation.
-        extra : str | None
-            Extra field handling mode.
+        extra : Literal["allow", "ignore", "forbid"] | None
+            Extra field handling mode ('allow', 'ignore', or 'forbid').
         from_attributes : bool | None
             Whether to validate from attributes.
         context : Mapping[str, object] | None
@@ -341,8 +357,8 @@ class AppSettings(BaseSettings):
 
         Returns
         -------
-        AppSettings
-            Validated configuration settings.
+        Self
+            Validated instance of AppSettings (same as Self).
 
         Raises
         ------

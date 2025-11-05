@@ -45,17 +45,6 @@ class DuckDBRegistry:
     """
 
     def __init__(self, db_path: str) -> None:
-        """Initialize the registry with a DuckDB database path.
-
-        Opens a connection to the DuckDB database and stores it for use
-        by all registry operations. The connection is opened in read-write mode.
-
-        Parameters
-        ----------
-        db_path : str
-            Path to the DuckDB database file. Database will be created if it
-            doesn't exist.
-        """
         self.db_path = db_path
         self.con = duckdb_helpers.connect(db_path, read_only=False)
 

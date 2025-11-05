@@ -17,12 +17,16 @@ theme:
 markdown_extensions:
   - admonition
   - attr_list
+  - toc:
+      permalink: true
   - pymdownx.details
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.snippets
+  - pymdownx.emoji
   - meta
   - mkdocs-typer
 
@@ -51,11 +55,19 @@ plugins:
           paths:
             - src
           load_external_modules: true
+          extensions:
+            - griffe_inherited_docstrings
+            - griffe_typingdoc
+            - griffe_pydantic
+            - griffe_fieldz
+            - griffe_public_wildcard_imports
           options:
             show_source: true
             show_signature: true
             show_root_heading: true
             inherited_members: true
+            docstring_style: numpy 
+            docstring_section_style: table
   - redoc-tag
   - redirects
   - minify

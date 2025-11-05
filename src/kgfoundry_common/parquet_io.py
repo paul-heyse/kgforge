@@ -81,16 +81,14 @@ class ParquetVectorWriter:
     to Parquet files with Hive-style partitioning. Supports partitioning by
     model, run_id, and shard for efficient querying.
 
+    Initializes the Parquet vector writer with root directory.
+
     Parameters
     ----------
     root : str
-        Root directory path for Parquet output. Vectors will be written to
+        Root directory path for Parquet output. Converted to Path object
+        and stored for use by write methods. Vectors will be written to
         subdirectories partitioned by model, run_id, and shard.
-
-    Raises
-    ------
-    ImportError
-        If pandas is not installed.
 
     Notes
     -----
@@ -133,14 +131,6 @@ class ParquetVectorWriter:
         )
 
     def __init__(self, root: str) -> None:
-        """Initialize Parquet vector writer.
-
-        Parameters
-        ----------
-        root : str
-            Root directory path for Parquet output. Converted to Path object
-            and stored for use by write methods.
-        """
         self.root = Path(root)
 
     def write_dense(
@@ -304,10 +294,13 @@ class ParquetChunkWriter:
     to Parquet files with Hive-style partitioning. Supports chunk text, character
     offsets, section information, and optional doctags spans.
 
+    Initializes the Parquet chunk writer with root directory and partitioning parameters.
+
     Parameters
     ----------
     root : str
-        Root directory path for Parquet output. Chunks will be written to
+        Root directory path for Parquet output. Converted to Path object
+        and combined with model and run_id partitioning. Chunks will be written to
         subdirectories partitioned by model and run_id.
     model : str, optional
         Model identifier used for partitioning. Defaults to "docling_hybrid".
@@ -358,18 +351,6 @@ class ParquetChunkWriter:
         return pa.schema(chunk_fields)
 
     def __init__(self, root: str, model: str = "docling_hybrid", run_id: str = "dev") -> None:
-        """Initialize Parquet chunk writer.
-
-        Parameters
-        ----------
-        root : str
-            Root directory path for Parquet output. Converted to Path object
-            and combined with model and run_id partitioning.
-        model : str, optional
-            Model identifier used for partitioning. Defaults to "docling_hybrid".
-        run_id : str, optional
-            Run identifier used for partitioning. Defaults to "dev".
-        """
         self.root = Path(root) / f"model={model}" / f"run_id={run_id}" / "shard=00000"
         self.root.mkdir(parents=True, exist_ok=True)
 

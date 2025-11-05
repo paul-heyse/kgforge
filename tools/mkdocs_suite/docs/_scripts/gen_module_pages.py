@@ -19,7 +19,7 @@ import logging
 import re
 import sys
 from collections import defaultdict
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -63,6 +63,44 @@ PROJECT_ROOT = Path(__file__).resolve().parents[4]
 TOOLS_ROOT = PROJECT_ROOT / "tools"
 SRC_ROOT = PROJECT_ROOT / "src"
 SUITE_ROOT = TOOLS_ROOT / "mkdocs_suite"
+MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
+EDIT_URI_BRANCH_INDEX = 1
+
+
+def _load_repo_settings() -> tuple[str | None, str | None]:
+    """Return the configured repository URL and default branch.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Pair of ``(repo_url, branch)`` with ``None`` when unavailable.
+    """
+    if not MKDOCS_CONFIG_PATH.exists():
+        return None, None
+    repo_url: str | None = None
+    edit_uri: str | None = None
+    try:
+        for raw_line in MKDOCS_CONFIG_PATH.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("repo_url:") and repo_url is None:
+                repo_url = line.split(":", 1)[1].strip().strip("\"'")
+            if line.startswith("edit_uri:") and edit_uri is None:
+                edit_uri = line.split(":", 1)[1].strip().strip("\"'")
+    except OSError:  # pragma: no cover - defensive guard for inaccessible config
+        return None, None
+    branch: str | None = None
+    if isinstance(edit_uri, str):
+        parts = edit_uri.strip("/").split("/")
+        if parts and parts[0] == "edit" and len(parts) > EDIT_URI_BRANCH_INDEX:
+            branch = parts[EDIT_URI_BRANCH_INDEX]
+    if not branch:
+        branch = "main"
+    return (str(repo_url) if isinstance(repo_url, str) and repo_url else None, branch)
+
+
+REPO_URL, DEFAULT_BRANCH = _load_repo_settings()
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
@@ -108,6 +146,7 @@ if TYPE_CHECKING:
     DEFAULT_SEARCH_PATHS = list(_DEFAULT_SEARCH_PATHS)
     load_nav_metadata = _load_nav_metadata
 
+
 PACKAGE_ROOTS: tuple[str, ...] = (
     "kgfoundry_common",
     "docling",
@@ -126,6 +165,7 @@ PACKAGE_ROOTS: tuple[str, ...] = (
 )
 API_USAGE_FILE = Path(__file__).with_name("api_usage.json")
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
+
 
 _griffe = importlib.import_module("griffe")
 _load = cast("Callable[..., object]", _griffe.load)
@@ -172,6 +212,16 @@ class _RelationshipTables:
     bases: dict[str, list[str]]
 
 
+@dataclass(frozen=True, slots=True)
+class OperationLink:
+    """Link metadata for an OpenAPI or CLI operation."""
+
+    operation_id: str
+    href: str | None
+    interface_id: str | None
+    spec_label: str | None
+
+
 @dataclass(slots=True)
 class ModuleFacts:
     """Aggregated metadata used when rendering module pages."""
@@ -182,8 +232,9 @@ class ModuleFacts:
     classes: dict[str, list[str]]
     functions: dict[str, list[str]]
     bases: dict[str, list[str]]
-    api_usage: Mapping[str, list[str]]
+    api_usage: Mapping[str, list[OperationLink]]
     documented_modules: set[str]
+    source_paths: dict[str, Path]
 
 
 def _is_kind(obj: object, expected: str) -> bool:
@@ -303,18 +354,42 @@ def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
     return modules
 
 
-def _load_api_usage() -> dict[str, list[str]]:
-    """
-    Return optional API usage mappings for deep-linking ReDoc operations.
+def _code_permalink(relative_path: Path | None) -> str | None:
+    """Return a GitHub permalink for ``relative_path`` when configured.
 
     Returns
     -------
-    dict[str, list[str]]
-        Mapping of symbol path to related OpenAPI ``operationId`` entries.
+    str | None
+        Fully-qualified repository URL or ``None`` if linking is disabled.
+    """
+    if relative_path is None or REPO_URL is None:
+        return None
+    branch = DEFAULT_BRANCH or "main"
+    return f"{REPO_URL}/blob/{branch}/{relative_path.as_posix()}"
+
+
+def _load_api_usage() -> dict[str, list[OperationLink]]:
+    """Return optional API usage mappings for deep-linking ReDoc operations.
+
+    Returns
+    -------
+    dict[str, list[OperationLink]]
+        Mapping of symbol paths to operation references derived from JSON.
     """
     if not API_USAGE_FILE.exists():
         return {}
-    return json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    raw_mapping = json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    usage: dict[str, list[OperationLink]] = defaultdict(list)
+    for symbol, operations in raw_mapping.items():
+        if not isinstance(symbol, str):
+            continue
+        if isinstance(operations, list):
+            for op in operations:
+                op_id = str(op)
+                usage[symbol].append(OperationLink(op_id, None, None, None))
+        elif isinstance(operations, str):
+            usage[symbol].append(OperationLink(str(operations), None, None, None))
+    return usage
 
 
 def _symbol_from_handler(handler: object) -> str | None:
@@ -336,47 +411,59 @@ def _symbol_from_handler(handler: object) -> str | None:
     return f"{module}.{attribute}"
 
 
-def _registry_api_usage(registry: Mapping[str, dict[str, object]]) -> dict[str, list[str]]:
+def _registry_api_usage(
+    registry: Mapping[str, dict[str, object]],
+) -> dict[str, list[OperationLink]]:
     """Derive symbol → operation mappings from the interface registry.
 
     Returns
     -------
-    dict[str, list[str]]
-        Mapping between symbol paths and OpenAPI operation identifiers.
+    dict[str, list[OperationLink]]
+        Mapping of symbol paths to `OperationLink` records from registry data.
     """
-    mapping: dict[str, set[str]] = defaultdict(set)
-    for entry in registry.values():
+    mapping: dict[str, list[OperationLink]] = defaultdict(list)
+    for identifier, entry in registry.items():
         operations = entry.get("operations")
         if not isinstance(operations, Mapping):
             continue
+        spec_path = entry.get("spec")
+        spec_label, _ = _spec_href(spec_path)
         for op_meta in operations.values():
             if not isinstance(op_meta, Mapping):
                 continue
             handler = _symbol_from_handler(op_meta.get("handler"))
             operation_id = op_meta.get("operation_id")
-            if handler and isinstance(operation_id, str) and operation_id:
-                mapping[handler].add(operation_id)
-    return {symbol: sorted(values) for symbol, values in mapping.items()}
+            if not handler or not isinstance(operation_id, str) or not operation_id:
+                continue
+            href = _operation_href(spec_path, operation_id)
+            mapping[handler].append(OperationLink(operation_id, href, identifier, spec_label))
+    return mapping
 
 
 def _merge_api_usage(
-    file_usage: Mapping[str, list[str]], registry_usage: Mapping[str, list[str]]
-) -> dict[str, list[str]]:
-    """Merge API usage derived from JSON and registry metadata.
+    file_usage: Mapping[str, list[OperationLink]],
+    registry_usage: Mapping[str, list[OperationLink]],
+) -> dict[str, list[OperationLink]]:
+    """Merge API usage derived from JSON files and the interface registry.
 
     Returns
     -------
-    dict[str, list[str]]
-        Combined mapping where duplicate operations are de-duplicated.
+    dict[str, list[OperationLink]]
+        Combined mapping with deduplicated operation references.
     """
-    merged: dict[str, set[str]] = defaultdict(set)
+    merged: dict[str, dict[tuple[str, str | None], OperationLink]] = defaultdict(dict)
     for symbol, operations in file_usage.items():
-        for op in operations:
-            merged[symbol].add(str(op))
+        for operation in operations:
+            key = (operation.operation_id, operation.href)
+            merged[symbol][key] = operation
     for symbol, operations in registry_usage.items():
-        for op in operations:
-            merged[symbol].add(str(op))
-    return {symbol: sorted(values) for symbol, values in merged.items()}
+        for operation in operations:
+            key = (operation.operation_id, operation.href)
+            merged[symbol][key] = operation
+    return {
+        symbol: [entry for _, entry in sorted(store.items(), key=lambda item: item[0])]
+        for symbol, store in merged.items()
+    }
 
 
 def _load_registry() -> dict[str, dict[str, object]]:
@@ -439,7 +526,7 @@ def _register_member(module_path: str, member: object, tables: _RelationshipTabl
 
 
 def _build_relationships(
-    modules: Mapping[str, _GriffeModule], api_usage: Mapping[str, list[str]]
+    modules: Mapping[str, _GriffeModule], api_usage: Mapping[str, list[OperationLink]]
 ) -> ModuleFacts:
     """
     Return imports, exports, symbols, and related API usage facts.
@@ -457,10 +544,14 @@ def _build_relationships(
     )
     imports = tables.imports
     exports: dict[str, set[str]] = defaultdict(set)
+    source_paths: dict[str, Path] = {}
     for module_path, module in modules.items():
         exports[module_path].update(_module_exports(module))
         for member in module.members.values():
             _register_member(module_path, member, tables)
+        relative = getattr(module, "relative_filepath", None)
+        if isinstance(relative, Path):
+            source_paths[module_path] = relative
     imported_by: dict[str, set[str]] = defaultdict(set)
     for src, targets in imports.items():
         for target in targets:
@@ -474,6 +565,7 @@ def _build_relationships(
         bases=dict(tables.bases),
         api_usage=api_usage,
         documented_modules=set(modules.keys()),
+        source_paths=source_paths,
     )
 
 
@@ -586,11 +678,10 @@ def _operation_href(spec_path: object, operation_id: str) -> str | None:
     """
     if not operation_id:
         return None
-    sanitized = re.sub(r"[^0-9A-Za-z_]+", "_", operation_id)
     if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
-        return f"../api/openapi-cli.md#operation/{sanitized}"
+        return "../api/openapi-cli.md"
     if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
-        return f"../api/index.md#operation/{sanitized}"
+        return "../api/index.md"
     return None
 
 
@@ -617,15 +708,29 @@ def _write_related_operations(
     fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts
 ) -> None:
     """Emit related API operations for symbols in ``module_path``."""
-    used_operations: set[str] = set()
-    for symbol_path in facts.classes.get(module_path, []) + facts.functions.get(module_path, []):
+    collected: dict[tuple[str, str | None], OperationLink] = {}
+    symbol_paths = facts.classes.get(module_path, []) + facts.functions.get(module_path, [])
+    for symbol_path in symbol_paths:
         for operation in facts.api_usage.get(symbol_path, []):
-            used_operations.add(operation)
-    if not used_operations:
+            key = (operation.operation_id, operation.href)
+            collected[key] = operation
+    if not collected:
         return
-    links = ", ".join(f"`{op}`" for op in sorted(used_operations))
     fd.write("## Related API operations\n\n")
-    fd.write(f"{links}\n\n")
+    parts: list[str] = []
+    for _, operation in sorted(collected.items(), key=lambda item: item[0]):
+        label = f"`{operation.operation_id}`"
+        if operation.href:
+            label = f"[{label}]({operation.href})"
+        context: list[str] = []
+        if operation.interface_id:
+            context.append(operation.interface_id)
+        if operation.spec_label and operation.spec_label not in context:
+            context.append(operation.spec_label)
+        if context:
+            label = f"{label} ({' · '.join(context)})"
+        parts.append(label)
+    fd.write(", ".join(parts) + "\n\n")
 
 
 def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts) -> None:
@@ -705,6 +810,132 @@ def _write_interface_operations(
         fd.write("\n")
 
 
+def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
+    """Return a Mermaid class diagram for classes defined in ``module_path``.
+
+    Returns
+    -------
+    str
+        Rendered Mermaid block or an empty string when no classes exist.
+    """
+    classes = facts.classes.get(module_path, [])
+    if not classes:
+        return ""
+
+    def _alias(name: str, counter: dict[str, int]) -> str:
+        base = re.sub(r"[^0-9A-Za-z_]", "_", name.rsplit(".", maxsplit=1)[-1]) or "Class"
+        if base not in counter:
+            counter[base] = 0
+            return base
+        counter[base] += 1
+        return f"{base}_{counter[base]}"
+
+    aliases: dict[str, str] = {}
+    alias_counter: dict[str, int] = {}
+    lines = ["```mermaid", "classDiagram"]
+
+    def ensure(name: str) -> str:
+        if name not in aliases:
+            aliases[name] = _alias(name, alias_counter)
+            lines.append(f"    class {aliases[name]}")
+        return aliases[name]
+
+    for cls in sorted(classes):
+        derived = ensure(cls)
+        for base in facts.bases.get(cls, []):
+            base_alias = ensure(base)
+            lines.append(f"    {base_alias} <|-- {derived}")
+
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
+    """Return a small inline D2 neighborhood diagram for ``module_path``.
+
+    Returns
+    -------
+    str
+        Rendered D2 block highlighting local imports/importers, or an empty string.
+    """
+    outgoing = sorted(facts.imports.get(module_path, set()))
+    incoming = sorted(facts.imported_by.get(module_path, set()))
+    if not outgoing and not incoming:
+        return ""
+
+    def _link(target: str) -> str | None:
+        if target in facts.documented_modules:
+            return f"./{target}.md"
+        return None
+
+    lines = [
+        "```d2",
+        "direction: right",
+        f'"{module_path}": "{module_path}" {{ link: "./{module_path}.md" }}',
+    ]
+    for target in outgoing:
+        link = _link(target)
+        node = f'"{target}": "{target}" {{ link: "{link}" }}' if link else f'"{target}": "{target}"'
+        lines.extend([node, f'"{module_path}" -> "{target}"'])
+    for source in incoming:
+        link = _link(source)
+        node = f'"{source}": "{source}" {{ link: "{link}" }}' if link else f'"{source}": "{source}"'
+        lines.extend([node, f'"{source}" -> "{module_path}"'])
+    code_link = _code_permalink(facts.source_paths.get(module_path))
+    if code_link:
+        lines.extend(
+            [
+                f'"{module_path}_code": "{module_path} code" {{ link: "{code_link}" }}',
+                f'"{module_path}" -> "{module_path}_code" {{ style: dashed }}',
+            ]
+        )
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def _write_module_diagram_file(module_path: str, facts: ModuleFacts) -> None:
+    """Write a standalone D2 diagram for ``module_path`` to the virtual FS."""
+    d2_path = f"diagrams/modules/{module_path}.d2"
+    with mkdocs_gen_files.open(d2_path, "w") as handle:
+        handle.write("direction: right\n")
+        handle.write(
+            f'"{module_path}": "{module_path}" {{ link: "../modules/{module_path}.md" }}\n'
+        )
+        for target in sorted(facts.imports.get(module_path, [])):
+            if target in facts.documented_modules:
+                handle.write(f'"{target}": "{target}" {{ link: "../modules/{target}.md" }}\n')
+            else:
+                handle.write(f'"{target}": "{target}"\n')
+            handle.write(f'"{module_path}" -> "{target}"\n')
+        for source in sorted(facts.imported_by.get(module_path, [])):
+            if source in facts.documented_modules:
+                handle.write(f'"{source}": "{source}" {{ link: "../modules/{source}.md" }}\n')
+            else:
+                handle.write(f'"{source}": "{source}"\n')
+            handle.write(f'"{source}" -> "{module_path}"\n')
+        code_link = _code_permalink(facts.source_paths.get(module_path))
+        if code_link:
+            handle.write(f'"{module_path}_code": "{module_path} code" {{ link: "{code_link}" }}\n')
+            handle.write(f'"{module_path}" -> "{module_path}_code" {{ style: dashed }}\n')
+
+
+def _write_autorefs_examples(
+    fd: mkdocs_gen_files.files,
+    module_path: str,
+    facts: ModuleFacts,
+) -> None:
+    """Emit a short autorefs sample list to demonstrate cross-linking."""
+    class_entries = [f"- [{cls}][]" for cls in sorted(facts.classes.get(module_path, []))[:3]]
+    function_entries = [
+        f"- [{func}][]" for func in sorted(facts.functions.get(module_path, []))[:3]
+    ]
+    entries = class_entries + function_entries
+    if not entries:
+        return
+    fd.write("## Autorefs Examples\n\n")
+    fd.write("\n".join(entries) + "\n\n")
+
+
 def _write_interfaces(
     fd: mkdocs_gen_files.files,
     module_path: str,
@@ -765,6 +996,22 @@ def _render_module_page(
             summary = _first_paragraph(module)
         if summary:
             fd.write(f"{summary}\n\n")
+        source_link = _code_permalink(facts.source_paths.get(module_path))
+        if source_link:
+            fd.write(f"[:material-source-repository: View source]({source_link})\n\n")
+        mermaid = _mermaid_inheritance(module_path, facts)
+        if mermaid:
+            fd.write("## Inheritance\n\n")
+            fd.write(f"{mermaid}\n\n")
+        d2_diagram = _inline_d2_neighborhood(module_path, facts)
+        if d2_diagram:
+            fd.write("## Dependencies at a Glance\n\n")
+            fd.write(f"{d2_diagram}\n\n")
+            _write_module_diagram_file(module_path, facts)
+            fd.write(
+                f"> See the full diagram: [{module_path}](../diagrams/modules/{module_path}.d2)\n\n"
+            )
+        _write_autorefs_examples(fd, module_path, facts)
         _write_interfaces(fd, module_path, nav_meta, registry)
         _write_relationships(fd, module_path, facts)
         _write_related_operations(fd, module_path, facts)

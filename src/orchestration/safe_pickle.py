@@ -34,18 +34,19 @@ _ALLOWED_TYPES = frozenset(
 
 
 class UnsafePickleError(ValueError):
-    """Raised when pickle encounters disallowed types or suspicious patterns."""
+    """Raised when pickle encounters disallowed types or suspicious patterns.
+
+    Initializes unsafe pickle error with message and optional type name.
+
+    Parameters
+    ----------
+    message : str
+        Error description.
+    type_name : str | None, optional
+        Attempted type name that was rejected. Defaults to None.
+    """
 
     def __init__(self, message: str, type_name: str | None = None) -> None:
-        """Initialize unsafe pickle error.
-
-        Parameters
-        ----------
-        message : str
-            Error description.
-        type_name : str | None
-            Attempted type name that was rejected.
-        """
         super().__init__(message)
         self.type_name = type_name
 
@@ -59,23 +60,7 @@ class _UnpicklerProtocol(Protocol):
         encoding: str = ...,
         errors: str = ...,
         buffers: object | None = ...,
-    ) -> None:
-        """Initialize unpickler with file handle.
-
-        Parameters
-        ----------
-        file : BinaryIO
-            Binary file handle to read from.
-        fix_imports : bool, optional
-            Whether to fix imports for Python 2 compatibility.
-        encoding : str, optional
-            Text encoding for Python 2 compatibility.
-        errors : str, optional
-            Error handling mode for encoding.
-        buffers : object | None, optional
-            Buffer protocol support.
-        """
-        ...
+    ) -> None: ...
 
     def load(self) -> object:
         """Load and return unpickled object.
@@ -149,23 +134,7 @@ if TYPE_CHECKING:
             encoding: str = ...,
             errors: str = ...,
             buffers: object | None = ...,
-        ) -> None:
-            """Initialize unpickler with file handle.
-
-            Parameters
-            ----------
-            file : BinaryIO
-                Binary file handle to read from.
-            fix_imports : bool, optional
-                Whether to fix imports for Python 2 compatibility.
-            encoding : str, optional
-                Text encoding for Python 2 compatibility.
-            errors : str, optional
-                Error handling mode for encoding.
-            buffers : object | None, optional
-                Buffer protocol support.
-            """
-            ...
+        ) -> None: ...
 
         def load(self) -> object:
             """Load and return unpickled object.
@@ -210,6 +179,21 @@ class SafeUnpickler(_StdlibUnpickler):
 
     This prevents arbitrary code execution by restricting deserialization to primitive types and
     basic containers (dict, list).
+
+    Initializes safe unpickler with file handle.
+
+    Parameters
+    ----------
+    file : BinaryIO
+        Binary file handle to read from.
+    fix_imports : bool, optional
+        Whether to fix imports for Python 2 compatibility. Defaults to True.
+    encoding : str, optional
+        Text encoding for Python 2 compatibility. Defaults to "ASCII".
+    errors : str, optional
+        Error handling mode for encoding. Defaults to "strict".
+    buffers : object | None, optional
+        Buffer protocol support. Defaults to None.
     """
 
     def __init__(
@@ -221,25 +205,6 @@ class SafeUnpickler(_StdlibUnpickler):
         errors: str = "strict",
         buffers: object | None = None,
     ) -> None:
-        """Initialize safe unpickler with file handle.
-
-        Parameters
-        ----------
-        file : BinaryIO
-            Binary file handle to read from.
-        fix_imports : bool, optional
-            Whether to fix imports for Python 2 compatibility.
-            Defaults to True.
-        encoding : str, optional
-            Text encoding for Python 2 compatibility.
-            Defaults to "ASCII".
-        errors : str, optional
-            Error handling mode for encoding.
-            Defaults to "strict".
-        buffers : object | None, optional
-            Buffer protocol support.
-            Defaults to None.
-        """
         super().__init__(
             file,
             fix_imports=fix_imports,

@@ -66,6 +66,37 @@ class Doc(BaseModel):
     content_hash : str | None, optional
         SHA256 hash of document content for deduplication. Defaults to None.
 
+    Attributes
+    ----------
+    model_config : ClassVar[ConfigDict]
+        Pydantic model configuration dictionary (class variable).
+    id : Id
+        Unique document identifier (URN or other unique string).
+    openalex_id : str | None
+        OpenAlex work identifier.
+    doi : str | None
+        Digital Object Identifier (DOI).
+    arxiv_id : str | None
+        arXiv preprint identifier.
+    pmcid : str | None
+        PubMed Central identifier.
+    title : str
+        Document title.
+    authors : list[str]
+        List of author names.
+    pub_date : str | None
+        Publication date string.
+    license : str | None
+        License identifier (e.g., "CC-BY").
+    language : str | None
+        Language code (e.g., "en").
+    pdf_uri : str
+        URI or path to PDF file.
+    source : str
+        Source identifier (e.g., "openalex", "arxiv").
+    content_hash : str | None
+        SHA256 hash of document content for deduplication.
+
     Examples
     --------
     >>> from pathlib import Path
@@ -115,6 +146,21 @@ class DoctagsAsset(BaseModel):
         Model revision or version identifier.
     avg_logprob : float | None, optional
         Average log probability score from the VLM. Defaults to None.
+
+    Attributes
+    ----------
+    doc_id : Id
+        Document identifier that this doctags asset belongs to.
+    doctags_uri : str
+        URI or path to the doctags file (typically JSON or Parquet).
+    pages : int
+        Number of pages in the document.
+    vlm_model : str
+        Vision-language model identifier used to generate tags.
+    vlm_revision : str
+        Model revision or version identifier.
+    avg_logprob : float | None
+        Average log probability score from the VLM.
     """
 
     doc_id: Id
@@ -134,6 +180,23 @@ class Chunk(BaseModel):
     for visual document tags.
 
     Parameters
+    ----------
+    id : Id
+        Unique chunk identifier.
+    doc_id : Id
+        Document identifier that this chunk belongs to.
+    section : str | None
+        Section name or identifier within the document.
+    start_char : int
+        Start character offset in the original document.
+    end_char : int
+        End character offset in the original document.
+    tokens : int
+        Number of tokens in the chunk.
+    doctags_span : dict[str, int]
+        Dictionary mapping doctags page numbers to character offsets.
+
+    Attributes
     ----------
     id : Id
         Unique chunk identifier.
@@ -187,6 +250,27 @@ class LinkAssertion(BaseModel):
     features : dict[str, float], optional
         Feature vector dictionary for the link (e.g., embedding distances,
         similarity scores). Defaults to empty dictionary.
+    run_id : str
+        Run identifier that created this link assertion.
+
+    Attributes
+    ----------
+    id : Id
+        Unique link assertion identifier.
+    chunk_id : Id
+        Chunk identifier that this link refers to.
+    concept_id : Id
+        Knowledge graph concept identifier.
+    score : float
+        Link score or confidence value.
+    decision : Literal['link', 'reject', 'uncertain']
+        Decision status: 'link' (accepted), 'reject' (rejected), or
+        'uncertain' (requires review).
+    evidence_span : str | None
+        Text span from the chunk that provides evidence for the link.
+    features : dict[str, float]
+        Feature vector dictionary for the link (e.g., embedding distances,
+        similarity scores).
     run_id : str
         Run identifier that created this link assertion.
     """

@@ -134,7 +134,7 @@ class BM25Doc:
     Stores document metadata, term frequencies, and field content for BM25
     scoring. Used by both PurePythonBM25 and LuceneBM25 implementations.
 
-    Parameters
+    Attributes
     ----------
     doc_id : str
         Unique document identifier.
@@ -143,7 +143,7 @@ class BM25Doc:
     fields : dict[str, str]
         Document field content dictionary containing "title", "section", and
         "body" fields.
-    term_freqs : dict[str, int], optional
+    term_freqs : dict[str, int]
         Term frequency dictionary mapping token strings to their occurrence
         counts in this document. Defaults to empty dict.
     """
@@ -162,6 +162,9 @@ class PurePythonBM25:
     without external dependencies. Suitable for small to medium-sized indexes
     that fit in memory.
 
+    Sets up BM25 scoring parameters and initializes empty data structures
+    for documents, postings, and document frequencies.
+
     Parameters
     ----------
     index_dir : str
@@ -175,31 +178,10 @@ class PurePythonBM25:
         Document length normalization parameter. Controls the degree of length
         normalization. Values closer to 1.0 normalize more aggressively.
         Defaults to 0.4.
-    field_boosts : dict[str, float] | None, optional
+    field_boosts : Mapping[str, float] | None, optional
         Optional mapping of field names to boost weights. Fields with higher
-        boosts contribute more to relevance scores. Defaults to None (uses
-        default boosts: title=2.0, section=1.2, body=1.0).
-
-    Attributes
-    ----------
-    index_dir : str
-        Directory path for index storage.
-    k1 : float
-        Term frequency saturation parameter.
-    b : float
-        Document length normalization parameter.
-    field_boosts : dict[str, float]
-        Field boost weights dictionary.
-    df : dict[str, int]
-        Document frequency dictionary mapping tokens to document counts.
-    postings : dict[str, dict[str, int]]
-        Postings list mapping tokens to document ID → term frequency mappings.
-    docs : dict[str, BM25Doc]
-        Dictionary of indexed documents keyed by document ID.
-    N : int
-        Total number of documents in the index.
-    avgdl : float
-        Average document length across all documents.
+        boosts contribute more to relevance scores. Normalized and merged with
+        default boosts. Defaults to None (uses default boosts: title=2.0, section=1.2, body=1.0).
 
     Notes
     -----
@@ -215,24 +197,6 @@ class PurePythonBM25:
         b: float = 0.4,
         field_boosts: Mapping[str, float] | None = None,
     ) -> None:
-        """Initialize the in-memory BM25 index.
-
-        Sets up BM25 scoring parameters and initializes empty data structures
-        for documents, postings, and document frequencies.
-
-        Parameters
-        ----------
-        index_dir : str
-            Directory path where index metadata will be stored. Created if it
-            doesn't exist.
-        k1 : float, optional
-            Term frequency saturation parameter. Defaults to 0.9.
-        b : float, optional
-            Document length normalization parameter. Defaults to 0.4.
-        field_boosts : Mapping[str, float] | None, optional
-            Optional mapping of field names to boost weights. Normalized and
-            merged with default boosts. Defaults to None.
-        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b
@@ -566,36 +530,24 @@ class LuceneBM25:
     Suitable for large indexes that benefit from disk-backed storage and
     optimized search performance.
 
+    Initializes the Lucene-backed BM25 adapter with index directory and scoring parameters.
+
     Parameters
     ----------
     index_dir : str
-        Directory path where the Lucene index will be stored. Created if it
-        doesn't exist.
+        Path to the Lucene index directory on disk.
     k1 : float, optional
-        Term frequency saturation parameter. Controls how quickly term frequency
-        saturates. Higher values allow more influence from repeated terms.
+        BM25 term saturation parameter forwarded to Pyserini. Controls how quickly
+        term frequency saturates. Higher values allow more influence from repeated terms.
         Defaults to 0.9.
     b : float, optional
-        Document length normalization parameter. Controls the degree of length
+        BM25 document length normalization parameter. Controls the degree of length
         normalization. Values closer to 1.0 normalize more aggressively.
         Defaults to 0.4.
-    field_boosts : dict[str, float] | None, optional
+    field_boosts : Mapping[str, float] | None, optional
         Optional mapping of field names to boost weights. Used when composing
-        Lucene query strings with field-specific boosts. Defaults to None (uses
-        default boosts: title=2.0, section=1.2, body=1.0).
-
-    Attributes
-    ----------
-    index_dir : str
-        Directory path for Lucene index storage.
-    k1 : float
-        Term frequency saturation parameter.
-    b : float
-        Document length normalization parameter.
-    field_boosts : dict[str, float]
-        Field boost weights dictionary.
-    _searcher : LuceneSearcherProtocol | None
-        Cached Lucene searcher instance (lazy-initialized).
+        Lucene query strings with field-specific boosts. Normalized and merged with
+        default boosts. Defaults to None (uses default boosts: title=2.0, section=1.2, body=1.0).
 
     Notes
     -----
@@ -611,24 +563,6 @@ class LuceneBM25:
         b: float = 0.4,
         field_boosts: Mapping[str, float] | None = None,
     ) -> None:
-        """Initialise the Lucene-backed BM25 adapter.
-
-        Parameters
-        ----------
-        index_dir : str
-            Path to the Lucene index directory on disk.
-        k1 : float, optional
-            BM25 term saturation parameter forwarded to Pyserini. Defaults to ``0.9``.
-        b : float, optional
-            BM25 document length normalisation parameter. Defaults to ``0.4``.
-        field_boosts : dict[str, float] | None, optional
-            Optional mapping of field names to boost weights. Defaults to ``None``.
-
-        Notes
-        -----
-        Requires the optional ``pyserini`` dependency. Import errors raised by
-        helper factory loaders propagate to callers.
-        """
         self.index_dir = index_dir
         self.k1 = k1
         self.b = b

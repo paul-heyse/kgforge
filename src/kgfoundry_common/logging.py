@@ -144,7 +144,7 @@ class LogContextExtra:
 
         Returns
         -------
-        LogContextExtra
+        Self
             New instance with updated correlation_id.
         """
         return replace(self, correlation_id=correlation_id)
@@ -159,7 +159,7 @@ class LogContextExtra:
 
         Returns
         -------
-        LogContextExtra
+        Self
             New instance with updated operation.
         """
         return replace(self, operation=operation)
@@ -174,7 +174,7 @@ class LogContextExtra:
 
         Returns
         -------
-        LogContextExtra
+        Self
             New instance with updated status.
         """
         return replace(self, status=status)
@@ -189,7 +189,7 @@ class LogContextExtra:
 
         Returns
         -------
-        LogContextExtra
+        Self
             New instance with updated duration_ms.
         """
         return replace(self, duration_ms=duration_ms)
@@ -339,7 +339,24 @@ if TYPE_CHECKING:
     from types import TracebackType
 
     class _LoggerAdapterBase:  # pragma: no cover - typing helper
-        """Typing helper matching logging.LoggerAdapter interface."""
+        """Typing helper matching logging.LoggerAdapter interface.
+
+        Initializes logger adapter with base logger and structured fields.
+
+        Parameters
+        ----------
+        logger : logging.Logger
+            Base logger instance.
+        extra : LogContextExtra | Mapping[str, object] | None, optional
+            Structured fields to inject into log entries.
+
+        Attributes
+        ----------
+        logger : logging.Logger
+            Base logger instance.
+        extra : LogContextExtra | Mapping[str, object] | None
+            Structured fields to inject into log entries.
+        """
 
         logger: logging.Logger
         extra: LogContextExtra | Mapping[str, object] | None
@@ -348,17 +365,7 @@ if TYPE_CHECKING:
             self,
             logger: logging.Logger,
             extra: LogContextExtra | Mapping[str, object] | None,
-        ) -> None:
-            """Initialize logger adapter.
-
-            Parameters
-            ----------
-            logger : logging.Logger
-                Base logger instance.
-            extra : LogContextExtra | Mapping[str, object] | None, optional
-                Structured fields to inject into log entries.
-            """
-            ...
+        ) -> None: ...
 
 else:
     _LoggerAdapterBase = logging.LoggerAdapter
@@ -379,6 +386,11 @@ class LoggerAdapter(_LoggerAdapterBase):
     extra : LogContextExtra | Mapping[str, object] | None, optional
         Structured fields to inject into log entries. Can be a LogContextExtra
         frozen dataclass or dict of fields. Defaults to None.
+
+    Attributes
+    ----------
+    logger : logging.Logger
+        Base logger instance to wrap.
 
     Examples
     --------
@@ -885,6 +897,8 @@ class CorrelationContext:
     cross-contamination between concurrent requests. Automatically restores
     the previous correlation ID when the context exits.
 
+    Initializes correlation context with correlation ID.
+
     Parameters
     ----------
     correlation_id : str | None
@@ -902,13 +916,6 @@ class CorrelationContext:
     """
 
     def __init__(self, correlation_id: str | None) -> None:
-        """Initialize correlation context.
-
-        Parameters
-        ----------
-        correlation_id : str | NoneType
-            Correlation ID to set in context (or None to clear).
-        """
         self.correlation_id = correlation_id
         self._token: contextvars.Token[str | None] | None = None
 
@@ -917,7 +924,7 @@ class CorrelationContext:
 
         Returns
         -------
-        CorrelationContext
+        Self
             Self for use as context manager.
         """
         self._token = _correlation_id.set(self.correlation_id)
@@ -937,7 +944,7 @@ class CorrelationContext:
             Exception type (if any).
         exc_val : BaseException | None
             Exception value (if any).
-        exc_tb : object
+        exc_tb : TracebackType | None
             Exception traceback (if any).
         """
         if self._token is not None:
@@ -946,20 +953,21 @@ class CorrelationContext:
 
 
 class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
-    """Context manager implementation for `with_fields`."""
+    """Context manager implementation for `with_fields`.
+
+    Initializes context manager with logger and fields.
+
+    Parameters
+    ----------
+    logger : logging.Logger | LoggerAdapter
+        Base logger to wrap (may already be an adapter).
+    fields : Mapping[str, object]
+        Structured fields to inject into log entries.
+    """
 
     def __init__(
         self, logger: logging.Logger | LoggerAdapter, fields: Mapping[str, object]
     ) -> None:
-        """Initialize context manager with logger and fields.
-
-        Parameters
-        ----------
-        logger : logging.Logger | LoggerAdapter
-            Base logger to wrap (may already be an adapter).
-        fields : Mapping[str, object]
-            Structured fields to inject into log entries.
-        """
         self._logger = logger
         self._fields = dict(fields)
         self._token: contextvars.Token[str | None] | None = None
@@ -1076,10 +1084,11 @@ class _DefaultLoggingCache:
 
     This class provides a simple cache for logging formatters and configuration. It implements the
     LoggingCache protocol and can be retrieved via get_logging_cache().
+
+    Initializes the logging cache with empty formatter cache.
     """
 
     def __init__(self) -> None:
-        """Initialize the logging cache."""
         self._formatter_cache: JsonFormatter | None = None
 
     def get_formatter(self) -> JsonFormatter:

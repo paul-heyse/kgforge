@@ -264,16 +264,15 @@ class SubprocessTimeoutError(TimeoutError):
     ----------
     message : str
         Error description.
-    command : list[str]
+    command : list[str] | None, optional
         The command that timed out.
-    timeout_seconds : int
+    timeout_seconds : int | None, optional
         The timeout that was configured.
     """
 
     def __init__(
         self, message: str, command: list[str] | None = None, timeout_seconds: int | None = None
     ) -> None:
-        """Initialize subprocess timeout error."""
         super().__init__(message)
         self.command = command
         self.timeout_seconds = timeout_seconds
@@ -296,7 +295,6 @@ class SubprocessError(RuntimeError):
     def __init__(
         self, message: str, returncode: int | None = None, stderr: str | None = None
     ) -> None:
-        """Initialize subprocess error."""
         super().__init__(message)
         self.returncode = returncode
         self.stderr = stderr
@@ -317,7 +315,7 @@ def run_subprocess(
     cmd : list[str]
         Command and arguments to execute.
         Command arguments are NOT shell-interpreted; each arg is literal.
-    timeout : int, optional
+    timeout : int | None, optional
         Maximum execution time in seconds.
         If None, defaults to DEFAULT_TIMEOUT.
         Must be between MIN_TIMEOUT and MAX_TIMEOUT.
@@ -457,6 +455,11 @@ def spawn_text_process(
     -------
     TextProcess
         Text process instance.
+
+    Raises
+    ------
+    ToolExecutionError
+        If command is empty or command validation fails.
     """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(

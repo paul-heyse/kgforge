@@ -73,6 +73,17 @@ class SpladeDoc:
         Section name or identifier within the document.
     text : str
         Text content of the chunk.
+
+    Attributes
+    ----------
+    chunk_id : str
+        Unique identifier for the chunk.
+    doc_id : str
+        Document identifier that this chunk belongs to.
+    section : str
+        Section name or identifier within the document.
+    text : str
+        Text content of the chunk.
     """
 
     chunk_id: str
@@ -107,23 +118,6 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """Initialize the SPLADE index and load documents from DuckDB.
-
-        Connects to the DuckDB catalog, loads document chunks from the
-        specified or latest chunks dataset, and builds the document frequency
-        index for search.
-
-        Parameters
-        ----------
-        db_path : str
-            Path to DuckDB catalog database file.
-        chunks_dataset_root : str | None, optional
-            Optional override path to chunks dataset root. If None, uses the
-            latest chunks dataset from the catalog. Defaults to None.
-        sparse_root : str | None, optional
-            Optional sparse embeddings root (retained for interface compatibility).
-            Currently unused. Defaults to None.
-        """
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
         self.docs: list[SpladeDoc] = []
