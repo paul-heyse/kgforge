@@ -144,7 +144,9 @@ class PathlibTransformer(cst.CSTTransformer):
                     self.needs_pathlib_import = True
         return True
 
-    def leave_call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.BaseExpression:
+    def leave_Call(  # noqa: N802
+        self, original_node: cst.Call, updated_node: cst.Call
+    ) -> cst.BaseExpression:
         """Apply call rewrites when exiting a Call node.
 
         Parameters
@@ -161,6 +163,16 @@ class PathlibTransformer(cst.CSTTransformer):
         """
         replacement = self._transform_call(original_node)
         return replacement if replacement is not None else updated_node
+
+    def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:  # noqa: N802
+        """Apply with-statement rewrites when exiting a ``with`` block.
+
+        Returns
+        -------
+        cst.With
+            Potentially transformed with statement node.
+        """
+        return self._transform_with(original_node, updated_node)
 
     def _transform_makedirs(self, node: cst.Call) -> cst.BaseExpression | None:
         if not (

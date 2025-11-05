@@ -458,9 +458,10 @@ def spawn_text_process(
 
     Raises
     ------
-    ToolExecutionError
+    Exception
         If command is empty or command validation fails. The actual exception
-        type is determined by the tools surface (raised via tool_execution_error_ctor).
+        type is determined by the tools surface and is raised via the
+        tool_execution_error_ctor callable.
     """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(

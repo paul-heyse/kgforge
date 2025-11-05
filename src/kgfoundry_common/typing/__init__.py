@@ -58,10 +58,10 @@ class _Comparable(Protocol):
         other : _Comparable
             Other object to compare.
 
-        Returns
-        -------
-        bool
-            True if self < other.
+        Raises
+        ------
+        NotImplementedError
+            This is a protocol stub that must be implemented by concrete classes.
         """
         _protocol_stub("__lt__", self, other)
 

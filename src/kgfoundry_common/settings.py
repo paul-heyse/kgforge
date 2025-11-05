@@ -147,7 +147,7 @@ class RuntimeSettings(BaseSettings):
         If settings validation fails.
     """
 
-    model_config = SettingsConfigDict(
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_prefix="KGFOUNDRY_",
         env_nested_delimiter="__",
         extra="forbid",

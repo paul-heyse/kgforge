@@ -143,7 +143,11 @@ class AppSettings(BaseSettings):
         le=3600,
     )
 
-    model_config = {"frozen": True, "case_sensitive": False, "populate_by_name": True}
+    model_config: ClassVar[SettingsConfigDict] = {
+        "frozen": True,
+        "case_sensitive": False,
+        "populate_by_name": True,
+    }
 
     @classmethod
     def model_validate(  # noqa: PLR0913

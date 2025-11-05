@@ -13,11 +13,6 @@ def validate_artifacts() -> dict[str, object]:
     This is the new public API for artifact validation that uses typed
     configuration for consistency with other toolchain operations.
 
-    Returns
-    -------
-    dict[str, object]
-        Validation results as a dictionary (currently raises NotImplementedError).
-
     Raises
     ------
     NotImplementedError

@@ -94,6 +94,27 @@ class FaissAdapterSettings:
     a :class:`FaissAdapter` with consistent defaults and validation. Inline
     attribute docstrings describe alias usage for documentation alignment.
 
+    Attributes
+    ----------
+    db_path : str
+        DuckDB registry or Parquet vector path.
+    index_path : str
+        Filesystem path for the built index.
+    factory : str
+        FAISS factory string (e.g., ``"OPQ64,IVF8192,PQ64"``).
+    metric : str
+        Similarity metric (``"ip"`` or ``"l2"``).
+    nprobe : int
+        IVF search parameter ``nprobe``.
+    use_gpu : bool
+        Enable GPU acceleration flag.
+    use_cuvs : bool
+        Enable cuVS acceleration flag.
+    gpu_devices : tuple[int, ...]
+        GPU device identifiers.
+    timeout_seconds : int
+        Build timeout in seconds.
+
     Raises
     ------
     ValueError

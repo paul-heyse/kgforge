@@ -148,11 +148,6 @@ except ImportError:  # pragma: no cover - optional dependency
         request : RequestProtocol | None, optional
             Request instance (ignored).
 
-        Returns
-        -------
-        JSONResponseProtocol
-            Never returns; always raises RuntimeError.
-
         Raises
         ------
         RuntimeError
