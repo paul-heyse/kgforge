@@ -42,7 +42,13 @@ class CheckStatus:
     details: str | None = None
 
     def to_row(self) -> str:
-        """Render the check outcome as a markdown table row."""
+        """Render the check outcome as a markdown table row.
+
+        Returns
+        -------
+        str
+            Markdown table row string.
+        """
         icon = STATUS_ICONS[self.status]
         description = f"{icon}"
         if self.details:
@@ -88,7 +94,18 @@ _CODEMOD_LOG_PATTERN = re.compile(r"^(?P<stem>.+?)(?:_r(?P<run>\d+))?\.log$")
 
 
 def _codemod_log_sort_key(filename: str) -> tuple[str, int, str]:
-    """Return a natural sort key for codemod log filenames."""
+    """Return a natural sort key for codemod log filenames.
+
+    Parameters
+    ----------
+    filename : str
+        Filename to sort.
+
+    Returns
+    -------
+    tuple[str, int, str]
+        (stem, run_number, filename) sort key tuple.
+    """
     match = _CODEMOD_LOG_PATTERN.match(filename)
     if match is None:
         return (filename, -1, filename)
@@ -99,7 +116,18 @@ def _codemod_log_sort_key(filename: str) -> tuple[str, int, str]:
 
 
 def collect_artifact_snapshot(base_path: Path | None = None) -> ArtifactSnapshot:
-    """Inspect ``base_path`` and report which build artifacts exist."""
+    """Inspect ``base_path`` and report which build artifacts exist.
+
+    Parameters
+    ----------
+    base_path : Path | None
+        Base directory to inspect (None uses current directory).
+
+    Returns
+    -------
+    ArtifactSnapshot
+        Snapshot of artifact availability.
+    """
     root = base_path or Path.cwd()
     coverage_xml = (root / "coverage.xml").is_file()
     coverage_html = (root / "htmlcov/index.html").is_file()
@@ -136,7 +164,18 @@ ArtifactEntryStrategy = Callable[[ArtifactSnapshot], list[str]]
 
 
 def _generate_test_result_entries(snapshot: ArtifactSnapshot) -> list[str]:
-    """Generate entries for test result artifacts."""
+    """Generate entries for test result artifacts.
+
+    Parameters
+    ----------
+    snapshot : ArtifactSnapshot
+        Artifact snapshot.
+
+    Returns
+    -------
+    list[str]
+        List of markdown entry strings.
+    """
     entries: list[str] = []
     if snapshot.coverage_xml:
         entries.append("- ✅ Coverage XML: `coverage.xml`")
@@ -150,7 +189,18 @@ def _generate_test_result_entries(snapshot: ArtifactSnapshot) -> list[str]:
 
 
 def _generate_documentation_entries(snapshot: ArtifactSnapshot) -> list[str]:
-    """Generate entries for documentation artifacts."""
+    """Generate entries for documentation artifacts.
+
+    Parameters
+    ----------
+    snapshot : ArtifactSnapshot
+        Artifact snapshot.
+
+    Returns
+    -------
+    list[str]
+        List of markdown entry strings.
+    """
     entries: list[str] = []
     if snapshot.docs_build:
         entries.append("- ✅ Docs build: `docs/_build/`")
@@ -164,7 +214,18 @@ def _generate_documentation_entries(snapshot: ArtifactSnapshot) -> list[str]:
 
 
 def _generate_schema_entries(snapshot: ArtifactSnapshot) -> list[str]:
-    """Generate entries for schema artifacts."""
+    """Generate entries for schema artifacts.
+
+    Parameters
+    ----------
+    snapshot : ArtifactSnapshot
+        Artifact snapshot.
+
+    Returns
+    -------
+    list[str]
+        List of markdown entry strings.
+    """
     entries = [
         "- ✅ Schema directory exists" if snapshot.schema_dir else "- ⚪ Schema directory missing"
     ]
@@ -174,7 +235,18 @@ def _generate_schema_entries(snapshot: ArtifactSnapshot) -> list[str]:
 
 
 def _generate_build_entries(snapshot: ArtifactSnapshot) -> list[str]:
-    """Generate entries for build artifacts."""
+    """Generate entries for build artifacts.
+
+    Parameters
+    ----------
+    snapshot : ArtifactSnapshot
+        Artifact snapshot.
+
+    Returns
+    -------
+    list[str]
+        List of markdown entry strings.
+    """
     entries: list[str] = []
     if snapshot.dist_wheels:
         entries.append(f"- ✅ Wheels: {snapshot.dist_wheels} file(s)")
@@ -225,7 +297,20 @@ class SummaryGenerator:
         snapshot: ArtifactSnapshot | None = None,
         checks: Sequence[CheckStatus] | None = None,
     ) -> str:
-        """Generate PR summary markdown."""
+        """Generate PR summary markdown.
+
+        Parameters
+        ----------
+        snapshot : ArtifactSnapshot | None
+            Artifact snapshot (None collects automatically).
+        checks : Sequence[CheckStatus] | None
+            Check statuses to include.
+
+        Returns
+        -------
+        str
+            Generated markdown summary.
+        """
         lines: list[str] = ["# Quality Gates Summary", ""]
         artifact_snapshot = snapshot or collect_artifact_snapshot()
 
@@ -267,7 +352,20 @@ def generate_summary(
     snapshot: ArtifactSnapshot | None = None,
     checks: Sequence[CheckStatus] | None = None,
 ) -> str:
-    """Generate PR summary markdown."""
+    """Generate PR summary markdown.
+
+    Parameters
+    ----------
+    snapshot : ArtifactSnapshot | None
+        Artifact snapshot (None collects automatically).
+    checks : Sequence[CheckStatus] | None
+        Check statuses to include.
+
+    Returns
+    -------
+    str
+        Generated markdown summary.
+    """
     generator = SummaryGenerator()
     return generator.generate(snapshot=snapshot, checks=checks)
 
@@ -288,7 +386,18 @@ class SummaryWriter:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Generate GitHub Actions step summary."""
+    """Generate GitHub Actions step summary.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (unused, provided for compatibility).
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     del argv
     summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
     summary = generate_summary()

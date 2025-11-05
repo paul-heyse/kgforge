@@ -198,7 +198,20 @@ class DataclassFieldDocPlugin(TransformerPlugin):
         del self, context
 
     def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
-        """Populate dataclass parameter metadata for ``payload``."""
+        """Populate dataclass parameter metadata for ``payload``.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin context.
+        payload : SemanticResult
+            Semantic result to process.
+
+        Returns
+        -------
+        SemanticResult
+            Updated semantic result with dataclass field metadata, or original if not applicable.
+        """
         if payload.symbol.kind != "class":
             return payload
         if not self._decorators_indicate_dataclass(payload.symbol.decorators):
@@ -222,7 +235,20 @@ class DataclassFieldDocPlugin(TransformerPlugin):
 
     @staticmethod
     def _collect_fields(path: Path, module: str) -> dict[str, list[_FieldInfo]]:
-        """Parse ``path`` and return dataclass field metadata keyed by qualified name."""
+        """Parse ``path`` and return dataclass field metadata keyed by qualified name.
+
+        Parameters
+        ----------
+        path : Path
+            File path to parse.
+        module : str
+            Module name for context.
+
+        Returns
+        -------
+        dict[str, list[_FieldInfo]]
+            Dictionary mapping qualified class names to field metadata lists.
+        """
         try:
             source = path.read_text(encoding="utf-8")
         except OSError:  # pragma: no cover - non-readable file
@@ -237,7 +263,20 @@ class DataclassFieldDocPlugin(TransformerPlugin):
 
     @staticmethod
     def _apply_fields(result: SemanticResult, fields: list[_FieldInfo]) -> SemanticResult:
-        """Return ``result`` updated with dataclass field documentation."""
+        """Return ``result`` updated with dataclass field documentation.
+
+        Parameters
+        ----------
+        result : SemanticResult
+            Semantic result to update.
+        fields : list[_FieldInfo]
+            Dataclass field metadata.
+
+        Returns
+        -------
+        SemanticResult
+            Updated semantic result with field-based parameter documentation.
+        """
         schema = result.schema
         existing = {parameter.name: parameter for parameter in schema.parameters}
         field_names = {field.name for field in fields}
@@ -279,7 +318,20 @@ class DataclassFieldDocPlugin(TransformerPlugin):
 
 
 def collect_dataclass_field_names(path: Path, module: str) -> dict[str, list[str]]:
-    """Return dataclass field names keyed by fully-qualified class name."""
+    """Return dataclass field names keyed by fully-qualified class name.
+
+    Parameters
+    ----------
+    path : Path
+        File path to parse.
+    module : str
+        Module name for context.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Dictionary mapping qualified class names to lists of field names.
+    """
     try:
         source = path.read_text(encoding="utf-8")
     except OSError:  # pragma: no cover - file may not exist

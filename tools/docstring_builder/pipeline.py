@@ -80,7 +80,18 @@ def _repo_relative_path(path: Path) -> str:
 
 
 def _coerce_int(value: object) -> int:
-    """Return ``value`` coerced to ``int`` when possible."""
+    """Return ``value`` coerced to ``int`` when possible.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce to integer.
+
+    Returns
+    -------
+    int
+        Coerced integer value, or 0 if coercion fails.
+    """
     if isinstance(value, bool):
         return int(value)
     if isinstance(value, int):
@@ -212,7 +223,18 @@ class PipelineRunner:
         self._cfg = config
 
     def run(self, files: Iterable[Path]) -> DocstringBuildResult:
-        """Execute the pipeline for the provided file set."""
+        """Execute the pipeline for the provided file set.
+
+        Parameters
+        ----------
+        files : Iterable[Path]
+            File paths to process.
+
+        Returns
+        -------
+        DocstringBuildResult
+            Build result with exit status, metrics, and outputs.
+        """
         files_list = list(files)
         jobs = self._resolve_jobs(self._cfg.request.jobs)
         state = PipelineState(status_counts=Counter())
@@ -236,14 +258,36 @@ class PipelineRunner:
 
     @staticmethod
     def _resolve_jobs(jobs: int) -> int:
-        """Determine the number of worker jobs to use."""
+        """Determine the number of worker jobs to use.
+
+        Parameters
+        ----------
+        jobs : int
+            Requested number of jobs (0 means auto-detect).
+
+        Returns
+        -------
+        int
+            Number of worker jobs to use (at least 1).
+        """
         if jobs <= 0:
             return max(1, os.cpu_count() or 1)
         return jobs
 
     @staticmethod
     def _repo_label(path: Path) -> str:
-        """Return ``path`` relative to ``REPO_ROOT`` when possible."""
+        """Return ``path`` relative to ``REPO_ROOT`` when possible.
+
+        Parameters
+        ----------
+        path : Path
+            File path to label.
+
+        Returns
+        -------
+        str
+            Relative path string, or absolute path if not under repo root.
+        """
         return _repo_relative_path(path)
 
     def _process_files(self, files: Sequence[Path], jobs: int, state: PipelineState) -> None:
@@ -293,7 +337,20 @@ class PipelineRunner:
     def _ordered_outcomes(
         self, files: Sequence[Path], jobs: int
     ) -> Iterable[tuple[Path, FileOutcome]]:
-        """Process files in order, respecting job count."""
+        """Process files in order, respecting job count.
+
+        Parameters
+        ----------
+        files : Sequence[Path]
+            File paths to process.
+        jobs : int
+            Number of worker jobs (1 for serial execution).
+
+        Yields
+        ------
+        tuple[Path, FileOutcome]
+            Tuple of (file_path, outcome) for each processed file.
+        """
         if jobs <= 1:
             for file_path in files:
                 yield file_path, self._cfg.file_processor.process(file_path)
@@ -372,7 +429,18 @@ class PipelineRunner:
                 state.status_counts[self._cfg.violation_status] += 1
 
     def _resolve_exit_status(self, status_counts: Counter[ExitStatus]) -> ExitStatus:
-        """Determine the exit status from counts."""
+        """Determine the exit status from counts.
+
+        Parameters
+        ----------
+        status_counts : Counter[ExitStatus]
+            Counts of each exit status.
+
+        Returns
+        -------
+        ExitStatus
+            Highest priority exit status, or SUCCESS if all counts are zero.
+        """
         for status in (
             self._cfg.error_status,
             self._cfg.config_status,
@@ -384,7 +452,18 @@ class PipelineRunner:
         return self._cfg.success_status
 
     def _map_docfacts_status(self, status: str) -> ExitStatus:
-        """Map DocFacts status string to ExitStatus enum."""
+        """Map DocFacts status string to ExitStatus enum.
+
+        Parameters
+        ----------
+        status : str
+            DocFacts status string (e.g., "success", "violation").
+
+        Returns
+        -------
+        ExitStatus
+            Corresponding exit status enum value.
+        """
         if status == "success":
             return self._cfg.success_status
         if status in {"violation", "failure"}:
@@ -396,7 +475,20 @@ class PipelineRunner:
         return self._cfg.error_status
 
     def _build_file_report(self, file_path: Path, outcome: FileOutcome) -> FileReport:
-        """Build a file report for JSON output."""
+        """Build a file report for JSON output.
+
+        Parameters
+        ----------
+        file_path : Path
+            File path that was processed.
+        outcome : FileOutcome
+            Processing outcome for the file.
+
+        Returns
+        -------
+        FileReport
+            File report dictionary for JSON output.
+        """
         report: FileReport = {
             "path": self._repo_label(file_path),
             "status": self._cfg.status_from_exit(outcome.status),
@@ -418,7 +510,22 @@ class PipelineRunner:
         state: PipelineState,
         duration: float,
     ) -> Mapping[str, object]:
-        """Build the run summary for observability."""
+        """Build the run summary for observability.
+
+        Parameters
+        ----------
+        files : Sequence[Path]
+            Files that were considered.
+        state : PipelineState
+            Accumulated pipeline state.
+        duration : float
+            Execution duration in seconds.
+
+        Returns
+        -------
+        Mapping[str, object]
+            Summary dictionary with counts and metrics.
+        """
         return {
             "considered": len(files),
             "processed": state.processed_count,
@@ -450,7 +557,26 @@ class PipelineRunner:
         policy_report: PolicyReport,
         files_list: Sequence[Path],
     ) -> DocstringBuildResult:
-        """Assemble the final result from accumulated state."""
+        """Assemble the final result from accumulated state.
+
+        Parameters
+        ----------
+        exit_status : ExitStatus
+            Final exit status.
+        duration : float
+            Execution duration in seconds.
+        state : PipelineState
+            Accumulated pipeline state.
+        policy_report : PolicyReport
+            Policy evaluation report.
+        files_list : Sequence[Path]
+            Files that were processed.
+
+        Returns
+        -------
+        DocstringBuildResult
+            Complete build result with all outputs.
+        """
         command = self._cfg.request.command or "unknown"
 
         cache_summary = self._build_cache_summary(state)
@@ -545,7 +671,18 @@ class PipelineRunner:
 
     @staticmethod
     def _build_cache_summary(state: PipelineState) -> CacheSummary:
-        """Build the cache summary for the manifest."""
+        """Build the cache summary for the manifest.
+
+        Parameters
+        ----------
+        state : PipelineState
+            Pipeline state with cache statistics.
+
+        Returns
+        -------
+        CacheSummary
+            Cache summary dictionary.
+        """
         exists = CACHE_PATH.exists()
         summary: CacheSummary = {
             "path": str(CACHE_PATH),
@@ -563,7 +700,18 @@ class PipelineRunner:
 
     @staticmethod
     def _build_input_hashes(files: Sequence[Path]) -> dict[str, InputHash]:
-        """Build input file hashes for the manifest."""
+        """Build input file hashes for the manifest.
+
+        Parameters
+        ----------
+        files : Sequence[Path]
+            File paths to hash.
+
+        Returns
+        -------
+        dict[str, InputHash]
+            Dictionary mapping relative paths to hash metadata.
+        """
         hashes: dict[str, InputHash] = {}
         for path in files:
             rel = _repo_relative_path(path)
@@ -581,7 +729,18 @@ class PipelineRunner:
 
     @staticmethod
     def _build_dependency_map(files: Sequence[Path]) -> dict[str, list[str]]:
-        """Build the dependency map for the manifest."""
+        """Build the dependency map for the manifest.
+
+        Parameters
+        ----------
+        files : Sequence[Path]
+            File paths to analyze.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            Dictionary mapping file paths to their dependent file paths.
+        """
         mapping: dict[str, list[str]] = {}
         for path in files:
             key = _repo_relative_path(path)
@@ -590,7 +749,13 @@ class PipelineRunner:
         return mapping
 
     def _build_plugin_report(self) -> PluginReport:
-        """Build the plugin report for the manifest."""
+        """Build the plugin report for the manifest.
+
+        Returns
+        -------
+        PluginReport
+            Plugin report dictionary with enabled/available/disabled/skipped lists.
+        """
         if self._cfg.plugin_manager is None:
             return {"enabled": [], "available": [], "disabled": [], "skipped": []}
         return {
@@ -609,7 +774,26 @@ class PipelineRunner:
         policy_report: PolicyReport,
         diff_links: Mapping[str, str],
     ) -> dict[str, object]:
-        """Build the observability payload for storage."""
+        """Build the observability payload for storage.
+
+        Parameters
+        ----------
+        exit_status : ExitStatus
+            Final exit status.
+        summary : Mapping[str, object]
+            Run summary dictionary.
+        errors : Sequence[ErrorReport]
+            Error reports (limited to max).
+        policy_report : PolicyReport
+            Policy evaluation report.
+        diff_links : Mapping[str, str]
+            Diff artifact links.
+
+        Returns
+        -------
+        dict[str, object]
+            Observability payload dictionary.
+        """
         limited_errors = list(errors)[:OBSERVABILITY_MAX_ERRORS]
         payload: dict[str, object] = {
             "generated_at": datetime.datetime.now(datetime.UTC).isoformat(),
@@ -642,7 +826,18 @@ class PipelineRunner:
         self,
         context: CliResultContext,
     ) -> CliResult | None:
-        """Build the CLI result for JSON output."""
+        """Build the CLI result for JSON output.
+
+        Parameters
+        ----------
+        context : CliResultContext
+            Context containing exit status, duration, and state.
+
+        Returns
+        -------
+        CliResult or None
+            CLI result dictionary if JSON output is enabled, None otherwise.
+        """
         if not self._cfg.request.json_output:
             return None
 
@@ -711,7 +906,18 @@ class PipelineRunner:
 
     @classmethod
     def _build_docfacts_report(cls, *, docfacts_checked: bool) -> DocfactsReport | None:
-        """Build the docfacts report for JSON output."""
+        """Build the docfacts report for JSON output.
+
+        Parameters
+        ----------
+        docfacts_checked : bool
+            Whether DocFacts were checked during the run.
+
+        Returns
+        -------
+        DocfactsReport or None
+            DocFacts report dictionary if checked, None otherwise.
+        """
         if not docfacts_checked:
             return None
         report: DocfactsReport = {

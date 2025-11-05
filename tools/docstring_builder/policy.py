@@ -31,7 +31,23 @@ class PolicyAction(StrEnum):
 
     @classmethod
     def parse(cls, value: str) -> PolicyAction:
-        """Parse ``value`` into a :class:`PolicyAction`."""
+        """Parse ``value`` into a :class:`PolicyAction`.
+
+        Parameters
+        ----------
+        value : str
+            Policy action string (e.g., "error", "warn", "autofix").
+
+        Returns
+        -------
+        PolicyAction
+            Parsed policy action enum value.
+
+        Raises
+        ------
+        PolicyConfigurationError
+            If the value is not a valid policy action.
+        """
         lowered = value.strip().lower()
         try:
             return cls(lowered)
@@ -50,7 +66,18 @@ class PolicyException:
     justification: str
 
     def is_active(self, today: _dt.date) -> bool:
-        """Return ``True`` when the exception has not expired."""
+        """Return ``True`` when the exception has not expired.
+
+        Parameters
+        ----------
+        today : _dt.date
+            Current date to compare against expiration.
+
+        Returns
+        -------
+        bool
+            True if exception is still active, False if expired.
+        """
         return self.expires_on >= today
 
 
@@ -68,7 +95,18 @@ class PolicySettings:
     exceptions: list[PolicyException] = field(default_factory=list)
 
     def action_for(self, rule: str) -> PolicyAction:
-        """Return the configured action for ``rule``."""
+        """Return the configured action for ``rule``.
+
+        Parameters
+        ----------
+        rule : str
+            Rule name (e.g., "coverage", "missing-params").
+
+        Returns
+        -------
+        PolicyAction
+            Configured action for the rule, or ERROR if not found.
+        """
         mapping: dict[str, PolicyAction] = {
             "coverage": self.coverage_action,
             "missing-params": self.missing_params_action,
@@ -91,7 +129,13 @@ class PolicyViolation:
 
     @property
     def fatal(self) -> bool:
-        """Return ``True`` when the violation is considered fatal."""
+        """Return ``True`` when the violation is considered fatal.
+
+        Returns
+        -------
+        bool
+            True if violation action is ERROR, False otherwise.
+        """
         return self.action == PolicyAction.ERROR
 
 
@@ -123,6 +167,18 @@ _MIN_SUMMARY_WORD_LENGTH = 3
 
 
 def _read_pyproject_policy(repo_root: Path) -> Mapping[str, object]:
+    """Read policy configuration from pyproject.toml.
+
+    Parameters
+    ----------
+    repo_root : Path
+        Repository root directory.
+
+    Returns
+    -------
+    Mapping[str, object]
+        Policy configuration dictionary from pyproject.toml.
+    """
     pyproject = repo_root / "pyproject.toml"
     if not pyproject.exists():
         return {}
@@ -135,6 +191,23 @@ def _read_pyproject_policy(repo_root: Path) -> Mapping[str, object]:
 
 
 def _parse_exceptions(entries: Iterable[Mapping[str, object]]) -> list[PolicyException]:
+    """Parse exception entries from configuration.
+
+    Parameters
+    ----------
+    entries : Iterable[Mapping[str, object]]
+        Exception entry dictionaries.
+
+    Returns
+    -------
+    list[PolicyException]
+        Parsed exception instances.
+
+    Raises
+    ------
+    PolicyConfigurationError
+        If exception entries are malformed.
+    """
     parsed: list[PolicyException] = []
     for entry in entries:
         symbol = str(entry.get("symbol", "")).strip()
@@ -161,10 +234,36 @@ def _parse_exceptions(entries: Iterable[Mapping[str, object]]) -> list[PolicyExc
 
 
 def _normalized_key(key: str) -> str:
+    """Normalize a configuration key name.
+
+    Parameters
+    ----------
+    key : str
+        Raw configuration key.
+
+    Returns
+    -------
+    str
+        Normalized key (lowercase, underscores instead of hyphens).
+    """
     return key.strip().replace("-", "_").lower()
 
 
 def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, object]) -> None:
+    """Apply configuration mapping to policy settings.
+
+    Parameters
+    ----------
+    settings : PolicySettings
+        Settings instance to modify.
+    mapping : Mapping[str, object]
+        Configuration key-value pairs.
+
+    Raises
+    ------
+    PolicyConfigurationError
+        If configuration values are invalid or keys are unknown.
+    """
     for raw_key, value in sorted(mapping.items(), key=lambda item: str(item[0])):
         key = _normalized_key(str(raw_key))
         if key == "coverage_threshold":
@@ -190,6 +289,23 @@ def _apply_mapping(settings: PolicySettings, mapping: Mapping[str, object]) -> N
 
 
 def _parse_override_pairs(raw: str) -> dict[str, str]:
+    """Parse override key=value pairs from a string.
+
+    Parameters
+    ----------
+    raw : str
+        Comma-separated key=value pairs.
+
+    Returns
+    -------
+    dict[str, str]
+        Dictionary mapping normalized keys to values.
+
+    Raises
+    ------
+    PolicyConfigurationError
+        If override pairs are malformed.
+    """
     overrides: dict[str, str] = {}
     for chunk in raw.split(","):
         if not chunk.strip():
@@ -203,6 +319,20 @@ def _parse_override_pairs(raw: str) -> dict[str, str]:
 
 
 def _apply_overrides(settings: PolicySettings, overrides: Mapping[str, str]) -> None:
+    """Apply override values to policy settings.
+
+    Parameters
+    ----------
+    settings : PolicySettings
+        Settings instance to modify.
+    overrides : Mapping[str, str]
+        Override key-value pairs.
+
+    Raises
+    ------
+    PolicyConfigurationError
+        If override values are invalid or keys are unknown.
+    """
     for raw_key, raw_value in overrides.items():
         key = _normalized_key(raw_key)
         if key in {"coverage", "coverage_threshold"}:
@@ -225,7 +355,22 @@ def load_policy_settings(
     cli_overrides: Mapping[str, str] | None = None,
     env: Mapping[str, str] | None = None,
 ) -> PolicySettings:
-    """Load policy settings from configuration, environment, and CLI overrides."""
+    """Load policy settings from configuration, environment, and CLI overrides.
+
+    Parameters
+    ----------
+    repo_root : Path
+        Repository root directory.
+    cli_overrides : Mapping[str, str], optional
+        CLI override key-value pairs.
+    env : Mapping[str, str], optional
+        Environment variable mapping (defaults to os.environ).
+
+    Returns
+    -------
+    PolicySettings
+        Loaded policy settings with precedence applied.
+    """
     settings = PolicySettings()
     _apply_mapping(settings, _read_pyproject_policy(repo_root))
     env_mapping: Mapping[str, str] = env or os.environ
@@ -298,7 +443,22 @@ class PolicyEngine:
                 self.documented_symbols += 1
 
     def _register_violation(self, rule: str, symbol: str, detail: str) -> bool:
-        """Register a violation, returning ``True`` if it was recorded."""
+        """Register a violation, returning ``True`` if it was recorded.
+
+        Parameters
+        ----------
+        rule : str
+            Violation rule name.
+        symbol : str
+            Symbol qualified name.
+        detail : str
+            Violation detail message.
+
+        Returns
+        -------
+        bool
+            True if violation was recorded and is fatal, False otherwise.
+        """
         exception = self._match_exception(symbol, rule)
         if exception and exception.is_active(self._today):
             return False
@@ -314,14 +474,33 @@ class PolicyEngine:
         return violation.fatal
 
     def _match_exception(self, symbol: str, rule: str) -> PolicyException | None:
-        """Return an exception entry matching ``symbol`` and ``rule`` if present."""
+        """Return an exception entry matching ``symbol`` and ``rule`` if present.
+
+        Parameters
+        ----------
+        symbol : str
+            Symbol qualified name.
+        rule : str
+            Rule name.
+
+        Returns
+        -------
+        PolicyException or None
+            Matching exception if found, None otherwise.
+        """
         for exception in self.settings.exceptions:
             if exception.symbol == symbol and exception.rule == rule:
                 return exception
         return None
 
     def finalize(self) -> PolicyReport:
-        """Produce a final :class:`PolicyReport` summarising the evaluation."""
+        """Produce a final :class:`PolicyReport` summarising the evaluation.
+
+        Returns
+        -------
+        PolicyReport
+            Policy report with coverage, threshold, and violations.
+        """
         coverage = 1.0 if self.total_symbols == 0 else self.documented_symbols / self.total_symbols
         if coverage + 1e-9 < self.settings.coverage_threshold:
             shortfall = (
@@ -336,7 +515,18 @@ class PolicyEngine:
 
     @staticmethod
     def _missing_parameter_names(entry: SemanticResult) -> list[str]:
-        """Return parameter names missing descriptions for ``entry``."""
+        """Return parameter names missing descriptions for ``entry``.
+
+        Parameters
+        ----------
+        entry : SemanticResult
+            Semantic result to check.
+
+        Returns
+        -------
+        list[str]
+            List of parameter names missing descriptions.
+        """
         missing: list[str] = []
         for parameter in entry.schema.parameters:
             description = parameter.description.strip()
@@ -346,7 +536,18 @@ class PolicyEngine:
 
     @staticmethod
     def _returns_missing_description(entry: SemanticResult) -> bool:
-        """Return ``True`` when any return entry lacks a useful description."""
+        """Return ``True`` when any return entry lacks a useful description.
+
+        Parameters
+        ----------
+        entry : SemanticResult
+            Semantic result to check.
+
+        Returns
+        -------
+        bool
+            True if any return entry lacks a description, False otherwise.
+        """
         for ret in entry.schema.returns:
             description = ret.description.strip()
             if not description or description.lower().startswith("todo"):
@@ -355,14 +556,36 @@ class PolicyEngine:
 
     @staticmethod
     def _examples_missing(entry: SemanticResult) -> bool:
-        """Return ``True`` when the Examples section is empty or placeholder only."""
+        """Return ``True`` when the Examples section is empty or placeholder only.
+
+        Parameters
+        ----------
+        entry : SemanticResult
+            Semantic result to check.
+
+        Returns
+        -------
+        bool
+            True if examples are missing or empty, False otherwise.
+        """
         if not entry.schema.examples:
             return True
         return not any(example.strip() for example in entry.schema.examples)
 
     @staticmethod
     def _summary_not_imperative(entry: SemanticResult) -> bool:
-        """Return ``True`` when the summary appears non-imperative."""
+        """Return ``True`` when the summary appears non-imperative.
+
+        Parameters
+        ----------
+        entry : SemanticResult
+            Semantic result to check.
+
+        Returns
+        -------
+        bool
+            True if summary appears non-imperative, False otherwise.
+        """
         summary = entry.schema.summary.strip()
         if not summary:
             return True
@@ -372,7 +595,18 @@ class PolicyEngine:
         return bool(first.endswith("s") and len(first) > _MIN_SUMMARY_WORD_LENGTH)
 
     def _dataclass_parity_detail(self, entry: SemanticResult) -> str | None:
-        """Return a violation detail when dataclass fields and docstrings drift."""
+        """Return a violation detail when dataclass fields and docstrings drift.
+
+        Parameters
+        ----------
+        entry : SemanticResult
+            Semantic result to check.
+
+        Returns
+        -------
+        str or None
+            Violation detail message if drift detected, None otherwise.
+        """
         if entry.symbol.kind != "class":
             return None
         decorators = {decorator.lower() for decorator in entry.symbol.decorators}
@@ -415,7 +649,18 @@ class PolicyEngine:
 
     @staticmethod
     def _has_summary(entry: SemanticResult) -> bool:
-        """Return ``True`` when ``entry`` includes a meaningful summary."""
+        """Return ``True`` when ``entry`` includes a meaningful summary.
+
+        Parameters
+        ----------
+        entry : SemanticResult
+            Semantic result to check.
+
+        Returns
+        -------
+        bool
+            True if entry has a meaningful summary, False otherwise.
+        """
         summary = entry.schema.summary.strip()
         if not summary:
             return False

@@ -17,7 +17,18 @@ DOCFACTS = REPO / "docs" / "_build" / "docfacts.json"
 
 
 def run_builder(extra_args: list[str] | None = None) -> None:
-    """Execute the docstring builder CLI with optional arguments."""
+    """Execute the docstring builder CLI with optional arguments.
+
+    Parameters
+    ----------
+    extra_args : list[str] | None
+        Additional command-line arguments.
+
+    Raises
+    ------
+    SystemExit
+        If docstring builder execution fails.
+    """
     args = extra_args or []
     cmd = [sys.executable, "-m", "tools.docstring_builder.cli", "update", *args]
     LOGGER.info("[docstrings] Running docstring builder: %s", " ".join(cmd))

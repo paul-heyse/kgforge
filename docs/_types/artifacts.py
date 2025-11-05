@@ -583,11 +583,6 @@ class SymbolDeltaPayload(BaseModel):
         -------
         tuple[SymbolDeltaChange, ...]
             Coerced tuple of symbol delta changes.
-
-        Raises
-        ------
-        ArtifactValidationError
-            If value is not a sequence of change mappings.
         """
         if v is None:
             return ()
@@ -600,7 +595,7 @@ class SymbolDeltaPayload(BaseModel):
                 changes.append(coerced)
             return tuple(changes)
         changed_field = "changed"
-        raise _validation_error(
+        _validation_error(
             changed_field,
             "a sequence of change mappings",
             artifact="symbol-delta",
@@ -615,10 +610,28 @@ def _validation_error(
     *,
     artifact: str,
     row: int | None = None,
-) -> ArtifactValidationError:
+) -> None:
+    """Raise ArtifactValidationError with formatted message.
+
+    Parameters
+    ----------
+    field : str
+        Field name for error messages.
+    expected : str
+        Expected value description.
+    artifact : str
+        Artifact name for error messages.
+    row : int | None, optional
+        Row number for error context.
+
+    Raises
+    ------
+    ArtifactValidationError
+        Always raised with formatted validation error message.
+    """
     prefix = f"Row {row}: " if row is not None else ""
     message = f"{prefix}field '{field}' must be {expected}"
-    return ArtifactValidationError(
+    raise ArtifactValidationError(
         message,
         context={"artifact": artifact, "field": field},
     )
@@ -648,11 +661,6 @@ def _coerce_optional_str(
     -------
     str | None
         Coerced string value or None.
-
-    Raises
-    ------
-    ArtifactValidationError
-        If value is not None or a string.
     """
     if value is None:
         return None
@@ -661,7 +669,7 @@ def _coerce_optional_str(
     error_msg = f"{field} must be a string or null"
     if row is not None:
         error_msg = f"Row {row}: {error_msg}"
-    raise _validation_error(field, "a string or null", artifact=artifact, row=row)
+    _validation_error(field, "a string or null", artifact=artifact, row=row)
 
 
 def _coerce_str_tuple(
@@ -688,11 +696,6 @@ def _coerce_str_tuple(
     -------
     tuple[str, ...]
         Coerced tuple of strings, sorted if input was a set.
-
-    Raises
-    ------
-    ArtifactValidationError
-        If value is not a sequence of strings.
     """
     if value is None:
         return ()
@@ -703,12 +706,12 @@ def _coerce_str_tuple(
         ):
             if not isinstance(entry, str):
                 indexed_field = f"{field}[{index}]"
-                raise _validation_error(indexed_field, "a string", artifact=artifact, row=row)
+                _validation_error(indexed_field, "a string", artifact=artifact, row=row)
             items.append(entry)
         if isinstance(value, set):
             return tuple(sorted(items))
         return tuple(items)
-    raise _validation_error(field, "a sequence of strings", artifact=artifact, row=row)
+    _validation_error(field, "a sequence of strings", artifact=artifact, row=row)
 
 
 def _coerce_str_mapping(
@@ -735,11 +738,6 @@ def _coerce_str_mapping(
     -------
     dict[str, str]
         Coerced dictionary, empty if value is None.
-
-    Raises
-    ------
-    ArtifactValidationError
-        If value is not a mapping of strings to strings.
     """
     if value is None:
         return {}
@@ -748,13 +746,13 @@ def _coerce_str_mapping(
         for key, val in value.items():
             if not isinstance(key, str):
                 key_field = f"{field} key"
-                raise _validation_error(key_field, "a string", artifact=artifact, row=row)
+                _validation_error(key_field, "a string", artifact=artifact, row=row)
             if not isinstance(val, str):
                 val_field = f"{field}['{key}']"
-                raise _validation_error(val_field, "a string", artifact=artifact, row=row)
+                _validation_error(val_field, "a string", artifact=artifact, row=row)
             result[key] = val
         return result
-    raise _validation_error(
+    _validation_error(
         field,
         "a mapping of string keys to string values",
         artifact=artifact,
@@ -772,12 +770,12 @@ def _coerce_optional_int(
     if value is None:
         return None
     if isinstance(value, bool):
-        raise _validation_error(field, "an integer", artifact=artifact, row=row)
+        _validation_error(field, "an integer", artifact=artifact, row=row)
     if isinstance(value, int):
         return value
     if isinstance(value, float) and value.is_integer():
         return int(value)
-    raise _validation_error(field, "an integer", artifact=artifact, row=row)
+    _validation_error(field, "an integer", artifact=artifact, row=row)
 
 
 def _coerce_delta_change(
@@ -801,11 +799,6 @@ def _coerce_delta_change(
     -------
     SymbolDeltaChange
         Coerced symbol delta change instance.
-
-    Raises
-    ------
-    ArtifactValidationError
-        If entry is not a valid symbol delta change mapping.
     """
     symbol_delta_cls: type[SymbolDeltaChange] = SymbolDeltaChange
     if isinstance(entry, symbol_delta_cls):
@@ -816,7 +809,7 @@ def _coerce_delta_change(
         for key, value in entry.items():
             if not isinstance(key, str):
                 key_field = f"changed[{index}] key"
-                raise _validation_error(key_field, "a string", artifact=artifact)
+                _validation_error(key_field, "a string", artifact=artifact)
             mapping[key] = value
 
         validator = cast(
@@ -828,14 +821,14 @@ def _coerce_delta_change(
             return validator(mapping)
         except ValidationError as exc:  # pragma: no cover - propagated with context
             indexed_field = f"changed[{index}]"
-            raise _validation_error(
+            _validation_error(
                 indexed_field,
                 "a valid symbol delta change",
                 artifact=artifact,
-            ) from exc
+            )
 
     indexed_field = f"changed[{index}]"
-    raise _validation_error(
+    _validation_error(
         indexed_field,
         "a mapping describing the change",
         artifact=artifact,
@@ -856,11 +849,6 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
     -------
     tuple[SymbolDeltaChange, ...]
         Coerced tuple of symbol delta changes.
-
-    Raises
-    ------
-    ArtifactValidationError
-        If value is not a sequence of change mappings.
     """
     if value is None:
         return ()
@@ -873,7 +861,7 @@ def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaC
             changes.append(coerced)
         return tuple(changes)
     changed_field = "changed"
-    raise _validation_error(
+    _validation_error(
         changed_field,
         "a sequence of change mappings",
         artifact=artifact,
@@ -897,8 +885,6 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
     ------
     ArtifactDeserializationError
         If the payload structure is invalid or rows cannot be constructed.
-    ArtifactValidationError
-        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -948,15 +934,15 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
             path_raw = item.get("path")
             path_field = "path"
             if not isinstance(path_raw, str):
-                raise _validation_error(path_field, "a string", artifact="symbol-index", row=i)
+                _validation_error(path_field, "a string", artifact="symbol-index", row=i)
             kind_raw = item.get("kind")
             kind_field = "kind"
             if not isinstance(kind_raw, str):
-                raise _validation_error(kind_field, "a string", artifact="symbol-index", row=i)
+                _validation_error(kind_field, "a string", artifact="symbol-index", row=i)
             doc_raw = item.get("doc")
             doc_field = "doc"
             if not isinstance(doc_raw, str):
-                raise _validation_error(doc_field, "a string", artifact="symbol-index", row=i)
+                _validation_error(doc_field, "a string", artifact="symbol-index", row=i)
 
             lineno = _coerce_optional_int(
                 item.get("lineno"), field="lineno", artifact="symbol-index", row=i
@@ -1109,8 +1095,6 @@ def symbol_delta_from_json(raw: JsonPayload) -> SymbolDeltaPayload:
     ------
     ArtifactDeserializationError
         If the payload structure is invalid or construction fails.
-    ArtifactValidationError
-        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -1223,8 +1207,6 @@ def load_symbol_index(path: Path) -> SymbolIndexArtifacts:
     ------
     ArtifactDeserializationError
         If the file cannot be read or parsed.
-    ArtifactValidationError
-        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -1302,8 +1284,6 @@ def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
     ------
     ArtifactDeserializationError
         If the file cannot be read or parsed.
-    ArtifactValidationError
-        If field validation fails (raised by coercion helpers).
 
     Examples
     --------

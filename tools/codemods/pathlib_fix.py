@@ -124,7 +124,18 @@ class PathlibTransformer(cst.CSTTransformer):
         self.needs_pathlib_import = False
 
     def on_visit(self, node: cst.CSTNode) -> bool:
-        """Track if pathlib import already exists."""
+        """Track if pathlib import already exists.
+
+        Parameters
+        ----------
+        node : cst.CSTNode
+            Node being visited.
+
+        Returns
+        -------
+        bool
+            True to continue traversal.
+        """
         if isinstance(node, cst.Import):
             for alias in node.names:
                 if isinstance(alias.name, cst.Name) and alias.name.value == "pathlib":
@@ -132,13 +143,22 @@ class PathlibTransformer(cst.CSTTransformer):
         return True
 
     def leave_call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.BaseExpression:
-        """Apply call rewrites when exiting a Call node."""
+        """Apply call rewrites when exiting a Call node.
+
+        Parameters
+        ----------
+        original_node : cst.Call
+            Original call node.
+        updated_node : cst.Call
+            Updated call node.
+
+        Returns
+        -------
+        cst.BaseExpression
+            Transformed call expression.
+        """
         replacement = self._transform_call(original_node)
         return replacement if replacement is not None else updated_node
-
-    def leave_with(self, original_node: cst.With, updated_node: cst.With) -> cst.BaseStatement:
-        """Apply context-manager rewrites when exiting a With node."""
-        return self._transform_with(original_node, updated_node)
 
     def _transform_makedirs(self, node: cst.Call) -> cst.BaseExpression | None:
         if not (
@@ -225,7 +245,18 @@ class PathlibTransformer(cst.CSTTransformer):
         )
 
     def _transform_call(self, node: cst.Call) -> cst.BaseExpression | None:
-        """Return rewritten call expression when a pathlib substitution exists."""
+        """Return rewritten call expression when a pathlib substitution exists.
+
+        Parameters
+        ----------
+        node : cst.Call
+            Call node to transform.
+
+        Returns
+        -------
+        cst.BaseExpression | None
+            Transformed expression or None if no transformation applies.
+        """
         for transformer in (
             self._transform_makedirs,
             self._transform_path_join,
@@ -238,7 +269,20 @@ class PathlibTransformer(cst.CSTTransformer):
         return None
 
     def _transform_with(self, original_node: cst.With, updated_node: cst.With) -> cst.With:
-        """Rewrite ``with`` blocks wrapping ``open(os.path.join(...))`` patterns."""
+        """Rewrite ``with`` blocks wrapping ``open(os.path.join(...))`` patterns.
+
+        Parameters
+        ----------
+        original_node : cst.With
+            Original with statement node.
+        updated_node : cst.With
+            Updated with statement node.
+
+        Returns
+        -------
+        cst.With
+            Transformed with statement.
+        """
         for index, (original_item, updated_item) in enumerate(
             zip(original_node.items, updated_node.items, strict=True)
         ):
@@ -346,7 +390,18 @@ def _pathlib_import_statement() -> cst.SimpleStatementLine:
 def ensure_pathlib_import(
     module: cst.Module,
 ) -> cst.Module:
-    """Add pathlib import if missing."""
+    """Add pathlib import if missing.
+
+    Parameters
+    ----------
+    module : cst.Module
+        Module node to modify.
+
+    Returns
+    -------
+    cst.Module
+        Module with pathlib import added if needed.
+    """
     if _module_has_pathlib(module):
         return module
 

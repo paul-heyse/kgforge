@@ -434,6 +434,20 @@ def spawn_text_process(
     The command is resolved through the shared allow-list policy to ensure the executable path is
     trusted, and the environment is sanitised to drop inherited state that could affect tooling
     deterministically.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command and arguments to execute.
+    cwd : Path | None, optional
+        Working directory for the process.
+    env : Mapping[str, str] | None, optional
+        Environment variables.
+
+    Returns
+    -------
+    TextProcess
+        Text process instance.
     """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(

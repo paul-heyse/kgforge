@@ -79,7 +79,20 @@ class BlindExceptTransformer(cst.CSTTransformer):
     def leave_excepthandler(
         self, original_node: cst.ExceptHandler, updated_node: cst.ExceptHandler
     ) -> cst.ExceptHandler:
-        """Rewrite blind except handlers when exiting traversal."""
+        """Rewrite blind except handlers when exiting traversal.
+
+        Parameters
+        ----------
+        original_node : cst.ExceptHandler
+            Original exception handler node.
+        updated_node : cst.ExceptHandler
+            Updated exception handler node.
+
+        Returns
+        -------
+        cst.ExceptHandler
+            Transformed exception handler.
+        """
         return self._transform_except(original_node, updated_node)
 
     def _transform_except(
@@ -87,7 +100,20 @@ class BlindExceptTransformer(cst.CSTTransformer):
         original_node: cst.ExceptHandler,
         updated_node: cst.ExceptHandler,
     ) -> cst.ExceptHandler:
-        """Return an updated exception handler when we detect a blind clause."""
+        """Return an updated exception handler when we detect a blind clause.
+
+        Parameters
+        ----------
+        original_node : cst.ExceptHandler
+            Original exception handler node.
+        updated_node : cst.ExceptHandler
+            Updated exception handler node.
+
+        Returns
+        -------
+        cst.ExceptHandler
+            Transformed exception handler.
+        """
         # Match `except Exception:` or bare `except:`
         is_blind_except = False
 

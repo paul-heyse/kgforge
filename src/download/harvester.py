@@ -168,7 +168,7 @@ class OpenAccessHarvester:
         Raises
         ------
         TypeError
-        Raised when TODO for TypeError.
+            If the response payload is not a mapping or contains invalid structure.
         """
         url = f"{self.openalex}/works"
         params: dict[str, str | int] = {
@@ -366,9 +366,9 @@ class OpenAccessHarvester:
         Raises
         ------
         DownloadError
-        Raised when TODO for DownloadError.
+            If the HTTP request returns a non-200 status code.
         UnsupportedMIMEError
-        Raised when TODO for UnsupportedMIMEError.
+            If the response content type is not PDF-like.
         """
         response = self.session.get(url, timeout=60)
         if response.status_code != HTTP_OK:

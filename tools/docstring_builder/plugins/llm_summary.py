@@ -37,7 +37,20 @@ class LLMSummaryRewritePlugin(TransformerPlugin):
         del self, context
 
     def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
-        """Rewrite the summary text for ``payload`` when configured to do so."""
+        """Rewrite the summary text for ``payload`` when configured to do so.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin context.
+        payload : SemanticResult
+            Semantic result to process.
+
+        Returns
+        -------
+        SemanticResult
+            Updated semantic result with rewritten summary, or original if not applicable.
+        """
         del self
         mode_attr: object = getattr(context.config, "llm_summary_mode", "off")
         mode = str(mode_attr).lower()

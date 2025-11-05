@@ -73,6 +73,16 @@ class FaissGpuIndex:
         The method is safe to call repeatedly; once a GPU index has been prepared it is reused on
         subsequent invocations. Any failures during cloning or configuration are logged and the CPU
         index is returned.
+
+        Parameters
+        ----------
+        trained_index : FaissIndexProtocol
+            Trained CPU index to prepare.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            GPU index if available, otherwise CPU index.
         """
         if not self.use_gpu:
             logger.debug("GPU acceleration disabled; using CPU index only")
@@ -98,7 +108,25 @@ class FaissGpuIndex:
         return gpu_index
 
     def search(self, query: FloatVector, k: int) -> list[tuple[int, float]]:
-        """Execute a search against the prepared index returning ``(id, score)`` pairs."""
+        """Execute a search against the prepared index returning ``(id, score)`` pairs.
+
+        Parameters
+        ----------
+        query : FloatVector
+            Query vector to search with.
+        k : int
+            Number of results to return.
+
+        Returns
+        -------
+        list[tuple[int, float]]
+            List of (id, score) pairs.
+
+        Raises
+        ------
+        RuntimeError
+            If index has not been prepared.
+        """
         if self._index is None:
             msg = "FAISS GPU index not prepared"
             raise RuntimeError(msg)

@@ -109,16 +109,39 @@ class SuppressionGuardReport:
 
     @property
     def is_clean(self) -> bool:
-        """Return ``True`` when the report has no violations."""
+        """Return ``True`` when the report has no violations.
+
+        Returns
+        -------
+        bool
+            True if no violations found.
+        """
         return self.violation_count == 0
 
     def to_context(self) -> SuppressionGuardContext:
-        """Render the report as structured problem details context."""
+        """Render the report as structured problem details context.
+
+        Returns
+        -------
+        SuppressionGuardContext
+            Problem Details context dictionary.
+        """
         return build_guard_context(self)
 
     @classmethod
     def merge(cls, reports: Iterable[SuppressionGuardReport]) -> SuppressionGuardReport:
-        """Merge multiple reports into a single aggregate."""
+        """Merge multiple reports into a single aggregate.
+
+        Parameters
+        ----------
+        reports : Iterable[SuppressionGuardReport]
+            Reports to merge.
+
+        Returns
+        -------
+        SuppressionGuardReport
+            Merged report.
+        """
         aggregated: dict[Path, list[SuppressionViolation]] = {}
         for report in reports:
             for file_report in report.files:
@@ -133,7 +156,23 @@ class SuppressionGuardReport:
 
     @classmethod
     def from_context(cls, context: SuppressionGuardContext) -> SuppressionGuardReport:
-        """Build a report instance from a context payload."""
+        """Build a report instance from a context payload.
+
+        Parameters
+        ----------
+        context : SuppressionGuardContext
+            Problem Details context dictionary.
+
+        Returns
+        -------
+        SuppressionGuardReport
+            Report instance.
+
+        Raises
+        ------
+        ValueError
+            If violation count mismatch is detected.
+        """
         files = tuple(
             SuppressionGuardFileReport.from_context_entry(entry) for entry in context["files"]
         )
@@ -162,7 +201,13 @@ class SuppressionGuardFileReport:
         object.__setattr__(self, "violations", _normalize_violations(self.violations))
 
     def to_context_entry(self) -> SuppressionGuardFileEntry:
-        """Return a serializable representation for Problem Details."""
+        """Return a serializable representation for Problem Details.
+
+        Returns
+        -------
+        SuppressionGuardFileEntry
+            Problem Details file entry dictionary.
+        """
         return {
             "file": str(self.path),
             "violations": [
@@ -176,7 +221,18 @@ class SuppressionGuardFileReport:
 
     @classmethod
     def from_context_entry(cls, entry: SuppressionGuardFileEntry) -> SuppressionGuardFileReport:
-        """Hydrate a file report from its Problem Details entry."""
+        """Hydrate a file report from its Problem Details entry.
+
+        Parameters
+        ----------
+        entry : SuppressionGuardFileEntry
+            Problem Details file entry dictionary.
+
+        Returns
+        -------
+        SuppressionGuardFileReport
+            File report instance.
+        """
         path = Path(entry["file"]).resolve()
         violations = tuple(
             SuppressionViolation(
@@ -190,31 +246,86 @@ class SuppressionGuardFileReport:
 
 
 def _guard_file_sort_key(report: SuppressionGuardFileReport) -> str:
-    """Return a deterministic sort key for file reports."""
+    """Return a deterministic sort key for file reports.
+
+    Parameters
+    ----------
+    report : SuppressionGuardFileReport
+        File report.
+
+    Returns
+    -------
+    str
+        Sort key string.
+    """
     return report.path.as_posix()
 
 
 def _violation_sort_key(violation: SuppressionViolation) -> int:
-    """Return a deterministic sort key for individual violations."""
+    """Return a deterministic sort key for individual violations.
+
+    Parameters
+    ----------
+    violation : SuppressionViolation
+        Violation instance.
+
+    Returns
+    -------
+    int
+        Line number sort key.
+    """
     return violation.line_number
 
 
 def _normalize_file_reports(
     files: Iterable[SuppressionGuardFileReport],
 ) -> tuple[SuppressionGuardFileReport, ...]:
-    """Return files sorted by path for deterministic behavior."""
+    """Return files sorted by path for deterministic behavior.
+
+    Parameters
+    ----------
+    files : Iterable[SuppressionGuardFileReport]
+        File reports to normalize.
+
+    Returns
+    -------
+    tuple[SuppressionGuardFileReport, ...]
+        Sorted tuple of file reports.
+    """
     return tuple(sorted(files, key=_guard_file_sort_key))
 
 
 def _normalize_violations(
     violations: Iterable[SuppressionViolation],
 ) -> tuple[SuppressionViolation, ...]:
-    """Return violations sorted by ascending line number."""
+    """Return violations sorted by ascending line number.
+
+    Parameters
+    ----------
+    violations : Iterable[SuppressionViolation]
+        Violations to normalize.
+
+    Returns
+    -------
+    tuple[SuppressionViolation, ...]
+        Sorted tuple of violations.
+    """
     return tuple(sorted(violations, key=_violation_sort_key))
 
 
 def _iter_suppression_comments(content: str) -> Sequence[tuple[int, str]]:
-    """Yield ``(line_number, comment)`` pairs for suppression comments."""
+    """Yield ``(line_number, comment)`` pairs for suppression comments.
+
+    Parameters
+    ----------
+    content : str
+        Source file content.
+
+    Returns
+    -------
+    Sequence[tuple[int, str]]
+        List of (line_number, comment) tuples.
+    """
     reader = io.StringIO(content).readline
     matches: list[tuple[int, str]] = []
     for token in tokenize.generate_tokens(reader):
@@ -227,7 +338,18 @@ def _iter_suppression_comments(content: str) -> Sequence[tuple[int, str]]:
 
 
 def check_file(file_path: Path) -> tuple[SuppressionViolation, ...]:
-    """Return suppressions lacking ``TICKET:`` metadata within ``file_path``."""
+    """Return suppressions lacking ``TICKET:`` metadata within ``file_path``.
+
+    Parameters
+    ----------
+    file_path : Path
+        File path to check.
+
+    Returns
+    -------
+    tuple[SuppressionViolation, ...]
+        Tuple of violations found.
+    """
     try:
         content = file_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
@@ -250,7 +372,18 @@ def check_file(file_path: Path) -> tuple[SuppressionViolation, ...]:
 
 
 def check_directory(directory: Path) -> SuppressionGuardReport:
-    """Return per-file suppressions lacking ``TICKET:`` metadata."""
+    """Return per-file suppressions lacking ``TICKET:`` metadata.
+
+    Parameters
+    ----------
+    directory : Path
+        Directory path to check.
+
+    Returns
+    -------
+    SuppressionGuardReport
+        Report with violations found.
+    """
     files = tuple(
         SuppressionGuardFileReport(path=py_file.resolve(), violations=file_violations)
         for py_file in sorted(directory.rglob("*.py"))
@@ -292,7 +425,23 @@ def resolve_target_directories(paths: Sequence[str]) -> list[Path]:
 
 
 def run_suppression_guard(directories: Sequence[Path]) -> SuppressionGuardReport:
-    """Run suppression guard on the given directories."""
+    """Run suppression guard on the given directories.
+
+    Parameters
+    ----------
+    directories : Sequence[Path]
+        Directories to check.
+
+    Returns
+    -------
+    SuppressionGuardReport
+        Final merged report.
+
+    Raises
+    ------
+    ConfigurationError
+        If suppressions without TICKET tags are found.
+    """
     reports = [check_directory(directory) for directory in directories]
     final_report = SuppressionGuardReport.merge(reports)
 
@@ -304,14 +453,36 @@ def run_suppression_guard(directories: Sequence[Path]) -> SuppressionGuardReport
 
 
 def build_guard_context(report: SuppressionGuardReport) -> SuppressionGuardContext:
-    """Construct structured context payload for Problem Details reporting."""
+    """Construct structured context payload for Problem Details reporting.
+
+    Parameters
+    ----------
+    report : SuppressionGuardReport
+        Report to convert.
+
+    Returns
+    -------
+    SuppressionGuardContext
+        Problem Details context dictionary.
+    """
     files = [file_report.to_context_entry() for file_report in report.files]
 
     return {"violation_count": report.violation_count, "files": files}
 
 
 def _extract_guard_report(error: ConfigurationError) -> SuppressionGuardReport | None:
-    """Normalize the context payload attached to a suppression guard error."""
+    """Normalize the context payload attached to a suppression guard error.
+
+    Parameters
+    ----------
+    error : ConfigurationError
+        Error with context payload.
+
+    Returns
+    -------
+    SuppressionGuardReport | None
+        Extracted report or None if parsing fails.
+    """
     try:
         context = cast("SuppressionGuardContext", dict(error.context))
         return SuppressionGuardReport.from_context(context)
@@ -321,7 +492,18 @@ def _extract_guard_report(error: ConfigurationError) -> SuppressionGuardReport |
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Check source files for untracked suppressions."""
+    """Check source files for untracked suppressions.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     arguments = list(argv if argv is not None else sys.argv[1:])
     if not arguments:
         LOGGER.error("Usage: python tools/check_new_suppressions.py <directories...>")

@@ -54,11 +54,6 @@ if TYPE_CHECKING:
             by_name : bool | None, optional
                 Permit field-name based population alongside aliases.
                 Defaults to ``None``.
-
-            Returns
-            -------
-            Self
-                A validated model instance.
             """
             raise NotImplementedError
 
@@ -69,11 +64,6 @@ if TYPE_CHECKING:
             ----------
             **model_dump_kwargs : dict[str, object]
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump`.
-
-            Returns
-            -------
-            dict[str, Any]
-                Dictionary representation of the model.
             """
             del self, model_dump_kwargs
             raise NotImplementedError
@@ -85,11 +75,6 @@ if TYPE_CHECKING:
             ----------
             **model_dump_json_kwargs : dict[str, object]
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump_json`.
-
-            Returns
-            -------
-            str
-                JSON string representing the model.
             """
             del self, model_dump_json_kwargs
             raise NotImplementedError

@@ -81,12 +81,15 @@ def _load_schema_by_path_str_impl(schema_path_str: str) -> dict[str, object]:
     """
     try:
         schema_text = read_text(Path(schema_path_str))
+    except FileNotFoundError:
+        raise
+    try:
         schema_raw: object = json.loads(schema_text)
         if not isinstance(schema_raw, dict):
             msg = f"Schema must be a JSON object at root, got {type(schema_raw).__name__}"
             raise SchemaValidationError(msg)
         schema_obj = cast("dict[str, object]", schema_raw)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+    except json.JSONDecodeError as e:
         msg = f"Failed to load schema from {schema_path_str}: {e}"
         raise SchemaValidationError(msg) from e
     else:
@@ -127,7 +130,10 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
     if cached is not None:
         return cached
 
-    schema_obj = _load_schema_by_path_str_impl(schema_key)
+    try:
+        schema_obj = _load_schema_by_path_str_impl(schema_key)
+    except (FileNotFoundError, SchemaValidationError):
+        raise
     _schema_cache[schema_key] = schema_obj
     return schema_obj
 
@@ -166,7 +172,10 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     ...     validate_payload({"k1": "invalid"}, schema)  # doctest: +SKIP
     SchemaValidationError: Schema validation failed
     """
-    schema_obj = _load_schema_cached(schema_path)
+    try:
+        schema_obj = _load_schema_cached(schema_path)
+    except (FileNotFoundError, SchemaValidationError):
+        raise
     try:
         jsonschema_validate(instance=payload, schema=schema_obj)
     except ValidationError as exc:
@@ -386,12 +395,20 @@ def _validate_json_against_schema(obj: object, schema_path: Path) -> None:
     ------
     SchemaValidationError
         If validation fails.
+    FileNotFoundError
+        If schema file does not exist.
     """
     if isinstance(obj, Mapping):
-        validate_payload(obj, schema_path)
+        try:
+            validate_payload(obj, schema_path)
+        except (FileNotFoundError, SchemaValidationError):
+            raise
     else:
         # For non-Mapping objects, load schema and validate directly
-        schema_obj = _load_schema_cached(schema_path)
+        try:
+            schema_obj = _load_schema_cached(schema_path)
+        except (FileNotFoundError, SchemaValidationError):
+            raise
         try:
             jsonschema_validate(instance=obj, schema=schema_obj)
         except ValidationError as exc:
@@ -490,7 +507,10 @@ def deserialize_json(
             raise DeserializationError(msg) from exc
 
         # Validate against schema (uses cached schema loader)
-        _validate_json_against_schema(obj, schema_path)
+        try:
+            _validate_json_against_schema(obj, schema_path)
+        except (FileNotFoundError, SchemaValidationError):
+            raise
 
         logger.debug(
             "Deserialized JSON",

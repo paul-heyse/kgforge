@@ -227,6 +227,11 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
         ----------
         plugin : LegacyPluginProtocol
             Legacy plugin instance to wrap.
+
+        Raises
+        ------
+        TypeError
+            If plugin stage is invalid or unsupported.
         """
         stage_candidate: object = getattr(plugin, "stage", None)
         valid_stages: dict[str, PluginStage] = {
@@ -246,7 +251,18 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
 
     @classmethod
     def create(cls, plugin: LegacyPluginProtocol, /) -> _AnyLegacyAdapter:
-        """Return a typed adapter for the legacy ``plugin`` instance."""
+        """Return a typed adapter for the legacy ``plugin`` instance.
+
+        Parameters
+        ----------
+        plugin : LegacyPluginProtocol
+            Legacy plugin instance to adapt.
+
+        Returns
+        -------
+        _AnyLegacyAdapter
+            Typed adapter instance (harvester, transformer, or formatter).
+        """
         adapter = cls(plugin)
         if adapter.stage == "harvester":
             return cls.wrap_harvester(adapter)
@@ -256,7 +272,23 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
 
     @classmethod
     def wrap_harvester(cls, adapter: LegacyPluginAdapter, /) -> _LegacyHarvesterAdapter:
-        """Wrap ``adapter`` as a harvester plugin."""
+        """Wrap ``adapter`` as a harvester plugin.
+
+        Parameters
+        ----------
+        adapter : LegacyPluginAdapter
+            Base adapter instance.
+
+        Returns
+        -------
+        _LegacyHarvesterAdapter
+            Harvester adapter instance.
+
+        Raises
+        ------
+        TypeError
+            If adapter stage is not "harvester".
+        """
         if adapter.stage != "harvester":
             message = f"Expected harvester plugin, received stage {adapter.stage!r}"
             raise TypeError(message)
@@ -264,7 +296,23 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
 
     @classmethod
     def wrap_transformer(cls, adapter: LegacyPluginAdapter, /) -> _LegacyTransformerAdapter:
-        """Wrap ``adapter`` as a transformer plugin."""
+        """Wrap ``adapter`` as a transformer plugin.
+
+        Parameters
+        ----------
+        adapter : LegacyPluginAdapter
+            Base adapter instance.
+
+        Returns
+        -------
+        _LegacyTransformerAdapter
+            Transformer adapter instance.
+
+        Raises
+        ------
+        TypeError
+            If adapter stage is not "transformer".
+        """
         if adapter.stage != "transformer":
             message = f"Expected transformer plugin, received stage {adapter.stage!r}"
             raise TypeError(message)
@@ -272,7 +320,23 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
 
     @classmethod
     def wrap_formatter(cls, adapter: LegacyPluginAdapter, /) -> _LegacyFormatterAdapter:
-        """Wrap ``adapter`` as a formatter plugin."""
+        """Wrap ``adapter`` as a formatter plugin.
+
+        Parameters
+        ----------
+        adapter : LegacyPluginAdapter
+            Base adapter instance.
+
+        Returns
+        -------
+        _LegacyFormatterAdapter
+            Formatter adapter instance.
+
+        Raises
+        ------
+        TypeError
+            If adapter stage is not "formatter".
+        """
         if adapter.stage != "formatter":
             message = f"Expected formatter plugin, received stage {adapter.stage!r}"
             raise TypeError(message)
@@ -293,7 +357,20 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
             finish_hook(context)
 
     def apply(self, context: PluginContext, payload: DocstringPayload) -> DocstringPayload:
-        """Delegate to the legacy ``run`` implementation with a warning."""
+        """Delegate to the legacy ``run`` implementation with a warning.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin context.
+        payload : DocstringPayload
+            Payload to process.
+
+        Returns
+        -------
+        DocstringPayload
+            Processed payload from legacy plugin.
+        """
         self._warn()
         return self._plugin.run(context, payload)
 

@@ -18,7 +18,12 @@ import duckdb
 
 from kgfoundry_common.errors import ConfigurationError, DeserializationError
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
-from kgfoundry_common.serialization import deserialize_json, serialize_json
+from kgfoundry_common.serialization import (
+    SchemaValidationError,
+    SerializationError,
+    deserialize_json,
+    serialize_json,
+)
 from registry.duckdb_helpers import fetch_all, fetch_one
 
 if TYPE_CHECKING:
@@ -277,6 +282,11 @@ class BM25Index:
         -------
         BM25Index
             Describe return value.
+
+        Raises
+        ------
+        TypeError
+            If parquet_root type is invalid.
         """
         index = cls()
         con = duckdb.connect(db_path)
@@ -426,7 +436,9 @@ class BM25Index:
         Raises
         ------
         SerializationError
-            If serialization or schema validation fails.
+            If serialization fails.
+        SchemaValidationError
+            If schema validation fails.
         FileNotFoundError
             If schema file is missing.
 
@@ -460,7 +472,10 @@ class BM25Index:
             "df": self.df,
             "docs": docs_data,
         }
-        serialize_json(payload, schema_path, path_obj)
+        try:
+            serialize_json(payload, schema_path, path_obj)
+        except (SerializationError, FileNotFoundError, SchemaValidationError):
+            raise
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
@@ -497,7 +512,10 @@ class BM25Index:
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
         )
-        payload = cls._load_payload(path_obj, schema_path)
+        try:
+            payload = cls._load_payload(path_obj, schema_path)
+        except (DeserializationError, FileNotFoundError):
+            raise
         return cls._index_from_payload(payload)
 
     @staticmethod

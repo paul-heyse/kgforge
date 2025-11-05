@@ -54,11 +54,6 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self < other.
         """
         _protocol_stub("__lt__", self, other)
 
@@ -69,11 +64,6 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self <= other.
         """
         _protocol_stub("__le__", self, other)
 
@@ -84,11 +74,6 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self > other.
         """
         _protocol_stub("__gt__", self, other)
 
@@ -99,11 +84,6 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self >= other.
         """
         _protocol_stub("__ge__", self, other)
 
@@ -291,7 +271,10 @@ def resolve_numpy() -> object:
         DeprecationWarning,
         stacklevel=2,
     )
-    return gate_import("numpy", "numpy array processing")
+    try:
+        return gate_import("numpy", "numpy array processing")
+    except ImportError:
+        raise
 
 
 def resolve_fastapi() -> object:
@@ -315,7 +298,10 @@ def resolve_fastapi() -> object:
         DeprecationWarning,
         stacklevel=2,
     )
-    return gate_import("fastapi", "FastAPI application")
+    try:
+        return gate_import("fastapi", "FastAPI application")
+    except ImportError:
+        raise
 
 
 def resolve_faiss() -> object:
@@ -339,7 +325,10 @@ def resolve_faiss() -> object:
         DeprecationWarning,
         stacklevel=2,
     )
-    return gate_import("faiss", "vector similarity search")
+    try:
+        return gate_import("faiss", "vector similarity search")
+    except ImportError:
+        raise
 
 
 # =============================================================================
@@ -348,7 +337,20 @@ def resolve_faiss() -> object:
 
 
 def _version_gte(installed: str, required: str) -> bool:
-    """Check if installed version >= required version."""
+    """Check if installed version >= required version.
+
+    Parameters
+    ----------
+    installed : str
+        Installed version string.
+    required : str
+        Required version string.
+
+    Returns
+    -------
+    bool
+        True if installed version is >= required version.
+    """
     if _PARSE_VERSION is None:
         return installed >= required
     installed_version = _PARSE_VERSION(installed)

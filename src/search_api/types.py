@@ -927,7 +927,18 @@ class _FaissModuleAdapter:
 
 
 def wrap_faiss_module(module: object) -> FaissModuleProtocol:
-    """Return a :class:`FaissModuleProtocol` with PEP 8 method names."""
+    """Return a :class:`FaissModuleProtocol` with PEP 8 method names.
+
+    Parameters
+    ----------
+    module : object
+        FAISS module to wrap.
+
+    Returns
+    -------
+    FaissModuleProtocol
+        Wrapped module conforming to protocol.
+    """
     required_attributes = (
         "index_flat_ip",
         "index_factory",

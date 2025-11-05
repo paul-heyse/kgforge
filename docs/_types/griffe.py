@@ -259,11 +259,6 @@ def _load_autoapi() -> object:
     -------
     object
         AutoAPI module instance.
-
-    Raises
-    ------
-    ArtifactDependencyError
-        If AutoAPI is not installed or cannot be imported.
     """
     # Use guarded import with Problem Details support
     return safe_import_autoapi()
@@ -276,12 +271,6 @@ def get_autoapi_loader() -> object:
     -------
     object
         AutoAPI loader instance.
-
-    Raises
-    ------
-    ArtifactDependencyError
-        If AutoAPI is not installed or cannot be imported, with RFC 9457
-        Problem Details and remediation guidance.
 
     Examples
     --------
@@ -302,11 +291,6 @@ def _load_sphinx() -> object:
     -------
     object
         Sphinx module instance.
-
-    Raises
-    ------
-    ArtifactDependencyError
-        If Sphinx is not installed or cannot be imported.
     """
     # Use guarded import with Problem Details support
     return safe_import_sphinx()
@@ -319,12 +303,6 @@ def get_sphinx_loader() -> object:
     -------
     object
         Sphinx loader instance.
-
-    Raises
-    ------
-    ArtifactDependencyError
-        If Sphinx is not installed or cannot be imported, with RFC 9457
-        Problem Details and remediation guidance.
 
     Examples
     --------

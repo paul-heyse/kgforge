@@ -328,7 +328,13 @@ class _SafeUnpickler(_StdlibUnpickler):
         return cast("type[object]", super().find_class(module, name))
 
     def load(self) -> object:
-        """Deserialize the payload using the hardened allow-list."""
+        """Deserialize the payload using the hardened allow-list.
+
+        Returns
+        -------
+        object
+            Deserialized object.
+        """
         return super().load()
 
 
@@ -448,7 +454,10 @@ class SignedPickleWrapper:
         ValueError
             If object contains disallowed types.
         """
-        _validate_object(obj)
+        try:
+            _validate_object(obj)
+        except ValueError:
+            raise
 
         payload = _stdlib_pickle.dumps(obj)
         signature = hmac.new(self.signing_key, payload, hashlib.sha256).digest()
@@ -486,7 +495,10 @@ class SignedPickleWrapper:
             msg = "Deserialization blocked: HMAC signature verification failed; payload may be tampered"
             raise UnsafeSerializationError(msg, reason="signature_mismatch")
 
-        result = _load_with_allow_list(io.BytesIO(payload))
+        try:
+            result = _load_with_allow_list(io.BytesIO(payload))
+        except UnsafeSerializationError:
+            raise
 
         logger.debug("Deserialized object with verified signature", extra={"size": len(payload)})
         return result
@@ -512,7 +524,10 @@ def load_unsigned_legacy(file: BinaryIO) -> object:
     """
     data = file.read()
     buffer = io.BytesIO(data)
-    return _load_with_allow_list(buffer)
+    try:
+        return _load_with_allow_list(buffer)
+    except UnsafeSerializationError:
+        raise
 
 
 def create_unsigned_pickle_payload(obj: object) -> bytes:
@@ -522,6 +537,21 @@ def create_unsigned_pickle_payload(obj: object) -> bytes:
     (e.g., local classes defined inside tests), it falls back to ``cloudpickle``
     when available. Production code should continue to use
     :class:`SignedPickleWrapper` or :func:`load_unsigned_legacy`.
+
+    Parameters
+    ----------
+    obj : object
+        Object to serialize.
+
+    Returns
+    -------
+    bytes
+        Pickle bytes representation of the object.
+
+    Raises
+    ------
+    RuntimeError
+        If cloudpickle is required but not available.
     """
     try:
         return _stdlib_pickle.dumps(obj)

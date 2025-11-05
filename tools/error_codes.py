@@ -44,7 +44,13 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def _cmd_list() -> int:
-    """Print all known error codes in tab-separated format."""
+    """Print all known error codes in tab-separated format.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success.
+    """
     for code in sorted(CANONICAL_ERROR_CODES):
         info = CANONICAL_ERROR_CODES[code]
         sys.stdout.write(f"{info.code}\t{info.title}\t{info.domain}/{info.category}\n")
@@ -52,7 +58,20 @@ def _cmd_list() -> int:
 
 
 def _cmd_show(code: str, *, output_format: str) -> int:
-    """Display metadata for a single error code."""
+    """Display metadata for a single error code.
+
+    Parameters
+    ----------
+    code : str
+        Error code to display.
+    output_format : str
+        Output format ('json' or 'text').
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     try:
         info = get_error_code(code)
     except KeyError as exc:
@@ -76,7 +95,18 @@ def _cmd_show(code: str, *, output_format: str) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Entry point for the error code inspection CLI."""
+    """Entry point for the error code inspection CLI.
+
+    Parameters
+    ----------
+    argv : list[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     args = _parse_args(argv)
     if args.command == "list":
         return _cmd_list()

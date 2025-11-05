@@ -144,7 +144,20 @@ class PluginManager:
                 plugin.on_finish(context)
 
     def apply_harvest(self, file_path: Path, result: HarvestResult) -> HarvestResult:
-        """Run harvester plugins sequentially."""
+        """Run harvester plugins sequentially.
+
+        Parameters
+        ----------
+        file_path : Path
+            File path being processed.
+        result : HarvestResult
+            Harvest result to process.
+
+        Returns
+        -------
+        HarvestResult
+            Processed harvest result after applying all harvester plugins.
+        """
         context = self._context(file_path)
         with self._lock:
             return _run_harvest_pipeline(self.harvesters, context, result)
@@ -152,7 +165,20 @@ class PluginManager:
     def apply_transformers(
         self, file_path: Path, semantics: Iterable[SemanticResult]
     ) -> list[SemanticResult]:
-        """Run transformer plugins sequentially for each semantic result."""
+        """Run transformer plugins sequentially for each semantic result.
+
+        Parameters
+        ----------
+        file_path : Path
+            File path being processed.
+        semantics : Iterable[SemanticResult]
+            Semantic results to transform.
+
+        Returns
+        -------
+        list[SemanticResult]
+            Transformed semantic results after applying all transformer plugins.
+        """
         context = self._context(file_path)
         processed: list[SemanticResult] = []
         for entry in semantics:
@@ -163,7 +189,20 @@ class PluginManager:
     def apply_formatters(
         self, file_path: Path, edits: Iterable[DocstringEdit]
     ) -> list[DocstringEdit]:
-        """Run formatter plugins sequentially for each edit."""
+        """Run formatter plugins sequentially for each edit.
+
+        Parameters
+        ----------
+        file_path : Path
+            File path being processed.
+        edits : Iterable[DocstringEdit]
+            Docstring edits to format.
+
+        Returns
+        -------
+        list[DocstringEdit]
+            Formatted docstring edits after applying all formatter plugins.
+        """
         context = self._context(file_path)
         processed: list[DocstringEdit] = []
         for entry in edits:
@@ -172,10 +211,23 @@ class PluginManager:
         return processed
 
     def enabled_plugins(self) -> list[str]:
-        """Return the names of active plugins in execution order."""
+        """Return the names of active plugins in execution order.
+
+        Returns
+        -------
+        list[str]
+            List of plugin names in execution order.
+        """
         return [plugin.name for plugin in self._iter_plugins()]
 
     def _iter_plugins(self) -> Iterable[RegisteredPlugin]:
+        """Yield all registered plugins in execution order.
+
+        Yields
+        ------
+        RegisteredPlugin
+            Registered plugin instances.
+        """
         yield from self.harvesters
         yield from self.transformers
         yield from self.formatters
@@ -186,7 +238,22 @@ def _run_harvest_pipeline(
     context: PluginContext,
     payload: HarvestResult,
 ) -> HarvestResult:
-    """Execute harvester plugins sequentially for ``payload``."""
+    """Execute harvester plugins sequentially for ``payload``.
+
+    Parameters
+    ----------
+    plugins : Iterable[HarvesterPlugin]
+        Harvester plugins to execute.
+    context : PluginContext
+        Plugin context.
+    payload : HarvestResult
+        Harvest result to process.
+
+    Returns
+    -------
+    HarvestResult
+        Processed harvest result.
+    """
     result = payload
     for plugin in plugins:
         result = _invoke_apply(plugin, context, result)
@@ -198,7 +265,22 @@ def _run_transformer_pipeline(
     context: PluginContext,
     payload: SemanticResult,
 ) -> SemanticResult:
-    """Execute transformer plugins sequentially for ``payload``."""
+    """Execute transformer plugins sequentially for ``payload``.
+
+    Parameters
+    ----------
+    plugins : Iterable[TransformerPlugin]
+        Transformer plugins to execute.
+    context : PluginContext
+        Plugin context.
+    payload : SemanticResult
+        Semantic result to transform.
+
+    Returns
+    -------
+    SemanticResult
+        Transformed semantic result.
+    """
     result = payload
     for plugin in plugins:
         result = _invoke_apply(plugin, context, result)
@@ -210,7 +292,22 @@ def _run_formatter_pipeline(
     context: PluginContext,
     payload: DocstringEdit,
 ) -> DocstringEdit:
-    """Execute formatter plugins sequentially for ``payload``."""
+    """Execute formatter plugins sequentially for ``payload``.
+
+    Parameters
+    ----------
+    plugins : Iterable[FormatterPlugin]
+        Formatter plugins to execute.
+    context : PluginContext
+        Plugin context.
+    payload : DocstringEdit
+        Docstring edit to format.
+
+    Returns
+    -------
+    DocstringEdit
+        Formatted docstring edit.
+    """
     result = payload
     for plugin in plugins:
         result = _invoke_apply(plugin, context, result)
@@ -222,7 +319,29 @@ def _invoke_apply(
     context: PluginContext,
     payload: PayloadT,
 ) -> ResultT:
-    """Invoke ``plugin.apply`` with structured error reporting."""
+    """Invoke ``plugin.apply`` with structured error reporting.
+
+    Parameters
+    ----------
+    plugin : DocstringBuilderPlugin[PayloadT, ResultT]
+        Plugin instance to invoke.
+    context : PluginContext
+        Plugin context.
+    payload : PayloadT
+        Payload to process.
+
+    Returns
+    -------
+    ResultT
+        Result from plugin application.
+
+    Raises
+    ------
+    DocstringBuilderError
+        Propagated if plugin raises a DocstringBuilderError.
+    PluginExecutionError
+        If plugin raises a runtime error during execution.
+    """
     try:
         return plugin.apply(context, payload)
     except DocstringBuilderError:
@@ -634,7 +753,31 @@ def load_plugins(
     disable: Sequence[str] | None = None,
     builtin: Sequence[PluginFactoryCandidateT] | None = None,
 ) -> PluginManager:
-    """Discover, filter, and instantiate plugins for the current run."""
+    """Discover, filter, and instantiate plugins for the current run.
+
+    Parameters
+    ----------
+    config : BuilderConfig
+        Builder configuration.
+    repo_root : Path
+        Repository root directory.
+    only : Sequence[str], optional
+        Plugin names to include (whitelist).
+    disable : Sequence[str], optional
+        Plugin names to disable (blacklist).
+    builtin : Sequence[PluginFactoryCandidateT], optional
+        Built-in plugin candidates.
+
+    Returns
+    -------
+    PluginManager
+        Initialized plugin manager with discovered and filtered plugins.
+
+    Raises
+    ------
+    PluginConfigurationError
+        If unknown plugins are specified in only or disable lists.
+    """
     builtin_candidates = _builtin_candidates(builtin)
 
     discovered: dict[str, object] = {

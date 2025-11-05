@@ -57,11 +57,6 @@ def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProto
     -------
     type[AstroidManagerProtocol]
         Typed Astroid manager class.
-
-    Raises
-    ------
-    TypeError
-        If the module does not have an AstroidManager class attribute.
     """
     manager_cls = _coerce_class(module, "AstroidManager", "AstroidManager")
     return cast("type[AstroidManagerProtocol]", manager_cls)
@@ -79,11 +74,6 @@ def coerce_astroid_builder_class(module: ModuleType) -> type[AstroidBuilderProto
     -------
     type[AstroidBuilderProtocol]
         Typed Astroid builder class.
-
-    Raises
-    ------
-    TypeError
-        If the module does not have an AstroidBuilder class attribute.
     """
     builder_cls = _coerce_class(module, "AstroidBuilder", "AstroidBuilder")
     return cast("type[AstroidBuilderProtocol]", builder_cls)

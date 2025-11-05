@@ -180,6 +180,11 @@ def detect_repo() -> tuple[str, str]:
     Environment variables ``DOCS_GITHUB_ORG`` and ``DOCS_GITHUB_REPO`` override
     the detected values so downstream builds can rehost the docs without
     reconfiguring git remotes.
+
+    Returns
+    -------
+    tuple[str, str]
+        (owner, repo) tuple.
     """
     log_adapter = with_fields(
         LOGGER,
@@ -230,6 +235,11 @@ def git_sha() -> str:
 
     A ``DOCS_GITHUB_SHA`` environment variable can provide the value when the
     repository is not available locally (for example, in CI artifacts).
+
+    Returns
+    -------
+    str
+        Git SHA or fallback value.
     """
     log_adapter = with_fields(LOGGER, command=("git", "rev-parse", "HEAD"))
     try:
@@ -271,6 +281,11 @@ def iter_packages() -> list[str]:
 
     The helper delegates to :func:`tools.detect_pkg.detect_packages` so CLI
     overrides and auto-detection share the same semantics.
+
+    Returns
+    -------
+    list[str]
+        List of package names.
     """
     env_pkgs = os.environ.get("DOCS_PKG")
     if env_pkgs:
@@ -279,7 +294,18 @@ def iter_packages() -> list[str]:
 
 
 def summarize(node: GriffeObjectLike) -> str:
-    """Return the first sentence of ``node``'s docstring, when present."""
+    """Return the first sentence of ``node``'s docstring, when present.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to summarize.
+
+    Returns
+    -------
+    str
+        First sentence of docstring or empty string.
+    """
     doc = node.docstring
     if doc is None or not doc.value:
         return ""
@@ -297,7 +323,18 @@ def summarize(node: GriffeObjectLike) -> str:
 
 
 def is_public(node: GriffeObjectLike) -> bool:
-    """Return ``True`` if the symbol name is not private by convention."""
+    """Return ``True`` if the symbol name is not private by convention.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to check.
+
+    Returns
+    -------
+    bool
+        True if symbol is public (doesn't start with underscore).
+    """
     return not node.name.startswith("_")
 
 
@@ -307,6 +344,18 @@ def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
     The link points to the source file on disk using the ``./path:line:column``
     format understood by VS Code and other Markdown-aware viewers. ``None`` is
     returned when the source file is not within the README directory tree.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to link.
+    readme_dir : Path
+        README directory path.
+
+    Returns
+    -------
+    str | None
+        Editor link or None if not available.
     """
     rel_path = node.relative_package_filepath
     if not rel_path:
@@ -322,7 +371,18 @@ def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
 
 
 def get_view_link(node: GriffeObjectLike) -> str | None:
-    """Return a GitHub URL for ``node`` when its path maps inside the repo."""
+    """Return a GitHub URL for ``node`` when its path maps inside the repo.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to link.
+
+    Returns
+    -------
+    str | None
+        GitHub URL or None if not available.
+    """
     rel_path = node.relative_package_filepath
     if not rel_path:
         return None
@@ -338,14 +398,36 @@ def get_view_link(node: GriffeObjectLike) -> str | None:
 
 
 def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
-    """Return ``node`` members that are public based on their name."""
+    """Return ``node`` members that are public based on their name.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to examine.
+
+    Returns
+    -------
+    list[GriffeObjectLike]
+        List of public members sorted by path.
+    """
     members = node.members
     if not members:
         return []
     public = [member for member in members.values() if is_public(member)]
 
     def _member_key(member: GriffeObjectLike) -> str:
-        """Return the fully qualified path when available, otherwise the name."""
+        """Return the fully qualified path when available, otherwise the name.
+
+        Parameters
+        ----------
+        member : GriffeObjectLike
+            Member object.
+
+        Returns
+        -------
+        str
+            Member path or name.
+        """
         if member.path:
             return member.path
         return member.name
@@ -354,7 +436,18 @@ def iter_public_members(node: GriffeObjectLike) -> list[GriffeObjectLike]:
 
 
 def _load_json(path: Path) -> JsonObject:
-    """Return the JSON document stored at ``path`` or ``{}`` when unavailable."""
+    """Return the JSON document stored at ``path`` or ``{}`` when unavailable.
+
+    Parameters
+    ----------
+    path : Path
+        JSON file path.
+
+    Returns
+    -------
+    JsonObject
+        Parsed JSON object or empty dict.
+    """
     if not path.exists():
         return {}
     try:
@@ -381,7 +474,18 @@ class SymbolMetadata:
     deprecated_in: str | None = None
 
     def merged(self, override: SymbolMetadata | None) -> SymbolMetadata:
-        """Return a metadata instance where ``override`` values take precedence."""
+        """Return a metadata instance where ``override`` values take precedence.
+
+        Parameters
+        ----------
+        override : SymbolMetadata | None
+            Override metadata (None means no override).
+
+        Returns
+        -------
+        SymbolMetadata
+            Merged metadata instance.
+        """
         if override is None:
             return self
         return SymbolMetadata(
@@ -393,7 +497,18 @@ class SymbolMetadata:
         )
 
     def with_section(self, section: str | None) -> SymbolMetadata:
-        """Return metadata with ``section`` applied when provided."""
+        """Return metadata with ``section`` applied when provided.
+
+        Parameters
+        ----------
+        section : str | None
+            Section name (None means no change).
+
+        Returns
+        -------
+        SymbolMetadata
+            Metadata instance with updated section.
+        """
         if section is None or self.section == section:
             return self
         return SymbolMetadata(
@@ -426,7 +541,20 @@ class NavModuleData:
     listed_symbols: frozenset[str]
 
     def lookup(self, qname: str, symbol: str) -> NavMatch:
-        """Return metadata lookup result for ``qname`` within this module."""
+        """Return metadata lookup result for ``qname`` within this module.
+
+        Parameters
+        ----------
+        qname : str
+            Qualified symbol name.
+        symbol : str
+            Symbol short name.
+
+        Returns
+        -------
+        NavMatch
+            Lookup result with metadata and matching flags.
+        """
         override = self.overrides.get(qname) or self.overrides.get(symbol)
         section = self.sections.get(symbol)
         defaults = self.defaults.with_section(section)
@@ -446,7 +574,18 @@ class NavData:
     modules: dict[str, NavModuleData]
 
     def lookup(self, qname: str) -> tuple[SymbolMetadata | None, SymbolMetadata]:
-        """Return override metadata and defaults for ``qname``."""
+        """Return override metadata and defaults for ``qname``.
+
+        Parameters
+        ----------
+        qname : str
+            Qualified symbol name.
+
+        Returns
+        -------
+        tuple[SymbolMetadata | None, SymbolMetadata]
+            (override_metadata, default_metadata) tuple.
+        """
         symbol = qname.rsplit(".", maxsplit=1)[-1]
         fallback: SymbolMetadata | None = None
         for module in self.modules.values():
@@ -473,7 +612,18 @@ class TestCatalog:
     records: dict[str, tuple[TestRecord, ...]]
 
     def lookup(self, qname: str) -> tuple[TestRecord, ...]:
-        """Return test records associated with ``qname`` or its short name."""
+        """Return test records associated with ``qname`` or its short name.
+
+        Parameters
+        ----------
+        qname : str
+            Qualified symbol name.
+
+        Returns
+        -------
+        tuple[TestRecord, ...]
+            Test records for the symbol.
+        """
         symbol = qname.rsplit(".", maxsplit=1)[-1]
         return self.records.get(qname) or self.records.get(symbol) or ()
 
@@ -504,7 +654,18 @@ class ReadmeConfig:
 
     @classmethod
     def from_namespace(cls, namespace: argparse.Namespace) -> ReadmeConfig:
-        """Construct configuration from an argparse namespace."""
+        """Construct configuration from an argparse namespace.
+
+        Parameters
+        ----------
+        namespace : argparse.Namespace
+            Parsed arguments namespace.
+
+        Returns
+        -------
+        ReadmeConfig
+            Configuration instance.
+        """
         packages_arg: str = getattr(namespace, "packages", "")
         packages = tuple(pkg for pkg in (part.strip() for part in packages_arg.split(",")) if pkg)
         if not packages:
@@ -639,7 +800,18 @@ _TEST_CATALOG = _build_test_catalog(_load_json(TESTMAP_PATH))
 
 
 def parse_config(argv: Sequence[str] | None = None) -> ReadmeConfig:
-    """Parse CLI arguments and environment overrides into a :class:`ReadmeConfig`."""
+    """Parse CLI arguments and environment overrides into a :class:`ReadmeConfig`.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    ReadmeConfig
+        Parsed configuration.
+    """
     parser = argparse.ArgumentParser(description="Generate per-package README files.")
     packages_default: str = os.getenv("DOCS_PKG", "") or ""
     link_mode_default: str = os.getenv("DOCS_LINK_MODE", "both") or "both"
@@ -670,7 +842,22 @@ def badges_for(
     nav: NavData | None = None,
     tests: TestCatalog | None = None,
 ) -> Badges:
-    """Return badge metadata for ``qname`` using NavMap and test fixtures."""
+    """Return badge metadata for ``qname`` using NavMap and test fixtures.
+
+    Parameters
+    ----------
+    qname : str
+        Qualified symbol name.
+    nav : NavData | None
+        Navigation data (None uses default).
+    tests : TestCatalog | None
+        Test catalog (None uses default).
+
+    Returns
+    -------
+    Badges
+        Badge metadata instance.
+    """
     nav_data = nav if nav is not None else _NAV_DATA
     test_catalog = tests if tests is not None else _TEST_CATALOG
     symbol_meta, defaults = nav_data.lookup(qname)
@@ -686,7 +873,18 @@ def badges_for(
 
 
 def _format_test_badge(entries: Sequence[TestRecord] | None) -> str | None:
-    """Format the ``tested-by`` badge snippet when entries exist."""
+    """Format the ``tested-by`` badge snippet when entries exist.
+
+    Parameters
+    ----------
+    entries : Sequence[TestRecord] | None
+        Test records to format.
+
+    Returns
+    -------
+    str | None
+        Formatted badge string or None if no entries.
+    """
     if not entries:
         return None
     formatted: list[str] = []
@@ -701,7 +899,18 @@ def _format_test_badge(entries: Sequence[TestRecord] | None) -> str | None:
 
 
 def _badge_parts(badge: Badges) -> list[str]:
-    """Return textual fragments that make up the badge line."""
+    """Return textual fragments that make up the badge line.
+
+    Parameters
+    ----------
+    badge : Badges
+        Badge metadata.
+
+    Returns
+    -------
+    list[str]
+        List of badge fragment strings.
+    """
     attributes = [
         ("stability", "stability"),
         ("owner", "owner"),
@@ -721,7 +930,18 @@ def _badge_parts(badge: Badges) -> list[str]:
 
 
 def _wrap_badge_parts(parts: Sequence[str]) -> list[str]:
-    """Wrap badge fragments to respect the configured line width."""
+    """Wrap badge fragments to respect the configured line width.
+
+    Parameters
+    ----------
+    parts : Sequence[str]
+        Badge fragments to wrap.
+
+    Returns
+    -------
+    list[str]
+        Wrapped badge lines.
+    """
     wrapped: list[str] = []
     current: list[str] = []
     current_len = 0
@@ -768,7 +988,22 @@ def format_badges(qname: str, base_length: int = 0) -> str:
 
 
 def editor_link(abs_path: Path, lineno: int, editor_mode: EditorMode) -> str | None:
-    """Return an editor-friendly link for ``abs_path`` based on ``editor_mode``."""
+    """Return an editor-friendly link for ``abs_path`` based on ``editor_mode``.
+
+    Parameters
+    ----------
+    abs_path : Path
+        Absolute file path.
+    lineno : int
+        Line number (1-based).
+    editor_mode : EditorMode
+        Editor mode to use.
+
+    Returns
+    -------
+    str | None
+        Editor link string or None.
+    """
     if editor_mode is EditorMode.VSCODE:
         return f"vscode://file/{abs_path}:{lineno}:1"
     if editor_mode is EditorMode.RELATIVE:
@@ -781,7 +1016,18 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: EditorMode) -> str | N
 
 
 def _is_exception(node: GriffeObjectLike) -> bool:
-    """Return ``True`` when ``node`` represents an exception type."""
+    """Return ``True`` when ``node`` represents an exception type.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to check.
+
+    Returns
+    -------
+    bool
+        True if node is an exception class.
+    """
     kind = node.kind.value if node.kind else ""
     if kind != "class":
         return False
@@ -799,12 +1045,34 @@ KINDS = {"module", "package", "class", "function"}
 
 
 def _child_path(node: GriffeObjectLike) -> str:
-    """Return the path attribute for ``node`` ensuring str typing."""
+    """Return the path attribute for ``node`` ensuring str typing.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object.
+
+    Returns
+    -------
+    str
+        Node path string.
+    """
     return node.path
 
 
 def bucket_for(node: GriffeObjectLike) -> str:
-    """Return the README section name that should contain ``node``."""
+    """Return the README section name that should contain ``node``.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to categorize.
+
+    Returns
+    -------
+    str
+        Section name (e.g., 'Modules', 'Classes', 'Functions', 'Exceptions').
+    """
     kind = node.kind.value if node.kind else ""
     if kind in {"module", "package"}:
         return "Modules"
@@ -820,6 +1088,20 @@ def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: ReadmeConfig) -> 
 
     The output includes GitHub links, optional editor URIs, and badges derived from the NavMap,
     matching the style published on kgfoundry.dev.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Griffe object to render.
+    readme_dir : Path
+        README directory path.
+    cfg : ReadmeConfig
+        Configuration instance.
+
+    Returns
+    -------
+    str | None
+        Markdown line or None if no links available.
     """
     qname = node.path
     summary = summarize(node)
@@ -857,7 +1139,20 @@ def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: ReadmeConfig) -> 
 
 
 def write_if_changed(path: Path, content: str) -> bool:
-    """Write ``content`` to ``path`` when the rendered output differs."""
+    """Write ``content`` to ``path`` when the rendered output differs.
+
+    Parameters
+    ----------
+    path : Path
+        File path to write.
+    content : str
+        Content to write.
+
+    Returns
+    -------
+    bool
+        True if file was written, False if unchanged.
+    """
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()[:12]
     rendered = content.rstrip() + f"\n<!-- agent:readme v1 sha:{SHA} content:{digest} -->\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else ""
@@ -869,7 +1164,20 @@ def write_if_changed(path: Path, content: str) -> bool:
 
 
 def write_readme(node: GriffeObjectLike, cfg: ReadmeConfig) -> bool:
-    """Generate or update the README for the package described by ``node``."""
+    """Generate or update the README for the package described by ``node``.
+
+    Parameters
+    ----------
+    node : GriffeObjectLike
+        Package node.
+    cfg : ReadmeConfig
+        Configuration instance.
+
+    Returns
+    -------
+    bool
+        True if README was written or updated.
+    """
     pkg_dir = (SRC if SRC.exists() else ROOT) / node.path.replace(".", "/")
     readme = pkg_dir / "README.md"
 
@@ -955,7 +1263,18 @@ def _collect_missing_metadata(node: GriffeObjectLike, missing: set[str]) -> None
 
 
 def _ensure_packages_selected(packages: Sequence[str]) -> None:
-    """Exit when no packages are available for processing."""
+    """Exit when no packages are available for processing.
+
+    Parameters
+    ----------
+    packages : Sequence[str]
+        Package names.
+
+    Raises
+    ------
+    SystemExit
+        If no packages are provided.
+    """
     if packages:
         return
     message = "No packages detected; set DOCS_PKG or add packages under src/."
@@ -973,7 +1292,22 @@ def _warn_missing_inputs() -> None:
 
 
 def _process_module(module: GriffeObjectLike, cfg: ReadmeConfig, missing_meta: set[str]) -> bool:
-    """Render README files for ``module`` and its package members."""
+    """Render README files for ``module`` and its package members.
+
+    Parameters
+    ----------
+    module : GriffeObjectLike
+        Module node.
+    cfg : ReadmeConfig
+        Configuration instance.
+    missing_meta : set[str]
+        Set to collect missing metadata symbols.
+
+    Returns
+    -------
+    bool
+        True if any README was written or updated.
+    """
     changed = False
     if cfg.fail_on_metadata_miss:
         _collect_missing_metadata(module, missing_meta)
@@ -1010,7 +1344,20 @@ def _report_duration(start: float, *, changed_any: bool) -> None:
 
 
 def _log_problem_and_exit(problem: ProblemDetailsDict, exit_code: int) -> NoReturn:
-    """Log ``problem`` using structured context before exiting."""
+    """Log ``problem`` using structured context before exiting.
+
+    Parameters
+    ----------
+    problem : ProblemDetailsDict
+        Problem details dictionary.
+    exit_code : int
+        Exit code to use.
+
+    Raises
+    ------
+    SystemExit
+        Always raised with the provided exit code.
+    """
     with_fields(
         LOGGER,
         problemType=problem["type"],
@@ -1021,7 +1368,20 @@ def _log_problem_and_exit(problem: ProblemDetailsDict, exit_code: int) -> NoRetu
 
 
 def _raise_missing_metadata(detail: str, problem: ProblemDetailsDict) -> NoReturn:
-    """Raise ``MissingMetadataError`` with the provided context."""
+    """Raise ``MissingMetadataError`` with the provided context.
+
+    Parameters
+    ----------
+    detail : str
+        Error detail message.
+    problem : ProblemDetailsDict
+        Problem details dictionary.
+
+    Raises
+    ------
+    MissingMetadataError
+        Always raised.
+    """
     raise MissingMetadataError(detail, problem=problem)
 
 
