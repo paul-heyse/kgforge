@@ -18,13 +18,10 @@ if TYPE_CHECKING:
 LOGGER = get_logger(__name__)
 
 DOCS_ADAPTERS = (
-    "tools.docs.build_agent_analytics",
-    "tools.docs.build_agent_catalog",
     "tools.docs.build_artifacts",
     "tools.docs.build_graphs",
     "tools.docs.build_test_map",
     "tools.docs.export_schemas",
-    "tools.docs.render_agent_portal",
     "tools.docs.scan_observability",
 )
 

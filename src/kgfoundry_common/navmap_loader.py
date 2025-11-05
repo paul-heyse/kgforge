@@ -17,7 +17,7 @@ def _candidate_sidecars(package: str) -> list[Path]:
 
     Returns
     -------
-    list[pathlib.Path]
+    list[Path]
         Candidate paths in priority order where `_nav.json` sidecars may live.
     """
     spec = importlib.util.find_spec(package)
@@ -49,6 +49,7 @@ def _candidate_sidecars(package: str) -> list[Path]:
         deduped.append(candidate)
 
     return deduped
+
 
 def _load_sidecar_data(package: str) -> dict[str, Any]:
     """Return metadata loaded from package sidecar files.
@@ -106,27 +107,23 @@ def load_nav_metadata(package: str, exports: tuple[str, ...]) -> dict[str, Any]:
         documentation toolchain. When no sidecar is present a minimal fallback
         derived from ``exports`` is returned.
     """
-    data: dict[str, Any] = _load_sidecar_data(package)
-    if not data:
-        data = _load_runtime_nav(package)
+    data = _load_sidecar_data(package) or _load_runtime_nav(package)
 
-    normalized_exports = list(exports)
+    normalized_exports = list(dict.fromkeys(exports))
 
-    sections = data.get("sections")
-    if not sections:
-        sections = [
-            {
-                "id": "public-api",
-                "title": "Public API",
-                "symbols": normalized_exports,
-            }
-        ]
+    sections = data.get("sections") or [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": normalized_exports,
+        }
+    ]
 
-    symbol_meta: dict[str, Any] = {}
     raw_symbols = data.get("symbols") or {}
-    for name in normalized_exports:
-        meta = raw_symbols.get(name)
-        symbol_meta[name] = meta if isinstance(meta, dict) else {}
+    symbol_meta = {
+        name: raw_symbols[name] if isinstance(raw_symbols.get(name), dict) else {}
+        for name in normalized_exports
+    }
 
     navmap: dict[str, Any] = {
         "title": data.get("title", package),
@@ -137,10 +134,6 @@ def load_nav_metadata(package: str, exports: tuple[str, ...]) -> dict[str, Any]:
         "symbols": symbol_meta,
     }
 
-    # Preserve any additional top-level keys the sidecar may define (e.g.,
-    # relationships). This allows future extensions without code changes.
-    for key, value in data.items():
-        if key not in navmap:
-            navmap[key] = value
-
+    extras = {key: value for key, value in data.items() if key not in navmap}
+    navmap.update(extras)
     return navmap

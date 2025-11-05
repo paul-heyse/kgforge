@@ -35,70 +35,6 @@ def _coerce_argv(argv: Sequence[str] | None) -> list[str] | None:
     return list(argv) if argv is not None else None
 
 
-def build_agent_analytics(argv: Sequence[str] | None = None) -> int:
-    """Build the agent analytics documentation artifacts.
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Optional CLI-style arguments forwarded to the underlying builder.
-
-    Returns
-    -------
-    int
-        Exit code emitted by the analytics builder.
-
-    Notes
-    -----
-    Errors propagate as structured Problem Details documented under
-    ``schema/examples/tools/problem_details/tool-execution-error.json``.
-    """
-    module = import_module("tools.docs.build_agent_analytics")
-    main_fn = cast("Callable[[list[str] | None], int]", module.main)
-    return main_fn(_coerce_argv(argv))
-
-
-def build_agent_api() -> int:
-    """Generate the Agent API documentation bundle.
-
-    Returns
-    -------
-    int
-        Exit code emitted by the Agent API builder.
-
-    Notes
-    -----
-    Failures emit Problem Details aligned with
-    ``schema/examples/tools/problem_details/tool-execution-error.json``.
-    """
-    module = import_module("tools.docs.build_agent_api")
-    main_fn = cast("Callable[[], int]", module.main)
-    return main_fn()
-
-
-def build_agent_catalog(argv: Sequence[str] | None = None) -> int:
-    """Construct the agent catalog JSON artifact consumed by downstream docs.
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Optional CLI arguments forwarded to the catalog builder.
-
-    Returns
-    -------
-    int
-        Exit code reported by the catalog builder.
-
-    Notes
-    -----
-    Exceptions are rendered as Problem Details compatible with
-    ``schema/examples/tools/problem_details/tool-execution-error.json``.
-    """
-    module = import_module("tools.docs.build_agent_catalog")
-    main_fn = cast("Callable[[list[str] | None], int]", module.main)
-    return main_fn(_coerce_argv(argv))
-
-
 def build_artifacts() -> int:
     """Assemble the full documentation artifact set.
 
@@ -166,29 +102,6 @@ def export_schemas(argv: Sequence[str] | None = None) -> int:
     return main_fn(_coerce_argv(argv))
 
 
-def render_agent_portal(argv: Sequence[str] | None = None) -> int:
-    """Render the Agent Portal static site.
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Optional CLI-style arguments forwarded to the portal renderer.
-
-    Returns
-    -------
-    int
-        Exit code returned by the portal renderer.
-
-    Notes
-    -----
-    Failures emit Problem Details aligned with
-    ``schema/examples/tools/problem_details/tool-execution-error.json``.
-    """
-    module = import_module("tools.docs.render_agent_portal")
-    main_fn = cast("Callable[[list[str] | None], int]", module.main)
-    return main_fn(_coerce_argv(argv))
-
-
 def scan_observability() -> int:
     """Scan observability metadata and emit compliance reports.
 
@@ -208,14 +121,10 @@ def scan_observability() -> int:
 
 
 _PUBLIC_EXPORTS: dict[str, object] = {
-    "build_agent_analytics": build_agent_analytics,
-    "build_agent_api": build_agent_api,
-    "build_agent_catalog": build_agent_catalog,
     "build_artifacts": build_artifacts,
     "build_graphs": build_graphs,
     "build_test_map": build_test_map,
     "export_schemas": export_schemas,
-    "render_agent_portal": render_agent_portal,
     "scan_observability": scan_observability,
 }
 
@@ -233,9 +142,6 @@ if TYPE_CHECKING:
     from tools.docs import catalog_models, errors, observability
 
 __all__: tuple[str, ...] = (
-    "build_agent_analytics",
-    "build_agent_api",
-    "build_agent_catalog",
     "build_artifacts",
     "build_graphs",
     "build_test_map",
@@ -243,7 +149,6 @@ __all__: tuple[str, ...] = (
     "errors",
     "export_schemas",
     "observability",
-    "render_agent_portal",
     "scan_observability",
 )
 

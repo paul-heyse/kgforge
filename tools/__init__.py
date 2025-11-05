@@ -76,7 +76,6 @@ if TYPE_CHECKING:
     from types import ModuleType
 
     from tools import codemods, docs, docstring_builder, gen_readmes, generate_pr_summary, navmap
-    from tools.docs import build_agent_api, build_agent_catalog
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -133,8 +132,6 @@ _PUBLIC_EXPORTS: dict[str, object] = {
 PUBLIC_EXPORTS: Final[Mapping[str, object]] = MappingProxyType(_PUBLIC_EXPORTS)
 
 _MODULE_EXPORTS: dict[str, str] = {
-    "build_agent_api": "tools.docs.build_agent_api",
-    "build_agent_catalog": "tools.docs.build_agent_catalog",
     "codemods": "tools.codemods",
     "docstring_builder": "tools.docstring_builder",
     "docs": "tools.docs",
@@ -168,8 +165,6 @@ __all__: tuple[str, ...] = (
     "ToolRunResult",
     "ToolRuntimeSettings",
     "ValidationError",
-    "build_agent_api",
-    "build_agent_catalog",
     "build_problem_details",
     "build_schema_problem_details",
     "build_tool_problem_details",

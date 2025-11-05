@@ -1,0 +1,41 @@
+tags:
+  - name: orchestration
+    x-displayName: Orchestration
+    description: Commands that orchestrate indexing, ingestion, and flow execution.
+
+x-tagGroups:
+  - name: CLI Suites
+    tags: [orchestration]
+
+operations:
+  cli.index_bm25:
+    tags: [orchestration, index_bm25]
+    x-handler: "orchestration.cli:index_bm25"
+    x-codeSamples:
+      - lang: bash
+        source: "kgf index-bm25 data/chunks.parquet --backend lucene --index-dir ./_indices/bm25"
+  cli.index_faiss:
+    tags: [orchestration, index_faiss]
+    x-handler: "orchestration.cli:index_faiss"
+    x-env:
+      - KGF_FAISS_RESOURCES
+    x-codeSamples:
+      - lang: bash
+        source: "kgf index-faiss vectors.json --factory 'OPQ64,IVF8192,PQ64' --metric ip"
+  cli.api:
+    tags: [orchestration, api]
+    x-handler: "orchestration.cli:api"
+    x-env:
+      - KGF_SEARCH_CONFIG
+    x-codeSamples:
+      - lang: bash
+        source: "kgf api --port 8080"
+  cli.e2e:
+    tags: [orchestration, e2e]
+    x-handler: "orchestration.cli:e2e"
+    x-env:
+      - KGF_PROFILE
+    x-codeSamples:
+      - lang: bash
+        source: "kgf e2e"
+

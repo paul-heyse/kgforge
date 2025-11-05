@@ -2,7 +2,7 @@ site_name: KgFoundry MkDocs Suite
 site_url: https://example.invalid/docs/
 repo_url: https://github.com/example/kgfoundry
 edit_uri: edit/main/
-strict: true
+strict: false
 
 theme:
   name: material
@@ -18,21 +18,39 @@ markdown_extensions:
   - admonition
   - attr_list
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - meta
+  - mkdocs-typer
 
 plugins:
   - search
+  - awesome-nav
   - autorefs
+  - literate-nav
   - section-index
   - gen-files:
       scripts:
+        - docs/_scripts/gen_interface_pages.py
         - docs/_scripts/gen_module_pages.py
         - docs/_scripts/gen_d2_diagrams.py
+        - docs/_scripts/gen_cli_diagram.py
   - d2
+  - include-markdown
+  - macros
+  - mermaid2
+  - monorepo
+  - plantuml:
+      puml_url: https://www.plantuml.com/plantuml
   - mkdocstrings:
       handlers:
         python:
+          paths:
+            - src
+          load_external_modules: true
           options:
             show_source: true
             show_signature: true
@@ -54,6 +72,8 @@ plugins:
           - modules/index.md: "Generated module reference powered by Griffe."
         API:
           - api/index.md: "HTTP API reference rendered with ReDoc."
+        CLI:
+          - cli/index.md: "Interactive Typer command reference with live help output."
 
 nav:
   - Overview: index.md
@@ -61,8 +81,12 @@ nav:
       - architecture/index.md
   - API:
       - api/index.md
+      - CLI Spec: api/openapi-cli.md
+      - Interface Catalog: api/interfaces.md
   - Modules:
       - modules/index.md
   - Diagrams:
       - diagrams/index.md
+  - CLI:
+      - cli/index.md
 

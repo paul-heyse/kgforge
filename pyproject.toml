@@ -479,15 +479,14 @@ dependencies = [
     "mkdocs-include-markdown-plugin>=7.2.0",
     "mkdocs-macros-plugin>=1.4.1",
     "mkdocs-monorepo-plugin>=1.1.2",
+    "mkdocs-typer>=0.0.3",
+    "mkdocs-typer2>=0.1.6",
 ]
 
 [project.scripts]
-catalogctl = "kgfoundry.agent_catalog.cli:main"
-catalogctl-mcp = "kgfoundry.agent_catalog.mcp:main"
 docs-build-symbol-index = "docs.toolchain:build_symbol_index"
 docs-validate-artifacts = "docs.toolchain:validate_artifacts"
 docs-symbol-delta = "docs.toolchain:symbol_delta"
-tools-build-agent-catalog = "tools.cli:build_agent_catalog"
 tools-build-navmap = "tools.cli:build_navmap"
 
 
