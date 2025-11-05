@@ -2,13 +2,35 @@
 
 from __future__ import annotations
 
+import os
 from collections import defaultdict
+from typing import Final
 
 import mkdocs_gen_files
 
 
+GROUP_DEPTH_ENV_VAR: Final = "MKDOCS_D2_GROUP_DEPTH"
+DEFAULT_GROUP_DEPTH: Final = 1
+
+
+def _resolve_group_depth() -> int:
+    """Return the configured module prefix depth used for grouping diagrams."""
+
+    value = os.environ.get(GROUP_DEPTH_ENV_VAR)
+    if value is None:
+        return DEFAULT_GROUP_DEPTH
+
+    try:
+        depth = int(value)
+    except ValueError:
+        return DEFAULT_GROUP_DEPTH
+
+    return max(1, depth)
+
+
 def main() -> None:
     """Entry point executed by mkdocs-gen-files."""
+    group_depth = _resolve_group_depth()
     by_folder: dict[str, list[str]] = defaultdict(list)
     for file in list(mkdocs_gen_files.files):
         path = file.src_uri
@@ -18,10 +40,12 @@ def main() -> None:
         if module_path == "index":
             continue
         parts = module_path.split(".")
-        folder = parts[1] if len(parts) > 1 else parts[0]
+        depth = min(len(parts), group_depth)
+        folder = ".".join(parts[:depth])
         by_folder[folder].append(module_path)
 
-    for folder, modules in by_folder.items():
+    for folder in sorted(by_folder):
+        modules = by_folder[folder]
         d2_path = f"diagrams/{folder}.d2"
         with mkdocs_gen_files.open(d2_path, "w") as handle:
             handle.write("direction: right\n")
