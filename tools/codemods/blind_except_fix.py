@@ -74,7 +74,11 @@ class BlindExceptTransformer(cst.CSTTransformer):
     Initializes transformer with change tracking.
     """
 
-    def leave_excepthandler(
+    def __init__(self) -> None:
+        super().__init__()
+        self.changes: list[str] = []
+
+    def leave_ExceptHandler(
         self, original_node: cst.ExceptHandler, updated_node: cst.ExceptHandler
     ) -> cst.ExceptHandler:
         """Rewrite blind except handlers when exiting traversal.

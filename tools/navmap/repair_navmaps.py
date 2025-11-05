@@ -287,17 +287,26 @@ def repair_module(
 ) -> RepairResult:
     """Repair a single module's navmap metadata and optionally persist fixes.
 
+    This function analyzes a module's navmap metadata and applies automated fixes
+    including: inserting missing anchor markers, adding public API sections, and
+    synchronizing the navmap literal with actual module exports. Changes can be
+    applied in dry-run mode (inspection only) or persisted to disk.
+
     Parameters
     ----------
-    info
-        Metadata describing the target module discovered by ``build_navmap``.
-    execution
-        Execution options controlling whether changes are applied to disk.
+    info : ModuleInfo
+        Metadata describing the target module discovered by ``build_navmap``,
+        including file path, exports, and existing navmap structure.
+    execution : RepairExecutionConfig
+        Execution options controlling whether changes are applied to disk or
+        only reported. Includes flags for dry-run mode and change persistence.
 
     Returns
     -------
     RepairResult
         Outcome describing emitted messages alongside change and apply flags.
+        The messages list contains human-readable descriptions of all fixes
+        that were applied or would be applied.
     """
     path = info.path
     original_text = path.read_text(encoding="utf-8")

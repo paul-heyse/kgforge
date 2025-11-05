@@ -71,6 +71,11 @@ class PluginFactory(Protocol[T_Plugin_co]):
     def __call__(self, **kwargs: object) -> T_Plugin_co:
         """Invoke the factory to create a new plugin instance.
 
+        Parameters
+        ----------
+        **kwargs : object
+            Keyword arguments passed to the plugin factory (ignored by default).
+
         Returns
         -------
         T_Plugin_co
@@ -190,24 +195,30 @@ class LegacyPluginProtocol(Protocol):
 
 
 class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayload]):
-    """Adapt legacy ``run`` plugins to the typed ``apply`` protocol."""
+    """Adapt legacy ``run`` plugins to the typed ``apply`` protocol.
+
+    Attributes
+    ----------
+    name : str
+        Plugin name.
+    stage : PluginStage
+        Plugin stage (harvester, transformer, or formatter).
+
+    Parameters
+    ----------
+    plugin : LegacyPluginProtocol
+        Legacy plugin instance to wrap.
+
+    Raises
+    ------
+    TypeError
+        If plugin stage is invalid or unsupported.
+    """
 
     name: str
     stage: PluginStage
 
     def __init__(self, plugin: LegacyPluginProtocol) -> None:
-        """Initialize legacy plugin adapter.
-
-        Parameters
-        ----------
-        plugin : LegacyPluginProtocol
-            Legacy plugin instance to wrap.
-
-        Raises
-        ------
-        TypeError
-            If plugin stage is invalid or unsupported.
-        """
         stage_candidate: object = getattr(plugin, "stage", None)
         valid_stages: dict[str, PluginStage] = {
             "harvester": "harvester",
@@ -361,18 +372,22 @@ class LegacyPluginAdapter(DocstringBuilderPlugin[DocstringPayload, DocstringPayl
 
 
 class _LegacyHarvesterAdapter(HarvesterPlugin):
-    """Adapter that narrows ``apply`` to ``HarvestResult`` payloads."""
+    """Adapter that narrows ``apply`` to ``HarvestResult`` payloads.
+
+    Attributes
+    ----------
+    stage : PluginStage
+        Plugin stage, always "harvester".
+
+    Parameters
+    ----------
+    adapter : LegacyPluginAdapter
+        Base adapter instance.
+    """
 
     stage: PluginStage = "harvester"
 
     def __init__(self, adapter: LegacyPluginAdapter) -> None:
-        """Initialize harvester adapter.
-
-        Parameters
-        ----------
-        adapter : LegacyPluginAdapter
-            Base adapter instance.
-        """
         self._adapter = adapter
         self.name = adapter.name
 
@@ -426,18 +441,22 @@ class _LegacyHarvesterAdapter(HarvesterPlugin):
 
 
 class _LegacyTransformerAdapter(TransformerPlugin):
-    """Adapter that narrows ``apply`` to ``SemanticResult`` payloads."""
+    """Adapter that narrows ``apply`` to ``SemanticResult`` payloads.
+
+    Attributes
+    ----------
+    stage : PluginStage
+        Plugin stage, always "transformer".
+
+    Parameters
+    ----------
+    adapter : LegacyPluginAdapter
+        Base adapter instance.
+    """
 
     stage: PluginStage = "transformer"
 
     def __init__(self, adapter: LegacyPluginAdapter) -> None:
-        """Initialize transformer adapter.
-
-        Parameters
-        ----------
-        adapter : LegacyPluginAdapter
-            Base adapter instance.
-        """
         self._adapter = adapter
         self.name = adapter.name
 
@@ -489,18 +508,22 @@ class _LegacyTransformerAdapter(TransformerPlugin):
 
 
 class _LegacyFormatterAdapter(FormatterPlugin):
-    """Adapter that narrows ``apply`` to ``DocstringEdit`` payloads."""
+    """Adapter that narrows ``apply`` to ``DocstringEdit`` payloads.
+
+    Attributes
+    ----------
+    stage : PluginStage
+        Plugin stage, always "formatter".
+
+    Parameters
+    ----------
+    adapter : LegacyPluginAdapter
+        Base adapter instance.
+    """
 
     stage: PluginStage = "formatter"
 
     def __init__(self, adapter: LegacyPluginAdapter) -> None:
-        """Initialize formatter adapter.
-
-        Parameters
-        ----------
-        adapter : LegacyPluginAdapter
-            Base adapter instance.
-        """
         self._adapter = adapter
         self.name = adapter.name
 

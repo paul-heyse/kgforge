@@ -38,6 +38,37 @@ class Doc(BaseModel):
     references. Field descriptions below include alias behaviour for
     reproducibility across serialization boundaries.
 
+    Attributes
+    ----------
+    id : Id
+        Unique document identifier.
+    openalex_id : str | None
+        OpenAlex work identifier.
+    doi : str | None
+        Digital Object Identifier.
+    arxiv_id : str | None
+        arXiv preprint identifier.
+    pmcid : str | None
+        PubMed Central identifier.
+    title : str
+        Document title.
+    authors : list[str]
+        List of author names.
+    pub_date : str | None
+        Publication date string.
+    license : str | None
+        License identifier (for example ``"CC-BY"``).
+    language : str | None
+        Two-letter language code.
+    pdf_uri : str
+        URI or path to the PDF file.
+    source : str
+        Source identifier (for example ``"openalex"``).
+    content_hash : str | None
+        SHA256 content hash for deduplication.
+    model_config : ConfigDict
+        Pydantic configuration forbidding unknown fields.
+
     Examples
     --------
     >>> from pathlib import Path

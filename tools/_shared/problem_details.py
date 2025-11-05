@@ -48,6 +48,7 @@ __all__ = [
     "build_problem_details",
     "build_schema_problem_details",
     "build_tool_problem_details",
+    "coerce_optional_dict",
     "problem_from_exception",
     "render_problem",
     "tool_digest_mismatch_problem_details",
@@ -56,12 +57,34 @@ __all__ = [
     "tool_missing_problem_details",
     "tool_timeout_problem_details",
 ]
+__all__.sort()
 
 # Type aliases for JSON values (RFC 7159 compatible)
 JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
 
 ProblemDetailsDict = dict[str, JsonValue]
+
+
+def coerce_optional_dict(
+    mapping: Mapping[str, JsonValue] | None,
+) -> dict[str, JsonValue] | None:
+    """Return ``mapping`` as a ``dict`` when non-empty, otherwise ``None``.
+
+    Parameters
+    ----------
+    mapping : Mapping[str, JsonValue] | None
+        Mapping of extension values.
+
+    Returns
+    -------
+    dict[str, JsonValue] | None
+        Materialised dictionary or ``None`` when ``mapping`` is empty/``None``.
+    """
+    if mapping is None:
+        return None
+    materialised = {str(key): value for key, value in mapping.items()}
+    return materialised or None
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,8 +133,9 @@ def build_problem_details(params: ProblemDetailsParams) -> ProblemDetailsDict:
         "detail": params.detail,
         "instance": params.instance,
     }
-    if params.extensions:
-        for key, value in params.extensions.items():
+    extensions = coerce_optional_dict(params.extensions)
+    if extensions:
+        for key, value in extensions.items():
             payload[key] = value
     return payload
 
@@ -156,7 +180,7 @@ def build_schema_problem_details(params: SchemaProblemDetailsParams) -> ProblemD
     validator_raw = getattr(params.error, "validator", None)
     if validator_raw is not None:
         extras["validator"] = str(validator_raw)
-    additional = dict(params.extensions) if params.extensions else {}
+    additional = coerce_optional_dict(params.extensions) or {}
     merged_extra = {**extras, **additional} if extras or additional else None
     base = replace(params.base, detail=detail, extensions=None)
     problem = build_problem_details(base)
@@ -195,8 +219,9 @@ def build_tool_problem_details(params: ToolProblemDetailsParams) -> ProblemDetai
     tool_name = Path(command_list[0]).name if command_list else "<unknown>"
     command_extension: JsonValue = [str(part) for part in command_list]
     merged_extensions: dict[str, JsonValue] = {"command": command_extension}
-    if params.extensions:
-        merged_extensions.update(dict(params.extensions))
+    additional_extensions = coerce_optional_dict(params.extensions)
+    if additional_extensions:
+        merged_extensions.update(additional_extensions)
     base = ProblemDetailsParams(
         type=f"https://kgfoundry.dev/problems/{params.category}",
         title=params.title,
@@ -243,7 +268,7 @@ def tool_timeout_problem_details(
             title="Tool execution timed out",
             detail=detail,
             instance_suffix="timeout",
-            extensions=extensions | None,
+            extensions=coerce_optional_dict(extensions),
         )
     )
 

@@ -370,11 +370,11 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
 
     Parameters
     ----------
-    *args : tuple[object, ...]
+    *args : object
         Either a single :class:`ProblemDetailsParams` instance or the
         positional fields ``(problem_type, title, status, detail, instance)``
         in that order.
-    **kwargs : dict[str, object]
+    **kwargs : object
         Optional keyword arguments accepted when the dataclass form is not
         used. Supports ``code`` and ``extensions`` for the legacy calling
         style.
@@ -451,11 +451,11 @@ def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
 
     Parameters
     ----------
-    *args : tuple[object, ...]
+    *args : object
         Either a single :class:`ExceptionProblemDetailsParams` instance or
         the legacy positional arguments ``(exc, problem_type, title, status,
         instance)``.
-    **kwargs : dict[str, object]
+    **kwargs : object
         Optional keyword arguments accepted when the dataclass form is not used.
         Supports ``code`` and ``extensions`` for backward compatibility. Note
         that ``detail`` cannot be provided as a keyword argument; it is

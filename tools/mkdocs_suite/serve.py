@@ -11,9 +11,13 @@ from __future__ import annotations
 import argparse
 import os
 import socket
-import subprocess
 import sys
 from pathlib import Path
+
+from tools._shared.logging import get_logger
+from tools._shared.proc import ToolExecutionError, run_tool
+
+LOGGER = get_logger(__name__)
 
 DEFAULT_CONFIG = Path("tools/mkdocs_suite/mkdocs.yml")
 DEFAULT_HOST = "127.0.0.1"
@@ -75,11 +79,23 @@ def _find_available_port(host: str, min_port: int, max_port: int) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run MkDocs dev server on the first available port.
+
+    Parameters
+    ----------
+    argv : list[str] | None, optional
+        Command-line arguments (defaults to sys.argv[1:]).
+
+    Returns
+    -------
+    int
+        Exit code returned by the underlying ``mkdocs serve`` process.
+    """
     args = _parse_args(argv or sys.argv[1:])
 
     port = _find_available_port(args.host, args.min_port, args.max_port)
     dev_addr = f"{args.host}:{port}"
-    print(f"[mkdocs-suite] Selected dev address {dev_addr}")
+    LOGGER.info("Starting MkDocs dev server", extra={"dev_addr": dev_addr})
 
     command = [
         "mkdocs",
@@ -101,10 +117,21 @@ def main(argv: list[str] | None = None) -> int:
         env["PYTHONPATH"] = str(src_path)
 
     try:
-        result = subprocess.run(command, check=False, env=env)
-    except KeyboardInterrupt:
-        print("[mkdocs-suite] mkdocs serve interrupted")
+        result = run_tool(command, env=env, check=False)
+    except KeyboardInterrupt:  # pragma: no cover - interactive interrupt
+        LOGGER.info("MkDocs dev server interrupted", extra={"dev_addr": dev_addr})
         return 130
+    except ToolExecutionError as exc:
+        LOGGER.exception(
+            "MkDocs dev server failed",
+            extra={
+                "dev_addr": dev_addr,
+                "returncode": exc.returncode,
+                "stdout": exc.stdout,
+                "stderr": exc.stderr,
+            },
+        )
+        return exc.returncode if exc.returncode is not None else 1
 
     return result.returncode
 

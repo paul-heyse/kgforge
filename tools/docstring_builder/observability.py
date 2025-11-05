@@ -56,6 +56,26 @@ class DocstringBuilderMetrics:
     Metrics follow the naming pattern: ``docbuilder_<operation>_<unit>_total`` for
     counters and ``docbuilder_<operation>_duration_seconds`` for histograms.
 
+    Attributes
+    ----------
+    runs_total : CounterLike
+        Total number of docstring builder runs.
+    plugin_failures_total : CounterLike
+        Total number of plugin execution failures.
+    harvest_duration_seconds : HistogramLike
+        Duration of harvest operations in seconds.
+    policy_duration_seconds : HistogramLike
+        Duration of policy engine operations in seconds.
+    render_duration_seconds : HistogramLike
+        Duration of rendering operations in seconds.
+    cli_duration_seconds : HistogramLike
+        Duration of CLI operations in seconds.
+
+    Parameters
+    ----------
+    registry : CollectorRegistry | None, optional
+        Prometheus registry (defaults to default registry).
+
     Examples
     --------
     >>> metrics = DocstringBuilderMetrics()
@@ -71,13 +91,6 @@ class DocstringBuilderMetrics:
     cli_duration_seconds: HistogramLike
 
     def __init__(self, registry: CollectorRegistry | None = None) -> None:
-        """Initialize metrics registry.
-
-        Parameters
-        ----------
-        registry : CollectorRegistry | None, optional
-            Prometheus registry (defaults to default registry).
-        """
         resolved_registry = (
             registry if registry is not None else cast("CollectorRegistry", get_default_registry())
         )

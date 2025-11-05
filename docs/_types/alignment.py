@@ -151,19 +151,6 @@ def align_schema_fields(
             f"Payload for {artifact_id} contains unknown fields: {unknown_sorted}. "
             f"Valid fields are: {', '.join(sorted(expected_fields))}"
         )
-        problem = ArtifactValidationError(
-            msg,
-            context={
-                "artifact_id": artifact_id,
-                "unknown_fields": sorted(unknown_keys),
-                "valid_fields": sorted(expected_fields),
-                "remediation": (
-                    "Remove unknown fields or consult the schema at "
-                    "https://kgfoundry.dev/schema/docs/"
-                ),
-            },
-        )
-
         # Log structured error
         logger.error(
             "schema_alignment_error",
@@ -175,7 +162,18 @@ def align_schema_fields(
             },
         )
 
-        raise problem
+        raise ArtifactValidationError(
+            msg,
+            context={
+                "artifact_id": artifact_id,
+                "unknown_fields": sorted(unknown_keys),
+                "valid_fields": sorted(expected_fields),
+                "remediation": (
+                    "Remove unknown fields or consult the schema at "
+                    "https://kgfoundry.dev/schema/docs/"
+                ),
+            },
+        )
 
     # Return normalized payload
     result: dict[str, object] = dict(payload)

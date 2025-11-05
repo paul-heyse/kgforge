@@ -190,7 +190,7 @@ class PayloadFactory:
 
         Returns
         -------
-        list[dict[str, JsonValue]]
+        list[JsonObject]
             A symbol index payload (list of rows) with specified mutations.
         """
         base_payload = _load(SYMBOL_EXAMPLE)
@@ -229,7 +229,7 @@ class PayloadFactory:
 
         Returns
         -------
-        dict[str, JsonValue]
+        JsonObject
             A symbol delta payload with specified mutations.
         """
         payload = _load(DELTA_EXAMPLE)

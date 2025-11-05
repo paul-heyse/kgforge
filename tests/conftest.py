@@ -169,9 +169,13 @@ class SkipReturnedUnexpectedlyError(RuntimeError):
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest by setting up Python path for src packages.
 
+    This hook is called by pytest during initialization to configure the test
+    environment. It ensures that the project's source directory is added to
+    sys.path so that test modules can import packages from the src directory.
+
     Parameters
     ----------
-    config
+    config : pytest.Config
         Pytest configuration object (required by pytest hook).
     """
     _ = config  # Unused but required by pytest hook signature
@@ -198,9 +202,18 @@ def temp_index_dir() -> Iterator[Path]:
 def caplog_records(caplog: LogCaptureFixture) -> dict[str, list[logging.LogRecord]]:
     """Capture logs by operation name for structured assertions.
 
+    This fixture captures log records during test execution and groups them
+    by operation name (extracted from the 'operation' field in structured logs).
+    This enables test assertions that verify log messages for specific operations.
+
+    Parameters
+    ----------
+    caplog : LogCaptureFixture
+        Pytest fixture for capturing log records.
+
     Returns
     -------
-    dict[str, list[LogRecord]]
+    dict[str, list[logging.LogRecord]]
         Mapping of operation → list of log records for that operation.
     """
 
@@ -380,9 +393,13 @@ def structured_log_asserter() -> Callable[[logging.LogRecord, set[str]], None]:
     ) -> None:
         """Assert log record includes all required fields.
 
+        This helper function checks that a log record contains all expected
+        structured fields. It extracts fields from the log record's 'extra'
+        dictionary and verifies that all required field names are present.
+
         Parameters
         ----------
-        record : LogRecord
+        record : logging.LogRecord
             The log record to check.
         required_fields : set[str]
             Field names that must be present.
@@ -421,11 +438,15 @@ def metrics_asserter(
     def assert_metric(name: str, value: float | None = None) -> None:
         """Assert Prometheus metric exists and optionally has expected value.
 
+        This helper function verifies that a Prometheus metric exists in the
+        registry and optionally checks that it has the expected value. It
+        searches through all registered collectors to find the metric by name.
+
         Parameters
         ----------
         name : str
             Metric name to check.
-        value : int | float | None, optional
+        value : float | None, optional
             Expected value (if None, only checks existence).
 
         Raises
@@ -453,16 +474,20 @@ def metrics_asserter(
 
 
 class _SimpleSpanProcessor:
-    """Simple span processor for in-memory collection during tests."""
+    """Simple span processor for in-memory collection during tests.
+
+    This processor collects OpenTelemetry spans and immediately exports them
+    through the provided exporter. It's designed for testing scenarios where
+    spans need to be captured and inspected without the complexity of a full
+    production span processor.
+
+    Parameters
+    ----------
+    exporter : SpanExporterProtocol
+        OTEL span exporter used to export collected spans.
+    """
 
     def __init__(self, exporter: SpanExporterProtocol) -> None:
-        """Initialize with exporter.
-
-        Parameters
-        ----------
-        exporter : SpanExporterProtocol
-            OTEL span exporter.
-        """
         self.exporter = exporter
 
     def on_start(self, span: SpanProtocol, parent_context: object | None = None) -> None:
@@ -487,10 +512,13 @@ class _SimpleSpanProcessor:
     def on_end(self, span: SpanProtocol) -> None:
         """Process ended span.
 
+        This method is called by the OpenTelemetry SDK when a span ends.
+        It immediately exports the span through the configured exporter.
+
         Parameters
         ----------
-        span : object
-            The ended span.
+        span : SpanProtocol
+            The ended span to export.
         """
         self.exporter.export([span])
 

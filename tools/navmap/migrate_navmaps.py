@@ -40,20 +40,26 @@ def migrate_navmaps(
 ) -> dict[str, object]:
     """Rebuild the navigation map JSON file from the current source tree.
 
+    This function regenerates the navmap by scanning the current source code and
+    building a fresh navigation index. It can optionally write the result to a
+    file or return it in memory. This is useful for migrating navmaps to new
+    formats or rebuilding them after structural changes.
+
     Parameters
     ----------
-    output
+    output : Path | None, optional
         Destination path for the generated JSON document. When ``None`` the
-        navmap is only returned to the caller.
-    config
-        Controls JSON emission options, including indentation. Defaults to
-        :class:`NavmapWriteConfig` which emits human-readable JSON.
+        navmap is only returned to the caller without writing to disk.
+    config : NavmapWriteConfig | None, optional
+        Controls JSON emission options, including indentation and formatting.
+        Defaults to :class:`NavmapWriteConfig` which emits human-readable JSON.
 
     Returns
     -------
     dict[str, object]
         Structured navigation metadata emitted by
-        :func:`tools.navmap.build_navmap.build_index`.
+        :func:`tools.navmap.build_navmap.build_index`, containing module paths,
+        exports, sections, and symbol metadata.
     """
     write_config = config or NavmapWriteConfig()
     index = build_index()
@@ -97,17 +103,22 @@ def _parse_args(argv: list[str] | None = None) -> MigrateArgs:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry point for regenerating the navmap JSON asset.
+    """Command-line entry point for navmap migration utility.
+
+    This function parses command-line arguments and invokes the navmap migration
+    process, writing the result to the configured output path. It returns an
+    exit code suitable for shell scripts and CI pipelines.
 
     Parameters
     ----------
-    argv
-        Optional argument vector, primarily used by tests.
+    argv : list[str] | None, optional
+        Command-line arguments to parse. When ``None``, defaults to ``sys.argv[1:]``.
+        This parameter is primarily useful for testing.
 
     Returns
     -------
     int
-        ``0`` on success so the helper integrates cleanly with shell pipelines.
+        Exit code: 0 for success, non-zero for errors.
     """
     args = _parse_args(argv)
     migrate_navmaps(args.output, config=args.write_config)

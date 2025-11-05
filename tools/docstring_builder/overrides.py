@@ -497,7 +497,7 @@ def extended_summary(kind: str, name: str, module: str, node: object | None = No
         Symbol name.
     module : str
         Module name (unused, kept for signature compatibility).
-    node : object, optional
+    node : object | None, optional
         AST node for additional context (used for class detection).
 
     Returns

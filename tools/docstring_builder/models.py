@@ -74,22 +74,26 @@ class DocstringBuilderError(RuntimeError):
 
 
 class SchemaViolationError(DocstringBuilderError):
-    """Raised when generated payloads do not satisfy the published schema."""
+    """Raised when generated payloads do not satisfy the published schema.
+
+    Attributes
+    ----------
+    problem : ProblemDetails | None
+        RFC 9457 Problem Details payload.
+
+    Parameters
+    ----------
+    message : str
+        Error message.
+    problem : ProblemDetails | None, optional
+        RFC 9457 Problem Details payload.
+    """
 
     __slots__ = ("problem",)
 
     problem: ProblemDetails | None
 
     def __init__(self, message: str, *, problem: ProblemDetails | None = None) -> None:
-        """Initialize docstring builder error.
-
-        Parameters
-        ----------
-        message : str
-            Error message.
-        problem : ProblemDetails | None, optional
-            RFC 9457 Problem Details payload.
-        """
         super().__init__(message)
         self.problem = problem
 

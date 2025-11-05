@@ -761,11 +761,11 @@ def load_plugins(
         Builder configuration.
     repo_root : Path
         Repository root directory.
-    only : Sequence[str], optional
+    only : Sequence[str] | None, optional
         Plugin names to include (whitelist).
-    disable : Sequence[str], optional
+    disable : Sequence[str] | None, optional
         Plugin names to disable (blacklist).
-    builtin : Sequence[PluginFactoryCandidateT], optional
+    builtin : Sequence[PluginFactoryCandidateT] | None, optional
         Built-in plugin candidates.
 
     Returns

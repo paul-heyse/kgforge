@@ -21,14 +21,9 @@ def iter_python_files() -> list[Path]:
 
     Returns
     -------
-    List[Path]
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.update_navmaps import iter_python_files
-    >>> result = iter_python_files()
-    >>> result  # doctest: +ELLIPSIS
+    list[Path]
+        Sorted list of Path objects pointing to Python source files found
+        in the project, excluding directories and non-Python files.
     """
     search_root = SRC if SRC.exists() else ROOT
     return sorted(path for path in search_root.rglob("*.py") if path.is_file())

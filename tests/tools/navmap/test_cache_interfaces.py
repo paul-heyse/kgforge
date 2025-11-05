@@ -30,18 +30,23 @@ RepairResultClass = _RepairResultClass  # Runtime class, use "RepairResult" in t
 
 
 class MockCollectorCache:
-    """Mock implementation of NavmapCollectorCache for testing."""
+    """Mock implementation of NavmapCollectorCache for testing.
+
+    This mock cache provides an in-memory implementation of the collector cache
+    interface, allowing tests to verify cache behavior without requiring file
+    system operations. It stores module metadata in memory and provides the
+    same interface as the production cache implementation.
+
+    Parameters
+    ----------
+    root : Path
+        Root directory path that serves as the cache root.
+    modules : Sequence[ModuleInfo] | None, optional
+        Pre-populated modules to initialize the cache with. When None, the
+        cache starts empty.
+    """
 
     def __init__(self, root: Path, modules: Sequence[ModuleInfo] | None = None) -> None:
-        """Initialize mock collector cache.
-
-        Parameters
-        ----------
-        root : Path
-            Root directory path.
-        modules : Sequence[ModuleInfo] | None, optional
-            Pre-populated modules.
-        """
         self._root = root
         self._modules = list(modules) if modules else []
 
@@ -80,10 +85,21 @@ class MockCollectorCache:
 
 
 class MockRepairCache:
-    """Mock implementation of NavmapRepairCache for testing."""
+    """Mock implementation of NavmapRepairCache for testing.
+
+    This mock cache provides an in-memory implementation of the repair cache
+    interface, allowing tests to verify repair tracking behavior without
+    requiring file system operations. It stores repair results in memory and
+    provides query methods to inspect recorded repairs.
+
+    Notes
+    -----
+    The cache starts empty and accumulates repair results as they are recorded
+    during test execution. All repairs are stored in memory until explicitly
+    cleared or the cache instance is destroyed.
+    """
 
     def __init__(self) -> None:
-        """Initialize mock repair cache."""
         self._repairs: list[RepairResult] = []
 
     def record_repair(self, result: RepairResult) -> None:

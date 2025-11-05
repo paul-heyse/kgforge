@@ -99,12 +99,20 @@ class ArtifactValidationError(RuntimeError):
     This exception wraps validation failures with RFC 9457 Problem Details,
     providing structured error information suitable for CLI output and logging.
 
-    Attributes
+    Parameters
     ----------
+    message : str
+        Human-readable error message describing the validation failure.
     artifact_name : str
-        Logical identifier for the artifact (e.g., "symbols.json").
-    problem : ProblemDetailsDict
+        Logical identifier for the artifact that failed validation.
+    problem : ProblemDetailsDict | None, optional
         RFC 9457 Problem Details dict with validation error details.
+        Defaults to empty dict if not provided.
+
+    Notes
+    -----
+    The ``artifact_name`` and ``problem`` attributes are set as instance variables
+    during initialization and can be accessed directly on the exception instance.
     """
 
     def __init__(
@@ -113,17 +121,6 @@ class ArtifactValidationError(RuntimeError):
         artifact_name: str,
         problem: ProblemDetailsDict | None = None,
     ) -> None:
-        """Initialize ArtifactValidationError.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        artifact_name : str
-            Logical identifier for the artifact.
-        problem : ProblemDetailsDict | None, optional
-            RFC 9457 Problem Details dict. Defaults to None.
-        """
         super().__init__(message)
         self.artifact_name = artifact_name
         self.problem = problem or {}

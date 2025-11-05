@@ -169,16 +169,15 @@ class _ExampleContext:
 
 
 class _SymbolCollector(ast.NodeVisitor):
-    """Collect callable and class symbols for docstring generation."""
+    """Collect callable and class symbols for docstring generation.
+
+    Parameters
+    ----------
+    module_name : str
+        Module qualified name.
+    """
 
     def __init__(self, module_name: str) -> None:
-        """Initialize symbol collector.
-
-        Parameters
-        ----------
-        module_name : str
-            Module qualified name.
-        """
         self.module_name = module_name
         self.namespace: list[str] = []
         self.symbols: list[_CollectedSymbol] = []
@@ -494,6 +493,8 @@ def required_sections(
         Exception names raised.
     is_public : bool
         Whether the symbol is public (doesn't start with underscore).
+    **_ : object
+        Additional keyword arguments (ignored).
 
     Returns
     -------
@@ -650,7 +651,7 @@ def extended_summary(kind: str, name: str, module: str, node: ast.AST | None = N
         Symbol name.
     module : str
         Module name.
-    node : ast.AST, optional
+    node : ast.AST | None, optional
         AST node for additional context.
 
     Returns
@@ -752,7 +753,7 @@ def build_docstring(
     ----------
     kind : str
         Symbol kind (e.g., "function", "method").
-    node : ast.FunctionDef or ast.AsyncFunctionDef
+    node : ast.FunctionDef | ast.AsyncFunctionDef
         Function AST node.
     module_name : str
         Module name for context.

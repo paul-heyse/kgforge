@@ -212,8 +212,8 @@ def get_metrics_registry() -> MetricsRegistry:
 
 
 @dataclass(slots=True)
-class _DurationObserver:
-    """Track the state of an in-flight operation for structured recording."""
+class DurationObservation:
+    """Capture metrics and structured status for an in-flight operation."""
 
     metrics: MetricsProvider
     operation: str
@@ -222,13 +222,21 @@ class _DurationObserver:
     status: StatusLiteral = "success"
     _start: float = field(default_factory=time.monotonic)
 
-    def success(self) -> None:
+    def mark_success(self) -> None:
         """Mark the operation as successful."""
         self.status = "success"
 
-    def error(self) -> None:
+    def mark_error(self) -> None:
         """Mark the operation as failed."""
         self.status = "error"
+
+    def success(self) -> None:  # pragma: no cover - backward compatibility alias
+        """Alias for :meth:`mark_success` to preserve caller compatibility."""
+        self.mark_success()
+
+    def error(self) -> None:  # pragma: no cover - backward compatibility alias
+        """Alias for :meth:`mark_error` to preserve caller compatibility."""
+        self.mark_error()
 
     def duration_seconds(self) -> float:
         """Return the elapsed duration in seconds.
@@ -236,7 +244,7 @@ class _DurationObserver:
         Returns
         -------
         float
-            Elapsed duration in seconds since the observer was created.
+            Elapsed wall-clock duration since the observation began.
         """
         return time.monotonic() - self._start
 
@@ -249,7 +257,7 @@ def observe_duration(
     *,
     component: str = "unknown",
     correlation_id: str | None = None,
-) -> Iterator[_DurationObserver]:
+) -> Iterator[DurationObservation]:
     """Record metrics and structured logs for a component operation.
 
     Parameters
@@ -265,45 +273,56 @@ def observe_duration(
 
     Yields
     ------
-    _DurationObserver
-        Observer instance for tracking operation state.
+    DurationObservation
+        Observation instance used to track operation state.
 
     Raises
     ------
     Exception
-        Any exception raised during the operation is propagated after recording
-        error status and metrics.
+        Any exception raised within the context is re-raised after the observation
+        is marked as ``"error"`` and metrics/logs are recorded.
+
+    Notes
+    -----
+    Any exception raised within the context is re-raised after the observation
+    is marked as ``"error"`` and metrics/logs are recorded.
     """
+    observation = DurationObservation(
+        metrics=metrics,
+        operation=operation,
+        component=component,
+        correlation_id=correlation_id,
+    )
     try:
-        yield observer
+        yield observation
     except Exception:
-        observer.status = "error"
-        _finalise_observation(observer)
+        observation.mark_error()
+        _finalise_observation(observation)
         raise
     else:
-        _finalise_observation(observer)
+        _finalise_observation(observation)
 
 
-def _finalise_observation(observer: _DurationObserver) -> None:
-    duration = observer.duration_seconds()
-    observer.metrics.runs_total.labels(
-        component=observer.component,
-        status=observer.status,
+def _finalise_observation(observation: DurationObservation) -> None:
+    duration = observation.duration_seconds()
+    observation.metrics.runs_total.labels(
+        component=observation.component,
+        status=observation.status,
     ).inc()
-    observer.metrics.operation_duration_seconds.labels(
-        component=observer.component,
-        operation=observer.operation,
-        status=observer.status,
+    observation.metrics.operation_duration_seconds.labels(
+        component=observation.component,
+        operation=observation.operation,
+        status=observation.status,
     ).observe(duration)
     extra = {
-        "component": observer.component,
+        "component": observation.component,
         "duration_ms": duration * 1000,
     }
     with with_fields(
         LOGGER,
-        correlation_id=observer.correlation_id,
-        operation=observer.operation,
-        status=observer.status,
+        correlation_id=observation.correlation_id,
+        operation=observation.operation,
+        status=observation.status,
     ) as adapter:
         adapter.info("Operation completed", extra=extra)
 

@@ -312,7 +312,7 @@ def safe_json_serialize(
         Data to serialize to JSON.
     path : Path
         Output file path (uses pathlib for safe path handling).
-    logger : WarningLogger, optional
+    logger : WarningLogger | None, optional
         Logger for warnings and errors. If None, falls back to module logger.
 
     Returns
@@ -363,7 +363,7 @@ def safe_json_deserialize(
     ----------
     path : Path
         Input file path (uses pathlib for safe path handling).
-    logger : WarningLogger, optional
+    logger : WarningLogger | None, optional
         Logger for warnings and errors. If None, falls back to module logger.
 
     Returns

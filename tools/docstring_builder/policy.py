@@ -383,16 +383,15 @@ def load_policy_settings(
 
 
 class PolicyEngine:
-    """Evaluate docstring semantics against configured policy rules."""
+    """Evaluate docstring semantics against configured policy rules.
+
+    Parameters
+    ----------
+    settings : PolicySettings
+        Policy configuration settings.
+    """
 
     def __init__(self, settings: PolicySettings) -> None:
-        """Initialize policy engine.
-
-        Parameters
-        ----------
-        settings : PolicySettings
-            Policy configuration settings.
-        """
         self.settings = settings
         self.total_symbols = 0
         self.documented_symbols = 0

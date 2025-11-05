@@ -32,6 +32,7 @@ from tools.docstring_builder.policy import (
     PolicyEngine,
     load_policy_settings,
 )
+from tools.docstring_builder.utils import optional_str
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -224,5 +225,5 @@ class PipelineContextBuilder:
             ignore_missing=self.request.ignore_missing,
             missing_patterns=tuple(MISSING_MODULE_PATTERNS),
             skip_docfacts=self.request.skip_docfacts,
-            baseline=self.request.baseline | None,
+            baseline=optional_str(self.request.baseline),
         )

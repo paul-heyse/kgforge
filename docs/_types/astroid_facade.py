@@ -28,10 +28,15 @@ class AstroidManagerProtocol(Protocol):
 
 @runtime_checkable
 class AstroidBuilderProtocol(Protocol):
-    """Subset of :mod:`astroid.builder` consumed by the docs build."""
+    """Subset of :mod:`astroid.builder` consumed by the docs build.
 
-    def __init__(self, manager: AstroidManagerProtocol | None = None) -> None:
-        """Initialise the builder with an optional manager instance."""
+    Parameters
+    ----------
+    manager : AstroidManagerProtocol | None, optional
+        Optional Astroid manager instance for configuration.
+    """
+
+    def __init__(self, manager: AstroidManagerProtocol | None = None) -> None: ...
 
     def file_build(self, file_path: str, module_name: str) -> object:
         """Return an AST node representing ``module_name`` at ``file_path``."""

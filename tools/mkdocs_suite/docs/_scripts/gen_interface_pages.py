@@ -173,6 +173,15 @@ def _write_interface_table(
 ) -> set[str]:
     """Render the overview table and return the set of discovered interface IDs.
 
+    Parameters
+    ----------
+    handle : mkdocs_gen_files.files
+        File handle for writing markdown content.
+    interfaces : list[dict[str, object]]
+        List of interface dictionaries from nav metadata.
+    registry : Mapping[str, dict[str, object]]
+        Registry mapping interface IDs to metadata.
+
     Returns
     -------
     set[str]

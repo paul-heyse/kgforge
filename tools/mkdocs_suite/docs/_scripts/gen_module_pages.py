@@ -258,8 +258,12 @@ def _is_function(obj: object) -> TypeGuard[_GriffeFunction]:
 
 
 def _first_paragraph(module: _GriffeModule) -> str | None:
-    """
-    Return the first paragraph from the module docstring, if present.
+    """Return the first paragraph from the module docstring, if present.
+
+    Parameters
+    ----------
+    module : _GriffeModule
+        Griffe module object.
 
     Returns
     -------
@@ -275,12 +279,11 @@ def _first_paragraph(module: _GriffeModule) -> str | None:
 
 
 def _discover_extensions(candidates: Iterable[str]) -> tuple[list[str], object | None]:
-    """
-    Return available Griffe extensions and a preloaded bundle.
+    """Return available Griffe extensions and a preloaded bundle.
 
     Parameters
     ----------
-    candidates
+    candidates : Iterable[str]
         Extension module names to probe.
 
     Returns
@@ -308,12 +311,11 @@ def _discover_extensions(candidates: Iterable[str]) -> tuple[list[str], object |
 
 
 def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
-    """
-    Load all submodules for the configured package roots.
+    """Load all submodules for the configured package roots.
 
     Parameters
     ----------
-    extensions_bundle
+    extensions_bundle : object
         Preloaded extension bundle returned by ``griffe.load_extensions``.
 
     Returns
@@ -357,6 +359,11 @@ def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
 def _code_permalink(relative_path: Path | None) -> str | None:
     """Return a GitHub permalink for ``relative_path`` when configured.
 
+    Parameters
+    ----------
+    relative_path : Path | None
+        Relative path to the source file.
+
     Returns
     -------
     str | None
@@ -395,6 +402,11 @@ def _load_api_usage() -> dict[str, list[OperationLink]]:
 def _symbol_from_handler(handler: object) -> str | None:
     """Return the fully-qualified symbol path for a registry handler string.
 
+    Parameters
+    ----------
+    handler : object
+        Handler string from registry metadata.
+
     Returns
     -------
     str | None
@@ -415,6 +427,11 @@ def _registry_api_usage(
     registry: Mapping[str, dict[str, object]],
 ) -> dict[str, list[OperationLink]]:
     """Derive symbol → operation mappings from the interface registry.
+
+    Parameters
+    ----------
+    registry : Mapping[str, dict[str, object]]
+        Interface registry mapping identifiers to metadata.
 
     Returns
     -------
@@ -445,6 +462,13 @@ def _merge_api_usage(
     registry_usage: Mapping[str, list[OperationLink]],
 ) -> dict[str, list[OperationLink]]:
     """Merge API usage derived from JSON files and the interface registry.
+
+    Parameters
+    ----------
+    file_usage : Mapping[str, list[OperationLink]]
+        API usage mappings from JSON files.
+    registry_usage : Mapping[str, list[OperationLink]]
+        API usage mappings from interface registry.
 
     Returns
     -------
@@ -490,8 +514,12 @@ def _load_registry() -> dict[str, dict[str, object]]:
 
 
 def _module_exports(module: _GriffeModule) -> set[str]:
-    """
-    Extract export names declared in ``__all__`` for the module.
+    """Extract export names declared in ``__all__`` for the module.
+
+    Parameters
+    ----------
+    module : _GriffeModule
+        Griffe module object.
 
     Returns
     -------
@@ -528,8 +556,14 @@ def _register_member(module_path: str, member: object, tables: _RelationshipTabl
 def _build_relationships(
     modules: Mapping[str, _GriffeModule], api_usage: Mapping[str, list[OperationLink]]
 ) -> ModuleFacts:
-    """
-    Return imports, exports, symbols, and related API usage facts.
+    """Return imports, exports, symbols, and related API usage facts.
+
+    Parameters
+    ----------
+    modules : Mapping[str, _GriffeModule]
+        Mapping of module paths to Griffe module objects.
+    api_usage : Mapping[str, list[OperationLink]]
+        Mapping of symbol paths to operation references.
 
     Returns
     -------
@@ -572,6 +606,13 @@ def _build_relationships(
 def _format_module_links(module_names: Iterable[str], documented: set[str]) -> str:
     """Return a comma-separated list of module names with links where possible.
 
+    Parameters
+    ----------
+    module_names : Iterable[str]
+        Iterable of module names to format.
+    documented : set[str]
+        Set of module names that have documentation pages.
+
     Returns
     -------
     str
@@ -591,6 +632,15 @@ def _nav_metadata_for_module(
     module_path: str, module: _GriffeModule, facts: ModuleFacts
 ) -> dict[str, Any]:
     """Return nav metadata merged with runtime defaults for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Module path identifier.
+    module : _GriffeModule
+        Griffe module object.
+    facts : ModuleFacts
+        Module relationship facts.
 
     Returns
     -------
@@ -651,6 +701,11 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
 def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
     """Return a tuple of (label, href) for the provided spec path.
 
+    Parameters
+    ----------
+    spec_path : object
+        Specification file path.
+
     Returns
     -------
     tuple[str | None, str | None]
@@ -669,6 +724,13 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
     """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``.
+
+    Parameters
+    ----------
+    spec_path : object
+        Specification file path.
+    operation_id : str
+        OpenAPI operation identifier.
 
     Returns
     -------
@@ -753,6 +815,11 @@ def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleF
 def _interface_entries(nav_meta: Mapping[str, Any]) -> list[Mapping[str, object]]:
     """Return validated interface entries from nav metadata.
 
+    Parameters
+    ----------
+    nav_meta : Mapping[str, Any]
+        Navigation metadata dictionary.
+
     Returns
     -------
     list[Mapping[str, object]]
@@ -771,6 +838,15 @@ def _merge_interface_metadata(
     default_identifier: str,
 ) -> tuple[str, dict[str, object], Mapping[str, object]]:
     """Return identifier, merged metadata, and registry entry for ``entry``.
+
+    Parameters
+    ----------
+    entry : Mapping[str, object]
+        Interface entry from nav metadata.
+    registry : Mapping[str, dict[str, object]]
+        Interface registry mapping identifiers to metadata.
+    default_identifier : str
+        Default identifier to use if entry lacks one.
 
     Returns
     -------
@@ -813,6 +889,13 @@ def _write_interface_operations(
 def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
     """Return a Mermaid class diagram for classes defined in ``module_path``.
 
+    Parameters
+    ----------
+    module_path : str
+        Module path identifier.
+    facts : ModuleFacts
+        Module relationship facts.
+
     Returns
     -------
     str
@@ -852,6 +935,13 @@ def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
 
 def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
     """Return a small inline D2 neighborhood diagram for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Module path identifier.
+    facts : ModuleFacts
+        Module relationship facts.
 
     Returns
     -------

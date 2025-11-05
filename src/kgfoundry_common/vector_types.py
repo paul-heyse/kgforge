@@ -74,6 +74,13 @@ class VectorValidationError(ValueError):
 class VectorBatch:
     """Immutable collection of typed vectors with shared dimensionality.
 
+    Attributes
+    ----------
+    ids : tuple[VectorId, ...]
+        Identifiers for each vector row.
+    matrix : VectorMatrix
+        Two-dimensional ``float32`` matrix.
+
     Raises
     ------
     VectorValidationError

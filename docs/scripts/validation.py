@@ -86,6 +86,11 @@ if TYPE_CHECKING:  # pragma: no cover - typing assistance only
         ) -> None:
             """Validate payload against JSON schema.
 
+            This method validates a JSON payload against a JSON Schema file.
+            It raises ValidationError if the payload does not conform to the
+            schema, providing detailed error information about the validation
+            failures.
+
             Parameters
             ----------
             payload : JsonPayload
@@ -94,11 +99,6 @@ if TYPE_CHECKING:  # pragma: no cover - typing assistance only
                 Path to JSON schema file.
             artifact : str
                 Artifact name for error reporting.
-
-            Raises
-            ------
-            ValidationError
-                If payload does not conform to schema.
             """
             ...
 

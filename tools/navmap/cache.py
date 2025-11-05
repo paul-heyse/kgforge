@@ -21,12 +21,13 @@ class NavmapCollectorCache(Protocol):
 
     This Protocol defines the contract for any object that implements
     module collection caching. Implementations must track module metadata
-    and provide access to collected modules.
+    and provide access to collected modules. The cache helps optimize
+    repeated module discovery operations by storing metadata between runs.
 
-    Attributes
-    ----------
-    root : Path
-        The root directory being scanned for modules.
+    Note
+    ----
+    The ``root`` attribute is accessed via a property, not stored as a direct
+    class attribute. This Protocol documents the expected interface.
     """
 
     @property

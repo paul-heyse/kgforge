@@ -42,6 +42,30 @@ class NavmapMetrics:
     Metrics follow the naming pattern: ``navmap_<operation>_total`` for
     counters and ``navmap_<operation>_duration_seconds`` for histograms.
 
+    Attributes
+    ----------
+    build_runs_total : CounterLike
+        Total number of navmap build operations.
+    check_runs_total : CounterLike
+        Total number of navmap check operations.
+    repair_runs_total : CounterLike
+        Total number of navmap repair operations.
+    migrate_runs_total : CounterLike
+        Total number of navmap migrate operations.
+    build_duration_seconds : HistogramLike
+        Duration of build operations in seconds.
+    check_duration_seconds : HistogramLike
+        Duration of check operations in seconds.
+    repair_duration_seconds : HistogramLike
+        Duration of repair operations in seconds.
+    migrate_duration_seconds : HistogramLike
+        Duration of migrate operations in seconds.
+
+    Parameters
+    ----------
+    registry : CollectorRegistry | None, optional
+        Prometheus registry (defaults to default registry).
+
     Examples
     --------
     >>> metrics = NavmapMetrics()
@@ -59,13 +83,6 @@ class NavmapMetrics:
     migrate_duration_seconds: HistogramLike
 
     def __init__(self, registry: CollectorRegistry | None = None) -> None:
-        """Initialize metrics registry.
-
-        Parameters
-        ----------
-        registry : CollectorRegistry | None, optional
-            Prometheus registry (defaults to default registry).
-        """
         resolved = (
             registry if registry is not None else cast("CollectorRegistry", get_default_registry())
         )
@@ -178,21 +195,34 @@ def record_operation_metrics(
     status: str = "success",
     correlation_id: str | None = None,
 ) -> Iterator[None]:
-    """Context manager to record operation metrics.
+    """Context manager to record operation metrics and duration.
+
+    This context manager tracks the execution of navmap operations (build, check,
+    repair, migrate) by recording Prometheus metrics including duration histograms
+    and status counters. It automatically updates the status to "error" if an
+    exception occurs within the context.
 
     Parameters
     ----------
     operation : str
         Operation name (e.g., "build", "check", "repair", "migrate").
     status : str, optional
-        Status label ("success" or "error"), by default "success".
+        Initial status label ("success" or "error"), by default "success".
+        Automatically updated to "error" if an exception occurs.
     correlation_id : str | None, optional
-        Correlation ID for tracing, by default None (auto-generated).
+        Correlation ID for distributed tracing across service boundaries.
+        When ``None``, a new correlation ID is auto-generated.
 
     Yields
     ------
     None
-        Context manager yields nothing.
+        Context manager yields nothing; use within a ``with`` statement.
+
+    Raises
+    ------
+    Exception
+        Any exception raised within the context is propagated after metrics
+        are recorded, allowing normal exception handling to proceed.
 
     Examples
     --------

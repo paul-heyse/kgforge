@@ -84,7 +84,7 @@ class AppSettings(BaseSettings):
         Default timeout for subprocess operations in seconds. Defaults to 300.
     request_timeout : int
         Default timeout for network requests in seconds. Defaults to 30.
-    model_config : dict[str, object]
+    model_config : ClassVar[SettingsConfigDict]
         Pydantic model configuration (frozen=True, case_sensitive=False, populate_by_name=True).
 
     Examples
