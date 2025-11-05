@@ -13,12 +13,9 @@ __all__ = ["OperationEntry", "collect_operations", "write_diagram"]
 
 def collect_operations(spec: Mapping[str, object]) -> list[OperationEntry]:
     """Return CLI operations extracted from the OpenAPI specification mapping."""
-
     return _impl.collect_operations(spec)
 
 
 def write_diagram(operations: Sequence[OperationEntry]) -> None:
     """Write the CLI diagram to the MkDocs virtual filesystem."""
-
     _impl.write_diagram(operations)
-

@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 
 
 @contextlib.contextmanager
-def _capture_write(
-    buffers: dict[str, io.StringIO], path: str, mode: str
-) -> Iterator[io.StringIO]:
+def _capture_write(buffers: dict[str, io.StringIO], path: str, mode: str) -> Iterator[io.StringIO]:
     if "w" in mode:
         buffer = io.StringIO()
         buffers[path] = buffer
@@ -28,9 +26,7 @@ def _capture_write(
 def test_write_diagram_emits_single_node_for_multi_tag_operations(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    gen_cli_module = importlib.import_module(
-        "tools.mkdocs_suite.docs._scripts.gen_cli_diagram"
-    )
+    gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
     spec = {
         "paths": {
             "/cli/run": {

@@ -9,13 +9,14 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Final
 
 import mkdocs_gen_files
 import yaml
 
-OperationEntry = tuple[str, str, str, str, tuple[str, ...]]
+OperationEntry = tuple[str, str, str | None, str, tuple[str, ...]]
 
-__all__ = ["OperationEntry", "collect_operations", "write_diagram", "main"]
+__all__ = ["OperationEntry", "collect_operations", "main", "write_diagram"]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +36,18 @@ def _operation_anchor(operation_id: str) -> str:
     return f"../{REDOC_PAGE}#operation/{operation_id}"
 
 
+HTTP_METHODS: Final[set[str]] = {
+    "delete",
+    "get",
+    "head",
+    "options",
+    "patch",
+    "post",
+    "put",
+    "trace",
+}
+
+
 def _collect_operations(
     spec: Mapping[str, object],
 ) -> list[OperationEntry]:
@@ -52,9 +65,12 @@ def _collect_operations(
         if not isinstance(path_item, dict):
             continue
         for method, op in path_item.items():
-            if method.lower() != "post" or not isinstance(op, dict):
+            if method.lower() not in HTTP_METHODS or not isinstance(op, dict):
                 continue
-            operation_id = str(op.get("operationId", ""))
+            operation_id_obj = op.get("operationId")
+            operation_id: str | None = None
+            if operation_id_obj is not None:
+                operation_id = str(operation_id_obj).strip() or None
             tag_values = op.get("tags") or ["cli"]
             tags = tuple(dict.fromkeys(str(tag) for tag in tag_values))
             summary = (op.get("summary") or "").strip()
@@ -63,7 +79,7 @@ def _collect_operations(
 
 
 def _write_diagram(
-    operations: list[OperationEntry]
+    operations: list[OperationEntry],
 ) -> None:
     diagram_path = "diagrams/cli_by_tag.d2"
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
@@ -77,9 +93,10 @@ def _write_diagram(
             node_id = f"{method} {path}"
             label = f"{method} {path}\\n{summary}" if summary else node_id
             if node_id not in written_nodes:
-                handle.write(
-                    f'  "{node_id}": "{label}" {{ link: "{_operation_anchor(operation_id)}" }}\n'
+                link_attr = (
+                    f' {{ link: "{_operation_anchor(operation_id)}" }}' if operation_id else ""
                 )
+                handle.write(f'  "{node_id}": "{label}"{link_attr}\n')
                 written_nodes.add(node_id)
             for tag in tags:
                 handle.write(f'  "{tag}" -> "{node_id}"\n')
@@ -88,13 +105,11 @@ def _write_diagram(
 
 def collect_operations(spec: Mapping[str, object]) -> list[OperationEntry]:
     """Return CLI operations extracted from the OpenAPI specification."""
-
     return _collect_operations(spec)
 
 
 def write_diagram(operations: Sequence[OperationEntry]) -> None:
     """Emit a D2 diagram linking CLI tags to operations."""
-
     _write_diagram(list(operations))
 
 
