@@ -24,7 +24,6 @@ This release introduces **production-grade testing infrastructure** with:
 
 ### 1. Comprehensive Test Suites (Tasks 1.2-1.5)
 
-#### 1.1 Search Options Coverage (`tests/agent_catalog/test_search_options_table.py`)
 **11 parametrized tests** covering:
 - ✅ Valid configurations (default facets, custom pools, alpha weights)
 - ✅ Missing dependencies (graceful fallbacks)
@@ -100,7 +99,6 @@ if isinstance(problem, dict):
     assert problem.get("correlation_id") == "req-xyz789"
 ```
 
-#### 1.5 Schema Validation & Round-Trips (`tests/agent_catalog/test_catalog_schema_roundtrip.py`)
 **7 parametrized tests** verifying:
 - ✅ JSON serialization round-trips (data → JSON → data)
 - ✅ Problem Details RFC 9457 structure validation
@@ -168,7 +166,6 @@ def test_operation_traced(otel_tracer_provider):
 
 **Runnable docstrings** in key APIs:
 
-**`src/kgfoundry/agent_catalog/search.py::build_default_search_options()`**:
 ```python
 >>> opts = build_default_search_options()
 >>> assert opts.alpha == 0.6  # default alpha
@@ -259,7 +256,6 @@ else:
 
 **Applied to**:
 - ✅ `tests/search_api/test_client_idempotency.py`
-- ✅ `tests/agent_catalog/test_catalog_schema_roundtrip.py`
 
 ---
 
@@ -425,7 +421,6 @@ uv run pytest tests/ -q
 ### Run Specific Suite
 ```bash
 # Search options
-uv run pytest tests/agent_catalog/test_search_options_table.py -v
 
 # HTTP client idempotency
 uv run pytest tests/search_api/test_client_idempotency.py -v
@@ -436,7 +431,6 @@ uv run pytest tests/kgfoundry_common/test_prometheus_metrics.py -v
 
 ### Run Doctests
 ```bash
-uv run pytest --doctest-modules src/kgfoundry/agent_catalog/search.py
 ```
 
 ### Check All Quality Gates
@@ -454,16 +448,12 @@ make artifacts && git diff --exit-code
 
 ### New Test Files
 - ✅ `tests/conftest.py` — Shared fixtures (OTEL, Prometheus, Problem Details loaders)
-- ✅ `tests/agent_catalog/conftest.py` — Import path setup
-- ✅ `tests/agent_catalog/test_search_options_table.py` — 11 parametrized tests
-- ✅ `tests/agent_catalog/test_catalog_schema_roundtrip.py` — 7 parametrized tests
 - ✅ `tests/orchestration/test_index_cli_idempotency.py` — 9 parametrized tests
 - ✅ `tests/kgfoundry_common/test_prometheus_metrics.py` — 18 parametrized tests
 - ✅ `tests/search_api/conftest.py` — Import path setup
 - ✅ `tests/search_api/test_client_idempotency.py` — 14 parametrized tests
 
 ### Enhanced Source Files (Doctests)
-- ✅ `src/kgfoundry/agent_catalog/search.py` — Enhanced `build_default_search_options()` docstring
 - ✅ `src/orchestration/cli.py` — Enhanced `index_bm25()` and `index_faiss()` docstrings
 - ✅ `src/search_api/faiss_adapter.py` — Enhanced `DenseVecs` and `FaissAdapter` docstrings
 

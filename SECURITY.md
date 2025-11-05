@@ -45,7 +45,6 @@ All `pickle.load` usage is:
 - `src/search_api/bm25_index.py`: Legacy pickle format support (line 371)
 - `src/embeddings_sparse/bm25.py`: Legacy pickle format support (lines 276, 284)
 - `src/embeddings_sparse/splade.py`: Legacy pickle format support (lines 306, 314)
-- `src/kgfoundry/agent_catalog/search.py`: Local trusted artifact (line 288)
 
 **Migration Status**: In progress (R3 - Secure Serialization & Persistence)
 - New code uses JSON with schema validation
