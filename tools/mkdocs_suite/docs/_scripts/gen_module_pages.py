@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING, Any, Protocol, TypeGuard, cast
 import mkdocs_gen_files
 import yaml
 
+from . import load_repo_settings
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -63,44 +65,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[4]
 TOOLS_ROOT = PROJECT_ROOT / "tools"
 SRC_ROOT = PROJECT_ROOT / "src"
 SUITE_ROOT = TOOLS_ROOT / "mkdocs_suite"
-MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
-EDIT_URI_BRANCH_INDEX = 1
 
 
-def _load_repo_settings() -> tuple[str | None, str | None]:
-    """Return the configured repository URL and default branch.
-
-    Returns
-    -------
-    tuple[str | None, str | None]
-        Pair of ``(repo_url, branch)`` with ``None`` when unavailable.
-    """
-    if not MKDOCS_CONFIG_PATH.exists():
-        return None, None
-    repo_url: str | None = None
-    edit_uri: str | None = None
-    try:
-        for raw_line in MKDOCS_CONFIG_PATH.read_text(encoding="utf-8").splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if line.startswith("repo_url:") and repo_url is None:
-                repo_url = line.split(":", 1)[1].strip().strip("\"'")
-            if line.startswith("edit_uri:") and edit_uri is None:
-                edit_uri = line.split(":", 1)[1].strip().strip("\"'")
-    except OSError:  # pragma: no cover - defensive guard for inaccessible config
-        return None, None
-    branch: str | None = None
-    if isinstance(edit_uri, str):
-        parts = edit_uri.strip("/").split("/")
-        if parts and parts[0] == "edit" and len(parts) > EDIT_URI_BRANCH_INDEX:
-            branch = parts[EDIT_URI_BRANCH_INDEX]
-    if not branch:
-        branch = "main"
-    return (str(repo_url) if isinstance(repo_url, str) and repo_url else None, branch)
-
-
-REPO_URL, DEFAULT_BRANCH = _load_repo_settings()
+REPO_URL, DEFAULT_BRANCH = load_repo_settings()
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator, Sequence
