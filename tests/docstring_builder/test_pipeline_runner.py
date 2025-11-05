@@ -108,6 +108,16 @@ class _StubDiffManager:
 
 
 @dataclass(slots=True)
+class PipelineConfigOverrides:
+    """Customization knobs for building pipeline configurations in tests."""
+
+    docfacts_status: DocfactsStatus = "success"
+    docfacts_message: str | None = None
+    baseline: str | None = None
+    diff_manager: DiffManager | None = None
+
+
+@dataclass(slots=True)
 class _MetricsHistogram:
     labels_called: list[dict[str, object]] = field(default_factory=list)
     observed: list[float] = field(default_factory=list)
@@ -139,20 +149,32 @@ def _build_metrics_recorder() -> MetricsRecorder:
     return MetricsRecorder(cli_duration_seconds=histogram, runs_total=counter)
 
 
-def _build_pipeline_config(
+def make_pipeline_config(
     request: DocstringBuildRequest,
     file_outcomes: Sequence[FileOutcome],
-    *,
-    docfacts_status: DocfactsStatus = "success",
-    docfacts_message: str | None = None,
+    overrides: PipelineConfigOverrides | None = None,
 ) -> PipelineConfig:
+    """Construct a pipeline configuration tailored for orchestrator tests.
+
+    Returns
+    -------
+    PipelineConfig
+        Configuration instance ready for execution by the pipeline runner.
+    """
+    overrides = overrides or PipelineConfigOverrides()
+
     def _write_cache() -> None:
         return None
 
     cache = cast("BuilderCache", SimpleNamespace(write=_write_cache))
 
+    outcomes_iter = iter(file_outcomes)
+
     def _process_file(_path: Path) -> FileOutcome:
-        return file_outcomes[0]
+        try:
+            return next(outcomes_iter)
+        except StopIteration:  # pragma: no cover - defensive guard
+            return file_outcomes[-1]
 
     file_processor = cast("FileProcessor", SimpleNamespace(process=_process_file))
 
@@ -160,27 +182,27 @@ def _build_pipeline_config(
         """Factory for creating DocfactsCoordinator instances."""
 
         def __call__(self, *, check_mode: bool) -> DocfactsCoordinator:
-            """Create coordinator with appropriate status based on mode.
-
-            Parameters
-            ----------
-            check_mode : bool
-                If True, use check status; otherwise use 'success'.
+            """Create a coordinator stub with status tailored to ``check_mode``.
 
             Returns
             -------
             DocfactsCoordinator
-                A stub coordinator with appropriate status.
+                Coordinator instance seeded with the desired status and message.
             """
-            status = docfacts_status if check_mode else "success"
+            status = overrides.docfacts_status if check_mode else "success"
             return cast(
                 "DocfactsCoordinator",
-                _StubDocfactsCoordinator(status=status, message=docfacts_message),
+                _StubDocfactsCoordinator(
+                    status=status,
+                    message=overrides.docfacts_message,
+                ),
             )
 
     coordinator_factory = CoordinatorFactory()
 
     config, _ = load_builder_config(None)
+
+    chosen_diff_manager = overrides.diff_manager or cast("DiffManager", _StubDiffManager())
 
     return PipelineConfig(
         request=request,
@@ -192,7 +214,7 @@ def _build_pipeline_config(
             ignore_missing=False,
             missing_patterns=(),
             skip_docfacts=request.command not in {"update", "check"},
-            baseline=None,
+            baseline=overrides.baseline,
         ),
         cache=cache,
         file_processor=file_processor,
@@ -202,7 +224,7 @@ def _build_pipeline_config(
         plugin_manager=None,
         policy_engine=cast("PolicyEngine", _StubPolicyEngine()),
         metrics=_build_metrics_recorder(),
-        diff_manager=cast("DiffManager", _StubDiffManager()),
+        diff_manager=chosen_diff_manager,
         logger=logging.getLogger(__name__),
         status_from_exit=status_from_exit,
         status_labels=STATUS_LABELS,
@@ -226,7 +248,7 @@ def test_pipeline_runner_collects_diff_previews(
         changed=True,
         skipped=False,
     )
-    config = _build_pipeline_config(request, [outcome])
+    config = make_pipeline_config(request, [outcome])
 
     dummy_path = tmp_path / "module.py"
     dummy_path.write_text("# placeholder")
@@ -258,11 +280,13 @@ def test_pipeline_runner_records_docfacts_violation(
         changed=False,
         skipped=False,
     )
-    config = _build_pipeline_config(
+    config = make_pipeline_config(
         request,
         [outcome],
-        docfacts_status="violation",
-        docfacts_message="docfacts drift",
+        overrides=PipelineConfigOverrides(
+            docfacts_status="violation",
+            docfacts_message="docfacts drift",
+        ),
     )
 
     dummy_path = tmp_path / "module.py"
@@ -282,3 +306,105 @@ def test_pipeline_runner_records_docfacts_violation(
 
     assert result.exit_status is ExitStatus.VIOLATION
     assert any(error["file"] == "<docfacts>" for error in result.errors)
+
+
+def test_pipeline_runner_records_docfacts_baseline_payload(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = DocstringBuildRequest(command="update", subcommand="update")
+    outcome = FileOutcome(
+        status=ExitStatus.SUCCESS,
+        docfacts=_empty_docfacts(),
+        preview=None,
+        changed=False,
+        skipped=False,
+    )
+    diff_manager = _StubDiffManager()
+    config = make_pipeline_config(
+        request,
+        [outcome],
+        overrides=PipelineConfigOverrides(
+            diff_manager=cast("DiffManager", diff_manager),
+        ),
+    )
+
+    cache_dir = tmp_path / "cache"
+    observability_path = tmp_path / "observability.json"
+    docfacts_path = tmp_path / "docfacts.json"
+    docfacts_diff_path = tmp_path / "docfacts.diff.json"
+
+    docfacts_payload = '{"status": "ok"}'
+    docfacts_path.write_text(docfacts_payload, encoding="utf-8")
+    docfacts_diff_path.write_text("{}", encoding="utf-8")
+
+    dummy_path = tmp_path / "module.py"
+    dummy_path.write_text("# placeholder")
+
+    monkeypatch.setattr("tools.docstring_builder.pipeline.CACHE_PATH", cache_dir)
+    monkeypatch.setattr(
+        "tools.docstring_builder.pipeline.OBSERVABILITY_PATH",
+        observability_path,
+    )
+    monkeypatch.setattr("tools.docstring_builder.pipeline.DOCFACTS_PATH", docfacts_path)
+    monkeypatch.setattr("tools.docstring_builder.pipeline.DOCFACTS_DIFF_PATH", docfacts_diff_path)
+
+    runner = PipelineRunner(config)
+    result = runner.run([dummy_path])
+
+    assert diff_manager.recorded_docfacts == [docfacts_payload]
+    assert result.cli_payload is not None
+    docfacts_report = result.cli_payload.get("docfacts")
+    assert isinstance(docfacts_report, dict)
+    assert docfacts_report["path"].endswith("docfacts.json")
+    assert docfacts_report["diff"].endswith("docfacts.diff.json")
+
+
+def test_pipeline_runner_includes_baseline_in_file_report(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = DocstringBuildRequest(
+        command="check",
+        subcommand="check",
+        json_output=True,
+    )
+    outcome = FileOutcome(
+        status=ExitStatus.SUCCESS,
+        docfacts=_empty_docfacts(),
+        preview="preview",
+        changed=True,
+        skipped=False,
+    )
+    diff_manager = _StubDiffManager()
+    config = make_pipeline_config(
+        request,
+        [outcome],
+        overrides=PipelineConfigOverrides(
+            baseline="main",
+            diff_manager=cast("DiffManager", diff_manager),
+        ),
+    )
+
+    cache_dir = tmp_path / "cache"
+    observability_path = tmp_path / "observability.json"
+    docfacts_path = tmp_path / "docfacts.json"
+
+    dummy_path = tmp_path / "module.py"
+    dummy_path.write_text("# placeholder")
+
+    monkeypatch.setattr("tools.docstring_builder.pipeline.CACHE_PATH", cache_dir)
+    monkeypatch.setattr(
+        "tools.docstring_builder.pipeline.OBSERVABILITY_PATH",
+        observability_path,
+    )
+    monkeypatch.setattr("tools.docstring_builder.pipeline.DOCFACTS_PATH", docfacts_path)
+
+    runner = PipelineRunner(config)
+    result = runner.run([dummy_path])
+
+    assert diff_manager.baseline_calls
+    path_recorded, preview_recorded = diff_manager.baseline_calls[0]
+    assert path_recorded.endswith("module.py")
+    assert preview_recorded == "preview"
+    assert result.file_reports[0]["baseline"] == "main"

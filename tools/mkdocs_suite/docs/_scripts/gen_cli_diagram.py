@@ -7,10 +7,15 @@ Nodes link directly into the rendered ReDoc page for each CLI operation.
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import mkdocs_gen_files
 import yaml
+
+OperationEntry = tuple[str, str, str, str, tuple[str, ...]]
+
+__all__ = ["OperationEntry", "collect_operations", "write_diagram", "main"]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,9 +36,9 @@ def _operation_anchor(operation_id: str) -> str:
 
 
 def _collect_operations(
-    spec: dict[str, object],
-) -> list[tuple[str, str, str, str, tuple[str, ...]]]:
-    operations: list[tuple[str, str, str, str, tuple[str, ...]]] = []
+    spec: Mapping[str, object],
+) -> list[OperationEntry]:
+    operations: list[OperationEntry] = []
     paths_section = spec.get("paths")
     if not isinstance(paths_section, dict):
         if paths_section not in (None, {}):
@@ -58,7 +63,7 @@ def _collect_operations(
 
 
 def _write_diagram(
-    operations: list[tuple[str, str, str, str, tuple[str, ...]]]
+    operations: list[OperationEntry]
 ) -> None:
     diagram_path = "diagrams/cli_by_tag.d2"
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
@@ -81,13 +86,25 @@ def _write_diagram(
         handle.write("}\n")
 
 
+def collect_operations(spec: Mapping[str, object]) -> list[OperationEntry]:
+    """Return CLI operations extracted from the OpenAPI specification."""
+
+    return _collect_operations(spec)
+
+
+def write_diagram(operations: Sequence[OperationEntry]) -> None:
+    """Emit a D2 diagram linking CLI tags to operations."""
+
+    _write_diagram(list(operations))
+
+
 def main() -> None:
     spec = _load_cli_spec()
-    operations = _collect_operations(spec)
+    operations = collect_operations(spec)
     if not operations:
         LOGGER.info("No CLI operations discovered in specification")
         return
-    _write_diagram(operations)
+    write_diagram(operations)
     with mkdocs_gen_files.open("diagrams/index.md", "a") as handle:
         handle.write("- [CLI by Tag](./cli_by_tag.d2)\n")
 

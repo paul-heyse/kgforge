@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "kgfoundry"
 version = "0.1.0"
 description = "kgfoundry"
-readme = "README.md"
+readme = "AGENTS.md"
 requires-python = ">=3.13"
 dependencies = [
     # ============================================================================
