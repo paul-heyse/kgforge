@@ -194,7 +194,13 @@ class DocstringCommonModuleProto(Protocol):
 
 
 def _get_attr_name(entry: DocstringAttrProto) -> str | None:
-    """Return the attribute identifier embedded in a metadata entry."""
+    """Return the attribute identifier embedded in a metadata entry.
+
+    Returns
+    -------
+    str | None
+        Normalized attribute name or ``None`` when unavailable.
+    """
     if not entry.args:
         return None
     if len(entry.args) == 1:
@@ -207,12 +213,24 @@ def _get_attr_name(entry: DocstringAttrProto) -> str | None:
 def ensure_docstring_attrs(
     doc_cls: type[DocstringProto], attr_cls: type[DocstringAttrProto]
 ) -> bool:
-    """Install an ``attrs`` property on ``Docstring`` when absent."""
+    """Install an ``attrs`` property on ``Docstring`` when absent.
+
+    Returns
+    -------
+    bool
+        ``True`` if the property was added; ``False`` when it already existed.
+    """
     if hasattr(doc_cls, "attrs"):
         return False
 
     def _attrs(self: DocstringProto) -> list[DocstringAttrProto]:
-        """Return attribute metadata entries collected from Docstring meta."""
+        """Return attribute metadata entries collected from Docstring meta.
+
+        Returns
+        -------
+        list[DocstringAttrProto]
+            Attribute metadata entries whose names could be resolved.
+        """
         return [
             entry
             for entry in self.meta
@@ -228,14 +246,26 @@ def ensure_docstring_attrs(
 def ensure_docstring_yields(
     doc_cls: type[DocstringProto], yields_cls: type[DocstringYieldsProto]
 ) -> tuple[bool, bool]:
-    """Install ``yields`` and ``many_yields`` helpers on ``Docstring``."""
+    """Install ``yields`` and ``many_yields`` helpers on ``Docstring``.
+
+    Returns
+    -------
+    tuple[bool, bool]
+        Tuple indicating whether ``yields`` and ``many_yields`` were added.
+    """
     added_single = False
     added_many = False
 
     if not hasattr(doc_cls, "yields"):
 
         def _yield_entry(self: DocstringProto) -> DocstringYieldsProto | None:
-            """Return the first generator metadata entry, if any."""
+            """Return the first generator metadata entry, if any.
+
+            Returns
+            -------
+            DocstringYieldsProto | None
+                First generator metadata entry when present; otherwise ``None``.
+            """
             for entry in self.meta:
                 if isinstance(entry, yields_cls):
                     return entry
@@ -248,7 +278,13 @@ def ensure_docstring_yields(
     if not hasattr(doc_cls, "many_yields"):
 
         def _many(self: DocstringProto) -> list[DocstringYieldsProto]:
-            """Return all generator metadata entries in the docstring."""
+            """Return all generator metadata entries in the docstring.
+
+            Returns
+            -------
+            list[DocstringYieldsProto]
+                All generator metadata entries collected from ``meta``.
+            """
             return [entry for entry in self.meta if isinstance(entry, yields_cls)]
 
         doc_cls_any = cast("Any", doc_cls)
@@ -263,12 +299,25 @@ def ensure_docstring_yields(
 
 
 def ensure_docstring_size(doc_cls: type[DocstringProto]) -> bool:
-    """Install a ``size`` property mirroring ``Docstring.total_size`` semantics."""
+    """Install a ``size`` property mirroring ``Docstring.total_size`` semantics.
+
+    Returns
+    -------
+    bool
+        ``True`` if the property was added; ``False`` when already present.
+    """
     if hasattr(doc_cls, "size"):
         return False
 
     def _size(self: DocstringProto) -> int:
-        """Return the total length of rendered docstring components."""
+        """Return the total length of rendered docstring components.
+
+        Returns
+        -------
+        int
+            Total character count across short description, long description,
+            and meta entries.
+        """
         blocks: list[str] = []
         if self.short_description:
             blocks.append(self.short_description)

@@ -381,9 +381,11 @@ class AppSettings(BaseSettings):
         ------
         TypeError
             If any key in ``values`` is not a string.
-        ValueError
-            If validation fails; error messages match ``AppSettings`` field
-            validators.
+
+        Notes
+        -----
+        Propagates :class:`ValueError` from ``pydantic`` when validation fails;
+        error messages mirror ``AppSettings`` field validators.
         """
         normalized: dict[str, object] = {}
 
@@ -398,10 +400,7 @@ class AppSettings(BaseSettings):
                     raise TypeError(message)
                 normalized[key_obj] = value
 
-        try:
-            return cls.model_validate(normalized, context=context)
-        except ValueError:
-            raise
+        return cls.model_validate(normalized, context=context)
 
 
 def _load_config_impl() -> AppSettings:
@@ -463,10 +462,10 @@ def load_config(*, reload: bool = False) -> AppSettings:
     AppSettings
         Validated application settings.
 
-    Raises
-    ------
-    ValueError
-        If configuration validation fails (e.g., invalid log level).
+    Notes
+    -----
+    Propagates :class:`ValueError` from ``pydantic`` when configuration
+    validation fails (for example, due to an invalid log level).
 
     Examples
     --------
@@ -480,10 +479,7 @@ def load_config(*, reload: bool = False) -> AppSettings:
     if reload:
         _load_config_cached.cache_clear()
 
-    try:
-        return _load_config_cached()
-    except ValueError:
-        raise
+    return _load_config_cached()
 
 
 def _format_validation_error(exc: ValidationError) -> str:

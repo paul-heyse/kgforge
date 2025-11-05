@@ -192,12 +192,14 @@ def _load_bm25_documents(chunks_path: str) -> list[tuple[str, dict[str, str]]]:
 
     Raises
     ------
-    FileNotFoundError
-        If file not found.
     TypeError
         If dataset format is invalid.
-    json.JSONDecodeError
-        If JSON parsing fails.
+
+    Notes
+    -----
+    Propagates :class:`FileNotFoundError` when the input path is missing and
+    :class:`json.JSONDecodeError` for malformed JSON payloads in non-JSONL
+    inputs. Invalid JSON lines in JSONL inputs are logged and skipped.
     """
     docs: list[tuple[str, dict[str, str]]] = []
 
@@ -256,28 +258,22 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
 
     Raises
     ------
-    FileNotFoundError
-        If input file missing.
-    TypeError
-        If dataset is invalid.
-    json.JSONDecodeError
-        If JSON parsing fails.
     RuntimeError
-        If index building fails.
+        If index building fails after attempting both backends.
+
+    Notes
+    -----
+    Propagates :class:`FileNotFoundError`, :class:`TypeError`, and
+    :class:`json.JSONDecodeError` from dataset loading helpers when the source
+    data is invalid.
 
     Returns
     -------
     str
         Backend identifier that successfully produced the index.
     """
-    try:
-        docs = _load_bm25_documents(config.chunks_path)
-    except (FileNotFoundError, TypeError, json.JSONDecodeError):
-        raise
-    try:
-        builder, backend_used = _instantiate_bm25_builder(config)
-    except RuntimeError:
-        raise
+    docs = _load_bm25_documents(config.chunks_path)
+    builder, backend_used = _instantiate_bm25_builder(config)
 
     try:
         builder.build(docs)
@@ -531,15 +527,11 @@ def _prepare_index_directory(index_path: str) -> None:
     index_path : str
         Path where index will be written.
 
-    Raises
-    ------
-    OSError
-        If directory creation fails.
+    Notes
+    -----
+    Propagates :class:`OSError` when directory creation fails.
     """
-    try:
-        Path(index_path).parent.mkdir(parents=True, exist_ok=True)
-    except OSError:
-        raise
+    Path(index_path).parent.mkdir(parents=True, exist_ok=True)
 
 
 # [nav:anchor index_bm25]
@@ -572,11 +564,11 @@ def index_bm25(
     Raises
     ------
     FileNotFoundError
-        If input file is missing.
+        If the chunk dataset cannot be located.
     TypeError
-        If dataset format is invalid.
+        If the dataset format is invalid.
     json.JSONDecodeError
-        If JSON parsing fails.
+        If JSON chunk payloads are malformed.
     typer.Exit
         If index building fails (exit code 1).
     """
@@ -842,10 +834,10 @@ def index_faiss(
     - **Retries**: No automatic retries. On failure, check logs and re-run.
     - **GPU Fallback**: If GPU unavailable, CPU index is built automatically.
 
-    Raises
-    ------
-    typer.Exit
-        On any error with exit code 1.
+    Notes
+    -----
+    Propagates :class:`typer.Exit` from :func:`run_index_faiss` when the index
+    build fails.
 
     Examples
     --------
@@ -864,10 +856,7 @@ def index_faiss(
         factory=factory,
         metric=metric,
     )
-    try:
-        run_index_faiss(config=config)
-    except typer.Exit:
-        raise
+    run_index_faiss(config=config)
 
 
 # [nav:anchor api]

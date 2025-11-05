@@ -449,15 +449,12 @@ class SignedPickleWrapper:
         file : BinaryIO
             File-like object opened in binary write mode.
 
-        Raises
-        ------
-        ValueError
-            If object contains disallowed types.
+        Notes
+        -----
+        Propagates :class:`ValueError` when the object contains disallowed
+        types according to :func:`_validate_object`.
         """
-        try:
-            _validate_object(obj)
-        except ValueError:
-            raise
+        _validate_object(obj)
 
         payload = _stdlib_pickle.dumps(obj)
         signature = hmac.new(self.signing_key, payload, hashlib.sha256).digest()
@@ -495,10 +492,7 @@ class SignedPickleWrapper:
             msg = "Deserialization blocked: HMAC signature verification failed; payload may be tampered"
             raise UnsafeSerializationError(msg, reason="signature_mismatch")
 
-        try:
-            result = _load_with_allow_list(io.BytesIO(payload))
-        except UnsafeSerializationError:
-            raise
+        result = _load_with_allow_list(io.BytesIO(payload))
 
         logger.debug("Deserialized object with verified signature", extra={"size": len(payload)})
         return result
@@ -517,17 +511,14 @@ def load_unsigned_legacy(file: BinaryIO) -> object:
     object
         Deserialized object containing only allow-listed primitives and containers.
 
-    Raises
-    ------
-    UnsafeSerializationError
-        If the pickle stream contains disallowed types or cannot be parsed.
+    Notes
+    -----
+    Propagates :class:`UnsafeSerializationError` when the pickle stream contains
+    disallowed types or cannot be parsed by :func:`_load_with_allow_list`.
     """
     data = file.read()
     buffer = io.BytesIO(data)
-    try:
-        return _load_with_allow_list(buffer)
-    except UnsafeSerializationError:
-        raise
+    return _load_with_allow_list(buffer)
 
 
 def create_unsigned_pickle_payload(obj: object) -> bytes:

@@ -29,28 +29,29 @@ logger = get_logger(__name__)
 def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     """Create directory if it does not exist, including parent directories.
 
-    <!-- auto:docstring-builder v1 -->
+    Creates the specified directory path and all intermediate parent directories
+    if they do not exist. Uses pathlib's mkdir with parents=True for atomic
+    directory creation.
 
     Parameters
     ----------
     path : Path
-        Directory path to create.
+        Directory path to create. May be absolute or relative.
     exist_ok : bool, optional
-        If True, do not raise if directory already exists.
+        If True, do not raise an exception if the directory already exists.
         Defaults to True.
-        Defaults to ``True``.
 
     Returns
     -------
     Path
-        The created or existing directory path.
+        The created or existing directory path (same as input).
 
     Raises
     ------
     PermissionError
-        If the filesystem denies creation.
+        If the filesystem denies creation due to insufficient permissions.
     FileExistsError
-        If `exist_ok=False` and the path exists as a file.
+        If exist_ok=False and the path exists as a file (not a directory).
 
     Examples
     --------
@@ -58,34 +59,35 @@ def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     >>> ensure_dir(Path("/tmp/data/subdir"))
     Path('/tmp/data/subdir')
     """
-    try:
-        path.mkdir(parents=True, exist_ok=exist_ok)
-    except (PermissionError, FileExistsError):
-        raise
+    path.mkdir(parents=True, exist_ok=exist_ok)
     return path
 
 
 def safe_join(base: Path, *parts: str | Path) -> Path:
     """Join path components safely, preventing directory traversal.
 
-    <!-- auto:docstring-builder v1 -->
+    Joins path components relative to a base directory and validates that the
+    resolved path does not escape the base directory. This prevents path
+    traversal attacks by ensuring all resolved paths are within the base.
 
     Parameters
     ----------
     base : Path
-        Base directory path (must be absolute).
+        Base directory path. Must be absolute to enable validation.
     *parts : str | Path
-        Relative path components to join.
+        Relative path components to join. These are joined relative to base.
 
     Returns
     -------
     Path
-        Resolved path within the base directory.
+        Resolved absolute path that is guaranteed to be within the base
+        directory.
 
     Raises
     ------
     ValueError
-        If the resolved path escapes the base directory.
+        If base is not absolute or if the resolved path escapes the base
+        directory (path traversal attempt).
 
     Examples
     --------
@@ -111,20 +113,21 @@ def safe_join(base: Path, *parts: str | Path) -> Path:
 def read_text(path: Path, encoding: str = "utf-8") -> str:
     """Read text file contents with explicit encoding.
 
-    <!-- auto:docstring-builder v1 -->
+    Reads a text file and returns its contents as a string. Uses the specified
+    encoding to decode bytes. This is a convenience wrapper around
+    pathlib.Path.read_text().
 
     Parameters
     ----------
     path : Path
-        File path to read.
+        File path to read. Must exist and be readable.
     encoding : str, optional
-        Text encoding to use. Defaults to "utf-8".
-        Defaults to ``'utf-8'``.
+        Text encoding to use for decoding bytes. Defaults to "utf-8".
 
     Returns
     -------
     str
-        File contents as text.
+        File contents as a decoded string.
 
     Raises
     ------
@@ -132,6 +135,8 @@ def read_text(path: Path, encoding: str = "utf-8") -> str:
         If the file does not exist.
     UnicodeDecodeError
         If the file cannot be decoded with the specified encoding.
+    PermissionError
+        If the file is not readable.
 
     Examples
     --------
@@ -140,33 +145,31 @@ def read_text(path: Path, encoding: str = "utf-8") -> str:
     >>> read_text(Path("/tmp/test.txt"))
     'hello'
     """
-    try:
-        return path.read_text(encoding=encoding)
-    except (FileNotFoundError, UnicodeDecodeError):
-        raise
+    return path.read_text(encoding=encoding)
 
 
 def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
     """Write text data to a file, creating parent directories if needed.
 
-    <!-- auto:docstring-builder v1 -->
+    Writes text content to a file, encoding it using the specified encoding.
+    Creates parent directories if they do not exist. Uses pathlib's write_text
+    for atomic file operations.
 
     Parameters
     ----------
     path : Path
-        File path to write.
+        File path to write. Parent directories will be created if needed.
     data : str
-        Text content to write.
+        Text content to write. Will be encoded using the specified encoding.
     encoding : str, optional
-        Text encoding to use. Defaults to "utf-8".
-        Defaults to ``'utf-8'``.
+        Text encoding to use for encoding the string to bytes. Defaults to "utf-8".
 
     Raises
     ------
     PermissionError
         If the filesystem denies write access.
     OSError
-        If the parent directory cannot be created.
+        If parent directory creation fails or file write fails.
 
     Examples
     --------
@@ -175,14 +178,8 @@ def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
     >>> read_text(Path("/tmp/output.txt"))
     'content'
     """
-    try:
-        ensure_dir(path.parent, exist_ok=True)
-    except (PermissionError, OSError):
-        raise
-    try:
-        path.write_text(data, encoding=encoding)
-    except PermissionError:
-        raise
+    ensure_dir(path.parent, exist_ok=True)
+    path.write_text(data, encoding=encoding)
 
 
 def atomic_write(
@@ -192,17 +189,20 @@ def atomic_write(
 ) -> None:
     """Write data atomically using a temporary file and rename.
 
-    <!-- auto:docstring-builder v1 -->
+    Writes data to a file using an atomic operation: first writes to a temporary
+    file in the same directory, then renames it to the final path. This ensures
+    that the final file is either completely written or not present, preventing
+    partial writes in case of crashes.
 
     Parameters
     ----------
     path : Path
-        Final file path to write.
+        Final file path to write. Parent directories will be created if needed.
     data : str | bytes
-        Content to write (str for text mode, bytes for binary).
+        Content to write. Must be str for text mode or bytes for binary mode.
     mode : Literal['text', 'binary'], optional
-        Write mode. Defaults to "text".
-        Defaults to ``'text'``.
+        Write mode. Use "text" for string data (UTF-8 encoding) or "binary"
+        for bytes data. Defaults to "text".
 
     Raises
     ------
@@ -210,6 +210,15 @@ def atomic_write(
         If mode is "text" but data is bytes, or mode is "binary" but data is str.
     PermissionError
         If the filesystem denies write access.
+    OSError
+        If parent directory creation fails, temporary file creation fails, or
+        rename operation fails.
+
+    Notes
+    -----
+    The atomic operation ensures that concurrent readers never see a partially
+    written file. The temporary file is created in the same directory as the
+    final path to ensure the rename operation succeeds (requires same filesystem).
 
     Examples
     --------
@@ -218,10 +227,7 @@ def atomic_write(
     >>> read_text(Path("/tmp/atomic.txt"))
     'safe content'
     """
-    try:
-        ensure_dir(path.parent, exist_ok=True)
-    except PermissionError:
-        raise
+    ensure_dir(path.parent, exist_ok=True)
     tmp_path: Path | None = None
     try:
         dir_arg = str(path.parent) if path.parent else None
@@ -251,10 +257,7 @@ def atomic_write(
                 temp_file.write(data)
                 temp_file.flush()
         if tmp_path is not None:
-            try:
-                tmp_path.replace(path)
-            except PermissionError:
-                raise
+            tmp_path.replace(path)
     finally:
         if tmp_path is not None and sys.exc_info()[0] is not None:
             tmp_path.unlink(missing_ok=True)

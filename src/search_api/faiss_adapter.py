@@ -331,13 +331,13 @@ class FaissAdapter:
         ------
         IndexBuildError
             If index construction fails.
-        VectorSearchError
-            If vector loading fails.
+
+        Notes
+        -----
+        Propagates :class:`VectorSearchError` when vector loading fails prior to
+        index construction.
         """
-        try:
-            vectors = self._load_dense_vectors()
-        except VectorSearchError:
-            raise
+        vectors = self._load_dense_vectors()
         self.vecs = vectors
         self.idmap = vectors.ids
         self._cpu_matrix = vectors.matrix
@@ -398,17 +398,14 @@ class FaissAdapter:
         cpu_index_path : str | None, optional
             Path to CPU index file.
 
-        Raises
-        ------
-        VectorSearchError
-            If index loading or vector loading fails.
+        Notes
+        -----
+        Propagates :class:`VectorSearchError` when index or vector loading
+        fails before a rebuild occurs.
         """
         module = faiss
         if module is None or not HAVE_FAISS:
-            try:
-                self.build()
-            except VectorSearchError:
-                raise
+            self.build()
             return
         faiss_module: FaissModuleProtocol = module
 
@@ -417,10 +414,7 @@ class FaissAdapter:
             if index_path.exists():
                 try:
                     cpu_index = faiss_module.read_index(str(index_path))
-                    try:
-                        vectors = self._load_dense_vectors()
-                    except VectorSearchError:
-                        raise
+                    vectors = self._load_dense_vectors()
                     self.vecs = vectors
                     self.idmap = vectors.ids
                     self._cpu_matrix = vectors.matrix
@@ -650,10 +644,7 @@ class FaissAdapter:
         """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
-            try:
-                return self._load_from_parquet(candidate)
-            except VectorSearchError:
-                raise
+            return self._load_from_parquet(candidate)
 
         if not candidate.exists():
             msg = f"DuckDB registry not found: {candidate}"
@@ -684,10 +675,7 @@ class FaissAdapter:
             msg = "dense_runs table is empty or malformed"
             raise VectorSearchError(msg)
 
-        try:
-            return self._load_from_parquet(Path(root_candidate))
-        except VectorSearchError:
-            raise
+        return self._load_from_parquet(Path(root_candidate))
 
     @staticmethod
     def _load_from_parquet(source: Path) -> DenseVecs:

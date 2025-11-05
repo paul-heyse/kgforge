@@ -122,7 +122,13 @@ class FaissAdapterSettings:
     timeout_seconds: int = DEFAULT_INDEX_TIMEOUT_SECONDS
 
     def __post_init__(self) -> None:
-        """Validate settings."""
+        """Validate settings.
+
+        Raises
+        ------
+        ValueError
+            If ``metric`` is not one of ``{"ip", "l2"}``.
+        """
         if self.metric not in VALID_METRICS:
             msg = f"metric must be 'ip' or 'l2', got {self.metric!r}"
             raise ValueError(msg)
@@ -351,10 +357,11 @@ class FaissVectorstoreFactory:
         correlation_id : str | None, optional
             Correlation identifier propagated to logs and metrics. Defaults to ``None``.
 
-        Raises
-        ------
-        RuntimeError
-            If adapter has no vectors or save fails.
+        Notes
+        -----
+        Propagates exceptions raised by :meth:`FaissAdapter.save` (for example
+        I/O errors or FAISS errors). Callers should handle these according to
+        their error-handling strategy.
         """
         logger.info(
             "Saving FAISS index",

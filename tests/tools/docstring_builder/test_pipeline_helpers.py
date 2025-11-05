@@ -53,6 +53,7 @@ def _empty_docfacts() -> list[DocFact]:
     list[DocFact]
         Empty list.
     """
+    return []
 
 
 def _captured_messages(caplog: LogCaptureFixture) -> list[str]:

@@ -141,37 +141,39 @@ def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
     ------
     DeserializationError
         If deserialization fails or payload is invalid.
-    OSError
-        If the file cannot be read.
+
+    Notes
+    -----
+    Wraps :class:`OSError` raised during file access as
+    :class:`DeserializationError` with additional context.
     """
     signing_key = _decode_signing_key()
     try:
-        try:
-            with legacy_path.open("rb") as handle:
-                if signing_key:
-                    wrapper = SignedPickleWrapper(signing_key)
-                    try:
-                        payload_obj = wrapper.load(handle)
-                    except UnsafeSerializationError:
-                        logger.warning(
-                            "Signed pickle validation failed for legacy SPLADE index; falling back to unsigned loader",
-                            extra={"legacy_path": str(legacy_path)},
-                        )
-                        handle.seek(0)
-                        payload = _load_unsigned_payload(handle, legacy_path)
-                    else:
-                        if not isinstance(payload_obj, dict):
-                            msg = f"Invalid signed legacy payload: expected dict, got {type(payload_obj)}"
-                            raise DeserializationError(msg)
-                        payload = cast("dict[str, JsonValue]", payload_obj)
-                else:
+        with legacy_path.open("rb") as handle:
+            if signing_key:
+                wrapper = SignedPickleWrapper(signing_key)
+                try:
+                    payload_obj = wrapper.load(handle)
+                except UnsafeSerializationError:
                     logger.warning(
-                        "Missing signing key; using unsigned legacy pickle loader",
+                        "Signed pickle validation failed for legacy SPLADE index; falling back to unsigned loader",
                         extra={"legacy_path": str(legacy_path)},
                     )
+                    handle.seek(0)
                     payload = _load_unsigned_payload(handle, legacy_path)
-        except OSError:
-            raise
+                else:
+                    if not isinstance(payload_obj, dict):
+                        msg = (
+                            f"Invalid signed legacy payload: expected dict, got {type(payload_obj)}"
+                        )
+                        raise DeserializationError(msg)
+                    payload = cast("dict[str, JsonValue]", payload_obj)
+            else:
+                logger.warning(
+                    "Missing signing key; using unsigned legacy pickle loader",
+                    extra={"legacy_path": str(legacy_path)},
+                )
+                payload = _load_unsigned_payload(handle, legacy_path)
     except OSError as exc:
         msg = f"Failed to read legacy SPLADE index at {legacy_path}: {exc}"
         raise DeserializationError(msg) from exc
@@ -261,31 +263,34 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SPLADEv3Encoder]
 class SPLADEv3Encoder:
-    """Describe SPLADEv3Encoder.
+    """SPLADE-v3 encoder for generating sparse embeddings.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Provides an interface for encoding text into SPLADE sparse embeddings.
+    Currently a skeleton implementation that raises NotImplementedError.
 
     Parameters
     ----------
     model_id : str, optional
-        Describe ``model_id``.
-        Defaults to ``'naver/splade-v3-distilbert'``.
+        Hugging Face model identifier for the SPLADE encoder. Defaults to
+        "naver/splade-v3-distilbert".
     device : str, optional
-        Describe ``device``.
-        Defaults to ``'cuda'``.
+        Device to run inference on ("cuda" or "cpu"). Defaults to "cuda".
     topk : int, optional
-        Describe ``topk``.
-        Defaults to ``256``.
+        Number of top-k vocabulary tokens to retain in sparse representation.
+        Defaults to 256.
     max_seq_len : int, optional
-        Describe ``max_seq_len``.
-        Defaults to ``512``.
+        Maximum sequence length for tokenization. Defaults to 512.
 
     Raises
     ------
     NotImplementedError
-    Raised when TODO for NotImplementedError.
+        The encode method is not implemented in the skeleton. Use LuceneImpactIndex
+        for SPLADE-based retrieval instead.
+
+    Notes
+    -----
+    This is a placeholder implementation. For production use, consider using
+    LuceneImpactIndex which integrates with Pyserini's Lucene impact search.
     """
 
     name = "SPLADE-v3-distilbert"
@@ -297,26 +302,18 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialize SPLADE-v3 encoder.
 
         Parameters
         ----------
         model_id : str, optional
-            Describe ``model_id``.
-            Defaults to ``'naver/splade-v3-distilbert'``.
+            Hugging Face model identifier. Defaults to "naver/splade-v3-distilbert".
         device : str, optional
-            Describe ``device``.
-            Defaults to ``'cuda'``.
+            Device to run inference on. Defaults to "cuda".
         topk : int, optional
-            Describe ``topk``.
-            Defaults to ``256``.
+            Number of top-k vocabulary tokens to retain. Defaults to 256.
         max_seq_len : int, optional
-            Describe ``max_seq_len``.
-            Defaults to ``512``.
+            Maximum sequence length for tokenization. Defaults to 512.
         """
         self.model_id = model_id
         self.device = device
@@ -324,25 +321,32 @@ class SPLADEv3Encoder:
         self.max_seq_len = max_seq_len
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """Describe encode.
+        """Encode texts into SPLADE sparse embeddings.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        This method is not implemented in the skeleton implementation. Use
+        LuceneImpactIndex for SPLADE-based retrieval instead.
 
         Parameters
         ----------
         texts : list[str]
-            Describe ``texts``.
+            List of text strings to encode.
+
+        Returns
+        -------
+        list[tuple[list[int], list[float]]]
+            List of (vocab_ids, weights) tuples representing sparse embeddings.
+            Not currently implemented.
 
         Raises
         ------
         NotImplementedError
-            This function is not implemented in the skeleton.
+            This function is not implemented in the skeleton. Use LuceneImpactIndex
+            instead.
 
         Notes
         -----
-        Use the Lucene impact index variant if available.
+        Use the Lucene impact index variant if available for production SPLADE
+        encoding and retrieval.
         """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "
@@ -354,31 +358,45 @@ class SPLADEv3Encoder:
 
 # [nav:anchor PureImpactIndex]
 class PureImpactIndex:
-    """Describe PureImpactIndex.
+    """Pure Python SPLADE impact index implementation.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Implements SPLADE (Sparse Lexical and Expansion) sparse retrieval using
+    Python dictionaries and lists. Suitable for small to medium-sized indexes
+    that fit in memory.
 
     Parameters
     ----------
     index_dir : str
-        Describe ``index_dir``.
+        Directory path where index metadata will be stored. Created if it
+        doesn't exist.
+
+    Attributes
+    ----------
+    index_dir : str
+        Directory path for index storage.
+    df : dict[str, int]
+        Document frequency dictionary mapping tokens to document counts.
+    N : int
+        Total number of documents in the index.
+    postings : dict[str, dict[str, float]]
+        Postings list mapping tokens to document ID → impact weight mappings.
+        Weights combine term frequency (log1p) with IDF scoring.
+
+    Notes
+    -----
+    The implementation uses in-memory data structures and is suitable for
+    indexes that fit in RAM. For larger indexes, consider using LuceneImpactIndex
+    which uses Pyserini's disk-backed Lucene impact search.
     """
 
     def __init__(self, index_dir: str) -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialize SPLADE impact index.
 
         Parameters
         ----------
         index_dir : str
-            Describe ``index_dir``.
+            Directory path where index metadata will be stored. Created if it
+            doesn't exist.
         """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
@@ -387,36 +405,44 @@ class PureImpactIndex:
 
     @staticmethod
     def _tokenize(text: str) -> list[str]:
-        """Describe  tokenize.
+        """Tokenize text with a simple alphanumeric regex.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Extracts alphanumeric sequences (including underscores) from text and
+        converts them to lowercase for case-insensitive matching.
 
         Parameters
         ----------
         text : str
-            Describe ``text``.
+            Input text to tokenize. May be empty.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            List of lowercase tokens extracted from the text. Empty list if
+            input contains no alphanumeric sequences.
         """
         matches = cast("list[str]", TOKEN_RE.findall(text))
         return [token.lower() for token in matches]
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Describe build.
+        """Build SPLADE impact index from document iterable.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Processes an iterable of documents, computes term frequencies with
+        log1p normalization, applies IDF scoring, and serializes the index
+        metadata to disk with schema validation.
 
         Parameters
         ----------
-        docs_iterable : tuple[str, dict[str, str]]
-            Describe ``docs_iterable``.
+        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+            Iterable of (doc_id, fields) tuples. Each fields dictionary should
+            contain "title", "section", and "body" keys with string values.
+
+        Notes
+        -----
+        This method clears any existing index state and rebuilds from scratch.
+        Term frequencies are normalized using log1p, then combined with IDF
+        scores. The final metadata is written to `impact.json` in the index
+        directory with schema validation and checksum verification.
         """
         Path(self.index_dir).mkdir(parents=True, exist_ok=True)
         df: defaultdict[str, int] = defaultdict(int)
@@ -452,17 +478,23 @@ class PureImpactIndex:
     def load(self) -> None:
         """Load SPLADE index metadata from disk with schema validation and checksum verification.
 
-        <!-- auto:docstring-builder v1 -->
-
         Deserializes index metadata from JSON, verifying checksum and validating
-        against the schema. Falls back to legacy pickle format for backward compatibility.
+        against the schema. Falls back to legacy pickle format for backward
+        compatibility if JSON loading fails.
 
         Raises
         ------
         DeserializationError
             If deserialization, schema validation, or checksum verification fails.
         FileNotFoundError
-            If metadata or schema file is missing.
+            If metadata or schema file is missing (and no legacy pickle exists).
+
+        Notes
+        -----
+        The method first attempts to load from `impact.json`. If that fails and
+        `impact.pkl` exists, it falls back to legacy pickle format with
+        allow-list validation. Legacy pickle loading supports both signed and
+        unsigned formats.
         """
         metadata_path = Path(self.index_dir) / "impact.json"
         schema_path = (
@@ -519,23 +551,31 @@ class PureImpactIndex:
             self.postings = {}
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """Describe search.
+        """Search SPLADE impact index and return top-k results.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Tokenizes the query, computes impact scores by summing term weights
+        from postings, and returns the top-k results sorted by score in
+        descending order.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query string to tokenize and match against documents.
         k : int
-            Describe ``k``.
+            Maximum number of results to return.
 
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+            List of (doc_id, score) tuples sorted by score descending. Only
+            includes documents with score > 0.0. Returns empty list if index is
+            empty or no documents match.
+
+        Notes
+        -----
+        SPLADE impact scoring sums term weights (combining log1p(TF) and IDF)
+        for each query token. Documents with higher scores are more relevant
+        to the query.
         """
         tokens = self._tokenize(query)
         scores: defaultdict[str, float] = defaultdict(float)
@@ -554,56 +594,65 @@ class PureImpactIndex:
 
 # [nav:anchor LuceneImpactIndex]
 class LuceneImpactIndex:
-    """Describe LuceneImpactIndex.
+    """Lucene-backed SPLADE impact index implementation.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Provides SPLADE sparse retrieval using Apache Lucene via Pyserini's impact
+    search. Suitable for large indexes that benefit from disk-backed storage
+    and optimized search performance.
 
     Parameters
     ----------
     index_dir : str
-        Describe ``index_dir``.
+        Directory path where the Lucene impact index is stored. Must exist
+        and contain a valid Lucene index.
     query_encoder : str, optional
-        Describe ``query_encoder``.
-        Defaults to ``'naver/splade-v3-distilbert'``.
+        Hugging Face model identifier for query encoding. Defaults to
+        "naver/splade-v3-distilbert".
+
+    Attributes
+    ----------
+    index_dir : str
+        Directory path for Lucene index storage.
+    query_encoder : str
+        Hugging Face model identifier for query encoding.
+    _searcher : LuceneImpactSearcherProtocol | None
+        Cached Lucene impact searcher instance (lazy-initialized).
 
     Raises
     ------
     RuntimeError
-    Raised when TODO for RuntimeError.
+        If Pyserini is not available or LuceneImpactSearcher cannot be imported.
+
+    Notes
+    -----
+    Requires the optional ``pyserini`` dependency. Import errors propagate as
+    :class:`RuntimeError` when helper factories are loaded. The searcher is
+    lazy-initialized on first search call to avoid unnecessary index loading.
     """
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialize Lucene impact index.
 
         Parameters
         ----------
         index_dir : str
-            Describe ``index_dir``.
+            Directory path where the Lucene impact index is stored. Must exist
+            and contain a valid Lucene index.
         query_encoder : str, optional
-            Describe ``query_encoder``.
-            Defaults to ``'naver/splade-v3-distilbert'``.
+            Hugging Face model identifier for query encoding. Defaults to
+            "naver/splade-v3-distilbert".
         """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: LuceneImpactSearcherProtocol | None = None
 
     def _ensure(self) -> None:
-        """Describe  ensure.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialise the Lucene impact searcher if Pyserini is available.
 
         Raises
         ------
         RuntimeError
-            If Pyserini is not available for SPLADE impact search.
+            If the Pyserini Lucene search implementation is unavailable.
         """
         if self._searcher is not None:
             return
@@ -623,44 +672,40 @@ class LuceneImpactIndex:
     def ensure_available(self) -> None:
         """Ensure the Lucene searcher is initialized and ready for queries.
 
-        Raises
-        ------
-        RuntimeError
-            If Pyserini is not available for SPLADE impact search.
+        Notes
+        -----
+        Propagates :class:`RuntimeError` when Pyserini is not available for
+        SPLADE impact search.
         """
-        try:
-            self._ensure()
-        except RuntimeError:
-            raise
+        self._ensure()
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
-        """Describe search.
+        """Search Lucene impact index and return top-k results.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Executes a SPLADE impact search using the configured Lucene searcher
+        and returns the top-k results sorted by impact score.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query string to encode and search.
         k : int
-            Describe ``k``.
+            Maximum number of results to return.
 
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+            List of (doc_id, score) tuples sorted by score descending. Contains
+            up to k results.
 
         Raises
         ------
         RuntimeError
             If Lucene searcher is not initialized or Pyserini is not available.
+            This can occur if ensure_available() has not been called or if
+            Pyserini modules are missing.
         """
-        try:
-            self._ensure()
-        except RuntimeError:
-            raise
+        self._ensure()
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
             raise RuntimeError(message)
@@ -674,26 +719,33 @@ def get_splade(
     index_dir: str,
     query_encoder: str = "naver/splade-v3-distilbert",
 ) -> PureImpactIndex | LuceneImpactIndex:
-    """Describe get splade.
+    """Return a SPLADE index implementation for the requested backend.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Factory function that creates either a PureImpactIndex or LuceneImpactIndex
+    based on the backend parameter. Attempts to use Lucene backend if requested,
+    falling back to PureImpactIndex if Lucene is unavailable.
 
     Parameters
     ----------
     backend : str
-        Describe ``backend``.
+        Backend name ("pure" or "lucene"). Case-insensitive.
     index_dir : str
-        Describe ``index_dir``.
+        Directory path for the index. Must exist and contain valid index data.
     query_encoder : str, optional
-        Describe ``query_encoder``.
-        Defaults to ``'naver/splade-v3-distilbert'``.
+        Hugging Face model identifier for query encoding (used only for Lucene
+        backend). Defaults to "naver/splade-v3-distilbert".
 
     Returns
     -------
     PureImpactIndex | LuceneImpactIndex
-        Describe return value.
+        SPLADE index instance. Returns PureImpactIndex if Lucene backend is
+        requested but unavailable.
+
+    Notes
+    -----
+    If "lucene" backend is requested but Pyserini is not available, the function
+    logs a warning and falls back to PureImpactIndex. This allows graceful
+    degradation when optional dependencies are missing.
     """
     if backend == "lucene":
         lucene_index = LuceneImpactIndex(index_dir=index_dir, query_encoder=query_encoder)

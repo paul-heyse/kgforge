@@ -336,16 +336,13 @@ class KGFoundryClient:
         object
             JSON payload describing service health.
 
-        Raises
-        ------
-        requests.HTTPError
-            Raised when the API responds with a non-success status code.
+        Notes
+        -----
+        Propagates :class:`requests.HTTPError` when the API responds with a
+        non-success status code.
         """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
-        try:
-            response.raise_for_status()
-        except requests.HTTPError:
-            raise
+        response.raise_for_status()
         return response.json()
 
     def search(
@@ -379,10 +376,10 @@ class KGFoundryClient:
         object
             JSON response containing the ranked search results.
 
-        Raises
-        ------
-        requests.HTTPError
-            Raised when the API responds with a non-success status code.
+        Notes
+        -----
+        Propagates :class:`requests.HTTPError` when the API responds with a
+        non-success status code.
         """
         filters_payload: dict[str, JsonValue] = filters.copy() if filters is not None else {}
         payload: dict[str, JsonValue] = {
@@ -397,10 +394,7 @@ class KGFoundryClient:
             headers=self._headers(),
             timeout=self.timeout,
         )
-        try:
-            response.raise_for_status()
-        except requests.HTTPError:
-            raise
+        response.raise_for_status()
         return response.json()
 
     def concepts(self, q: str, limit: int = 50) -> JsonValue:
@@ -421,10 +415,10 @@ class KGFoundryClient:
         object
             JSON response containing matching concepts.
 
-        Raises
-        ------
-        requests.HTTPError
-            Raised when the API responds with a non-success status code.
+        Notes
+        -----
+        Propagates :class:`requests.HTTPError` when the API responds with a
+        non-success status code.
         """
         body: dict[str, JsonValue] = {"q": q, "limit": limit}
         response = self._http.post(
@@ -433,8 +427,5 @@ class KGFoundryClient:
             headers=self._headers(),
             timeout=self.timeout,
         )
-        try:
-            response.raise_for_status()
-        except requests.HTTPError:
-            raise
+        response.raise_for_status()
         return response.json()

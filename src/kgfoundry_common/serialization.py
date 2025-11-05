@@ -79,10 +79,11 @@ def _load_schema_by_path_str_impl(schema_path_str: str) -> dict[str, object]:
     SchemaValidationError
         If schema is invalid JSON or fails schema validation.
     """
-    try:
-        schema_text = read_text(Path(schema_path_str))
-    except FileNotFoundError:
-        raise
+    schema_path = Path(schema_path_str)
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+    schema_text = read_text(schema_path)
     try:
         schema_raw: object = json.loads(schema_text)
         if not isinstance(schema_raw, dict):
@@ -99,20 +100,19 @@ def _load_schema_by_path_str_impl(schema_path_str: str) -> dict[str, object]:
 def _load_schema_cached(schema_path: Path) -> dict[str, object]:
     """Load and parse a JSON Schema file with caching.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This function uses LRU cache to avoid repeated I/O for the same schema file.
-    The cache is keyed by the resolved Path object (converted to string).
+    Uses an in-memory cache keyed by resolved path to avoid repeated I/O
+    for the same schema file. The cache persists for the lifetime of the
+    module.
 
     Parameters
     ----------
     schema_path : Path
-        Path to JSON Schema 2020-12 file.
+        Path to JSON Schema 2020-12 file. Must exist and be readable.
 
     Returns
     -------
     dict[str, object]
-        Parsed schema dictionary.
+        Parsed schema dictionary ready for validation.
 
     Raises
     ------
@@ -132,8 +132,9 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
 
     try:
         schema_obj = _load_schema_by_path_str_impl(schema_key)
-    except (FileNotFoundError, SchemaValidationError):
-        raise
+    except SchemaValidationError as exc:
+        msg = f"Failed to load schema {schema_path}: {exc}"
+        raise SchemaValidationError(msg) from exc
     _schema_cache[schema_key] = schema_obj
     return schema_obj
 
@@ -141,24 +142,25 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
 def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     """Validate a payload against a JSON Schema 2020-12.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This function loads the schema (with caching), validates the payload,
-    and raises SchemaValidationError if validation fails.
+    Loads the schema (with caching), validates the payload against it, and
+    raises SchemaValidationError if validation fails. Used for validating
+    JSON-serializable data structures before persistence.
 
     Parameters
     ----------
-    payload : str | object
-        Payload to validate (must be JSON-serializable).
+    payload : Mapping[str, object]
+        Payload to validate. Must be JSON-serializable and conform to the
+        schema structure (dict, list, or primitive types).
     schema_path : Path
-        Path to JSON Schema 2020-12 file.
+        Path to JSON Schema 2020-12 file. Must exist and be readable.
 
     Raises
     ------
     FileNotFoundError
         If schema file does not exist.
     SchemaValidationError
-        If payload does not match schema.
+        If payload does not match schema constraints or if the schema
+        itself is invalid.
 
     Examples
     --------
@@ -172,10 +174,11 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     ...     validate_payload({"k1": "invalid"}, schema)  # doctest: +SKIP
     SchemaValidationError: Schema validation failed
     """
-    try:
-        schema_obj = _load_schema_cached(schema_path)
-    except (FileNotFoundError, SchemaValidationError):
-        raise
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+
+    schema_obj = _load_schema_cached(schema_path)
     try:
         jsonschema_validate(instance=payload, schema=schema_obj)
     except ValidationError as exc:
@@ -189,7 +192,8 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
 def compute_checksum(data: bytes) -> str:
     """Compute SHA256 checksum of binary data.
 
-    <!-- auto:docstring-builder v1 -->
+    Computes the SHA256 hash of the input bytes and returns it as a
+    hexadecimal string. Used for data integrity verification.
 
     Parameters
     ----------
@@ -199,7 +203,7 @@ def compute_checksum(data: bytes) -> str:
     Returns
     -------
     str
-        Hexadecimal SHA256 checksum (64 characters).
+        Hexadecimal SHA256 checksum (64 characters, lowercase).
 
     Examples
     --------
@@ -215,19 +219,21 @@ def compute_checksum(data: bytes) -> str:
 def verify_checksum(data: bytes, expected: str) -> None:
     """Verify SHA256 checksum matches expected value.
 
-    <!-- auto:docstring-builder v1 -->
+    Computes the SHA256 checksum of the data and compares it to the expected
+    value. Raises an exception if they do not match.
 
     Parameters
     ----------
     data : bytes
         Binary data to verify.
     expected : str
-        Expected hexadecimal SHA256 checksum.
+        Expected hexadecimal SHA256 checksum (64 characters).
 
     Raises
     ------
     SerializationError
-        If checksum does not match.
+        If computed checksum does not match expected value. The error message
+        includes truncated checksums for debugging.
 
     Examples
     --------
@@ -251,38 +257,39 @@ def serialize_json(
 ) -> str:
     """Serialize object to JSON with schema validation and optional checksum.
 
-    <!-- auto:docstring-builder v1 -->
-
-    The serialized JSON is validated against the provided JSON Schema 2020-12
-    before writing. If `include_checksum=True`, a checksum file is written
-    alongside the JSON file.
+    Serializes a Python object to JSON format, validates it against the
+    provided JSON Schema 2020-12, and optionally writes a SHA256 checksum
+    file alongside the JSON output. Uses atomic writes to prevent corruption.
 
     Parameters
     ----------
     obj : object
-        Python object to serialize (must be JSON-serializable).
+        Python object to serialize. Must be JSON-serializable (dict, list,
+        str, int, float, bool, None, or nested combinations).
     schema_path : Path
-        Path to JSON Schema 2020-12 file for validation.
+        Path to JSON Schema 2020-12 file for validation. Must exist.
     output_path : Path
-        Output file path for JSON data.
+        Output file path for JSON data. Parent directory must exist or be
+        creatable.
     include_checksum : bool, optional
-        If True, write a `.sha256` checksum file. Defaults to True.
-        Defaults to ``True``.
-    indent : int | NoneType, optional
-        JSON indentation (None for compact). Defaults to 2.
-        Defaults to ``2``.
+        If True, write a `.sha256` checksum file alongside the JSON file.
+        Defaults to True.
+    indent : int | None, optional
+        JSON indentation level. Use None for compact (minified) output.
+        Defaults to 2.
 
     Returns
     -------
     str
         SHA256 checksum of the serialized JSON (hexadecimal, 64 characters).
+        Returns the checksum even if include_checksum=False.
 
     Raises
     ------
     SerializationError
-        If serialization fails or file write fails.
+        If JSON serialization fails or file write fails.
     SchemaValidationError
-        If schema validation fails.
+        If the object does not conform to the schema.
     FileNotFoundError
         If schema file does not exist.
 
@@ -300,55 +307,57 @@ def serialize_json(
     ...     assert len(checksum) == 64
     ...     assert output.exists()
     """
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+
     try:
-        # Validate payload against schema (uses cached schema loader)
         if isinstance(obj, Mapping):
             validate_payload(obj, schema_path)
         else:
-            # For non-Mapping objects, load schema and validate directly
             schema_obj = _load_schema_cached(schema_path)
             try:
                 jsonschema_validate(instance=obj, schema=schema_obj)
             except ValidationError as exc:
                 msg = f"Schema validation failed: {exc}"
                 raise SchemaValidationError(msg) from exc
+    except SchemaValidationError as exc:
+        msg = f"Schema validation failed for payload written to {output_path}: {exc}"
+        raise SchemaValidationError(msg) from exc
 
-        # Serialize object
+    try:
+        json_text: str = json.dumps(obj, indent=indent, ensure_ascii=False)
+    except (TypeError, ValueError) as exc:
+        msg = f"Failed to serialize object to JSON: {exc}"
+        raise SerializationError(msg) from exc
+
+    json_bytes = json_text.encode("utf-8")
+    checksum = compute_checksum(json_bytes)
+
+    try:
+        atomic_write(output_path, json_text, mode="text")
+    except OSError as exc:
+        msg = f"Failed to write JSON output to {output_path}: {exc}"
+        raise SerializationError(msg) from exc
+
+    if include_checksum:
+        checksum_path = output_path.with_suffix(output_path.suffix + ".sha256")
         try:
-            json_text: str = json.dumps(obj, indent=indent, ensure_ascii=False)
-        except (TypeError, ValueError) as exc:
-            msg = f"Failed to serialize object to JSON: {exc}"
+            write_text(checksum_path, checksum)
+        except OSError as exc:
+            msg = f"Failed to write checksum file {checksum_path}: {exc}"
             raise SerializationError(msg) from exc
 
-        json_bytes = json_text.encode("utf-8")
+    logger.debug(
+        "Serialized JSON",
+        extra={
+            "output_path": str(output_path),
+            "schema_path": str(schema_path),
+            "checksum": checksum,
+        },
+    )
 
-        # Compute checksum
-        checksum = compute_checksum(json_bytes)
-
-        # Write JSON atomically
-        atomic_write(output_path, json_text, mode="text")
-
-        # Write checksum file if requested
-        if include_checksum:
-            checksum_path = output_path.with_suffix(output_path.suffix + ".sha256")
-            write_text(checksum_path, checksum)
-
-        logger.debug(
-            "Serialized JSON",
-            extra={
-                "output_path": str(output_path),
-                "schema_path": str(schema_path),
-                "checksum": checksum,
-            },
-        )
-    except FileNotFoundError:
-        # Preserve FileNotFoundError for missing schema files
-        raise
-    except (OSError, json.JSONDecodeError) as exc:
-        msg = f"Serialization failed: {exc}"
-        raise SerializationError(msg) from exc
-    else:
-        return checksum
+    return checksum
 
 
 def _verify_checksum_file(data_path: Path) -> None:
@@ -398,25 +407,23 @@ def _validate_json_against_schema(obj: object, schema_path: Path) -> None:
     FileNotFoundError
         If schema file does not exist.
     """
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+
     if isinstance(obj, Mapping):
-        try:
-            validate_payload(obj, schema_path)
-        except (FileNotFoundError, SchemaValidationError):
-            raise
-    else:
-        # For non-Mapping objects, load schema and validate directly
-        try:
-            schema_obj = _load_schema_cached(schema_path)
-        except (FileNotFoundError, SchemaValidationError):
-            raise
-        try:
-            jsonschema_validate(instance=obj, schema=schema_obj)
-        except ValidationError as exc:
-            msg = f"Schema validation failed: {exc}"
-            raise SchemaValidationError(msg) from exc
-        except SchemaError as exc:
-            msg = f"Invalid schema: {exc}"
-            raise SchemaValidationError(msg) from exc
+        validate_payload(obj, schema_path)
+        return
+
+    schema_obj = _load_schema_cached(schema_path)
+    try:
+        jsonschema_validate(instance=obj, schema=schema_obj)
+    except ValidationError as exc:
+        msg = f"Schema validation failed: {exc}"
+        raise SchemaValidationError(msg) from exc
+    except SchemaError as exc:
+        msg = f"Invalid schema: {exc}"
+        raise SchemaValidationError(msg) from exc
 
 
 def _load_data_file(data_path: Path) -> str:
@@ -451,32 +458,33 @@ def deserialize_json(
 ) -> object:  # JSON types: dict, list, str, int, float, bool, None
     """Deserialize JSON with schema validation and checksum verification.
 
-    <!-- auto:docstring-builder v1 -->
-
-    The JSON is validated against the provided schema and (optionally) verified
-    against a `.sha256` checksum file before parsing.
+    Loads a JSON file, optionally verifies its SHA256 checksum against a
+    `.sha256` file, validates the parsed object against the provided schema,
+    and returns the deserialized Python object.
 
     Parameters
     ----------
     data_path : Path
-        Path to JSON file to deserialize.
+        Path to JSON file to deserialize. Must exist and be readable.
     schema_path : Path
-        Path to JSON Schema 2020-12 file for validation.
+        Path to JSON Schema 2020-12 file for validation. Must exist.
     verify_checksum_file : bool, optional
-        If True, verify against `.sha256` checksum file. Defaults to True.
-        Defaults to ``True``.
+        If True, verify against `.sha256` checksum file (if present).
+        If the checksum file is missing, logs a warning but continues.
+        Defaults to True.
 
     Returns
     -------
     object
-        Deserialized Python object (JSON-serializable types).
+        Deserialized Python object (JSON-serializable types: dict, list, str,
+        int, float, bool, None, or nested combinations).
 
     Raises
     ------
     DeserializationError
-        If deserialization fails or checksum mismatch.
+        If JSON parsing fails, checksum verification fails, or file read fails.
     SchemaValidationError
-        If schema validation fails.
+        If the parsed object does not conform to the schema.
     FileNotFoundError
         If data or schema file does not exist.
 
@@ -493,37 +501,35 @@ def deserialize_json(
     ...     loaded = deserialize_json(data_path, schema)
     ...     assert loaded == {"k1": 0.9}
     """
+    if not data_path.exists():
+        msg = f"Data file not found: {data_path}"
+        raise FileNotFoundError(msg)
+    if not schema_path.exists():
+        msg = f"Schema file not found: {schema_path}"
+        raise FileNotFoundError(msg)
+
+    if verify_checksum_file:
+        _verify_checksum_file(data_path)
+
+    json_text = _load_data_file(data_path)
     try:
-        # Verify checksum if requested
-        if verify_checksum_file:
-            _verify_checksum_file(data_path)
-
-        # Read and parse JSON
-        json_text = _load_data_file(data_path)
-        try:
-            obj: object = json.loads(json_text)
-        except json.JSONDecodeError as exc:
-            msg = f"Invalid JSON in {data_path}: {exc}"
-            raise DeserializationError(msg) from exc
-
-        # Validate against schema (uses cached schema loader)
-        try:
-            _validate_json_against_schema(obj, schema_path)
-        except (FileNotFoundError, SchemaValidationError):
-            raise
-
-        logger.debug(
-            "Deserialized JSON",
-            extra={
-                "data_path": str(data_path),
-                "schema_path": str(schema_path),
-            },
-        )
-    except FileNotFoundError:
-        # Preserve FileNotFoundError for missing files
-        raise
-    except (OSError, json.JSONDecodeError) as exc:
-        msg = f"Deserialization failed: {exc}"
+        obj: object = json.loads(json_text)
+    except json.JSONDecodeError as exc:
+        msg = f"Invalid JSON in {data_path}: {exc}"
         raise DeserializationError(msg) from exc
-    else:
-        return obj
+
+    try:
+        _validate_json_against_schema(obj, schema_path)
+    except SchemaValidationError as exc:
+        msg = f"Schema validation failed for {data_path} against {schema_path}: {exc}"
+        raise SchemaValidationError(msg) from exc
+
+    logger.debug(
+        "Deserialized JSON",
+        extra={
+            "data_path": str(data_path),
+            "schema_path": str(schema_path),
+        },
+    )
+
+    return obj

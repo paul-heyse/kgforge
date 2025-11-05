@@ -111,7 +111,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping as MappingABC
-from typing import TYPE_CHECKING, Annotated, cast
+from typing import TYPE_CHECKING, Annotated, NoReturn, cast
 
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
@@ -600,6 +600,7 @@ class SymbolDeltaPayload(BaseModel):
             "a sequence of change mappings",
             artifact="symbol-delta",
         )
+        return ()
 
     model_config = {"frozen": True}
 
@@ -610,7 +611,7 @@ def _validation_error(
     *,
     artifact: str,
     row: int | None = None,
-) -> None:
+) -> NoReturn:
     """Raise ArtifactValidationError with formatted message.
 
     Parameters
@@ -819,7 +820,7 @@ def _coerce_delta_change(
 
         try:
             return validator(mapping)
-        except ValidationError as exc:  # pragma: no cover - propagated with context
+        except ValidationError:  # pragma: no cover - propagated with context
             indexed_field = f"changed[{index}]"
             _validation_error(
                 indexed_field,

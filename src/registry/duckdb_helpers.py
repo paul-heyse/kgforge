@@ -93,23 +93,22 @@ def connect(
 
 
 def _format_sql(sql: str) -> str:
-    """Describe  format sql.
+    """Format SQL query for logging preview.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+    Compacts whitespace and truncates long SQL queries to MAX_SQL_PREVIEW_CHARS
+    for safe logging. Used internally to prevent logging sensitive data or
+    overwhelming logs with very long queries.
 
     Parameters
     ----------
     sql : str
-        Configure the sql.
+        SQL query string to format.
 
     Returns
     -------
     str
-        Describe return value.
+        Compacted SQL string, truncated with ellipsis if longer than
+        MAX_SQL_PREVIEW_CHARS.
     """
     compact = " ".join(sql.split())
     if len(compact) <= MAX_SQL_PREVIEW_CHARS:
@@ -118,23 +117,22 @@ def _format_sql(sql: str) -> str:
 
 
 def _truncate_value(value: object) -> object:
-    """Describe  truncate value.
+    """Truncate string values for logging preview.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+    Truncates string values longer than MAX_SQL_PREVIEW_CHARS to prevent
+    logging sensitive data or overwhelming logs. Other types are returned
+    unchanged.
 
     Parameters
     ----------
     value : object
-        Configure the value.
+        Value to truncate (if string).
 
     Returns
     -------
     object
-        Describe return value.
+        Truncated string with ellipsis if longer than MAX_SQL_PREVIEW_CHARS,
+        or original value if not a string.
     """
     if isinstance(value, str) and len(value) > MAX_SQL_PREVIEW_CHARS:
         return value[:MAX_SQL_PREVIEW_CHARS] + "…"
@@ -142,23 +140,21 @@ def _truncate_value(value: object) -> object:
 
 
 def _format_params(params: Params) -> object:
-    """Describe  format params.
+    """Format query parameters for logging preview.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+    Formats query parameters for safe logging by truncating string values.
+    Returns a dict for named parameters or a list for positional parameters.
 
     Parameters
     ----------
-    params : object | str | object | NoneType
-        Configure the params.
+    params : Params
+        Query parameters (Sequence for positional, Mapping for named, or None).
 
     Returns
     -------
     object
-        Describe return value.
+        Formatted parameters: dict for named params, list for positional params,
+        or empty dict if params is None.
     """
     if params is None:
         return {}
@@ -168,25 +164,25 @@ def _format_params(params: Params) -> object:
 
 
 def _ensure_parameterized(sql: str, *, require_parameterized: bool) -> None:
-    """Describe  ensure parameterized.
+    """Ensure SQL query uses parameterized placeholders.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+    Validates that SQL queries use parameterized placeholders (?, :name, or $n)
+    when required. Raises RegistryError if parameterization is required but
+    missing, preventing SQL injection vulnerabilities.
 
     Parameters
     ----------
     sql : str
-        Configure the sql.
+        SQL query string to validate.
     require_parameterized : bool
-        Indicate whether require parameterized.
+        Whether to require parameterization. If True, query must contain
+        parameter placeholders (?, :name, or $n).
 
     Raises
     ------
     RegistryError
-        Raised when error_message.
+        If require_parameterized is True but query contains no parameter
+        placeholders.
     """
     if not require_parameterized:
         return
@@ -200,20 +196,18 @@ def _ensure_parameterized(sql: str, *, require_parameterized: bool) -> None:
 
 
 def _set_timeout(conn: DuckDBPyConnection, timeout_s: float) -> None:
-    """Describe  set timeout.
+    """Set statement timeout for DuckDB connection.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+    Configures the statement_timeout pragma on the connection to limit query
+    execution time. Timeout is set in milliseconds. If timeout_s is <= 0,
+    no timeout is set.
 
     Parameters
     ----------
     conn : DuckDBPyConnection
-        Configure the conn.
+        DuckDB connection to configure.
     timeout_s : float
-        Configure the timeout s.
+        Timeout in seconds. Must be positive to set a timeout.
     """
     if timeout_s <= 0:
         return
@@ -242,30 +236,35 @@ def execute(
 ) -> DuckDBPyConnection:
     """Execute a DuckDB query with parameter binding, logging, and metrics.
 
-    <!-- auto:docstring-builder v1 -->
+    Executes a SQL query with optional parameter binding, structured logging,
+    performance metrics, and timeout enforcement. Validates parameterization
+    when required and logs slow queries.
 
     Parameters
     ----------
     conn : DuckDBPyConnection
-        Describe ``conn``.
+        DuckDB connection to execute query on.
     sql : str
-        Describe ``sql``.
-    params : object | str | object | NoneType, optional
-        Describe ``params``.
-        Defaults to ``None``.
+        SQL query string. Must use parameterized placeholders (?, :name, or $n)
+        if params is provided or require_parameterized is True.
+    params : Params, optional
+        Query parameters (Sequence for positional, Mapping for named).
+        Defaults to None.
     options : DuckDBQueryOptions | None, optional
-        Query execution options including timeout, logging metadata, and parameter enforcement.
-        Defaults to ``None`` (uses module defaults).
+        Query execution options including timeout, logging metadata, and
+        parameter enforcement. Defaults to None (uses module defaults).
 
     Returns
     -------
     DuckDBPyConnection
-        Describe return value.
+        Connection with query result relation (use .fetchall() or .fetchone()
+        to retrieve rows).
 
     Raises
     ------
     RegistryError
-        If query execution fails or parameterization is required but missing.
+        If query execution fails, parameterization is required but missing,
+        or timeout is exceeded.
     """
     opts = _coerce_options(options, operation="duckdb.execute")
     require_flag = (
@@ -326,25 +325,26 @@ def fetch_all(
 ) -> list[tuple[object, ...]]:
     """Execute a query and return all rows as a list of tuples.
 
-    <!-- auto:docstring-builder v1 -->
+    Executes a SQL query and returns all result rows as a list of tuples.
+    Uses execute() internally for logging and metrics.
 
     Parameters
     ----------
     conn : DuckDBPyConnection
-        Describe ``conn``.
+        DuckDB connection to execute query on.
     sql : str
-        Describe ``sql``.
-    params : object | str | object | NoneType, optional
-        Describe ``params``.
-        Defaults to ``None``.
+        SQL query string. Must use parameterized placeholders if params provided.
+    params : Params, optional
+        Query parameters (Sequence for positional, Mapping for named).
+        Defaults to None.
     options : DuckDBQueryOptions | None, optional
         Query execution options forwarded to :func:`execute`.
-        Defaults to ``None``.
+        Defaults to None.
 
     Returns
     -------
     list[tuple[object, ...]]
-        Describe return value.
+        List of result rows, each row as a tuple of column values.
     """
     relation = execute(
         conn,
@@ -366,25 +366,26 @@ def fetch_one(
 ) -> tuple[object, ...] | None:
     """Execute a query and return the first row or None.
 
-    <!-- auto:docstring-builder v1 -->
+    Executes a SQL query and returns the first result row as a tuple, or None
+    if no rows are returned. Uses execute() internally for logging and metrics.
 
     Parameters
     ----------
     conn : DuckDBPyConnection
-        Describe ``conn``.
+        DuckDB connection to execute query on.
     sql : str
-        Describe ``sql``.
-    params : object | str | object | NoneType, optional
-        Describe ``params``.
-        Defaults to ``None``.
+        SQL query string. Must use parameterized placeholders if params provided.
+    params : Params, optional
+        Query parameters (Sequence for positional, Mapping for named).
+        Defaults to None.
     options : DuckDBQueryOptions | None, optional
         Query execution options forwarded to :func:`execute`.
-        Defaults to ``None``.
+        Defaults to None.
 
     Returns
     -------
     tuple[object, ...] | None
-        Describe return value.
+        First result row as a tuple of column values, or None if no rows.
     """
     relation = execute(
         conn,
@@ -406,27 +407,30 @@ def validate_identifier(
 ) -> str:
     """Validate that an identifier is within an allowed set.
 
-    <!-- auto:docstring-builder v1 -->
+    Validates that an identifier string is present in the allowed set of values.
+    Used for sanitizing table names, column names, or other database identifiers
+    to prevent SQL injection.
 
     Parameters
     ----------
     identifier : str
-        Describe ``identifier``.
-    allowed : str
-        Describe ``allowed``.
+        Identifier string to validate.
+    allowed : Iterable[str]
+        Set of allowed identifier values.
     label : str, optional
-        Describe ``label``.
-        Defaults to ``'identifier'``.
+        Human-readable label for error messages (e.g., "table name", "column name").
+        Defaults to "identifier".
 
     Returns
     -------
     str
-        Describe return value.
+        The validated identifier (unchanged).
 
     Raises
     ------
     RegistryError
-        If identifier is not in the allowed set.
+        If identifier is not in the allowed set. Error context includes the
+        invalid identifier and sorted list of allowed values.
     """
     allowed_set = set(allowed)
     if identifier in allowed_set:
