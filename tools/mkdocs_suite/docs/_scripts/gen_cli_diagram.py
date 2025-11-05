@@ -30,8 +30,10 @@ def _operation_anchor(operation_id: str) -> str:
     return f"../{REDOC_PAGE}#operation/{operation_id}"
 
 
-def _collect_operations(spec: dict[str, object]) -> list[tuple[str, str, str, str, str]]:
-    operations: list[tuple[str, str, str, str, str]] = []
+def _collect_operations(
+    spec: dict[str, object],
+) -> list[tuple[str, str, str, str, tuple[str, ...]]]:
+    operations: list[tuple[str, str, str, str, tuple[str, ...]]] = []
     paths_section = spec.get("paths")
     if not isinstance(paths_section, dict):
         if paths_section not in (None, {}):
@@ -48,29 +50,34 @@ def _collect_operations(spec: dict[str, object]) -> list[tuple[str, str, str, st
             if method.lower() != "post" or not isinstance(op, dict):
                 continue
             operation_id = str(op.get("operationId", ""))
-            tags = [str(tag) for tag in (op.get("tags") or ["cli"])]
+            tag_values = op.get("tags") or ["cli"]
+            tags = tuple(dict.fromkeys(str(tag) for tag in tag_values))
             summary = (op.get("summary") or "").strip()
-            operations.extend(
-                (tag, method.upper(), path, operation_id, summary) for tag in tags
-            )
+            operations.append((method.upper(), path, operation_id, summary, tags))
     return operations
 
 
-def _write_diagram(operations: list[tuple[str, str, str, str, str]]) -> None:
+def _write_diagram(
+    operations: list[tuple[str, str, str, str, tuple[str, ...]]]
+) -> None:
     diagram_path = "diagrams/cli_by_tag.d2"
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
         handle.write('direction: right\nCLI: "CLI" {\n')
-        unique_tags = sorted({tag for tag, *_ in operations})
+        unique_tags = sorted({tag for *_, tags in operations for tag in tags})
         handle.write("\n".join(f'  "{tag}": "{tag}" {{}}' for tag in unique_tags))
         if unique_tags:
             handle.write("\n")
-        for tag, method, path, operation_id, summary in operations:
+        written_nodes: set[str] = set()
+        for method, path, operation_id, summary, tags in operations:
             node_id = f"{method} {path}"
             label = f"{method} {path}\\n{summary}" if summary else node_id
-            handle.write(
-                f'  "{node_id}": "{label}" {{ link: "{_operation_anchor(operation_id)}" }}\n'
-            )
-            handle.write(f'  "{tag}" -> "{node_id}"\n')
+            if node_id not in written_nodes:
+                handle.write(
+                    f'  "{node_id}": "{label}" {{ link: "{_operation_anchor(operation_id)}" }}\n'
+                )
+                written_nodes.add(node_id)
+            for tag in tags:
+                handle.write(f'  "{tag}" -> "{node_id}"\n')
         handle.write("}\n")
 
 
