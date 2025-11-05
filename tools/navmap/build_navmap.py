@@ -163,7 +163,7 @@ def _eval_constant(node: ast.Constant) -> NavTree:
     Returns
     -------
     NavTree
-        Constant value if supported (str, int, float, bool, or None).
+        Constant value if supported (str, int, float, bool, | None).
 
     Raises
     ------
@@ -321,7 +321,7 @@ def _literal_eval_navmap(node: ast.AST | None) -> NavTree:
     Parameters
     ----------
     node : ast.AST | None
-        AST node to evaluate, or None for empty literals.
+        AST node to evaluate, | None for empty literals.
 
     Returns
     -------
@@ -566,7 +566,7 @@ def _gh_link(path: Path, start: int | None, end: int | None) -> str | None:
     Returns
     -------
     str | None
-        GitHub permalink URL, or None if org/repo not configured.
+        GitHub permalink URL, | None if org/repo not configured.
     """
     if not (G_ORG and G_REPO):
         return None
@@ -592,7 +592,7 @@ def _editor_link(path: Path, line: int | None = None) -> str | None:
     Returns
     -------
     str | None
-        Editor deep link URL, or None if editor mode not supported.
+        Editor deep link URL, | None if editor mode not supported.
     """
     if EDITOR_MODE == "relative":
         try:
@@ -673,7 +673,7 @@ def _parse_module(py: Path) -> ast.Module | None:
     Returns
     -------
     ast.Module | None
-        Parsed AST module, or None if file cannot be read or parsed.
+        Parsed AST module, | None if file cannot be read or parsed.
     """
     try:
         source = py.read_text(encoding="utf-8")
@@ -889,7 +889,7 @@ def _resolve_navmap(
     Parameters
     ----------
     nav_literal : dict[str, NavTree] | None
-        Navmap literal to resolve, or None.
+        Navmap literal to resolve, | None.
     exports : list[str]
         Current exports list.
 
@@ -1191,7 +1191,7 @@ def _merge_symbol_meta(
     module_meta : ModuleMetaDict
         Module-level metadata defaults.
     symbol_meta : SymbolMetaDict | None
-        Symbol-specific metadata, or None.
+        Symbol-specific metadata, | None.
 
     Returns
     -------

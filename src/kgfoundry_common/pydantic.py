@@ -14,13 +14,18 @@ if TYPE_CHECKING:
 
         Parameters
         ----------
-        **data : Any
+        **data : object
             Keyword arguments accepted by the Pydantic model.
 
         Attributes
         ----------
         model_config : ClassVar[object]
             Pydantic model configuration dictionary.
+
+        Raises
+        ------
+        NotImplementedError
+            This is a stub implementation.
         """
 
         model_config: ClassVar[object]
@@ -34,26 +39,18 @@ if TYPE_CHECKING:
 
             Parameters
             ----------
-            obj : Any
+            obj : object
                 Instance or mapping to validate.
-            strict : bool | None, optional
-                Whether to forbid coercion during validation.
-                Defaults to ``None`` (defer to Pydantic).
-            extra : ExtraValues | None, optional
-                Strategy for handling extra keys.
-                Defaults to ``None`` (use model configuration).
-            from_attributes : bool | None, optional
-                Allow attribute-based population when ``obj`` is not a mapping.
-                Defaults to ``None`` (follow model configuration).
-            context : Any | None, optional
-                Context data available to validators.
-                Defaults to ``None``.
-            by_alias : bool | None, optional
-                Interpret alias names when reading ``obj``.
-                Defaults to ``None`` (inherit from configuration).
-            by_name : bool | None, optional
-                Permit field-name based population alongside aliases.
-                Defaults to ``None``.
+
+            Returns
+            -------
+            Self
+                Validated instance.
+
+            Raises
+            ------
+            NotImplementedError
+                This is a stub implementation.
             """
             raise NotImplementedError
 
@@ -62,8 +59,18 @@ if TYPE_CHECKING:
 
             Parameters
             ----------
-            **model_dump_kwargs : dict[str, object]
+            **model_dump_kwargs : object
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump`.
+
+            Returns
+            -------
+            dict[str, object]
+                Dictionary representation of the model.
+
+            Raises
+            ------
+            NotImplementedError
+                This is a stub implementation.
             """
             del self, model_dump_kwargs
             raise NotImplementedError
@@ -73,8 +80,18 @@ if TYPE_CHECKING:
 
             Parameters
             ----------
-            **model_dump_json_kwargs : dict[str, object]
+            **model_dump_json_kwargs : object
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump_json`.
+
+            Returns
+            -------
+            str
+                JSON string representation of the model.
+
+            Raises
+            ------
+            NotImplementedError
+                This is a stub implementation.
             """
             del self, model_dump_json_kwargs
             raise NotImplementedError

@@ -311,7 +311,7 @@ def normalize_docstring(symbol: SymbolHarvest, marker: str) -> str | None:
 
     Returns
     -------
-    str or None
+    str | None
         Normalized docstring if symbol has a docstring and can be resolved, None otherwise.
     """
     if not symbol.docstring:

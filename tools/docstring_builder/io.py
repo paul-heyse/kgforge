@@ -70,8 +70,8 @@ def normalize_input_path(raw: str, *, repo_root: Path = REPO_ROOT) -> Path:
     ----------
     raw : str
         Input path string (can be relative or absolute).
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
@@ -109,12 +109,12 @@ def module_to_path(module: str, *, repo_root: Path = REPO_ROOT) -> Path | None:
     ----------
     module : str
         Dotted module name (e.g., "tools.docstring_builder").
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
-    Path or None
+    Path | None
         Filesystem path to the module file if found, None otherwise.
     """
     if not module:
@@ -233,8 +233,8 @@ def module_name_from_path(path: Path, *, repo_root: Path = REPO_ROOT) -> str:
     ----------
     path : Path
         Filesystem path to a Python file.
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
@@ -282,8 +282,8 @@ def matches_patterns(path: Path, patterns: Iterable[str], *, repo_root: Path = R
         File path to check.
     patterns : Iterable[str]
         Glob patterns to match against.
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
@@ -306,8 +306,8 @@ def should_ignore(path: Path, config: BuilderConfig, *, repo_root: Path = REPO_R
         File path to check.
     config : BuilderConfig
         Builder configuration with ignore patterns.
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
@@ -330,8 +330,8 @@ def changed_files_since(revision: str, *, repo_root: Path = REPO_ROOT) -> set[st
     ----------
     revision : str
         Git revision (commit hash, branch, tag, etc.).
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
@@ -355,12 +355,12 @@ def default_since_revision(*, repo_root: Path = REPO_ROOT) -> str | None:
 
     Parameters
     ----------
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
-    str or None
+    str | None
         Revision string (commit hash) if found, None otherwise.
     """
     candidates = [
@@ -445,7 +445,7 @@ def _filter_by_module(
     ----------
     files : Iterable[Path]
         File paths to filter.
-    module : str or None
+    module : str | None
         Module name prefix to match (e.g., "tools.docstring_builder").
     repo_root : Path
         Repository root directory.
@@ -476,7 +476,7 @@ def _filter_by_revision(
     ----------
     files : Iterable[Path]
         File paths to filter.
-    since : str or None
+    since : str | None
         Git revision to compare against.
     repo_root : Path
         Repository root directory.
@@ -536,10 +536,10 @@ def select_files(
     ----------
     config : BuilderConfig
         Builder configuration.
-    criteria : SelectionCriteria, optional
+    criteria : SelectionCriteria | None, optional
         Selection criteria (module, since, explicit_paths, etc.).
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
@@ -587,12 +587,12 @@ def read_baseline_version(baseline: str, path: Path, *, repo_root: Path = REPO_R
         Baseline identifier (git revision or directory path).
     path : Path
         File path to read.
-    repo_root : Path, default REPO_ROOT
-        Repository root directory.
+    repo_root : Path, optional
+        Repository root directory. Defaults to REPO_ROOT.
 
     Returns
     -------
-    str or None
+    str | None
         File contents if found, None otherwise.
     """
     if not baseline:

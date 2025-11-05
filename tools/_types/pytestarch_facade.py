@@ -40,11 +40,15 @@ ModuleDependencies = Mapping[str, Sequence[tuple[IdentifierProtocol, IdentifierP
 
 @runtime_checkable
 class ModuleNameFilterProtocol(Protocol):
-    """Filter object for selecting modules via pytestarch queries."""
+    """Filter object for selecting modules via pytestarch queries.
 
-    def __init__(self, name: str) -> None:
-        """Construct a filter bound to ``name``."""
-        ...
+    Constructs a filter bound to ``name``.
+
+    Parameters
+    ----------
+    name : str
+        Module name to filter.
+    """
 
 
 @runtime_checkable
@@ -93,10 +97,8 @@ class _PytestarchModule(Protocol):
 
         Parameters
         ----------
-        *args : object
-            Positional arguments.
         **kwargs : object
-            Keyword arguments.
+            Keyword arguments (unused).
 
         Returns
         -------
@@ -113,10 +115,8 @@ class _PytestarchModule(Protocol):
 
         Parameters
         ----------
-        *args : object
-            Positional arguments.
         **kwargs : object
-            Keyword arguments.
+            Keyword arguments (unused).
 
         Returns
         -------

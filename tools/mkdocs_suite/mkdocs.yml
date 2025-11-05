@@ -58,16 +58,23 @@ plugins:
           extensions:
             - griffe_inherited_docstrings
             - griffe_typingdoc
-            - griffe_pydantic
-            - griffe_fieldz
+            - griffe_pydantic:
+                schema: true
+            - griffe_fieldz:
+                add_fields_to: docstring-attributes
+                include_inherited: true
+                include_private: false
             - griffe_public_wildcard_imports
           options:
             show_source: true
             show_signature: true
             show_root_heading: true
             inherited_members: true
-            docstring_style: numpy 
+            docstring_style: numpy
             docstring_section_style: table
+            docstring_options:
+              numpy:
+                warn_unknown_params: true
   - redoc-tag
   - redirects
   - minify

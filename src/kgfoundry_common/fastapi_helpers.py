@@ -51,7 +51,7 @@ async def _await_with_timeout[T](coro: t.Awaitable[T], timeout_seconds: float | 
 
     Parameters
     ----------
-    coro : Awaitable[T]
+    coro : t.Awaitable[T]
         Coroutine to await.
     timeout_seconds : float | None
         Timeout in seconds, or None for no timeout.
@@ -80,7 +80,7 @@ def typed_dependency[**P, T](
 
     Parameters
     ----------
-    dependency : Callable[P, Awaitable[T]]
+    dependency : Callable[P, t.Awaitable[T]]
         Dependency function to wrap.
     name : str
         Operation name for logging.
@@ -242,13 +242,13 @@ def typed_middleware(
             ----------
             request : StarletteRequest
                 HTTP request to process.
-            call_next : Callable[[StarletteRequest], Awaitable[Response]]
+            call_next : Callable[[StarletteRequest], t.Awaitable[Response]]
                 Next middleware/handler in the chain.
 
             Returns
             -------
             Response
-            HTTP response.
+                HTTP response.
 
             Raises
             ------

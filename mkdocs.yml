@@ -19,10 +19,17 @@ plugins:
             - "sys.path.insert(0, str(Path('src').resolve()))"
           options:
             show_source: true
+            docstring_style: numpy
             docstring_options:
-              google:
-                warnings: false
-                warn_missing_types: false
+              numpy:
+                warn_unknown_params: true
+            extensions:
+              - griffe_pydantic:
+                  schema: true
+              - griffe_fieldz:
+                  add_fields_to: docstring-attributes
+                  include_inherited: true
+                  include_private: false
   - literate-nav
   - section-index
 nav:

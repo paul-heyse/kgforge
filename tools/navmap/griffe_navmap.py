@@ -137,10 +137,10 @@ def _git_commit_sha() -> str | None:
         ref = head_value[5:].strip()
         ref_path = repo_root / ".git" / ref
         try:
-            return ref_path.read_text(encoding="utf-8").strip() or None
+            return ref_path.read_text(encoding="utf-8").strip() | None
         except OSError:  # pragma: no cover - ref missing
             return None
-    return head_value or None
+    return head_value | None
 
 
 def _short_summary(doc: Docstring | None) -> str | None:
@@ -362,7 +362,7 @@ def build_navmap(
         try:
             resolve_aliases(
                 implicit=True,
-                external=settings.resolve_external or None,
+                external=settings.resolve_external | None,
             )
         except (
             AliasResolutionError,

@@ -80,7 +80,7 @@ class DocFact:
 
         Returns
         -------
-        DocFact or None
+        DocFact | None
             Instantiated DocFact if mapping is valid, None otherwise.
         """
         try:
@@ -322,7 +322,7 @@ def build_docfacts_document(
         DocFact entries to include in the document.
     provenance : DocfactsProvenance
         Provenance metadata for the document.
-    version : str, optional
+    version : str | None, optional
         DocFacts version string. If None, uses ``DOCFACTS_VERSION``.
 
     Returns
@@ -352,8 +352,8 @@ def write_docfacts(
         Target file path for the DocFacts JSON file.
     document : DocfactsDocument
         Document instance to serialize.
-    validate : bool, default True
-        Whether to validate the payload against the schema before writing.
+    validate : bool, optional
+        Whether to validate the payload against the schema before writing. Defaults to True.
 
     Returns
     -------

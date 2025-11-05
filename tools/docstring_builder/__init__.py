@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
 
     Parameters
     ----------
-    argv : list[str] or None, optional
+    argv : list[str] | None, optional
         Command-line arguments. If None, uses sys.argv.
 
     Returns

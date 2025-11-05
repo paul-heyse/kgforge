@@ -232,8 +232,8 @@ def _build_request(
     return DocstringBuildRequest(
         command=command,
         subcommand=subcommand,
-        module=(args.module or "") or None,
-        since=(args.since or "") or None,
+        module=(args.module or "") | None,
+        since=(args.since or "") | None,
         changed_only=getattr(args, "changed_only", False),
         explicit_paths=explicit_paths,
         force=getattr(args, "force", False),
@@ -242,7 +242,7 @@ def _build_request(
         skip_docfacts=getattr(args, "skip_docfacts", False),
         json_output=getattr(args, "json_output", False),
         jobs=getattr(args, "jobs", 1) or 1,
-        baseline=(getattr(args, "baseline", "") or None),
+        baseline=(getattr(args, "baseline", "") | None),
         only_plugins=_parse_plugin_names(getattr(args, "only_plugin", None)),
         disable_plugins=_parse_plugin_names(getattr(args, "disable_plugin", None)),
         policy_overrides=policy_overrides,
@@ -325,8 +325,8 @@ def _command_list(args: argparse.Namespace) -> int:
     config, _ = load_builder_config(getattr(args, "config_path", None))
     try:
         selection = SelectionCriteria(
-            module=(args.module or "") or None,
-            since=(args.since or "") or None,
+            module=(args.module or "") | None,
+            since=(args.since or "") | None,
             changed_only=getattr(args, "changed_only", False),
             explicit_paths=getattr(args, "paths", None),
         )
@@ -738,7 +738,7 @@ def main(argv: list[str] | None = None) -> int:
 
     Parameters
     ----------
-    argv : list[str], optional
+    argv : list[str] | None, optional
         Command-line arguments. If None, uses sys.argv.
 
     Returns

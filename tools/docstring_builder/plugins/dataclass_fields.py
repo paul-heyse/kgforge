@@ -142,16 +142,17 @@ def _metadata_doc(node: ast.Dict) -> str | None:
 
 
 class _DataclassFieldCollector(ast.NodeVisitor):
-    """Collect dataclass field metadata keyed by fully-qualified class name."""
+    """Collect dataclass field metadata keyed by fully-qualified class name.
+
+    Initialize field collector.
+
+    Parameters
+    ----------
+    module : str
+        Module qualified name.
+    """
 
     def __init__(self, module: str) -> None:
-        """Initialize field collector.
-
-        Parameters
-        ----------
-        module : str
-            Module qualified name.
-        """
         self.module = module
         self.namespace: list[str] = []
         self.fields: dict[str, list[_FieldInfo]] = {}
@@ -180,14 +181,10 @@ class _DataclassFieldCollector(ast.NodeVisitor):
 
 
 class DataclassFieldDocPlugin(TransformerPlugin):
-    """Populate dataclass parameter documentation from field definitions."""
+    """Populate dataclass parameter documentation from field definitions.
 
-    name: str = "dataclass_field_docs"
-    stage: PluginStage = "transformer"
-
-    def __init__(self) -> None:
-        """Initialize dataclass field doc plugin."""
-        self._cache: dict[Path, dict[str, list[_FieldInfo]]] = {}
+    Initialize dataclass field doc plugin.
+    """
 
     def on_start(self, context: PluginContext) -> None:
         """Reset caches before processing begins."""

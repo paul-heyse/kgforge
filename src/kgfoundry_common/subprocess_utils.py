@@ -286,10 +286,10 @@ class SubprocessError(RuntimeError):
     ----------
     message : str
         Error description.
-    returncode : int, optional
-        Exit code from subprocess.
-    stderr : str, optional
-        Captured stderr output.
+    returncode : int | None, optional
+        Exit code from subprocess. Defaults to None.
+    stderr : str | None, optional
+        Captured stderr output. Defaults to None.
     """
 
     def __init__(
@@ -459,7 +459,8 @@ def spawn_text_process(
     Raises
     ------
     ToolExecutionError
-        If command is empty or command validation fails.
+        If command is empty or command validation fails. The actual exception
+        type is determined by the tools surface (raised via tool_execution_error_ctor).
     """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(

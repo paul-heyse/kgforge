@@ -205,9 +205,9 @@ def build_problem_details(
         Build request context.
     detail : str
         Error detail message.
-    instance : str, optional
+    instance : str | None, optional
         Problem instance URI.
-    errors : Sequence[ErrorReport], optional
+    errors : Sequence[ErrorReport] | None, optional
         Error reports to include in extensions.
 
     Returns

@@ -20,13 +20,13 @@ def format_annotation(
     ----------
     annotation : object
         Type annotation to format.
-    module_globals : Mapping[str, object], optional
+    module_globals : Mapping[str, object] | None, optional
         Module globals dictionary for resolving forward references.
 
     Returns
     -------
-    str or None
-        Formatted annotation string, or None if formatting fails.
+    str | None
+        Formatted annotation string, | None if formatting fails.
     """
     simple = _format_simple_type(annotation)
     if simple is not None:
@@ -67,7 +67,7 @@ def _format_simple_type(annotation: object) -> str | None:
 
     Returns
     -------
-    str or None
+    str | None
         Formatted string for simple types, None otherwise.
     """
     if annotation is None:
@@ -89,12 +89,12 @@ def _format_union_type(
     ----------
     annotation : object
         Type annotation to format.
-    module_globals : Mapping[str, object] or None
+    module_globals : Mapping[str, object] | None
         Module globals for resolving forward references.
 
     Returns
     -------
-    str or None
+    str | None
         Formatted union/collection string, None if not applicable.
     """
     origin = get_origin(annotation)
@@ -133,12 +133,12 @@ def _format_annotated_type(
     ----------
     annotation : object
         Type annotation to format.
-    module_globals : Mapping[str, object] or None
+    module_globals : Mapping[str, object] | None
         Module globals for resolving forward references.
 
     Returns
     -------
-    str or None
+    str | None
         Formatted base type string, None if not Annotated.
     """
     if get_origin(annotation) is Annotated:
@@ -157,7 +157,7 @@ def _format_literal_type(annotation: object) -> str | None:
 
     Returns
     -------
-    str or None
+    str | None
         Formatted Literal string, None if not Literal.
     """
     if get_origin(annotation) is Literal:

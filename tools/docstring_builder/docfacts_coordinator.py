@@ -48,7 +48,7 @@ def _coerce_provenance_payload(data: object) -> dict[str, str] | None:
 
     Returns
     -------
-    dict[str, str] or None
+    dict[str, str] | None
         Provenance payload dictionary if data is valid, None otherwise.
     """
     if not isinstance(data, Mapping):

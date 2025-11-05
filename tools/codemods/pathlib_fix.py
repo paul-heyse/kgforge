@@ -115,13 +115,10 @@ def _path_join_expression(arguments: Sequence[cst.Arg]) -> cst.BaseExpression | 
 
 
 class PathlibTransformer(cst.CSTTransformer):
-    """Apply pathlib conversions to common ``os.path`` call sites."""
+    """Apply pathlib conversions to common ``os.path`` call sites.
 
-    def __init__(self) -> None:
-        """Initialize transformer with change tracking."""
-        super().__init__()
-        self.changes: list[str] = []
-        self.needs_pathlib_import = False
+    Initializes transformer with change tracking.
+    """
 
     def on_visit(self, node: cst.CSTNode) -> bool:
         """Track if pathlib import already exists.
@@ -255,7 +252,7 @@ class PathlibTransformer(cst.CSTTransformer):
         Returns
         -------
         cst.BaseExpression | None
-            Transformed expression or None if no transformation applies.
+            Transformed expression | None if no transformation applies.
         """
         for transformer in (
             self._transform_makedirs,

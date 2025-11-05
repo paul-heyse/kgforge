@@ -477,7 +477,7 @@ def _extract_stub_parity_report(error: ConfigurationError) -> StubParityReport |
     Returns
     -------
     StubParityReport | None
-        Extracted report or None if parsing fails.
+        Extracted report | None if parsing fails.
     """
     try:
         context = cast("StubParityContext", dict(error.context))

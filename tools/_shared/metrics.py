@@ -133,6 +133,12 @@ def observe_tool_run(
     ------
     ToolRunObservation
         Observation object for tracking execution details.
+
+    Raises
+    ------
+    Exception
+        Any exception raised during tool execution is propagated after recording
+        error status and metrics.
     """
     settings = get_runtime_settings()
     observation = ToolRunObservation(

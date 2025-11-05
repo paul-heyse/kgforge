@@ -86,7 +86,7 @@ def build_problem_details(params: ProblemDetailsParams) -> ProblemDetailsDict:
 
     Returns
     -------
-    dict[str, JsonValue]
+    ProblemDetailsDict
         Problem Details payload conforming to RFC 9457.
 
     Examples
@@ -243,7 +243,7 @@ def tool_timeout_problem_details(
             title="Tool execution timed out",
             detail=detail,
             instance_suffix="timeout",
-            extensions=extensions or None,
+            extensions=extensions | None,
         )
     )
 
@@ -426,7 +426,7 @@ def problem_from_exception(params: ExceptionProblemDetailsParams) -> ProblemDeta
 
     Returns
     -------
-    dict[str, JsonValue]
+    ProblemDetailsDict
         Problem Details payload.
 
     Examples

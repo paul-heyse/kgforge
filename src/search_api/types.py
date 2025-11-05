@@ -135,6 +135,7 @@ class FaissIndexProtocol(Protocol):
         vectors : VectorArray
             Array of shape (n_vectors, dimension) with float32 dtype.
             Vectors should be normalized to unit length for inner-product search.
+        """
         ...
 
     def search(self, vectors: VectorArray, k: int) -> tuple[NDArray[np.float32], NDArray[np.int64]]:
@@ -292,6 +293,7 @@ class FaissModuleProtocol(Protocol):
             Index instance to save.
         path : str
             File path for the persisted index.
+        """
         ...
 
     def read_index(self, path: str) -> FaissIndexProtocol:
@@ -309,6 +311,7 @@ class FaissModuleProtocol(Protocol):
         -------
         FaissIndexProtocol
             Loaded index instance.
+        """
         ...
 
     normalize_l2: Callable[[VectorArray], None]
@@ -463,6 +466,7 @@ class SpladeEncoderProtocol(Protocol):
         VectorArray
             Sparse vector array of shape (len(texts), vocab_size) with float32 dtype.
             Vectors are typically sparse (many zeros) and represent term importance.
+        """
         ...
 
 
@@ -504,6 +508,7 @@ class BM25IndexProtocol(Protocol):
         list[tuple[str, float]]
             List of (document_id, score) tuples, sorted by score descending.
             Scores are BM25 relevance scores (higher is better).
+        """
         ...
 
 

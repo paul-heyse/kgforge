@@ -72,7 +72,7 @@ def _load_json(path: Path) -> JSONValue | None:
     Returns
     -------
     JSONValue | None
-        Parsed JSON data or None if file is unreadable.
+        Parsed JSON data | None if file is unreadable.
     """
     try:
         return cast("JSONValue", json.loads(path.read_text(encoding="utf-8")))
@@ -228,7 +228,7 @@ def load_symbol_spans() -> dict[str, dict[str, Any]]:
 
     Returns
     -------
-    collections.abc.Mapping
+    dict[str, dict[str, Any]]
         Description of return value.
 
     Examples
@@ -272,7 +272,7 @@ def load_public_symbols() -> set[str]:
 
     Returns
     -------
-    collections.abc.Set
+    set[str]
         Description of return value.
 
     Raises
@@ -404,7 +404,7 @@ def _read_source(path: Path) -> str | None:
     Returns
     -------
     str | None
-        Source text or None if file cannot be read.
+        Source text | None if file cannot be read.
     """
     try:
         return path.read_text(encoding="utf-8")
@@ -423,7 +423,7 @@ def _parse_source(text: str) -> ast.AST | None:
     Returns
     -------
     ast.AST | None
-        Parsed AST or None if syntax error.
+        Parsed AST | None if syntax error.
     """
     try:
         return ast.parse(text)
@@ -462,7 +462,7 @@ def _match_reason(symbol: str, dotted_tokens: set[str], ast_tokens: set[str]) ->
     Returns
     -------
     str | None
-        Match reason string or None if no match.
+        Match reason string | None if no match.
     """
     top = symbol.split(".", 1)[0]
     tail = _symbol_tail(symbol)
@@ -666,7 +666,7 @@ def load_coverage() -> tuple[dict[str, set[int]], dict[tuple[str, int], set[str]
 
     Returns
     -------
-    Tuple[dict[str, collections.abc.Set], dict[Tuple[str, int], collections.abc.Set]]
+    tuple[dict[str, set[int]], dict[tuple[str, int], set[str]]]
         Description of return value.
 
     Examples
@@ -710,12 +710,12 @@ def build_test_map(symbols: set[str]) -> dict[str, list[dict[str, object]]]:
 
     Parameters
     ----------
-    symbols : collections.abc.Set
+    symbols : set[str]
         Description for ``symbols``.
 
     Returns
     -------
-    collections.abc.Mapping
+    dict[str, list[dict[str, object]]]
         Description of return value.
 
     Examples
@@ -747,16 +747,16 @@ def attach_coverage(
 
     Parameters
     ----------
-    symbol_spans : collections.abc.Mapping
+    symbol_spans : dict[str, dict[str, Any]]
         Description for ``symbol_spans``.
-    executed : collections.abc.Mapping
+    executed : dict[str, set[int]]
         Description for ``executed``.
-    ctx_by_line : collections.abc.Mapping
+    ctx_by_line : dict[tuple[str, int], set[str]]
         Description for ``ctx_by_line``.
 
     Returns
     -------
-    collections.abc.Mapping
+    dict[str, dict[str, Any]]
         Description of return value.
 
     Examples
@@ -809,18 +809,18 @@ def summarize(
 
     Parameters
     ----------
-    public_syms : collections.abc.Set
+    public_syms : set[str]
         Description for ``public_syms``.
-    symbol_spans : collections.abc.Mapping
+    symbol_spans : dict[str, dict[str, Any]]
         Description for ``symbol_spans``.
-    coverage : collections.abc.Mapping
+    coverage : dict[str, dict[str, Any]]
         Description for ``coverage``.
     budget : int
         Description for ``budget``.
 
     Returns
     -------
-    Tuple[dict[str, typing.Any], List[dict[str, typing.Any]]]
+    tuple[dict[str, Any], list[dict[str, Any]]]
         Description of return value.
 
     Examples

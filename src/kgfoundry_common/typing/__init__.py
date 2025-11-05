@@ -57,6 +57,11 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self < other.
         """
         _protocol_stub("__lt__", self, other)
 
@@ -67,6 +72,11 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self <= other.
         """
         _protocol_stub("__le__", self, other)
 
@@ -77,6 +87,11 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self > other.
         """
         _protocol_stub("__gt__", self, other)
 
@@ -87,6 +102,11 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self >= other.
         """
         _protocol_stub("__ge__", self, other)
 

@@ -205,8 +205,8 @@ def _atomic_write(target: Path, content: str, *, encoding: str = "utf-8") -> Non
         Target file path.
     content : str
         Content to write.
-    encoding : str, default "utf-8"
-        File encoding.
+    encoding : str, optional
+        File encoding. Defaults to "utf-8".
 
     Raises
     ------
@@ -257,7 +257,7 @@ def apply_edits(
         The harvested module metadata, including the target filepath.
     edits : Iterable[DocstringEdit]
         The sequence of docstring edits to apply to the module.
-    apply_config : DocstringApplyConfig, optional
+    apply_config : DocstringApplyConfig | None, optional
         Configuration controlling whether edits are written, whether backups are created,
         and whether atomic writes are used. Defaults to ``DocstringApplyConfig()``.
 

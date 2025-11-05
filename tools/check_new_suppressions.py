@@ -481,7 +481,7 @@ def _extract_guard_report(error: ConfigurationError) -> SuppressionGuardReport |
     Returns
     -------
     SuppressionGuardReport | None
-        Extracted report or None if parsing fails.
+        Extracted report | None if parsing fails.
     """
     try:
         context = cast("SuppressionGuardContext", dict(error.context))

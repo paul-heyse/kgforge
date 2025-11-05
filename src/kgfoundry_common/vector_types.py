@@ -192,7 +192,7 @@ def coerce_vector_batch(records: Iterable[object]) -> VectorBatch:
 
     Parameters
     ----------
-    records : Iterable[Mapping[str, object]]
+    records : Iterable[object]
         Iterable of JSON-like mappings containing ``"key"`` and ``"vector"``
         entries. ``"vector"`` must be a one-dimensional sequence of numbers.
 

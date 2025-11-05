@@ -69,12 +69,10 @@ def _parse_args(argv: Sequence[str] | None = None) -> BlindExceptArgs:
 
 
 class BlindExceptTransformer(cst.CSTTransformer):
-    """Rewrite blind ``except`` handlers to capture exceptions explicitly."""
+    """Rewrite blind ``except`` handlers to capture exceptions explicitly.
 
-    def __init__(self) -> None:
-        """Initialize transformer with change tracking."""
-        super().__init__()
-        self.changes: list[str] = []
+    Initializes transformer with change tracking.
+    """
 
     def leave_excepthandler(
         self, original_node: cst.ExceptHandler, updated_node: cst.ExceptHandler
