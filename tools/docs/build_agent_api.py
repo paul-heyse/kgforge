@@ -9,7 +9,13 @@ OUTPUT = Path("docs/_build/agent_api_openapi.json")
 
 
 def build_spec() -> dict[str, object]:
-    """Return the OpenAPI specification document."""
+    """Return the OpenAPI specification document.
+
+    Returns
+    -------
+    dict[str, object]
+        OpenAPI 3.2.0 specification dictionary.
+    """
     problem_details = {
         "type": "object",
         "description": "RFC 9457 Problem Details error response.",
@@ -143,7 +149,13 @@ def build_spec() -> dict[str, object]:
 
 
 def main() -> int:
-    """Write the OpenAPI document to the repository build directory."""
+    """Write the OpenAPI document to the repository build directory.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success).
+    """
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     spec = build_spec()
     OUTPUT.write_text(json.dumps(spec, indent=2), encoding="utf-8")

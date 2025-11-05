@@ -76,6 +76,13 @@ class ApplyEditsCallable(Protocol):
 
 
 def _load_apply_edits() -> ApplyEditsCallable:
+    """Load and return the apply_edits function from the apply module.
+
+    Returns
+    -------
+    ApplyEditsCallable
+        Callable that applies docstring edits to source files.
+    """
     module = import_module("tools.docstring_builder.apply")
     return cast("ApplyEditsCallable", module.apply_edits)
 
@@ -103,7 +110,18 @@ class FileProcessor:
     logger: LoggerLike = field(default_factory=lambda: logging.getLogger(__name__))
 
     def process(self, file_path: Path) -> FileOutcome:
-        """Harvest, render, and apply docstrings for a single file."""
+        """Harvest, render, and apply docstrings for a single file.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file to process.
+
+        Returns
+        -------
+        FileOutcome
+            Outcome containing status, docfacts, preview, and change information.
+        """
         command = self.options.command
         is_update = command in {"update", "fmt"}
         is_check = command == "check"
@@ -221,7 +239,23 @@ class FileProcessor:
         )
 
     def _try_harvest(self, file_path: Path) -> HarvestResult | FileOutcome:
-        """Attempt to harvest a file, returning outcome on error."""
+        """Attempt to harvest a file, returning outcome on error.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file to harvest.
+
+        Returns
+        -------
+        HarvestResult or FileOutcome
+            HarvestResult on success, FileOutcome on error.
+
+        Raises
+        ------
+        KeyboardInterrupt
+            Propagated if user interrupts the operation.
+        """
         result: HarvestResult | FileOutcome | None = None
         try:
             with record_operation_metrics("harvest", status="success"):
@@ -269,7 +303,18 @@ class FileProcessor:
         return result
 
     def _use_cache(self, file_path: Path) -> bool:
-        """Return ``True`` when cached results remain valid."""
+        """Return ``True`` when cached results remain valid.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file to check.
+
+        Returns
+        -------
+        bool
+            True if cache is valid and should be used, False otherwise.
+        """
         command = self.options.command
         return (
             command != "harvest"
@@ -278,7 +323,18 @@ class FileProcessor:
         )
 
     def _can_ignore_missing(self, file_path: Path) -> bool:
-        """Return ``True`` if missing dependencies can be ignored."""
+        """Return ``True`` if missing dependencies can be ignored.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file to check.
+
+        Returns
+        -------
+        bool
+            True if missing dependencies can be ignored for this file.
+        """
         return self.options.ignore_missing and matches_patterns(
             file_path, self.options.missing_patterns
         )
@@ -290,7 +346,23 @@ class FileProcessor:
         *,
         apply_config: DocstringApplyConfig,
     ) -> tuple[bool, str | None]:
-        """Apply docstring edits and return change status plus preview."""
+        """Apply docstring edits and return change status plus preview.
+
+        Parameters
+        ----------
+        result : HarvestResult
+            Harvested module metadata.
+        edits : Sequence[DocstringEdit]
+            Docstring edits to apply.
+        apply_config : DocstringApplyConfig
+            Configuration for applying edits.
+
+        Returns
+        -------
+        tuple[bool, str | None]
+            Tuple of (changed, preview) where changed indicates if edits were applied,
+            and preview contains the rendered code when in dry-run mode.
+        """
         changed = False
         preview: str | None = None
         if not edits:

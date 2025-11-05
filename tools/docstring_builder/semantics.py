@@ -219,7 +219,20 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
 
 
 def build_semantic_schemas(result: HarvestResult, config: BuilderConfig) -> list[SemanticResult]:
-    """Generate docstring schemas for the harvested symbols in a file."""
+    """Generate docstring schemas for the harvested symbols in a file.
+
+    Parameters
+    ----------
+    result : HarvestResult
+        Harvested module metadata and symbols.
+    config : BuilderConfig
+        Builder configuration.
+
+    Returns
+    -------
+    list[SemanticResult]
+        List of semantic results with enriched schema information for each symbol.
+    """
     ast_nodes = _ast_index(result)
     entries: list[SemanticResult] = []
     for symbol in result.symbols:

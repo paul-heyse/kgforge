@@ -7,10 +7,10 @@ Overview of embeddings dense.
 
 ## Modules
 
-- **`embeddings_dense.base`** — Overview of base. → [open](vscode://file//home/paul/kgfoundry/src/embeddings_dense/base.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/embeddings_dense/base.py#L1)
-- **`embeddings_dense.qwen3`** — Overview of qwen3. → [open](vscode://file//home/paul/kgfoundry/src/embeddings_dense/qwen3.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/embeddings_dense/qwen3.py#L1)
+- **`embeddings_dense.base`** — Overview of base. → [open](vscode://file//home/paul/kgfoundry/src/embeddings_dense/base.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/embeddings_dense/base.py#L1)
+- **`embeddings_dense.qwen3`** — Overview of qwen3. → [open](vscode://file//home/paul/kgfoundry/src/embeddings_dense/qwen3.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/embeddings_dense/qwen3.py#L1)
 
 ## Classes
 
-- **`embeddings_dense.NavMap`** — Model the NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:74:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/kgfoundry_common/navmap_types.py#L74-L93)
-<!-- agent:readme v1 sha:3e93a43e5369e5222f2d28b839bae3718d96657a content:adc5c5ee1eea -->
+- **`embeddings_dense.NavMap`** — Describe NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:82:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/kgfoundry_common/navmap_types.py#L82-L102)
+<!-- agent:readme v1 sha:c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae content:1fa0e15dd973 -->

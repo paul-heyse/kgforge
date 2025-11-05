@@ -101,7 +101,13 @@ class ToolRunObservation:
         self.timed_out = timed_out
 
     def duration_seconds(self) -> float:
-        """Return the elapsed duration in seconds."""
+        """Return the elapsed duration in seconds.
+
+        Returns
+        -------
+        float
+            Duration in seconds since initialization.
+        """
         return time.monotonic() - self.start_time
 
 
@@ -112,7 +118,22 @@ def observe_tool_run(
     cwd: Path | None,
     timeout: float | None,
 ) -> Iterator[ToolRunObservation]:
-    """Context manager that records metrics and tracing for a subprocess."""
+    """Context manager that records metrics and tracing for a subprocess.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command to execute.
+    cwd : Path | None
+        Working directory for the command.
+    timeout : float | None
+        Optional timeout in seconds.
+
+    Yields
+    ------
+    ToolRunObservation
+        Observation object for tracking execution details.
+    """
     settings = get_runtime_settings()
     observation = ToolRunObservation(
         command=command,

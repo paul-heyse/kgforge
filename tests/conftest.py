@@ -116,7 +116,13 @@ else:
 
 # Type aliases - use lazy import for JsonValue to avoid E402
 def _get_json_value() -> object:
-    """Lazy import JsonValue after path setup."""
+    """Lazy import JsonValue after path setup.
+
+    Returns
+    -------
+    object
+        JsonValue type alias.
+    """
     from kgfoundry_common.problem_details import JsonValue  # noqa: PLC0415
 
     return JsonValue
@@ -199,7 +205,13 @@ def caplog_records(caplog: LogCaptureFixture) -> dict[str, list[logging.LogRecor
     """
 
     def _collect_records() -> dict[str, list[logging.LogRecord]]:
-        """Collect records grouped by operation."""
+        """Collect records grouped by operation.
+
+        Returns
+        -------
+        dict[str, list[logging.LogRecord]]
+            Mapping of operation name to log records.
+        """
         records_by_op: dict[str, list[logging.LogRecord]] = {}
         records = [record for record in caplog.records if isinstance(record, logging.LogRecord)]
         for record in records:
@@ -229,7 +241,18 @@ def prometheus_registry() -> CollectorRegistry:
 
 @fixture
 def otel_span_exporter() -> SpanExporterProtocol:
-    """Provide an in-memory OpenTelemetry span exporter for testing."""
+    """Provide an in-memory OpenTelemetry span exporter for testing.
+
+    Returns
+    -------
+    SpanExporterProtocol
+        In-memory span exporter instance.
+
+    Raises
+    ------
+    SkipReturnedUnexpectedlyError
+        If pytest.skip is called but control flow continues unexpectedly.
+    """
     # Lazy import after path setup to avoid E402
     from kgfoundry_common.opentelemetry_types import (  # noqa: PLC0415
         load_in_memory_span_exporter_cls,
@@ -247,7 +270,23 @@ def otel_span_exporter() -> SpanExporterProtocol:
 def otel_tracer_provider(
     otel_span_exporter: SpanExporterProtocol,
 ) -> Iterator[TracerProviderProtocol]:
-    """Provide an OpenTelemetry tracer provider configured with in-memory exporter."""
+    """Provide an OpenTelemetry tracer provider configured with in-memory exporter.
+
+    Parameters
+    ----------
+    otel_span_exporter : SpanExporterProtocol
+        Span exporter to use.
+
+    Yields
+    ------
+    TracerProviderProtocol
+        Configured tracer provider.
+
+    Raises
+    ------
+    SkipReturnedUnexpectedlyError
+        If pytest.skip is called but control flow continues unexpectedly.
+    """
     # Lazy import after path setup to avoid E402
     from kgfoundry_common.opentelemetry_types import (  # noqa: PLC0415
         load_tracer_provider_cls,
@@ -293,15 +332,13 @@ def load_problem_details_example(example_name: str) -> ProblemDetailsDict:
 
     Returns
     -------
-    dict
+    ProblemDetailsDict
         Parsed Problem Details JSON.
 
     Raises
     ------
     FileNotFoundError
         If example file does not exist.
-    json.JSONDecodeError
-        If example JSON is malformed.
     """
     example_path = (
         Path(__file__).parent.parent / "schema/examples/problem_details" / f"{example_name}.json"
@@ -319,9 +356,9 @@ def load_problem_details_example(example_name: str) -> ProblemDetailsDict:
 def problem_details_loader() -> Callable[[str], ProblemDetailsDict]:
     """Fixture providing access to Problem Details examples.
 
-    Yields
-    ------
-    callable
+    Returns
+    -------
+    Callable[[str], ProblemDetailsDict]
         Function load_problem_details_example() bound to this fixture.
     """
     return load_problem_details_example
@@ -331,9 +368,9 @@ def problem_details_loader() -> Callable[[str], ProblemDetailsDict]:
 def structured_log_asserter() -> Callable[[logging.LogRecord, set[str]], None]:
     """Provide helpers for asserting structured log fields.
 
-    Yields
-    ------
-    callable
+    Returns
+    -------
+    Callable[[logging.LogRecord, set[str]], None]
         Function to assert log record has required fields.
     """
 
@@ -370,9 +407,14 @@ def metrics_asserter(
 ) -> Callable[[str, int | float | None], None]:
     """Provide helpers for asserting Prometheus metrics.
 
-    Yields
-    ------
-    callable
+    Parameters
+    ----------
+    prometheus_registry : CollectorRegistry
+        Prometheus registry to check metrics in.
+
+    Returns
+    -------
+    Callable[[str, int | float | None], None]
         Function to assert metric exists and has expected value.
     """
 
@@ -427,7 +469,18 @@ class _SimpleSpanProcessor:
         """No-op start hook to satisfy span processor protocol."""
 
     def force_flush(self, timeout_millis: int | None = None) -> bool:
-        """Flush spans immediately (noop)."""
+        """Flush spans immediately (noop).
+
+        Parameters
+        ----------
+        timeout_millis : int | None, optional
+            Timeout in milliseconds (ignored).
+
+        Returns
+        -------
+        bool
+            Always returns True.
+        """
         del timeout_millis
         return True
 

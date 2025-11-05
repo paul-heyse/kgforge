@@ -158,7 +158,13 @@ class TestGriffeFacade:
 
     @pytest.fixture(name="facade")
     def _facade(self) -> GriffeFacade:
-        """Create a Griffe facade for testing."""
+        """Create a Griffe facade for testing.
+
+        Returns
+        -------
+        GriffeFacade
+            Configured Griffe facade instance.
+        """
         env = detect_environment()
         facade = build_facade(env)
         assert isinstance(facade, GriffeFacade)
@@ -222,7 +228,13 @@ class TestGriffeNodeProtocol:
 
     @pytest.fixture(name="test_node")
     def _test_node(self) -> GriffeNode:
-        """Load a real Griffe node for testing."""
+        """Load a real Griffe node for testing.
+
+        Returns
+        -------
+        GriffeNode
+            Loaded Griffe node for pathlib module.
+        """
         return cast("GriffeNode", griffe.load("pathlib"))
 
     def test_node_has_path_property(self, test_node: GriffeNode) -> None:

@@ -63,6 +63,16 @@ def namespace_exports(module: ModuleType) -> list[str]:
 
     The helper respects ``__all__`` when present and otherwise derives a sensible
     default by filtering out private attributes.
+
+    Parameters
+    ----------
+    module : ModuleType
+        The module whose exports are being queried.
+
+    Returns
+    -------
+    list[str]
+        List of public export names.
     """
     return _namespace_exports(module)
 
@@ -86,5 +96,18 @@ def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
 
 
 def namespace_getattr(module: ModuleType, name: str) -> object:
-    """Resolve ``name`` from ``module`` while preserving the original attribute."""
+    """Resolve ``name`` from ``module`` while preserving the original attribute.
+
+    Parameters
+    ----------
+    module : ModuleType
+        The module whose attribute is being accessed.
+    name : str
+        The attribute name to resolve.
+
+    Returns
+    -------
+    object
+        The attribute value from the module.
+    """
     return _namespace_getattr(module, name)

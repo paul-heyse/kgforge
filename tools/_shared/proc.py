@@ -26,7 +26,13 @@ _PROCESS_STATE = _ProcessRunnerState(ProcessRunner())
 
 
 def get_process_runner() -> ProcessRunner:
-    """Return the global process runner instance used by :func:`run_tool`."""
+    """Return the global process runner instance used by :func:`run_tool`.
+
+    Returns
+    -------
+    ProcessRunner
+        Global process runner instance.
+    """
     return _PROCESS_STATE.runner
 
 
@@ -47,7 +53,31 @@ def run_tool(
     timeout: float | None = None,
     check: bool = False,
 ) -> ToolRunResult:
-    """Execute ``command`` using the shared :class:`ProcessRunner` policies."""
+    """Execute ``command`` using the shared :class:`ProcessRunner` policies.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command to execute.
+    cwd : Path | None, optional
+        Working directory. Default is None.
+    env : Mapping[str, str] | None, optional
+        Environment variables. Default is None.
+    timeout : float | None, optional
+        Timeout in seconds. Default is None.
+    check : bool, optional
+        Raise on non-zero exit. Default is False.
+
+    Returns
+    -------
+    ToolRunResult
+        Execution result.
+
+    Note
+    ----
+    This function calls :meth:`ProcessRunner.run` which may raise
+    :exc:`ToolExecutionError`. See :class:`ProcessRunner` for details.
+    """
     return _PROCESS_STATE.runner.run(
         command,
         cwd=cwd,

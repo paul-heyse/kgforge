@@ -232,7 +232,25 @@ class AllowListEnforcer:
     digest_verifier: ExecutableDigestVerifier = field(default_factory=ExecutableDigestVerifier)
 
     def resolve(self, executable: str, command: Command) -> Path:
-        """Resolve ``executable`` to an absolute, allow-listed path."""
+        """Resolve ``executable`` to an absolute, allow-listed path.
+
+        Parameters
+        ----------
+        executable : str
+            Executable name or path.
+        command : Command
+            Full command sequence.
+
+        Returns
+        -------
+        Path
+            Absolute, allow-listed executable path.
+
+        Raises
+        ------
+        ToolExecutionError
+            If executable is not found or not allow-listed.
+        """
         candidate = Path(executable)
         if candidate.is_absolute():
             self.ensure_permitted(candidate, command)
@@ -253,7 +271,20 @@ class AllowListEnforcer:
         return resolved_path
 
     def ensure_permitted(self, executable: Path, command: Command) -> None:
-        """Raise ``ToolExecutionError`` if ``executable`` is not allow-listed."""
+        """Raise ``ToolExecutionError`` if ``executable`` is not allow-listed.
+
+        Parameters
+        ----------
+        executable : Path
+            Executable path to check.
+        command : Command
+            Full command sequence.
+
+        Raises
+        ------
+        ToolExecutionError
+            If executable is not in the allow list.
+        """
         settings = self.settings_loader()
         if settings.is_allowed(executable):
             return
@@ -302,7 +333,18 @@ class SanitisedEnvironment(EnvironmentPolicy):
     )
 
     def build(self, overrides: Mapping[str, str] | None) -> dict[str, str]:
-        """Return an environment dictionary merged with ``overrides``."""
+        """Return an environment dictionary merged with ``overrides``.
+
+        Parameters
+        ----------
+        overrides : Mapping[str, str] | None
+            Optional environment variable overrides.
+
+        Returns
+        -------
+        dict[str, str]
+            Merged environment dictionary.
+        """
         baseline = {
             key: value
             for key, value in os.environ.items()
@@ -341,7 +383,31 @@ class ProcessRunner:
         timeout: float | None = None,
         check: bool = False,
     ) -> ToolRunResult:
-        """Execute ``command`` under the configured policies."""
+        """Execute ``command`` under the configured policies.
+
+        Parameters
+        ----------
+        command : Command
+            Command to execute.
+        cwd : Path | None, optional
+            Working directory. Default is None.
+        env : Mapping[str, str] | None, optional
+            Environment variables. Default is None.
+        timeout : float | None, optional
+            Timeout in seconds. Default is None.
+        check : bool, optional
+            Raise on non-zero exit. Default is False.
+
+        Returns
+        -------
+        ToolRunResult
+            Execution result.
+
+        Raises
+        ------
+        ToolExecutionError
+            If execution fails or ``check=True`` and returncode is non-zero.
+        """
         if not command:
             message = "Command must contain at least one argument"
             raise ToolExecutionError(message, command=[])

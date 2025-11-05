@@ -52,7 +52,18 @@ HEADER_SNIPPET = [
 
 
 def iter_test_paths(argv: list[str]) -> Iterable[pathlib.Path]:
-    """Yield test file paths to inspect."""
+    """Yield test file paths to inspect.
+
+    Parameters
+    ----------
+    argv : list[str]
+        Command-line arguments (file paths or directories).
+
+    Yields
+    ------
+    pathlib.Path
+        Test file paths to inspect.
+    """
     if argv:
         for entry in argv:
             path = pathlib.Path(entry)
@@ -63,7 +74,18 @@ def iter_test_paths(argv: list[str]) -> Iterable[pathlib.Path]:
 
 
 def contains_gpu_import(source: str) -> bool:
-    """Return True when the source imports a known GPU module."""
+    """Return True when the source imports a known GPU module.
+
+    Parameters
+    ----------
+    source : str
+        Source code to check for GPU imports.
+
+    Returns
+    -------
+    bool
+        True if the source contains imports from known GPU modules.
+    """
     for match in GPU_IMPORT_RE.finditer(source):
         mod_from = match.group("mod_from")
         mod_imp = match.group("mod_imp")
@@ -80,12 +102,29 @@ def contains_gpu_import(source: str) -> bool:
 
 
 def has_required_header(source: str) -> bool:
-    """Return True when the expected pytest gating header exists."""
+    """Return True when the expected pytest gating header exists.
+
+    Parameters
+    ----------
+    source : str
+        Source code to check for GPU header.
+
+    Returns
+    -------
+    bool
+        True if the source contains all required header snippets.
+    """
     return all(snippet in source for snippet in HEADER_SNIPPET)
 
 
 def main() -> int:
-    """Validate GPU gating for relevant tests."""
+    """Validate GPU gating for relevant tests.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success, 2 if violations found).
+    """
     failures: list[pathlib.Path] = []
     root_conftest = (TESTS_ROOT / "conftest.py").resolve()
     for candidate in iter_test_paths(sys.argv[1:]):

@@ -102,13 +102,37 @@ class NamespaceRegistry:
 
 
 def namespace_getattr(module: ModuleType, name: str) -> object:
-    """Return ``name`` from ``module`` while preserving the original attribute."""
+    """Return ``name`` from ``module`` while preserving the original attribute.
+
+    Parameters
+    ----------
+    module : ModuleType
+        Module to get attribute from.
+    name : str
+        Attribute name to get.
+
+    Returns
+    -------
+    object
+        Attribute value.
+    """
     # getattr returns Any; cast to object for type safety
     return cast("object", getattr(module, name))
 
 
 def namespace_exports(module: ModuleType) -> list[str]:
-    """Return the public export list for ``module`` respecting ``__all__``."""
+    """Return the public export list for ``module`` respecting ``__all__``.
+
+    Parameters
+    ----------
+    module : ModuleType
+        Module to get exports from.
+
+    Returns
+    -------
+    list[str]
+        List of public export names.
+    """
     exports: object = getattr(module, "__all__", None)
     if isinstance(exports, (list, tuple, set)):
         # Cast narrowed iterable to ensure static type checkers can infer str() return
@@ -128,7 +152,20 @@ def namespace_attach(
 
 
 def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
-    """Return the combined attribute listing exposed by a namespace bridge."""
+    """Return the combined attribute listing exposed by a namespace bridge.
+
+    Parameters
+    ----------
+    module : ModuleType
+        Module to get attributes from.
+    exports : Iterable[str]
+        Pre-defined export names.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of combined attribute names.
+    """
     exported = set(exports)
     exported.update(attr for attr in dir(module) if not attr.startswith("__"))
     return sorted(exported)

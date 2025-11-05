@@ -53,7 +53,13 @@ class SchemaMetadata:
     generated_at: datetime
 
     def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serialisable representation of the metadata."""
+        """Return a JSON-serialisable representation of the metadata.
+
+        Returns
+        -------
+        dict[str, object]
+            Dictionary representation of metadata.
+        """
         return {
             "schema": self.schema,
             "version": self.version,
@@ -101,13 +107,39 @@ def get_schema_path(name: str) -> Path:
 
 
 def validate_tools_payload(payload: Mapping[str, object], schema_name: str) -> None:
-    """Validate ``payload`` against a tooling schema."""
+    """Validate ``payload`` against a tooling schema.
+
+    Parameters
+    ----------
+    payload : Mapping[str, object]
+        Payload to validate.
+    schema_name : str
+        Schema file basename under ``schema/tools``.
+
+    Notes
+    -----
+    This function calls ``validate_payload`` from ``kgfoundry_common.serialization``
+    which may raise validation errors.
+    """
     schema_path = get_schema_path(schema_name)
     validate_payload(payload, schema_path)
 
 
 def validate_struct_payload(payload: Mapping[str, object], model: type[msgspec.Struct]) -> None:
-    """Validate ``payload`` against a msgspec struct ``model``."""
+    """Validate ``payload`` against a msgspec struct ``model``.
+
+    Parameters
+    ----------
+    payload : Mapping[str, object]
+        Payload to validate.
+    model : type[msgspec.Struct]
+        msgspec Struct class to validate against.
+
+    Raises
+    ------
+    SchemaValidationError
+        If validation fails.
+    """
     try:
         msgspec.convert(payload, model)
     except (msgspec.ValidationError, msgspec.DecodeError, TypeError, ValueError) as exc:
@@ -121,7 +153,27 @@ def render_schema(
     name: str | None = None,
     schema_id: str | None = None,
 ) -> dict[str, object]:
-    """Return a JSON Schema (draft 2020-12) for ``model``."""
+    """Return a JSON Schema (draft 2020-12) for ``model``.
+
+    Parameters
+    ----------
+    model : type[msgspec.Struct]
+        msgspec Struct class to generate schema for.
+    name : str | None, optional
+        Optional schema title.
+    schema_id : str | None, optional
+        Optional schema $id field.
+
+    Returns
+    -------
+    dict[str, object]
+        JSON Schema document.
+
+    Raises
+    ------
+    RuntimeError
+        If msgspec JSON schema extras are not available.
+    """
     schema_fn = cast(
         "Callable[[type[msgspec.Struct]], dict[str, object]] | None",
         getattr(msgspec_json, "schema", None),
@@ -159,7 +211,24 @@ def write_schema(
     context: SchemaContext | None = None,
     metadata_path: Path | None = None,
 ) -> SchemaMetadata:
-    """Render ``model`` as JSON Schema and persist alongside metadata."""
+    """Render ``model`` as JSON Schema and persist alongside metadata.
+
+    Parameters
+    ----------
+    model : type[msgspec.Struct]
+        msgspec Struct class to generate schema for.
+    destination : Path
+        Output path for the schema file.
+    context : SchemaContext | None, optional
+        Optional context fields. Default is None.
+    metadata_path : Path | None, optional
+        Optional metadata file path. Default is None.
+
+    Returns
+    -------
+    SchemaMetadata
+        Generated metadata.
+    """
     ctx = context or SchemaContext()
     schema = render_schema(model, name=ctx.name, schema_id=ctx.schema_id)
     text = _write_json(destination, schema)

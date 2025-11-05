@@ -153,6 +153,11 @@ def validate_against_schema(
         Absolute path to the JSON Schema file.
     artifact : str
         Artifact identifier used in problem details when validation fails.
+
+    Raises
+    ------
+    ToolExecutionError
+        When schema validation fails.
     """
     validator = _get_validator(schema_path)
 

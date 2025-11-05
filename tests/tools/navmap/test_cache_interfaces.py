@@ -51,11 +51,28 @@ class MockCollectorCache:
         return self._root
 
     def collect_modules(self) -> list[ModuleInfo]:
-        """Return collected modules."""
+        """Return collected modules.
+
+        Returns
+        -------
+        list[ModuleInfo]
+            List of collected module info objects.
+        """
         return self._modules
 
     def get_module(self, path: Path) -> ModuleInfo | None:
-        """Return a module by path."""
+        """Return a module by path.
+
+        Parameters
+        ----------
+        path : Path
+            Module path to look up.
+
+        Returns
+        -------
+        ModuleInfo | None
+            Module info if found, otherwise None.
+        """
         for mod in self._modules:
             if mod.path == path:
                 return mod
@@ -74,11 +91,23 @@ class MockRepairCache:
         self._repairs.append(result)
 
     def get_repairs(self) -> list[RepairResult]:
-        """Return all recorded repairs."""
+        """Return all recorded repairs.
+
+        Returns
+        -------
+        list[RepairResult]
+            List of repair results.
+        """
         return list(self._repairs)
 
     def summary(self) -> dict[str, int]:
-        """Return summary statistics."""
+        """Return summary statistics.
+
+        Returns
+        -------
+        dict[str, int]
+            Summary dictionary with total, changed, and applied counts.
+        """
         total = len(self._repairs)
         changed = sum(1 for r in self._repairs if r.changed)
         applied = sum(1 for r in self._repairs if r.applied)

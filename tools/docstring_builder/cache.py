@@ -22,12 +22,24 @@ DOCSTRING_CACHE_VERSION: Final[str] = "1.0.0"
 
 
 def _default_generated_at() -> str:
-    """Return the current UTC timestamp as an ISO-8601 string."""
+    """Return the current UTC timestamp as an ISO-8601 string.
+
+    Returns
+    -------
+    str
+        ISO-8601 formatted timestamp string.
+    """
     return datetime.now(tz=UTC).isoformat()
 
 
 def _default_entries() -> dict[str, CacheEntry]:
-    """Return an empty entries dict for :class:`CacheDocument`."""
+    """Return an empty entries dict for :class:`CacheDocument`.
+
+    Returns
+    -------
+    dict[str, CacheEntry]
+        Empty dictionary mapping file paths to cache entries.
+    """
     return {}
 
 
@@ -69,7 +81,24 @@ def _new_document(
     generated_at: str | None = None,
     entries: dict[str, CacheEntry] | None = None,
 ) -> CacheDocument:
-    """Create a :class:`CacheDocument` with schema-aligned keyword casing."""
+    """Create a :class:`CacheDocument` with schema-aligned keyword casing.
+
+    Parameters
+    ----------
+    schema_version : str, default DOCSTRING_CACHE_VERSION
+        Schema version identifier.
+    schema_id : str, default DOCSTRING_CACHE_SCHEMA_ID
+        Schema identifier URI.
+    generated_at : str, optional
+        ISO-8601 timestamp string. If None, uses current UTC time.
+    entries : dict[str, CacheEntry], optional
+        Cache entries mapping file paths to entry metadata. If None, uses empty dict.
+
+    Returns
+    -------
+    CacheDocument
+        Initialized cache document instance.
+    """
     payload_entries: dict[str, CacheEntry]
     payload_entries = {} if entries is None else dict(entries)
 
@@ -215,7 +244,20 @@ class BuilderCache:
             self._handle_load_error("Cache entry schema mismatch", exc)
 
     def needs_update(self, file_path: Path, config_hash: str) -> bool:
-        """Determine whether a file requires regeneration."""
+        """Determine whether a file requires regeneration.
+
+        Parameters
+        ----------
+        file_path : Path
+            Path to the file to check.
+        config_hash : str
+            SHA256 hash of the configuration used for processing.
+
+        Returns
+        -------
+        bool
+            True if the file needs regeneration (missing from cache, config changed, or file modified).
+        """
         key = str(file_path)
         mtime = file_path.stat().st_mtime
         with self._lock:
@@ -327,11 +369,6 @@ def from_payload(payload: dict[str, object]) -> CacheDocument:
     -------
     CacheDocument
         Typed document instance.
-
-    Raises
-    ------
-    ValueError
-        If the payload cannot be converted to the expected structure.
     """
     validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)
     return _CACHE_DOCUMENT_ADAPTER.validate_python(payload)
@@ -360,11 +397,6 @@ def validate_document(document: CacheDocument) -> None:
     ----------
     document : CacheDocument
         Document to validate.
-
-    Raises
-    ------
-    Exception
-        If validation fails.
     """
     payload = to_payload(document)
     validate_tools_payload(payload, DOCSTRING_CACHE_SCHEMA)

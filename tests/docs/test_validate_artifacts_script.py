@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -13,6 +12,8 @@ import pytest
 validate_artifacts = import_module("docs._scripts.validate_artifacts")
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from docs._scripts.validate_artifacts import (
         ArtifactValidationError as ArtifactValidationErrorType,
     )

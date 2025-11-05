@@ -27,7 +27,13 @@ class StubResponse:
     payload: JsonValue
 
     def json(self) -> JsonValue:
-        """Return the JSON payload associated with the response."""
+        """Return the JSON payload associated with the response.
+
+        Returns
+        -------
+        JsonValue
+            Response payload.
+        """
         return self.payload
 
 
@@ -82,12 +88,31 @@ class StubHttpClient:
         return responses[capped_index]
 
     def get(self) -> StubResponse:
-        """Return the next queued GET response."""
+        """Return the next queued GET response.
+
+        Returns
+        -------
+        StubResponse
+            Next GET response in queue.
+        """
         self.get_call_count += 1
         return self._response_for(self._get_responses, self.get_call_count - 1)
 
     def post(self, *args: object, **kwargs: object) -> StubResponse:
-        """Return the next queued POST response."""
+        """Return the next queued POST response.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments (ignored).
+        **kwargs : object
+            Keyword arguments (ignored).
+
+        Returns
+        -------
+        StubResponse
+            Next POST response in queue.
+        """
         del args, kwargs
         self.post_call_count += 1
         return self._response_for(self._post_responses, self.post_call_count - 1)

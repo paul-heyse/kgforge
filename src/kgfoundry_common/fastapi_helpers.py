@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import asyncio
 import time
+import typing as t
 from collections.abc import Callable
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, cast
 
 from fastapi import Depends
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -19,8 +20,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from kgfoundry_common.logging import get_correlation_id, get_logger, with_fields
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable
-
     from fastapi import FastAPI, Request
     from fastapi.params import Depends as DependsMarker
     from starlette.requests import Request as StarletteRequest
@@ -39,22 +38,31 @@ DEFAULT_TIMEOUT_SECONDS = 10.0
 
 logger = get_logger(__name__)
 
-T = TypeVar("T")
-E = TypeVar("E", bound=Exception)
-
-
 MiddlewareFactory = Callable[..., BaseHTTPMiddleware]
 
 
-async def _await_with_timeout(coro: Awaitable[T], timeout_seconds: float | None) -> T:
-    """Await ``coro`` while respecting ``timeout_seconds`` when provided."""
+async def _await_with_timeout[T](coro: t.Awaitable[T], timeout_seconds: float | None) -> T:
+    """Await ``coro`` while respecting ``timeout_seconds`` when provided.
+
+    Parameters
+    ----------
+    coro : Awaitable[T]
+        Coroutine to await.
+    timeout_seconds : float | None
+        Timeout in seconds, or None for no timeout.
+
+    Returns
+    -------
+    T
+        Result of the coroutine.
+    """
     if timeout_seconds is None:
         return await coro
     return await asyncio.wait_for(coro, timeout_seconds)
 
 
-def typed_dependency(
-    dependency: Callable[..., Awaitable[T]],
+def typed_dependency[**P, T](
+    dependency: Callable[P, t.Awaitable[T]],
     *,
     name: str,
     timeout: float | None = DEFAULT_TIMEOUT_SECONDS,
@@ -63,10 +71,37 @@ def typed_dependency(
 
     The wrapped dependency records structured logs, includes any correlation ID
     stored in :mod:`kgfoundry_common.logging`, and enforces ``timeout``.
+
+    Parameters
+    ----------
+    dependency : Callable[P, Awaitable[T]]
+        Dependency function to wrap.
+    name : str
+        Operation name for logging.
+    timeout : float | None, optional
+        Timeout in seconds. Defaults to DEFAULT_TIMEOUT_SECONDS.
+
+    Returns
+    -------
+    object
+        Dependency marker for use in Annotated parameters.
     """
 
-    async def _instrumented(*args: object, **kwargs: object) -> T:
-        """Invoke ``dependency`` with logging, metrics, and timeout enforcement."""
+    async def _instrumented(*args: P.args, **kwargs: P.kwargs) -> T:
+        """Invoke ``dependency`` with logging, metrics, and timeout enforcement.
+
+        Parameters
+        ----------
+        *args : P.args
+            Positional arguments for the dependency.
+        **kwargs : P.kwargs
+            Keyword arguments for the dependency.
+
+        Returns
+        -------
+        T
+            Result from the dependency function.
+        """
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -94,10 +129,10 @@ def typed_dependency(
     return cast("object", marker)
 
 
-def typed_exception_handler(
+def typed_exception_handler[E: Exception](
     app: FastAPI,
     exception_type: type[E],
-    handler: Callable[[Request, E], Awaitable[Response]],
+    handler: Callable[[Request, E], t.Awaitable[Response]],
     *,
     name: str,
     timeout: float | None = DEFAULT_TIMEOUT_SECONDS,
@@ -105,7 +140,20 @@ def typed_exception_handler(
     """Register ``handler`` for ``exception_type`` with logging and timeouts."""
 
     async def _wrapped(request: Request, exc: E) -> Response:
-        """Execute ``handler`` while recording structured timing metadata."""
+        """Execute ``handler`` while recording structured timing metadata.
+
+        Parameters
+        ----------
+        request : Request
+            HTTP request object.
+        exc : E
+            Exception instance.
+
+        Returns
+        -------
+        Response
+            Response from the exception handler.
+        """
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -136,7 +184,7 @@ def typed_exception_handler(
             )
             return result
 
-    handler_callable = cast("Callable[[Request, Exception], Awaitable[Response]]", _wrapped)
+    handler_callable = cast("Callable[[Request, Exception], t.Awaitable[Response]]", _wrapped)
     app.add_exception_handler(exception_type, handler_callable)
 
 
@@ -161,9 +209,22 @@ def typed_middleware(
         async def dispatch(
             self,
             request: StarletteRequest,
-            call_next: Callable[[StarletteRequest], Awaitable[Response]],
+            call_next: Callable[[StarletteRequest], t.Awaitable[Response]],
         ) -> Response:
-            """Process ``request`` while capturing timing and error metrics."""
+            """Process ``request`` while capturing timing and error metrics.
+
+            Parameters
+            ----------
+            request : StarletteRequest
+                HTTP request to process.
+            call_next : Callable[[StarletteRequest], Awaitable[Response]]
+                Next middleware/handler in the chain.
+
+            Returns
+            -------
+            Response
+                HTTP response.
+            """
             correlation_id = get_correlation_id()
             with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
                 start = time.perf_counter()

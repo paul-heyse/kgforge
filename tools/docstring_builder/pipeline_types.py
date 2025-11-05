@@ -60,5 +60,11 @@ class ErrorEnvelope:
     message: str
 
     def to_report(self) -> ErrorReport:
-        """Convert the envelope to the ErrorReport mapping."""
+        """Convert the envelope to the ErrorReport mapping.
+
+        Returns
+        -------
+        ErrorReport
+            Error report dictionary with file, status, and message fields.
+        """
         return {"file": self.file, "status": self.status, "message": self.message}

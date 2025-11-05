@@ -58,7 +58,18 @@ def ensure_src_path() -> None:
 
 
 def load_optional_module(module_name: str) -> ModuleType | None:
-    """Return ``module_name`` when importable, otherwise ``None``."""
+    """Return ``module_name`` when importable, otherwise ``None``.
+
+    Parameters
+    ----------
+    module_name : str
+        Module name to import.
+
+    Returns
+    -------
+    ModuleType | None
+        Imported module if available, otherwise None.
+    """
     spec = importlib.util.find_spec(module_name)
     if spec is None:
         return None
@@ -70,6 +81,18 @@ def load_optional_attr(module_name: str, attr_name: str) -> object | None:
 
     ``None`` is returned when either the module or the attribute cannot be
     imported. Consumers remain responsible for type-casting the result.
+
+    Parameters
+    ----------
+    module_name : str
+        Module name to import from.
+    attr_name : str
+        Attribute name to retrieve.
+
+    Returns
+    -------
+    object | None
+        Attribute value if available, otherwise None.
     """
     module = load_optional_module(module_name)
     if module is None:

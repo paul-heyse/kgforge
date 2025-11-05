@@ -69,7 +69,13 @@ class NavSection:
     symbols: list[str]
 
     def to_dict(self) -> NavSectionDict:
-        """Convert to TypedDict representation."""
+        """Convert to TypedDict representation.
+
+        Returns
+        -------
+        NavSectionDict
+            TypedDict representation of this section.
+        """
         return NavSectionDict(id=self.id, symbols=self.symbols)
 
 
@@ -83,7 +89,13 @@ class SymbolMeta:
     deprecated_in: str | None = None
 
     def to_dict(self) -> SymbolMetaDict:
-        """Convert to TypedDict representation."""
+        """Convert to TypedDict representation.
+
+        Returns
+        -------
+        SymbolMetaDict
+            TypedDict representation of this symbol metadata.
+        """
         result: SymbolMetaDict = {}
         if self.owner is not None:
             result["owner"] = self.owner
@@ -106,7 +118,13 @@ class ModuleMeta:
     deprecated_in: str | None = None
 
     def to_dict(self) -> ModuleMetaDict:
-        """Convert to TypedDict representation."""
+        """Convert to TypedDict representation.
+
+        Returns
+        -------
+        ModuleMetaDict
+            TypedDict representation of this module metadata.
+        """
         result: ModuleMetaDict = {}
         if self.owner is not None:
             result["owner"] = self.owner
@@ -137,7 +155,13 @@ class ModuleEntry:
     deps: list[str]
 
     def to_dict(self) -> ModuleEntryDict:
-        """Convert to TypedDict representation."""
+        """Convert to TypedDict representation.
+
+        Returns
+        -------
+        ModuleEntryDict
+            TypedDict representation of this module entry.
+        """
         return ModuleEntryDict(
             path=self.path,
             exports=self.exports,
@@ -164,7 +188,13 @@ class NavIndex:
     modules: dict[str, ModuleEntry]
 
     def to_dict(self) -> NavIndexDict:
-        """Convert to TypedDict representation."""
+        """Convert to TypedDict representation.
+
+        Returns
+        -------
+        NavIndexDict
+            TypedDict representation of this nav index.
+        """
         return NavIndexDict(
             commit=self.commit,
             policy_version=self.policy_version,

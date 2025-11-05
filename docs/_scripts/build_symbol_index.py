@@ -100,7 +100,13 @@ class NavLookup:
 
     @classmethod
     def empty(cls) -> NavLookup:
-        """Return an empty nav lookup with default mappings."""
+        """Return an empty nav lookup with default mappings.
+
+        Returns
+        -------
+        NavLookup
+            Empty nav lookup instance.
+        """
         return cls(symbol_meta={}, module_meta={}, sections={})
 
 
@@ -128,7 +134,13 @@ class SymbolIndexRow:
     source_link: Mapping[str, str]
 
     def to_payload(self) -> dict[str, JsonValue]:
-        """Return a JSON-compatible payload for the row."""
+        """Return a JSON-compatible payload for the row.
+
+        Returns
+        -------
+        dict[str, JsonValue]
+            JSON-compatible dictionary representation.
+        """
         return {
             "path": self.path,
             "canonical_path": self.canonical_path,
@@ -162,19 +174,43 @@ class SymbolIndexArtifacts:
 
     @property
     def symbol_count(self) -> int:
-        """Return the number of symbols captured in the artifact."""
+        """Return the number of symbols captured in the artifact.
+
+        Returns
+        -------
+        int
+            Number of symbol rows.
+        """
         return len(self.rows)
 
     def rows_payload(self) -> list[dict[str, JsonValue]]:
-        """Serialise the symbol rows into JSON-compatible dictionaries."""
+        """Serialise the symbol rows into JSON-compatible dictionaries.
+
+        Returns
+        -------
+        list[dict[str, JsonValue]]
+            List of JSON-compatible row dictionaries.
+        """
         return [row.to_payload() for row in self.rows]
 
     def by_file_payload(self) -> dict[str, list[str]]:
-        """Return the file-to-symbol mapping as primitive JSON data."""
+        """Return the file-to-symbol mapping as primitive JSON data.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            File to symbol paths mapping.
+        """
         return {key: list(values) for key, values in sorted(self.by_file.items())}
 
     def by_module_payload(self) -> dict[str, list[str]]:
-        """Return the module-to-symbol mapping as primitive JSON data."""
+        """Return the module-to-symbol mapping as primitive JSON data.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            Module to symbol paths mapping.
+        """
         return {key: list(values) for key, values in sorted(self.by_module.items())}
 
 
@@ -203,7 +239,13 @@ class GriffeNode(Protocol):
 
 
 def safe_getattr(obj: object, name: str, default: object | None = None) -> object | None:
-    """Return ``getattr`` with defensive error handling."""
+    """Return ``getattr`` with defensive error handling.
+
+    Returns
+    -------
+    object | None
+        Attribute value or default if not found or error occurs.
+    """
     try:
         return cast("object", getattr(obj, name, default))
     except (AttributeError, RuntimeError, AliasResolutionErrorType):
@@ -451,7 +493,13 @@ def _navmap_from_payload(data: Mapping[str, JsonValue]) -> NavLookup:
 
 
 def load_nav_lookup() -> NavLookup:
-    """Return navmap metadata if available."""
+    """Return navmap metadata if available.
+
+    Returns
+    -------
+    NavLookup
+        Nav lookup instance with metadata, or empty if unavailable.
+    """
     for candidate in SETTINGS.navmap_candidates:
         if not candidate.exists():
             continue
@@ -488,7 +536,13 @@ def load_nav_lookup() -> NavLookup:
 
 
 def load_test_map() -> dict[str, JsonValue]:
-    """Return the optional test map produced earlier in the docs pipeline."""
+    """Return the optional test map produced earlier in the docs pipeline.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Test map dictionary, or empty dict if unavailable.
+    """
     path = DOCS_BUILD / "test_map.json"
     if not path.exists():
         return {}
@@ -575,6 +629,22 @@ def _collect_rows(
     nav: NavLookup,
     test_map: Mapping[str, JsonValue],
 ) -> list[SymbolIndexRow]:
+    """Collect symbol index rows from a Griffe node tree.
+
+    Parameters
+    ----------
+    node : GriffeNode
+        Root Griffe node to traverse.
+    nav : NavLookup
+        Navigation lookup for metadata.
+    test_map : Mapping[str, JsonValue]
+        Test mapping for symbol metadata.
+
+    Returns
+    -------
+    list[SymbolIndexRow]
+        List of collected symbol index rows.
+    """
     rows: list[SymbolIndexRow] = []
     stack: list[GriffeNode] = [node]
     while stack:
@@ -589,6 +659,20 @@ def _collect_rows(
 def _build_reverse_map(
     rows: Sequence[SymbolIndexRow], attribute: str
 ) -> dict[str, tuple[str, ...]]:
+    """Build reverse mapping from attribute value to symbol paths.
+
+    Parameters
+    ----------
+    rows : Sequence[SymbolIndexRow]
+        Symbol index rows to process.
+    attribute : str
+        Attribute name to use for mapping.
+
+    Returns
+    -------
+    dict[str, tuple[str, ...]]
+        Mapping from attribute value to sorted tuple of symbol paths.
+    """
     mapping: dict[str, set[str]] = {}
     for row in rows:
         value = cast("object", getattr(row, attribute))
@@ -603,7 +687,20 @@ def generate_index(
     packages: Sequence[str],
     loader: shared.GriffeLoader,
 ) -> SymbolIndexArtifacts:
-    """Produce typed symbol index artifacts for ``packages``."""
+    """Produce typed symbol index artifacts for ``packages``.
+
+    Parameters
+    ----------
+    packages : Sequence[str]
+        Package names to index.
+    loader : shared.GriffeLoader
+        Griffe loader instance.
+
+    Returns
+    -------
+    SymbolIndexArtifacts
+        Complete symbol index artifacts bundle.
+    """
     nav_lookup = load_nav_lookup()
     test_map = load_test_map()
     rows: list[SymbolIndexRow] = []
@@ -612,7 +709,18 @@ def generate_index(
         rows.extend(_collect_rows(root, nav=nav_lookup, test_map=test_map))
 
     def get_row_path(row: SymbolIndexRow) -> str:
-        """Extract path for sorting."""
+        """Extract path for sorting.
+
+        Parameters
+        ----------
+        row : SymbolIndexRow
+            Symbol index row.
+
+        Returns
+        -------
+        str
+            Symbol path.
+        """
         return row.path
 
     rows_sorted = tuple(sorted(rows, key=get_row_path))
@@ -623,12 +731,31 @@ def generate_index(
 
 @lru_cache(maxsize=1)
 def _git_sha() -> str:
-    """Return the Git SHA for permalink construction."""
+    """Return the Git SHA for permalink construction.
+
+    Returns
+    -------
+    str
+        Git commit SHA.
+    """
     return shared.resolve_git_sha(ENV, SETTINGS, logger=BASE_LOGGER)
 
 
 def build_github_permalink(file: Path, span: LineSpan) -> str | None:
-    """Return a commit-stable GitHub permalink for ``file`` when configured."""
+    """Return a commit-stable GitHub permalink for ``file`` when configured.
+
+    Parameters
+    ----------
+    file : Path
+        Source file path.
+    span : LineSpan
+        Line span for fragment.
+
+    Returns
+    -------
+    str | None
+        GitHub permalink URL, or None if not configured.
+    """
     if not (SETTINGS.github_org and SETTINGS.github_repo):
         return None
     sha = _git_sha()
@@ -652,7 +779,26 @@ def write_artifact(
     artifact: str,
     validation: SchemaValidation | None = None,
 ) -> bool:
-    """Validate (when configured) and write ``payload`` to ``path`` if it changed."""
+    """Validate (when configured) and write ``payload`` to ``path`` if it changed.
+
+    Parameters
+    ----------
+    path : Path
+        Output file path.
+    payload : object
+        Payload to serialize.
+    logger : StructuredLoggerAdapter
+        Logger instance.
+    artifact : str
+        Artifact name for logging.
+    validation : SchemaValidation | None, optional
+        Optional schema validation configuration.
+
+    Returns
+    -------
+    bool
+        True if file was written, False if unchanged.
+    """
     if validation is not None:
         validate_against_schema(
             cast("JsonPayload", payload),
@@ -678,12 +824,33 @@ def write_artifact(
 
 
 def iter_packages() -> list[str]:
-    """Return packages configured for documentation builds (compatibility helper)."""
+    """Return packages configured for documentation builds (compatibility helper).
+
+    Returns
+    -------
+    list[str]
+        List of package names.
+    """
     return list(SETTINGS.packages)
 
 
 def safe_attr(node: object, attr: str, default: object | None = None) -> object | None:
-    """Compatibility wrapper delegating to :func:`safe_getattr`."""
+    """Compatibility wrapper delegating to :func:`safe_getattr`.
+
+    Parameters
+    ----------
+    node : object
+        Object to get attribute from.
+    attr : str
+        Attribute name.
+    default : object | None, optional
+        Default value if attribute not found.
+
+    Returns
+    -------
+    object | None
+        Attribute value or default.
+    """
     return safe_getattr(node, attr, default)
 
 
@@ -718,11 +885,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     -------
     int
         Exit code: 0 on success, 1 on error.
-
-    Raises
-    ------
-    SystemExit
-        When called as __main__, propagates the exit code.
 
     Examples
     --------

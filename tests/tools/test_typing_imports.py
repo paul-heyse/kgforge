@@ -127,7 +127,20 @@ class TestToolsTypingImports:
 
     @staticmethod
     def _is_in_type_checking_block(tree: ast.AST, target_node: ast.AST) -> bool:
-        """Check if a node is inside an `if TYPE_CHECKING:` block."""
+        """Check if a node is inside an `if TYPE_CHECKING:` block.
+
+        Parameters
+        ----------
+        tree : ast.AST
+            AST root node.
+        target_node : ast.AST
+            Node to check location for.
+
+        Returns
+        -------
+        bool
+            True if target_node is inside a TYPE_CHECKING block.
+        """
         for node in ast.walk(tree):
             if isinstance(node, ast.If):
                 # Check if condition is NAME "TYPE_CHECKING"

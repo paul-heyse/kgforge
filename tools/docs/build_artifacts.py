@@ -109,7 +109,22 @@ STEP_ERROR_CODES: dict[str, str] = {
 
 
 def _run_step(name: str, command: list[str], message: str) -> int:
-    """Execute a single artefact regeneration step."""
+    """Execute a single artefact regeneration step.
+
+    Parameters
+    ----------
+    name : str
+        Step name identifier.
+    command : list[str]
+        Command to execute.
+    message : str
+        Success message to log.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success, non-zero for failure).
+    """
     log_adapter = with_fields(LOGGER, operation=name, command=command)
     try:
         timeout = STEP_TIMEOUTS.get(name, 60.0)
@@ -157,7 +172,13 @@ def _run_step(name: str, command: list[str], message: str) -> int:
 
 
 def main() -> int:
-    """Run all artefact regeneration steps and stop on the first failure."""
+    """Run all artefact regeneration steps and stop on the first failure.
+
+    Returns
+    -------
+    int
+        Exit code (0 if all steps succeed, non-zero on first failure).
+    """
     for name, command, message in STEPS:
         status = _run_step(name, command, message)
         if status != 0:

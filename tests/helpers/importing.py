@@ -25,12 +25,30 @@ def load_module(module_name: str) -> ModuleType:
     ----------
     module_name : str
         Dotted name of the module to import.
+
+    Returns
+    -------
+    ModuleType
+        Imported module object.
     """
     return import_module(module_name)
 
 
 def load_attribute(module_name: str, attribute: str) -> object:
-    """Load ``attribute`` from ``module_name`` and return the value."""
+    """Load ``attribute`` from ``module_name`` and return the value.
+
+    Parameters
+    ----------
+    module_name : str
+        Dotted name of the module.
+    attribute : str
+        Attribute name to load.
+
+    Returns
+    -------
+    object
+        Attribute value.
+    """
     module = load_module(module_name)
     attr: object = getattr(module, attribute)
     return attr
@@ -57,13 +75,6 @@ def load_typed_attribute[T](module_name: str, attribute: str, expected_type: typ
     ------
     TypeError
         If attribute does not match expected_type.
-    """
-    value = load_attribute(module_name, attribute)
-
-    Raises
-    ------
-    TypeError
-        Raised when the attribute does not match ``expected_type``.
     """
     value = load_attribute(module_name, attribute)
     if isinstance(value, expected_type):

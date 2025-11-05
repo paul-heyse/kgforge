@@ -46,11 +46,28 @@ class _CounterStub:
 
 
 def _empty_docfacts() -> list[DocFact]:
-    return []
+    """Return an empty list of docfacts.
+
+    Returns
+    -------
+    list[DocFact]
+        Empty list.
+    """
 
 
 def _captured_messages(caplog: LogCaptureFixture) -> list[str]:
-    """Return captured log messages from the caplog fixture."""
+    """Return captured log messages from the caplog fixture.
+
+    Parameters
+    ----------
+    caplog : LogCaptureFixture
+        Pytest log capture fixture.
+
+    Returns
+    -------
+    list[str]
+        List of captured log messages.
+    """
     return [record.getMessage() for record in caplog.records]
 
 

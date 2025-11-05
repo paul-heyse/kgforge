@@ -14,7 +14,18 @@ from kgfoundry_common.config import AppSettings
 
 
 def make_settings(**overrides: object) -> AppSettings:
-    """Construct AppSettings using typed overrides."""
+    """Construct AppSettings using typed overrides.
+
+    Parameters
+    ----------
+    **overrides : object
+        Field overrides for AppSettings.
+
+    Returns
+    -------
+    AppSettings
+        Configured AppSettings instance.
+    """
     overrides_dict: dict[str, object] = dict(overrides)
     app_settings_cls: type[AppSettings] = AppSettings
     return app_settings_cls.from_dict(overrides_dict)

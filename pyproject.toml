@@ -633,7 +633,7 @@ select = [
     "NPY",
     "PD",
     "PLE",
-    #"DOC",
+    "DOC",
 ]
 ignore = ["Q", "E203", "D203", "D213", "D205"]
 preview = true

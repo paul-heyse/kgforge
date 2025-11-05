@@ -98,9 +98,9 @@ class SearchOptionsFactory(Protocol):
 def search_options_factory() -> SearchOptionsFactory:
     """Create a factory for SearchOptions test cases.
 
-    Yields
-    ------
-    callable
+    Returns
+    -------
+    SearchOptionsFactory
         Function to create SearchOptions with specified parameters.
     """
 

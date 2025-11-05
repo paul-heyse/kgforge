@@ -419,10 +419,10 @@ class AgentCatalogModel(BaseModel):
 
         <!-- auto:docstring-builder v1 -->
 
-        Returns
-        -------
+        Yields
+        ------
         SymbolModel
-            Describe return value.
+            Symbol entry from the catalog.
         """
         for package in self.packages:
             for module in package.modules:
@@ -487,6 +487,11 @@ def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, J
     -------
     dict[str, object]
         Describe return value.
+
+    Raises
+    ------
+    CatalogLoadError
+        If the catalog file is not found, contains invalid JSON, or has an invalid format.
     """
     try:
         payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
@@ -528,6 +533,11 @@ def _expand_shards_if_present(
     -------
     dict[str, JsonValue]
         Payload with packages field populated from shards if applicable.
+
+    Raises
+    ------
+    CatalogLoadError
+        If shard index file is not found or contains invalid JSON.
     """
     shards = payload.get("shards")
     if not isinstance(shards, dict):
@@ -651,6 +661,7 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
     AgentCatalogModel
         Describe return value.
     """
+
     # Pydantic BaseModel classes contain Any in their type signatures.
     # We use cast() to explicitly acknowledge this typing limitation while
     # maintaining runtime safety through schema validation.

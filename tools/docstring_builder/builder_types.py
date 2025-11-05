@@ -74,12 +74,34 @@ _EXIT_TO_RUN_STATUS: dict[ExitStatus, RunStatus] = {
 
 
 def status_from_exit(status: ExitStatus) -> RunStatus:
-    """Translate an :class:`ExitStatus` into the CLI ``RunStatus`` enum."""
+    """Translate an :class:`ExitStatus` into the CLI ``RunStatus`` enum.
+
+    Parameters
+    ----------
+    status : ExitStatus
+        Exit status to translate.
+
+    Returns
+    -------
+    RunStatus
+        Corresponding run status, or ``RunStatus.ERROR`` if status is unknown.
+    """
     return _EXIT_TO_RUN_STATUS.get(status, RunStatus.ERROR)
 
 
 def status_from_label(label: str) -> RunStatus:
-    """Translate a status label string into ``RunStatus``."""
+    """Translate a status label string into ``RunStatus``.
+
+    Parameters
+    ----------
+    label : str
+        Status label string (case-insensitive).
+
+    Returns
+    -------
+    RunStatus
+        Corresponding run status, or ``RunStatus.ERROR`` if label is unrecognized.
+    """
     lowered = label.lower()
     match lowered:
         case "success":
@@ -95,7 +117,23 @@ def status_from_label(label: str) -> RunStatus:
 
 
 def http_status_for_exit(status: ExitStatus) -> int:
-    """Map an :class:`ExitStatus` to an HTTP Problem Details status."""
+    """Map an :class:`ExitStatus` to an HTTP Problem Details status.
+
+    Parameters
+    ----------
+    status : ExitStatus
+        Exit status to map.
+
+    Returns
+    -------
+    int
+        HTTP status code (200 for SUCCESS, 422 for VIOLATION, 400 for CONFIG, 500 for ERROR).
+
+    Raises
+    ------
+    AssertionError
+        If the status is not one of the known ExitStatus values.
+    """
     match status:
         case ExitStatus.SUCCESS:
             return 200
@@ -157,7 +195,26 @@ def build_problem_details(
     instance: str | None = None,
     errors: Sequence[ErrorReport] | None = None,
 ) -> ModelProblemDetails:
-    """Create an RFC 9457 Problem Details payload for CLI failures."""
+    """Create an RFC 9457 Problem Details payload for CLI failures.
+
+    Parameters
+    ----------
+    status : ExitStatus
+        Exit status code.
+    request : DocstringBuildRequest
+        Build request context.
+    detail : str
+        Error detail message.
+    instance : str, optional
+        Problem instance URI.
+    errors : Sequence[ErrorReport], optional
+        Error reports to include in extensions.
+
+    Returns
+    -------
+    ModelProblemDetails
+        RFC 9457 Problem Details payload with extensions for command, subcommand, and error count.
+    """
     command = request.command or "unknown"
     subcommand = request.invoked_subcommand or request.subcommand or command
     params = ProblemDetailsParams(

@@ -26,8 +26,13 @@ def load_module_globals(module_name: str) -> Mapping[str, object]:
 
     Parameters
     ----------
-    module_name:
+    module_name : str
         Name of the module to import.
+
+    Returns
+    -------
+    Mapping[str, object]
+        Module globals dictionary.
 
     Raises
     ------
@@ -52,8 +57,13 @@ def resolve_callable(symbol: SymbolHarvest) -> Callable[..., object]:
 
     Parameters
     ----------
-    symbol:
+    symbol : SymbolHarvest
         Harvested metadata describing the symbol to resolve.
+
+    Returns
+    -------
+    Callable[..., object]
+        Resolved callable object.
 
     Raises
     ------
@@ -99,11 +109,16 @@ def signature_and_hints(
 
     Parameters
     ----------
-    obj:
+    obj : Callable[..., object]
         Callable to introspect.
-    module_globals:
+    module_globals : Mapping[str, object] or ModuleType or None
         Mapping of module globals to resolve forward references while
         evaluating annotations.
+
+    Returns
+    -------
+    tuple[inspect.Signature, dict[str, object]]
+        Signature object and dictionary of parameter names to type hints.
 
     Raises
     ------

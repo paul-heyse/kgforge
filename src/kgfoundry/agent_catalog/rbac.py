@@ -99,6 +99,11 @@ class AccessController:
         ----------
         method : str
             Describe ``method``.
+
+        Raises
+        ------
+        PermissionError
+            If the method is not permitted for the current role.
         """
         if not self.enabled:
             return

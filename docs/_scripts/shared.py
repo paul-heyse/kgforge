@@ -97,7 +97,13 @@ def _loader_factory() -> Callable[..., GriffeLoader]:
 
 @lru_cache(maxsize=1)
 def detect_environment() -> BuildEnvironment:
-    """Return filesystem locations relevant to docs tooling."""
+    """Return filesystem locations relevant to docs tooling.
+
+    Returns
+    -------
+    BuildEnvironment
+        Build environment with root, src, and tools_dir paths.
+    """
     root = Path(__file__).resolve().parents[2]
     src = root / "src"
     tools_dir = root / "tools"
@@ -114,7 +120,13 @@ def ensure_sys_paths(env: BuildEnvironment) -> None:
 
 @lru_cache(maxsize=1)
 def load_settings() -> DocsSettings:
-    """Return docs settings derived from environment variables."""
+    """Return docs settings derived from environment variables.
+
+    Returns
+    -------
+    DocsSettings
+        Documentation build settings.
+    """
     env = detect_environment()
 
     env_pkgs = os.environ.get("DOCS_PKG")
@@ -149,7 +161,18 @@ def load_settings() -> DocsSettings:
 
 
 def make_loader(env: BuildEnvironment) -> GriffeLoader:
-    """Instantiate a Griffe loader configured for the repository layout."""
+    """Instantiate a Griffe loader configured for the repository layout.
+
+    Parameters
+    ----------
+    env : BuildEnvironment
+        Build environment configuration.
+
+    Returns
+    -------
+    GriffeLoader
+        Configured Griffe loader instance.
+    """
     search_root = env.src if env.src.exists() else env.root
     loader_cls = _loader_factory()
     return loader_cls(search_paths=[str(search_root)])
@@ -161,7 +184,22 @@ def resolve_git_sha(
     *,
     logger: WarningLogger,
 ) -> str:
-    """Return the Git SHA used when rendering GitHub permalinks."""
+    """Return the Git SHA used when rendering GitHub permalinks.
+
+    Parameters
+    ----------
+    env : BuildEnvironment
+        Build environment configuration.
+    settings : DocsSettings
+        Documentation settings.
+    logger : WarningLogger
+        Logger for warnings.
+
+    Returns
+    -------
+    str
+        Git commit SHA or "HEAD" if unavailable.
+    """
     if settings.github_sha:
         return settings.github_sha
 
@@ -198,7 +236,22 @@ def make_logger(
     artifact: str | None = None,
     logger: logging.Logger | StructuredLoggerAdapter | None = None,
 ) -> StructuredLoggerAdapter:
-    """Return a structured logger adapter enriched with docs metadata."""
+    """Return a structured logger adapter enriched with docs metadata.
+
+    Parameters
+    ----------
+    operation : str
+        Operation name for logging.
+    artifact : str | None, optional
+        Artifact name for logging context.
+    logger : logging.Logger | StructuredLoggerAdapter | None, optional
+        Base logger instance, defaults to operation-specific logger.
+
+    Returns
+    -------
+    StructuredLoggerAdapter
+        Structured logger adapter with enriched metadata.
+    """
     base_logger: logging.Logger | StructuredLoggerAdapter = (
         logger if logger is not None else get_logger(f"docs.{operation}")
     )

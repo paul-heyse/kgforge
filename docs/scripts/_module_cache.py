@@ -38,7 +38,13 @@ class ModuleExportsCache:
         self._exports: tuple[str, ...] | None = None
 
     def load_module(self) -> ModuleType:
-        """Import and cache the target module."""
+        """Import and cache the target module.
+
+        Returns
+        -------
+        ModuleType
+            Imported module.
+        """
         module = self._module
         if module is None:
             module = import_module(self._module_path)
@@ -46,7 +52,13 @@ class ModuleExportsCache:
         return module
 
     def export_names(self) -> tuple[str, ...]:
-        """Return exported attribute names from the cached module."""
+        """Return exported attribute names from the cached module.
+
+        Returns
+        -------
+        tuple[str, ...]
+            Tuple of exported attribute names.
+        """
         exports = self._exports
         if exports is not None:
             return exports

@@ -77,7 +77,20 @@ def _join_sections(sections: list[_Section]) -> str:
 
 
 def _relayout_marker_block(docstring: str, marker: str) -> str:
-    """Ensure the ownership marker sits on its own paragraph."""
+    """Ensure the ownership marker sits on its own paragraph.
+
+    Parameters
+    ----------
+    docstring : str
+        Original docstring text.
+    marker : str
+        Ownership marker string to relocate.
+
+    Returns
+    -------
+    str
+        Docstring with marker relocated to its own paragraph.
+    """
     if not marker:
         return docstring
 
@@ -287,7 +300,20 @@ def _update_return_section(
 
 
 def normalize_docstring(symbol: SymbolHarvest, marker: str) -> str | None:
-    """Return a docstring updated to mirror runtime annotations."""
+    """Return a docstring updated to mirror runtime annotations.
+
+    Parameters
+    ----------
+    symbol : SymbolHarvest
+        Symbol metadata including docstring and signature information.
+    marker : str
+        Ownership marker string.
+
+    Returns
+    -------
+    str or None
+        Normalized docstring if symbol has a docstring and can be resolved, None otherwise.
+    """
     if not symbol.docstring:
         return None
     original = textwrap.dedent(symbol.docstring).strip()

@@ -19,10 +19,27 @@ __path__ = [str(item) for item in _module_path] if isinstance(_module_path, Sequ
 
 
 def __getattr__(name: str) -> object:
-    """Return ``name`` from the proxied ``search_client.client`` module."""
+    """Return ``name`` from the proxied ``search_client.client`` module.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to look up.
+
+    Returns
+    -------
+    object
+        Attribute value from the proxied module.
+    """
     return namespace_getattr(_module, name)
 
 
 def __dir__() -> list[str]:
-    """Return the combined attribute listing exposed by the namespace bridge."""
+    """Return the combined attribute listing exposed by the namespace bridge.
+
+    Returns
+    -------
+    list[str]
+        Combined list of attributes from the module and exports.
+    """
     return namespace_dir(_module, __all__)

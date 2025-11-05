@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -50,6 +51,24 @@ except ModuleNotFoundError as exc:  # pragma: no cover - clearer guidance for pa
     raise ModuleNotFoundError(message) from exc
 
 LOGGER = get_logger(__name__)
+
+try:  # Griffe 0.43+
+    _griffe_exceptions = importlib.import_module("griffe.exceptions")
+except ImportError:  # pragma: no cover - older Griffe versions
+    try:
+        _griffe_exceptions = importlib.import_module("griffe._internal.exceptions")
+    except ImportError as exc:  # pragma: no cover - missing optional dependency
+        message = "tools.gen_readmes requires griffe; install kgfoundry[tools] to enable README generation"
+        raise ImportError(message) from exc
+    try:
+        _AliasResolutionError = _griffe_exceptions.AliasResolutionError  # type: ignore[attr-defined]
+    except AttributeError as attr_exc:  # pragma: no cover - defensive guard
+        message = (
+            "griffe._internal.exceptions missing AliasResolutionError; incompatible griffe version"
+        )
+        raise ImportError(message) from attr_exc
+else:
+    _AliasResolutionError = _griffe_exceptions.AliasResolutionError  # type: ignore[attr-defined]
 
 type JsonPrimitive = str | int | float | bool | None
 type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]
@@ -525,8 +544,9 @@ def _parse_symbol_overrides(payload: Mapping[str, JsonValue]) -> dict[str, Symbo
     overrides: dict[str, SymbolMetadata] = {}
     meta_value = payload.get("meta")
     if isinstance(meta_value, Mapping):
-        for key, raw_meta in meta_value.items():
-            if isinstance(key, str) and isinstance(raw_meta, Mapping):
+        typed_meta = cast("Mapping[str, JsonValue]", meta_value)
+        for key, raw_meta in typed_meta.items():
+            if isinstance(raw_meta, Mapping):
                 overrides[key] = _symbol_metadata_from_mapping(raw_meta)
     return overrides
 
@@ -585,16 +605,18 @@ def _build_nav_data(document: JsonObject) -> NavData:
     modules_value = document.get("modules")
     modules: dict[str, NavModuleData] = {}
     if isinstance(modules_value, Mapping):
-        for identifier, payload in modules_value.items():
-            if isinstance(identifier, str) and isinstance(payload, Mapping):
-                modules[identifier] = _parse_nav_module(identifier, payload)
+        typed_modules = cast("Mapping[str, JsonValue]", modules_value)
+        for identifier, payload in typed_modules.items():
+            if isinstance(payload, Mapping):
+                module_payload = cast("Mapping[str, JsonValue]", payload)
+                modules[identifier] = _parse_nav_module(identifier, module_payload)
     return NavData(modules=modules)
 
 
 def _build_test_catalog(document: JsonObject) -> TestCatalog:
     records: dict[str, tuple[TestRecord, ...]] = {}
     for key, value in document.items():
-        if not isinstance(key, str) or not isinstance(value, list):
+        if not isinstance(value, list):
             continue
         entries: list[TestRecord] = []
         for item in value:
@@ -766,8 +788,9 @@ def _is_exception(node: GriffeObjectLike) -> bool:
     if node.name.endswith(("Error", "Exception")):
         return True
     for base in node.bases or []:
-        base_name = base.full or base.name
-        if base_name and base_name.endswith(("Error", "Exception")):
+        base_full = getattr(base, "full", None)
+        base_name = base_full or getattr(base, "name", None)
+        if isinstance(base_name, str) and base_name.endswith(("Error", "Exception")):
             return True
     return False
 
@@ -961,7 +984,16 @@ def _process_module(module: GriffeObjectLike, cfg: ReadmeConfig, missing_meta: s
         return changed
 
     for member in members.values():
-        if not member.is_package:
+        try:
+            if not member.is_package:
+                continue
+        except _AliasResolutionError as exc:  # pragma: no cover - guarded at runtime
+            with_fields(
+                LOGGER,
+                package_path=module.path,
+                member_path=member.path,
+                reason=str(exc),
+            ).warning("Skipping member with unresolved alias during README generation")
             continue
         if cfg.fail_on_metadata_miss:
             _collect_missing_metadata(member, missing_meta)

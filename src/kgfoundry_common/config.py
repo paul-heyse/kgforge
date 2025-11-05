@@ -184,6 +184,28 @@ class AppSettings(BaseSettings):
         the parent class signature from pydantic, which has 7 parameters total.
         The actual validation logic is delegated to ``_validate_with_options``
         which has only 2 parameters, reducing complexity.
+
+        Parameters
+        ----------
+        obj : object
+            Object to validate.
+        strict : bool | None
+            Whether to use strict mode validation.
+        extra : str | None
+            Extra field handling mode.
+        from_attributes : bool | None
+            Whether to validate from attributes.
+        context : Mapping[str, object] | None
+            Validation context.
+        by_alias : bool | None
+            Whether to use aliases.
+        by_name : bool | None
+            Whether to use names.
+
+        Returns
+        -------
+        Self
+            Validated instance.
         """
         return cls._validate_with_options(
             obj,
@@ -459,7 +481,18 @@ def load_config(*, reload: bool = False) -> AppSettings:
 
 
 def _format_validation_error(exc: ValidationError) -> str:
-    """Return the most helpful message from a pydantic ``ValidationError``."""
+    """Return the most helpful message from a pydantic ``ValidationError``.
+
+    Parameters
+    ----------
+    exc : ValidationError
+        Validation error to format.
+
+    Returns
+    -------
+    str
+        Most helpful error message from the validation error.
+    """
     errors_raw = cast("Sequence[Mapping[str, object]]", exc.errors())
     if errors_raw:
         primary = errors_raw[0]

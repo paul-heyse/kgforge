@@ -14,7 +14,20 @@ def format_annotation(
     annotation: object,
     module_globals: Mapping[str, object] | None = None,
 ) -> str | None:
-    """Return a human-readable representation of ``annotation``."""
+    """Return a human-readable representation of ``annotation``.
+
+    Parameters
+    ----------
+    annotation : object
+        Type annotation to format.
+    module_globals : Mapping[str, object], optional
+        Module globals dictionary for resolving forward references.
+
+    Returns
+    -------
+    str or None
+        Formatted annotation string, or None if formatting fails.
+    """
     simple = _format_simple_type(annotation)
     if simple is not None:
         return simple
@@ -45,6 +58,18 @@ def format_annotation(
 
 
 def _format_simple_type(annotation: object) -> str | None:
+    """Format simple built-in types.
+
+    Parameters
+    ----------
+    annotation : object
+        Type annotation to format.
+
+    Returns
+    -------
+    str or None
+        Formatted string for simple types, None otherwise.
+    """
     if annotation is None:
         return "None"
     if isinstance(annotation, str):
@@ -58,6 +83,20 @@ def _format_union_type(
     annotation: object,
     module_globals: Mapping[str, object] | None,
 ) -> str | None:
+    """Format union types (including collections and generics).
+
+    Parameters
+    ----------
+    annotation : object
+        Type annotation to format.
+    module_globals : Mapping[str, object] or None
+        Module globals for resolving forward references.
+
+    Returns
+    -------
+    str or None
+        Formatted union/collection string, None if not applicable.
+    """
     origin = get_origin(annotation)
     if origin is None or origin is Literal:
         return None
@@ -88,6 +127,20 @@ def _format_annotated_type(
     annotation: object,
     module_globals: Mapping[str, object] | None,
 ) -> str | None:
+    """Format Annotated types by extracting the base type.
+
+    Parameters
+    ----------
+    annotation : object
+        Type annotation to format.
+    module_globals : Mapping[str, object] or None
+        Module globals for resolving forward references.
+
+    Returns
+    -------
+    str or None
+        Formatted base type string, None if not Annotated.
+    """
     if get_origin(annotation) is Annotated:
         base, *_ = get_args(annotation)
         return format_annotation(base, module_globals)
@@ -95,6 +148,18 @@ def _format_annotated_type(
 
 
 def _format_literal_type(annotation: object) -> str | None:
+    """Format Literal types.
+
+    Parameters
+    ----------
+    annotation : object
+        Type annotation to format.
+
+    Returns
+    -------
+    str or None
+        Formatted Literal string, None if not Literal.
+    """
     if get_origin(annotation) is Literal:
         values = ", ".join(repr(value) for value in get_args(annotation))
         return f"Literal[{values}]"

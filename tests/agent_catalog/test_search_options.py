@@ -28,13 +28,32 @@ if TYPE_CHECKING:
 
 @pytest.fixture
 def mock_embedding_loader() -> Callable[[str], EmbeddingModelProtocol]:
-    """Fixture providing a mock embedding model loader."""
+    """Fixture providing a mock embedding model loader.
+
+    Returns
+    -------
+    Callable[[str], EmbeddingModelProtocol]
+        Mock embedding model loader function.
+    """
 
     class MockEmbeddingModel(EmbeddingModelProtocol):
         """Mock embedding model implementing EmbeddingModelProtocol."""
 
         def encode(self, sentences: Sequence[str], **_kwargs: object) -> VectorArray:
-            """Mock encode method returning dummy embeddings."""
+            """Mock encode method returning dummy embeddings.
+
+            Parameters
+            ----------
+            sentences : Sequence[str]
+                Input sentences to encode.
+            **_kwargs : object
+                Additional keyword arguments (ignored).
+
+            Returns
+            -------
+            VectorArray
+                Mock embedding vectors.
+            """
             if not sentences:
                 return np.zeros((0, 10), dtype=np.float32)
             return np.full((len(sentences), 10), 0.1, dtype=np.float32)

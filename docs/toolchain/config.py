@@ -31,7 +31,13 @@ class DocsSymbolIndexConfig:
     max_depth: int | None = None
 
     def __post_init__(self) -> None:
-        """Validate configuration parameters after initialization."""
+        """Validate configuration parameters after initialization.
+
+        Raises
+        ------
+        ValueError
+            If output_format is not one of the valid formats or max_depth is negative.
+        """
         valid_formats = {"json", "yaml", "xml"}
         if self.output_format not in valid_formats:
             msg = f"output_format must be one of {valid_formats}, got {self.output_format!r}"
@@ -63,7 +69,13 @@ class DocsDeltaConfig:
     severity_threshold: str = "info"
 
     def __post_init__(self) -> None:
-        """Validate configuration parameters after initialization."""
+        """Validate configuration parameters after initialization.
+
+        Raises
+        ------
+        ValueError
+            If severity_threshold is not one of the valid values.
+        """
         valid_thresholds = {"error", "info", "warning"}
         if self.severity_threshold not in valid_thresholds:
             msg = f"severity_threshold must be one of {valid_thresholds}, got {self.severity_threshold!r}"

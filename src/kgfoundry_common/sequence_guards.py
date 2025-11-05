@@ -23,7 +23,14 @@ When sequence is empty, raises a Problem Details error:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+else:
+    import collections.abc as _abc
+
+    Sequence = _abc.Sequence
 
 from kgfoundry_common.errors import VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
@@ -32,9 +39,6 @@ from kgfoundry_common.problem_details import (
     render_problem,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
 logger = get_logger(__name__)
 
 __all__ = [
@@ -42,10 +46,8 @@ __all__ = [
     "first_or_error_multi_device",
 ]
 
-T = TypeVar("T")
 
-
-def first_or_error(
+def first_or_error[T](
     sequence: Sequence[T],
     *,
     context: str,
@@ -125,7 +127,7 @@ def first_or_error(
     return sequence[0]
 
 
-def first_or_error_multi_device(
+def first_or_error_multi_device[T](
     sequence: Sequence[T],
     *,
     context: str = "device_selection",

@@ -122,6 +122,11 @@ class CatalogSession:
         -------
         str
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionError
+            If the process cannot be spawned.
         """
         if self._process is None or self._process.poll() is not None:
             with with_fields(
@@ -153,6 +158,11 @@ class CatalogSession:
             Describe ``process``.
         payload : dict[str, object]
             Describe ``payload``.
+
+        Raises
+        ------
+        CatalogSessionError
+            If process stdin is unavailable.
         """
         stdin = process.stdin
         if stdin is None:
@@ -176,6 +186,11 @@ class CatalogSession:
         -------
         dict[str, object]
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionError
+            If process stdout is unavailable, process terminates unexpectedly, or response is invalid JSON.
         """
         stdout = process.stdout
         if stdout is None:
@@ -220,6 +235,11 @@ class CatalogSession:
         -------
         int | str
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionError
+            If value is not a string or integer.
         """
         if isinstance(value, (str, int)):
             return value
@@ -244,6 +264,11 @@ class CatalogSession:
         -------
         int
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionError
+            If value is not a valid status code (integer in valid range or parseable string).
         """
         if isinstance(value, int):
             if _MIN_STATUS_CODE <= value <= _MAX_STATUS_CODE:
@@ -286,6 +311,11 @@ class CatalogSession:
         -------
         object
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionError
+            If the request fails, response is invalid, or JSON-RPC error is returned.
         """
         with with_fields(
             logger, operation="jsonrpc_request", method=method, status="started"

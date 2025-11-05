@@ -109,12 +109,24 @@ def configure_roots(repo_root: Path, src_root: Path) -> None:
 # Public API: Module-level constants for backward compatibility
 # These delegate to the thread-safe config singleton
 def _get_repo_root() -> Path:
-    """Get repository root from thread-safe config."""
+    """Get repository root from thread-safe config.
+
+    Returns
+    -------
+    Path
+        Repository root directory path.
+    """
     return LegacyConfig().repo_root
 
 
 def _get_src_root() -> Path:
-    """Get source root from thread-safe config."""
+    """Get source root from thread-safe config.
+
+    Returns
+    -------
+    Path
+        Source root directory path.
+    """
     return LegacyConfig().src_root
 
 
@@ -233,7 +245,18 @@ def _is_variadic_parameter(parameter: DocstringIRParameter) -> bool:
 
 
 def annotation_to_text(annotation: ast.AST | None) -> str | None:
-    """Convert an annotation node to source text."""
+    """Convert an annotation node to source text.
+
+    Parameters
+    ----------
+    annotation : ast.AST or None
+        AST annotation node.
+
+    Returns
+    -------
+    str or None
+        Source text representation of the annotation, or None if conversion fails.
+    """
     if annotation is None:
         return None
     try:
@@ -275,7 +298,18 @@ def _make_parameter(
 
 
 def parameters_for(node: ast.AST) -> list[DocstringIRParameter]:
-    """Return parameter metadata for function or method nodes."""
+    """Return parameter metadata for function or method nodes.
+
+    Parameters
+    ----------
+    node : ast.AST
+        AST node (must be FunctionDef or AsyncFunctionDef).
+
+    Returns
+    -------
+    list[DocstringIRParameter]
+        List of parameter metadata, empty if node is not a function/method.
+    """
     if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return []
     params: list[DocstringIRParameter] = []
@@ -327,7 +361,18 @@ def parameters_for(node: ast.AST) -> list[DocstringIRParameter]:
 
 
 def module_name_for(file_path: Path) -> str:
-    """Return the dotted module path for a file."""
+    """Return the dotted module path for a file.
+
+    Parameters
+    ----------
+    file_path : Path
+        Filesystem path to a Python file.
+
+    Returns
+    -------
+    str
+        Dotted module name (e.g., "tools.docstring_builder").
+    """
     resolved = file_path.resolve()
     config = LegacyConfig()
     src_root = config.src_root
@@ -345,13 +390,35 @@ def module_name_for(file_path: Path) -> str:
 
 
 def _normalize_qualified_name(name: str) -> str:
-    """Canonicalise a fully-qualified name using the override catalogue."""
+    """Canonicalise a fully-qualified name using the override catalogue.
+
+    Parameters
+    ----------
+    name : str
+        Qualified name to normalize.
+
+    Returns
+    -------
+    str
+        Normalized name using override mappings.
+    """
     base = name.split("[", 1)[0]
     return QUALIFIED_NAME_OVERRIDES.get(base, base)
 
 
 def normalize_qualified_name(name: str) -> str:
-    """Canonicalise a fully-qualified name using the override catalogue."""
+    """Canonicalise a fully-qualified name using the override catalogue.
+
+    Parameters
+    ----------
+    name : str
+        Qualified name to normalize.
+
+    Returns
+    -------
+    str
+        Normalized name using override mappings.
+    """
     return _normalize_qualified_name(name)
 
 
@@ -380,7 +447,18 @@ def _format_parameter_entry(param: DocstringIRParameter) -> tuple[str, str]:
 
 
 def _required_sections(context: _RequiredSectionsContext) -> list[str]:
-    """Return the ordered docstring section headers required for a symbol."""
+    """Return the ordered docstring section headers required for a symbol.
+
+    Parameters
+    ----------
+    context : _RequiredSectionsContext
+        Context containing symbol metadata.
+
+    Returns
+    -------
+    list[str]
+        Ordered list of section headers (e.g., ["Parameters", "Returns", "Raises"]).
+    """
     required: list[str] = []
     if context.parameters:
         required.append("Parameters")
@@ -402,7 +480,26 @@ def required_sections(
     is_public: bool,
     **_: object,
 ) -> list[str]:
-    """Return the ordered docstring sections for a symbol description."""
+    """Return the ordered docstring sections for a symbol description.
+
+    Parameters
+    ----------
+    kind : str
+        Symbol kind (e.g., "function", "class").
+    parameters : Sequence[DocstringIRParameter]
+        Parameter metadata.
+    returns : str or None
+        Return annotation text.
+    raises : Sequence[str]
+        Exception names raised.
+    is_public : bool
+        Whether the symbol is public (doesn't start with underscore).
+
+    Returns
+    -------
+    list[str]
+        Ordered list of section headers required for the symbol.
+    """
     context = _RequiredSectionsContext(
         kind=kind,
         parameters=list(parameters),
@@ -414,7 +511,18 @@ def required_sections(
 
 
 def build_examples(context: _ExampleContext) -> list[str]:
-    """Generate doctest-style examples for a callable."""
+    """Generate doctest-style examples for a callable.
+
+    Parameters
+    ----------
+    context : _ExampleContext
+        Context containing symbol metadata for example generation.
+
+    Returns
+    -------
+    list[str]
+        List of doctest-style example lines.
+    """
     lines: list[str] = []
     if context.include_import and context.module_name:
         lines.append(f">>> from {context.module_name} import {context.name}")
@@ -447,7 +555,18 @@ def build_examples(context: _ExampleContext) -> list[str]:
 
 
 def _extract_exception_name(exc: ast.AST | None) -> str | None:
-    """Return the exception name for a raise expression."""
+    """Return the exception name for a raise expression.
+
+    Parameters
+    ----------
+    exc : ast.AST or None
+        Exception AST node.
+
+    Returns
+    -------
+    str or None
+        Exception name if extractable, None otherwise.
+    """
     if exc is None:
         return None
     if isinstance(exc, ast.Name):
@@ -460,7 +579,18 @@ def _extract_exception_name(exc: ast.AST | None) -> str | None:
 
 
 def _child_blocks(statement: ast.stmt) -> list[list[ast.stmt]]:
-    """Return child statement blocks that should be inspected for raises."""
+    """Return child statement blocks that should be inspected for raises.
+
+    Parameters
+    ----------
+    statement : ast.stmt
+        Statement node to extract child blocks from.
+
+    Returns
+    -------
+    list[list[ast.stmt]]
+        List of child statement blocks (e.g., body, orelse, handlers).
+    """
     if isinstance(statement, (ast.If, ast.For, ast.AsyncFor, ast.While)):
         return [statement.body, statement.orelse]
     if isinstance(statement, (ast.With, ast.AsyncWith)):
@@ -475,7 +605,18 @@ def _child_blocks(statement: ast.stmt) -> list[list[ast.stmt]]:
 
 
 def detect_raises(node: ast.AST) -> list[str]:
-    """Detect top-level exceptions raised by a callable."""
+    """Detect top-level exceptions raised by a callable.
+
+    Parameters
+    ----------
+    node : ast.AST
+        AST node (must be FunctionDef or AsyncFunctionDef).
+
+    Returns
+    -------
+    list[str]
+        List of exception names raised by the callable.
+    """
     raises: list[str] = []
     if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         return raises
@@ -499,39 +640,128 @@ def detect_raises(node: ast.AST) -> list[str]:
 
 
 def extended_summary(kind: str, name: str, module: str, node: ast.AST | None = None) -> str:
-    """Return the extended summary paragraph for the symbol."""
+    """Return the extended summary paragraph for the symbol.
+
+    Parameters
+    ----------
+    kind : str
+        Symbol kind (e.g., "function", "class").
+    name : str
+        Symbol name.
+    module : str
+        Module name.
+    node : ast.AST, optional
+        AST node for additional context.
+
+    Returns
+    -------
+    str
+        Extended summary paragraph text.
+    """
     return overrides_extended_summary(kind, name, module, node)
 
 
 def summarize(kind: str, name: str) -> str:
-    """Return the short summary sentence for the symbol."""
+    """Return the short summary sentence for the symbol.
+
+    Parameters
+    ----------
+    kind : str
+        Symbol kind (e.g., "function", "class").
+    name : str
+        Symbol name.
+
+    Returns
+    -------
+    str
+        Short summary sentence.
+    """
     return overrides_summarize(name, kind)
 
 
 def _is_magic(name: str) -> bool:
-    """Return ``True`` when the provided callable is a Python magic method."""
+    """Return ``True`` when the provided callable is a Python magic method.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a magic method, False otherwise.
+    """
     return overrides_is_magic(name)
 
 
 def _is_pydantic_artifact(name: str) -> bool:
-    """Return ``True`` when the provided name refers to a Pydantic helper."""
+    """Return ``True`` when the provided name refers to a Pydantic helper.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a Pydantic artifact, False otherwise.
+    """
     return overrides_is_pydantic_artifact(name)
 
 
 def is_magic(name: str) -> bool:
-    """Return ``True`` when the provided callable is a Python magic method."""
+    """Return ``True`` when the provided callable is a Python magic method.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a magic method, False otherwise.
+    """
     return _is_magic(name)
 
 
 def is_pydantic_artifact(name: str) -> bool:
-    """Return ``True`` when the provided name refers to a Pydantic helper."""
+    """Return ``True`` when the provided name refers to a Pydantic helper.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a Pydantic artifact, False otherwise.
+    """
     return _is_pydantic_artifact(name)
 
 
 def build_docstring(
     kind: str, node: ast.FunctionDef | ast.AsyncFunctionDef, module_name: str
 ) -> list[str]:
-    """Build a NumPy style docstring as a list of lines."""
+    """Build a NumPy style docstring as a list of lines.
+
+    Parameters
+    ----------
+    kind : str
+        Symbol kind (e.g., "function", "method").
+    node : ast.FunctionDef or ast.AsyncFunctionDef
+        Function AST node.
+    module_name : str
+        Module name for context.
+
+    Returns
+    -------
+    list[str]
+        List of docstring lines including triple quotes.
+    """
     name = node.name
     is_public = not name.startswith("_")
     params = parameters_for(node)

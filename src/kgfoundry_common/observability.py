@@ -127,7 +127,13 @@ class MetricsProvider:
 
     @classmethod
     def default(cls) -> MetricsProvider:
-        """Return a cached provider instance suitable for process-wide use."""
+        """Return a cached provider instance suitable for process-wide use.
+
+        Returns
+        -------
+        MetricsProvider
+            Cached metrics provider instance.
+        """
         if _OBS_CACHE.provider is None:
             _OBS_CACHE.provider = MetricsProvider()
         return _OBS_CACHE.provider

@@ -56,7 +56,26 @@ def _new_document(
     errors: AnalyticsErrors | None = None,
     generated_at: str | None = None,
 ) -> AgentAnalyticsDocument:
-    """Create an :class:`AgentAnalyticsDocument` with schema-aligned keywords."""
+    """Create an :class:`AgentAnalyticsDocument` with schema-aligned keywords.
+
+    Parameters
+    ----------
+    repo : RepoInfo | None, optional
+        Repository information (default: None).
+    catalog : CatalogMetrics | None, optional
+        Catalog metrics (default: None).
+    portal : PortalAnalytics | None, optional
+        Portal analytics (default: None).
+    errors : AnalyticsErrors | None, optional
+        Error information (default: None).
+    generated_at : str | None, optional
+        ISO timestamp of generation (default: None).
+
+    Returns
+    -------
+    AgentAnalyticsDocument
+        Constructed analytics document.
+    """
     payload: _AnalyticsDocumentInit = {
         "schemaVersion": ANALYTICS_SCHEMA_VERSION,
         "schemaId": ANALYTICS_SCHEMA_ID,
@@ -110,7 +129,13 @@ class CatalogModuleSnapshot:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Return the CLI parser for the analytics builder."""
+    """Return the CLI parser for the analytics builder.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Configured argument parser.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -140,6 +165,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _load_previous(path: Path) -> AgentAnalyticsDocument | None:
+    """Load previous analytics document if it exists.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the previous analytics JSON file.
+
+    Returns
+    -------
+    AgentAnalyticsDocument | None
+        Previous document if found and valid, otherwise None.
+    """
     if not path.exists():
         return None
     raw = path.read_bytes()
@@ -230,7 +267,18 @@ def _catalog_metrics(catalog: JSONMapping) -> CatalogMetrics:
 
 
 def _iter_catalog_modules(catalog: JSONMapping) -> list[CatalogModuleSnapshot]:
-    """Return all module snapshots contained in ``catalog``."""
+    """Return all module snapshots contained in ``catalog``.
+
+    Parameters
+    ----------
+    catalog : JSONMapping
+        Catalog JSON mapping.
+
+    Returns
+    -------
+    list[CatalogModuleSnapshot]
+        List of module snapshots from the catalog.
+    """
     modules: list[CatalogModuleSnapshot] = []
     packages = _get_list(catalog.get("packages"))
     if packages is None:
@@ -345,7 +393,18 @@ def _legacy_generated_at(value: object) -> str:
 
 
 def build_analytics(args: argparse.Namespace) -> AgentAnalyticsDocument:
-    """Return the analytics document for the current catalog snapshot."""
+    """Return the analytics document for the current catalog snapshot.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed command-line arguments.
+
+    Returns
+    -------
+    AgentAnalyticsDocument
+        Analytics document with current metrics.
+    """
     catalog_path = cast("Path", args.catalog)
     output_path = cast("Path", args.output)
     repo_root = cast("Path", args.repo_root)
@@ -365,7 +424,13 @@ def build_analytics(args: argparse.Namespace) -> AgentAnalyticsDocument:
 
 
 def write_analytics(args: argparse.Namespace) -> None:
-    """Persist the analytics document to disk after schema validation."""
+    """Persist the analytics document to disk after schema validation.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed command-line arguments.
+    """
     document = build_analytics(args)
     payload: dict[str, object] = msgspec.to_builtins(document)
     validate_tools_payload(payload, ANALYTICS_SCHEMA)
@@ -376,7 +441,18 @@ def write_analytics(args: argparse.Namespace) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry point for the analytics builder."""
+    """CLI entry point for the analytics builder.
+
+    Parameters
+    ----------
+    argv : list[str] | None, optional
+        Command-line arguments (default: None).
+
+    Returns
+    -------
+    int
+        Exit code (0 for success).
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     write_analytics(args)
@@ -384,7 +460,18 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _legacy_to_document(payload: JSONMapping) -> AgentAnalyticsDocument:
-    """Convert legacy analytics payloads into the typed document model."""
+    """Convert legacy analytics payloads into the typed document model.
+
+    Parameters
+    ----------
+    payload : JSONMapping
+        Legacy analytics JSON mapping.
+
+    Returns
+    -------
+    AgentAnalyticsDocument
+        Converted analytics document.
+    """
     repo_root = _legacy_repo_root(payload)
     metrics = _legacy_catalog_section_metrics(_get_mapping(payload.get("catalog")))
     sessions = _legacy_portal_sessions(_get_mapping(payload.get("portal")))

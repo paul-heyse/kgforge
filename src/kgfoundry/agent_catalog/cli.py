@@ -101,7 +101,22 @@ class EnvelopeContext:
 def _build_success_payload(
     query: str, results: list[SearchResult], duration_seconds: float
 ) -> dict[str, JsonValue]:
-    """Return envelope payload for successful search responses."""
+    """Return envelope payload for successful search responses.
+
+    Parameters
+    ----------
+    query : str
+        Search query string.
+    results : list[SearchResult]
+        Search results.
+    duration_seconds : float
+        Search duration in seconds.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Envelope payload dictionary.
+    """
     results_payload: list[dict[str, JsonValue]] = [
         search_result_to_dict(result) for result in results
     ]
@@ -118,7 +133,20 @@ def _build_success_payload(
 def _build_error_entries(
     exc: Exception, problem: dict[str, JsonValue]
 ) -> list[dict[str, JsonValue]]:
-    """Return typed error entries for envelope responses."""
+    """Return typed error entries for envelope responses.
+
+    Parameters
+    ----------
+    exc : Exception
+        Exception to format.
+    problem : dict[str, JsonValue]
+        Problem Details dictionary.
+
+    Returns
+    -------
+    list[dict[str, JsonValue]]
+        List of error entry dictionaries.
+    """
     return [
         {
             "status": "error",
@@ -204,7 +232,18 @@ def _parse_facets(raw: list[str]) -> dict[str, str]:
 
 
 def _extract_facet_args(namespace: argparse.Namespace) -> list[str]:
-    """Return CLI facet arguments as a list of strings."""
+    """Return CLI facet arguments as a list of strings.
+
+    Parameters
+    ----------
+    namespace : argparse.Namespace
+        Parsed command-line arguments.
+
+    Returns
+    -------
+    list[str]
+        List of facet strings.
+    """
     raw_value = cast("list[str] | None", getattr(namespace, "facet", None))
     if raw_value is None:
         return []
@@ -434,6 +473,11 @@ def _raise_unknown_command_error(command: str) -> None:
     ----------
     command : str
         Describe ``command``.
+
+    Raises
+    ------
+    CatalogctlError
+        Always raised for unknown commands.
     """
     message = f"Unknown command: {command}"
     raise CatalogctlError(message)
@@ -453,6 +497,11 @@ def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
     -------
     AgentCatalogClient
         Describe return value.
+
+    Raises
+    ------
+    CatalogctlError
+        If catalog path or repository root does not exist.
     """
     catalog_path: Path = args.catalog
     if not catalog_path.exists() and not any(
@@ -519,6 +568,11 @@ def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
+
+    Raises
+    ------
+    CatalogctlError
+        If the symbol is not found.
     """
     symbol_id: str = args.symbol_id
     symbol = client.get_symbol(symbol_id)
@@ -622,6 +676,13 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
+
+    Raises
+    ------
+    CatalogctlError
+        If facet parsing fails.
+    AgentCatalogSearchError
+        If search execution fails.
     """
     use_envelope, _ = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())
@@ -729,6 +790,11 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
         Describe ``client``.
     args : argparse.Namespace
         Describe ``args``.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If search execution fails.
     """
     use_envelope, _ = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())

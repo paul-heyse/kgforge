@@ -165,7 +165,18 @@ MISSING_MODULE_PATTERNS = ("docs/_build/**",)
 
 
 def _coerce_provenance_payload(data: object) -> DocfactsProvenancePayload | None:
-    """Return a typed DocFacts provenance payload when ``data`` is valid."""
+    """Return a typed DocFacts provenance payload when ``data`` is valid.
+
+    Parameters
+    ----------
+    data : object
+        Object to coerce to provenance payload.
+
+    Returns
+    -------
+    DocfactsProvenancePayload or None
+        Provenance payload if data is valid, None otherwise.
+    """
     if not isinstance(data, dict):
         return None
     builder_version = data.get("builderVersion")
@@ -204,7 +215,18 @@ def _handle_schema_violation(context: str, exc: SchemaViolationError) -> None:
 
 
 def _git_output(arguments: Sequence[str]) -> str | None:
-    """Return stripped stdout for a git command or ``None`` on failure."""
+    """Return stripped stdout for a git command or ``None`` on failure.
+
+    Parameters
+    ----------
+    arguments : Sequence[str]
+        Git command arguments.
+
+    Returns
+    -------
+    str or None
+        Stripped stdout if command succeeds, None otherwise.
+    """
     command_args: list[str] = list(arguments)
     adapter = with_fields(_LOGGER, command=command_args)
     try:
@@ -220,11 +242,30 @@ def _git_output(arguments: Sequence[str]) -> str | None:
 
 
 def _resolve_commit_hash() -> str:
+    """Resolve the current git commit hash.
+
+    Returns
+    -------
+    str
+        Commit hash string, or "unknown" if git is unavailable.
+    """
     command = ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"]
     return _git_output(command) or "unknown"
 
 
 def _resolve_commit_timestamp(commit_hash: str) -> str:
+    """Resolve the commit timestamp for a given hash.
+
+    Parameters
+    ----------
+    commit_hash : str
+        Git commit hash.
+
+    Returns
+    -------
+    str
+        ISO-8601 timestamp string, or default timestamp if unavailable.
+    """
     if not commit_hash or commit_hash == "unknown":
         return "1970-01-01T00:00:00Z"
     command = ["git", "-C", str(REPO_ROOT), "show", "-s", "--format=%cI", commit_hash]
@@ -232,6 +273,18 @@ def _resolve_commit_timestamp(commit_hash: str) -> str:
 
 
 def _build_docfacts_provenance(config: BuilderConfig) -> DocfactsProvenance:
+    """Build provenance metadata for DocFacts.
+
+    Parameters
+    ----------
+    config : BuilderConfig
+        Builder configuration.
+
+    Returns
+    -------
+    DocfactsProvenance
+        Provenance metadata instance.
+    """
     commit_hash = _resolve_commit_hash()
     generated_at = _resolve_commit_timestamp(commit_hash)
     return DocfactsProvenance(
@@ -284,7 +337,13 @@ def _collect_edits(
 
 
 def _load_docfacts_from_disk() -> dict[str, DocFact]:
-    """Load previously generated DocFacts entries keyed by qualified name."""
+    """Load previously generated DocFacts entries keyed by qualified name.
+
+    Returns
+    -------
+    dict[str, DocFact]
+        Dictionary mapping qualified names to DocFact instances.
+    """
     if not DOCFACTS_PATH.exists():
         return {}
     try:
@@ -314,7 +373,14 @@ def _load_docfacts_from_disk() -> dict[str, DocFact]:
 
 
 def _load_docfact_state() -> tuple[dict[str, DocFact], dict[str, Path]]:
-    """Load docfact entries along with best-effort source mapping."""
+    """Load docfact entries along with best-effort source mapping.
+
+    Returns
+    -------
+    tuple[dict[str, DocFact], dict[str, Path]]
+        Tuple of (entries dictionary, sources dictionary) mapping qualified names
+        to DocFact instances and source file paths.
+    """
     entries = _load_docfacts_from_disk()
     sources: dict[str, Path] = {}
     for qname, fact in entries.items():
@@ -484,7 +550,18 @@ def _build_pipeline_dependencies(
 
 
 def render_cli_result(result: DocstringBuildResult) -> CliResult | None:
-    """Return the CLI payload for JSON output when available."""
+    """Return the CLI payload for JSON output when available.
+
+    Parameters
+    ----------
+    result : DocstringBuildResult
+        Build result containing CLI payload.
+
+    Returns
+    -------
+    CliResult or None
+        CLI result dictionary if available, None otherwise.
+    """
     return result.cli_payload
 
 
@@ -522,7 +599,18 @@ def render_failure_summary(result: DocstringBuildResult) -> None:
 def load_builder_config(
     override: str | None = None,
 ) -> tuple[BuilderConfig, ConfigSelection]:
-    """Load builder configuration honouring CLI/environment precedence."""
+    """Load builder configuration honouring CLI/environment precedence.
+
+    Parameters
+    ----------
+    override : str, optional
+        Explicit config path override.
+
+    Returns
+    -------
+    tuple[BuilderConfig, ConfigSelection]
+        Loaded configuration and selection metadata.
+    """
     config, selection = load_config_with_selection(override)
     return config, selection
 
@@ -733,27 +821,10 @@ def run_build(
     cache : DocstringBuilderCache
         Cache interface for storing/retrieving processed file metadata.
 
-    Returns
-    -------
-    DocstringBuildResult
-        Summary plus metrics from the build run.
-
     Raises
     ------
-    ConfigurationError
-        If config options conflict (e.g., emit_diff=True while enable_plugins=False).
-    ToolExecutionError
-        If tool execution fails during the pipeline.
-
-    Examples
-    --------
-    >>> from tools.docstring_builder.config_models import DocstringBuildConfig
-    >>> from tools.docstring_builder.cache import BuilderCache
-    >>> from pathlib import Path
-    >>> config = DocstringBuildConfig(enable_plugins=True, emit_diff=False)
-    >>> cache = BuilderCache(Path("/tmp/cache.json"))
-    >>> result = run_build(config=config, cache=cache)  # doctest: +SKIP
-    >>> print(result.exit_status)  # doctest: +SKIP
+    NotImplementedError
+        Always raised as this function is a placeholder and not yet implemented.
     """
     # This is a placeholder implementation that delegates to the existing
     # run_docstring_builder function. In a full implementation, this would
@@ -782,27 +853,10 @@ def run_legacy(
     **kwargs
         Keyword arguments (deprecated, accepted for backward compatibility only).
 
-    Returns
-    -------
-    DocstringBuildResult
-        Summary plus metrics from the build run.
-
     Raises
     ------
     NotImplementedError
         Always raised as this function is a placeholder and not yet implemented.
-
-    Warns
-    -----
-    DeprecationWarning
-        Always emitted to guide users to the new API.
-
-    Notes
-    -----
-    This function accepts any arguments for backward compatibility with legacy
-    callers. The arguments are logged for debugging purposes but are not used
-    since the function raises NotImplementedError. Migrate to :func:`run_build`
-    with typed :class:`DocstringBuildConfig` objects.
     """
     msg = (
         "run_legacy() is deprecated and will be removed in a future release. "

@@ -46,7 +46,13 @@ class DocumentableNode(Protocol):
 
 
 def iter_packages() -> Sequence[str]:
-    """Return the packages that should receive API documentation pages."""
+    """Return the packages that should receive API documentation pages.
+
+    Returns
+    -------
+    Sequence[str]
+        Package names sequence.
+    """
     return SETTINGS.packages
 
 
@@ -83,7 +89,22 @@ def generate_api_reference(
     *,
     destination: Path | None = None,
 ) -> list[RenderedPage]:
-    """Generate MkDocs API reference pages for ``packages``."""
+    """Generate MkDocs API reference pages for ``packages``.
+
+    Parameters
+    ----------
+    loader : shared.GriffeLoader
+        Griffe loader instance.
+    packages : Sequence[str]
+        Package names to document.
+    destination : Path | None, optional
+        Output directory path, defaults to "api".
+
+    Returns
+    -------
+    list[RenderedPage]
+        List of rendered API pages.
+    """
     target = destination if destination is not None else Path("api")
     pages: list[RenderedPage] = [_render_index(target)]
 
@@ -103,7 +124,18 @@ def write_api_page(page: RenderedPage) -> None:
 
 
 def main(packages: Sequence[str] | None = None) -> int:
-    """Generate MkDocs API documentation and return an exit status."""
+    """Generate MkDocs API documentation and return an exit status.
+
+    Parameters
+    ----------
+    packages : Sequence[str] | None, optional
+        Package names to document, defaults to configured packages.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success.
+    """
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 

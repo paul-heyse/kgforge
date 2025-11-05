@@ -8,8 +8,9 @@ implementation specifics.
 from __future__ import annotations
 
 import sys
+from contextlib import suppress
 from importlib import import_module
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING as _TYPE_CHECKING
 
 _ALIASES: dict[str, str] = {
     "docling": "kgfoundry.docling",
@@ -45,6 +46,15 @@ __all__: list[str] = [
     "vectorstore_faiss",
 ]
 
+# Remove the helper introduced by ``from __future__ import annotations`` so Griffe
+# does not interpret it as a public alias (it points to ``__future__.annotations``).
+with suppress(NameError):
+    del annotations  # type: ignore[name-defined]
+
+# Provide a benign placeholder so static analysers see a concrete value rather than
+# the ``__future__`` alias (the name is not exported via ``__all__``).
+annotations = None
+
 if __debug__:
     expected: set[str] = set(_ALIASES)
     configured: set[str] = set(__all__)
@@ -54,23 +64,26 @@ if __debug__:
         message = f"kgfoundry exports mismatch. missing={missing!r} extra={extra!r}"
         raise RuntimeError(message)
 
-if TYPE_CHECKING:
+if _TYPE_CHECKING:
+    from importlib import import_module as _import_module
     from types import ModuleType
 
-    kgfoundry_common: ModuleType = import_module("kgfoundry_common")
-    docling: ModuleType = import_module("kgfoundry.docling")
-    download: ModuleType = import_module("kgfoundry.download")
-    embeddings_dense: ModuleType = import_module("kgfoundry.embeddings_dense")
-    embeddings_sparse: ModuleType = import_module("kgfoundry.embeddings_sparse")
-    kg_builder: ModuleType = import_module("kgfoundry.kg_builder")
-    linking: ModuleType = import_module("kgfoundry.linking")
-    observability: ModuleType = import_module("kgfoundry.observability")
-    ontology: ModuleType = import_module("kgfoundry.ontology")
-    orchestration: ModuleType = import_module("kgfoundry.orchestration")
-    registry: ModuleType = import_module("kgfoundry.registry")
-    search_api: ModuleType = import_module("kgfoundry.search_api")
-    search_client: ModuleType = import_module("kgfoundry.search_client")
-    vectorstore_faiss: ModuleType = import_module("kgfoundry.vectorstore_faiss")
+    kgfoundry_common: ModuleType = _import_module("kgfoundry_common")
+    docling: ModuleType = _import_module("kgfoundry.docling")
+    download: ModuleType = _import_module("kgfoundry.download")
+    embeddings_dense: ModuleType = _import_module("kgfoundry.embeddings_dense")
+    embeddings_sparse: ModuleType = _import_module("kgfoundry.embeddings_sparse")
+    kg_builder: ModuleType = _import_module("kgfoundry.kg_builder")
+    linking: ModuleType = _import_module("kgfoundry.linking")
+    observability: ModuleType = _import_module("kgfoundry.observability")
+    ontology: ModuleType = _import_module("kgfoundry.ontology")
+    orchestration: ModuleType = _import_module("kgfoundry.orchestration")
+    registry: ModuleType = _import_module("kgfoundry.registry")
+    search_api: ModuleType = _import_module("kgfoundry.search_api")
+    search_client: ModuleType = _import_module("kgfoundry.search_client")
+    vectorstore_faiss: ModuleType = _import_module("kgfoundry.vectorstore_faiss")
+
+del _TYPE_CHECKING
 
 
 def _load(name: str) -> object:
@@ -113,6 +126,11 @@ def __getattr__(name: str) -> object:
     -------
     object
         Describe return value.
+
+    Raises
+    ------
+    AttributeError
+        If the attribute name is not in the aliases dictionary.
     """
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
