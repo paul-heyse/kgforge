@@ -12,17 +12,21 @@ revisions without additional glue code.
 
 from __future__ import annotations
 
+import copy
 import importlib
 import json
 import logging
+import re
 import sys
 from collections import defaultdict
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, TypeGuard, cast
+from typing import TYPE_CHECKING, Any, Protocol, TypeGuard, cast
 
 import mkdocs_gen_files
+import yaml
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,58 +59,113 @@ def _suppress_griffe_errors() -> Iterator[None]:
         root_logger.setLevel(previous_root_level)
 
 
-if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
+TOOLS_ROOT = PROJECT_ROOT / "tools"
+SRC_ROOT = PROJECT_ROOT / "src"
+SUITE_ROOT = TOOLS_ROOT / "mkdocs_suite"
+MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
+EDIT_URI_BRANCH_INDEX = 1
 
+
+def _load_repo_settings() -> tuple[str | None, str | None]:
+    """Return the configured repository URL and default branch.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Pair of ``(repo_url, branch)`` with ``None`` when unavailable.
+    """
+    if not MKDOCS_CONFIG_PATH.exists():
+        return None, None
+    repo_url: str | None = None
+    edit_uri: str | None = None
+    try:
+        for raw_line in MKDOCS_CONFIG_PATH.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("repo_url:") and repo_url is None:
+                repo_url = line.split(":", 1)[1].strip().strip("\"'")
+            if line.startswith("edit_uri:") and edit_uri is None:
+                edit_uri = line.split(":", 1)[1].strip().strip("\"'")
+    except OSError:  # pragma: no cover - defensive guard for inaccessible config
+        return None, None
+    branch: str | None = None
+    if isinstance(edit_uri, str):
+        parts = edit_uri.strip("/").split("/")
+        if parts and parts[0] == "edit" and len(parts) > EDIT_URI_BRANCH_INDEX:
+            branch = parts[EDIT_URI_BRANCH_INDEX]
+    if not branch:
+        branch = "main"
+    return (str(repo_url) if isinstance(repo_url, str) and repo_url else None, branch)
+
+
+REPO_URL, DEFAULT_BRANCH = _load_repo_settings()
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+
+    from kgfoundry_common.navmap_loader import load_nav_metadata as _load_nav_metadata
     from tools.navmap.griffe_navmap import (
         DEFAULT_EXTENSIONS as _DEFAULT_EXTENSIONS,
     )
     from tools.navmap.griffe_navmap import (
         DEFAULT_SEARCH_PATHS as _DEFAULT_SEARCH_PATHS,
     )
-    from tools.navmap.griffe_navmap import (
-        NavmapBuildSettings as _NavmapBuildSettings,
-    )
-    from tools.navmap.griffe_navmap import (
-        Symbol as _Symbol,
-    )
-    from tools.navmap.griffe_navmap import (
-        build_navmap as _build_navmap,
-    )
 else:
-    _griffe_navmap_module_path = Path(__file__).resolve().parents[3] / "navmap" / "griffe_navmap.py"
+    _griffe_navmap_module_path = TOOLS_ROOT / "navmap" / "griffe_navmap.py"
     _griffe_navmap_spec = importlib.util.spec_from_file_location(
         "tools.mkdocs_suite._griffe_navmap", _griffe_navmap_module_path
     )
     if (
         _griffe_navmap_spec is None or _griffe_navmap_spec.loader is None
     ):  # pragma: no cover - defensive guard
-        message = f"Unable to load griffe navmap module from {_griffe_navmap_module_path}"
-        raise RuntimeError(message)
+        error_message = f"Unable to load griffe navmap module from {_griffe_navmap_module_path}"
+        raise RuntimeError(error_message)
     _griffe_navmap = importlib.util.module_from_spec(_griffe_navmap_spec)
     sys.modules[_griffe_navmap_spec.name] = _griffe_navmap
     _griffe_navmap_spec.loader.exec_module(_griffe_navmap)  # type: ignore[union-attr]
 
-    NavmapBuildSettings = _griffe_navmap.NavmapBuildSettings
-    Symbol = _griffe_navmap.Symbol
-    build_navmap = _griffe_navmap.build_navmap
+    _nav_loader_path = SRC_ROOT / "kgfoundry_common" / "navmap_loader.py"
+    _nav_loader_spec = importlib.util.spec_from_file_location(
+        "tools.mkdocs_suite._navmap_loader", _nav_loader_path
+    )
+    if _nav_loader_spec is None or _nav_loader_spec.loader is None:  # pragma: no cover
+        error_message = f"Unable to load navmap loader from {_nav_loader_path}"
+        raise RuntimeError(error_message)
+    _nav_loader = importlib.util.module_from_spec(_nav_loader_spec)
+    sys.modules[_nav_loader_spec.name] = _nav_loader
+    _nav_loader_spec.loader.exec_module(_nav_loader)  # type: ignore[union-attr]
+
     DEFAULT_EXTENSIONS = list(_griffe_navmap.DEFAULT_EXTENSIONS)
     DEFAULT_SEARCH_PATHS = list(_griffe_navmap.DEFAULT_SEARCH_PATHS)
+    load_nav_metadata = _nav_loader.load_nav_metadata
 
 if TYPE_CHECKING:
-    NavmapBuildSettings = _NavmapBuildSettings
-    Symbol = _Symbol
-    build_navmap = _build_navmap
     DEFAULT_EXTENSIONS = list(_DEFAULT_EXTENSIONS)
     DEFAULT_SEARCH_PATHS = list(_DEFAULT_SEARCH_PATHS)
+    load_nav_metadata = _load_nav_metadata
 
-PACKAGE_ROOTS: tuple[str, ...] = ("kgfoundry", "kgfoundry_common")
-NAVMAP_SETTINGS = NavmapBuildSettings(
-    docstring_parser="numpy",
-    include_inherited=True,
-    resolve_external=False,
+
+PACKAGE_ROOTS: tuple[str, ...] = (
+    "kgfoundry_common",
+    "docling",
+    "download",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "kg_builder",
+    "linking",
+    "observability",
+    "ontology",
+    "orchestration",
+    "registry",
+    "search_api",
+    "search_client",
+    "vectorstore_faiss",
 )
 API_USAGE_FILE = Path(__file__).with_name("api_usage.json")
+REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
+
 
 _griffe = importlib.import_module("griffe")
 _load = cast("Callable[..., object]", _griffe.load)
@@ -153,6 +212,16 @@ class _RelationshipTables:
     bases: dict[str, list[str]]
 
 
+@dataclass(frozen=True, slots=True)
+class OperationLink:
+    """Link metadata for an OpenAPI or CLI operation."""
+
+    operation_id: str
+    href: str | None
+    interface_id: str | None
+    spec_label: str | None
+
+
 @dataclass(slots=True)
 class ModuleFacts:
     """Aggregated metadata used when rendering module pages."""
@@ -163,7 +232,9 @@ class ModuleFacts:
     classes: dict[str, list[str]]
     functions: dict[str, list[str]]
     bases: dict[str, list[str]]
-    api_usage: Mapping[str, list[str]]
+    api_usage: Mapping[str, list[OperationLink]]
+    documented_modules: set[str]
+    source_paths: dict[str, Path]
 
 
 def _is_kind(obj: object, expected: str) -> bool:
@@ -236,7 +307,7 @@ def _discover_extensions(candidates: Iterable[str]) -> tuple[list[str], object |
         return available, _load_extensions(*available)
 
 
-def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModule]:
+def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
     """
     Load all submodules for the configured package roots.
 
@@ -251,6 +322,7 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
         Mapping of module path to Griffe module objects.
     """
     modules: dict[str, _GriffeModule] = {}
+    visited: set[str] = set()
     for package in PACKAGE_ROOTS:
         try:
             with _suppress_griffe_errors():
@@ -261,7 +333,7 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
                     search_paths=DEFAULT_SEARCH_PATHS,
                     docstring_parser="numpy",
                     resolve_aliases=True,
-                    resolve_external=False,
+                    resolve_external=True,
                 )
         except _GriffeError as exc:  # pragma: no cover - degradation for broken modules
             LOGGER.warning("Skipping package %s due to Griffe load error: %s", package, exc)
@@ -270,6 +342,9 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
             continue
 
         def _visit(module: _GriffeModule) -> None:
+            if module.path in visited:
+                return
+            visited.add(module.path)
             modules[module.path] = module
             for child in module.members.values():
                 if _is_module(child):
@@ -279,18 +354,139 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
     return modules
 
 
-def _load_api_usage() -> dict[str, list[str]]:
-    """
-    Return optional API usage mappings for deep-linking ReDoc operations.
+def _code_permalink(relative_path: Path | None) -> str | None:
+    """Return a GitHub permalink for ``relative_path`` when configured.
 
     Returns
     -------
-    dict[str, list[str]]
-        Mapping of symbol path to related OpenAPI ``operationId`` entries.
+    str | None
+        Fully-qualified repository URL or ``None`` if linking is disabled.
+    """
+    if relative_path is None or REPO_URL is None:
+        return None
+    branch = DEFAULT_BRANCH or "main"
+    return f"{REPO_URL}/blob/{branch}/{relative_path.as_posix()}"
+
+
+def _load_api_usage() -> dict[str, list[OperationLink]]:
+    """Return optional API usage mappings for deep-linking ReDoc operations.
+
+    Returns
+    -------
+    dict[str, list[OperationLink]]
+        Mapping of symbol paths to operation references derived from JSON.
     """
     if not API_USAGE_FILE.exists():
         return {}
-    return json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    raw_mapping = json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    usage: dict[str, list[OperationLink]] = defaultdict(list)
+    for symbol, operations in raw_mapping.items():
+        if not isinstance(symbol, str):
+            continue
+        if isinstance(operations, list):
+            for op in operations:
+                op_id = str(op)
+                usage[symbol].append(OperationLink(op_id, None, None, None))
+        elif isinstance(operations, str):
+            usage[symbol].append(OperationLink(str(operations), None, None, None))
+    return usage
+
+
+def _symbol_from_handler(handler: object) -> str | None:
+    """Return the fully-qualified symbol path for a registry handler string.
+
+    Returns
+    -------
+    str | None
+        Symbol path derived from the handler, or ``None`` when the handler
+        cannot be parsed.
+    """
+    if not isinstance(handler, str) or ":" not in handler:
+        return None
+    module, attribute = handler.split(":", 1)
+    module = module.strip()
+    attribute = attribute.strip().replace(":", ".")
+    if not module or not attribute:
+        return None
+    return f"{module}.{attribute}"
+
+
+def _registry_api_usage(
+    registry: Mapping[str, dict[str, object]],
+) -> dict[str, list[OperationLink]]:
+    """Derive symbol → operation mappings from the interface registry.
+
+    Returns
+    -------
+    dict[str, list[OperationLink]]
+        Mapping of symbol paths to `OperationLink` records from registry data.
+    """
+    mapping: dict[str, list[OperationLink]] = defaultdict(list)
+    for identifier, entry in registry.items():
+        operations = entry.get("operations")
+        if not isinstance(operations, Mapping):
+            continue
+        spec_path = entry.get("spec")
+        spec_label, _ = _spec_href(spec_path)
+        for op_meta in operations.values():
+            if not isinstance(op_meta, Mapping):
+                continue
+            handler = _symbol_from_handler(op_meta.get("handler"))
+            operation_id = op_meta.get("operation_id")
+            if not handler or not isinstance(operation_id, str) or not operation_id:
+                continue
+            href = _operation_href(spec_path, operation_id)
+            mapping[handler].append(OperationLink(operation_id, href, identifier, spec_label))
+    return mapping
+
+
+def _merge_api_usage(
+    file_usage: Mapping[str, list[OperationLink]],
+    registry_usage: Mapping[str, list[OperationLink]],
+) -> dict[str, list[OperationLink]]:
+    """Merge API usage derived from JSON files and the interface registry.
+
+    Returns
+    -------
+    dict[str, list[OperationLink]]
+        Combined mapping with deduplicated operation references.
+    """
+    merged: dict[str, dict[tuple[str, str | None], OperationLink]] = defaultdict(dict)
+    for symbol, operations in file_usage.items():
+        for operation in operations:
+            key = (operation.operation_id, operation.href)
+            merged[symbol][key] = operation
+    for symbol, operations in registry_usage.items():
+        for operation in operations:
+            key = (operation.operation_id, operation.href)
+            merged[symbol][key] = operation
+    return {
+        symbol: [entry for _, entry in sorted(store.items(), key=lambda item: item[0])]
+        for symbol, store in merged.items()
+    }
+
+
+def _load_registry() -> dict[str, dict[str, object]]:
+    """Return the interface registry payload keyed by identifier.
+
+    Returns
+    -------
+    dict[str, dict[str, object]]
+        Mapping of interface identifiers to registry metadata entries. Empty
+        when the registry file is missing or invalid.
+    """
+    if not REGISTRY_PATH.exists():
+        return {}
+    with REGISTRY_PATH.open("r", encoding="utf-8") as handle:
+        payload = yaml.safe_load(handle) or {}
+    interfaces = payload.get("interfaces") if isinstance(payload, dict) else {}
+    if not isinstance(interfaces, dict):
+        return {}
+    return {
+        str(identifier): value
+        for identifier, value in interfaces.items()
+        if isinstance(value, dict)
+    }
 
 
 def _module_exports(module: _GriffeModule) -> set[str]:
@@ -330,7 +526,7 @@ def _register_member(module_path: str, member: object, tables: _RelationshipTabl
 
 
 def _build_relationships(
-    modules: Mapping[str, _GriffeModule], api_usage: Mapping[str, list[str]]
+    modules: Mapping[str, _GriffeModule], api_usage: Mapping[str, list[OperationLink]]
 ) -> ModuleFacts:
     """
     Return imports, exports, symbols, and related API usage facts.
@@ -348,10 +544,14 @@ def _build_relationships(
     )
     imports = tables.imports
     exports: dict[str, set[str]] = defaultdict(set)
+    source_paths: dict[str, Path] = {}
     for module_path, module in modules.items():
         exports[module_path].update(_module_exports(module))
         for member in module.members.values():
             _register_member(module_path, member, tables)
+        relative = getattr(module, "relative_filepath", None)
+        if isinstance(relative, Path):
+            source_paths[module_path] = relative
     imported_by: dict[str, set[str]] = defaultdict(set)
     for src, targets in imports.items():
         for target in targets:
@@ -364,7 +564,125 @@ def _build_relationships(
         functions=dict(tables.functions),
         bases=dict(tables.bases),
         api_usage=api_usage,
+        documented_modules=set(modules.keys()),
+        source_paths=source_paths,
     )
+
+
+def _format_module_links(module_names: Iterable[str], documented: set[str]) -> str:
+    """Return a comma-separated list of module names with links where possible.
+
+    Returns
+    -------
+    str
+        Comma-separated string where documented modules link to their pages and
+        external modules are rendered as inline code.
+    """
+    links: list[str] = []
+    for name in module_names:
+        if name in documented:
+            links.append(f"[{name}](../modules/{name}.md)")
+        else:
+            links.append(f"`{name}`")
+    return ", ".join(links)
+
+
+def _nav_metadata_for_module(
+    module_path: str, module: _GriffeModule, facts: ModuleFacts
+) -> dict[str, Any]:
+    """Return nav metadata merged with runtime defaults for ``module_path``.
+
+    Returns
+    -------
+    dict[str, Any]
+        Normalized navigation metadata including exports, sections, synopsis,
+        and relationship details for the module.
+    """
+    exports = sorted(_module_exports(module))
+    raw_meta = load_nav_metadata(module_path, tuple(exports))
+    meta: dict[str, Any] = copy.deepcopy(raw_meta)
+    meta["exports"] = exports
+
+    symbols_meta = meta.get("symbols")
+    if not isinstance(symbols_meta, dict):
+        symbols_meta = {}
+    meta["symbols"] = {name: symbols_meta.get(name, {}) for name in exports}
+
+    sections = meta.get("sections")
+    if not isinstance(sections, list) or not sections:
+        meta["sections"] = [
+            {
+                "id": "public-api",
+                "title": "Public API",
+                "symbols": exports,
+            }
+        ]
+
+    synopsis = meta.get("synopsis")
+    if not synopsis:
+        synopsis = _first_paragraph(module)
+        if synopsis:
+            meta["synopsis"] = synopsis
+
+    imports = sorted(facts.imports.get(module_path, set()))
+    imported_by = sorted(facts.imported_by.get(module_path, set()))
+    relationships: dict[str, list[str]] = {}
+    if imports:
+        relationships["imports"] = imports
+    if imported_by:
+        relationships["imported_by"] = imported_by
+    existing_relationships = meta.get("relationships")
+    if isinstance(existing_relationships, dict):
+        relationships = {**existing_relationships, **relationships}
+    if relationships:
+        meta["relationships"] = relationships
+
+    return meta
+
+
+def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
+    """Persist nav metadata for ``module_path`` to the MkDocs virtual FS."""
+    rel_path = module_path.replace(".", "/") + ".json"
+    json_path = f"_data/navmaps/{rel_path}"
+    with mkdocs_gen_files.open(json_path, "w") as fd:
+        json.dump(nav_meta, fd, indent=2)
+
+
+def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
+    """Return a tuple of (label, href) for the provided spec path.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Human-readable label and relative hyperlink for the specification. Both
+        values are ``None`` when the spec path cannot be resolved.
+    """
+    if not isinstance(spec_path, str) or not spec_path:
+        return None, None
+    if spec_path.endswith("openapi-cli.yaml"):
+        return "CLI Spec", "../api/openapi-cli.md"
+    if spec_path.endswith("openapi.yaml"):
+        return "HTTP API", "../api/index.md"
+    rel = Path("..") / spec_path
+    return spec_path, rel.as_posix()
+
+
+def _operation_href(spec_path: object, operation_id: str) -> str | None:
+    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``.
+
+    Returns
+    -------
+    str | None
+        Anchor URL pointing to the operation in the rendered specification, or
+        ``None`` when the operation cannot be linked automatically.
+    """
+    if not operation_id:
+        return None
+    if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
+        return "../api/openapi-cli.md"
+    if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
+        return "../api/index.md"
+    return None
 
 
 def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts) -> None:
@@ -376,10 +694,10 @@ def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: Mo
         return
     fd.write("## Relationships\n\n")
     if outgoing:
-        out_links = ", ".join(f"[{name}](../modules/{name}.md)" for name in outgoing)
+        out_links = _format_module_links(outgoing, facts.documented_modules)
         fd.write(f"**Imports:** {out_links}\n\n")
     if incoming:
-        in_links = ", ".join(f"[{name}](../modules/{name}.md)" for name in incoming)
+        in_links = _format_module_links(incoming, facts.documented_modules)
         fd.write(f"**Imported by:** {in_links}\n\n")
     if exported:
         export_list = ", ".join(f"`{name}`" for name in exported)
@@ -390,15 +708,29 @@ def _write_related_operations(
     fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts
 ) -> None:
     """Emit related API operations for symbols in ``module_path``."""
-    used_operations: set[str] = set()
-    for symbol_path in facts.classes.get(module_path, []) + facts.functions.get(module_path, []):
+    collected: dict[tuple[str, str | None], OperationLink] = {}
+    symbol_paths = facts.classes.get(module_path, []) + facts.functions.get(module_path, [])
+    for symbol_path in symbol_paths:
         for operation in facts.api_usage.get(symbol_path, []):
-            used_operations.add(operation)
-    if not used_operations:
+            key = (operation.operation_id, operation.href)
+            collected[key] = operation
+    if not collected:
         return
-    links = ", ".join(f"[{op}](../api/index/#operation/{op})" for op in sorted(used_operations))
     fd.write("## Related API operations\n\n")
-    fd.write(f"{links}\n\n")
+    parts: list[str] = []
+    for _, operation in sorted(collected.items(), key=lambda item: item[0]):
+        label = f"`{operation.operation_id}`"
+        if operation.href:
+            label = f"[{label}]({operation.href})"
+        context: list[str] = []
+        if operation.interface_id:
+            context.append(operation.interface_id)
+        if operation.spec_label and operation.spec_label not in context:
+            context.append(operation.spec_label)
+        if context:
+            label = f"{label} ({' · '.join(context)})"
+        parts.append(label)
+    fd.write(", ".join(parts) + "\n\n")
 
 
 def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts) -> None:
@@ -418,21 +750,269 @@ def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleF
         fd.write(f"### {function_path}\n\n::: {function_path}\n\n")
 
 
+def _interface_entries(nav_meta: Mapping[str, Any]) -> list[Mapping[str, object]]:
+    """Return validated interface entries from nav metadata.
+
+    Returns
+    -------
+    list[Mapping[str, object]]
+        Normalized interface entries, or an empty list when no metadata is
+        present.
+    """
+    interfaces = nav_meta.get("interfaces")
+    if not isinstance(interfaces, list):
+        return []
+    return [entry for entry in interfaces if isinstance(entry, Mapping)]
+
+
+def _merge_interface_metadata(
+    entry: Mapping[str, object],
+    registry: Mapping[str, dict[str, object]],
+    default_identifier: str,
+) -> tuple[str, dict[str, object], Mapping[str, object]]:
+    """Return identifier, merged metadata, and registry entry for ``entry``.
+
+    Returns
+    -------
+    tuple[str, dict[str, object], Mapping[str, object]]
+        Interface identifier, merged metadata dictionary, and registry-sourced
+        metadata mapping.
+    """
+    identifier = str(entry.get("id") or entry.get("entrypoint") or default_identifier)
+    registry_entry = registry.get(identifier, {})
+    merged: dict[str, object] = {**registry_entry, **entry}
+    return identifier, merged, registry_entry
+
+
+def _write_interface_operations(
+    fd: mkdocs_gen_files.files,
+    identifier: str,
+    merged: Mapping[str, object],
+    registry_entry: Mapping[str, object],
+) -> None:
+    operations = registry_entry.get("operations")
+    if not isinstance(operations, Mapping) or not operations:
+        return
+    spec_path = merged.get("spec") or registry_entry.get("spec")
+    fd.write("- **Operations:**\n")
+    for op_key, op_meta in sorted(operations.items()):
+        if not isinstance(op_meta, Mapping):
+            continue
+        op_id = str(op_meta.get("operation_id") or f"{identifier}.{op_key}")
+        summary = str(op_meta.get("summary") or "")
+        anchor = _operation_href(spec_path, op_id)
+        if anchor:
+            fd.write(f"  - [`{op_id}`]({anchor})")
+        else:
+            fd.write(f"  - `{op_id}`")
+        if summary:
+            fd.write(f" — {summary}")
+        fd.write("\n")
+
+
+def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
+    """Return a Mermaid class diagram for classes defined in ``module_path``.
+
+    Returns
+    -------
+    str
+        Rendered Mermaid block or an empty string when no classes exist.
+    """
+    classes = facts.classes.get(module_path, [])
+    if not classes:
+        return ""
+
+    def _alias(name: str, counter: dict[str, int]) -> str:
+        base = re.sub(r"[^0-9A-Za-z_]", "_", name.rsplit(".", maxsplit=1)[-1]) or "Class"
+        if base not in counter:
+            counter[base] = 0
+            return base
+        counter[base] += 1
+        return f"{base}_{counter[base]}"
+
+    aliases: dict[str, str] = {}
+    alias_counter: dict[str, int] = {}
+    lines = ["```mermaid", "classDiagram"]
+
+    def ensure(name: str) -> str:
+        if name not in aliases:
+            aliases[name] = _alias(name, alias_counter)
+            lines.append(f"    class {aliases[name]}")
+        return aliases[name]
+
+    for cls in sorted(classes):
+        derived = ensure(cls)
+        for base in facts.bases.get(cls, []):
+            base_alias = ensure(base)
+            lines.append(f"    {base_alias} <|-- {derived}")
+
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
+    """Return a small inline D2 neighborhood diagram for ``module_path``.
+
+    Returns
+    -------
+    str
+        Rendered D2 block highlighting local imports/importers, or an empty string.
+    """
+    outgoing = sorted(facts.imports.get(module_path, set()))
+    incoming = sorted(facts.imported_by.get(module_path, set()))
+    if not outgoing and not incoming:
+        return ""
+
+    def _link(target: str) -> str | None:
+        if target in facts.documented_modules:
+            return f"./{target}.md"
+        return None
+
+    lines = [
+        "```d2",
+        "direction: right",
+        f'"{module_path}": "{module_path}" {{ link: "./{module_path}.md" }}',
+    ]
+    for target in outgoing:
+        link = _link(target)
+        node = f'"{target}": "{target}" {{ link: "{link}" }}' if link else f'"{target}": "{target}"'
+        lines.extend([node, f'"{module_path}" -> "{target}"'])
+    for source in incoming:
+        link = _link(source)
+        node = f'"{source}": "{source}" {{ link: "{link}" }}' if link else f'"{source}": "{source}"'
+        lines.extend([node, f'"{source}" -> "{module_path}"'])
+    code_link = _code_permalink(facts.source_paths.get(module_path))
+    if code_link:
+        lines.extend(
+            [
+                f'"{module_path}_code": "{module_path} code" {{ link: "{code_link}" }}',
+                f'"{module_path}" -> "{module_path}_code" {{ style: dashed }}',
+            ]
+        )
+    lines.append("```")
+    return "\n".join(lines)
+
+
+def _write_module_diagram_file(module_path: str, facts: ModuleFacts) -> None:
+    """Write a standalone D2 diagram for ``module_path`` to the virtual FS."""
+    d2_path = f"diagrams/modules/{module_path}.d2"
+    with mkdocs_gen_files.open(d2_path, "w") as handle:
+        handle.write("direction: right\n")
+        handle.write(
+            f'"{module_path}": "{module_path}" {{ link: "../modules/{module_path}.md" }}\n'
+        )
+        for target in sorted(facts.imports.get(module_path, [])):
+            if target in facts.documented_modules:
+                handle.write(f'"{target}": "{target}" {{ link: "../modules/{target}.md" }}\n')
+            else:
+                handle.write(f'"{target}": "{target}"\n')
+            handle.write(f'"{module_path}" -> "{target}"\n')
+        for source in sorted(facts.imported_by.get(module_path, [])):
+            if source in facts.documented_modules:
+                handle.write(f'"{source}": "{source}" {{ link: "../modules/{source}.md" }}\n')
+            else:
+                handle.write(f'"{source}": "{source}"\n')
+            handle.write(f'"{source}" -> "{module_path}"\n')
+        code_link = _code_permalink(facts.source_paths.get(module_path))
+        if code_link:
+            handle.write(f'"{module_path}_code": "{module_path} code" {{ link: "{code_link}" }}\n')
+            handle.write(f'"{module_path}" -> "{module_path}_code" {{ style: dashed }}\n')
+
+
+def _write_autorefs_examples(
+    fd: mkdocs_gen_files.files,
+    module_path: str,
+    facts: ModuleFacts,
+) -> None:
+    """Emit a short autorefs sample list to demonstrate cross-linking."""
+    class_entries = [f"- [{cls}][]" for cls in sorted(facts.classes.get(module_path, []))[:3]]
+    function_entries = [
+        f"- [{func}][]" for func in sorted(facts.functions.get(module_path, []))[:3]
+    ]
+    entries = class_entries + function_entries
+    if not entries:
+        return
+    fd.write("## Autorefs Examples\n\n")
+    fd.write("\n".join(entries) + "\n\n")
+
+
+def _write_interfaces(
+    fd: mkdocs_gen_files.files,
+    module_path: str,
+    nav_meta: Mapping[str, Any],
+    registry: Mapping[str, dict[str, object]],
+) -> None:
+    rows = _interface_entries(nav_meta)
+    if not rows:
+        return
+    fd.write("## Interfaces\n\n")
+    for entry in rows:
+        identifier, merged, registry_entry = _merge_interface_metadata(entry, registry, module_path)
+        fd.write(f"### `{identifier}`\n\n")
+        fd.write(
+            "- **Type:** {type}\n".format(
+                type=merged.get("type") or registry_entry.get("type") or "—"
+            )
+        )
+        fd.write(
+            "- **Owner:** {owner}\n".format(
+                owner=merged.get("owner") or registry_entry.get("owner") or "—"
+            )
+        )
+        fd.write(
+            "- **Stability:** {stability}\n".format(
+                stability=merged.get("stability") or registry_entry.get("stability") or "—"
+            )
+        )
+        if description := merged.get("description") or registry_entry.get("description"):
+            fd.write(f"- **Description:** {description}\n")
+        spec_label, spec_href = _spec_href(merged.get("spec") or registry_entry.get("spec"))
+        if spec_href:
+            fd.write(f"- **Spec:** [{spec_label}]({spec_href})\n")
+        elif spec_label:
+            fd.write(f"- **Spec:** {spec_label}\n")
+        problems = merged.get("problem_details") or registry_entry.get("problem_details")
+        if isinstance(problems, list) and problems:
+            fd.write("- **Problem Details:** " + ", ".join(map(str, problems)) + "\n")
+        elif isinstance(problems, str) and problems:
+            fd.write(f"- **Problem Details:** {problems}\n")
+        _write_interface_operations(fd, identifier, merged, registry_entry)
+        fd.write("\n")
+
+
 def _render_module_page(
     module_path: str,
     module: _GriffeModule,
-    nav_summary: Symbol | None,
+    nav_meta: Mapping[str, Any],
     facts: ModuleFacts,
+    registry: Mapping[str, dict[str, object]],
 ) -> None:
     """Generate the Markdown page for ``module_path``."""
     page_path = f"modules/{module_path}.md"
     with mkdocs_gen_files.open(page_path, "w") as fd:
         fd.write(f"# {module_path}\n\n")
-        summary = nav_summary.summary if nav_summary else None
+        summary = nav_meta.get("synopsis")
         if not summary:
             summary = _first_paragraph(module)
         if summary:
             fd.write(f"{summary}\n\n")
+        source_link = _code_permalink(facts.source_paths.get(module_path))
+        if source_link:
+            fd.write(f"[:material-source-repository: View source]({source_link})\n\n")
+        mermaid = _mermaid_inheritance(module_path, facts)
+        if mermaid:
+            fd.write("## Inheritance\n\n")
+            fd.write(f"{mermaid}\n\n")
+        d2_diagram = _inline_d2_neighborhood(module_path, facts)
+        if d2_diagram:
+            fd.write("## Dependencies at a Glance\n\n")
+            fd.write(f"{d2_diagram}\n\n")
+            _write_module_diagram_file(module_path, facts)
+            fd.write(
+                f"> See the full diagram: [{module_path}](../diagrams/modules/{module_path}.d2)\n\n"
+            )
+        _write_autorefs_examples(fd, module_path, facts)
+        _write_interfaces(fd, module_path, nav_meta, registry)
         _write_relationships(fd, module_path, facts)
         _write_related_operations(fd, module_path, facts)
         _write_contents(fd, module_path, facts)
@@ -451,34 +1031,24 @@ def _write_module_index(modules: Mapping[str, _GriffeModule]) -> None:
 
 def main() -> None:
     """Entry point executed by mkdocs-gen-files."""
-    extensions, extensions_bundle = _discover_extensions(DEFAULT_EXTENSIONS)
-    try:
-        with _suppress_griffe_errors():
-            navmap = build_navmap(
-                packages=PACKAGE_ROOTS,
-                search_paths=DEFAULT_SEARCH_PATHS,
-                extensions=extensions,
-                settings=NAVMAP_SETTINGS,
-            )
-        navmap_symbols = navmap.symbols
-    except _GriffeError as exc:  # pragma: no cover - degradation when navmap build fails
-        LOGGER.warning("Griffe navmap build failed: %s", exc)
-        navmap_symbols = []
+    _extensions, extensions_bundle = _discover_extensions(DEFAULT_EXTENSIONS)
     modules = _collect_modules(extensions_bundle)
     if not modules:
         LOGGER.warning("No modules loaded via Griffe; skipping module page generation.")
         _write_module_index({})
         return
-    api_usage = _load_api_usage()
-    navmap_by_path: dict[str, Symbol] = {
-        symbol.path: symbol
-        for symbol in navmap_symbols
-        if getattr(symbol, "kind", None) == "module"
-    }
+    registry = _load_registry()
+    api_usage = _merge_api_usage(_load_api_usage(), _registry_api_usage(registry))
     facts = _build_relationships(modules, api_usage)
+    manifest: dict[str, Any] = {}
     for module_path, module in modules.items():
-        _render_module_page(module_path, module, navmap_by_path.get(module_path), facts)
+        nav_meta = _nav_metadata_for_module(module_path, module, facts)
+        manifest[module_path] = nav_meta
+        _write_navmap_json(module_path, nav_meta)
+        _render_module_page(module_path, module, nav_meta, facts, registry)
     _write_module_index(modules)
+    with mkdocs_gen_files.open("_data/navmaps/manifest.json", "w") as fd:
+        json.dump(manifest, fd, indent=2, sort_keys=True)
 
 
 main()

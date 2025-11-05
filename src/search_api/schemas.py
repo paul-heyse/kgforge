@@ -41,6 +41,13 @@ class SearchResponse(BaseModel):
     results : list[SearchResult]
         List of search results, ordered by relevance score descending.
         Defaults to empty list.
+
+    Attributes
+    ----------
+    model_config : ClassVar[ConfigDict]
+        Pydantic model configuration dictionary (class variable).
+    results : list[SearchResult]
+        List of search results, ordered by relevance score descending.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -65,6 +72,19 @@ class SearchRequest(BaseModel):
         Optional filters to apply to search results. Defaults to None.
     explain : bool, optional
         Whether to include explanation metadata in results. Defaults to False.
+
+    Attributes
+    ----------
+    model_config : ClassVar[ConfigDict]
+        Pydantic model configuration dictionary (class variable).
+    query : str
+        Search query text. Must be non-empty (min_length=1).
+    k : int
+        Number of results to return.
+    filters : dict[str, JsonValue] | None
+        Optional filters to apply to search results.
+    explain : bool
+        Whether to include explanation metadata in results.
 
     Examples
     --------
@@ -115,6 +135,27 @@ class SearchResult(BaseModel):
         Dictionary of character span information. Defaults to empty dictionary.
     concepts : list[dict[str, str]], optional
         List of linked concept dictionaries. Defaults to empty list.
+
+    Attributes
+    ----------
+    model_config : ClassVar[ConfigDict]
+        Pydantic model configuration dictionary (class variable).
+    doc_id : str
+        Document identifier.
+    chunk_id : str
+        Chunk identifier within the document.
+    title : str
+        Document title.
+    section : str
+        Section name or identifier within the document.
+    score : float
+        Relevance score for this result.
+    signals : dict[str, float]
+        Dictionary of signal scores (e.g., "dense", "sparse", "kg").
+    spans : dict[str, int]
+        Dictionary of character span information.
+    concepts : list[dict[str, str]]
+        List of linked concept dictionaries.
 
     Examples
     --------

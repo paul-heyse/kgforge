@@ -8,10 +8,12 @@ for implementation specifics.
 from __future__ import annotations
 
 import ast
+import copy
+import json
 import re
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from packaging.version import InvalidVersion, Version
 
@@ -641,6 +643,72 @@ def _read_text(py: Path) -> list[str]:
         return []
 
 
+def _candidate_sidecars(py: Path) -> list[Path]:
+    """Return potential nav sidecar files for ``py`` in priority order.
+
+    Parameters
+    ----------
+    py : Path
+        Python module to inspect for nav metadata.
+
+    Returns
+    -------
+    list[Path]
+        Candidate sidecar paths with duplicates removed while preserving order.
+    """
+    candidates: list[Path] = []
+    if py.name == "__init__.py":
+        candidates.append(py.parent / "_nav.json")
+        module_sidecar = py.with_name(f"{py.stem}._nav.json")
+        if module_sidecar.name != "__init__._nav.json":
+            candidates.append(module_sidecar)
+    else:
+        candidates.append(py.with_name(f"{py.stem}._nav.json"))
+
+    unique: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        unique.append(candidate)
+    return unique
+
+
+def _load_nav_sidecar(py: Path) -> dict[str, ResolvedNavValue]:
+    """Return navigation metadata loaded from JSON sidecars when available.
+
+    Parameters
+    ----------
+    py : Path
+        Python module to inspect for nav metadata.
+
+    Returns
+    -------
+    dict[str, ResolvedNavValue]
+        Nav metadata from the first matching sidecar, or an empty dict when absent.
+    """
+    for candidate in _candidate_sidecars(py):
+        if not candidate.is_file():
+            continue
+        try:
+            payload = json.loads(candidate.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            LOGGER.warning("Failed to read nav sidecar %s: %s", candidate, exc)
+            continue
+        if not isinstance(payload, dict):
+            LOGGER.warning("Nav sidecar %s did not contain an object", candidate)
+            continue
+        nav_copy = cast("dict[str, ResolvedNavValue]", copy.deepcopy(payload))
+        exports = nav_copy.get("exports")
+        if isinstance(exports, list):
+            nav_copy["exports"] = _dedupe_str_list(
+                [item for item in exports if isinstance(item, str)]
+            )
+        return nav_copy
+    return {}
+
+
 def _scan_inline(py: Path) -> tuple[dict[str, int], dict[str, int]]:
     """Scan file for inline navigation markers.
 
@@ -681,15 +749,17 @@ def _parse_navmap_dict(py: Path) -> dict[str, ResolvedNavValue]:
         Navmap dictionary if found, empty dict otherwise.
     """
     module = _parse_module(py)
-    if module is None:
-        return {}
-    nav_literal = _extract_navmap_literal(module)
-    if nav_literal is None:
-        return {}
-    exports = _parse_all(py)
-    if not exports:
-        exports = _exports_from_nav_literal(nav_literal)
-    return _resolve_navmap_literal(nav_literal, exports)
+    nav_map: dict[str, ResolvedNavValue] = {}
+    if module is not None:
+        nav_literal = _extract_navmap_literal(module)
+        if nav_literal is not None:
+            exports = _parse_all(py)
+            if not exports:
+                exports = _exports_from_nav_literal(nav_literal)
+            nav_map = _resolve_navmap_literal(nav_literal, exports)
+            if nav_map:
+                return nav_map
+    return _load_nav_sidecar(py)
 
 
 def _literal_string_sequence(node: ast.AST | None) -> list[str] | None:

@@ -127,6 +127,11 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
     dispatch : Callable[[StarletteRequest], Awaitable[Response]] | None, optional
         Custom dispatch function (typically None for default behavior).
         Defaults to None.
+
+    Attributes
+    ----------
+    HEADER_NAME : Final[str]
+        HTTP header name for correlation ID ("X-Correlation-ID").
     """
 
     HEADER_NAME: Final[str] = "X-Correlation-ID"
@@ -173,16 +178,19 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
     Logs validation failures and returns Problem Details (RFC 9457) on schema
     mismatch. Only validates JSON responses from the /search endpoint.
 
+    Initializes response validation middleware. Sets up the middleware with optional
+    schema validation. Loads the JSON Schema 2020-12 from the provided path or
+    default location.
+
     Parameters
     ----------
-    app : ASGIApp
-        ASGI application instance to wrap.
+    app : FastAPI
+        FastAPI application instance to wrap.
     enabled : bool, optional
         Whether to enable response validation. Defaults to False.
     schema_path : Path | None, optional
         Path to search_response.json schema file. If None, searches for
-        schema/search/search_response.json relative to repo root.
-        Defaults to None.
+        schema/search/search_response.json relative to repo root. Defaults to None.
     """
 
     def __init__(
@@ -192,22 +200,6 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
         enabled: bool = False,
         schema_path: Path | None = None,
     ) -> None:
-        """Initialize response validation middleware.
-
-        Sets up the middleware with optional schema validation. Loads the
-        JSON Schema 2020-12 from the provided path or default location.
-
-        Parameters
-        ----------
-        app : FastAPI
-            FastAPI application instance to wrap.
-        enabled : bool, optional
-            Whether to enable response validation. Defaults to False.
-        schema_path : Path | None, optional
-            Path to search_response.json schema file. If None, searches for
-            schema/search/search_response.json relative to repo root.
-            Defaults to None.
-        """
         super().__init__(cast("ASGIApp", app))
         self.enabled = enabled
         if schema_path is None:

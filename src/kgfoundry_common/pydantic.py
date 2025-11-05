@@ -10,23 +10,22 @@ if TYPE_CHECKING:
     class BaseModel:
         """Typing-friendly stub that mirrors Pydantic's ``BaseModel``.
 
+        Populates the model from keyword arguments.
+
         Parameters
         ----------
         **data : Any
             Keyword arguments accepted by the Pydantic model.
+
+        Attributes
+        ----------
+        model_config : ClassVar[object]
+            Pydantic model configuration dictionary.
         """
 
         model_config: ClassVar[object]
 
         def __init__(self, **data: object) -> None:
-            """Populate the model from keyword arguments.
-
-            Parameters
-            ----------
-            **data : Any
-                Keyword arguments forwarded to the underlying Pydantic model
-                constructor.
-            """
             raise NotImplementedError
 
         @classmethod

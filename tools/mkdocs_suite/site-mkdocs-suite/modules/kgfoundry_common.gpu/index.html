@@ -2,6 +2,8 @@
 <meta charset="utf-8">
 <meta content="width=device-width,initial-scale=1" name="viewport">
 <link href="https://example.invalid/docs/modules/kgfoundry_common.gpu/" rel="canonical">
+<link href="../kgfoundry_common.fs/" rel="prev">
+<link href="../kgfoundry_common.ids/" rel="next">
 <link href="../../assets/images/favicon.png" rel="icon">
 <meta content="mkdocs-1.6.1, mkdocs-material-9.6.23" name="generator">
 <title>kgfoundry_common.gpu - KgFoundry MkDocs Suite</title>
@@ -11,6 +13,8 @@
 <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
 <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
 <link href="../../assets/stylesheets/mkdocs_d2_plugin.css" rel="stylesheet">
+<link href="../../assets/mkdocs_puml/puml.css" rel="stylesheet">
+<link href="../../assets/mkdocs_puml/interaction.css" rel="stylesheet">
 <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
             html.glightbox-open { overflow: initial; height: 100%; }
@@ -128,10 +132,48 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../..">
 <span class="md-ellipsis">
-    Overview
+    KgFoundry MkDocs Suite
     
   </span>
 </a>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../api/">
+<span class="md-ellipsis">
+    Api
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Api
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/interfaces/">
+<span class="md-ellipsis">
+    Interface Catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/openapi-cli/">
+<span class="md-ellipsis">
+    CLI Specification
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../architecture/">
@@ -142,17 +184,9 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/">
+<a class="md-nav__link" href="../../cli/">
 <span class="md-ellipsis">
-    API
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../">
-<span class="md-ellipsis">
-    Modules
+    Cli
     
   </span>
 </a>
@@ -165,20 +199,204 @@
   </span>
 </a>
 </li>
-</ul>
-</nav>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_6" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../">
+<span class="md-ellipsis">
+    Modules
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
 </div>
-</div>
-</div>
-<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
-<div class="md-sidebar__scrollwrap">
-<div class="md-sidebar__inner">
+<nav aria-expanded="true" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            Modules
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling/">
+<span class="md-ellipsis">
+    docling
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling.vlm/">
+<span class="md-ellipsis">
+    docling.vlm
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling.canonicalizer/">
+<span class="md-ellipsis">
+    docling.canonicalizer
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling.hybrid/">
+<span class="md-ellipsis">
+    docling.hybrid
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../download.cli/">
+<span class="md-ellipsis">
+    download.cli
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../download/">
+<span class="md-ellipsis">
+    download
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../download.harvester/">
+<span class="md-ellipsis">
+    download.harvester
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_dense.base/">
+<span class="md-ellipsis">
+    embeddings_dense.base
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_dense/">
+<span class="md-ellipsis">
+    embeddings_dense
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_dense.qwen3/">
+<span class="md-ellipsis">
+    embeddings_dense.qwen3
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse.base/">
+<span class="md-ellipsis">
+    embeddings_sparse.base
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse.bm25/">
+<span class="md-ellipsis">
+    embeddings_sparse.bm25
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse/">
+<span class="md-ellipsis">
+    embeddings_sparse
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse.splade/">
+<span class="md-ellipsis">
+    embeddings_sparse.splade
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kg_builder/">
+<span class="md-ellipsis">
+    kg_builder
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kg_builder.mock_kg/">
+<span class="md-ellipsis">
+    kg_builder.mock_kg
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kg_builder.neo4j_store/">
+<span class="md-ellipsis">
+    kg_builder.neo4j_store
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.fs/">
+<span class="md-ellipsis">
+    kgfoundry_common.fs
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox">
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    kgfoundry_common.gpu
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    kgfoundry_common.gpu
+    
+  </span>
+</a>
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">
 <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dependencies-at-a-glance">
+<span class="md-ellipsis">
+      Dependencies at a Glance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#autorefs-examples">
+<span class="md-ellipsis">
+      Autorefs Examples
+    </span>
+</a>
+</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#relationships">
 <span class="md-ellipsis">
@@ -213,19 +431,641 @@
 <nav aria-label="_modules_available" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.gpu._modules_available--parameters">
+<a class="md-nav__link" href="#kgfoundry_commongpuhas_gpu_stack">
 <span class="md-ellipsis">
-      Parameters
+      kgfoundry_common.gpu.has_gpu_stack
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.gpu.has_gpu_stack">
+<span class="md-ellipsis">
+      has_gpu_stack
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.ids/">
+<span class="md-ellipsis">
+    kgfoundry_common.ids
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common/">
+<span class="md-ellipsis">
+    kgfoundry_common
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.config/">
+<span class="md-ellipsis">
+    kgfoundry_common.config
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors.http/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.http
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors.codes/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.codes
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors.exceptions/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.exceptions/">
+<span class="md-ellipsis">
+    kgfoundry_common.exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.fastapi_helpers/">
+<span class="md-ellipsis">
+    kgfoundry_common.fastapi_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.jsonschema_utils/">
+<span class="md-ellipsis">
+    kgfoundry_common.jsonschema_utils
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.logging/">
+<span class="md-ellipsis">
+    kgfoundry_common.logging
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.models/">
+<span class="md-ellipsis">
+    kgfoundry_common.models
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.navmap_loader/">
+<span class="md-ellipsis">
+    kgfoundry_common.navmap_loader
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.navmap_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.navmap_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.numpy_typing/">
+<span class="md-ellipsis">
+    kgfoundry_common.numpy_typing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.observability/">
+<span class="md-ellipsis">
+    kgfoundry_common.observability
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.opentelemetry_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.opentelemetry_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.optional_deps/">
+<span class="md-ellipsis">
+    kgfoundry_common.optional_deps
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.parquet_io/">
+<span class="md-ellipsis">
+    kgfoundry_common.parquet_io
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.problem_details/">
+<span class="md-ellipsis">
+    kgfoundry_common.problem_details
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.prometheus/">
+<span class="md-ellipsis">
+    kgfoundry_common.prometheus
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.pydantic/">
+<span class="md-ellipsis">
+    kgfoundry_common.pydantic
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.safe_pickle_v2/">
+<span class="md-ellipsis">
+    kgfoundry_common.safe_pickle_v2
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.schema_helpers/">
+<span class="md-ellipsis">
+    kgfoundry_common.schema_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.sequence_guards/">
+<span class="md-ellipsis">
+    kgfoundry_common.sequence_guards
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.serialization/">
+<span class="md-ellipsis">
+    kgfoundry_common.serialization
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.settings/">
+<span class="md-ellipsis">
+    kgfoundry_common.settings
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.subprocess_utils/">
+<span class="md-ellipsis">
+    kgfoundry_common.subprocess_utils
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.types/">
+<span class="md-ellipsis">
+    kgfoundry_common.types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.typing/">
+<span class="md-ellipsis">
+    kgfoundry_common.typing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.vector_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.vector_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../linking/">
+<span class="md-ellipsis">
+    linking
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../linking.calibration/">
+<span class="md-ellipsis">
+    linking.calibration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../linking.linker/">
+<span class="md-ellipsis">
+    linking.linker
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../observability/">
+<span class="md-ellipsis">
+    observability
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../observability.metrics/">
+<span class="md-ellipsis">
+    observability.metrics
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ontology/">
+<span class="md-ellipsis">
+    ontology
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ontology.catalog/">
+<span class="md-ellipsis">
+    ontology.catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ontology.loader/">
+<span class="md-ellipsis">
+    ontology.loader
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.cli/">
+<span class="md-ellipsis">
+    orchestration.cli
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration/">
+<span class="md-ellipsis">
+    orchestration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.config/">
+<span class="md-ellipsis">
+    orchestration.config
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.fixture_flow/">
+<span class="md-ellipsis">
+    orchestration.fixture_flow
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.flows/">
+<span class="md-ellipsis">
+    orchestration.flows
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.safe_pickle/">
+<span class="md-ellipsis">
+    orchestration.safe_pickle
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.api/">
+<span class="md-ellipsis">
+    registry.api
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry/">
+<span class="md-ellipsis">
+    registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.duckdb_helpers/">
+<span class="md-ellipsis">
+    registry.duckdb_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.duckdb_registry/">
+<span class="md-ellipsis">
+    registry.duckdb_registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.helper/">
+<span class="md-ellipsis">
+    registry.helper
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.migrate/">
+<span class="md-ellipsis">
+    registry.migrate
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.app/">
+<span class="md-ellipsis">
+    search_api.app
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api/">
+<span class="md-ellipsis">
+    search_api
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.bm25_index/">
+<span class="md-ellipsis">
+    search_api.bm25_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.faiss_adapter/">
+<span class="md-ellipsis">
+    search_api.faiss_adapter
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.faiss_gpu/">
+<span class="md-ellipsis">
+    search_api.faiss_gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.fastapi_helpers/">
+<span class="md-ellipsis">
+    search_api.fastapi_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.fixture_index/">
+<span class="md-ellipsis">
+    search_api.fixture_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.fusion/">
+<span class="md-ellipsis">
+    search_api.fusion
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.kg_mock/">
+<span class="md-ellipsis">
+    search_api.kg_mock
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.schemas/">
+<span class="md-ellipsis">
+    search_api.schemas
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.service/">
+<span class="md-ellipsis">
+    search_api.service
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.splade_index/">
+<span class="md-ellipsis">
+    search_api.splade_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.types/">
+<span class="md-ellipsis">
+    search_api.types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.vectorstore_factory/">
+<span class="md-ellipsis">
+    search_api.vectorstore_factory
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_client/">
+<span class="md-ellipsis">
+    search_client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_client.client/">
+<span class="md-ellipsis">
+    search_client.client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../vectorstore_faiss.gpu/">
+<span class="md-ellipsis">
+    vectorstore_faiss.gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../vectorstore_faiss/">
+<span class="md-ellipsis">
+    vectorstore_faiss
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dependencies-at-a-glance">
+<span class="md-ellipsis">
+      Dependencies at a Glance
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.gpu._modules_available--returns">
+<a class="md-nav__link" href="#autorefs-examples">
 <span class="md-ellipsis">
-      Returns
+      Autorefs Examples
     </span>
 </a>
 </li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#relationships">
+<span class="md-ellipsis">
+      Relationships
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#contents">
+<span class="md-ellipsis">
+      Contents
+    </span>
+</a>
+<nav aria-label="Contents" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_commongpu_modules_available">
+<span class="md-ellipsis">
+      kgfoundry_common.gpu._modules_available
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.gpu._modules_available">
+<span class="md-ellipsis">
+      _modules_available
+    </span>
+</a>
+<nav aria-label="_modules_available" class="md-nav">
+<ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kgfoundry_commongpuhas_gpu_stack">
 <span class="md-ellipsis">
@@ -242,24 +1082,6 @@
       has_gpu_stack
     </span>
 </a>
-<nav aria-label="has_gpu_stack" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.gpu.has_gpu_stack--parameters">
-<span class="md-ellipsis">
-      Parameters
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.gpu.has_gpu_stack--returns">
-<span class="md-ellipsis">
-      Returns
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 </ul>
 </nav>
@@ -274,26 +1096,201 @@
 <a class="md-content__button md-icon" href="https://github.com/example/kgfoundry/raw/main/src/kgfoundry_common/gpu.py" title="View source of this page">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
 </a>
-<h1 id="kgfoundry_commongpu">kgfoundry_common.gpu</h1>
-<p>Utilities for detecting GPU stack availability.</p>
-<h2 id="relationships">Relationships</h2>
-<p><strong>Imports:</strong> <a href="../modules/__future__.annotations.md"><strong>future</strong>.annotations</a>, <a href="../modules/collections.abc.Callable.md">collections.abc.Callable</a>, <a href="../modules/collections.abc.Iterable.md">collections.abc.Iterable</a>, <a href="../modules/importlib.md">importlib</a>, <a href="../modules/os.md">os</a>, <a href="../modules/types.ModuleType.md">types.ModuleType</a>, <a href="../modules/typing.TYPE_CHECKING.md">typing.TYPE_CHECKING</a>, <a href="../modules/typing.cast.md">typing.cast</a></p>
-<h2 id="contents">Contents</h2>
-<h3 id="kgfoundry_commongpu_modules_available">kgfoundry_common.gpu._modules_available</h3>
+<h1 id="kgfoundry_commongpu">kgfoundry_common.gpu<a class="headerlink" href="#kgfoundry_commongpu" title="Permanent link">¶</a></h1>
+<p>Shared utilities and data structures used across KgFoundry services and tools.</p>
+<p><a href="https://github.com/example/kgfoundry/blob/main/src/kgfoundry_common/gpu.py">:material-source-repository: View source</a></p>
+<h2 id="dependencies-at-a-glance">Dependencies at a Glance<a class="headerlink" href="#dependencies-at-a-glance" title="Permanent link">¶</a></h2>
+<div class="d2"><svg aria-label="Diagram" data-d2-version="v0.7.1" preserveAspectRatio="xMinYMin meet" role="img" viewBox="0 0 795 1276" xmlns:ns0="http://www.w3.org/1999/xlink"><svg class="d2-06e7bbbe2a034cc19a0f66493d6738a4 d2-svg" height="1276" viewBox="-101 -101 795 1276" width="795"><rect class="fill-N7" fill="#FFFFFF" height="1276.000000" rx="0.000000" stroke-width="0" width="795.000000" x="-101.000000" y="-101.000000"></rect><style type="text/css">
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-06e7bbbe2a034cc19a0f66493d6738a4 .text-bold {
+	font-family: "d2-06e7bbbe2a034cc19a0f66493d6738a4-font-bold";
+}
+@font-face {
+	font-family: d2-06e7bbbe2a034cc19a0f66493d6738a4-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}</style><style type="text/css">.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N1{fill:#0A0F25;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N2{fill:#676C7E;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N3{fill:#9499AB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N4{fill:#CFD2DD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N5{fill:#DEE1EB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N6{fill:#EEF1F8;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-N7{fill:#FFFFFF;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-B1{fill:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-B2{fill:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-B3{fill:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-B4{fill:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-B5{fill:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-B6{fill:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-AA2{fill:#4A6FF3;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-AA4{fill:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-AA5{fill:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-AB4{fill:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .fill-AB5{fill:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N1{stroke:#0A0F25;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N2{stroke:#676C7E;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N3{stroke:#9499AB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N4{stroke:#CFD2DD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N5{stroke:#DEE1EB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N6{stroke:#EEF1F8;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-N7{stroke:#FFFFFF;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-B1{stroke:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-B2{stroke:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-B3{stroke:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-B4{stroke:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-B5{stroke:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-B6{stroke:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N1{background-color:#0A0F25;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N2{background-color:#676C7E;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N3{background-color:#9499AB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N4{background-color:#CFD2DD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N5{background-color:#DEE1EB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N6{background-color:#EEF1F8;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-N7{background-color:#FFFFFF;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-B1{background-color:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-B2{background-color:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-B3{background-color:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-B4{background-color:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-B5{background-color:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-B6{background-color:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N1{color:#0A0F25;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N2{color:#676C7E;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N3{color:#9499AB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N4{color:#CFD2DD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N5{color:#DEE1EB;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N6{color:#EEF1F8;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-N7{color:#FFFFFF;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-B1{color:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-B2{color:#0D32B2;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-B3{color:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-B4{color:#E3E9FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-B5{color:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-B6{color:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-AA2{color:#4A6FF3;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-AA4{color:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-AA5{color:#F7F8FE;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-AB4{color:#EDF0FD;}
+		.d2-06e7bbbe2a034cc19a0f66493d6738a4 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-06e7bbbe2a034cc19a0f66493d6738a4);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}</style><a href="./kgfoundry_common.gpu.md" ns0:href="./kgfoundry_common.gpu.md"><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLmdwdSYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="220.000000" x="0.000000" y="504.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="110.000000" y="542.500000">kgfoundry_common.gpu</text></g></a><g class="JiMzNDtfX2Z1dHVyZV9fLmFubm90YXRpb25zJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="212.000000" x="342.000000" y="0.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.000000" y="38.500000">__future__.annotations</text></g><g class="JiMzNDtjb2xsZWN0aW9ucy5hYmMuQ2FsbGFibGUmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="214.000000" x="341.000000" y="126.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.000000" y="164.500000">collections.abc.Callable</text></g><g class="JiMzNDtjb2xsZWN0aW9ucy5hYmMuSXRlcmFibGUmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="213.000000" x="342.000000" y="252.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.500000" y="290.500000">collections.abc.Iterable</text></g><g class="aW1wb3J0bGli"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="112.000000" x="392.000000" y="378.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.000000" y="416.500000">importlib</text></g><g class="b3M="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="61.000000" x="418.000000" y="504.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.500000" y="542.500000">os</text></g><g class="JiMzNDt0eXBlcy5Nb2R1bGVUeXBlJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="176.000000" x="360.000000" y="630.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.000000" y="668.500000">types.ModuleType</text></g><g class="JiMzNDt0eXBpbmcuVFlQRV9DSEVDS0lORyYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="213.000000" x="342.000000" y="756.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.500000" y="794.500000">typing.TYPE_CHECKING</text></g><g class="JiMzNDt0eXBpbmcuY2FzdCYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="125.000000" x="386.000000" y="882.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.500000" y="920.500000">typing.cast</text></g><a href="https://github.com/example/kgfoundry/blob/main/src/kgfoundry_common/gpu.py" ns0:href="https://github.com/example/kgfoundry/blob/main/src/kgfoundry_common/gpu.py"><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLmdwdV9jb2RlJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="256.000000" x="320.000000" y="1008.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="448.000000" y="1046.500000">kgfoundry_common.gpu code</text></g></a><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O19fZnV0dXJlX18uYW5ub3RhdGlvbnMmIzM0OylbMF0="><marker id="mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134" markerHeight="12.000000" markerUnits="userSpaceOnUse" markerWidth="10.000000" orient="auto" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000"> <polygon class="connection fill-B1" fill="#0D32B2" points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" stroke-width="2"></polygon> </marker><path class="connection stroke-B1" d="M 120.606907 502.094307 C 240.000000 127.198997 284.399994 33.000000 338.000000 33.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O2NvbGxlY3Rpb25zLmFiYy5DYWxsYWJsZSYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 124.779454 502.158139 C 240.800003 228.000000 284.200012 159.000000 337.000000 159.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O2NvbGxlY3Rpb25zLmFiYy5JdGVyYWJsZSYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 132.071750 502.311405 C 242.199997 328.799011 284.299988 285.000000 337.500000 285.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyBpbXBvcnRsaWIpWzBd"><path class="connection stroke-B1" d="M 153.570787 502.762007 C 246.399994 429.600006 294.399994 411.000000 388.000000 411.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyBvcylbMF0="><path class="connection stroke-B1" d="M 222.000000 537.000000 C 260.000000 537.000000 299.500000 537.000000 413.500000 537.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O3R5cGVzLk1vZHVsZVR5cGUmIzM0OylbMF0="><path class="connection stroke-B1" d="M 153.570787 571.237994 C 246.399994 644.400024 288.000000 663.000000 356.000000 663.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O3R5cGluZy5UWVBFX0NIRUNLSU5HJiMzNDspWzBd"><path class="connection stroke-B1" d="M 132.071755 571.688592 C 242.199997 745.200012 284.299988 789.000000 337.500000 789.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O3R5cGluZy5jYXN0JiMzNDspWzBd"><path class="connection stroke-B1" d="M 124.779454 571.841861 C 240.800003 846.000000 293.100006 915.000000 381.500000 915.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5ncHUmIzM0OyAtJmd0OyAmIzM0O2tnZm91bmRyeV9jb21tb24uZ3B1X2NvZGUmIzM0OylbMF0="><path class="connection stroke-B1" d="M 120.606908 571.905692 C 240.000000 946.799988 280.000000 1041.000000 316.000000 1041.000000" fill="none" marker-end="url(#mk-d2-06e7bbbe2a034cc19a0f66493d6738a4-3488378134)" mask="url(#d2-06e7bbbe2a034cc19a0f66493d6738a4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="appendix-icon" transform="translate(204 488)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-06e7bbbe2a034cc19a0f66493d6738a4-EJVWOZTPOVXGI4TZL5RW63LNN5XC4Z3QOURA)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-06e7bbbe2a034cc19a0f66493d6738a4-EJVWOZTPOVXGI4TZL5RW63LNN5XC4Z3QOURA">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><g class="appendix-icon" transform="translate(560 992)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-06e7bbbe2a034cc19a0f66493d6738a4-EJVWOZTPOVXGI4TZL5RW63LNN5XC4Z3QOVPWG33EMURA)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-06e7bbbe2a034cc19a0f66493d6738a4-EJVWOZTPOVXGI4TZL5RW63LNN5XC4Z3QOVPWG33EMURA">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><mask height="1276" id="d2-06e7bbbe2a034cc19a0f66493d6738a4" maskUnits="userSpaceOnUse" width="795" x="-101" y="-101">
+<rect fill="white" height="1276" width="795" x="-101" y="-101"></rect>
+</mask></svg></svg></div>
+<blockquote>
+<p>See the full diagram: <a href="../../diagrams/modules/kgfoundry_common.gpu.d2">kgfoundry_common.gpu</a></p>
+</blockquote>
+<h2 id="autorefs-examples">Autorefs Examples<a class="headerlink" href="#autorefs-examples" title="Permanent link">¶</a></h2>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#kgfoundry_common.gpu._modules_available" title="kgfoundry_common.gpu._modules_available(modules)">kgfoundry_common.gpu._modules_available</a></li>
+<li><a class="autorefs autorefs-internal" href="#kgfoundry_common.gpu.has_gpu_stack" title="kgfoundry_common.gpu.has_gpu_stack(*, allow_without_cuda_env='ALLOW_GPU_TESTS_WITHOUT_CUDA')">kgfoundry_common.gpu.has_gpu_stack</a></li>
+</ul>
+<h2 id="relationships">Relationships<a class="headerlink" href="#relationships" title="Permanent link">¶</a></h2>
+<p><strong>Imports:</strong> <code>__future__.annotations</code>, <code>collections.abc.Callable</code>, <code>collections.abc.Iterable</code>, <code>importlib</code>, <code>os</code>, <code>types.ModuleType</code>, <code>typing.TYPE_CHECKING</code>, <code>typing.cast</code></p>
+<h2 id="contents">Contents<a class="headerlink" href="#contents" title="Permanent link">¶</a></h2>
+<h3 id="kgfoundry_commongpu_modules_available">kgfoundry_common.gpu._modules_available<a class="headerlink" href="#kgfoundry_commongpu_modules_available" title="Permanent link">¶</a></h3>
 <div class="doc doc-object doc-function">
 <h2 class="doc doc-heading" id="kgfoundry_common.gpu._modules_available">
 <code class="highlight language-python"><span class="n">kgfoundry_common</span><span class="o">.</span><span class="n">gpu</span><span class="o">.</span><span class="n">_modules_available</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span></code>
-</h2>
+<a class="headerlink" href="#kgfoundry_common.gpu._modules_available" title="Permanent link">¶</a></h2>
 <div class="doc doc-contents first">
 <p>Check if all specified modules can be imported.</p>
 <p>Verifies that each module in the iterable can be resolved
 by Python's import system.</p>
-<h4 id="kgfoundry_common.gpu._modules_available--parameters">Parameters</h4>
-<p>modules : Iterable[str]
-    Iterable of module names to check.</p>
-<h4 id="kgfoundry_common.gpu._modules_available--returns">Returns</h4>
-<p>bool
-    True if all modules are available, False otherwise.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>modules</code>
+</td>
+<td>
+<code><span title="collections.abc.Iterable">Iterable</span>[<span title="str">str</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Iterable of module names to check.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code><span title="bool">bool</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>True if all modules are available, False otherwise.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/gpu.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
@@ -332,25 +1329,69 @@ by Python's import system.</p>
 </code></pre></div></td></tr></tbody></table></div>
 </details>
 </div>
-</div><h3 id="kgfoundry_commongpuhas_gpu_stack">kgfoundry_common.gpu.has_gpu_stack</h3>
+</div><h3 id="kgfoundry_commongpuhas_gpu_stack">kgfoundry_common.gpu.has_gpu_stack<a class="headerlink" href="#kgfoundry_commongpuhas_gpu_stack" title="Permanent link">¶</a></h3>
 <div class="doc doc-object doc-function">
 <h2 class="doc doc-heading" id="kgfoundry_common.gpu.has_gpu_stack">
 <code class="highlight language-python"><span class="n">kgfoundry_common</span><span class="o">.</span><span class="n">gpu</span><span class="o">.</span><span class="n">has_gpu_stack</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">allow_without_cuda_env</span><span class="o">=</span><span class="s1">'ALLOW_GPU_TESTS_WITHOUT_CUDA'</span><span class="p">)</span></code>
-</h2>
+<a class="headerlink" href="#kgfoundry_common.gpu.has_gpu_stack" title="Permanent link">¶</a></h2>
 <div class="doc doc-contents first">
 <p>Check if the optional GPU stack is available and CUDA is usable.</p>
 <p>Verifies that all core GPU modules can be imported and that CUDA
 is available via PyTorch. Can be overridden by an environment variable
 for testing on CPU-only hosts.</p>
-<h4 id="kgfoundry_common.gpu.has_gpu_stack--parameters">Parameters</h4>
-<p>allow_without_cuda_env : str, optional
-    Environment variable name that, when set to "1", permits returning
-    True even when CUDA is unavailable. Defaults to
-    "ALLOW_GPU_TESTS_WITHOUT_CUDA".</p>
-<h4 id="kgfoundry_common.gpu.has_gpu_stack--returns">Returns</h4>
-<p>bool
-    True when the GPU stack is available or the override environment
-    variable is set, False otherwise.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>allow_without_cuda_env</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Environment variable name that, when set to "1", permits returning
+True even when CUDA is unavailable. Defaults to
+"ALLOW_GPU_TESTS_WITHOUT_CUDA".</p>
+</div>
+</td>
+<td>
+<code>'ALLOW_GPU_TESTS_WITHOUT_CUDA'</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code><span title="bool">bool</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>True when the GPU stack is available or the override environment
+variable is set, False otherwise.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/gpu.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
@@ -433,7 +1474,7 @@ for testing on CPU-only hosts.</p>
 <span class="md-icon" title="Last update">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
 </span>
-<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2025 11:57:58 UTC">November 5, 2025</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2025 17:26:50 UTC">November 5, 2025</span>
 </span>
 </aside>
 </article>
@@ -446,6 +1487,34 @@ for testing on CPU-only hosts.</p>
 </button>
 </main>
 <footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: kgfoundry_common.fs" class="md-footer__link md-footer__link--prev" href="../kgfoundry_common.fs/">
+<div class="md-footer__button md-icon">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                kgfoundry_common.fs
+              </div>
+</div>
+</a>
+<a aria-label="Next: kgfoundry_common.ids" class="md-footer__link md-footer__link--next" href="../kgfoundry_common.ids/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                kgfoundry_common.ids
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
 <div class="md-footer-meta md-typeset">
 <div class="md-footer-meta__inner md-grid">
 <div class="md-copyright">
@@ -465,6 +1534,9 @@ for testing on CPU-only hosts.</p>
 </div>
 <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.tracking", "navigation.footer", "content.action.edit", "content.action.view"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
 <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+<script src="../../assets/mkdocs_puml/puml.js"></script>
+<script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<script src="../../assets/mkdocs_puml/interaction.js"></script>
 <script>document$.subscribe(() => {
             const dark_scheme_name = "slate"
             

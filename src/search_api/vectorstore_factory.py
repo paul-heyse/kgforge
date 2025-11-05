@@ -114,6 +114,27 @@ class FaissAdapterSettings:
     timeout_seconds : int, optional
         Build operation timeout. Defaults to 3600.
 
+    Attributes
+    ----------
+    db_path : str
+        Path to DuckDB registry or Parquet vector file.
+    index_path : str
+        Path where the built index will be saved.
+    factory : str
+        FAISS factory string (e.g., "OPQ64,IVF8192,PQ64").
+    metric : str
+        Metric type: "ip" (inner product) or "l2" (L2 distance).
+    nprobe : int
+        IVF search parameter.
+    use_gpu : bool
+        Enable GPU acceleration.
+    use_cuvs : bool
+        Enable cuVS acceleration.
+    gpu_devices : tuple[int, ...]
+        GPU device IDs.
+    timeout_seconds : int
+        Build operation timeout.
+
     Raises
     ------
     ValueError
@@ -152,6 +173,11 @@ class FaissVectorstoreFactory:
     structured logs, Prometheus metrics, and Problem Details on error.
 
     Parameters
+    ----------
+    settings : FaissAdapterSettings
+        Configuration for adapter instances.
+
+    Attributes
     ----------
     settings : FaissAdapterSettings
         Configuration for adapter instances.
@@ -367,11 +393,11 @@ class FaissVectorstoreFactory:
         correlation_id : str | None, optional
             Correlation identifier propagated to logs and metrics. Defaults to ``None``.
 
-        Notes
-        -----
-        Propagates exceptions raised by :meth:`FaissAdapter.save` (for example
-        I/O errors or FAISS errors). Callers should handle these according to
-        their error-handling strategy.
+        Raises
+        ------
+        Exception
+            Propagates exceptions raised by :meth:`FaissAdapter.save` (for example
+            I/O errors or FAISS errors).
         """
         logger.info(
             "Saving FAISS index",

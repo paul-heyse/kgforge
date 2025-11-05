@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from functools import lru_cache
 from pathlib import Path
 
 import mkdocs_gen_files
@@ -12,6 +13,43 @@ import yaml
 SUITE_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[4]
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
+MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
+EDIT_URI_BRANCH_INDEX = 1
+
+def _load_repo_settings() -> tuple[str | None, str | None]:
+    """Return repo URL and default branch configured for MkDocs.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Pair of ``(repo_url, branch)`` with ``None`` when unavailable.
+    """
+    if not MKDOCS_CONFIG_PATH.exists():
+        return None, None
+    repo_url: str | None = None
+    edit_uri: str | None = None
+    try:
+        for raw_line in MKDOCS_CONFIG_PATH.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("repo_url:") and repo_url is None:
+                repo_url = line.split(":", 1)[1].strip().strip('"\'')
+            if line.startswith("edit_uri:") and edit_uri is None:
+                edit_uri = line.split(":", 1)[1].strip().strip('"\'')
+    except OSError:  # pragma: no cover - defensive guard
+        return None, None
+    branch: str | None = None
+    if isinstance(edit_uri, str):
+        parts = edit_uri.strip("/").split("/")
+        if parts and parts[0] == "edit" and len(parts) > EDIT_URI_BRANCH_INDEX:
+            branch = parts[EDIT_URI_BRANCH_INDEX]
+    if not branch:
+        branch = "main"
+    return (str(repo_url) if isinstance(repo_url, str) and repo_url else None, branch)
+
+
+REPO_URL, DEFAULT_BRANCH = _load_repo_settings()
 
 
 def _load_registry() -> dict[str, dict[str, object]]:
@@ -49,6 +87,50 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
             record.setdefault("module", module_name)
             records.append(record)
     return records
+
+
+def _module_doc_link(module: object) -> str:
+    if not isinstance(module, str) or not module:
+        return "—"
+    return f"[{module}](../modules/{module}.md)"
+
+
+def _operation_href(spec_path: object, operation_id: str) -> str | None:
+    if not operation_id:
+        return None
+    if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
+        return "../api/openapi-cli.md"
+    if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
+        return "../api/index.md"
+    return None
+
+
+def _parse_handler_module(handler: object) -> str | None:
+    if not isinstance(handler, str) or ":" not in handler:
+        return None
+    module, _ = handler.split(":", 1)
+    module = module.strip()
+    return module or None
+
+
+@lru_cache(maxsize=512)
+def _resolve_source_path(module_path: str) -> Path | None:
+    candidate = Path("src") / Path(module_path.replace(".", "/") + ".py")
+    package_init = Path("src") / Path(module_path.replace(".", "/")) / "__init__.py"
+    for option in (candidate, package_init):
+        if (REPO_ROOT / option).exists():
+            return option
+    return None
+
+
+def _code_link_for_module(module_path: str | None) -> str | None:
+    if not module_path:
+        return None
+    rel_path = _resolve_source_path(module_path)
+    if rel_path is None or REPO_URL is None:
+        return None
+    branch = DEFAULT_BRANCH or "main"
+    return f"{REPO_URL}/blob/{branch}/{rel_path.as_posix()}"
 
 
 def _spec_link(record: dict[str, object]) -> str:
@@ -113,7 +195,7 @@ def _write_interface_table(
         row = "| {id} | {type} | {module} | {owner} | {stability} | {spec} | {desc} | {problems} |".format(
             id=identifier,
             type=record.get("type", "—"),
-            module=record.get("module", "—"),
+            module=_module_doc_link(record.get("module")),
             owner=owner,
             stability=record.get("stability", "—"),
             spec=spec_cell,
@@ -150,7 +232,9 @@ def _write_code_samples(handle: mkdocs_gen_files.files, samples: object) -> None
             handle.write(f"    * ({lang}) `{source}`\n")
 
 
-def _operations_block(handle: mkdocs_gen_files.files, operations: object) -> None:
+def _operations_block(
+    handle: mkdocs_gen_files.files, operations: object, spec_path: object
+) -> None:
     """Render operation metadata if the registry entry exposes operations."""
     if not isinstance(operations, Mapping) or not operations:
         return
@@ -160,7 +244,17 @@ def _operations_block(handle: mkdocs_gen_files.files, operations: object) -> Non
             continue
         op_id = str(op_meta.get("operation_id") or f"cli.{op_key.replace('-', '_')}")
         summary = str(op_meta.get("summary") or "")
-        handle.write(f"- [`{op_id}`](../api/openapi-cli.md) — {summary}\n")
+        href = _operation_href(spec_path, op_id)
+        if href:
+            handle.write(f"- [`{op_id}`]({href}) — {summary}\n")
+        else:
+            handle.write(f"- `{op_id}` — {summary}\n")
+        module_path = _parse_handler_module(op_meta.get("handler"))
+        if module_path:
+            handle.write(f"    - Module docs: {_module_doc_link(module_path)}\n")
+            code_link = _code_link_for_module(module_path)
+            if code_link:
+                handle.write(f"    - Source: [{module_path}]({code_link})\n")
         _write_optional_list(handle, "Tags", _ensure_str_list(op_meta.get("tags")))
         _write_optional_line(handle, "Handler", op_meta.get("handler"))
         _write_optional_list(handle, "Env", _ensure_str_list(op_meta.get("env")))
@@ -208,7 +302,8 @@ def _write_interface_details(
         ):
             handle.write(f"* **Description:** {reg_entry['description']}\n")
 
-        _operations_block(handle, reg_entry.get("operations"))
+        spec_path = reg_entry.get("spec") or nav_meta.get("spec")
+        _operations_block(handle, reg_entry.get("operations"), spec_path)
         handle.write("\n")
 
 

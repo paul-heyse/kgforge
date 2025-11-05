@@ -149,14 +149,6 @@ class RequestsHttp(SupportsHttp):
     """
 
     def __init__(self, session: requests.Session | None = None) -> None:
-        """Initialize search client.
-
-        Parameters
-        ----------
-        session : requests.Session | None, optional
-            HTTP session to use. Creates new session if None.
-            Defaults to None.
-        """
         self._session = session or requests.Session()
 
     def get(
@@ -232,6 +224,10 @@ class KGFoundryClient:
     including search, health checks, and knowledge graph concept queries. Supports
     authentication via API keys and configurable timeouts.
 
+    Instantiates the client with connection details. Initializes the client with
+    API endpoint, authentication, and timeout configuration. The base_url is
+    normalized by removing trailing slashes.
+
     Parameters
     ----------
     base_url : str, optional
@@ -241,8 +237,7 @@ class KGFoundryClient:
     timeout : float, optional
         Default request timeout in seconds. Defaults to 30.0.
     http : SupportsHttp | None, optional
-        HTTP adapter implementation. If None, uses RequestsHttp.
-        Defaults to None.
+        HTTP adapter implementation. If None, uses RequestsHttp. Defaults to None.
     """
 
     def __init__(
@@ -252,23 +247,6 @@ class KGFoundryClient:
         timeout: float = 30.0,
         http: SupportsHttp | None = None,
     ) -> None:
-        """Instantiate the client with connection details.
-
-        Initializes the client with API endpoint, authentication, and timeout
-        configuration. The base_url is normalized by removing trailing slashes.
-
-        Parameters
-        ----------
-        base_url : str, optional
-            Base URL of the Search API service. Defaults to "http://localhost:8080".
-        api_key : str | None, optional
-            API key for Bearer token authentication. Defaults to None (no auth).
-        timeout : float, optional
-            Default request timeout in seconds. Defaults to 30.0.
-        http : SupportsHttp | None, optional
-            HTTP adapter implementation. If None, uses RequestsHttp.
-            Defaults to None.
-        """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout

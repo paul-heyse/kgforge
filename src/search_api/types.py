@@ -135,14 +135,6 @@ class FaissIndexProtocol(Protocol):
         vectors : VectorArray
             Array of shape (n_vectors, dimension) with float32 dtype.
             Vectors should be normalized to unit length for inner-product search.
-
-        Raises
-        ------
-        RuntimeError
-            If index has not been trained (for trainable indexes).
-        ValueError
-            If vector dimensions do not match index configuration.
-        """
         ...
 
     def search(self, vectors: VectorArray, k: int) -> tuple[NDArray[np.float32], NDArray[np.int64]]:
@@ -222,6 +214,19 @@ class FaissModuleProtocol(Protocol):
     adapters. It enables type checking and allows fallback implementations
     (e.g., `_SimpleFaissModule`) to satisfy the protocol.
 
+    Attributes
+    ----------
+    metric_inner_product : int
+        Constant for inner-product metric (used with index_factory).
+    metric_l2 : int
+        Constant for L2 distance metric (used with index_factory).
+    index_flat_ip : Callable[[int], FaissIndexProtocol]
+        Create a flat inner-product index.
+    index_id_map2 : Callable[[FaissIndexProtocol], FaissIndexProtocol]
+        Wrap an index with 64-bit ID mapping.
+    normalize_l2 : Callable[[VectorArray], None]
+        Normalize vectors to unit L2 norm in-place.
+
     Examples
     --------
     >>> from kgfoundry.search_api.types import FaissModuleProtocol, FaissIndexProtocol
@@ -287,12 +292,6 @@ class FaissModuleProtocol(Protocol):
             Index instance to save.
         path : str
             File path for the persisted index.
-
-        Raises
-        ------
-        OSError
-            If the file cannot be written.
-        """
         ...
 
     def read_index(self, path: str) -> FaissIndexProtocol:
@@ -310,14 +309,6 @@ class FaissModuleProtocol(Protocol):
         -------
         FaissIndexProtocol
             Loaded index instance.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the index file does not exist.
-        OSError
-            If the file cannot be read or is corrupted.
-        """
         ...
 
     normalize_l2: Callable[[VectorArray], None]
@@ -340,12 +331,7 @@ class GpuResourcesProtocol(Protocol):
     >>> resources: GpuResourcesProtocol = MockGpuResources()
     """
 
-    def __init__(self) -> None:
-        """Initialize GPU resources.
-
-        Sets up GPU memory management and resource allocation for FAISS GPU operations.
-        """
-        ...
+    def __init__(self) -> None: ...
 
 
 # [nav:anchor GpuClonerOptionsProtocol]
@@ -354,6 +340,11 @@ class GpuClonerOptionsProtocol(Protocol):
 
     This protocol describes the GpuClonerOptions interface used when cloning
     CPU indexes to GPU. The `use_cuvs` attribute controls cuVS acceleration.
+
+    Attributes
+    ----------
+    use_cuvs : bool
+        Enable cuVS acceleration for GPU operations (default: False).
 
     Examples
     --------
@@ -387,6 +378,17 @@ class VectorSearchResult:
         Final relevance score combining multiple signals (higher is better).
     vector_score : float
         Raw vector similarity score from FAISS search (inner product or L2).
+
+    Attributes
+    ----------
+    doc_id : str
+        Document identifier (URN format).
+    chunk_id : str
+        Chunk identifier within the document.
+    score : float
+        Final relevance score (may combine multiple signals).
+    vector_score : float
+        Raw vector similarity score (inner product or L2 distance).
 
     Examples
     --------
@@ -461,14 +463,6 @@ class SpladeEncoderProtocol(Protocol):
         VectorArray
             Sparse vector array of shape (len(texts), vocab_size) with float32 dtype.
             Vectors are typically sparse (many zeros) and represent term importance.
-
-        Raises
-        ------
-        RuntimeError
-            If the encoder model fails to load or encode.
-        ValueError
-            If input texts are invalid or exceed maximum sequence length.
-        """
         ...
 
 
@@ -510,14 +504,6 @@ class BM25IndexProtocol(Protocol):
         list[tuple[str, float]]
             List of (document_id, score) tuples, sorted by score descending.
             Scores are BM25 relevance scores (higher is better).
-
-        Raises
-        ------
-        RuntimeError
-            If the index has not been built or loaded.
-        ValueError
-            If the query is empty or invalid.
-        """
         ...
 
 
@@ -544,6 +530,20 @@ class AgentSearchQuery:
     explain : bool, optional
         Whether to include explanation metadata in results. When True, results include
         detailed scoring breakdowns and match highlights. Defaults to False.
+
+    Attributes
+    ----------
+    query : str
+        Search query text (tokenized and normalized internally). Cannot be empty.
+    k : int
+        Maximum number of results to return. Must be positive.
+    facets : Mapping[str, str] | None
+        Optional facet filters for narrowing search results. Common facets include:
+        package, module, kind, stability, deprecated. Values are matched exactly
+        (case-sensitive).
+    explain : bool
+        Whether to include explanation metadata in results. When True, results include
+        detailed scoring breakdowns and match highlights.
 
     Examples
     --------
@@ -738,16 +738,17 @@ def _legacy_normalize_l2(module: _LegacyFaissModule) -> Callable[[VectorArray], 
 
 
 class _FaissModuleAdapter:
-    """Adapter that exposes PEP 8 method names for FAISS modules."""
+    """Adapter that exposes PEP 8 method names for FAISS modules.
+
+    Initializes adapter with legacy FAISS module.
+
+    Parameters
+    ----------
+    module : _LegacyFaissModule
+        Legacy FAISS module with UPPER_CASE names.
+    """
 
     def __init__(self, module: _LegacyFaissModule) -> None:
-        """Initialize adapter with legacy FAISS module.
-
-        Parameters
-        ----------
-        module : _LegacyFaissModule
-            Legacy FAISS module with UPPER_CASE names.
-        """
         self._module = module
 
     @property

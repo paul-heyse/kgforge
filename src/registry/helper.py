@@ -52,6 +52,10 @@ class DuckDBRegistryHelper:
     doctags in the DuckDB registry. All operations use parameterized queries
     for safety and structured logging for observability.
 
+    Initializes the registry helper with database path. Sets up the helper
+    with the path to the DuckDB database file. The database will be created
+    if it doesn't exist.
+
     Parameters
     ----------
     db_path : str
@@ -59,16 +63,6 @@ class DuckDBRegistryHelper:
     """
 
     def __init__(self, db_path: str) -> None:
-        """Initialize the registry helper with database path.
-
-        Sets up the helper with the path to the DuckDB database file.
-        The database will be created if it doesn't exist.
-
-        Parameters
-        ----------
-        db_path : str
-            Path to the DuckDB database file.
-        """
         self.db_path = db_path
 
     def _connect(self) -> DuckDBPyConnection:

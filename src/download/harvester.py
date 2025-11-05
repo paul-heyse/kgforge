@@ -36,16 +36,16 @@ class HarvesterConfig:
     Provides configuration options for customizing API endpoints and output
     directory for the harvester. All fields have sensible defaults.
 
-    Parameters
+    Attributes
     ----------
-    openalex_base : str, optional
+    openalex_base : str
         Base URL for the OpenAlex API. Defaults to "https://api.openalex.org".
-    unpaywall_base : str, optional
+    unpaywall_base : str
         Base URL for the Unpaywall API. Defaults to "https://api.unpaywall.org".
-    pdf_host_base : str | None, optional
+    pdf_host_base : str | None
         Optional base URL for a custom PDF hosting service. If provided,
         PDFs will be resolved using this host. Defaults to None.
-    out_dir : str, optional
+    out_dir : str
         Output directory path where downloaded PDFs will be saved.
         Defaults to "/data/pdfs".
     """
@@ -64,6 +64,9 @@ class OpenAccessHarvester:
     PDF URLs through multiple sources (direct links, locations, Unpaywall, or
     custom PDF host), and download PDFs to local storage.
 
+    Sets up HTTP session with proper headers and creates output directory
+    if it doesn't exist.
+
     Parameters
     ----------
     user_agent : str
@@ -73,15 +76,6 @@ class OpenAccessHarvester:
     config : HarvesterConfig | None, optional
         Optional configuration object. If None, uses default HarvesterConfig.
         Defaults to None.
-
-    Raises
-    ------
-    TypeError
-        If OpenAlex API response has invalid structure.
-    DownloadError
-        If PDF download fails due to HTTP errors.
-    UnsupportedMIMEError
-        If downloaded content is not PDF-like.
     """
 
     def __init__(
@@ -90,21 +84,6 @@ class OpenAccessHarvester:
         contact_email: str,
         config: HarvesterConfig | None = None,
     ) -> None:
-        """Initialize the harvester with user agent, email, and configuration.
-
-        Sets up HTTP session with proper headers and creates output directory
-        if it doesn't exist.
-
-        Parameters
-        ----------
-        user_agent : str
-            User agent string for HTTP requests.
-        contact_email : str
-            Contact email address for API requests.
-        config : HarvesterConfig | None, optional
-            Optional configuration object. If None, uses default HarvesterConfig.
-            Defaults to None.
-        """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
         self.email = contact_email

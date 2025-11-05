@@ -117,7 +117,35 @@ class FaissConfig(BaseSettings):
 
 # [nav:anchor RuntimeSettings]
 class RuntimeSettings(BaseSettings):
-    """Aggregate runtime configuration loaded from environment variables."""
+    """Aggregate runtime configuration loaded from environment variables.
+
+    Initialises settings with fail-fast validation. Settings are loaded from
+    environment variables with the KGFOUNDRY_ prefix and validated according
+    to the nested configuration schemas.
+
+    Parameters
+    ----------
+    **overrides : object
+        Settings overrides to apply during initialization.
+
+    Attributes
+    ----------
+    model_config : ClassVar[SettingsConfigDict]
+        Pydantic model configuration dictionary (class variable).
+    search : SearchConfig
+        Search service configuration.
+    observability : ObservabilityConfig
+        Observability configuration.
+    sparse_embedding : SparseEmbeddingConfig
+        Sparse embedding configuration.
+    faiss : FaissConfig
+        FAISS index configuration.
+
+    Raises
+    ------
+    SettingsError
+        If settings validation fails.
+    """
 
     model_config = SettingsConfigDict(
         env_prefix="KGFOUNDRY_",
@@ -139,18 +167,6 @@ class RuntimeSettings(BaseSettings):
     faiss: FaissConfig = Field(default_factory=FaissConfig, description="FAISS index configuration")
 
     def __init__(self, **overrides: object) -> None:
-        """Initialise settings with fail-fast validation.
-
-        Parameters
-        ----------
-        **overrides : object
-            Settings overrides to apply.
-
-        Raises
-        ------
-        SettingsError
-            If settings validation fails.
-        """
         try:
             cast_overrides: dict[str, Any] = {
                 key: cast("Any", value) for key, value in overrides.items()

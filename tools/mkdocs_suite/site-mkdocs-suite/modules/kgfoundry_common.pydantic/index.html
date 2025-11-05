@@ -2,6 +2,8 @@
 <meta charset="utf-8">
 <meta content="width=device-width,initial-scale=1" name="viewport">
 <link href="https://example.invalid/docs/modules/kgfoundry_common.pydantic/" rel="canonical">
+<link href="../kgfoundry_common.prometheus/" rel="prev">
+<link href="../kgfoundry_common.safe_pickle_v2/" rel="next">
 <link href="../../assets/images/favicon.png" rel="icon">
 <meta content="mkdocs-1.6.1, mkdocs-material-9.6.23" name="generator">
 <title>kgfoundry_common.pydantic - KgFoundry MkDocs Suite</title>
@@ -11,6 +13,8 @@
 <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
 <link href="../../assets/_mkdocstrings.css" rel="stylesheet">
 <link href="../../assets/stylesheets/mkdocs_d2_plugin.css" rel="stylesheet">
+<link href="../../assets/mkdocs_puml/puml.css" rel="stylesheet">
+<link href="../../assets/mkdocs_puml/interaction.css" rel="stylesheet">
 <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
             html.glightbox-open { overflow: initial; height: 100%; }
@@ -128,10 +132,48 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="../..">
 <span class="md-ellipsis">
-    Overview
+    KgFoundry MkDocs Suite
     
   </span>
 </a>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../api/">
+<span class="md-ellipsis">
+    Api
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Api
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/interfaces/">
+<span class="md-ellipsis">
+    Interface Catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../api/openapi-cli/">
+<span class="md-ellipsis">
+    CLI Specification
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../../architecture/">
@@ -142,17 +184,9 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/">
+<a class="md-nav__link" href="../../cli/">
 <span class="md-ellipsis">
-    API
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../">
-<span class="md-ellipsis">
-    Modules
+    Cli
     
   </span>
 </a>
@@ -165,20 +199,387 @@
   </span>
 </a>
 </li>
-</ul>
-</nav>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_6" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../">
+<span class="md-ellipsis">
+    Modules
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
 </div>
-</div>
-</div>
-<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
-<div class="md-sidebar__scrollwrap">
-<div class="md-sidebar__inner">
+<nav aria-expanded="true" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            Modules
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling/">
+<span class="md-ellipsis">
+    docling
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling.vlm/">
+<span class="md-ellipsis">
+    docling.vlm
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling.canonicalizer/">
+<span class="md-ellipsis">
+    docling.canonicalizer
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../docling.hybrid/">
+<span class="md-ellipsis">
+    docling.hybrid
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../download.cli/">
+<span class="md-ellipsis">
+    download.cli
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../download/">
+<span class="md-ellipsis">
+    download
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../download.harvester/">
+<span class="md-ellipsis">
+    download.harvester
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_dense.base/">
+<span class="md-ellipsis">
+    embeddings_dense.base
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_dense/">
+<span class="md-ellipsis">
+    embeddings_dense
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_dense.qwen3/">
+<span class="md-ellipsis">
+    embeddings_dense.qwen3
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse.base/">
+<span class="md-ellipsis">
+    embeddings_sparse.base
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse.bm25/">
+<span class="md-ellipsis">
+    embeddings_sparse.bm25
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse/">
+<span class="md-ellipsis">
+    embeddings_sparse
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../embeddings_sparse.splade/">
+<span class="md-ellipsis">
+    embeddings_sparse.splade
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kg_builder/">
+<span class="md-ellipsis">
+    kg_builder
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kg_builder.mock_kg/">
+<span class="md-ellipsis">
+    kg_builder.mock_kg
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kg_builder.neo4j_store/">
+<span class="md-ellipsis">
+    kg_builder.neo4j_store
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.fs/">
+<span class="md-ellipsis">
+    kgfoundry_common.fs
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.gpu/">
+<span class="md-ellipsis">
+    kgfoundry_common.gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.ids/">
+<span class="md-ellipsis">
+    kgfoundry_common.ids
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common/">
+<span class="md-ellipsis">
+    kgfoundry_common
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.config/">
+<span class="md-ellipsis">
+    kgfoundry_common.config
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors.http/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.http
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors.codes/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.codes
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.errors.exceptions/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.exceptions/">
+<span class="md-ellipsis">
+    kgfoundry_common.exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.fastapi_helpers/">
+<span class="md-ellipsis">
+    kgfoundry_common.fastapi_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.jsonschema_utils/">
+<span class="md-ellipsis">
+    kgfoundry_common.jsonschema_utils
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.logging/">
+<span class="md-ellipsis">
+    kgfoundry_common.logging
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.models/">
+<span class="md-ellipsis">
+    kgfoundry_common.models
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.navmap_loader/">
+<span class="md-ellipsis">
+    kgfoundry_common.navmap_loader
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.navmap_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.navmap_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.numpy_typing/">
+<span class="md-ellipsis">
+    kgfoundry_common.numpy_typing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.observability/">
+<span class="md-ellipsis">
+    kgfoundry_common.observability
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.opentelemetry_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.opentelemetry_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.optional_deps/">
+<span class="md-ellipsis">
+    kgfoundry_common.optional_deps
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.parquet_io/">
+<span class="md-ellipsis">
+    kgfoundry_common.parquet_io
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.problem_details/">
+<span class="md-ellipsis">
+    kgfoundry_common.problem_details
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.prometheus/">
+<span class="md-ellipsis">
+    kgfoundry_common.prometheus
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" id="__toc" type="checkbox">
+<label class="md-nav__link md-nav__link--active" for="__toc">
+<span class="md-ellipsis">
+    kgfoundry_common.pydantic
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./">
+<span class="md-ellipsis">
+    kgfoundry_common.pydantic
+    
+  </span>
+</a>
 <nav aria-label="Table of contents" class="md-nav md-nav--secondary">
 <label class="md-nav__title" for="__toc">
 <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#inheritance">
+<span class="md-ellipsis">
+      Inheritance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dependencies-at-a-glance">
+<span class="md-ellipsis">
+      Dependencies at a Glance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#autorefs-examples">
+<span class="md-ellipsis">
+      Autorefs Examples
+    </span>
+</a>
+</li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#relationships">
 <span class="md-ellipsis">
@@ -213,29 +614,11 @@
 <nav aria-label="BaseModel" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel--parameters">
-<span class="md-ellipsis">
-      Parameters
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
 <a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.__init__">
 <span class="md-ellipsis">
       __init__
     </span>
 </a>
-<nav aria-label="__init__" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.__init__--parameters">
-<span class="md-ellipsis">
-      Parameters
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_dump">
@@ -243,17 +626,6 @@
       model_dump
     </span>
 </a>
-<nav aria-label="model_dump" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_dump--parameters">
-<span class="md-ellipsis">
-      Parameters
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_dump_json">
@@ -261,17 +633,6 @@
       model_dump_json
     </span>
 </a>
-<nav aria-label="model_dump_json" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_dump_json--parameters">
-<span class="md-ellipsis">
-      Parameters
-    </span>
-</a>
-</li>
-</ul>
-</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_validate">
@@ -279,17 +640,487 @@
       model_validate
     </span>
 </a>
-<nav aria-label="model_validate" class="md-nav">
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.safe_pickle_v2/">
+<span class="md-ellipsis">
+    kgfoundry_common.safe_pickle_v2
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.schema_helpers/">
+<span class="md-ellipsis">
+    kgfoundry_common.schema_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.sequence_guards/">
+<span class="md-ellipsis">
+    kgfoundry_common.sequence_guards
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.serialization/">
+<span class="md-ellipsis">
+    kgfoundry_common.serialization
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.settings/">
+<span class="md-ellipsis">
+    kgfoundry_common.settings
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.subprocess_utils/">
+<span class="md-ellipsis">
+    kgfoundry_common.subprocess_utils
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.types/">
+<span class="md-ellipsis">
+    kgfoundry_common.types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.typing/">
+<span class="md-ellipsis">
+    kgfoundry_common.typing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../kgfoundry_common.vector_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.vector_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../linking/">
+<span class="md-ellipsis">
+    linking
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../linking.calibration/">
+<span class="md-ellipsis">
+    linking.calibration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../linking.linker/">
+<span class="md-ellipsis">
+    linking.linker
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../observability/">
+<span class="md-ellipsis">
+    observability
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../observability.metrics/">
+<span class="md-ellipsis">
+    observability.metrics
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ontology/">
+<span class="md-ellipsis">
+    ontology
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ontology.catalog/">
+<span class="md-ellipsis">
+    ontology.catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../ontology.loader/">
+<span class="md-ellipsis">
+    ontology.loader
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.cli/">
+<span class="md-ellipsis">
+    orchestration.cli
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration/">
+<span class="md-ellipsis">
+    orchestration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.config/">
+<span class="md-ellipsis">
+    orchestration.config
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.fixture_flow/">
+<span class="md-ellipsis">
+    orchestration.fixture_flow
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.flows/">
+<span class="md-ellipsis">
+    orchestration.flows
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../orchestration.safe_pickle/">
+<span class="md-ellipsis">
+    orchestration.safe_pickle
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.api/">
+<span class="md-ellipsis">
+    registry.api
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry/">
+<span class="md-ellipsis">
+    registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.duckdb_helpers/">
+<span class="md-ellipsis">
+    registry.duckdb_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.duckdb_registry/">
+<span class="md-ellipsis">
+    registry.duckdb_registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.helper/">
+<span class="md-ellipsis">
+    registry.helper
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../registry.migrate/">
+<span class="md-ellipsis">
+    registry.migrate
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.app/">
+<span class="md-ellipsis">
+    search_api.app
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api/">
+<span class="md-ellipsis">
+    search_api
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.bm25_index/">
+<span class="md-ellipsis">
+    search_api.bm25_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.faiss_adapter/">
+<span class="md-ellipsis">
+    search_api.faiss_adapter
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.faiss_gpu/">
+<span class="md-ellipsis">
+    search_api.faiss_gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.fastapi_helpers/">
+<span class="md-ellipsis">
+    search_api.fastapi_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.fixture_index/">
+<span class="md-ellipsis">
+    search_api.fixture_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.fusion/">
+<span class="md-ellipsis">
+    search_api.fusion
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.kg_mock/">
+<span class="md-ellipsis">
+    search_api.kg_mock
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.schemas/">
+<span class="md-ellipsis">
+    search_api.schemas
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.service/">
+<span class="md-ellipsis">
+    search_api.service
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.splade_index/">
+<span class="md-ellipsis">
+    search_api.splade_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.types/">
+<span class="md-ellipsis">
+    search_api.types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_api.vectorstore_factory/">
+<span class="md-ellipsis">
+    search_api.vectorstore_factory
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_client/">
+<span class="md-ellipsis">
+    search_client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../search_client.client/">
+<span class="md-ellipsis">
+    search_client.client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../vectorstore_faiss.gpu/">
+<span class="md-ellipsis">
+    vectorstore_faiss.gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../vectorstore_faiss/">
+<span class="md-ellipsis">
+    vectorstore_faiss
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#inheritance">
+<span class="md-ellipsis">
+      Inheritance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#dependencies-at-a-glance">
+<span class="md-ellipsis">
+      Dependencies at a Glance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#autorefs-examples">
+<span class="md-ellipsis">
+      Autorefs Examples
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#relationships">
+<span class="md-ellipsis">
+      Relationships
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#contents">
+<span class="md-ellipsis">
+      Contents
+    </span>
+</a>
+<nav aria-label="Contents" class="md-nav">
 <ul class="md-nav__list">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_validate--parameters">
+<a class="md-nav__link" href="#kgfoundry_commonpydanticbasemodel">
 <span class="md-ellipsis">
-      Parameters
+      kgfoundry_common.pydantic.BaseModel
     </span>
 </a>
 </li>
 </ul>
 </nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel">
+<span class="md-ellipsis">
+      BaseModel
+    </span>
+</a>
+<nav aria-label="BaseModel" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.__init__">
+<span class="md-ellipsis">
+      __init__
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_dump">
+<span class="md-ellipsis">
+      model_dump
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_dump_json">
+<span class="md-ellipsis">
+      model_dump_json
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.pydantic.BaseModel.model_validate">
+<span class="md-ellipsis">
+      model_validate
+    </span>
+</a>
 </li>
 </ul>
 </nav>
@@ -307,21 +1138,181 @@
 <a class="md-content__button md-icon" href="https://github.com/example/kgfoundry/raw/main/src/kgfoundry_common/pydantic.py" title="View source of this page">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"></path></svg>
 </a>
-<h1 id="kgfoundry_commonpydantic">kgfoundry_common.pydantic</h1>
-<p>Compatibility helpers for Pydantic adapters used in kgfoundry.</p>
-<h2 id="relationships">Relationships</h2>
-<p><strong>Imports:</strong> <a href="../modules/__future__.annotations.md"><strong>future</strong>.annotations</a>, <a href="../modules/pydantic.BaseModel.md">pydantic.BaseModel</a>, <a href="../modules/typing.ClassVar.md">typing.ClassVar</a>, <a href="../modules/typing.Self.md">typing.Self</a>, <a href="../modules/typing.TYPE_CHECKING.md">typing.TYPE_CHECKING</a></p>
-<h2 id="contents">Contents</h2>
-<h3 id="kgfoundry_commonpydanticbasemodel">kgfoundry_common.pydantic.BaseModel</h3>
+<h1 id="kgfoundry_commonpydantic">kgfoundry_common.pydantic<a class="headerlink" href="#kgfoundry_commonpydantic" title="Permanent link">¶</a></h1>
+<p>Shared utilities and data structures used across KgFoundry services and tools.</p>
+<p><a href="https://github.com/example/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py">:material-source-repository: View source</a></p>
+<h2 id="inheritance">Inheritance<a class="headerlink" href="#inheritance" title="Permanent link">¶</a></h2>
+<pre class="mermaid"><code>classDiagram
+    class BaseModel
+</code></pre>
+<h2 id="dependencies-at-a-glance">Dependencies at a Glance<a class="headerlink" href="#dependencies-at-a-glance" title="Permanent link">¶</a></h2>
+<div class="d2"><svg aria-label="Diagram" data-d2-version="v0.7.1" preserveAspectRatio="xMinYMin meet" role="img" viewBox="0 0 867 898" xmlns:ns0="http://www.w3.org/1999/xlink"><svg class="d2-5023c94cfde04d74af7834e37c16260f d2-svg" height="898" viewBox="-101 -101 867 898" width="867"><rect class="fill-N7" fill="#FFFFFF" height="898.000000" rx="0.000000" stroke-width="0" width="867.000000" x="-101.000000" y="-101.000000"></rect><style type="text/css">
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-5023c94cfde04d74af7834e37c16260f .text-bold {
+	font-family: "d2-5023c94cfde04d74af7834e37c16260f-font-bold";
+}
+@font-face {
+	font-family: d2-5023c94cfde04d74af7834e37c16260f-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}</style><style type="text/css">.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N1{fill:#0A0F25;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N2{fill:#676C7E;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N3{fill:#9499AB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N4{fill:#CFD2DD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N5{fill:#DEE1EB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N6{fill:#EEF1F8;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-N7{fill:#FFFFFF;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-B1{fill:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-B2{fill:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-B3{fill:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-B4{fill:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-B5{fill:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-B6{fill:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-AA2{fill:#4A6FF3;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-AA4{fill:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-AA5{fill:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-AB4{fill:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .fill-AB5{fill:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N1{stroke:#0A0F25;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N2{stroke:#676C7E;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N3{stroke:#9499AB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N4{stroke:#CFD2DD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N5{stroke:#DEE1EB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N6{stroke:#EEF1F8;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-N7{stroke:#FFFFFF;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-B1{stroke:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-B2{stroke:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-B3{stroke:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-B4{stroke:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-B5{stroke:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-B6{stroke:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-AA2{stroke:#4A6FF3;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-AA4{stroke:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-AA5{stroke:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-AB4{stroke:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .stroke-AB5{stroke:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N1{background-color:#0A0F25;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N2{background-color:#676C7E;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N3{background-color:#9499AB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N4{background-color:#CFD2DD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N5{background-color:#DEE1EB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N6{background-color:#EEF1F8;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-N7{background-color:#FFFFFF;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-B1{background-color:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-B2{background-color:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-B3{background-color:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-B4{background-color:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-B5{background-color:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-B6{background-color:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-AA2{background-color:#4A6FF3;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-AA4{background-color:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-AA5{background-color:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-AB4{background-color:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .background-color-AB5{background-color:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N1{color:#0A0F25;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N2{color:#676C7E;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N3{color:#9499AB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N4{color:#CFD2DD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N5{color:#DEE1EB;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N6{color:#EEF1F8;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-N7{color:#FFFFFF;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-B1{color:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-B2{color:#0D32B2;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-B3{color:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-B4{color:#E3E9FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-B5{color:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-B6{color:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-AA2{color:#4A6FF3;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-AA4{color:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-AA5{color:#F7F8FE;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-AB4{color:#EDF0FD;}
+		.d2-5023c94cfde04d74af7834e37c16260f .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-5023c94cfde04d74af7834e37c16260f);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}</style><a href="./kgfoundry_common.pydantic.md" ns0:href="./kgfoundry_common.pydantic.md"><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLnB5ZGFudGljJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="256.000000" x="0.000000" y="315.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="128.000000" y="353.500000">kgfoundry_common.pydantic</text></g></a><g class="JiMzNDtfX2Z1dHVyZV9fLmFubm90YXRpb25zJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="212.000000" x="396.000000" y="0.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="502.000000" y="38.500000">__future__.annotations</text></g><g class="JiMzNDtweWRhbnRpYy5CYXNlTW9kZWwmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="189.000000" x="408.000000" y="126.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="502.500000" y="164.500000">pydantic.BaseModel</text></g><g class="JiMzNDt0eXBpbmcuQ2xhc3NWYXImIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="157.000000" x="424.000000" y="252.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="502.500000" y="290.500000">typing.ClassVar</text></g><g class="JiMzNDt0eXBpbmcuU2VsZiYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="124.000000" x="440.000000" y="378.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="502.000000" y="416.500000">typing.Self</text></g><g class="JiMzNDt0eXBpbmcuVFlQRV9DSEVDS0lORyYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="213.000000" x="396.000000" y="504.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="502.500000" y="542.500000">typing.TYPE_CHECKING</text></g><a href="https://github.com/example/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py" ns0:href="https://github.com/example/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py"><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLnB5ZGFudGljX2NvZGUmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="292.000000" x="356.000000" y="630.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="502.000000" y="668.500000">kgfoundry_common.pydantic code</text></g></a><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpYyYjMzQ7IC0mZ3Q7ICYjMzQ7X19mdXR1cmVfXy5hbm5vdGF0aW9ucyYjMzQ7KVswXQ=="><marker id="mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134" markerHeight="12.000000" markerUnits="userSpaceOnUse" markerWidth="10.000000" orient="auto" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000"> <polygon class="connection fill-B1" fill="#0D32B2" points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" stroke-width="2"></polygon> </marker><path class="connection stroke-B1" d="M 147.982279 313.257838 C 274.200012 89.399002 324.000000 33.000000 392.000000 33.000000" fill="none" marker-end="url(#mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134)" mask="url(#d2-5023c94cfde04d74af7834e37c16260f)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpYyYjMzQ7IC0mZ3Q7ICYjMzQ7cHlkYW50aWMuQmFzZU1vZGVsJiMzNDspWzBd"><path class="connection stroke-B1" d="M 160.371602 313.544422 C 276.600006 190.199997 326.299988 159.000000 403.500000 159.000000" fill="none" marker-end="url(#mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134)" mask="url(#d2-5023c94cfde04d74af7834e37c16260f)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpYyYjMzQ7IC0mZ3Q7ICYjMzQ7dHlwaW5nLkNsYXNzVmFyJiMzNDspWzBd"><path class="connection stroke-B1" d="M 222.885981 314.334360 C 289.000000 291.000000 329.500000 285.000000 419.500000 285.000000" fill="none" marker-end="url(#mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134)" mask="url(#d2-5023c94cfde04d74af7834e37c16260f)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpYyYjMzQ7IC0mZ3Q7ICYjMzQ7dHlwaW5nLlNlbGYmIzM0OylbMF0="><path class="connection stroke-B1" d="M 222.885981 381.665640 C 289.000000 405.000000 332.799988 411.000000 436.000000 411.000000" fill="none" marker-end="url(#mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134)" mask="url(#d2-5023c94cfde04d74af7834e37c16260f)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpYyYjMzQ7IC0mZ3Q7ICYjMzQ7dHlwaW5nLlRZUEVfQ0hFQ0tJTkcmIzM0OylbMF0="><path class="connection stroke-B1" d="M 160.371602 382.455578 C 276.600006 505.799988 323.899994 537.000000 391.500000 537.000000" fill="none" marker-end="url(#mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134)" mask="url(#d2-5023c94cfde04d74af7834e37c16260f)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpYyYjMzQ7IC0mZ3Q7ICYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5weWRhbnRpY19jb2RlJiMzNDspWzBd"><path class="connection stroke-B1" d="M 147.982282 382.742160 C 274.200012 606.599976 316.000000 663.000000 352.000000 663.000000" fill="none" marker-end="url(#mk-d2-5023c94cfde04d74af7834e37c16260f-3488378134)" mask="url(#d2-5023c94cfde04d74af7834e37c16260f)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="appendix-icon" transform="translate(240 299)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-5023c94cfde04d74af7834e37c16260f-EJVWOZTPOVXGI4TZL5RW63LNN5XC44DZMRQW45DJMMRA)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-5023c94cfde04d74af7834e37c16260f-EJVWOZTPOVXGI4TZL5RW63LNN5XC44DZMRQW45DJMMRA">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><g class="appendix-icon" transform="translate(632 614)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-5023c94cfde04d74af7834e37c16260f-EJVWOZTPOVXGI4TZL5RW63LNN5XC44DZMRQW45DJMNPWG33EMURA)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-5023c94cfde04d74af7834e37c16260f-EJVWOZTPOVXGI4TZL5RW63LNN5XC44DZMRQW45DJMNPWG33EMURA">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><mask height="898" id="d2-5023c94cfde04d74af7834e37c16260f" maskUnits="userSpaceOnUse" width="867" x="-101" y="-101">
+<rect fill="white" height="898" width="867" x="-101" y="-101"></rect>
+</mask></svg></svg></div>
+<blockquote>
+<p>See the full diagram: <a href="../../diagrams/modules/kgfoundry_common.pydantic.d2">kgfoundry_common.pydantic</a></p>
+</blockquote>
+<h2 id="autorefs-examples">Autorefs Examples<a class="headerlink" href="#autorefs-examples" title="Permanent link">¶</a></h2>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#kgfoundry_common.pydantic.BaseModel">kgfoundry_common.pydantic.BaseModel</a></li>
+</ul>
+<h2 id="relationships">Relationships<a class="headerlink" href="#relationships" title="Permanent link">¶</a></h2>
+<p><strong>Imports:</strong> <code>__future__.annotations</code>, <code>pydantic.BaseModel</code>, <code>typing.ClassVar</code>, <code>typing.Self</code>, <code>typing.TYPE_CHECKING</code></p>
+<h2 id="contents">Contents<a class="headerlink" href="#contents" title="Permanent link">¶</a></h2>
+<h3 id="kgfoundry_commonpydanticbasemodel">kgfoundry_common.pydantic.BaseModel<a class="headerlink" href="#kgfoundry_commonpydanticbasemodel" title="Permanent link">¶</a></h3>
 <div class="doc doc-object doc-class">
 <h2 class="doc doc-heading" id="kgfoundry_common.pydantic.BaseModel">
 <code>kgfoundry_common.pydantic.BaseModel</code>
-</h2>
+<a class="headerlink" href="#kgfoundry_common.pydantic.BaseModel" title="Permanent link">¶</a></h2>
 <div class="doc doc-contents first">
 <p>Typing-friendly stub that mirrors Pydantic's <code>BaseModel</code>.</p>
-<h4 id="kgfoundry_common.pydantic.BaseModel--parameters">Parameters</h4>
-<p>**data : Any
-    Keyword arguments accepted by the Pydantic model.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>**data</code>
+</td>
+<td>
+<code><span title="Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Keyword arguments accepted by the Pydantic model.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/pydantic.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
@@ -473,13 +1464,39 @@
 <div class="doc doc-object doc-function">
 <h3 class="doc doc-heading" id="kgfoundry_common.pydantic.BaseModel.__init__">
 <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></code>
-</h3>
+<a class="headerlink" href="#kgfoundry_common.pydantic.BaseModel.__init__" title="Permanent link">¶</a></h3>
 <div class="doc doc-contents">
 <p>Populate the model from keyword arguments.</p>
-<h5 id="kgfoundry_common.pydantic.BaseModel.__init__--parameters">Parameters</h5>
-<p>**data : Any
-    Keyword arguments forwarded to the underlying Pydantic model
-    constructor.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>**data</code>
+</td>
+<td>
+<code><span title="Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Keyword arguments forwarded to the underlying Pydantic model
+constructor.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/pydantic.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">21</span>
@@ -508,12 +1525,38 @@
 <div class="doc doc-object doc-function">
 <h3 class="doc doc-heading" id="kgfoundry_common.pydantic.BaseModel.model_dump">
 <code class="highlight language-python"><span class="n">model_dump</span><span class="p">(</span><span class="o">**</span><span class="n">model_dump_kwargs</span><span class="p">)</span></code>
-</h3>
+<a class="headerlink" href="#kgfoundry_common.pydantic.BaseModel.model_dump" title="Permanent link">¶</a></h3>
 <div class="doc doc-contents">
 <p>Return the dictionary representation produced by Pydantic.</p>
-<h5 id="kgfoundry_common.pydantic.BaseModel.model_dump--parameters">Parameters</h5>
-<p>**model_dump_kwargs : dict[str, object]
-    Keyword arguments forwarded to :meth:<code>pydantic.BaseModel.model_dump</code>.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>**model_dump_kwargs</code>
+</td>
+<td>
+<code><span title="dict">dict</span>[<span title="str">str</span>, <span title="object">object</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Keyword arguments forwarded to :meth:<code>pydantic.BaseModel.model_dump</code>.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/pydantic.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
@@ -542,12 +1585,38 @@
 <div class="doc doc-object doc-function">
 <h3 class="doc doc-heading" id="kgfoundry_common.pydantic.BaseModel.model_dump_json">
 <code class="highlight language-python"><span class="n">model_dump_json</span><span class="p">(</span><span class="o">**</span><span class="n">model_dump_json_kwargs</span><span class="p">)</span></code>
-</h3>
+<a class="headerlink" href="#kgfoundry_common.pydantic.BaseModel.model_dump_json" title="Permanent link">¶</a></h3>
 <div class="doc doc-contents">
 <p>Return the JSON representation produced by Pydantic.</p>
-<h5 id="kgfoundry_common.pydantic.BaseModel.model_dump_json--parameters">Parameters</h5>
-<p>**model_dump_json_kwargs : dict[str, object]
-    Keyword arguments forwarded to :meth:<code>pydantic.BaseModel.model_dump_json</code>.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>**model_dump_json_kwargs</code>
+</td>
+<td>
+<code><span title="dict">dict</span>[<span title="str">str</span>, <span title="object">object</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Keyword arguments forwarded to :meth:<code>pydantic.BaseModel.model_dump_json</code>.</p>
+</div>
+</td>
+<td>
+<code>{}</code>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/pydantic.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
@@ -579,30 +1648,140 @@
 <span class="doc doc-labels">
 <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
 </span>
-</h3>
+<a class="headerlink" href="#kgfoundry_common.pydantic.BaseModel.model_validate" title="Permanent link">¶</a></h3>
 <div class="doc doc-contents">
 <p>Validate <code>obj</code> using the underlying Pydantic implementation.</p>
-<h5 id="kgfoundry_common.pydantic.BaseModel.model_validate--parameters">Parameters</h5>
-<p>obj : Any
-    Instance or mapping to validate.
-strict : bool | None, optional
-    Whether to forbid coercion during validation.
-    Defaults to <code>None</code> (defer to Pydantic).
-extra : ExtraValues | None, optional
-    Strategy for handling extra keys.
-    Defaults to <code>None</code> (use model configuration).
-from_attributes : bool | None, optional
-    Allow attribute-based population when <code>obj</code> is not a mapping.
-    Defaults to <code>None</code> (follow model configuration).
-context : Any | None, optional
-    Context data available to validators.
-    Defaults to <code>None</code>.
-by_alias : bool | None, optional
-    Interpret alias names when reading <code>obj</code>.
-    Defaults to <code>None</code> (inherit from configuration).
-by_name : bool | None, optional
-    Permit field-name based population alongside aliases.
-    Defaults to <code>None</code>.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>obj</code>
+</td>
+<td>
+<code><span title="Any">Any</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Instance or mapping to validate.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>strict</code>
+</td>
+<td>
+<code><span title="bool">bool</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Whether to forbid coercion during validation.
+Defaults to <code>None</code> (defer to Pydantic).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>extra</code>
+</td>
+<td>
+<code><span title="ExtraValues">ExtraValues</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Strategy for handling extra keys.
+Defaults to <code>None</code> (use model configuration).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>from_attributes</code>
+</td>
+<td>
+<code><span title="bool">bool</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Allow attribute-based population when <code>obj</code> is not a mapping.
+Defaults to <code>None</code> (follow model configuration).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>context</code>
+</td>
+<td>
+<code><span title="Any">Any</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Context data available to validators.
+Defaults to <code>None</code>.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>by_alias</code>
+</td>
+<td>
+<code><span title="bool">bool</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Interpret alias names when reading <code>obj</code>.
+Defaults to <code>None</code> (inherit from configuration).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>by_name</code>
+</td>
+<td>
+<code><span title="bool">bool</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Permit field-name based population alongside aliases.
+Defaults to <code>None</code>.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
 <details class="quote">
 <summary>Source code in <code>src/kgfoundry_common/pydantic.py</code></summary>
 <div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">32</span>
@@ -672,7 +1851,7 @@ by_name : bool | None, optional
 <span class="md-icon" title="Last update">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
 </span>
-<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2025 11:57:58 UTC">November 5, 2025</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2025 17:26:50 UTC">November 5, 2025</span>
 </span>
 </aside>
 </article>
@@ -685,6 +1864,34 @@ by_name : bool | None, optional
 </button>
 </main>
 <footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: kgfoundry_common.prometheus" class="md-footer__link md-footer__link--prev" href="../kgfoundry_common.prometheus/">
+<div class="md-footer__button md-icon">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                kgfoundry_common.prometheus
+              </div>
+</div>
+</a>
+<a aria-label="Next: kgfoundry_common.safe_pickle_v2" class="md-footer__link md-footer__link--next" href="../kgfoundry_common.safe_pickle_v2/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                kgfoundry_common.safe_pickle_v2
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
 <div class="md-footer-meta md-typeset">
 <div class="md-footer-meta__inner md-grid">
 <div class="md-copyright">
@@ -704,7 +1911,13 @@ by_name : bool | None, optional
 </div>
 <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.tracking", "navigation.footer", "content.action.edit", "content.action.view"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
 <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
-<script>document$.subscribe(() => {
+<script src="../../assets/mkdocs_puml/puml.js"></script>
+<script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<script src="../../assets/mkdocs_puml/interaction.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+window.mermaidConfig = {default: {
+    startOnLoad: false
+}};</script><script>document$.subscribe(() => {
             const dark_scheme_name = "slate"
             
             window.scheme = document.body.getAttribute("data-md-color-scheme")

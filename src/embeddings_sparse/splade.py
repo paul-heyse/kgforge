@@ -192,10 +192,6 @@ class ImpactHitProtocol(Protocol):
 class LuceneImpactSearcherProtocol(Protocol):
     """Protocol for Lucene-backed SPLADE searchers."""
 
-    def __init__(self, index_dir: str, *, query_encoder: str | None = None) -> None:
-        """Initialise the searcher with an index directory and optional encoder."""
-        ...
-
     def search(self, query: str, k: int) -> Sequence[ImpactHitProtocol]:
         """Return the top ``k`` SPLADE impact hits for ``query``."""
         ...
@@ -229,6 +225,8 @@ class SPLADEv3Encoder:
     Provides an interface for encoding text into SPLADE sparse embeddings.
     Currently a skeleton implementation that raises NotImplementedError.
 
+    Initializes the SPLADE-v3 encoder with model configuration and device settings.
+
     Parameters
     ----------
     model_id : str, optional
@@ -242,11 +240,11 @@ class SPLADEv3Encoder:
     max_seq_len : int, optional
         Maximum sequence length for tokenization. Defaults to 512.
 
-    Raises
-    ------
-    NotImplementedError
-        The encode method is not implemented in the skeleton. Use LuceneImpactIndex
-        for SPLADE-based retrieval instead.
+    Attributes
+    ----------
+    name : ClassVar[str]
+        Encoder name identifier ("SPLADE-v3-distilbert").
+
 
     Notes
     -----
@@ -263,19 +261,6 @@ class SPLADEv3Encoder:
         topk: int = 256,
         max_seq_len: int = 512,
     ) -> None:
-        """Initialize SPLADE-v3 encoder.
-
-        Parameters
-        ----------
-        model_id : str, optional
-            Hugging Face model identifier. Defaults to "naver/splade-v3-distilbert".
-        device : str, optional
-            Device to run inference on. Defaults to "cuda".
-        topk : int, optional
-            Number of top-k vocabulary tokens to retain. Defaults to 256.
-        max_seq_len : int, optional
-            Maximum sequence length for tokenization. Defaults to 512.
-        """
         self.model_id = model_id
         self.device = device
         self.topk = topk
@@ -291,6 +276,11 @@ class SPLADEv3Encoder:
         ----------
         texts : list[str]
             List of text strings to encode.
+
+        Returns
+        -------
+        list[tuple[list[int], list[float]]]
+            List of (token_ids, weights) tuples, one per input text.
 
         Raises
         ------
@@ -319,23 +309,13 @@ class PureImpactIndex:
     Python dictionaries and lists. Suitable for small to medium-sized indexes
     that fit in memory.
 
+    Initializes the SPLADE impact index with an index directory.
+
     Parameters
     ----------
     index_dir : str
         Directory path where index metadata will be stored. Created if it
         doesn't exist.
-
-    Attributes
-    ----------
-    index_dir : str
-        Directory path for index storage.
-    df : dict[str, int]
-        Document frequency dictionary mapping tokens to document counts.
-    N : int
-        Total number of documents in the index.
-    postings : dict[str, dict[str, float]]
-        Postings list mapping tokens to document ID → impact weight mappings.
-        Weights combine term frequency (log1p) with IDF scoring.
 
     Notes
     -----
@@ -345,14 +325,6 @@ class PureImpactIndex:
     """
 
     def __init__(self, index_dir: str) -> None:
-        """Initialize SPLADE impact index.
-
-        Parameters
-        ----------
-        index_dir : str
-            Directory path where index metadata will be stored. Created if it
-            doesn't exist.
-        """
         self.index_dir = index_dir
         self.df: dict[str, int] = {}
         self.N = 0
@@ -555,6 +527,8 @@ class LuceneImpactIndex:
     search. Suitable for large indexes that benefit from disk-backed storage
     and optimized search performance.
 
+    Initializes the Lucene impact index with an index directory and optional query encoder.
+
     Parameters
     ----------
     index_dir : str
@@ -564,20 +538,6 @@ class LuceneImpactIndex:
         Hugging Face model identifier for query encoding. Defaults to
         "naver/splade-v3-distilbert".
 
-    Attributes
-    ----------
-    index_dir : str
-        Directory path for Lucene index storage.
-    query_encoder : str
-        Hugging Face model identifier for query encoding.
-    _searcher : LuceneImpactSearcherProtocol | None
-        Cached Lucene impact searcher instance (lazy-initialized).
-
-    Raises
-    ------
-    RuntimeError
-        If Pyserini is not available or LuceneImpactSearcher cannot be imported.
-
     Notes
     -----
     Requires the optional ``pyserini`` dependency. Import errors propagate as
@@ -586,17 +546,6 @@ class LuceneImpactIndex:
     """
 
     def __init__(self, index_dir: str, query_encoder: str = "naver/splade-v3-distilbert") -> None:
-        """Initialize Lucene impact index.
-
-        Parameters
-        ----------
-        index_dir : str
-            Directory path where the Lucene impact index is stored. Must exist
-            and contain a valid Lucene index.
-        query_encoder : str, optional
-            Hugging Face model identifier for query encoding. Defaults to
-            "naver/splade-v3-distilbert".
-        """
         self.index_dir = index_dir
         self.query_encoder = query_encoder
         self._searcher: LuceneImpactSearcherProtocol | None = None

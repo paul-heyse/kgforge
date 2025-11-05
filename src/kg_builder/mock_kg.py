@@ -22,13 +22,11 @@ class MockKG:
 
     Provides a simple dictionary-based implementation of a knowledge graph with concept mentions and
     edges for use in tests and fixtures.
+
+    Creates empty mappings for chunk-to-concepts and concept neighbors.
     """
 
     def __init__(self) -> None:
-        """Initialize empty mock knowledge graph.
-
-        Creates empty mappings for chunk-to-concepts and concept neighbors.
-        """
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 

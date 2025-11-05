@@ -107,6 +107,11 @@ def typed_dependency[**P, T](
         -------
         T
             Result from the dependency function.
+
+        Raises
+        ------
+        Exception
+            Any exception raised by the dependency is propagated after logging.
         """
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
@@ -160,6 +165,11 @@ def typed_exception_handler[E: Exception](
         -------
         Response
             Response from the exception handler.
+
+        Raises
+        ------
+        Exception
+            Any exception raised by the handler is propagated after logging.
         """
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
@@ -207,10 +217,17 @@ def typed_middleware(
     """Register ``middleware_class`` with instrumentation and timeouts."""
 
     class _InstrumentedMiddleware(BaseHTTPMiddleware):
-        """Middleware wrapper that adds logging, metrics, and timeout controls."""
+        """Middleware wrapper that adds logging, metrics, and timeout controls.
+
+        Instantiates the wrapped middleware and records configuration.
+
+        Parameters
+        ----------
+        app : ASGIApp
+            ASGI application instance.
+        """
 
         def __init__(self, app: ASGIApp) -> None:
-            """Instantiate the wrapped middleware and record configuration."""
             self._delegate = middleware_class(app, *factory_args, **options)
             super().__init__(app)
 
@@ -231,7 +248,12 @@ def typed_middleware(
             Returns
             -------
             Response
-                HTTP response.
+            HTTP response.
+
+            Raises
+            ------
+            Exception
+            Any exception raised by the middleware is propagated after logging.
             """
             correlation_id = get_correlation_id()
             with with_fields(logger, operation=name, correlation_id=correlation_id) as log:

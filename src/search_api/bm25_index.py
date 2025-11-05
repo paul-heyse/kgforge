@@ -195,6 +195,23 @@ class BM25Doc:
         Section name or heading where this chunk appears.
     tf : dict[str, float]
         Term frequency dictionary mapping token strings to their frequencies
+    in this chunk. Title terms have weight 2.0, section terms 1.2, body
+        terms 1.0.
+    dl : float
+        Document length (sum of all term frequencies in this chunk).
+
+    Attributes
+    ----------
+    chunk_id : str
+        Unique identifier for this document chunk.
+    doc_id : str
+        Parent document identifier that this chunk belongs to.
+    title : str
+        Document title (used for weighted term frequency in indexing).
+    section : str
+        Section name or heading where this chunk appears.
+    tf : dict[str, float]
+        Term frequency dictionary mapping token strings to their frequencies
         in this chunk. Title terms have weight 2.0, section terms 1.2, body
         terms 1.0.
     dl : float
@@ -232,22 +249,6 @@ class BM25Index:
         normalization. Values closer to 1.0 normalize more aggressively.
         Defaults to 0.4.
 
-    Attributes
-    ----------
-    k1 : float
-        Term frequency saturation parameter.
-    b : float
-        Document length normalization parameter.
-    docs : list[BM25Doc]
-        List of indexed documents.
-    df : dict[str, int]
-        Document frequency dictionary mapping tokens to the number of
-        documents containing them.
-    N : int
-        Total number of documents in the index.
-    avgdl : float
-        Average document length across all documents.
-
     Notes
     -----
     BM25 scoring formula:
@@ -266,15 +267,6 @@ class BM25Index:
     """
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """Initialize BM25 index with scoring parameters.
-
-        Parameters
-        ----------
-        k1 : float, optional
-            Term frequency saturation parameter. Defaults to 0.9.
-        b : float, optional
-            Document length normalization parameter. Defaults to 0.4.
-        """
         self.k1 = k1
         self.b = b
         self.docs: list[BM25Doc] = []

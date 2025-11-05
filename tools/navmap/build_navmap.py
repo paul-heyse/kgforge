@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import ast
 import copy
-import importlib
 import json
 import os
 import re
@@ -934,30 +933,56 @@ def _parse_py(py: Path) -> tuple[dict[str, ResolvedNavValue], list[str]]:
 
 
 def _load_runtime_navmap(
-    module_name: str, exports: list[str]
+    module_name: str, exports: list[str], source: Path
 ) -> tuple[dict[str, ResolvedNavValue], list[str]]:
-    """Load ``__navmap__`` by importing ``module_name`` when AST parsing fails.
+    """Load navigation metadata from JSON sidecars when AST parsing fails.
+
+    Parameters
+    ----------
+    module_name : str
+        Fully qualified module name used for logging.
+    exports : list[str]
+        Export list discovered from ``__all__`` literals (may be empty).
+    source : Path
+        Filesystem path to the Python module being processed.
 
     Returns
     -------
     tuple[dict[str, ResolvedNavValue], list[str]]
         Tuple containing the navmap dictionary (if discovered) and the deduped export list.
     """
-    try:
-        module = importlib.import_module(module_name)
-    except ImportError as exc:  # pragma: no cover - runtime fallback
-        LOGGER.debug("Unable to import %s for nav metadata: %s", module_name, exc)
-        return {}, exports
+    sidecar_candidates: list[Path] = []
+    if source.name == "__init__.py":
+        sidecar_candidates.append(source.parent / "_nav.json")
+    module_sidecar = source.with_name(f"{source.stem}._nav.json")
+    sidecar_candidates.append(module_sidecar)
 
-    nav_data = getattr(module, "__navmap__", None)
-    if not isinstance(nav_data, dict):
-        return {}, exports
+    seen: set[Path] = set()
+    for candidate in sidecar_candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if not candidate.is_file():
+            continue
+        try:
+            nav_data = json.loads(candidate.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:  # pragma: no cover - filesystem noise
+            LOGGER.warning("Failed to read nav sidecar %s: %s", candidate, exc)
+            continue
+        if not isinstance(nav_data, dict):
+            LOGGER.warning("Nav sidecar %s did not contain an object", candidate)
+            continue
+        nav_copy: dict[str, ResolvedNavValue] = copy.deepcopy(nav_data)
+        nav_exports = nav_copy.get("exports")
+        if isinstance(nav_exports, list):
+            exports = _dedupe_exports([item for item in nav_exports if isinstance(item, str)])
+            nav_copy["exports"] = exports
+        elif exports:
+            nav_copy["exports"] = exports
+        return nav_copy, exports
 
-    nav_copy: dict[str, ResolvedNavValue] = copy.deepcopy(nav_data)
-    nav_exports = nav_copy.get("exports")
-    if isinstance(nav_exports, list):
-        exports = _dedupe_exports([item for item in nav_exports if isinstance(item, str)])
-    return nav_copy, exports
+    LOGGER.debug("No nav sidecar discovered for module %s", module_name)
+    return {}, exports
 
 
 def _scan_inline_markers(py: Path) -> tuple[dict[str, int], dict[str, int]]:
@@ -1026,7 +1051,7 @@ def _collect_module(py: Path) -> ModuleInfo | None:
         return None
     navmap_dict, exports = _parse_py(py)
     if not navmap_dict:
-        navmap_dict, exports = _load_runtime_navmap(mod, exports)
+        navmap_dict, exports = _load_runtime_navmap(mod, exports, py)
     sections, anchors = _scan_inline_markers(py)
 
     # Normalize sections to kebab-case and ensure symbol lists are unique & stable

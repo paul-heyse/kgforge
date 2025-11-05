@@ -47,6 +47,15 @@ class NavSection(TypedDict):
         Human-readable section title.
     symbols : list[str]
         List of symbol names included in this section.
+
+    Attributes
+    ----------
+    id : str
+        Unique section identifier.
+    title : str
+        Human-readable section title.
+    symbols : list[str]
+        List of symbol names included in this section.
     """
 
     id: str
@@ -90,6 +99,35 @@ class SymbolMeta(TypedDict, total=False):
         List of contract identifiers (e.g., JSON Schema URIs).
     coverage_target : float, optional
         Test coverage target percentage.
+
+    Attributes
+    ----------
+    since : str
+        Version when the symbol was introduced.
+    stability : Stability
+        Stability level of the symbol.
+    side_effects : list[Literal['none', 'fs', 'net', 'gpu', 'db']]
+        List of side effects the symbol may have.
+    thread_safety : Literal['reentrant', 'threadsafe', 'not-threadsafe']
+        Thread safety guarantee of the symbol.
+    async_ok : bool
+        Whether the symbol is safe to use in async contexts.
+    perf_budget_ms : float
+        Performance budget in milliseconds.
+    tests : list[str]
+        List of test file paths or identifiers.
+    owner : NotRequired[str]
+        Owner or team responsible for the symbol.
+    deprecated_in : NotRequired[str]
+        Version when the symbol was deprecated.
+    replaced_by : NotRequired[str]
+        Symbol name that replaces this deprecated symbol.
+    deprecated_msg : NotRequired[str]
+        Deprecation message explaining the change.
+    contracts : NotRequired[list[str]]
+        List of contract identifiers (e.g., JSON Schema URIs).
+    coverage_target : NotRequired[float]
+        Test coverage target percentage.
     """
 
     since: str
@@ -123,6 +161,17 @@ class ModuleMeta(TypedDict, total=False):
     since : str
         Version when the module was introduced.
     deprecated_in : str, optional
+        Version when the module was deprecated.
+
+    Attributes
+    ----------
+    owner : str
+        Owner or team responsible for the module.
+    stability : Stability
+        Stability level of the module.
+    since : str
+        Version when the module was introduced.
+    deprecated_in : str
         Version when the module was deprecated.
     """
 
@@ -165,6 +214,33 @@ class NavMap(TypedDict, total=False):
     deps : list[str], optional
         List of dependency module names.
     module_meta : ModuleMeta, optional
+        Module-level metadata.
+
+    Attributes
+    ----------
+    title : str
+        Module title.
+    synopsis : str
+        Brief description of the module.
+    exports : list[str]
+        List of public symbol names exported by the module.
+    sections : list[NavSection]
+        List of navigation sections organizing the symbols.
+    see_also : list[str]
+        List of related modules or resources.
+    tags : list[str]
+        List of tags for categorization.
+    since : str
+        Version when the module was introduced.
+    deprecated : str
+        Version when the module was deprecated.
+    symbols : dict[str, SymbolMeta]
+        Dictionary mapping symbol names to their metadata.
+    edit_scopes : dict[str, list[str]]
+        Dictionary mapping edit scopes to symbol lists.
+    deps : list[str]
+        List of dependency module names.
+    module_meta : ModuleMeta
         Module-level metadata.
     """
 

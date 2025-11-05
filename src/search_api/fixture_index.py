@@ -84,6 +84,19 @@ class FixtureDoc:
         Section name or identifier within the document.
     text : str
         Text content of the chunk.
+
+    Attributes
+    ----------
+    chunk_id : str
+        Unique identifier for the chunk.
+    doc_id : str
+        Document identifier that this chunk belongs to.
+    title : str
+        Title of the document.
+    section : str
+        Section name or identifier within the document.
+    text : str
+        Text content of the chunk.
     """
 
     chunk_id: str
@@ -111,19 +124,6 @@ class FixtureIndex:
     """
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Initialize the fixture index and load documents from DuckDB.
-
-        Connects to the DuckDB catalog, loads the latest chunks dataset,
-        and builds the lexical index (TF/DF structures) for search.
-
-        Parameters
-        ----------
-        root : str, optional
-            Root directory path for data files. Defaults to "/data".
-        db_path : str, optional
-            Path to DuckDB catalog database file. Defaults to
-            "/data/catalog/catalog.duckdb".
-        """
         self.root = Path(root)
         self.db_path = db_path
         self.docs: list[FixtureDoc] = []

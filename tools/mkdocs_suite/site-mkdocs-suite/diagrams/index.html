@@ -2,7 +2,8 @@
 <meta charset="utf-8">
 <meta content="width=device-width,initial-scale=1" name="viewport">
 <link href="https://example.invalid/docs/diagrams/" rel="canonical">
-<link href="../modules/" rel="prev">
+<link href="../cli/" rel="prev">
+<link href="../modules/" rel="next">
 <link href="../assets/images/favicon.png" rel="icon">
 <meta content="mkdocs-1.6.1, mkdocs-material-9.6.23" name="generator">
 <title>Diagrams - KgFoundry MkDocs Suite</title>
@@ -12,6 +13,8 @@
 <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
 <link href="../assets/_mkdocstrings.css" rel="stylesheet">
 <link href="../assets/stylesheets/mkdocs_d2_plugin.css" rel="stylesheet">
+<link href="../assets/mkdocs_puml/puml.css" rel="stylesheet">
+<link href="../assets/mkdocs_puml/interaction.css" rel="stylesheet">
 <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
             html.glightbox-open { overflow: initial; height: 100%; }
@@ -129,10 +132,48 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="..">
 <span class="md-ellipsis">
-    Overview
+    KgFoundry MkDocs Suite
     
   </span>
 </a>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../api/">
+<span class="md-ellipsis">
+    Api
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Api
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../api/interfaces/">
+<span class="md-ellipsis">
+    Interface Catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../api/openapi-cli/">
+<span class="md-ellipsis">
+    CLI Specification
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="../architecture/">
@@ -143,17 +184,9 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../api/">
+<a class="md-nav__link" href="../cli/">
 <span class="md-ellipsis">
-    API
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../modules/">
-<span class="md-ellipsis">
-    Modules
+    Cli
     
   </span>
 </a>
@@ -166,6 +199,732 @@
     
   </span>
 </a>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_6" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../modules/">
+<span class="md-ellipsis">
+    Modules
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_6_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+            Modules
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/docling/">
+<span class="md-ellipsis">
+    docling
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/docling.vlm/">
+<span class="md-ellipsis">
+    docling.vlm
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/docling.canonicalizer/">
+<span class="md-ellipsis">
+    docling.canonicalizer
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/docling.hybrid/">
+<span class="md-ellipsis">
+    docling.hybrid
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/download.cli/">
+<span class="md-ellipsis">
+    download.cli
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/download/">
+<span class="md-ellipsis">
+    download
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/download.harvester/">
+<span class="md-ellipsis">
+    download.harvester
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_dense.base/">
+<span class="md-ellipsis">
+    embeddings_dense.base
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_dense/">
+<span class="md-ellipsis">
+    embeddings_dense
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_dense.qwen3/">
+<span class="md-ellipsis">
+    embeddings_dense.qwen3
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_sparse.base/">
+<span class="md-ellipsis">
+    embeddings_sparse.base
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_sparse.bm25/">
+<span class="md-ellipsis">
+    embeddings_sparse.bm25
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_sparse/">
+<span class="md-ellipsis">
+    embeddings_sparse
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/embeddings_sparse.splade/">
+<span class="md-ellipsis">
+    embeddings_sparse.splade
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kg_builder/">
+<span class="md-ellipsis">
+    kg_builder
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kg_builder.mock_kg/">
+<span class="md-ellipsis">
+    kg_builder.mock_kg
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kg_builder.neo4j_store/">
+<span class="md-ellipsis">
+    kg_builder.neo4j_store
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.fs/">
+<span class="md-ellipsis">
+    kgfoundry_common.fs
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.gpu/">
+<span class="md-ellipsis">
+    kgfoundry_common.gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.ids/">
+<span class="md-ellipsis">
+    kgfoundry_common.ids
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common/">
+<span class="md-ellipsis">
+    kgfoundry_common
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.config/">
+<span class="md-ellipsis">
+    kgfoundry_common.config
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.errors.http/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.http
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.errors/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.errors.codes/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.codes
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.errors.exceptions/">
+<span class="md-ellipsis">
+    kgfoundry_common.errors.exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.exceptions/">
+<span class="md-ellipsis">
+    kgfoundry_common.exceptions
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.fastapi_helpers/">
+<span class="md-ellipsis">
+    kgfoundry_common.fastapi_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.jsonschema_utils/">
+<span class="md-ellipsis">
+    kgfoundry_common.jsonschema_utils
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.logging/">
+<span class="md-ellipsis">
+    kgfoundry_common.logging
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.models/">
+<span class="md-ellipsis">
+    kgfoundry_common.models
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.navmap_loader/">
+<span class="md-ellipsis">
+    kgfoundry_common.navmap_loader
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.navmap_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.navmap_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.numpy_typing/">
+<span class="md-ellipsis">
+    kgfoundry_common.numpy_typing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.observability/">
+<span class="md-ellipsis">
+    kgfoundry_common.observability
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.opentelemetry_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.opentelemetry_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.optional_deps/">
+<span class="md-ellipsis">
+    kgfoundry_common.optional_deps
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.parquet_io/">
+<span class="md-ellipsis">
+    kgfoundry_common.parquet_io
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.problem_details/">
+<span class="md-ellipsis">
+    kgfoundry_common.problem_details
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.prometheus/">
+<span class="md-ellipsis">
+    kgfoundry_common.prometheus
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.pydantic/">
+<span class="md-ellipsis">
+    kgfoundry_common.pydantic
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.safe_pickle_v2/">
+<span class="md-ellipsis">
+    kgfoundry_common.safe_pickle_v2
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.schema_helpers/">
+<span class="md-ellipsis">
+    kgfoundry_common.schema_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.sequence_guards/">
+<span class="md-ellipsis">
+    kgfoundry_common.sequence_guards
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.serialization/">
+<span class="md-ellipsis">
+    kgfoundry_common.serialization
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.settings/">
+<span class="md-ellipsis">
+    kgfoundry_common.settings
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.subprocess_utils/">
+<span class="md-ellipsis">
+    kgfoundry_common.subprocess_utils
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.types/">
+<span class="md-ellipsis">
+    kgfoundry_common.types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.typing/">
+<span class="md-ellipsis">
+    kgfoundry_common.typing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/kgfoundry_common.vector_types/">
+<span class="md-ellipsis">
+    kgfoundry_common.vector_types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/linking/">
+<span class="md-ellipsis">
+    linking
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/linking.calibration/">
+<span class="md-ellipsis">
+    linking.calibration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/linking.linker/">
+<span class="md-ellipsis">
+    linking.linker
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/observability/">
+<span class="md-ellipsis">
+    observability
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/observability.metrics/">
+<span class="md-ellipsis">
+    observability.metrics
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/ontology/">
+<span class="md-ellipsis">
+    ontology
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/ontology.catalog/">
+<span class="md-ellipsis">
+    ontology.catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/ontology.loader/">
+<span class="md-ellipsis">
+    ontology.loader
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/orchestration.cli/">
+<span class="md-ellipsis">
+    orchestration.cli
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/orchestration/">
+<span class="md-ellipsis">
+    orchestration
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/orchestration.config/">
+<span class="md-ellipsis">
+    orchestration.config
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/orchestration.fixture_flow/">
+<span class="md-ellipsis">
+    orchestration.fixture_flow
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/orchestration.flows/">
+<span class="md-ellipsis">
+    orchestration.flows
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/orchestration.safe_pickle/">
+<span class="md-ellipsis">
+    orchestration.safe_pickle
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/registry.api/">
+<span class="md-ellipsis">
+    registry.api
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/registry/">
+<span class="md-ellipsis">
+    registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/registry.duckdb_helpers/">
+<span class="md-ellipsis">
+    registry.duckdb_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/registry.duckdb_registry/">
+<span class="md-ellipsis">
+    registry.duckdb_registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/registry.helper/">
+<span class="md-ellipsis">
+    registry.helper
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/registry.migrate/">
+<span class="md-ellipsis">
+    registry.migrate
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.app/">
+<span class="md-ellipsis">
+    search_api.app
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api/">
+<span class="md-ellipsis">
+    search_api
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.bm25_index/">
+<span class="md-ellipsis">
+    search_api.bm25_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.faiss_adapter/">
+<span class="md-ellipsis">
+    search_api.faiss_adapter
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.faiss_gpu/">
+<span class="md-ellipsis">
+    search_api.faiss_gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.fastapi_helpers/">
+<span class="md-ellipsis">
+    search_api.fastapi_helpers
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.fixture_index/">
+<span class="md-ellipsis">
+    search_api.fixture_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.fusion/">
+<span class="md-ellipsis">
+    search_api.fusion
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.kg_mock/">
+<span class="md-ellipsis">
+    search_api.kg_mock
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.schemas/">
+<span class="md-ellipsis">
+    search_api.schemas
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.service/">
+<span class="md-ellipsis">
+    search_api.service
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.splade_index/">
+<span class="md-ellipsis">
+    search_api.splade_index
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.types/">
+<span class="md-ellipsis">
+    search_api.types
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_api.vectorstore_factory/">
+<span class="md-ellipsis">
+    search_api.vectorstore_factory
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_client/">
+<span class="md-ellipsis">
+    search_client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/search_client.client/">
+<span class="md-ellipsis">
+    search_client.client
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/vectorstore_faiss.gpu/">
+<span class="md-ellipsis">
+    vectorstore_faiss.gpu
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../modules/vectorstore_faiss/">
+<span class="md-ellipsis">
+    vectorstore_faiss
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -182,22 +941,93 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="diagrams">Diagrams</h1>
+<h1 id="diagrams">Diagrams<a class="headerlink" href="#diagrams" title="Permanent link">¶</a></h1>
 <ul>
+<li><a href="api.d2">api</a></li>
+<li><a href="app.d2">app</a></li>
+<li><a href="base.d2">base</a></li>
+<li><a href="bm25.d2">bm25</a></li>
+<li><a href="bm25_index.d2">bm25_index</a></li>
+<li><a href="calibration.d2">calibration</a></li>
+<li><a href="canonicalizer.d2">canonicalizer</a></li>
+<li><a href="catalog.d2">catalog</a></li>
+<li><a href="cli.d2">cli</a></li>
+<li><a href="client.d2">client</a></li>
+<li><a href="config.d2">config</a></li>
+<li><a href="docling.d2">docling</a></li>
+<li><a href="download.d2">download</a></li>
+<li><a href="duckdb_helpers.d2">duckdb_helpers</a></li>
+<li><a href="duckdb_registry.d2">duckdb_registry</a></li>
+<li><a href="embeddings_dense.d2">embeddings_dense</a></li>
+<li><a href="embeddings_sparse.d2">embeddings_sparse</a></li>
+<li><a href="errors.d2">errors</a></li>
+<li><a href="exceptions.d2">exceptions</a></li>
+<li><a href="faiss_adapter.d2">faiss_adapter</a></li>
+<li><a href="faiss_gpu.d2">faiss_gpu</a></li>
+<li><a href="fastapi_helpers.d2">fastapi_helpers</a></li>
+<li><a href="fixture_flow.d2">fixture_flow</a></li>
+<li><a href="fixture_index.d2">fixture_index</a></li>
+<li><a href="flows.d2">flows</a></li>
 <li><a href="fs.d2">fs</a></li>
+<li><a href="fusion.d2">fusion</a></li>
 <li><a href="gpu.d2">gpu</a></li>
+<li><a href="harvester.d2">harvester</a></li>
+<li><a href="helper.d2">helper</a></li>
+<li><a href="hybrid.d2">hybrid</a></li>
+<li><a href="ids.d2">ids</a></li>
+<li><a href="jsonschema_utils.d2">jsonschema_utils</a></li>
+<li><a href="kg_builder.d2">kg_builder</a></li>
+<li><a href="kg_mock.d2">kg_mock</a></li>
 <li><a href="kgfoundry_common.d2">kgfoundry_common</a></li>
+<li><a href="linker.d2">linker</a></li>
+<li><a href="linking.d2">linking</a></li>
+<li><a href="loader.d2">loader</a></li>
+<li><a href="logging.d2">logging</a></li>
+<li><a href="metrics.d2">metrics</a></li>
+<li><a href="migrate.d2">migrate</a></li>
+<li><a href="mock_kg.d2">mock_kg</a></li>
+<li><a href="models.d2">models</a></li>
+<li><a href="navmap_loader.d2">navmap_loader</a></li>
+<li><a href="navmap_types.d2">navmap_types</a></li>
+<li><a href="neo4j_store.d2">neo4j_store</a></li>
+<li><a href="numpy_typing.d2">numpy_typing</a></li>
+<li><a href="observability.d2">observability</a></li>
+<li><a href="ontology.d2">ontology</a></li>
 <li><a href="opentelemetry_types.d2">opentelemetry_types</a></li>
+<li><a href="optional_deps.d2">optional_deps</a></li>
+<li><a href="orchestration.d2">orchestration</a></li>
+<li><a href="parquet_io.d2">parquet_io</a></li>
+<li><a href="problem_details.d2">problem_details</a></li>
+<li><a href="prometheus.d2">prometheus</a></li>
 <li><a href="pydantic.d2">pydantic</a></li>
+<li><a href="qwen3.d2">qwen3</a></li>
+<li><a href="registry.d2">registry</a></li>
+<li><a href="safe_pickle.d2">safe_pickle</a></li>
+<li><a href="safe_pickle_v2.d2">safe_pickle_v2</a></li>
 <li><a href="schema_helpers.d2">schema_helpers</a></li>
+<li><a href="schemas.d2">schemas</a></li>
+<li><a href="search_api.d2">search_api</a></li>
+<li><a href="search_client.d2">search_client</a></li>
+<li><a href="sequence_guards.d2">sequence_guards</a></li>
+<li><a href="serialization.d2">serialization</a></li>
+<li><a href="service.d2">service</a></li>
+<li><a href="settings.d2">settings</a></li>
+<li><a href="splade.d2">splade</a></li>
+<li><a href="splade_index.d2">splade_index</a></li>
+<li><a href="subprocess_utils.d2">subprocess_utils</a></li>
 <li><a href="types.d2">types</a></li>
+<li><a href="typing.d2">typing</a></li>
+<li><a href="vector_types.d2">vector_types</a></li>
+<li><a href="vectorstore_factory.d2">vectorstore_factory</a></li>
+<li><a href="vectorstore_faiss.d2">vectorstore_faiss</a></li>
+<li><a href="vlm.d2">vlm</a></li>
 </ul>
 <aside class="md-source-file">
 <span class="md-source-file__fact">
 <span class="md-icon" title="Last update">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
 </span>
-<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2025 11:57:58 UTC">November 5, 2025</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2025 17:26:48 UTC">November 5, 2025</span>
 </span>
 </aside>
 </article>
@@ -211,7 +1041,7 @@
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Modules" class="md-footer__link md-footer__link--prev" href="../modules/">
+<a aria-label="Previous: Cli" class="md-footer__link md-footer__link--prev" href="../cli/">
 <div class="md-footer__button md-icon">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
 </div>
@@ -220,8 +1050,21 @@
                 Previous
               </span>
 <div class="md-ellipsis">
+                Cli
+              </div>
+</div>
+</a>
+<a aria-label="Next: Modules" class="md-footer__link md-footer__link--next" href="../modules/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
                 Modules
               </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
 </div>
 </a>
 </nav>
@@ -244,6 +1087,9 @@
 </div>
 <script id="__config" type="application/json">{"base": "..", "features": ["navigation.sections", "navigation.top", "navigation.tracking", "navigation.footer", "content.action.edit", "content.action.view"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
 <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+<script src="../assets/mkdocs_puml/puml.js"></script>
+<script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<script src="../assets/mkdocs_puml/interaction.js"></script>
 <script>document$.subscribe(() => {
             const dark_scheme_name = "slate"
             

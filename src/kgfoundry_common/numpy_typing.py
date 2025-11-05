@@ -38,12 +38,13 @@ def normalize_l2(
 
     Parameters
     ----------
-    matrix:
+    matrix : FloatMatrix
         Input vectors that are expected to be contiguous ``float32`` values.
-    axis:
+    axis : int, optional
         Axis along which norms are computed. Defaults to ``1`` for row vectors.
-    epsilon:
+    epsilon : float, optional
         Minimum norm value to clamp to for zero or denormalised rows.
+        Defaults to MIN_EPSILON.
 
     Returns
     -------

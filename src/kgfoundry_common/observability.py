@@ -75,14 +75,29 @@ _OBS_CACHE = _ObservabilityCache()
 @dataclass(slots=True)
 # [nav:anchor MetricsProvider]
 class MetricsProvider:
-    """Provide component-level metrics for long-running operations."""
+    """Provide component-level metrics for long-running operations.
+
+    Initialises the metrics provider with a Prometheus registry.
+
+    Parameters
+    ----------
+    registry : CollectorRegistry | None, optional
+        Prometheus registry to use. If None, uses the default registry.
+        Defaults to None.
+
+    Attributes
+    ----------
+    runs_total : CounterLike
+        Counter for total number of operations executed by a component.
+    operation_duration_seconds : HistogramLike
+        Histogram for operation duration in seconds.
+    """
 
     runs_total: CounterLike
     operation_duration_seconds: HistogramLike
     _registry: CollectorRegistry | None = field(default=None, repr=False)
 
     def __init__(self, registry: CollectorRegistry | None = None) -> None:
-        """Initialise the metrics provider."""
         resolved_registry = cast("CollectorRegistry | None", registry or get_default_registry())
         self._registry = resolved_registry
         self.runs_total = build_counter(
@@ -120,7 +135,27 @@ class MetricsProvider:
 @dataclass(slots=True)
 # [nav:anchor MetricsRegistry]
 class MetricsRegistry:
-    """Expose request-level counters and histograms for HTTP surfaces."""
+    """Expose request-level counters and histograms for HTTP surfaces.
+
+    Initialises a metrics registry scoped to a namespace.
+
+    Parameters
+    ----------
+    namespace : str, optional
+        Namespace for metrics (e.g., "kgfoundry"). Defaults to "kgfoundry".
+    registry : CollectorRegistry | None, optional
+        Prometheus registry to use. If None, uses the default registry.
+        Defaults to None.
+
+    Attributes
+    ----------
+    requests_total : CounterLike
+        Counter for total number of processed operations.
+    request_errors_total : CounterLike
+        Counter for total number of failed operations.
+    request_duration_seconds : HistogramLike
+        Histogram for operation latency in seconds.
+    """
 
     requests_total: CounterLike
     request_errors_total: CounterLike
@@ -133,7 +168,6 @@ class MetricsRegistry:
         namespace: str = "kgfoundry",
         registry: CollectorRegistry | None = None,
     ) -> None:
-        """Initialise a metrics registry scoped to ``namespace``."""
         resolved_registry = cast("CollectorRegistry | None", registry or get_default_registry())
         metric_prefix = namespace.replace("-", "_")
         labels = ("operation", "status")
@@ -233,8 +267,13 @@ def observe_duration(
     ------
     _DurationObserver
         Observer instance for tracking operation state.
+
+    Raises
+    ------
+    Exception
+        Any exception raised during the operation is propagated after recording
+        error status and metrics.
     """
-    observer = _DurationObserver(metrics, operation, component, correlation_id)
     try:
         yield observer
     except Exception:

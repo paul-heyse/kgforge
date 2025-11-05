@@ -145,6 +145,10 @@ class KgFoundryError(Exception):
     Problem Details mapping. All kgfoundry exceptions inherit from this
     base class and can be converted to Problem Details JSON for HTTP responses.
 
+    Creates a new KgFoundryError instance with the provided message
+    and configuration. Resolves configuration from either the config
+    parameter or legacy keyword arguments.
+
     Parameters
     ----------
     message : str
@@ -153,22 +157,9 @@ class KgFoundryError(Exception):
         Structured configuration for the error including code, http_status,
         log_level, cause and context. When omitted, these fields fall back
         to sensible defaults. Defaults to None.
-    **legacy_kwargs : dict[str, object]
+    **legacy_kwargs : object
         Backwards-compatible keyword arguments mirroring the fields of
         KgFoundryErrorConfig. Cannot be combined with config.
-
-    Attributes
-    ----------
-    message : str
-        Human-readable error message.
-    code : ErrorCode
-        Error code enum value.
-    http_status : int
-        HTTP status code for Problem Details responses.
-    log_level : int
-        Logging level for error logging.
-    context : dict[str, object]
-        Additional context dictionary for error details.
 
     Examples
     --------
@@ -186,29 +177,6 @@ class KgFoundryError(Exception):
         config: KgFoundryErrorConfig | None = None,
         **legacy_kwargs: object,
     ) -> None:
-        """Initialize error with structured fields.
-
-        Creates a new KgFoundryError instance with the provided message
-        and configuration. Resolves configuration from either the config
-        parameter or legacy keyword arguments.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        config : KgFoundryErrorConfig | None, optional
-            Structured configuration for the error. Defaults to None.
-        legacy_kwargs : dict[str, object]
-            Backwards-compatible keyword arguments mirroring config fields.
-
-        Examples
-        --------
-        >>> from kgfoundry_common.errors import KgFoundryError, ErrorCode
-        >>> error = KgFoundryError("Operation failed", code=ErrorCode.RUNTIME_ERROR)
-        >>> assert error.code == ErrorCode.RUNTIME_ERROR
-        >>> details = error.to_problem_details(instance="/api/operation")
-        >>> assert details["status"] == 500
-        """
         resolved_config = _coerce_error_config(config, dict(legacy_kwargs))
         self.message = message
         self.code = resolved_config.code
@@ -290,6 +258,8 @@ class DownloadError(KgFoundryError):
     Raised when download or resource fetch operations fail. Uses error code
     DOWNLOAD_FAILED and HTTP status 503 (Service Unavailable).
 
+    Creates a DownloadError with DOWNLOAD_FAILED error code and HTTP status 503.
+
     Parameters
     ----------
     message : str
@@ -310,20 +280,6 @@ class DownloadError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize download error.
-
-        Creates a DownloadError with DOWNLOAD_FAILED error code and
-        HTTP status 503.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.DOWNLOAD_FAILED,
@@ -339,6 +295,9 @@ class UnsupportedMIMEError(KgFoundryError):
 
     Raised when a file or resource has an unsupported MIME type. Uses error
     code UNSUPPORTED_MIME and HTTP status 415 (Unsupported Media Type).
+
+    Creates an UnsupportedMIMEError with UNSUPPORTED_MIME error code
+    and HTTP status 415.
 
     Parameters
     ----------
@@ -360,20 +319,6 @@ class UnsupportedMIMEError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize unsupported MIME error.
-
-        Creates an UnsupportedMIMEError with UNSUPPORTED_MIME error code
-        and HTTP status 415.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.UNSUPPORTED_MIME,
@@ -389,6 +334,8 @@ class DoclingError(KgFoundryError):
 
     Raised when document processing operations fail in Docling. Uses error
     code DOCLING_ERROR and HTTP status 422 (Unprocessable Entity).
+
+    Creates a DoclingError with DOCLING_ERROR error code and HTTP status 422.
 
     Parameters
     ----------
@@ -410,20 +357,6 @@ class DoclingError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize docling error.
-
-        Creates a DoclingError with DOCLING_ERROR error code and
-        HTTP status 422.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.DOCLING_ERROR,
@@ -439,6 +372,8 @@ class OCRTimeoutError(KgFoundryError):
 
     Raised when OCR (Optical Character Recognition) operations exceed their
     timeout limit. Uses error code OCR_TIMEOUT and HTTP status 504 (Gateway Timeout).
+
+    Creates an OCRTimeoutError with OCR_TIMEOUT error code and HTTP status 504.
 
     Parameters
     ----------
@@ -460,20 +395,6 @@ class OCRTimeoutError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize OCR timeout error.
-
-        Creates an OCRTimeoutError with OCR_TIMEOUT error code and
-        HTTP status 504.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.OCR_TIMEOUT,
@@ -489,6 +410,8 @@ class ChunkingError(KgFoundryError):
 
     Raised when text chunking operations fail. Uses error code CHUNKING_ERROR
     and HTTP status 422 (Unprocessable Entity).
+
+    Creates a ChunkingError with CHUNKING_ERROR error code and HTTP status 422.
 
     Parameters
     ----------
@@ -510,20 +433,6 @@ class ChunkingError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize chunking error.
-
-        Creates a ChunkingError with CHUNKING_ERROR error code and
-        HTTP status 422.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.CHUNKING_ERROR,
@@ -539,6 +448,8 @@ class EmbeddingError(KgFoundryError):
 
     Raised when embedding generation operations fail. Uses error code
     EMBEDDING_ERROR and HTTP status 503 (Service Unavailable).
+
+    Creates an EmbeddingError with EMBEDDING_ERROR error code and HTTP status 503.
 
     Parameters
     ----------
@@ -560,20 +471,6 @@ class EmbeddingError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize embedding error.
-
-        Creates an EmbeddingError with EMBEDDING_ERROR error code and
-        HTTP status 503.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.EMBEDDING_ERROR,
@@ -590,6 +487,8 @@ class SpladeOOMError(KgFoundryError):
     Raised when SPLADE (Sparse Lexical and Expansion) operations exceed
     available memory. Uses error code SPLADE_OOM and HTTP status 507
     (Insufficient Storage).
+
+    Creates a SpladeOOMError with SPLADE_OOM error code and HTTP status 507.
 
     Parameters
     ----------
@@ -611,20 +510,6 @@ class SpladeOOMError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize SPLADE OOM error.
-
-        Creates a SpladeOOMError with SPLADE_OOM error code and
-        HTTP status 507.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.SPLADE_OOM,
@@ -640,6 +525,8 @@ class IndexBuildError(KgFoundryError):
 
     Raised when index construction operations fail (e.g., FAISS index build).
     Uses error code INDEX_BUILD_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates an IndexBuildError with INDEX_BUILD_ERROR error code and HTTP status 500.
 
     Parameters
     ----------
@@ -661,20 +548,6 @@ class IndexBuildError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize index build error.
-
-        Creates an IndexBuildError with INDEX_BUILD_ERROR error code and
-        HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.INDEX_BUILD_ERROR,
@@ -690,6 +563,9 @@ class OntologyParseError(KgFoundryError):
 
     Raised when ontology parsing operations fail (e.g., OWL file parsing).
     Uses error code ONTOLOGY_PARSE_ERROR and HTTP status 422 (Unprocessable Entity).
+
+    Creates an OntologyParseError with ONTOLOGY_PARSE_ERROR error code
+    and HTTP status 422.
 
     Parameters
     ----------
@@ -711,20 +587,6 @@ class OntologyParseError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize ontology parse error.
-
-        Creates an OntologyParseError with ONTOLOGY_PARSE_ERROR error code
-        and HTTP status 422.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.ONTOLOGY_PARSE_ERROR,
@@ -740,6 +602,9 @@ class LinkerCalibrationError(KgFoundryError):
 
     Raised when linker calibration operations fail. Uses error code
     LINKER_CALIBRATION_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates a LinkerCalibrationError with LINKER_CALIBRATION_ERROR error
+    code and HTTP status 500.
 
     Parameters
     ----------
@@ -761,20 +626,6 @@ class LinkerCalibrationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize linker calibration error.
-
-        Creates a LinkerCalibrationError with LINKER_CALIBRATION_ERROR error
-        code and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.LINKER_CALIBRATION_ERROR,
@@ -790,6 +641,8 @@ class Neo4jError(KgFoundryError):
 
     Raised when Neo4j database operations fail. Uses error code NEO4J_ERROR
     and HTTP status 503 (Service Unavailable).
+
+    Creates a Neo4jError with NEO4J_ERROR error code and HTTP status 503.
 
     Parameters
     ----------
@@ -811,20 +664,6 @@ class Neo4jError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize Neo4j error.
-
-        Creates a Neo4jError with NEO4J_ERROR error code and
-        HTTP status 503.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.NEO4J_ERROR,
@@ -841,6 +680,9 @@ class ConfigurationError(KgFoundryError):
     Raised when configuration validation or loading fails. Uses error code
     CONFIGURATION_ERROR and HTTP status 500 (Internal Server Error) with
     CRITICAL log level.
+
+    Creates a ConfigurationError with CONFIGURATION_ERROR error code,
+    HTTP status 500, and CRITICAL log level.
 
     Parameters
     ----------
@@ -862,20 +704,6 @@ class ConfigurationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize configuration error.
-
-        Creates a ConfigurationError with CONFIGURATION_ERROR error code,
-        HTTP status 500, and CRITICAL log level.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.CONFIGURATION_ERROR,
@@ -937,6 +765,9 @@ class SettingsError(KgFoundryError):
     but includes structured validation error details. Uses error code
     CONFIGURATION_ERROR and HTTP status 500.
 
+    Creates a SettingsError with CONFIGURATION_ERROR error code and
+    HTTP status 500. Merges validation errors into context if provided.
+
     Parameters
     ----------
     message : str
@@ -958,22 +789,6 @@ class SettingsError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize settings error with validation context.
-
-        Creates a SettingsError with CONFIGURATION_ERROR error code and
-        HTTP status 500. Merges validation errors into context if provided.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        errors : list[dict[str, object]] | None, optional
-            List of validation error dictionaries. Defaults to None.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         combined_context: dict[str, object] = dict(context or {})
         if errors:
             combined_context.setdefault(
@@ -996,6 +811,9 @@ class SerializationError(KgFoundryError):
     Raised when JSON serialization or schema validation fails. Uses error
     code SERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
 
+    Creates a SerializationError with SERIALIZATION_ERROR error code
+    and HTTP status 500.
+
     Parameters
     ----------
     message : str
@@ -1016,20 +834,6 @@ class SerializationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize serialization error.
-
-        Creates a SerializationError with SERIALIZATION_ERROR error code
-        and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.SERIALIZATION_ERROR,
@@ -1045,6 +849,8 @@ class RegistryError(KgFoundryError):
 
     Raised when registry or DuckDB database operations fail. Uses error code
     REGISTRY_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates a RegistryError with REGISTRY_ERROR error code and HTTP status 500.
 
     Parameters
     ----------
@@ -1067,20 +873,6 @@ class RegistryError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize registry error.
-
-        Creates a RegistryError with REGISTRY_ERROR error code and
-        HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.REGISTRY_ERROR,
@@ -1096,6 +888,9 @@ class DeserializationError(KgFoundryError):
 
     Raised when JSON deserialization, schema validation, or checksum verification
     fails. Uses error code DESERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates a DeserializationError with DESERIALIZATION_ERROR error code
+    and HTTP status 500.
 
     Parameters
     ----------
@@ -1117,20 +912,6 @@ class DeserializationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize deserialization error.
-
-        Creates a DeserializationError with DESERIALIZATION_ERROR error code
-        and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.DESERIALIZATION_ERROR,
@@ -1147,6 +928,9 @@ class SchemaValidationError(KgFoundryError):
     Raised when schema validation fails. Includes structured validation error
     details. Uses error code SCHEMA_VALIDATION_ERROR and HTTP status 422
     (Unprocessable Entity).
+
+    Creates a SchemaValidationError with SCHEMA_VALIDATION_ERROR error
+    code and HTTP status 422. Merges validation errors into context if provided.
 
     Parameters
     ----------
@@ -1173,22 +957,6 @@ class SchemaValidationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize schema validation error.
-
-        Creates a SchemaValidationError with SCHEMA_VALIDATION_ERROR error
-        code and HTTP status 422. Merges validation errors into context if provided.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        errors : list[str] | None, optional
-            List of validation error messages. Defaults to None.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         combined_context: dict[str, object] = dict(context or {})
         if errors:
             combined_context.setdefault("validation_errors", list(errors))
@@ -1208,6 +976,9 @@ class RetryExhaustedError(KgFoundryError):
     This exception indicates that a retryable operation has exhausted all
     retry attempts and should surface Problem Details with retry guidance
     information. Uses error code RETRY_EXHAUSTED and HTTP status 503.
+
+    Creates a RetryExhaustedError with RETRY_EXHAUSTED error code and
+    HTTP status 503. Stores retry metadata for Problem Details conversion.
 
     Parameters
     ----------
@@ -1233,25 +1004,6 @@ class RetryExhaustedError(KgFoundryError):
         last_error: Exception | None = None,
         retry_after_seconds: int | None = None,
     ) -> None:
-        """Initialize retry exhausted error.
-
-        Creates a RetryExhaustedError with RETRY_EXHAUSTED error code and
-        HTTP status 503. Stores retry metadata for Problem Details conversion.
-
-        Parameters
-        ----------
-        message : str
-            Error message describing the failure.
-        operation : str | None, optional
-            Name of the operation that failed. Defaults to None.
-        attempts : int | None, optional
-            Number of retry attempts that were made. Defaults to None.
-        last_error : Exception | None, optional
-            The last exception that occurred before retries were exhausted.
-            Defaults to None.
-        retry_after_seconds : int | None, optional
-            Suggested retry delay in seconds. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.RETRY_EXHAUSTED,
@@ -1312,6 +1064,8 @@ class VectorSearchError(KgFoundryError):
     Raised when vector search operations fail. Uses error code VECTOR_SEARCH_ERROR
     and HTTP status 503 (Service Unavailable).
 
+    Creates a VectorSearchError with VECTOR_SEARCH_ERROR error code and HTTP status 503.
+
     Parameters
     ----------
     message : str
@@ -1332,20 +1086,6 @@ class VectorSearchError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize vector search error.
-
-        Creates a VectorSearchError with VECTOR_SEARCH_ERROR error code and
-        HTTP status 503.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.VECTOR_SEARCH_ERROR,
@@ -1361,6 +1101,9 @@ class AgentCatalogSearchError(KgFoundryError):
 
     Raised when agent catalog search operations fail. Uses error code
     AGENT_CATALOG_SEARCH_ERROR and HTTP status 503 (Service Unavailable).
+
+    Creates an AgentCatalogSearchError with AGENT_CATALOG_SEARCH_ERROR error
+    code and HTTP status 503.
 
     Parameters
     ----------
@@ -1384,20 +1127,6 @@ class AgentCatalogSearchError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize agent catalog search error.
-
-        Creates an AgentCatalogSearchError with AGENT_CATALOG_SEARCH_ERROR error
-        code and HTTP status 503.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.AGENT_CATALOG_SEARCH_ERROR,
@@ -1413,6 +1142,8 @@ class CatalogSessionError(KgFoundryError):
 
     Raised when catalog session operations fail (e.g., JSON-RPC or subprocess
     spawning). Uses error code SESSION_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates a CatalogSessionError with SESSION_ERROR error code and HTTP status 500.
 
     Parameters
     ----------
@@ -1434,20 +1165,6 @@ class CatalogSessionError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize catalog session error.
-
-        Creates a CatalogSessionError with SESSION_ERROR error code and
-        HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.SESSION_ERROR,
@@ -1463,6 +1180,8 @@ class CatalogLoadError(KgFoundryError):
 
     Raised when catalog payload loading or parsing fails. Uses error code
     CATALOG_LOAD_ERROR and HTTP status 422 (Unprocessable Entity).
+
+    Creates a CatalogLoadError with CATALOG_LOAD_ERROR error code and HTTP status 422.
 
     Parameters
     ----------
@@ -1486,20 +1205,6 @@ class CatalogLoadError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize catalog load error.
-
-        Creates a CatalogLoadError with CATALOG_LOAD_ERROR error code and
-        HTTP status 422.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.CATALOG_LOAD_ERROR,
@@ -1515,6 +1220,9 @@ class SymbolAttachmentError(KgFoundryError):
 
     Raised when symbol attachment to modules in the catalog fails. Uses error
     code SYMBOL_ATTACHMENT_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates a SymbolAttachmentError with SYMBOL_ATTACHMENT_ERROR error
+    code and HTTP status 500.
 
     Parameters
     ----------
@@ -1538,20 +1246,6 @@ class SymbolAttachmentError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize symbol attachment error.
-
-        Creates a SymbolAttachmentError with SYMBOL_ATTACHMENT_ERROR error
-        code and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.SYMBOL_ATTACHMENT_ERROR,
@@ -1567,6 +1261,9 @@ class ArtifactModelError(KgFoundryError):
 
     Raised when artifact model loading or validation fails. Uses error code
     ARTIFACT_MODEL_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates an ArtifactModelError with ARTIFACT_MODEL_ERROR error code
+    and HTTP status 500.
 
     Parameters
     ----------
@@ -1590,20 +1287,6 @@ class ArtifactModelError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize artifact model error.
-
-        Creates an ArtifactModelError with ARTIFACT_MODEL_ERROR error code
-        and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.ARTIFACT_MODEL_ERROR,
@@ -1619,6 +1302,9 @@ class ArtifactValidationError(KgFoundryError):
 
     Raised when artifact validation fails. Uses error code ARTIFACT_VALIDATION_ERROR
     and HTTP status 422 (Unprocessable Entity).
+
+    Creates an ArtifactValidationError with ARTIFACT_VALIDATION_ERROR error
+    code and HTTP status 422.
 
     Parameters
     ----------
@@ -1642,20 +1328,6 @@ class ArtifactValidationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize artifact validation error.
-
-        Creates an ArtifactValidationError with ARTIFACT_VALIDATION_ERROR error
-        code and HTTP status 422.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.ARTIFACT_VALIDATION_ERROR,
@@ -1671,6 +1343,9 @@ class ArtifactSerializationError(KgFoundryError):
 
     Raised when artifact serialization fails. Uses error code
     ARTIFACT_SERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates an ArtifactSerializationError with ARTIFACT_SERIALIZATION_ERROR
+    error code and HTTP status 500.
 
     Parameters
     ----------
@@ -1694,20 +1369,6 @@ class ArtifactSerializationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize artifact serialization error.
-
-        Creates an ArtifactSerializationError with ARTIFACT_SERIALIZATION_ERROR
-        error code and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.ARTIFACT_SERIALIZATION_ERROR,
@@ -1723,6 +1384,9 @@ class ArtifactDeserializationError(KgFoundryError):
 
     Raised when artifact deserialization fails. Uses error code
     ARTIFACT_DESERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates an ArtifactDeserializationError with ARTIFACT_DESERIALIZATION_ERROR
+    error code and HTTP status 500.
 
     Parameters
     ----------
@@ -1746,20 +1410,6 @@ class ArtifactDeserializationError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize artifact deserialization error.
-
-        Creates an ArtifactDeserializationError with ARTIFACT_DESERIALIZATION_ERROR
-        error code and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.ARTIFACT_DESERIALIZATION_ERROR,
@@ -1775,6 +1425,9 @@ class ArtifactDependencyError(KgFoundryError):
 
     Raised when artifact dependency resolution fails. Uses error code
     ARTIFACT_DEPENDENCY_ERROR and HTTP status 500 (Internal Server Error).
+
+    Creates an ArtifactDependencyError with ARTIFACT_DEPENDENCY_ERROR error
+    code and HTTP status 500.
 
     Parameters
     ----------
@@ -1799,20 +1452,6 @@ class ArtifactDependencyError(KgFoundryError):
         cause: Exception | None = None,
         context: Mapping[str, object] | None = None,
     ) -> None:
-        """Initialize artifact dependency error.
-
-        Creates an ArtifactDependencyError with ARTIFACT_DEPENDENCY_ERROR error
-        code and HTTP status 500.
-
-        Parameters
-        ----------
-        message : str
-            Human-readable error message.
-        cause : Exception | None, optional
-            Underlying exception that caused the failure. Defaults to None.
-        context : Mapping[str, object] | None, optional
-            Additional context dictionary. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.ARTIFACT_DEPENDENCY_ERROR,

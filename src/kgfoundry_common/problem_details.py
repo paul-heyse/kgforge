@@ -125,6 +125,8 @@ class ProblemDetailsValidationError(Exception):
     This exception is raised when a Problem Details dictionary does not conform
     to the RFC 9457 schema or fails validation against the canonical JSON Schema.
 
+    Initializes the validation error with message and optional validation error details.
+
     Parameters
     ----------
     message : str
@@ -132,11 +134,6 @@ class ProblemDetailsValidationError(Exception):
     validation_errors : list[str] | None, optional
         List of specific validation error messages from the schema validator.
         Provides detailed path and constraint information. Defaults to None.
-
-    Attributes
-    ----------
-    validation_errors : list[str]
-        List of validation error messages (empty list if not provided).
 
     Examples
     --------
@@ -147,16 +144,6 @@ class ProblemDetailsValidationError(Exception):
     """
 
     def __init__(self, message: str, validation_errors: list[str] | None = None) -> None:
-        """Initialize validation error.
-
-        Parameters
-        ----------
-        message : str
-            Error message describing the validation failure.
-        validation_errors : list[str] | None, optional
-            List of specific validation error messages from the schema validator.
-            Defaults to None.
-        """
         super().__init__(message)
         self.validation_errors = validation_errors or []
 
