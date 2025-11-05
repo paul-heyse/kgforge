@@ -143,7 +143,6 @@ openspec/
 The system SHALL import anchors for all modules emitted by the Docs pipeline.
 
 #### Scenario: Import success
-- **GIVEN** a valid `agent_catalog.json`
 - **WHEN** the importer runs
 - **THEN** anchors are persisted with package, module, file, and line number
 ```

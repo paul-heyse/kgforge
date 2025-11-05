@@ -42,7 +42,6 @@ result = registry.resolve(unknown_name)  # Raises KeyError with available symbol
 
 ### 2. Stub File Alignment
 
-#### `stubs/kgfoundry/agent_catalog/search.pyi`
 
 **Removed `Any` types**:
 - ✅ `tokens: Any` → `tokens: collections.Counter[str]`
@@ -121,7 +120,6 @@ Checking: kgfoundry._namespace_proxy
   ✓ All runtime exports present in stub
   ✓ No problematic Any types found
 
-Checking: kgfoundry.agent_catalog.search
   ✓ All runtime exports present in stub
   ✓ No problematic Any types found
 
@@ -211,7 +209,6 @@ SUCCESS: All checks passed
 
 ### Modified
 - `src/kgfoundry/_namespace_proxy.py` - Added NamespaceRegistry
-- `stubs/kgfoundry/agent_catalog/search.pyi` - Removed Any types
 - `pyproject.toml` - Added per-file lint ignores
 
 ### Created
