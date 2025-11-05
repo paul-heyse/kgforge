@@ -25,19 +25,24 @@ BASE_TYPE_URI: Final[str] = "https://kgfoundry.dev/problems"
 class ErrorCode(StrEnum):
     """Stable error codes for kgfoundry exceptions.
 
-    <!-- auto:docstring-builder v1 -->
+    Enumeration of error codes used in RFC 9457 Problem Details responses.
+    Codes follow kebab-case naming and remain stable across releases to ensure
+    backward compatibility.
 
-    Codes follow kebab-case naming and remain stable across releases.
+    Error codes are organized by category:
+    - 1xx: Download & Ingestion
+    - 2xx: Document Processing
+    - 3xx: Embedding & Indexing
+    - 4xx: Search & Retrieval
+    - 5xx: Configuration & Runtime
+    - 6xx: Knowledge Graph & Ontology
+    - 7xx: Serialization & Persistence
 
-    Parameters
-    ----------
-    *values : inspect._empty
-        Describe ``values``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    Examples
+    --------
+    >>> code = ErrorCode.DOWNLOAD_FAILED
+    >>> assert code == "download-failed"
+    >>> assert isinstance(code, ErrorCode)
     """
 
     # Download & Ingestion (1xx)
@@ -88,14 +93,12 @@ class ErrorCode(StrEnum):
     ARTIFACT_DEPENDENCY_ERROR = "artifact-dependency-error"
 
     def __str__(self) -> str:
-        """Return the code value.
-
-        <!-- auto:docstring-builder v1 -->
+        """Return the code value as a string.
 
         Returns
         -------
         str
-            Describe return value.
+            The error code value (e.g., "download-failed").
         """
         return self.value
 
@@ -103,7 +106,9 @@ class ErrorCode(StrEnum):
 def get_type_uri(code: ErrorCode) -> str:
     """Get the RFC 9457 type URI for an error code.
 
-    <!-- auto:docstring-builder v1 -->
+    Constructs a complete type URI by combining BASE_TYPE_URI with the
+    error code value. Type URIs are used in Problem Details responses
+    to uniquely identify error types.
 
     Parameters
     ----------

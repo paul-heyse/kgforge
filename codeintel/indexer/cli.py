@@ -8,7 +8,14 @@ from typing import Annotated, Final
 
 import typer
 
-from codeintel.indexer.tscore import LANGUAGE_ALIAS, load_langs, parse_bytes, run_query
+from codeintel.indexer.tscore import (
+    LANGUAGE_NAMES,
+    get_language,
+    load_langs,
+    parse_bytes,
+    run_query,
+)
+from codeintel.mcp_server import tools as mcp_tools
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -71,14 +78,12 @@ def query(
     typer.BadParameter
         If an unsupported language is requested.
     """
-    langs = load_langs()
-    try:
-        lang_attr = LANGUAGE_ALIAS[language]
-    except KeyError as exc:
-        supported = ", ".join(sorted(LANGUAGE_ALIAS))
+    if language not in LANGUAGE_NAMES:
+        supported = ", ".join(sorted(LANGUAGE_NAMES))
         message = f"Unsupported language '{language}'. Supported values: {supported}"
-        raise typer.BadParameter(message) from exc
-    lang = getattr(langs, lang_attr)
+        raise typer.BadParameter(message)
+    langs = load_langs()
+    lang = get_language(langs, language)
     data = path.read_bytes()
     tree = parse_bytes(lang, data)
     query_text = query_file.read_text(encoding="utf-8")
@@ -91,18 +96,7 @@ def query(
 @app.command("symbols")
 def symbols(dirpath: Path) -> None:
     """List Python symbol captures for an entire directory tree."""
-    langs = load_langs()
-    out: list[dict[str, object]] = []
-    query_path = Path(__file__).resolve().parents[1] / "queries" / "python.scm"
-    query_lines = query_path.read_text(encoding="utf-8").splitlines()
-    query_text = "\n".join(
-        line for line in query_lines if "def.name" in line or "def.params" in line
-    )
-    for candidate in dirpath.rglob("*.py"):
-        data = candidate.read_bytes()
-        tree = parse_bytes(langs.py, data)
-        captures = run_query(langs.py, query_text, tree, data)
-        out.append({"file": str(candidate), "defs": captures})
+    out = mcp_tools.list_python_symbols(str(dirpath))
     typer.echo(json.dumps(out, indent=2, ensure_ascii=False))
 
 

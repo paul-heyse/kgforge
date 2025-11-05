@@ -87,21 +87,20 @@ del _TYPE_CHECKING
 
 
 def _load(name: str) -> object:
-    """Document  load.
+    """Load a module by alias name.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Dynamically imports a module using its alias from the _ALIASES mapping
+    and registers it in sys.modules under the kgfoundry namespace.
 
     Parameters
     ----------
     name : str
-        Describe ``name``.
+        Alias name of the module to load (e.g., "docling", "search_api").
 
     Returns
     -------
     object
-        Describe return value.
+        The imported module object.
     """
     module = import_module(_ALIASES[name])
     sys.modules[f"{__name__}.{name}"] = module
@@ -109,28 +108,26 @@ def _load(name: str) -> object:
 
 
 def __getattr__(name: str) -> object:
-    """Document   getattr  .
+    """Provide lazy module loading for namespace bridge.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+    Implements lazy loading for submodules in the kgfoundry package.
+    When a submodule is accessed (e.g., `kgfoundry.docling`), it is
+    dynamically imported and cached in sys.modules.
 
     Parameters
     ----------
     name : str
-        Configure the name.
+        Submodule name to import (e.g., "docling", "search_api").
 
     Returns
     -------
     object
-        Describe return value.
+        Imported module object.
 
     Raises
     ------
     AttributeError
-        If the attribute name is not in the aliases dictionary.
+        If the requested name is not in the _ALIASES dictionary.
     """
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
@@ -141,7 +138,8 @@ def __getattr__(name: str) -> object:
 def __dir__() -> list[str]:
     """Return the combined attribute listing.
 
-    <!-- auto:docstring-builder v1 -->
+    Returns the sorted union of exports and implementation attributes
+    from the namespace bridge.
 
     Returns
     -------
@@ -152,16 +150,16 @@ def __dir__() -> list[str]:
 
 
 def _ensure_namespace_alias(name: str) -> None:
-    """Document  ensure namespace alias.
+    """Ensure a namespace alias is loaded in sys.modules.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Checks if the namespace alias is already loaded, and if not,
+    loads it using _load(). Used internally to ensure modules are
+    available when needed.
 
     Parameters
     ----------
     name : str
-        Describe ``name``.
+        Alias name of the module to ensure is loaded.
     """
     if f"{__name__}.{name}" not in sys.modules:
         _load(name)

@@ -68,28 +68,26 @@ __all__: tuple[str, ...] = (
 
 
 def __getattr__(name: str) -> object:
-    """Describe   getattr  .
+    """Provide lazy module loading for submodules.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+    Implements lazy loading for submodules in the search_api package.
+    When a submodule is accessed (e.g., `search_api.app`), it is
+    dynamically imported and cached in sys.modules.
 
     Parameters
     ----------
     name : str
-        Configure the name.
+        Submodule name to import (e.g., "app", "bm25_index").
 
     Returns
     -------
     object
-        Describe return value.
+        Imported module object.
 
     Raises
     ------
     AttributeError
-        Raised when message.
+        If the requested name is not in the allowed aliases.
     """
     if name not in _ALIASES:
         message = f"module {__name__!r} has no attribute {name!r}"
@@ -100,18 +98,15 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """Describe   dir  .
+    """Return list of public module names.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Expose the attributes reported when ``dir()`` is called on the instance. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+    Returns the list of public submodule names available in this package.
+    Used by dir() to show available attributes.
 
     Returns
     -------
     list[str]
-        Describe return value.
+        Sorted list of public module names from __all__.
     """
     return sorted(set(__all__))
 

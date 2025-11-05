@@ -17,21 +17,17 @@ if TYPE_CHECKING:
 
 @dataclass
 class Concept:
-    """Describe Concept.
+    """Knowledge graph concept representation.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Represents a concept in the ontology catalog with an identifier
+    and optional human-readable label.
 
     Parameters
     ----------
     id : str
-        Describe ``id``.
-    label : str | NoneType, optional
-        Describe ``label``.
-        Defaults to ``None``.
+        Unique concept identifier (typically a URN).
+    label : str | None, optional
+        Human-readable label for the concept. Defaults to None.
     """
 
     id: str
@@ -68,31 +64,27 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyCatalog]
 class OntologyCatalog:
-    """Describe OntologyCatalog.
+    """Utility catalog for lightweight ontology lookups.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Provides a simple in-memory catalog for querying knowledge graph
+    concepts. Supports neighbor traversal and concept hydration.
 
     Parameters
     ----------
     concepts : list[Concept]
-        Describe ``concepts``.
+        List of concepts to include in the catalog.
     """
 
     def __init__(self, concepts: list[Concept]) -> None:
-        """Describe   init  .
+        """Initialize the ontology catalog with concepts.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Builds an internal index mapping concept IDs to concept objects
+        for fast lookup.
 
         Parameters
         ----------
         concepts : list[Concept]
-            Describe ``concepts``.
+            List of concepts to include in the catalog.
         """
         self.by_id = {concept.id: concept for concept in concepts}
 

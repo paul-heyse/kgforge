@@ -50,14 +50,15 @@ MAX_SEARCH_RESULTS = 100
 class RequestContext:
     """Context passed to JSON-RPC handlers.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains request metadata including correlation ID and request ID for
+    tracing and response matching in JSON-RPC over stdio.
 
     Parameters
     ----------
     correlation_id : str
-        Describe ``correlation_id``.
-    request_id : object | NoneType
-        Describe ``request_id``.
+        Correlation ID for request tracing and logging.
+    request_id : JsonValue | None
+        JSON-RPC request ID for matching responses. None for notifications.
     """
 
     correlation_id: str
@@ -67,41 +68,38 @@ class RequestContext:
 class CatalogSessionServerError(RuntimeError):
     """Raised when a JSON-RPC request cannot be fulfilled.
 
-    <!-- auto:docstring-builder v1 -->
+    Custom exception for JSON-RPC errors with HTTP status codes and
+    Problem Details support. Used by the catalog session server to signal
+    various error conditions.
 
     Parameters
     ----------
     status : int
-        Describe ``status``.
+        HTTP status code for the error (e.g., 400, 403, 404, 500).
     title : str
-        Describe ``title``.
+        Short error title (e.g., "invalid-params", "forbidden").
     detail : str
-        Describe ``detail``.
+        Detailed error message describing the failure.
     code : int, optional
-        Describe ``code``.
-        Defaults to ``-32603``.
+        JSON-RPC error code. Defaults to -32603 (internal error).
     """
 
     def __init__(self, status: int, title: str, detail: str, *, code: int = -32603) -> None:
-        """Document   init  .
+        """Initialize JSON-RPC error.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Creates a CatalogSessionServerError with the specified status, title,
+        detail, and optional JSON-RPC error code.
 
         Parameters
         ----------
         status : int
-            Configure the status.
+            HTTP status code for the error.
         title : str
-            Configure the title.
+            Short error title.
         detail : str
-            Configure the detail.
+            Detailed error message.
         code : int, optional
-            Configure the code. Defaults to ``-32603``.
-            Defaults to ``-32603``.
+            JSON-RPC error code. Defaults to -32603.
         """
         super().__init__(detail)
         self.status = status
@@ -112,18 +110,20 @@ class CatalogSessionServerError(RuntimeError):
     def to_error(self, *, correlation_id: str | None = None) -> JsonObject:
         """Return JSON-RPC error object with Problem Details payload.
 
-        <!-- auto:docstring-builder v1 -->
+        Converts the exception to a JSON-RPC error response object with
+        Problem Details structure in the data field.
 
         Parameters
         ----------
-        correlation_id : str | NoneType, optional
-            Describe ``correlation_id``.
-            Defaults to ``None``.
+        correlation_id : str | None, optional
+            Optional correlation ID to include in the Problem Details.
+            Defaults to None.
 
         Returns
         -------
-        dict[str, object]
-            Describe return value.
+        JsonObject
+            JSON-RPC error object with code, message, data (Problem Details),
+            status, and detail fields.
         """
         problem: JsonObject = {
             "type": "https://kgfoundry.dev/problems/catalogctl-mcp",
@@ -148,19 +148,20 @@ Handler = Callable[[JsonObject, RequestContext], JsonValue]
 class CatalogSessionServer:
     """Minimal JSON-RPC server speaking over stdin/stdout.
 
-    <!-- auto:docstring-builder v1 -->
+    Implements a JSON-RPC 2.0 server that communicates over stdin/stdout
+    for the Agent Catalog. Supports capabilities discovery, symbol lookup,
+    search, and various catalog operations with RBAC and audit logging.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Client for accessing the agent catalog.
     access : AccessController
-        Describe ``access``.
+        Access controller for RBAC enforcement.
     audit : AuditLogger
-        Describe ``audit``.
+        Audit logger for recording operations.
     metrics : MetricsProvider | None, optional
-        Describe ``metrics``.
-        Defaults to ``None``.
+        Optional metrics provider for observability. Defaults to None.
     """
 
     def __init__(
@@ -171,25 +172,21 @@ class CatalogSessionServer:
         audit: AuditLogger,
         metrics: MetricsProvider | None = None,
     ) -> None:
-        """Document   init  .
+        """Initialize the catalog session server.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Creates a new CatalogSessionServer with the provided client, access
+        controller, audit logger, and optional metrics provider.
 
         Parameters
         ----------
         client : AgentCatalogClient
-            Configure the client.
+            Client for accessing the agent catalog.
         access : AccessController
-            Configure the access.
+            Access controller for RBAC enforcement.
         audit : AuditLogger
-            Configure the audit.
-        metrics : MetricsProvider | NoneType, optional
-            Configure the metrics. Defaults to ``None``.
-            Defaults to ``None``.
+            Audit logger for recording operations.
+        metrics : MetricsProvider | None, optional
+            Optional metrics provider. Defaults to None.
         """
         self.client = client
         self._shutdown = False
@@ -217,35 +214,29 @@ class CatalogSessionServer:
 
     @staticmethod
     def _write(payload: JsonObject) -> None:
-        """Document  write.
+        """Write JSON-RPC payload to stdout.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Writes a JSON-RPC message to stdout and flushes the buffer.
+        Used for sending responses and errors to the client.
 
         Parameters
         ----------
-        payload : dict[str, object]
-            Configure the payload.
+        payload : JsonObject
+            JSON-RPC payload object to write.
         """
         sys.stdout.write(json.dumps(payload, ensure_ascii=False) + "\n")
         sys.stdout.flush()
 
     def _respond(self, payload: JsonObject) -> None:
-        """Document  respond.
+        """Send JSON-RPC response to client.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Writes a JSON-RPC response message to stdout. Used for sending
+        successful responses back to the client.
 
         Parameters
         ----------
-        payload : dict[str, object]
-            Configure the payload.
+        payload : JsonObject
+            JSON-RPC response payload object to write.
         """
         self._write(payload)
 
@@ -253,17 +244,18 @@ class CatalogSessionServer:
     def _coerce_params(raw: object) -> JsonObject:
         """Coerce JSON-RPC params into a JSON object or raise an error.
 
-        <!-- auto:docstring-builder v1 -->
+        Validates and coerces JSON-RPC params to a dictionary. Raises
+        CatalogSessionServerError if params is neither None nor a dict.
 
         Parameters
         ----------
         raw : object
-            Describe ``raw``.
+            Raw params value from JSON-RPC request.
 
         Returns
         -------
-        dict[str, object]
-            Describe return value.
+        JsonObject
+            Validated params dictionary (empty dict if None).
 
         Raises
         ------
@@ -283,36 +275,31 @@ class CatalogSessionServer:
         params: JsonObject,
         context: RequestContext,
     ) -> JsonValue:
-        """Document  dispatch.
+        """Dispatch JSON-RPC method call to appropriate handler.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Routes JSON-RPC method calls to registered handlers, enforces RBAC,
+        logs operations, and handles errors. Includes structured logging
+        and metrics observation.
 
         Parameters
         ----------
-        method_raw : object
-            Configure the method raw.
-        params : dict[str, object]
-            Configure the params.
+        method_raw : JsonValue
+            Method name from JSON-RPC request.
+        params : JsonObject
+            Params dictionary from JSON-RPC request.
         context : RequestContext
-            Configure the context.
+            Request context with correlation ID and request ID.
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Method handler result.
 
         Raises
         ------
         CatalogSessionServerError
-            Raised when 400.
-        CatalogSessionServerError
-            Raised when 404.
-        CatalogSessionServerError
-            Raised when 403.
+            If method is missing or invalid (400), unknown (404), or
+            forbidden (403).
         """
         if not isinstance(method_raw, str):
             raise CatalogSessionServerError(
@@ -396,20 +383,18 @@ class CatalogSessionServer:
                 return result
 
     def _error(self, request_id: JsonValue | None, error: CatalogSessionServerError) -> None:
-        """Document  error.
+        """Send JSON-RPC error response to client.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Writes a JSON-RPC error response to stdout with Problem Details
+        payload. Logs the error with correlation ID for tracing.
 
         Parameters
         ----------
-        request_id : object | NoneType
-            Identifier for the request.
+        request_id : JsonValue | None
+            JSON-RPC request ID for matching the response. None for
+            notifications or parse errors.
         error : CatalogSessionServerError
-            Configure the error.
+            Error exception to convert to JSON-RPC error response.
         """
         logger.debug(
             "JSON-RPC error %s: %s",
@@ -428,12 +413,14 @@ class CatalogSessionServer:
     def serve(self) -> int:
         """Process JSON-RPC requests from stdin until shutdown is requested.
 
-        <!-- auto:docstring-builder v1 -->
+        Main server loop that reads JSON-RPC requests from stdin, dispatches
+        them to handlers, and writes responses to stdout. Continues until
+        shutdown is requested via shutdown or exit methods.
 
         Returns
         -------
         int
-            Describe return value.
+            Exit code (0 for normal shutdown).
         """
         stdin: TextIO = sys.stdin
         for raw_line in stdin:
@@ -479,25 +466,22 @@ class CatalogSessionServer:
         return 0
 
     def _handle_initialize(self, _params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle initialize.
+        """Handle initialize JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Returns server capabilities including available catalog procedures.
+        Used by clients to discover available methods.
 
         Parameters
         ----------
-        _params : dict[str, object]
-            Configure the  params.
+        _params : JsonObject
+            Method parameters (unused for initialize).
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for initialize).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Capabilities object with procedures list.
         """
         commands = sorted(name for name in self._methods if name.startswith("catalog."))
         procedures = cast("list[JsonValue]", list(commands))
@@ -506,54 +490,46 @@ class CatalogSessionServer:
         return payload
 
     def _handle_capabilities(self, _params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle capabilities.
+        """Handle capabilities JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Returns list of available package names from the catalog.
 
         Parameters
         ----------
-        _params : dict[str, object]
-            Configure the  params.
+        _params : JsonObject
+            Method parameters (unused for capabilities).
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for capabilities).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            List of package names.
         """
         packages = [pkg.name for pkg in self.client.list_packages()]
         return cast("JsonValue", packages)
 
     def _handle_symbol(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle symbol.
+        """Handle symbol JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Retrieves symbol metadata by symbol ID from the catalog.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing symbol_id.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for symbol lookup).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Symbol metadata dictionary.
 
         Raises
         ------
         CatalogSessionServerError
-            Raised when 404.
+            If symbol_id is not found (404).
         """
         symbol_id = str(params.get("symbol_id"))
         symbol = self.client.get_symbol(symbol_id)
@@ -563,75 +539,64 @@ class CatalogSessionServer:
         return cast("JsonValue", symbol.model_dump())
 
     def _handle_find_callers(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle find callers.
+        """Handle find_callers JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Finds all callers (references) of a symbol by symbol ID.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing symbol_id.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for find_callers).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            List of caller symbol IDs.
         """
         symbol_id = str(params.get("symbol_id"))
         callers = self.client.find_callers(symbol_id)
         return cast("JsonValue", callers)
 
     def _handle_find_callees(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle find callees.
+        """Handle find_callees JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Finds all callees (called symbols) of a symbol by symbol ID.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing symbol_id.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for find_callees).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            List of callee symbol IDs.
         """
         symbol_id = str(params.get("symbol_id"))
         callees = self.client.find_callees(symbol_id)
         return cast("JsonValue", callees)
 
     def _handle_change_impact(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle change impact.
+        """Handle change_impact JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Analyzes change impact for a symbol by symbol ID, returning
+        affected symbols and modules.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing symbol_id.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for change_impact).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Change impact dictionary with affected symbols and modules.
         """
         symbol_id = str(params.get("symbol_id"))
         impact_raw = cast(
@@ -641,25 +606,21 @@ class CatalogSessionServer:
         return cast("JsonValue", impact_raw)
 
     def _handle_suggest_tests(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle suggest tests.
+        """Handle suggest_tests JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Suggests test files and test functions for a symbol by symbol ID.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing symbol_id.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for suggest_tests).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            List of test suggestion dictionaries.
         """
         symbol_id = str(params.get("symbol_id"))
         tests_raw: list[JsonValue] = []
@@ -671,25 +632,22 @@ class CatalogSessionServer:
         return tests_raw
 
     def _handle_open_anchor(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle open anchor.
+        """Handle open_anchor JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Returns anchor information (file path and line number) for a symbol
+        by symbol ID, suitable for opening in an editor.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing symbol_id.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for open_anchor).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Anchor dictionary with file path and line number.
         """
         symbol_id = str(params.get("symbol_id"))
         anchor_raw = cast("JsonObject", self.client.open_anchor(symbol_id))
@@ -697,19 +655,21 @@ class CatalogSessionServer:
 
     @staticmethod
     def _parse_limit(raw_k: JsonValue) -> int:
-        """Validate and normalise the `k` parameter for search.
+        """Validate and normalise the k parameter for search.
 
-        <!-- auto:docstring-builder v1 -->
+        Validates and coerces the k (limit) parameter for search operations.
+        Accepts integers, float strings, or integer strings. Enforces
+        bounds between MIN_SEARCH_RESULTS and MAX_SEARCH_RESULTS.
 
         Parameters
         ----------
-        raw_k : object
-            Describe ``raw_k``.
+        raw_k : JsonValue
+            Raw k value from JSON-RPC params.
 
         Returns
         -------
         int
-            Describe return value.
+            Validated integer k value.
 
         Raises
         ------
@@ -756,22 +716,24 @@ class CatalogSessionServer:
     def _parse_facets(raw_facets: JsonValue) -> dict[str, str]:
         """Validate facet filters and coerce values to strings.
 
-        <!-- auto:docstring-builder v1 -->
+        Validates and normalizes facet filters for search. Ensures only
+        allowed facet keys are used and coerces values to strings.
 
         Parameters
         ----------
-        raw_facets : object
-            Describe ``raw_facets``.
+        raw_facets : JsonValue
+            Raw facets value from JSON-RPC params.
 
         Returns
         -------
         dict[str, str]
-            Describe return value.
+            Validated facet dictionary with string values.
 
         Raises
         ------
         CatalogSessionServerError
-            If facets is not None and not a dict, or if an invalid facet key is provided.
+            If facets is not None and not a dict, or if an invalid facet
+            key is provided.
         """
         if raw_facets is None:
             return {}
@@ -797,30 +759,29 @@ class CatalogSessionServer:
         return facet_map
 
     def _handle_search(self, params: JsonObject, context: RequestContext) -> JsonValue:
-        """Document  handle search.
+        """Handle search JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Performs semantic search over the catalog with optional facet filters.
+        Returns search results with metadata including query info and
+        correlation ID.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing query, k (limit), and optional facets.
         context : RequestContext
-            Configure the context.
+            Request context for correlation ID tracking.
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Search response dictionary with results, total, took_ms, and
+            metadata fields.
 
         Raises
         ------
         CatalogSessionServerError
-            Raised when 400.
+            If query is missing, empty, or invalid (400).
         """
         raw_query = params.get("query", "")
         if not isinstance(raw_query, str):
@@ -866,45 +827,38 @@ class CatalogSessionServer:
         return response_obj
 
     def _handle_list_modules(self, params: JsonObject, _context: RequestContext) -> JsonValue:
-        """Document  handle list modules.
+        """Handle list_modules JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Lists all modules in a package by package name.
 
         Parameters
         ----------
-        params : dict[str, object]
-            Configure the params.
+        params : JsonObject
+            Method parameters containing package name.
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for list_modules).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            List of qualified module names.
         """
         package = str(params.get("package"))
         modules = [module.qualified for module in self.client.list_modules(package)]
         return cast("JsonValue", modules)
 
     def _handle_shutdown(self, _params: JsonObject, _context: RequestContext) -> None:
-        """Document  handle shutdown.
+        """Handle shutdown JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Signals the server to shutdown gracefully after processing the
+        current request.
 
         Parameters
         ----------
-        _params : dict[str, object]
-            Configure the  params.
+        _params : JsonObject
+            Method parameters (unused for shutdown).
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for shutdown).
         """
         self._shutdown = True
 
