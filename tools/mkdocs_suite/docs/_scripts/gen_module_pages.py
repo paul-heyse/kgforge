@@ -16,6 +16,7 @@ import copy
 import importlib
 import json
 import logging
+import re
 import sys
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping
@@ -64,7 +65,7 @@ SRC_ROOT = PROJECT_ROOT / "src"
 SUITE_ROOT = TOOLS_ROOT / "mkdocs_suite"
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+    from collections.abc import Callable, Iterable, Iterator, Sequence
 
     from kgfoundry_common.navmap_loader import load_nav_metadata as _load_nav_metadata
     from tools.navmap.griffe_navmap import (
@@ -316,8 +317,77 @@ def _load_api_usage() -> dict[str, list[str]]:
     return json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
 
 
+def _symbol_from_handler(handler: object) -> str | None:
+    """Return the fully-qualified symbol path for a registry handler string.
+
+    Returns
+    -------
+    str | None
+        Symbol path derived from the handler, or ``None`` when the handler
+        cannot be parsed.
+    """
+    if not isinstance(handler, str) or ":" not in handler:
+        return None
+    module, attribute = handler.split(":", 1)
+    module = module.strip()
+    attribute = attribute.strip().replace(":", ".")
+    if not module or not attribute:
+        return None
+    return f"{module}.{attribute}"
+
+
+def _registry_api_usage(registry: Mapping[str, dict[str, object]]) -> dict[str, list[str]]:
+    """Derive symbol → operation mappings from the interface registry.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Mapping between symbol paths and OpenAPI operation identifiers.
+    """
+    mapping: dict[str, set[str]] = defaultdict(set)
+    for entry in registry.values():
+        operations = entry.get("operations")
+        if not isinstance(operations, Mapping):
+            continue
+        for op_meta in operations.values():
+            if not isinstance(op_meta, Mapping):
+                continue
+            handler = _symbol_from_handler(op_meta.get("handler"))
+            operation_id = op_meta.get("operation_id")
+            if handler and isinstance(operation_id, str) and operation_id:
+                mapping[handler].add(operation_id)
+    return {symbol: sorted(values) for symbol, values in mapping.items()}
+
+
+def _merge_api_usage(
+    file_usage: Mapping[str, list[str]], registry_usage: Mapping[str, list[str]]
+) -> dict[str, list[str]]:
+    """Merge API usage derived from JSON and registry metadata.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Combined mapping where duplicate operations are de-duplicated.
+    """
+    merged: dict[str, set[str]] = defaultdict(set)
+    for symbol, operations in file_usage.items():
+        for op in operations:
+            merged[symbol].add(str(op))
+    for symbol, operations in registry_usage.items():
+        for op in operations:
+            merged[symbol].add(str(op))
+    return {symbol: sorted(values) for symbol, values in merged.items()}
+
+
 def _load_registry() -> dict[str, dict[str, object]]:
-    """Return the interface registry payload keyed by identifier."""
+    """Return the interface registry payload keyed by identifier.
+
+    Returns
+    -------
+    dict[str, dict[str, object]]
+        Mapping of interface identifiers to registry metadata entries. Empty
+        when the registry file is missing or invalid.
+    """
     if not REGISTRY_PATH.exists():
         return {}
     with REGISTRY_PATH.open("r", encoding="utf-8") as handle:
@@ -487,7 +557,14 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
 
 
 def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
-    """Return a tuple of (label, href) for the provided spec path."""
+    """Return a tuple of (label, href) for the provided spec path.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Human-readable label and relative hyperlink for the specification. Both
+        values are ``None`` when the spec path cannot be resolved.
+    """
     if not isinstance(spec_path, str) or not spec_path:
         return None, None
     if spec_path.endswith("openapi-cli.yaml"):
@@ -499,13 +576,21 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
-    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``."""
+    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``.
+
+    Returns
+    -------
+    str | None
+        Anchor URL pointing to the operation in the rendered specification, or
+        ``None`` when the operation cannot be linked automatically.
+    """
     if not operation_id:
         return None
+    sanitized = re.sub(r"[^0-9A-Za-z_]+", "_", operation_id)
     if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
-        return f"../api/openapi-cli.md#operation/{operation_id}"
+        return f"../api/openapi-cli.md#operation/{sanitized}"
     if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
-        return f"../api/index.md#operation/{operation_id}"
+        return f"../api/index.md#operation/{sanitized}"
     return None
 
 
@@ -560,30 +645,83 @@ def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleF
         fd.write(f"### {function_path}\n\n::: {function_path}\n\n")
 
 
+def _interface_entries(nav_meta: Mapping[str, Any]) -> list[Mapping[str, object]]:
+    """Return validated interface entries from nav metadata.
+
+    Returns
+    -------
+    list[Mapping[str, object]]
+        Normalized interface entries, or an empty list when no metadata is
+        present.
+    """
+    interfaces = nav_meta.get("interfaces")
+    if not isinstance(interfaces, list):
+        return []
+    return [entry for entry in interfaces if isinstance(entry, Mapping)]
+
+
+def _merge_interface_metadata(
+    entry: Mapping[str, object],
+    registry: Mapping[str, dict[str, object]],
+    default_identifier: str,
+) -> tuple[str, dict[str, object], Mapping[str, object]]:
+    """Return identifier, merged metadata, and registry entry for ``entry``.
+
+    Returns
+    -------
+    tuple[str, dict[str, object], Mapping[str, object]]
+        Interface identifier, merged metadata dictionary, and registry-sourced
+        metadata mapping.
+    """
+    identifier = str(entry.get("id") or entry.get("entrypoint") or default_identifier)
+    registry_entry = registry.get(identifier, {})
+    merged: dict[str, object] = {**registry_entry, **entry}
+    return identifier, merged, registry_entry
+
+
+def _write_interface_operations(
+    fd: mkdocs_gen_files.files,
+    identifier: str,
+    merged: Mapping[str, object],
+    registry_entry: Mapping[str, object],
+) -> None:
+    operations = registry_entry.get("operations")
+    if not isinstance(operations, Mapping) or not operations:
+        return
+    spec_path = merged.get("spec") or registry_entry.get("spec")
+    fd.write("- **Operations:**\n")
+    for op_key, op_meta in sorted(operations.items()):
+        if not isinstance(op_meta, Mapping):
+            continue
+        op_id = str(op_meta.get("operation_id") or f"{identifier}.{op_key}")
+        summary = str(op_meta.get("summary") or "")
+        anchor = _operation_href(spec_path, op_id)
+        if anchor:
+            fd.write(f"  - [`{op_id}`]({anchor})")
+        else:
+            fd.write(f"  - `{op_id}`")
+        if summary:
+            fd.write(f" — {summary}")
+        fd.write("\n")
+
+
 def _write_interfaces(
     fd: mkdocs_gen_files.files,
     module_path: str,
     nav_meta: Mapping[str, Any],
     registry: Mapping[str, dict[str, object]],
 ) -> None:
-    """Emit interface callouts for ``module_path`` if metadata is available."""
-    interfaces = nav_meta.get("interfaces")
-    if not isinstance(interfaces, list) or not interfaces:
-        return
-    rows: list[Mapping[str, object]] = []
-    for entry in interfaces:
-        if isinstance(entry, Mapping):
-            rows.append(entry)
+    rows = _interface_entries(nav_meta)
     if not rows:
         return
     fd.write("## Interfaces\n\n")
     for entry in rows:
-        identifier = str(entry.get("id") or entry.get("entrypoint") or module_path)
-        registry_entry = registry.get(identifier, {})
-        merged: dict[str, object] = {**registry_entry, **entry}
+        identifier, merged, registry_entry = _merge_interface_metadata(entry, registry, module_path)
         fd.write(f"### `{identifier}`\n\n")
         fd.write(
-            "- **Type:** {type}\n".format(type=merged.get("type") or registry_entry.get("type") or "—")
+            "- **Type:** {type}\n".format(
+                type=merged.get("type") or registry_entry.get("type") or "—"
+            )
         )
         fd.write(
             "- **Owner:** {owner}\n".format(
@@ -607,23 +745,7 @@ def _write_interfaces(
             fd.write("- **Problem Details:** " + ", ".join(map(str, problems)) + "\n")
         elif isinstance(problems, str) and problems:
             fd.write(f"- **Problem Details:** {problems}\n")
-
-        operations = registry_entry.get("operations")
-        if isinstance(operations, Mapping) and operations:
-            fd.write("- **Operations:**\n")
-            for op_key, op_meta in sorted(operations.items()):
-                if not isinstance(op_meta, Mapping):
-                    continue
-                op_id = str(op_meta.get("operation_id") or f"{identifier}.{op_key}")
-                summary = str(op_meta.get("summary") or "")
-                anchor = _operation_href(merged.get("spec") or registry_entry.get("spec"), op_id)
-                if anchor:
-                    fd.write(f"  - [`{op_id}`]({anchor})")
-                else:
-                    fd.write(f"  - `{op_id}`")
-                if summary:
-                    fd.write(f" — {summary}")
-                fd.write("\n")
+        _write_interface_operations(fd, identifier, merged, registry_entry)
         fd.write("\n")
 
 
@@ -668,8 +790,8 @@ def main() -> None:
         LOGGER.warning("No modules loaded via Griffe; skipping module page generation.")
         _write_module_index({})
         return
-    api_usage = _load_api_usage()
     registry = _load_registry()
+    api_usage = _merge_api_usage(_load_api_usage(), _registry_api_usage(registry))
     facts = _build_relationships(modules, api_usage)
     manifest: dict[str, Any] = {}
     for module_path, module in modules.items():
