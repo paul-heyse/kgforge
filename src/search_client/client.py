@@ -49,41 +49,34 @@ __navmap__: Final[NavMap] = {
 class SupportsResponse(Protocol):
     """Protocol describing the minimal HTTP response surface used by the client.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
+    This protocol defines the minimal interface required for HTTP responses
+    used by KGFoundryClient. Implementations should mirror the behavior of
+    `requests.Response` for the provided methods.
 
     Notes
     -----
     Implementations are expected to mirror :class:`requests.Response` for the provided
     methods so callers can work with a small shared interface.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
     """
 
     def raise_for_status(self) -> None:
         """Raise an HTTP error if the response indicates failure.
 
-        <!-- auto:docstring-builder v1 -->
+        Raises an exception if the HTTP status code indicates an error (4xx or 5xx). Should mirror
+        the behavior of `requests.Response.raise_for_status()`.
         """
 
     def json(self) -> JsonValue:
         """Return the response payload as JSON.
 
-        <!-- auto:docstring-builder v1 -->
+        Parses the response body as JSON and returns the decoded value.
+        Should mirror the behavior of `requests.Response.json()`.
 
         Returns
         -------
-        object
-            Decoded JSON body returned by the HTTP service. Can be a dict, list, str, int, float, bool, or None.
+        JsonValue
+            Decoded JSON body returned by the HTTP service. Can be a dict, list,
+            str, int, float, bool, or None.
         """
         ...
 
@@ -91,24 +84,14 @@ class SupportsResponse(Protocol):
 class SupportsHttp(Protocol):
     """Protocol describing the HTTP verbs required by :class:`KGFoundryClient`.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Parameters
-    ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
+    This protocol defines the minimal HTTP interface required by KGFoundryClient.
+    Implementations only need to provide `get` and `post` methods that mirror
+    the behavior of the `requests` library.
 
     Notes
     -----
     Implementations only need to provide ``get`` and ``post`` methods that mirror the
     behaviour of :mod:`requests`.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
     """
 
     def get(
@@ -120,16 +103,17 @@ class SupportsHttp(Protocol):
     ) -> SupportsResponse:
         """Issue an HTTP ``GET`` request.
 
-        <!-- auto:docstring-builder v1 -->
+        Sends a GET request to the specified URL with optional timeout and headers.
 
         Parameters
         ----------
         url : str
-            Describe ``url``.
+            Target URL for the GET request.
         timeout : float | tuple[float | None, float | None] | None, optional
-            Request timeout (seconds or connect/read tuple). Defaults to ``None``.
+            Request timeout in seconds or (connect, read) tuple. Defaults to None
+            (no timeout).
         headers : Mapping[str, str] | None, optional
-            HTTP headers to include with the request. Defaults to ``None``.
+            HTTP headers to include with the request. Defaults to None.
 
         Returns
         -------
@@ -148,18 +132,20 @@ class SupportsHttp(Protocol):
     ) -> SupportsResponse:
         """Issue an HTTP ``POST`` request.
 
-        <!-- auto:docstring-builder v1 -->
+        Sends a POST request to the specified URL with optional JSON payload,
+        headers, and timeout.
 
         Parameters
         ----------
         url : str
-            Describe ``url``.
+            Target URL for the POST request.
         json : JsonValue | None, optional
-            JSON payload to include in the request body. Defaults to ``None``.
+            JSON payload to include in the request body. Defaults to None.
         headers : Mapping[str, str] | None, optional
-            HTTP headers to include with the request. Defaults to ``None``.
+            HTTP headers to include with the request. Defaults to None.
         timeout : float | tuple[float | None, float | None] | None, optional
-            Request timeout (seconds or connect/read tuple). Defaults to ``None``.
+            Request timeout in seconds or (connect, read) tuple. Defaults to None
+            (no timeout).
 
         Returns
         -------
@@ -172,17 +158,14 @@ class SupportsHttp(Protocol):
 class RequestsHttp(SupportsHttp):
     """HTTP adapter that delegates HTTP verbs to :mod:`requests`.
 
-    <!-- auto:docstring-builder v1 -->
+    Thin wrapper around the `requests` library that implements the SupportsHttp
+    protocol. This adapter exists to make the high-level client easy to test
+    by swapping in alternative transports.
 
     Notes
     -----
     This thin wrapper exists to make the high-level client easy to test by swapping
     in alternative transports.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
     """
 
     def __init__(self, session: requests.Session | None = None) -> None:
@@ -205,16 +188,17 @@ class RequestsHttp(SupportsHttp):
     ) -> SupportsResponse:
         """Send a ``GET`` request using :func:`requests.get`.
 
-        <!-- auto:docstring-builder v1 -->
+        Delegates to the underlying requests.Session.get() method.
 
         Parameters
         ----------
         url : str
-            Describe ``url``.
+            Target URL for the GET request.
         timeout : float | tuple[float | None, float | None] | None, optional
-            Request timeout in seconds or connect/read tuple. Defaults to ``None``.
+            Request timeout in seconds or (connect, read) tuple. Defaults to None
+            (no timeout).
         headers : Mapping[str, str] | None, optional
-            Headers to include with the request. Defaults to ``None``.
+            HTTP headers to include with the request. Defaults to None.
 
         Returns
         -------
@@ -234,18 +218,19 @@ class RequestsHttp(SupportsHttp):
     ) -> SupportsResponse:
         """Send a ``POST`` request using :func:`requests.post`.
 
-        <!-- auto:docstring-builder v1 -->
+        Delegates to the underlying requests.Session.post() method.
 
         Parameters
         ----------
         url : str
-            Describe ``url``.
+            Target URL for the POST request.
         json : JsonValue | None, optional
-            JSON body to send with the request. Defaults to ``None``.
+            JSON body to send with the request. Defaults to None.
         headers : Mapping[str, str] | None, optional
-            Headers to include with the request. Defaults to ``None``.
+            HTTP headers to include with the request. Defaults to None.
         timeout : float | tuple[float | None, float | None] | None, optional
-            Request timeout in seconds or connect/read tuple. Defaults to ``None``.
+            Request timeout in seconds or (connect, read) tuple. Defaults to None
+            (no timeout).
 
         Returns
         -------
@@ -262,22 +247,21 @@ _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 class KGFoundryClient:
     """High-level client for the kgfoundry Search API.
 
-    <!-- auto:docstring-builder v1 -->
+    Provides a convenient interface for interacting with the kgfoundry Search API,
+    including search, health checks, and knowledge graph concept queries. Supports
+    authentication via API keys and configurable timeouts.
 
     Parameters
     ----------
     base_url : str, optional
-        Describe ``base_url``.
-        Defaults to ``'http://localhost:8080'``.
+        Base URL of the Search API service. Defaults to "http://localhost:8080".
     api_key : str | None, optional
-        Describe ``api_key``.
-        Defaults to ``None``.
+        API key for Bearer token authentication. Defaults to None (no auth).
     timeout : float, optional
-        Describe ``timeout``.
-        Defaults to ``30.0``.
+        Default request timeout in seconds. Defaults to 30.0.
     http : SupportsHttp | None, optional
-        Describe ``http``.
-        Defaults to ``None``.
+        HTTP adapter implementation. If None, uses RequestsHttp.
+        Defaults to None.
     """
 
     def __init__(
@@ -289,22 +273,20 @@ class KGFoundryClient:
     ) -> None:
         """Instantiate the client with connection details.
 
-        <!-- auto:docstring-builder v1 -->
+        Initializes the client with API endpoint, authentication, and timeout
+        configuration. The base_url is normalized by removing trailing slashes.
 
         Parameters
         ----------
         base_url : str, optional
-            Describe ``base_url``.
-            Defaults to ``'http://localhost:8080'``.
-        api_key : str | NoneType, optional
-            Describe ``api_key``.
-            Defaults to ``None``.
+            Base URL of the Search API service. Defaults to "http://localhost:8080".
+        api_key : str | None, optional
+            API key for Bearer token authentication. Defaults to None (no auth).
         timeout : float, optional
-            Describe ``timeout``.
-            Defaults to ``30.0``.
-        http : SupportsHttp | NoneType, optional
-            Describe ``http``.
-            Defaults to ``None``.
+            Default request timeout in seconds. Defaults to 30.0.
+        http : SupportsHttp | None, optional
+            HTTP adapter implementation. If None, uses RequestsHttp.
+            Defaults to None.
         """
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -314,12 +296,14 @@ class KGFoundryClient:
     def _headers(self) -> dict[str, str]:
         """Build default headers for authenticated requests.
 
-        <!-- auto:docstring-builder v1 -->
+        Constructs HTTP headers for requests, including Content-Type and
+        Authorization (if API key is configured).
 
         Returns
         -------
         dict[str, str]
-            Header dictionary including ``Authorization`` when an API key is configured.
+            Header dictionary including Content-Type and Authorization (if API key
+            is configured).
         """
         headers = {"Content-Type": "application/json"}
         if self.api_key:
@@ -329,12 +313,14 @@ class KGFoundryClient:
     def healthz(self) -> JsonValue:
         """Fetch the service health endpoint.
 
-        <!-- auto:docstring-builder v1 -->
+        Queries the /healthz endpoint to check service availability and
+        component status.
 
         Returns
         -------
-        object
-            JSON payload describing service health.
+        JsonValue
+            JSON payload describing service health, including component
+            availability status.
 
         Notes
         -----
@@ -355,26 +341,25 @@ class KGFoundryClient:
     ) -> JsonValue:
         """Execute a semantic search request.
 
-        <!-- auto:docstring-builder v1 -->
+        Performs a hybrid search query combining dense (FAISS), sparse (BM25/SPLADE),
+        and knowledge graph signals. Returns ranked results with optional explanation
+        metadata.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query text.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
-        filters : dict[str, object] | NoneType, optional
-            Describe ``filters``.
-            Defaults to ``None``.
+            Maximum number of results to return. Defaults to 10.
+        filters : dict[str, JsonValue] | None, optional
+            Optional facet filters for narrowing search results. Defaults to None.
         explain : bool, optional
-            Describe ``explain``.
-            Defaults to ``False``.
+            Whether to include explanation metadata in results. Defaults to False.
 
         Returns
         -------
-        object
-            JSON response containing the ranked search results.
+        JsonValue
+            JSON response containing the ranked search results with metadata.
 
         Notes
         -----
@@ -400,20 +385,21 @@ class KGFoundryClient:
     def concepts(self, q: str, limit: int = 50) -> JsonValue:
         """Retrieve graph concepts that match the provided query string.
 
-        <!-- auto:docstring-builder v1 -->
+        Queries the knowledge graph for concepts matching the query string.
+        Returns concept IDs and labels.
 
         Parameters
         ----------
         q : str
-            Describe ``q``.
+            Query string to match against concept labels (case-insensitive).
         limit : int, optional
-            Describe ``limit``.
-            Defaults to ``50``.
+            Maximum number of concepts to return. Defaults to 50.
 
         Returns
         -------
-        object
-            JSON response containing matching concepts.
+        JsonValue
+            JSON response containing matching concepts with concept_id and label
+            fields.
 
         Notes
         -----

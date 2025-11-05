@@ -63,21 +63,20 @@ def _as_str(value: object) -> str:
 
 # [nav:anchor tokenize]
 def tokenize(text: str) -> list[str]:
-    """Describe tokenize.
+    """Tokenize text into lowercase alphanumeric tokens.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Extracts alphanumeric sequences from the input text and converts them
+    to lowercase. Uses a regex pattern to match alphanumeric characters.
 
     Parameters
     ----------
     text : str
-        Describe ``text``.
+        Input text to tokenize. Empty strings are handled gracefully.
 
     Returns
     -------
     list[str]
-        Describe return value.
+        List of lowercase alphanumeric tokens extracted from the text.
     """
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN_RE.findall(text or "")
@@ -87,26 +86,23 @@ def tokenize(text: str) -> list[str]:
 # [nav:anchor FixtureDoc]
 @dataclass
 class FixtureDoc:
-    """Describe FixtureDoc.
+    """Document fixture for test and tutorial use.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Represents a document chunk loaded from the fixture index. Contains
+    metadata and text content for search testing and demonstrations.
 
     Parameters
     ----------
     chunk_id : str
-        Describe ``chunk_id``.
+        Unique identifier for the chunk.
     doc_id : str
-        Describe ``doc_id``.
+        Document identifier that this chunk belongs to.
     title : str
-        Describe ``title``.
+        Title of the document.
     section : str
-        Describe ``section``.
+        Section name or identifier within the document.
     text : str
-        Describe ``text``.
+        Text content of the chunk.
     """
 
     chunk_id: str
@@ -118,39 +114,34 @@ class FixtureDoc:
 
 # [nav:anchor FixtureIndex]
 class FixtureIndex:
-    """Describe FixtureIndex.
+    """In-memory fixture index for tests and tutorials.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Simple in-memory search index that loads document chunks from a DuckDB
+    catalog and builds term frequency (TF) and document frequency (DF)
+    indexes for basic text search. Used primarily for testing and tutorials.
 
     Parameters
     ----------
     root : str, optional
-        Describe ``root``.
-        Defaults to ``'/data'``.
+        Root directory path for data files. Defaults to "/data".
     db_path : str, optional
-        Describe ``db_path``.
-        Defaults to ``'/data/catalog/catalog.duckdb'``.
+        Path to DuckDB catalog database file. Defaults to
+        "/data/catalog/catalog.duckdb".
     """
 
     def __init__(self, root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb") -> None:
-        """Describe   init  .
+        """Initialize the fixture index and load documents from DuckDB.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Connects to the DuckDB catalog, loads the latest chunks dataset,
+        and builds the lexical index (TF/DF structures) for search.
 
         Parameters
         ----------
         root : str, optional
-            Describe ``root``.
-            Defaults to ``'/data'``.
+            Root directory path for data files. Defaults to "/data".
         db_path : str, optional
-            Describe ``db_path``.
-            Defaults to ``'/data/catalog/catalog.duckdb'``.
+            Path to DuckDB catalog database file. Defaults to
+            "/data/catalog/catalog.duckdb".
         """
         self.root = Path(root)
         self.db_path = db_path
@@ -160,13 +151,10 @@ class FixtureIndex:
         self._load_from_duckdb()
 
     def _load_from_duckdb(self) -> None:
-        """Describe  load from duckdb.
+        """Load documents from DuckDB catalog.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
+        Connects to the DuckDB database, finds the latest chunks dataset, and loads all document
+        chunks into memory. Then builds the lexical index for search.
         """
         db_file = Path(self.db_path)
         if not db_file.exists():
@@ -230,13 +218,10 @@ class FixtureIndex:
             )
 
     def _build_lex(self) -> None:
-        """Describe  build lex.
+        """Build lexical index (TF/DF structures) from loaded documents.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
+        Computes term frequency (TF) for each document and document frequency (DF) for each token
+        across all documents. Sets self.N to the total number of documents.
         """
         self.tf.clear()
         self.df.clear()
@@ -251,24 +236,24 @@ class FixtureIndex:
         self.N = len(self.docs)
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Describe search.
+        """Search documents using TF-IDF scoring.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Tokenizes the query and scores each document using TF-IDF (term
+        frequency-inverse document frequency). Returns top-k results sorted
+        by relevance score.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query text.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+            Number of top results to return. Defaults to 10.
 
         Returns
         -------
         list[tuple[int, float]]
-            Describe return value.
+            List of (document_index, score) tuples sorted by score descending.
+            Only documents with score > 0 are included.
         """
         if not hasattr(self, "N") or self.N == 0:
             return []
@@ -305,20 +290,19 @@ class FixtureIndex:
         return [(index, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> FixtureDoc:
-        """Describe doc.
+        """Get document by index.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Retrieves the document at the specified index from the loaded
+        documents list.
 
         Parameters
         ----------
         index : int
-            Describe ``index``.
+            Document index (0-based).
 
         Returns
         -------
         FixtureDoc
-            Describe return value.
+            Document fixture at the specified index.
         """
         return self.docs[index]
