@@ -1,16 +1,22 @@
 from __future__ import annotations
 
+import contextlib
+import importlib
 import io
-from collections.abc import Iterator
-from contextlib import contextmanager
+from typing import TYPE_CHECKING
 
-import pytest
+from tools.mkdocs_suite.docs.cli_diagram import collect_operations, write_diagram
 
-from tools.mkdocs_suite.docs._scripts import gen_cli_diagram
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    import pytest
 
 
-@contextmanager
-def _capture_write(buffers: dict[str, io.StringIO], path: str, mode: str) -> Iterator[io.StringIO]:
+@contextlib.contextmanager
+def _capture_write(
+    buffers: dict[str, io.StringIO], path: str, mode: str
+) -> Iterator[io.StringIO]:
     if "w" in mode:
         buffer = io.StringIO()
         buffers[path] = buffer
@@ -22,6 +28,9 @@ def _capture_write(buffers: dict[str, io.StringIO], path: str, mode: str) -> Ite
 def test_write_diagram_emits_single_node_for_multi_tag_operations(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    gen_cli_module = importlib.import_module(
+        "tools.mkdocs_suite.docs._scripts.gen_cli_diagram"
+    )
     spec = {
         "paths": {
             "/cli/run": {
@@ -33,19 +42,21 @@ def test_write_diagram_emits_single_node_for_multi_tag_operations(
             }
         }
     }
-    operations = gen_cli_diagram._collect_operations(spec)
+    operations = collect_operations(spec)
     assert operations == [
         ("POST", "/cli/run", "runCliCommand", "Execute the CLI", ("ingest", "admin"))
     ]
 
     buffers: dict[str, io.StringIO] = {}
 
-    def fake_open(path: str, mode: str = "r", *args, **kwargs):
+    def fake_open(
+        path: str, mode: str = "r", **_: object
+    ) -> contextlib.AbstractContextManager[io.StringIO]:
         return _capture_write(buffers, path, mode)
 
-    monkeypatch.setattr(gen_cli_diagram.mkdocs_gen_files, "open", fake_open)
+    monkeypatch.setattr(gen_cli_module.mkdocs_gen_files, "open", fake_open)
 
-    gen_cli_diagram._write_diagram(operations)
+    write_diagram(operations)
 
     d2_output = buffers["diagrams/cli_by_tag.d2"].getvalue()
 
