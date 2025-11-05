@@ -139,11 +139,6 @@ class TestNamespaceRegistry:
         def failing_loader() -> object:
             """Load symbol that always raises RuntimeError.
 
-            Returns
-            -------
-            object
-                Never returns normally; always raises RuntimeError.
-
             Raises
             ------
             RuntimeError

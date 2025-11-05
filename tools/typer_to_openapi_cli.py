@@ -31,7 +31,18 @@ DEFAULT_REGISTRY_PATH = SCRIPT_ROOT / "mkdocs_suite" / "api_registry.yaml"
 
 
 def import_object(path: str) -> Any:
-    """Import ``pkg.mod:attr`` strings and return the referenced object."""
+    """Import ``pkg.mod:attr`` strings and return the referenced object.
+
+    Parameters
+    ----------
+    path : str
+        Module path or ``module:attribute`` string to import.
+
+    Returns
+    -------
+    Any
+        The imported object (module or attribute).
+    """
     if ":" in path:
         module_name, attribute = path.split(":", 1)
         module = importlib.import_module(module_name)
@@ -40,7 +51,23 @@ def import_object(path: str) -> Any:
 
 
 def to_click_command(obj: Any) -> click.core.Command:
-    """Adapt Typer applications or raw click commands to ``click.Command``."""
+    """Adapt Typer applications or raw click commands to ``click.Command``.
+
+    Parameters
+    ----------
+    obj : Any
+        Typer application or click.Command instance.
+
+    Returns
+    -------
+    click.core.Command
+        Click command instance.
+
+    Raises
+    ------
+    RuntimeError
+        If Typer is not installed and obj is not already a click.Command.
+    """
     if isinstance(obj, click.core.Command):
         return obj
     if typer_get_command is None:
@@ -50,11 +77,34 @@ def to_click_command(obj: Any) -> click.core.Command:
 
 
 def snake_to_kebab(value: str) -> str:
+    """Convert snake_case to kebab-case.
+
+    Parameters
+    ----------
+    value : str
+        String in snake_case format.
+
+    Returns
+    -------
+    str
+        String converted to kebab-case.
+    """
     return value.replace("_", "-")
 
 
 def param_schema(param: click.Parameter) -> tuple[dict[str, Any], bool, str]:
-    """Return (schema, required, example-name) triple for a click parameter."""
+    """Return (schema, required, example-name) triple for a click parameter.
+
+    Parameters
+    ----------
+    param : click.Parameter
+        Click parameter to analyze.
+
+    Returns
+    -------
+    tuple[dict[str, Any], bool, str]
+        Schema dictionary, required flag, and example parameter name.
+    """
     schema: dict[str, Any] = {"type": "string"}
     required = bool(getattr(param, "required", False))
     example_name = param.name
@@ -83,7 +133,22 @@ def param_schema(param: click.Parameter) -> tuple[dict[str, Any], bool, str]:
 
 
 def build_example(bin_name: str, tokens: Iterable[str], params: Iterable[click.Parameter]) -> str:
-    """Construct a CLI usage example for documentation."""
+    """Construct a CLI usage example for documentation.
+
+    Parameters
+    ----------
+    bin_name : str
+        Binary/command name.
+    tokens : Iterable[str]
+        Command tokens (subcommands).
+    params : Iterable[click.Parameter]
+        Command parameters to include in example.
+
+    Returns
+    -------
+    str
+        CLI usage example string.
+    """
     parts = [bin_name, *tokens]
     for param in params:
         if param.param_type_name == "argument":
@@ -100,7 +165,20 @@ def build_example(bin_name: str, tokens: Iterable[str], params: Iterable[click.P
 def walk_commands(
     cmd: click.core.Command, tokens: list[str]
 ) -> list[tuple[list[str], click.core.Command]]:
-    """Traverse nested click groups returning runnable commands."""
+    """Traverse nested click group returning runnable commands.
+
+    Parameters
+    ----------
+    cmd : click.core.Command
+        Click command to traverse.
+    tokens : list[str]
+        Current command path tokens.
+
+    Returns
+    -------
+    list[tuple[list[str], click.core.Command]]
+        List of (token path, command) tuples for all runnable commands.
+    """
     results: list[tuple[list[str], click.core.Command]] = []
     if isinstance(cmd, click.core.Group) and getattr(cmd, "commands", {}):
         if getattr(cmd, "callback", None):
@@ -167,7 +245,28 @@ def make_openapi(
     interface_id: str | None = None,
     interface_meta: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Produce an OpenAPI 3.1 document representing the CLI."""
+    """Produce an OpenAPI 3.1 document representing the CLI.
+
+    Parameters
+    ----------
+    click_cmd : click.core.Command
+        Root click command to convert.
+    title : str
+        API title for OpenAPI document.
+    version : str
+        API version string.
+    augment : Mapping[str, Any] | None, optional
+        Augmentation payload for customizing output.
+    interface_id : str | None, optional
+        Interface identifier for metadata.
+    interface_meta : Mapping[str, Any] | None, optional
+        Interface metadata dictionary.
+
+    Returns
+    -------
+    dict[str, Any]
+        OpenAPI 3.1 document dictionary.
+    """
     augment = augment or {}
     tag_defs = {tag["name"]: tag for tag in augment.get("tags", [])}
     tag_groups = augment.get("x-tagGroups")

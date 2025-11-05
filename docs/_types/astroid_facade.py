@@ -9,10 +9,12 @@ if TYPE_CHECKING:
     from types import ModuleType
 
 __all__ = [
+    "AstroidBuilderFactory",
     "AstroidBuilderProtocol",
+    "AstroidManagerFactory",
     "AstroidManagerProtocol",
-    "coerce_astroid_builder_class",
-    "coerce_astroid_manager_class",
+    "coerce_astroid_builder_factory",
+    "coerce_astroid_manager_factory",
 ]
 
 _MISSING = object()
@@ -42,6 +44,27 @@ class AstroidBuilderProtocol(Protocol):
         """Return an AST node representing ``module_name`` at ``file_path``."""
 
 
+@runtime_checkable
+class AstroidManagerFactory(Protocol):
+    """Callable returning Astroid manager instances."""
+
+    def __call__(self) -> AstroidManagerProtocol:
+        """Return a new Astroid manager instance."""
+        ...
+
+
+@runtime_checkable
+class AstroidBuilderFactory(Protocol):
+    """Callable returning Astroid builder instances."""
+
+    def __call__(
+        self,
+        manager: AstroidManagerProtocol | None = None,
+    ) -> AstroidBuilderProtocol:
+        """Return a new Astroid builder instance."""
+        ...
+
+
 def _coerce_class(module: ModuleType, attribute: str, kind: str) -> type[object]:
     candidate_obj = getattr(module, attribute, _MISSING)
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
@@ -50,8 +73,8 @@ def _coerce_class(module: ModuleType, attribute: str, kind: str) -> type[object]
     return cast("type[object]", candidate_obj)
 
 
-def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProtocol]:
-    """Return the typed Astroid manager class from ``module``.
+def coerce_astroid_manager_factory(module: ModuleType) -> AstroidManagerFactory:
+    """Return a callable that constructs Astroid manager instances.
 
     Parameters
     ----------
@@ -60,15 +83,15 @@ def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProto
 
     Returns
     -------
-    type[AstroidManagerProtocol]
-        Typed Astroid manager class.
+    AstroidManagerFactory
+        Callable factory returning Astroid manager instances.
     """
     manager_cls = _coerce_class(module, "AstroidManager", "AstroidManager")
-    return cast("type[AstroidManagerProtocol]", manager_cls)
+    return cast("AstroidManagerFactory", manager_cls)
 
 
-def coerce_astroid_builder_class(module: ModuleType) -> type[AstroidBuilderProtocol]:
-    """Return the typed Astroid builder class from ``module``.
+def coerce_astroid_builder_factory(module: ModuleType) -> AstroidBuilderFactory:
+    """Return a callable that constructs Astroid builder instances.
 
     Parameters
     ----------
@@ -77,8 +100,20 @@ def coerce_astroid_builder_class(module: ModuleType) -> type[AstroidBuilderProto
 
     Returns
     -------
-    type[AstroidBuilderProtocol]
-        Typed Astroid builder class.
+    AstroidBuilderFactory
+        Callable factory returning Astroid builder instances.
     """
     builder_cls = _coerce_class(module, "AstroidBuilder", "AstroidBuilder")
-    return cast("type[AstroidBuilderProtocol]", builder_cls)
+    builder_callable = cast("AstroidBuilderFactory", builder_cls)
+
+    def factory(
+        manager: AstroidManagerProtocol | None = None,
+    ) -> AstroidBuilderProtocol:
+        if manager is not None:
+            try:
+                return builder_callable(manager)
+            except TypeError:
+                return builder_callable()
+        return builder_callable()
+
+    return cast("AstroidBuilderFactory", factory)

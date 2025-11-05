@@ -163,11 +163,21 @@ def run_ts_query(path: str, *, language: str, query: str) -> QueryResult:
 def list_python_symbols(directory: str) -> list[dict[str, Any]]:
     """Collect Python symbol definitions for files within ``directory``.
 
+    Parameters
+    ----------
+    directory : str
+        Directory path to scan for Python source files.
+
     Returns
     -------
     list[dict[str, Any]]
         Collection of files with their discovered symbol metadata.
-    """
+
+    Raises
+    ------
+    FileNotFoundError
+        If the directory does not exist.
+    """  # noqa: DOC502
     query_text = _load_python_symbols_query()
     langs = load_langs()
     lang = get_language(langs, "python")
@@ -234,11 +244,25 @@ def list_calls(
 def list_errors(path: str, *, language: str = "python") -> list[dict[str, Any]]:
     """Report syntax errors detected by Tree-sitter for ``path``.
 
+    Parameters
+    ----------
+    path : str
+        File path to analyze for syntax errors.
+    language : str, optional
+        Tree-sitter language identifier. Defaults to ``"python"``.
+
     Returns
     -------
     list[dict[str, Any]]
         Captures describing error spans and the extracted text.
-    """
+
+    Raises
+    ------
+    ValueError
+        If the language is not supported.
+    FileNotFoundError
+        If the file cannot be found.
+    """  # noqa: DOC502
     captures = run_ts_query(path, language=language, query=ERROR_QUERY).captures
     return [
         {

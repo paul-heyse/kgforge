@@ -217,7 +217,7 @@ def search_service(
     ------
     Exception
         Any exception raised during processing is propagated after logging.
-    """
+    """  # noqa: DOC502
     active_metrics = metrics or MetricsProvider.default()
     start_time = time.time()
 

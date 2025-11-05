@@ -286,7 +286,7 @@ def observe_duration(
     -----
     Any exception raised within the context is re-raised after the observation
     is marked as ``"error"`` and metrics/logs are recorded.
-    """
+    """  # noqa: DOC502
     observation = DurationObservation(
         metrics=metrics,
         operation=operation,

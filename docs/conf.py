@@ -50,8 +50,8 @@ from docs.types_facade import (
     AstroidBuilderProtocol,
     AstroidManagerProtocol,
     AutoapiParserProtocol,
-    coerce_astroid_builder_class,
-    coerce_astroid_manager_class,
+    coerce_astroid_builder_factory,
+    coerce_astroid_manager_factory,
     coerce_parser_class,
 )
 
@@ -248,8 +248,8 @@ autoapi_parser = _import_required_module("autoapi._parser")
 jsonimpl = _import_required_module("sphinxcontrib.serializinghtml.jsonimpl")
 json_module = cast("ModuleType", _require_attr(jsonimpl, "json"))
 
-AstroidManagerCls = coerce_astroid_manager_class(astroid_manager)
-AstroidBuilderCls = coerce_astroid_builder_class(astroid_builder)
+astroid_manager_factory = coerce_astroid_manager_factory(astroid_manager)
+astroid_builder_factory = coerce_astroid_builder_factory(astroid_builder)
 AutoapiParserCls = coerce_parser_class(autoapi_parser)
 
 AstroidManager = AstroidManagerProtocol
@@ -579,12 +579,8 @@ def _build_autoapi_parser(base: type[AutoapiParserProtocol]) -> type[AutoapiPars
                 parent = parent.parent
 
             module_name = ".".join(module_parts)
-            manager = AstroidManagerCls()
-            builder_class = AstroidBuilderCls
-            try:
-                builder = builder_class(manager)
-            except TypeError:
-                builder = builder_class()
+            manager = astroid_manager_factory()
+            builder = astroid_builder_factory(manager)
             node = builder.file_build(file_path, module_name)
             return self.parse(node)
 

@@ -62,7 +62,7 @@ class _Comparable(Protocol):
         ------
         NotImplementedError
             This is a protocol stub that must be implemented by concrete classes.
-        """
+        """  # noqa: DOC502
         _protocol_stub("__lt__", self, other)
 
     def __le__(self, other: _Comparable, /) -> bool:
@@ -73,11 +73,11 @@ class _Comparable(Protocol):
         other : _Comparable
             Other object to compare.
 
-        Returns
-        -------
-        bool
-            True if self <= other.
-        """
+        Raises
+        ------
+        NotImplementedError
+            This is a protocol stub that must be implemented by concrete classes.
+        """  # noqa: DOC502
         _protocol_stub("__le__", self, other)
 
     def __gt__(self, other: _Comparable, /) -> bool:
@@ -88,11 +88,11 @@ class _Comparable(Protocol):
         other : _Comparable
             Other object to compare.
 
-        Returns
-        -------
-        bool
-            True if self > other.
-        """
+        Raises
+        ------
+        NotImplementedError
+            This is a protocol stub that must be implemented by concrete classes.
+        """  # noqa: DOC502
         _protocol_stub("__gt__", self, other)
 
     def __ge__(self, other: _Comparable, /) -> bool:
@@ -103,11 +103,11 @@ class _Comparable(Protocol):
         other : _Comparable
             Other object to compare.
 
-        Returns
-        -------
-        bool
-            True if self >= other.
-        """
+        Raises
+        ------
+        NotImplementedError
+            This is a protocol stub that must be implemented by concrete classes.
+        """  # noqa: DOC502
         _protocol_stub("__ge__", self, other)
 
 
