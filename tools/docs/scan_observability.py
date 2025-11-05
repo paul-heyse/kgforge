@@ -35,21 +35,12 @@ def _optional_import(name: str) -> ModuleType | None:
     Parameters
     ----------
     name : str
-        Description.
+        Module name to import.
 
     Returns
     -------
-    Any
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _optional_import(...)
+    ModuleType | None
+        Module if available, None otherwise.
     """
     try:
         return importlib.import_module(name)
@@ -138,21 +129,12 @@ def _rel(p: Path) -> str:
     Parameters
     ----------
     p : Path
-        Description.
+        Path to convert.
 
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _rel(...)
+        Relative path string.
     """
     try:
         return str(p.relative_to(ROOT))
@@ -166,16 +148,7 @@ def _sha() -> str:
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _sha(...)
+        Git SHA or "HEAD" if unavailable.
     """
     if G_SHA:
         return G_SHA
@@ -194,23 +167,14 @@ def _gh_link(path: Path, start: int | None) -> str | None:
     Parameters
     ----------
     path : Path
-        Description.
+        File path.
     start : int | None
-        Description.
+        Starting line number.
 
     Returns
     -------
     str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _gh_link(...)
+        GitHub link URL or None if not configured.
     """
     if not (G_ORG and G_REPO):
         return None
@@ -224,23 +188,14 @@ def _editor_link(path: Path, line: int | None) -> str:
     Parameters
     ----------
     path : Path
-        Description.
+        File path.
     line : int | None
-        Description.
+        Line number.
 
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _editor_link(...)
+        Editor link URL.
     """
     ln = max(1, int(line or 1))
     return f"vscode://file/{_rel(path)}:{ln}:1"
@@ -287,7 +242,20 @@ POLICY_PATH = ROOT / "docs" / "policies" / "observability.yml"
 def _deep_merge_dicts(
     base: Mapping[str, object], override: Mapping[str, object]
 ) -> dict[str, object]:
-    """Return a deep merge of ``override`` into ``base`` without mutating either mapping."""
+    """Return a deep merge of ``override`` into ``base`` without mutating either mapping.
+
+    Parameters
+    ----------
+    base : Mapping[str, object]
+        Base dictionary.
+    override : Mapping[str, object]
+        Override dictionary.
+
+    Returns
+    -------
+    dict[str, object]
+        Deeply merged dictionary.
+    """
     merged: dict[str, object] = dict(base)
     for key, override_value in override.items():
         existing = merged.get(key)
@@ -395,7 +363,13 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
 
 
 def load_policy() -> ObservabilityPolicy:
-    """Load the observability policy from disk, falling back to defaults on failure."""
+    """Load the observability policy from disk, falling back to defaults on failure.
+
+    Returns
+    -------
+    ObservabilityPolicy
+        Loaded policy or default policy.
+    """
     policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():
         return policy
@@ -528,7 +502,18 @@ _PROM_UNITS = set(DEFAULT_POLICY.metric.allowed_units)
 
 
 def _first_str(node: ast.AST) -> str | None:
-    """Return the first string literal value found in node's args, else None."""
+    """Return the first string literal value found in node's args, else None.
+
+    Parameters
+    ----------
+    node : ast.AST
+        AST node to examine.
+
+    Returns
+    -------
+    str | None
+        First string literal or None.
+    """
     if isinstance(node, ast.Call) and node.args:
         arg0 = node.args[0]
         if isinstance(arg0, ast.Constant) and isinstance(arg0.value, str):
@@ -545,23 +530,14 @@ def _keywords_map(node: ast.Call, text: str) -> dict[str, str]:
     Parameters
     ----------
     node : ast.Call
-        Description.
+        AST call node.
     text : str
-        Description.
+        Source text.
 
     Returns
     -------
     dict[str, str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _keywords_map(...)
+        Mapping of keyword argument names to source strings.
     """
     out: dict[str, str] = {}
     for kw in node.keywords or []:
@@ -583,21 +559,12 @@ def _extract_labels_from_kw(kw_map: dict[str, str]) -> list[str]:
     Parameters
     ----------
     kw_map : dict[str, str]
-        Description.
+        Keyword arguments mapping.
 
     Returns
     -------
     list[str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _extract_labels_from_kw(...)
+        List of label names extracted from keyword arguments.
     """
     # prometheus_client: labelnames=(), namespace/subsystem help omitted here
     # common: labelnames=["method","status"], or .labels("method","status")—we only see construction here
@@ -613,21 +580,12 @@ def _infer_unit_from_name(name: str) -> str | None:
     Parameters
     ----------
     name : str
-        Description.
+        Metric name.
 
     Returns
     -------
     str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _infer_unit_from_name(...)
+        Unit suffix if found, None otherwise.
     """
     # Prometheus best-practice: include base unit in metric name (seconds, bytes, meters, grams, joules, volts, amperes, ratio)
     # and counters end with _total. We'll pull the suffix token.
@@ -642,21 +600,12 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
     Parameters
     ----------
     mtype : str | None
-        Description.
+        Metric type.
 
     Returns
     -------
     str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _recommended_aggregation(...)
+        Recommended aggregation query or None.
     """
     if mtype == "counter":
         return "rate(sum by (...) (__metric__[5m]))"
@@ -668,7 +617,18 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
 
 
 def _dedupe_strings(values: Sequence[str]) -> list[str]:
-    """Return ``values`` with duplicates removed, preserving order."""
+    """Return ``values`` with duplicates removed, preserving order.
+
+    Parameters
+    ----------
+    values : Sequence[str]
+        Sequence of strings.
+
+    Returns
+    -------
+    list[str]
+        List with duplicates removed, preserving order.
+    """
     seen: set[str] = set()
     ordered: list[str] = []
     for value in values:
@@ -683,6 +643,18 @@ def _is_structured_logging(call: ast.Call, text: str) -> tuple[list[str], bool]:
 
     Structured if kwargs or 'extra={'...'}' carries keys.
     Warn if %-format or f-string is used with positional args (unstructured).
+
+    Parameters
+    ----------
+    call : ast.Call
+        AST call node.
+    text : str
+        Source text.
+
+    Returns
+    -------
+    tuple[list[str], bool]
+        (structured_keys, is_structured) tuple.
     """
     keys: list[str] = []
     # capture kwargs
@@ -715,24 +687,15 @@ def _lint_metric(policy: ObservabilityPolicy, row: MetricRow) -> list[LintFindin
 
     Parameters
     ----------
-    policy : dict
-        Description.
+    policy : ObservabilityPolicy
+        Observability policy.
     row : MetricRow
-        Description.
+        Metric row to lint.
 
     Returns
     -------
-    list[dict]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _lint_metric(...)
+    list[LintFinding]
+        List of lint findings.
     """
     errs: list[LintFinding] = []
     name_rx = re.compile(policy.metric.name_regex)
@@ -821,24 +784,15 @@ def _lint_log(policy: ObservabilityPolicy, row: LogRow) -> list[LintFinding]:
 
     Parameters
     ----------
-    policy : dict
-        Description.
+    policy : ObservabilityPolicy
+        Observability policy.
     row : LogRow
-        Description.
+        Log row to lint.
 
     Returns
     -------
-    list[dict]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _lint_log(...)
+    list[LintFinding]
+        List of lint findings.
     """
     errs: list[LintFinding] = []
     if policy.logs.require_structured and not row.structured_keys:
@@ -861,24 +815,15 @@ def _lint_trace(policy: ObservabilityPolicy, row: TraceRow) -> list[LintFinding]
 
     Parameters
     ----------
-    policy : dict
-        Description.
+    policy : ObservabilityPolicy
+        Observability policy.
     row : TraceRow
-        Description.
+        Trace row to lint.
 
     Returns
     -------
-    list[dict]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _lint_trace(...)
+    list[LintFinding]
+        List of lint findings.
     """
     errs: list[LintFinding] = []
     rx = re.compile(policy.traces.name_regex)
@@ -1075,23 +1020,14 @@ def _links_for(path: Path, lineno: int) -> dict[str, str]:
     Parameters
     ----------
     path : Path
-        Description.
+        File path.
     lineno : int
-        Description.
+        Line number.
 
     Returns
     -------
     dict[str, str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _links_for(...)
+        Dictionary of link type to URL.
     """
     out: dict[str, str] = {}
     if LINK_MODE in {"editor", "both"}:
@@ -1138,7 +1074,18 @@ def _write_config_summary(
 def _scan_repository(
     policy: ObservabilityPolicy,
 ) -> tuple[list[LogRow], list[MetricRow], list[TraceRow], list[LintFinding]]:
-    """Traverse the source tree and collect observability artefacts."""
+    """Traverse the source tree and collect observability artefacts.
+
+    Parameters
+    ----------
+    policy : ObservabilityPolicy
+        Observability policy.
+
+    Returns
+    -------
+    tuple[list[LogRow], list[MetricRow], list[TraceRow], list[LintFinding]]
+        (logs, metrics, traces, lints) tuple.
+    """
     all_logs: list[LogRow] = []
     all_metrics: list[MetricRow] = []
     all_traces: list[TraceRow] = []
@@ -1161,7 +1108,18 @@ def _scan_repository(
 
 
 def _load_runbooks(policy: ObservabilityPolicy) -> dict[str, str]:
-    """Load optional runbook mappings from the error taxonomy."""
+    """Load optional runbook mappings from the error taxonomy.
+
+    Parameters
+    ----------
+    policy : ObservabilityPolicy
+        Observability policy.
+
+    Returns
+    -------
+    dict[str, str]
+        Mapping of error message to runbook URL.
+    """
     taxonomy = policy.error_taxonomy_json or ""
     tax_path = ROOT / taxonomy if taxonomy else ROOT / ""
     if not tax_path.exists():
@@ -1256,7 +1214,24 @@ def _summarize_exit(
     traces: list[TraceRow],
     lints: list[LintFinding],
 ) -> int:
-    """Report a summary to stdout and return the desired exit code."""
+    """Report a summary to stdout and return the desired exit code.
+
+    Parameters
+    ----------
+    metrics : list[MetricRow]
+        List of metric rows.
+    logs : list[LogRow]
+        List of log rows.
+    traces : list[TraceRow]
+        List of trace rows.
+    lints : list[LintFinding]
+        List of lint findings.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 2 if errors found and OBS_FAIL_ON_LINT=1.
+    """
     fail = os.getenv("OBS_FAIL_ON_LINT", "0") == "1"
     error_count = sum(1 for item in lints if item.severity == "error")
     warning_count = sum(1 for item in lints if item.severity == "warning")
@@ -1280,7 +1255,13 @@ def _summarize_exit(
 
 
 def main() -> int:
-    """Coordinate observability scanning."""
+    """Coordinate observability scanning.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 2 if errors found and OBS_FAIL_ON_LINT=1.
+    """
     policy = load_policy()
     if not SRC.exists():
         return 0

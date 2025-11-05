@@ -40,6 +40,11 @@ def normalize_l2(
     epsilon:
         Minimum norm value to clamp to for zero or denormalised rows.
 
+    Returns
+    -------
+    FloatMatrix
+        L2-normalized matrix with same shape as input.
+
     Examples
     --------
     >>> import numpy as np
@@ -61,7 +66,25 @@ def normalize_l2(
 
 
 def safe_argpartition(values: FloatVector, k: int) -> IntVector:
-    """Return indices of the smallest ``k`` values with predictable ordering."""
+    """Return indices of the smallest ``k`` values with predictable ordering.
+
+    Parameters
+    ----------
+    values : FloatVector
+        Input vector to partition.
+    k : int
+        Number of smallest values to select.
+
+    Returns
+    -------
+    IntVector
+        Indices of the smallest k values, sorted.
+
+    Raises
+    ------
+    ValueError
+        If k is negative.
+    """
     if k < 0:
         msg = "k must be non-negative"
         raise ValueError(msg)
@@ -76,7 +99,25 @@ def safe_argpartition(values: FloatVector, k: int) -> IntVector:
 
 
 def topk_indices(scores: FloatVector, k: int) -> IntVector:
-    """Return indices of the top ``k`` scores sorted by descending score."""
+    """Return indices of the top ``k`` scores sorted by descending score.
+
+    Parameters
+    ----------
+    scores : FloatVector
+        Input score vector.
+    k : int
+        Number of top scores to select.
+
+    Returns
+    -------
+    IntVector
+        Indices of the top k scores, sorted by descending score.
+
+    Raises
+    ------
+    ValueError
+        If k is not positive.
+    """
     if k <= 0:
         msg = "k must be positive"
         raise ValueError(msg)

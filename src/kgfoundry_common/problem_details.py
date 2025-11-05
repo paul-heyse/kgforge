@@ -186,7 +186,13 @@ def _load_schema_impl() -> JsonSchema:
 
 
 def _load_schema() -> JsonSchema:
-    """Return the cached Problem Details JSON Schema."""
+    """Return the cached Problem Details JSON Schema.
+
+    Returns
+    -------
+    JsonSchema
+        Cached JSON Schema for Problem Details.
+    """
     cached = _SCHEMA_CACHE.get("problem_details")
     if cached is not None:
         return cached
@@ -397,7 +403,10 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
         payload["extensions"] = dict(params.extensions)
 
     # Validate against schema (cast since dict[str, object] ⊇ Mapping[str, JsonValue])
-    validate_problem_details(cast("Mapping[str, JsonValue]", payload))
+    try:
+        validate_problem_details(cast("Mapping[str, JsonValue]", payload))
+    except ProblemDetailsValidationError:
+        raise
 
     return cast("ProblemDetails", payload)
 

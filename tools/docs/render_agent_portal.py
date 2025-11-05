@@ -193,7 +193,24 @@ def _render_module_card_cached(
     cache_dir: Path,
     used: set[CacheKey],
 ) -> str:
-    """Render ``module`` using a content-addressed HTML cache when available."""
+    """Render ``module`` using a content-addressed HTML cache when available.
+
+    Parameters
+    ----------
+    package : str
+        Package name.
+    module : ModuleModel
+        Module model.
+    cache_dir : Path
+        Cache directory path.
+    used : set[CacheKey]
+        Set of cache keys used (updated in-place).
+
+    Returns
+    -------
+    str
+        Rendered HTML markup.
+    """
     key = _module_cache_key(package, module)
     used.add(key)
     try:

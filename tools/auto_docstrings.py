@@ -53,17 +53,50 @@ if TYPE_CHECKING:
 
 
 def is_magic(name: str) -> bool:
-    """Return True when ``name`` refers to a recognised magic method."""
+    """Return True when ``name`` refers to a recognised magic method.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a magic method.
+    """
     return legacy_is_magic(name)
 
 
 def is_pydantic_artifact(name: str) -> bool:
-    """Return True when ``name`` is associated with Pydantic internals."""
+    """Return True when ``name`` is associated with Pydantic internals.
+
+    Parameters
+    ----------
+    name : str
+        Name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a Pydantic artifact.
+    """
     return legacy_is_pydantic_artifact(name)
 
 
 def normalize_qualified_name(name: str) -> str:
-    """Return the canonical qualified name for ``name`` using override mappings."""
+    """Return the canonical qualified name for ``name`` using override mappings.
+
+    Parameters
+    ----------
+    name : str
+        Qualified name to normalize.
+
+    Returns
+    -------
+    str
+        Normalized qualified name.
+    """
     return legacy_normalize_qualified_name(name)
 
 
@@ -74,7 +107,31 @@ def required_sections(
     raises: Sequence[str],
     **options: object,
 ) -> list[str]:
-    """Return the ordered docstring sections required for the provided symbol metadata."""
+    """Return the ordered docstring sections required for the provided symbol metadata.
+
+    Parameters
+    ----------
+    kind : str
+        Symbol kind (e.g., 'function', 'class').
+    parameters : Sequence[DocstringIRParameter]
+        Function parameters.
+    returns : str | None
+        Return type annotation.
+    raises : Sequence[str]
+        Exception types raised.
+    **options : object
+        Additional options (name, is_public).
+
+    Returns
+    -------
+    list[str]
+        List of required section names.
+
+    Raises
+    ------
+    TypeError
+        If unexpected keyword arguments are provided or required arguments are missing.
+    """
     name = options.pop("name", None)
     is_public_raw = options.pop("is_public", None)
     if options:
@@ -105,13 +162,35 @@ def _sync_roots() -> None:
 
 
 def module_name_for(file_path: Path) -> str:
-    """Return the module path for ``file_path`` using the configured roots."""
+    """Return the module path for ``file_path`` using the configured roots.
+
+    Parameters
+    ----------
+    file_path : Path
+        File path to convert.
+
+    Returns
+    -------
+    str
+        Module qualified name.
+    """
     _sync_roots()
     return legacy_module_name_for(file_path)
 
 
 def process_file(file_path: Path) -> bool:
-    """Generate docstrings for the provided source file."""
+    """Generate docstrings for the provided source file.
+
+    Parameters
+    ----------
+    file_path : Path
+        Source file path.
+
+    Returns
+    -------
+    bool
+        True if docstrings were generated, False otherwise.
+    """
     _sync_roots()
     return legacy_process_file(file_path)
 

@@ -136,7 +136,20 @@ except ImportError:  # pragma: no cover - optional dependency
         error: KgFoundryError,
         request: RequestProtocol | None = None,
     ) -> JSONResponseProtocol:
-        """Raise an informative error when FastAPI dependencies are missing."""
+        """Raise an informative error when FastAPI dependencies are missing.
+
+        Parameters
+        ----------
+        error : KgFoundryError
+            Error instance (ignored).
+        request : RequestProtocol | None, optional
+            Request instance (ignored).
+
+        Raises
+        ------
+        RuntimeError
+            Always raised to indicate missing FastAPI dependency.
+        """
         del error, request
         message = (
             "FastAPI support is not installed. Install kgfoundry[api] to enable "
@@ -147,7 +160,18 @@ except ImportError:  # pragma: no cover - optional dependency
     _problem_details_response = _missing_problem_details_response
 
     def _missing_register_problem_details_handler(app: FastAPIProtocol) -> None:
-        """Raise an informative error when FastAPI dependencies are missing."""
+        """Raise an informative error when FastAPI dependencies are missing.
+
+        Parameters
+        ----------
+        app : FastAPIProtocol
+            FastAPI app instance (ignored).
+
+        Raises
+        ------
+        RuntimeError
+            Always raised to indicate missing FastAPI dependency.
+        """
         del app
         message = (
             "FastAPI support is not installed. Install kgfoundry[api] to enable "
@@ -178,6 +202,18 @@ def problem_details_response(
     this module. When FastAPI support is installed, the helper delegates to the
     implementation in ``kgfoundry_common.errors.http``. Otherwise it raises an
     informative ``RuntimeError`` describing the missing optional dependency.
+
+    Parameters
+    ----------
+    error : KgFoundryError
+        Error instance to convert.
+    request : RequestProtocol | None, optional
+        Optional request instance for context.
+
+    Returns
+    -------
+    JSONResponseProtocol
+        Problem Details HTTP response.
     """
     return _problem_details_response(error, request)
 

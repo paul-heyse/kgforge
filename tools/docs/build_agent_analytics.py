@@ -292,7 +292,20 @@ def _iter_catalog_modules(catalog: JSONMapping) -> list[CatalogModuleSnapshot]:
 
 
 def _module_source_issue(module: CatalogModuleSnapshot, repo_root: Path) -> BrokenLinkDetail | None:
-    """Return a broken link detail when the module source path is missing."""
+    """Return a broken link detail when the module source path is missing.
+
+    Parameters
+    ----------
+    module : CatalogModuleSnapshot
+        Module snapshot.
+    repo_root : Path
+        Repository root path.
+
+    Returns
+    -------
+    BrokenLinkDetail | None
+        Broken link detail if source path is missing, None otherwise.
+    """
     path_value = module.source_path
     if path_value is None:
         return None
@@ -302,7 +315,20 @@ def _module_source_issue(module: CatalogModuleSnapshot, repo_root: Path) -> Brok
 
 
 def _module_page_issues(module: CatalogModuleSnapshot, repo_root: Path) -> list[BrokenLinkDetail]:
-    """Return missing documentation pages for ``module``."""
+    """Return missing documentation pages for ``module``.
+
+    Parameters
+    ----------
+    module : CatalogModuleSnapshot
+        Module snapshot.
+    repo_root : Path
+        Repository root path.
+
+    Returns
+    -------
+    list[BrokenLinkDetail]
+        List of broken link details for missing pages.
+    """
     issues: list[BrokenLinkDetail] = []
     for kind, value in module.pages.items():
         if (repo_root / value).exists():

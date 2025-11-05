@@ -34,7 +34,13 @@ def _build_envelope(result: architecture.ArchitectureResult) -> CliEnvelope:
 
 
 def main() -> int:
-    """Execute the tooling architecture checks and emit a CLI envelope."""
+    """Execute the tooling architecture checks and emit a CLI envelope.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--json",

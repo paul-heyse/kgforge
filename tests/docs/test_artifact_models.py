@@ -42,22 +42,61 @@ type JsonObjectArray = list[JsonObject]
 
 
 def _empty_source_link() -> dict[str, str]:
-    """Return a fresh, typed source link mapping."""
+    """Return a fresh, typed source link mapping.
+
+    Returns
+    -------
+    dict[str, str]
+        Empty dictionary for source links.
+    """
     return {}
 
 
 def _source_link(**pairs: str) -> dict[str, str]:
-    """Return a typed source link mapping populated with provided pairs."""
+    """Return a typed source link mapping populated with provided pairs.
+
+    Parameters
+    ----------
+    **pairs : str
+        Key-value pairs for source links.
+
+    Returns
+    -------
+    dict[str, str]
+        Dictionary of source link mappings.
+    """
     return dict(pairs)
 
 
 def _empty_reverse_map() -> dict[str, tuple[str, ...]]:
-    """Return a fresh, typed reverse lookup mapping."""
+    """Return a fresh, typed reverse lookup mapping.
+
+    Returns
+    -------
+    dict[str, tuple[str, ...]]
+        Empty dictionary for reverse mappings.
+    """
     return {}
 
 
 def _normalize_tested_by(value: object) -> tuple[str, ...]:
-    """Coerce tested_by payload values to a tuple of strings."""
+    """Coerce tested_by payload values to a tuple of strings.
+
+    Parameters
+    ----------
+    value : object
+        Value to normalize (tuple, list, or invalid).
+
+    Returns
+    -------
+    tuple[str, ...]
+        Normalized tuple of strings.
+
+    Raises
+    ------
+    TypeError
+        If value is not a tuple or list of strings.
+    """
     if isinstance(value, tuple):
         entries: list[str] = []
         for entry in value:
@@ -79,7 +118,23 @@ def _normalize_tested_by(value: object) -> tuple[str, ...]:
 
 
 def _normalize_source_link(value: object) -> dict[str, str]:
-    """Coerce source_link payloads to mapping of strings."""
+    """Coerce source_link payloads to mapping of strings.
+
+    Parameters
+    ----------
+    value : object
+        Value to normalize (None, mapping, or invalid).
+
+    Returns
+    -------
+    dict[str, str]
+        Normalized source link dictionary.
+
+    Raises
+    ------
+    TypeError
+        If value is not None or a mapping of strings.
+    """
     if value is None:
         return _empty_source_link()
     if isinstance(value, Mapping):
@@ -110,6 +165,22 @@ def _symbol_row(
     The helper seeds a payload with canonical defaults, applies overrides, and
     routes the result through ``align_schema_fields`` to guarantee parity with
     the JSON Schema surface before instantiating the Pydantic model.
+
+    Parameters
+    ----------
+    path : str, optional
+        Symbol path. Default is "pkg.func".
+    kind : str, optional
+        Symbol kind. Default is "function".
+    doc : str, optional
+        Documentation string. Default is "doc".
+    **overrides : object
+        Additional field overrides.
+
+    Returns
+    -------
+    SymbolIndexRow
+        Constructed symbol index row.
     """
     payload: dict[str, object] = {
         "path": path,
@@ -148,7 +219,18 @@ def _symbol_row(
 
 
 def _symbol_payload(**overrides: JsonValue) -> dict[str, JsonValue]:
-    """Construct a canonical symbol payload with optional overrides."""
+    """Construct a canonical symbol payload with optional overrides.
+
+    Parameters
+    ----------
+    **overrides : JsonValue
+        Field overrides.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Symbol payload dictionary.
+    """
     payload: dict[str, JsonValue] = {
         "path": "pkg.func",
         "kind": "function",

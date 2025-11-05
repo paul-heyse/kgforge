@@ -37,6 +37,16 @@ def parse_args(argv: Sequence[str] | None = None) -> DocstringArgs:
 
     The parser currently exposes a single flag, ``--no-todo``, which toggles the
     stricter placeholder validation step executed after Ruff runs.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    DocstringArgs
+        Parsed arguments.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -54,6 +64,16 @@ def iter_docstrings(path: Path) -> Iterable[tuple[Path, int, str]]:
     The generator emits the file path, starting line number, and raw docstring text for module,
     class, and function definitions, mirroring the locations that Ruff and other documentation tools
     inspect.
+
+    Parameters
+    ----------
+    path : Path
+        File path to scan.
+
+    Yields
+    ------
+    tuple[Path, int, str]
+        (file_path, line_number, docstring_text) tuples.
     """
     text = path.read_text(encoding="utf-8")
     tree = ast.parse(text)
@@ -73,6 +93,11 @@ def check_placeholders() -> int:
     The function scans every Python file in :data:`TARGETS` and records occurrences
     of ``TODO``, ``TBD``, or ``FIXME`` inside docstrings. It prints a summary of the
     offending locations to ``stderr`` and returns ``1`` if any placeholders remain.
+
+    Returns
+    -------
+    int
+        Exit code: 0 if no placeholders found, 1 otherwise.
     """
     errors: list[str] = []
     keywords = {"TODO", "TBD", "FIXME"}

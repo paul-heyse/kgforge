@@ -185,7 +185,13 @@ class MetricsRegistry:
 
 
 def get_metrics_registry() -> MetricsRegistry:
-    """Return the process-wide metrics registry singleton."""
+    """Return the process-wide metrics registry singleton.
+
+    Returns
+    -------
+    MetricsRegistry
+        Process-wide metrics registry instance.
+    """
     if _OBS_CACHE.registry is None:
         _OBS_CACHE.registry = MetricsRegistry()
     return _OBS_CACHE.registry
@@ -211,7 +217,13 @@ class _DurationObserver:
         self.status = "error"
 
     def duration_seconds(self) -> float:
-        """Return the elapsed duration in seconds."""
+        """Return the elapsed duration in seconds.
+
+        Returns
+        -------
+        float
+            Elapsed duration in seconds since the observer was created.
+        """
         return time.monotonic() - self._start
 
 
@@ -223,7 +235,24 @@ def observe_duration(
     component: str = "unknown",
     correlation_id: str | None = None,
 ) -> Iterator[_DurationObserver]:
-    """Record metrics and structured logs for a component operation."""
+    """Record metrics and structured logs for a component operation.
+
+    Parameters
+    ----------
+    metrics : MetricsProvider
+        Metrics provider instance.
+    operation : str
+        Operation name.
+    component : str, optional
+        Component name. Defaults to "unknown".
+    correlation_id : str | None, optional
+        Correlation ID for tracing.
+
+    Yields
+    ------
+    _DurationObserver
+        Observer instance for tracking operation state.
+    """
     observer = _DurationObserver(metrics, operation, component, correlation_id)
     try:
         yield observer

@@ -127,7 +127,18 @@ class _PytestarchModule(Protocol):
 
 
 def get_layered_architecture_cls() -> type[LayeredArchitectureProtocol]:
-    """Return the pytestarch layered architecture class."""
+    """Return the pytestarch layered architecture class.
+
+    Returns
+    -------
+    type[LayeredArchitectureProtocol]
+        Layered architecture class.
+
+    Raises
+    ------
+    TypeError
+        If pytestarch module is missing LayeredArchitecture class.
+    """
     module = _import("pytestarch.query_language.layered_architecture_rule")
     candidate_obj = getattr(module, "LayeredArchitecture", _MISSING)
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
@@ -137,7 +148,18 @@ def get_layered_architecture_cls() -> type[LayeredArchitectureProtocol]:
 
 
 def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
-    """Return the pytestarch module-name filter class."""
+    """Return the pytestarch module-name filter class.
+
+    Returns
+    -------
+    type[ModuleNameFilterProtocol]
+        Module name filter class.
+
+    Raises
+    ------
+    TypeError
+        If pytestarch module is missing ModuleNameFilter class.
+    """
     module = _import("pytestarch.eval_structure.evaluable_architecture")
     candidate_obj = getattr(module, "ModuleNameFilter", _MISSING)
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
@@ -147,17 +169,40 @@ def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
 
 
 def get_layered_architecture_factory() -> Callable[[], LayeredArchitectureProtocol]:
-    """Return a callable that instantiates the layered architecture builder."""
+    """Return a callable that instantiates the layered architecture builder.
+
+    Returns
+    -------
+    Callable[[], LayeredArchitectureProtocol]
+        Factory function for layered architecture.
+    """
     return get_layered_architecture_cls()
 
 
 def get_module_name_filter_factory() -> Callable[[str], ModuleNameFilterProtocol]:
-    """Return a callable that creates module-name filters."""
+    """Return a callable that creates module-name filters.
+
+    Returns
+    -------
+    Callable[[str], ModuleNameFilterProtocol]
+        Factory function for module name filters.
+    """
     return get_module_name_filter_cls()
 
 
 def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtocol]:
-    """Return the pytestarch entry-point for evaluable architectures."""
+    """Return the pytestarch entry-point for evaluable architectures.
+
+    Returns
+    -------
+    Callable[..., EvaluableArchitectureProtocol]
+        Function to create evaluable architecture.
+
+    Raises
+    ------
+    AttributeError
+        If pytestarch module is missing get_evaluable_architecture.
+    """
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture"):
         message = "pytestarch module is missing get_evaluable_architecture"
@@ -169,7 +214,18 @@ def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtoc
 def get_evaluable_architecture_for_module_objects_fn() -> Callable[
     ..., EvaluableArchitectureProtocol
 ]:
-    """Return the evaluable-architecture factory for module objects."""
+    """Return the evaluable-architecture factory for module objects.
+
+    Returns
+    -------
+    Callable[..., EvaluableArchitectureProtocol]
+        Function to create evaluable architecture from module objects.
+
+    Raises
+    ------
+    AttributeError
+        If pytestarch module is missing get_evaluable_architecture_for_module_objects.
+    """
     module = _import("pytestarch.pytestarch")
     if not hasattr(module, "get_evaluable_architecture_for_module_objects"):
         message = "pytestarch module is missing get_evaluable_architecture_for_module_objects"

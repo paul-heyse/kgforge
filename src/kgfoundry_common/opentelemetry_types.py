@@ -147,7 +147,13 @@ def _safe_getattr(module: object, name: str) -> object | None:
 
 
 def load_trace_runtime() -> TraceRuntime:
-    """Return the OpenTelemetry trace runtime handles if available."""
+    """Return the OpenTelemetry trace runtime handles if available.
+
+    Returns
+    -------
+    TraceRuntime
+        Trace runtime handles with API, status factory, and status codes.
+    """
     try:
         trace_module = import_module("opentelemetry.trace")
     except ImportError:
@@ -164,7 +170,13 @@ def load_trace_runtime() -> TraceRuntime:
 
 
 def load_tracer_provider_cls() -> Callable[[], TracerProviderProtocol] | None:
-    """Return a factory for the OpenTelemetry ``TracerProvider`` if present."""
+    """Return a factory for the OpenTelemetry ``TracerProvider`` if present.
+
+    Returns
+    -------
+    Callable[[], TracerProviderProtocol] | None
+        Factory function for creating TracerProvider instances, or None if not available.
+    """
     try:
         sdk_trace_module = import_module("opentelemetry.sdk.trace")
     except ImportError:
@@ -190,7 +202,13 @@ def load_tracer_provider_cls() -> Callable[[], TracerProviderProtocol] | None:
 
 
 def load_in_memory_span_exporter_cls() -> Callable[[], SpanExporterProtocol] | None:
-    """Return a factory for the in-memory span exporter if available."""
+    """Return a factory for the in-memory span exporter if available.
+
+    Returns
+    -------
+    Callable[[], SpanExporterProtocol] | None
+        Factory function for creating InMemorySpanExporter instances, or None if not available.
+    """
     try:
         exporter_module = import_module("opentelemetry.sdk.trace.export.in_memory_span_exporter")
     except ImportError:
