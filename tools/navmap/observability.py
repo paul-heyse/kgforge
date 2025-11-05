@@ -229,7 +229,7 @@ def record_operation_metrics(
     >>> with record_operation_metrics("build", status="success"):
     ...     # Build operation
     ...     pass
-    """
+    """  # noqa: DOC502
     if correlation_id is None:
         correlation_id = get_correlation_id()
 

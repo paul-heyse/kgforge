@@ -139,7 +139,7 @@ def observe_tool_run(
     Exception
         Any exception raised during tool execution is propagated after recording
         error status and metrics.
-    """
+    """  # noqa: DOC502
     settings = get_runtime_settings()
     observation = ToolRunObservation(
         command=command,

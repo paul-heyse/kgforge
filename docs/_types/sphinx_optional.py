@@ -141,19 +141,21 @@ def load_optional_dependencies() -> OptionalDependencies:
     ...     print(f"Cannot load AutoAPI: {e}")
     """
     # Try to import the AutoAPI parser module
+    autoapi_module_name = "autoapi._parser"
     autoapi_import_err_msg = "autoapi is required for AutoAPI docs generation"
     try:
-        parser_module = import_module("autoapi._parser")
+        parser_module = import_module(autoapi_module_name)
     except ImportError as e:
-        raise MissingDependencyError("autoapi._parser", autoapi_import_err_msg) from e
+        raise MissingDependencyError(autoapi_module_name, autoapi_import_err_msg) from e
     parser_cls = coerce_parser_class(parser_module)
 
     # Try to import astroid
+    astroid_module_name = "astroid"
     astroid_import_err_msg = "astroid is required for AST analysis during docs build"
     try:
-        astroid = import_module("astroid")
+        astroid = import_module(astroid_module_name)
     except ImportError as e:
-        raise MissingDependencyError("astroid", astroid_import_err_msg) from e
+        raise MissingDependencyError(astroid_module_name, astroid_import_err_msg) from e
 
     # If we get here, both are available
     # Return facades wrapping the actual modules/objects

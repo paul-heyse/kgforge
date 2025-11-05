@@ -835,11 +835,6 @@ def run_build(
     cache : DocstringBuilderCache
         Cache interface for storing/retrieving processed file metadata.
 
-    Returns
-    -------
-    DocstringBuildResult
-        Build result containing exit status, metrics, and CLI payload.
-
     Raises
     ------
     NotImplementedError
@@ -871,11 +866,6 @@ def run_legacy(
         Positional arguments (deprecated, accepted for backward compatibility only).
     **kwargs : object
         Keyword arguments (deprecated, accepted for backward compatibility only).
-
-    Returns
-    -------
-    DocstringBuildResult
-        Build result containing exit status, metrics, and CLI payload.
 
     Raises
     ------

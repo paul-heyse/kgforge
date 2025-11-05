@@ -9,10 +9,12 @@ documentation tooling.
 from __future__ import annotations
 
 from docs._types.astroid_facade import (
+    AstroidBuilderFactory,
     AstroidBuilderProtocol,
+    AstroidManagerFactory,
     AstroidManagerProtocol,
-    coerce_astroid_builder_class,
-    coerce_astroid_manager_class,
+    coerce_astroid_builder_factory,
+    coerce_astroid_manager_factory,
 )
 from docs._types.autoapi_parser import (
     AutoapiParserProtocol,
@@ -20,10 +22,12 @@ from docs._types.autoapi_parser import (
 )
 
 __all__ = [
+    "AstroidBuilderFactory",
     "AstroidBuilderProtocol",
+    "AstroidManagerFactory",
     "AstroidManagerProtocol",
     "AutoapiParserProtocol",
-    "coerce_astroid_builder_class",
-    "coerce_astroid_manager_class",
+    "coerce_astroid_builder_factory",
+    "coerce_astroid_manager_factory",
     "coerce_parser_class",
 ]

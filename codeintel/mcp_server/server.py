@@ -85,6 +85,11 @@ class MCPServer:
     async def _handle_request(self, message: dict[str, Any]) -> None:
         """Dispatch a JSON-RPC message to the appropriate handler.
 
+        Parameters
+        ----------
+        message : dict[str, Any]
+            JSON-RPC request message containing method name and parameters.
+
         Raises
         ------
         SystemExit
@@ -186,6 +191,11 @@ class MCPServer:
     async def _tool_ts_query(payload: dict[str, Any]) -> dict[str, Any]:
         """Execute the Tree-sitter query tool.
 
+        Parameters
+        ----------
+        payload : dict[str, Any]
+            Tool arguments containing path, language, and query string.
+
         Returns
         -------
         dict[str, Any]
@@ -205,6 +215,11 @@ class MCPServer:
     async def _tool_ts_symbols(payload: dict[str, Any]) -> dict[str, Any]:
         """Execute the symbol inventory tool.
 
+        Parameters
+        ----------
+        payload : dict[str, Any]
+            Tool arguments containing directory path.
+
         Returns
         -------
         dict[str, Any]
@@ -217,6 +232,11 @@ class MCPServer:
     @staticmethod
     async def _tool_ts_calls(payload: dict[str, Any]) -> dict[str, Any]:
         """Execute the call-graph extraction tool.
+
+        Parameters
+        ----------
+        payload : dict[str, Any]
+            Tool arguments containing directory path, language, and optional callee filter.
 
         Returns
         -------
@@ -236,6 +256,11 @@ class MCPServer:
     @staticmethod
     async def _tool_ts_errors(payload: dict[str, Any]) -> dict[str, Any]:
         """Execute the syntax error detection tool.
+
+        Parameters
+        ----------
+        payload : dict[str, Any]
+            Tool arguments containing file path and language identifier.
 
         Returns
         -------

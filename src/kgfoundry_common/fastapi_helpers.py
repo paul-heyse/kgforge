@@ -112,7 +112,7 @@ def typed_dependency[**P, T](
         ------
         Exception
             Any exception raised by the dependency is propagated after logging.
-        """
+        """  # noqa: DOC502
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -170,7 +170,7 @@ def typed_exception_handler[E: Exception](
         ------
         Exception
             Any exception raised by the handler is propagated after logging.
-        """
+        """  # noqa: DOC502
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -254,7 +254,7 @@ def typed_middleware(
             ------
             Exception
                 Any exception raised by the middleware is propagated after logging.
-            """
+            """  # noqa: DOC502
             correlation_id = get_correlation_id()
             with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
                 start = time.perf_counter()

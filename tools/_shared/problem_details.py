@@ -84,7 +84,9 @@ def coerce_optional_dict(
     if mapping is None:
         return None
     materialised = {str(key): value for key, value in mapping.items()}
-    return materialised or None
+    if not materialised:
+        return None
+    return materialised
 
 
 @dataclass(frozen=True, slots=True)
@@ -180,8 +182,15 @@ def build_schema_problem_details(params: SchemaProblemDetailsParams) -> ProblemD
     validator_raw = getattr(params.error, "validator", None)
     if validator_raw is not None:
         extras["validator"] = str(validator_raw)
-    additional = coerce_optional_dict(params.extensions) or {}
-    merged_extra = {**extras, **additional} if extras or additional else None
+    additional = coerce_optional_dict(params.extensions)
+    merged_extra: dict[str, JsonValue] | None = None
+    if extras:
+        merged_extra = dict(extras)
+    if additional:
+        if merged_extra is None:
+            merged_extra = dict(additional)
+        else:
+            merged_extra.update(additional)
     base = replace(params.base, detail=detail, extensions=None)
     problem = build_problem_details(base)
     if merged_extra:

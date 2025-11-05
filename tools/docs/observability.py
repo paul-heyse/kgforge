@@ -274,7 +274,7 @@ def record_operation_metrics(
     >>> with record_operation_metrics("catalog", corr_id):
     ...     # Perform catalog build operation
     ...     pass
-    """
+    """  # noqa: DOC502
     if metrics is None:
         metrics = get_metrics_registry()
 

@@ -382,7 +382,7 @@ class FaissVectorstoreFactory:
         Exception
             Propagates exceptions raised by :meth:`FaissAdapter.save` (for example
             I/O errors or FAISS errors).
-        """
+        """  # noqa: DOC502
         logger.info(
             "Saving FAISS index",
             extra={

@@ -24,6 +24,7 @@ import json
 import logging
 import sys
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -55,7 +56,6 @@ from tools.docstring_builder.paths import (
     REQUIRED_PYTHON_MINOR,
 )
 from tools.docstring_builder.policy import PolicyConfigurationError, load_policy_settings
-from tools.docstring_builder.utils import optional_str
 from tools.stubs.drift_check import run as run_stub_drift
 
 if TYPE_CHECKING:
@@ -67,6 +67,15 @@ if TYPE_CHECKING:
 
 LOGGER = get_logger(__name__)
 CommandHandler = Callable[[argparse.Namespace], int]
+
+
+@dataclass(slots=True)
+class _NormalizedCliOptions:
+    """Normalized CLI inputs shared between request building and listing."""
+
+    selection: SelectionCriteria
+    baseline: str | None
+    explicit_paths: tuple[str, ...]
 
 
 CLI_ARGUMENT_DEFINITIONS: tuple[tuple[tuple[str, ...], dict[str, Any]], ...] = (
@@ -186,6 +195,73 @@ def _parse_policy_overrides(values: Sequence[str] | None) -> dict[str, str]:
     return overrides
 
 
+def _normalize_optional_text(value: object | None) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _normalize_paths(value: object | None) -> tuple[str, ...]:
+    if value is None:
+        return ()
+    candidates = value if isinstance(value, (list, tuple, set, frozenset)) else (value,)
+    normalized: list[str] = []
+    for entry in candidates:
+        if entry is None:
+            continue
+        text = str(entry).strip()
+        if text:
+            normalized.append(text)
+    return tuple(normalized)
+
+
+def _normalize_request_options(args: argparse.Namespace) -> _NormalizedCliOptions:
+    """Return normalized CLI options materialized from ``args``.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed CLI arguments namespace.
+
+    Returns
+    -------
+    _NormalizedCliOptions
+        Materialised selection filters, baseline revision, and explicit paths tuple.
+    """
+    module = _normalize_optional_text(getattr(args, "module", None))
+    since = _normalize_optional_text(getattr(args, "since", None))
+    baseline = _normalize_optional_text(getattr(args, "baseline", None))
+    explicit_paths = _normalize_paths(getattr(args, "paths", None))
+    selection = SelectionCriteria(
+        module=module,
+        since=since,
+        changed_only=bool(getattr(args, "changed_only", False)),
+        explicit_paths=explicit_paths if explicit_paths else None,
+    )
+    return _NormalizedCliOptions(
+        selection=selection,
+        baseline=baseline,
+        explicit_paths=explicit_paths,
+    )
+
+
+def normalize_request_options(args: argparse.Namespace) -> _NormalizedCliOptions:
+    """Return normalized CLI options materialized from ``args``.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed CLI arguments namespace.
+
+    Returns
+    -------
+    _NormalizedCliOptions
+        Materialised selection filters, baseline revision, and explicit paths tuple.
+    """
+    return _normalize_request_options(args)
+
+
 def _legacy_command_from_flags(args: argparse.Namespace) -> str | None:
     for attr, command in (
         ("flag_update", "update"),
@@ -224,7 +300,7 @@ def _build_request(
     command: str,
     subcommand: str,
 ) -> DocstringBuildRequest:
-    explicit_paths = tuple(getattr(args, "paths", []) or [])
+    normalized = _normalize_request_options(args)
     policy_override_values = getattr(args, "policy_override", None)
     try:
         policy_overrides = _parse_policy_overrides(policy_override_values)
@@ -233,17 +309,17 @@ def _build_request(
     return DocstringBuildRequest(
         command=command,
         subcommand=subcommand,
-        module=optional_str(getattr(args, "module", None)),
-        since=optional_str(getattr(args, "since", None)),
-        changed_only=getattr(args, "changed_only", False),
-        explicit_paths=explicit_paths,
+        module=normalized.selection.module,
+        since=normalized.selection.since,
+        changed_only=normalized.selection.changed_only,
+        explicit_paths=normalized.explicit_paths,
         force=getattr(args, "force", False),
         diff=getattr(args, "diff", False),
         ignore_missing=getattr(args, "ignore_missing", False),
         skip_docfacts=getattr(args, "skip_docfacts", False),
         json_output=getattr(args, "json_output", False),
         jobs=getattr(args, "jobs", 1) or 1,
-        baseline=optional_str(getattr(args, "baseline", None)),
+        baseline=normalized.baseline,
         only_plugins=_parse_plugin_names(getattr(args, "only_plugin", None)),
         disable_plugins=_parse_plugin_names(getattr(args, "disable_plugin", None)),
         policy_overrides=policy_overrides,
@@ -252,6 +328,31 @@ def _build_request(
         normalize_sections=subcommand == "fmt",
         invoked_subcommand=subcommand,
     )
+
+
+def build_request_from_args(
+    args: argparse.Namespace,
+    *,
+    command: str,
+    subcommand: str,
+) -> DocstringBuildRequest:
+    """Public wrapper for constructing :class:`DocstringBuildRequest` instances.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed CLI arguments namespace.
+    command : str
+        Logical command to record on the request ("update", "check", etc.).
+    subcommand : str
+        CLI subcommand invoked by the user.
+
+    Returns
+    -------
+    DocstringBuildRequest
+        Structured request describing the desired docstring builder run.
+    """
+    return _build_request(args, command=command, subcommand=subcommand)
 
 
 def _emit_json(result: DocstringBuildResult) -> None:
@@ -325,12 +426,7 @@ def _command_harvest(args: argparse.Namespace) -> int:
 def _command_list(args: argparse.Namespace) -> int:
     config, _ = load_builder_config(getattr(args, "config_path", None))
     try:
-        selection = SelectionCriteria(
-            module=optional_str(getattr(args, "module", None)),
-            since=optional_str(getattr(args, "since", None)),
-            changed_only=getattr(args, "changed_only", False),
-            explicit_paths=getattr(args, "paths", None),
-        )
+        selection = _normalize_request_options(args).selection
         files = select_files(config, selection)
     except InvalidPathError:
         LOGGER.exception("Invalid path supplied to docstring builder list")

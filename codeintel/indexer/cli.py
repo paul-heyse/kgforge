@@ -66,11 +66,11 @@ def query(
     ----------
     path : Path
         Source file to parse.
-    language : str
+    language : LanguageOption
         Identifier of the Tree-sitter grammar to use.
-    query_file : Path
+    query_file : QueryFileOption
         Path to a query file containing S-expression patterns.
-    named_only : bool
+    named_only : NamedOnlyOption
         When ``True`` only named captures are included in the results.
 
     Raises

@@ -113,7 +113,7 @@ import json
 from collections.abc import Mapping as MappingABC
 from typing import TYPE_CHECKING, Annotated, NoReturn, cast
 
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from docs._types.alignment import (
     SYMBOL_DELTA_CHANGE_FIELDS,
@@ -164,7 +164,13 @@ __all__ = [
 ]
 
 
-class LineSpan(BaseModel):
+class FrozenBaseModel(BaseModel):
+    """Base class for immutable documentation artifacts."""
+
+    model_config = ConfigDict(frozen=True)
+
+
+class LineSpan(FrozenBaseModel):
     """Start/end line numbers for a symbol.
 
     Attributes
@@ -173,8 +179,8 @@ class LineSpan(BaseModel):
         Starting line number (1-indexed), or None if unknown.
     end : int | None
         Ending line number (1-indexed, inclusive), or None if unknown.
-    model_config : dict[str, object]
-        Pydantic model configuration dictionary.
+    model_config : ConfigDict
+        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -187,10 +193,8 @@ class LineSpan(BaseModel):
     start: int | None = Field(None, ge=0, description="Start line (1-indexed)")
     end: int | None = Field(None, ge=0, description="End line (1-indexed, inclusive)")
 
-    model_config: dict[str, object] = {"frozen": True}
 
-
-class SymbolIndexRow(BaseModel):
+class SymbolIndexRow(FrozenBaseModel):
     """A single symbol entry in the index.
 
     Each row represents one documented symbol (function, class, module, etc.) with
@@ -234,8 +238,8 @@ class SymbolIndexRow(BaseModel):
         True if this is an async function/method.
     is_property : bool
         True if this is a @property.
-    model_config : dict[str, object]
-        Pydantic model configuration dictionary.
+    model_config : ConfigDict
+        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -428,10 +432,8 @@ class SymbolIndexRow(BaseModel):
             return {str(k): str(val) for k, val in v.items()}
         return {}
 
-    model_config: dict[str, object] = {"frozen": True}
 
-
-class SymbolIndexArtifacts(BaseModel):
+class SymbolIndexArtifacts(FrozenBaseModel):
     """Complete symbol index payload with forward and reverse lookups.
 
     Attributes
@@ -442,8 +444,8 @@ class SymbolIndexArtifacts(BaseModel):
         Reverse lookup: file path -> sorted tuple of symbol paths.
     by_module : Annotated[dict[str, tuple[str, ...]], Field]
         Reverse lookup: module name -> sorted tuple of symbol paths.
-    model_config : dict[str, object]
-        Pydantic model configuration dictionary.
+    model_config : ConfigDict
+        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -489,10 +491,8 @@ class SymbolIndexArtifacts(BaseModel):
             return tuple(v)
         return ()
 
-    model_config: dict[str, object] = {"frozen": True}
 
-
-class SymbolDeltaChange(BaseModel):
+class SymbolDeltaChange(FrozenBaseModel):
     """A single changed symbol between two versions.
 
     Attributes
@@ -505,8 +505,8 @@ class SymbolDeltaChange(BaseModel):
         New version of the row (serialized).
     reasons : Annotated[tuple[str, ...], Field]
         List of reasons why the symbol changed (e.g., ["signature_changed"]).
-    model_config : dict[str, object]
-        Pydantic model configuration dictionary.
+    model_config : ConfigDict
+        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -575,10 +575,8 @@ class SymbolDeltaChange(BaseModel):
             return tuple(str(item) for item in v)
         return ()
 
-    model_config: dict[str, object] = {"frozen": True}
 
-
-class SymbolDeltaPayload(BaseModel):
+class SymbolDeltaPayload(FrozenBaseModel):
     """Delta (diff) of symbols between two git commits or documentation builds.
 
     Attributes
@@ -593,8 +591,8 @@ class SymbolDeltaPayload(BaseModel):
         Sorted tuple of removed symbol paths.
     changed : Annotated[tuple[SymbolDeltaChange, ...], Field]
         List of symbols that changed (sorted by path).
-    model_config : dict[str, object]
-        Pydantic model configuration dictionary.
+    model_config : ConfigDict
+        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -690,8 +688,6 @@ class SymbolDeltaPayload(BaseModel):
             artifact="symbol-delta",
         )
         return ()
-
-    model_config: dict[str, object] = {"frozen": True}
 
 
 def _validation_error(
@@ -791,13 +787,13 @@ def _coerce_str_tuple(
         return ()
     if isinstance(value, (list, tuple, set)):
         items: list[str] = []
-        for index, entry in enumerate(
-            cast("list[object] | tuple[object, ...] | set[object]", value)
-        ):
-            if not isinstance(entry, str):
-                indexed_field = f"{field}[{index}]"
-                _validation_error(indexed_field, "a string", artifact=artifact, row=row)
-            items.append(entry)
+        iterable = cast("list[object] | tuple[object, ...] | set[object]", value)
+        for index, entry in enumerate(iterable):
+            if isinstance(entry, str):
+                items.append(entry)
+                continue
+            indexed_field = f"{field}[{index}]"
+            _validation_error(indexed_field, "a string", artifact=artifact, row=row)
         if isinstance(value, set):
             return tuple(sorted(items))
         return tuple(items)

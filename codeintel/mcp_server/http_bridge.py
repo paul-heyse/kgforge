@@ -50,6 +50,11 @@ class ErrorsPayload(BaseModel):
 def ts_query(payload: QueryPayload) -> dict[str, object]:
     """Run a Tree-sitter query and return structured captures.
 
+    Parameters
+    ----------
+    payload : QueryPayload
+        Request payload containing file path, language, and query string.
+
     Returns
     -------
     dict[str, object]
@@ -73,6 +78,11 @@ def ts_query(payload: QueryPayload) -> dict[str, object]:
 def ts_symbols(payload: DirectoryPayload) -> dict[str, object]:
     """Summarise Python definitions for the supplied directory.
 
+    Parameters
+    ----------
+    payload : DirectoryPayload
+        Request payload containing directory path to analyze.
+
     Returns
     -------
     dict[str, object]
@@ -93,6 +103,11 @@ def ts_symbols(payload: DirectoryPayload) -> dict[str, object]:
 @app.post("/ts/calls")
 def ts_calls(payload: CallsPayload) -> dict[str, object]:
     """Enumerate call expressions detected within ``directory``.
+
+    Parameters
+    ----------
+    payload : CallsPayload
+        Request payload containing directory path, language, and optional callee filter.
 
     Returns
     -------
@@ -118,6 +133,11 @@ def ts_calls(payload: CallsPayload) -> dict[str, object]:
 @app.post("/ts/errors")
 def ts_errors(payload: ErrorsPayload) -> dict[str, object]:
     """Detect syntax errors using Tree-sitter.
+
+    Parameters
+    ----------
+    payload : ErrorsPayload
+        Request payload containing file path and language identifier.
 
     Returns
     -------
