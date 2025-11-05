@@ -26,39 +26,43 @@ GPU_CORE_MODULES: tuple[str, ...] = (
 
 
 def _modules_available(modules: Iterable[str]) -> bool:
-    """Return True when every module in ``modules`` can be resolved.
+    """Check if all specified modules can be imported.
 
-    <!-- auto:docstring-builder v1 -->
+    Verifies that each module in the iterable can be resolved
+    by Python's import system.
 
     Parameters
     ----------
-    modules : str
-        Describe ``modules``.
+    modules : Iterable[str]
+        Iterable of module names to check.
 
     Returns
     -------
     bool
-        Describe return value.
+        True if all modules are available, False otherwise.
     """
     return all(importlib.util.find_spec(module) is not None for module in modules)
 
 
 def has_gpu_stack(*, allow_without_cuda_env: str = "ALLOW_GPU_TESTS_WITHOUT_CUDA") -> bool:
-    """Return True when the optional GPU stack is importable and CUDA is usable.
+    """Check if the optional GPU stack is available and CUDA is usable.
 
-    <!-- auto:docstring-builder v1 -->
+    Verifies that all core GPU modules can be imported and that CUDA
+    is available via PyTorch. Can be overridden by an environment variable
+    for testing on CPU-only hosts.
 
     Parameters
     ----------
     allow_without_cuda_env : str, optional
-        Environment variable that, when set to ``"1"``, permits returning True even when
-        CUDA is unavailable. This supports import-only validation on CPU-only hosts.
-        Defaults to ``'ALLOW_GPU_TESTS_WITHOUT_CUDA'``.
+        Environment variable name that, when set to "1", permits returning
+        True even when CUDA is unavailable. Defaults to
+        "ALLOW_GPU_TESTS_WITHOUT_CUDA".
 
     Returns
     -------
     bool
-        True when the GPU stack is available or the override environment variable is set.
+        True when the GPU stack is available or the override environment
+        variable is set, False otherwise.
     """
     if not _modules_available(GPU_CORE_MODULES):
         return False

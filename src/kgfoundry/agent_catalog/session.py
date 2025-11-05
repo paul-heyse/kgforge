@@ -44,19 +44,19 @@ _MAX_STATUS_CODE = 599
 class CatalogSession:
     """Maintain a JSON-RPC session with ``catalogctl-mcp``.
 
-    <!-- auto:docstring-builder v1 -->
+    Provides a client interface for communicating with the catalogctl-mcp
+    stdio server via JSON-RPC. Handles process lifecycle, request/response
+    serialization, and error handling with RFC 9457 Problem Details.
 
     Parameters
     ----------
     command : Iterable[str] | None, optional
-        Describe ``command``.
-        Defaults to ``None``.
+        Command sequence to spawn the stdio server. If None, uses default.
+        Defaults to None.
     catalog : Path | None, optional
-        Describe ``catalog``.
-        Defaults to ``None``.
+        Path to catalog JSON file. Defaults to None.
     repo_root : Path | None, optional
-        Describe ``repo_root``.
-        Defaults to ``None``.
+        Repository root for resolving anchors. Defaults to None.
     """
 
     def __init__(
@@ -66,25 +66,20 @@ class CatalogSession:
         catalog: Path | None = None,
         repo_root: Path | None = None,
     ) -> None:
-        """Document   init  .
+        """Initialize catalog session.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Sets up command arguments and initializes session state. The process
+        is spawned lazily on first request.
 
         Parameters
         ----------
-        command : str | NoneType, optional
-            Configure the command. Defaults to ``None``.
-            Defaults to ``None``.
-        catalog : Path | NoneType, optional
-            Configure the catalog. Defaults to ``None``.
-            Defaults to ``None``.
-        repo_root : Path | NoneType, optional
-            Configure the repo root. Defaults to ``None``.
-            Defaults to ``None``.
+        command : Iterable[str] | None, optional
+            Command sequence to spawn server. If None, uses default.
+            Defaults to None.
+        catalog : Path | None, optional
+            Path to catalog JSON file. Defaults to None.
+        repo_root : Path | None, optional
+            Repository root for resolving anchors. Defaults to None.
         """
         command_sequence = command or self._default_command()
         self._command = [str(part) for part in command_sequence]
@@ -100,12 +95,13 @@ class CatalogSession:
     def _default_command() -> list[str]:
         """Return the default command used to spawn the stdio server.
 
-        <!-- auto:docstring-builder v1 -->
+        Returns the standard command sequence for launching catalogctl-mcp
+        using the current Python interpreter.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            Command sequence: [sys.executable, "-m", "tools.agent_catalog.catalogctl_mcp"].
         """
         return [
             sys.executable,
@@ -116,12 +112,13 @@ class CatalogSession:
     def _ensure_process(self) -> TextProcess:
         """Spawn the stdio server process if required.
 
-        <!-- auto:docstring-builder v1 -->
+        Lazily spawns the catalogctl-mcp process if it doesn't exist or
+        has terminated. Thread-safe.
 
         Returns
         -------
-        str
-            Describe return value.
+        TextProcess
+            Active text process for the stdio server.
 
         Raises
         ------
@@ -150,14 +147,15 @@ class CatalogSession:
     def _write_payload(process: TextProcess, payload: JsonObject) -> None:
         """Write a JSON payload to the process stdin.
 
-        <!-- auto:docstring-builder v1 -->
+        Serializes the payload to JSON and writes it as a newline-terminated
+        line to the process stdin.
 
         Parameters
         ----------
-        process : str
-            Describe ``process``.
-        payload : dict[str, object]
-            Describe ``payload``.
+        process : TextProcess
+            Text process with stdin available.
+        payload : JsonObject
+            JSON-RPC payload dictionary to write.
 
         Raises
         ------
@@ -175,22 +173,24 @@ class CatalogSession:
     def _read_response(process: TextProcess) -> JsonObject:
         """Read and decode a JSON-RPC response from stdout.
 
-        <!-- auto:docstring-builder v1 -->
+        Reads a single line from stdout and parses it as JSON. Validates
+        the response is a JSON object.
 
         Parameters
         ----------
-        process : str
-            Describe ``process``.
+        process : TextProcess
+            Text process with stdout available.
 
         Returns
         -------
-        dict[str, object]
-            Describe return value.
+        JsonObject
+            Parsed JSON-RPC response dictionary.
 
         Raises
         ------
         CatalogSessionError
-            If process stdout is unavailable, process terminates unexpectedly, or response is invalid JSON.
+            If process stdout is unavailable, process terminates unexpectedly,
+            or response is invalid JSON.
         """
         stdout = process.stdout
         if stdout is None:
@@ -224,17 +224,18 @@ class CatalogSession:
     def _validate_jsonrpc_id(value: JsonValue) -> int | str:
         """Validate and return a JSON-RPC ID (must be string or number).
 
-        <!-- auto:docstring-builder v1 -->
+        Ensures the ID conforms to JSON-RPC 2.0 specification which requires
+        IDs to be strings or numbers.
 
         Parameters
         ----------
-        value : object
-            Describe ``value``.
+        value : JsonValue
+            ID value to validate.
 
         Returns
         -------
         int | str
-            Describe return value.
+            Validated ID value.
 
         Raises
         ------
@@ -253,22 +254,24 @@ class CatalogSession:
     def _validate_status_code(value: JsonValue) -> int:
         """Validate and return an HTTP status code.
 
-        <!-- auto:docstring-builder v1 -->
+        Validates that the status code is an integer in the valid HTTP range
+        (100-599) or a parseable string representation.
 
         Parameters
         ----------
-        value : object
-            Describe ``value``.
+        value : JsonValue
+            Status code value to validate (int or str).
 
         Returns
         -------
         int
-            Describe return value.
+            Validated status code integer.
 
         Raises
         ------
         CatalogSessionError
-            If value is not a valid status code (integer in valid range or parseable string).
+            If value is not a valid status code (integer in valid range or
+            parseable string).
         """
         if isinstance(value, int):
             if _MIN_STATUS_CODE <= value <= _MAX_STATUS_CODE:
@@ -297,25 +300,27 @@ class CatalogSession:
     def _send_request(self, method: str, params: JsonObject | None = None) -> JsonValue:
         """Send a JSON-RPC request and return the result payload.
 
-        <!-- auto:docstring-builder v1 -->
+        Constructs a JSON-RPC 2.0 request, sends it to the server, and
+        validates the response. Handles error responses by raising
+        CatalogSessionError with Problem Details.
 
         Parameters
         ----------
         method : str
-            Describe ``method``.
-        params : dict[str, object] | NoneType, optional
-            Describe ``params``.
-            Defaults to ``None``.
+            JSON-RPC method name (e.g., "catalog.search").
+        params : JsonObject | None, optional
+            Method parameters dictionary. Defaults to None (empty dict).
 
         Returns
         -------
-        object
-            Describe return value.
+        JsonValue
+            Result payload from successful response.
 
         Raises
         ------
         CatalogSessionError
-            If the request fails, response is invalid, or JSON-RPC error is returned.
+            If the request fails, response is invalid, or JSON-RPC error
+            is returned.
         """
         with with_fields(
             logger, operation="jsonrpc_request", method=method, status="started"
@@ -383,12 +388,13 @@ class CatalogSession:
     def initialize(self) -> JsonObject:
         """Perform the initial handshake and return advertised capabilities.
 
-        <!-- auto:docstring-builder v1 -->
+        Sends the "initialize" JSON-RPC method to establish the session
+        and retrieve server capabilities.
 
         Returns
         -------
-        dict[str, object]
-            Describe return value.
+        JsonObject
+            Capabilities dictionary from server response.
         """
         result = self._send_request("initialize")
         # result is JsonValue, narrow to JsonObject (dict)
@@ -405,23 +411,21 @@ class CatalogSession:
     ) -> list[JsonObject]:
         """Execute hybrid search and return scored results.
 
-        <!-- auto:docstring-builder v1 -->
+        Performs semantic search over the catalog with optional facet filters.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query text.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
-        facets : dict[str, str] | NoneType, optional
-            Describe ``facets``.
-            Defaults to ``None``.
+            Number of results to return. Defaults to 10.
+        facets : dict[str, str] | None, optional
+            Facet filters (package, module, kind, stability). Defaults to None.
 
         Returns
         -------
-        list[dict[str, object]]
-            Describe return value.
+        list[JsonObject]
+            List of search result dictionaries with scores and metadata.
         """
         # Build params dict - facets dict[str, str] is compatible with JsonValue
         facets_dict: dict[str, str] = facets or {}
@@ -438,17 +442,17 @@ class CatalogSession:
     def symbol(self, symbol_id: str) -> JsonObject:
         """Return catalog metadata for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Retrieves symbol metadata including docfacts, anchors, and metrics.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier (e.g., "py:kgfoundry.search.find_similar").
 
         Returns
         -------
-        dict[str, object]
-            Describe return value.
+        JsonObject
+            Symbol metadata dictionary.
         """
         result = self._send_request("catalog.symbol", {"symbol_id": symbol_id})
         # result is JsonValue, narrow to JsonObject (dict)
@@ -459,17 +463,17 @@ class CatalogSession:
     def find_callers(self, symbol_id: str) -> list[str]:
         """Return callers recorded for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Finds all symbols that reference the given symbol.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            List of caller symbol IDs.
         """
         result = self._send_request("catalog.find_callers", {"symbol_id": symbol_id})
         if isinstance(result, list):
@@ -479,17 +483,17 @@ class CatalogSession:
     def find_callees(self, symbol_id: str) -> list[str]:
         """Return callees recorded for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Finds all symbols that are called by the given symbol.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            List of callee symbol IDs.
         """
         result = self._send_request("catalog.find_callees", {"symbol_id": symbol_id})
         if isinstance(result, list):
@@ -499,17 +503,18 @@ class CatalogSession:
     def change_impact(self, symbol_id: str) -> JsonObject:
         """Return change impact metadata for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Analyzes which symbols and modules would be affected by changes
+        to the given symbol.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
-        dict[str, object]
-            Describe return value.
+        JsonObject
+            Change impact dictionary with affected symbols and modules.
         """
         result = self._send_request("catalog.change_impact", {"symbol_id": symbol_id})
         # result is JsonValue, narrow to JsonObject (dict)
@@ -520,17 +525,18 @@ class CatalogSession:
     def suggest_tests(self, symbol_id: str) -> list[JsonObject]:
         """Return suggested test metadata for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Retrieves test suggestions including test files and test functions
+        that should be run when the symbol changes.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
-        list[dict[str, object]]
-            Describe return value.
+        list[JsonObject]
+            List of test suggestion dictionaries.
         """
         result = self._send_request("catalog.suggest_tests", {"symbol_id": symbol_id})
         if isinstance(result, list):
@@ -540,17 +546,18 @@ class CatalogSession:
     def open_anchor(self, symbol_id: str) -> dict[str, str]:
         """Return editor and GitHub anchors for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Returns anchor information suitable for opening the symbol in
+        an editor or viewing it on GitHub.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         dict[str, str]
-            Describe return value.
+            Anchor dictionary with file path and line number keys.
         """
         result = self._send_request("catalog.open_anchor", {"symbol_id": symbol_id})
         if isinstance(result, dict):
@@ -560,17 +567,17 @@ class CatalogSession:
     def list_modules(self, package: str) -> list[str]:
         """Return module names for ``package``.
 
-        <!-- auto:docstring-builder v1 -->
+        Lists all modules contained in the specified package.
 
         Parameters
         ----------
         package : str
-            Describe ``package``.
+            Package name.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            List of qualified module names.
         """
         result = self._send_request("catalog.list_modules", {"package": package})
         if isinstance(result, list):
@@ -580,7 +587,8 @@ class CatalogSession:
     def shutdown(self) -> None:
         """Request a graceful shutdown of the underlying process.
 
-        <!-- auto:docstring-builder v1 -->
+        Sends a shutdown request to the server and then closes the session. Logs shutdown status but
+        does not raise exceptions.
         """
         with with_fields(logger, operation="session_shutdown", status="started") as log_adapter:
             try:
@@ -596,7 +604,8 @@ class CatalogSession:
     def close(self) -> None:
         """Terminate the session process if it is running.
 
-        <!-- auto:docstring-builder v1 -->
+        Closes stdin, terminates the process, and waits for it to exit. Force-kills if termination
+        times out.
         """
         process = self._process
         if process is None:
@@ -614,12 +623,12 @@ class CatalogSession:
     def __enter__(self) -> Self:
         """Start the session process and return ``self``.
 
-        <!-- auto:docstring-builder v1 -->
+        Context manager entry point. Spawns the process if needed.
 
         Returns
         -------
         CatalogSession
-            Describe return value.
+            Self instance for use in context manager.
         """
         self._ensure_process()
         return self
@@ -632,16 +641,17 @@ class CatalogSession:
     ) -> None:
         """Ensure the underlying process is terminated when leaving the context.
 
-        <!-- auto:docstring-builder v1 -->
+        Context manager exit point. Always closes the session regardless
+        of exceptions.
 
         Parameters
         ----------
-        exc_type : BaseException | NoneType
-            Describe ``exc_type``.
-        exc : BaseException | NoneType
-            Describe ``exc``.
-        tb : traceback | NoneType
-            Describe ``tb``.
+        exc_type : type[BaseException] | None
+            Exception type (unused).
+        exc : BaseException | None
+            Exception instance (unused).
+        tb : TracebackType | None
+            Traceback object (unused).
         """
         _ = exc_type, exc, tb
         self.close()

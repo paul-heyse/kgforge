@@ -89,12 +89,13 @@ logger.addHandler(logging.NullHandler())
 def _sqlite_connection(path: Path) -> Iterator[sqlite3.Connection]:
     """Yield a SQLite connection configured for JSON operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Creates a SQLite connection with foreign keys enabled for safe
+    relational operations. Ensures the connection is closed on exit.
 
     Parameters
     ----------
     path : Path
-        Describe ``path``.
+        Path to SQLite database file.
 
     Yields
     ------
@@ -174,17 +175,18 @@ CREATE VIRTUAL TABLE symbol_fts USING fts5 (
 def _json_dumps(value: JsonValue) -> str:
     """Serialise ``value`` using JSON ensuring ASCII is preserved.
 
-    <!-- auto:docstring-builder v1 -->
+    Serializes a JSON value to a string with sorted keys for deterministic
+    output. Preserves non-ASCII characters.
 
     Parameters
     ----------
-    value : NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``value``.
+    value : JsonValue
+        JSON value to serialize.
 
     Returns
     -------
     str
-        Describe return value.
+        JSON string representation of the value.
     """
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
@@ -192,17 +194,17 @@ def _json_dumps(value: JsonValue) -> str:
 def _json_loads(value: str | None) -> JsonValue:
     """Return JSON-decoded ``value`` handling ``NULL`` gracefully.
 
-    <!-- auto:docstring-builder v1 -->
+    Deserializes a JSON string, returning None if the input is None.
 
     Parameters
     ----------
-    value : str | NoneType
-        Describe ``value``.
+    value : str | None
+        JSON string to decode, or None.
 
     Returns
     -------
-    NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe return value.
+    JsonValue
+        Decoded JSON value, or None if input is None.
     """
     if value is None:
         return None
@@ -212,17 +214,18 @@ def _json_loads(value: str | None) -> JsonValue:
 def _stringify(value: JsonValue) -> str | None:
     """Return ``value`` as a string if possible.
 
-    <!-- auto:docstring-builder v1 -->
+    Converts a JSON value to a string representation. Returns None if
+    the value is None, otherwise converts to string or JSON.
 
     Parameters
     ----------
-    value : NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``value``.
+    value : JsonValue
+        Value to convert to string.
 
     Returns
     -------
-    str | NoneType
-        Describe return value.
+    str | None
+        String representation of value, or None if value is None.
     """
     if value is None:
         return None
@@ -315,17 +318,18 @@ def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
 def _build_metadata_rows(payload: CatalogPayload) -> list[tuple[str, str]]:
     """Return rows for the ``metadata`` table.
 
-    <!-- auto:docstring-builder v1 -->
+    Extracts metadata fields from the catalog payload and returns them
+    as key-value tuples for database insertion.
 
     Parameters
     ----------
-    payload : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``payload``.
+    payload : CatalogPayload
+        Catalog payload containing metadata fields.
 
     Returns
     -------
     list[tuple[str, str]]
-        Describe return value.
+        List of (key, value) tuples for metadata table.
     """
     return [
         ("version", _json_dumps(payload.get("version"))),
@@ -343,20 +347,21 @@ def _build_metadata_rows(payload: CatalogPayload) -> list[tuple[str, str]]:
 class _SymbolExtraction:
     """Container bundling rows generated from symbol payloads.
 
-    <!-- auto:docstring-builder v1 -->
+    Aggregates extracted rows for modules, symbols, anchors, ranking,
+    and lookup mapping from symbol processing.
 
     Parameters
     ----------
-    modules : list[tuple[str, str, str]]
-        Describe ``modules``.
-    symbols : list[tuple[str, str, str, str, str, str]]
-        Describe ``symbols``.
-    anchors : list[tuple[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], str]]
-        Describe ``anchors``.
-    ranking : list[tuple[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], int]]
-        Describe ``ranking``.
+    modules : list[ModuleRow]
+        Module rows extracted from packages.
+    symbols : list[SymbolRow]
+        Symbol rows extracted from modules.
+    anchors : list[AnchorRow]
+        Anchor rows for symbol source locations.
+    ranking : list[RankingRow]
+        Ranking feature rows for symbols.
     lookup : dict[str, str]
-        Describe ``lookup``.
+        Mapping from qname to symbol_id.
     """
 
     modules: list[ModuleRow]
@@ -383,17 +388,18 @@ class _SqliteRows:
 def _collect_symbol_rows(packages: Sequence[PackagePayload]) -> _SymbolExtraction:
     """Aggregate module, symbol, anchor, and ranking rows.
 
-    <!-- auto:docstring-builder v1 -->
+    Iterates through packages and modules to extract all symbol-related
+    rows for database insertion.
 
     Parameters
     ----------
-    packages : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``packages``.
+    packages : Sequence[PackagePayload]
+        Sequence of package payloads to process.
 
     Returns
     -------
     _SymbolExtraction
-        Describe return value.
+        Aggregated rows for modules, symbols, anchors, ranking, and lookup.
     """
     extraction = _SymbolExtraction([], [], [], [], {})
     for package in packages:
@@ -503,19 +509,21 @@ def _collect_call_rows(
 ) -> list[CallRow]:
     """Return call graph rows using symbol identifiers where available.
 
-    <!-- auto:docstring-builder v1 -->
+    Extracts call edges from module graphs and converts them to database
+    rows using symbol lookup to resolve qnames to symbol_ids.
 
     Parameters
     ----------
-    packages : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``packages``.
-    symbol_lookup : str | str
-        Describe ``symbol_lookup``.
+    packages : Sequence[PackagePayload]
+        Sequence of package payloads containing call graphs.
+    symbol_lookup : Mapping[str, str]
+        Mapping from qname to symbol_id for resolving identifiers.
 
     Returns
     -------
-    list[tuple[str | NoneType, str | NoneType, str, str | NoneType, str | NoneType]]
-        Describe return value.
+    list[CallRow]
+        List of call rows (caller_symbol_id, callee_symbol_id, callee_qname,
+        confidence, kind).
     """
     rows: list[CallRow] = []
     for package in packages:
@@ -540,17 +548,17 @@ def _collect_call_rows(
 def _build_package_rows(packages: Sequence[PackagePayload]) -> list[tuple[str, str]]:
     """Return serialized package rows.
 
-    <!-- auto:docstring-builder v1 -->
+    Extracts package names and serializes them as JSON for database storage.
 
     Parameters
     ----------
-    packages : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``packages``.
+    packages : Sequence[PackagePayload]
+        Sequence of package payloads.
 
     Returns
     -------
     list[tuple[str, str]]
-        Describe return value.
+        List of (package_name, json_data) tuples.
     """
     rows: list[tuple[str, str]] = []
     for package in packages:
@@ -562,17 +570,17 @@ def _build_package_rows(packages: Sequence[PackagePayload]) -> list[tuple[str, s
 def _build_fts_rows(documents: Sequence[SearchDocument]) -> list[FtsRow]:
     """Return FTS rows from search documents.
 
-    <!-- auto:docstring-builder v1 -->
+    Extracts full-text search data from search documents for FTS5 index.
 
     Parameters
     ----------
-    documents : SearchDocument
-        Describe ``documents``.
+    documents : Sequence[SearchDocument]
+        Sequence of search documents to index.
 
     Returns
     -------
-    list[tuple[str, str, str, str, str]]
-        Describe return value.
+    list[FtsRow]
+        List of (symbol_id, package, module, qname, text) tuples.
     """
     rows: list[FtsRow] = []
     for document in documents:
@@ -594,16 +602,16 @@ def _write_many(
 ) -> None:
     """Execute ``executemany`` when rows are provided.
 
-    <!-- auto:docstring-builder v1 -->
+    Executes a bulk insert operation only if rows are available.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
+        SQLite connection to execute against.
     sql : str
-        Describe ``sql``.
-    rows : tuple[NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue], ...]
-        Describe ``rows``.
+        SQL INSERT statement with placeholders.
+    rows : Sequence[tuple[JsonValue, ...]]
+        Sequence of row tuples to insert.
     """
     if rows:
         connection.executemany(sql, rows)
@@ -657,17 +665,18 @@ def write_sqlite_catalog(
 ) -> None:
     """Persist ``payload`` as an optimised SQLite catalogue.
 
-    <!-- auto:docstring-builder v1 -->
+    Creates a SQLite database from catalog payload, including all tables
+    for packages, modules, symbols, anchors, ranking features, FTS index,
+    and call graph.
 
     Parameters
     ----------
-    payload : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]
-        Describe ``payload``.
+    payload : CatalogPayload
+        Catalog payload to persist.
     path : Path
-        Describe ``path``.
-    packages_override : str | NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue] | NoneType, optional
-        Describe ``packages_override``.
-        Defaults to ``None``.
+        Path where SQLite database will be created.
+    packages_override : Sequence[Mapping[str, JsonValue]] | None, optional
+        Optional override for packages list. Defaults to None.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
@@ -722,17 +731,17 @@ def write_sqlite_catalog(
 def _fetch_metadata(connection: sqlite3.Connection) -> JsonObject:
     """Return metadata rows keyed by attribute name.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads metadata key-value pairs from the database.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
+        SQLite connection to query.
 
     Returns
     -------
-    dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
-        Describe return value.
+    JsonObject
+        Dictionary of metadata key-value pairs.
     """
     result: JsonObject = {}
     rows = cast(
@@ -746,17 +755,19 @@ def _fetch_metadata(connection: sqlite3.Connection) -> JsonObject:
 def _load_packages_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
     """Load package rows and attach empty module containers.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads packages from the database and initializes empty module lists
+    for each package.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
+        SQLite connection to query.
 
     Returns
     -------
-    dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
-        Describe return value.
+    dict[str, JsonObject]
+        Dictionary mapping package names to package payloads with empty
+        module lists.
     """
     packages: dict[str, JsonObject] = {}
     rows = cast(
@@ -784,19 +795,20 @@ def _load_modules_table(
 ) -> dict[str, JsonObject]:
     """Load module rows and attach them to their packages.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads modules from the database and attaches them to their parent
+    packages, initializing empty symbol lists.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
-    packages : dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
-        Describe ``packages``.
+        SQLite connection to query.
+    packages : dict[str, JsonObject]
+        Dictionary of package payloads to update.
 
     Returns
     -------
-    dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
-        Describe return value.
+    dict[str, JsonObject]
+        Dictionary mapping module qualified names to module payloads.
     """
     modules: dict[str, JsonObject] = {}
     rows = cast(
@@ -833,17 +845,18 @@ def _load_modules_table(
 def _load_anchor_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
     """Return anchor metadata keyed by symbol identifier.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads anchor information (start_line, end_line, fingerprint, remap_order)
+    from the database.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
+        SQLite connection to query.
 
     Returns
     -------
-    dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
-        Describe return value.
+    dict[str, JsonObject]
+        Dictionary mapping symbol_id to anchor metadata.
     """
     anchors: dict[str, JsonObject] = {}
     rows = cast(
@@ -865,17 +878,18 @@ def _load_anchor_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
 def _load_ranking_table(connection: sqlite3.Connection) -> dict[str, JsonObject]:
     """Return ranking metadata keyed by symbol identifier.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads ranking features (coverage, complexity, churn, stability, deprecated)
+    from the database.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
+        SQLite connection to query.
 
     Returns
     -------
-    dict[str, dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]]
-        Describe return value.
+    dict[str, JsonObject]
+        Dictionary mapping symbol_id to ranking metadata.
     """
     ranking: dict[str, JsonObject] = {}
     rows = cast(
@@ -898,17 +912,19 @@ def _load_ranking_table(connection: sqlite3.Connection) -> dict[str, JsonObject]
 def _load_call_graph(connection: sqlite3.Connection) -> CallGraph:
     """Return caller/callee relationships keyed by symbol identifier.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads call graph edges from the database and builds bidirectional
+    mappings for callers and callees.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
+        SQLite connection to query.
 
     Returns
     -------
-    tuple[str | set[str], str | set[str]]
-        Describe return value.
+    CallGraph
+        Tuple of (callers mapping, callees mapping) where each maps
+        symbol_id to sets of related symbol IDs.
     """
     callers: dict[str, set[str]] = defaultdict(set)
     callees: dict[str, set[str]] = defaultdict(set)
@@ -936,20 +952,21 @@ def _attach_symbols_to_modules(
 ) -> None:
     """Populate module dictionaries with symbol payloads from SQLite rows.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads symbols from the database and attaches them to their modules,
+    enriching with anchor, ranking, and call graph data.
 
     Parameters
     ----------
     connection : sqlite3.Connection
-        Describe ``connection``.
-    modules : str | dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
-        Describe ``modules``.
-    anchors : str | dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
-        Describe ``anchors``.
-    ranking : str | dict[str, NoneType | bool | int | float | str | list[JsonValue] | dict[str, JsonValue]]
-        Describe ``ranking``.
-    call_graph : tuple[str | set[str], str | set[str]]
-        Describe ``call_graph``.
+        SQLite connection to query symbols from.
+    modules : Mapping[str, JsonObject]
+        Dictionary of module payloads to update.
+    anchors : Mapping[str, JsonObject]
+        Dictionary of anchor metadata by symbol_id.
+    ranking : Mapping[str, JsonObject]
+        Dictionary of ranking metadata by symbol_id.
+    call_graph : CallGraph
+        Tuple of (callers, callees) mappings.
 
     Raises
     ------
@@ -998,14 +1015,14 @@ def _attach_symbols_to_modules(
 def _attach_metrics(symbol_payload: JsonObject, ranking_entry: JsonObject) -> None:
     """Attach ranking metrics to symbol payload.
 
-    <!-- auto:docstring-builder v1 -->
+    Merges ranking features into the symbol's metrics dictionary.
 
     Parameters
     ----------
-    symbol_payload : dict[str, JsonValue]
-        Symbol payload dict to update.
-    ranking_entry : dict[str, JsonValue]
-        Ranking entry containing metrics.
+    symbol_payload : JsonObject
+        Symbol payload dict to update (modified in-place).
+    ranking_entry : JsonObject
+        Ranking entry containing complexity, stability, and deprecated flags.
     """
     metrics = symbol_payload.get("metrics")
     if not isinstance(metrics, dict):
@@ -1030,20 +1047,21 @@ def _attach_change_impact(
 ) -> None:
     """Attach change impact data to symbol payload.
 
-    <!-- auto:docstring-builder v1 -->
+    Merges call graph relationships and churn data into the symbol's
+    change_impact dictionary.
 
     Parameters
     ----------
-    symbol_payload : dict[str, JsonValue]
-        Symbol payload dict to update.
+    symbol_payload : JsonObject
+        Symbol payload dict to update (modified in-place).
     symbol_id : str
         ID of the symbol.
-    callers : dict[str, set[str]]
+    callers : Mapping[str, set[str]]
         Mapping of symbol_id to set of caller IDs.
-    callees : dict[str, set[str]]
+    callees : Mapping[str, set[str]]
         Mapping of symbol_id to set of callee IDs.
-    ranking_entry : dict[str, JsonValue]
-        Ranking entry containing churn info.
+    ranking_entry : JsonObject
+        Ranking entry containing churn_last_n information.
     """
     change_impact = symbol_payload.get("change_impact")
     if not isinstance(change_impact, dict):
@@ -1068,15 +1086,15 @@ def _append_symbol_to_module(
 ) -> None:
     """Append symbol payload to a module's symbol list.
 
-    <!-- auto:docstring-builder v1 -->
+    Adds a symbol to the symbols list of its parent module.
 
     Parameters
     ----------
-    modules : dict[str, JsonValue]
-        Mapping of module names to module payloads.
+    modules : Mapping[str, JsonObject]
+        Dictionary of module payloads (modified in-place).
     module_name : str
-        Name of the module.
-    symbol_payload : dict[str, JsonValue]
+        Qualified name of the module.
+    symbol_payload : JsonObject
         Symbol payload to append.
     """
     module_entry = modules.get(module_name)

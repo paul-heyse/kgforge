@@ -46,22 +46,19 @@ app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 
 # [nav:anchor harvest]
 def harvest(topic: str, years: str = ">=2018", max_works: int = 20000) -> None:
-    """Describe harvest.
+    """Harvest documents from OpenAlex matching the given criteria.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Downloads research papers from OpenAlex filtered by topic and
+    publication year. Currently implements a dry-run mode.
 
     Parameters
     ----------
     topic : str
-        Describe ``topic``.
+        Topic query string for filtering papers.
     years : str, optional
-        Describe ``years``.
-        Defaults to ``'>=2018'``.
+        Year filter expression (e.g., ">=2018"). Defaults to ">=2018".
     max_works : int, optional
-        Describe ``max_works``.
-        Defaults to ``20000``.
+        Maximum number of works to harvest. Defaults to 20000.
     """
     typer.echo(f"[dry-run] would harvest topic={topic!r}, years={years}, max_works={max_works}")
 

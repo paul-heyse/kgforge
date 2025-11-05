@@ -112,30 +112,23 @@ DEFAULT_GITHUB_TEMPLATE = "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{l
 
 
 class AgentCatalogClientError(RuntimeError):
-    """Document AgentCatalogClientError.
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+    """Exception raised for Agent Catalog client errors."""
 
 
 class AgentCatalogClient:
     """Typed client for interacting with the Agent Catalog.
 
-    <!-- auto:docstring-builder v1 -->
+    Provides a high-level interface for querying catalog data including
+    packages, modules, symbols, search, and change impact analysis.
 
     Parameters
     ----------
     catalog : AgentCatalogModel
-        Describe ``catalog``.
+        Loaded catalog model instance.
     repo_root : Path | None, optional
-        Describe ``repo_root``.
-        Defaults to ``None``.
+        Repository root for resolving relative paths. Defaults to None.
     catalog_path : Path | None, optional
-        Describe ``catalog_path``.
-        Defaults to ``None``.
+        Filesystem path to the catalog file. Defaults to None.
     """
 
     def __init__(
@@ -145,24 +138,19 @@ class AgentCatalogClient:
         repo_root: Path | None = None,
         catalog_path: Path | None = None,
     ) -> None:
-        """Document   init  .
+        """Initialize catalog client.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Sets up the client with a catalog model and resolves repository root.
 
         Parameters
         ----------
         catalog : AgentCatalogModel
-            Configure the catalog.
-        repo_root : Path | NoneType, optional
-            Configure the repo root. Defaults to ``None``.
-            Defaults to ``None``.
-        catalog_path : Path | NoneType, optional
-            Filesystem path for the catalog. Defaults to ``None``.
-            Defaults to ``None``.
+            Loaded catalog model instance.
+        repo_root : Path | None, optional
+            Repository root path. If None, uses catalog_path parent or cwd.
+            Defaults to None.
+        catalog_path : Path | None, optional
+            Filesystem path to the catalog file. Defaults to None.
         """
         self._catalog = catalog
         self._catalog_path = catalog_path
@@ -178,23 +166,22 @@ class AgentCatalogClient:
     ) -> AgentCatalogClient:
         """Construct a client by loading a catalog JSON artifact.
 
-        <!-- auto:docstring-builder v1 -->
+        Factory method that loads a catalog from file and creates a client.
 
         Parameters
         ----------
         path : Path
-            Describe ``path``.
-        repo_root : Path | NoneType, optional
-            Describe ``repo_root``.
-            Defaults to ``None``.
+            Path to catalog JSON file or SQLite database.
+        repo_root : Path | None, optional
+            Repository root path. If None, uses catalog path parent.
+            Defaults to None.
         load_shards : bool, optional
-            Describe ``load_shards``.
-            Defaults to ``True``.
+            Whether to expand shards if present. Defaults to True.
 
         Returns
         -------
         AgentCatalogClient
-            Describe return value.
+            Configured client instance.
         """
         model = load_catalog_model(path, load_shards=load_shards)
         root = repo_root or path.parent
@@ -203,17 +190,17 @@ class AgentCatalogClient:
     def _require_symbol(self, symbol_id: str) -> SymbolModel:
         """Return the symbol for ``symbol_id`` or raise a descriptive error.
 
-        <!-- auto:docstring-builder v1 -->
+        Internal helper that ensures a symbol exists before returning it.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         SymbolModel
-            Describe return value.
+            Symbol model instance.
 
         Raises
         ------
@@ -229,17 +216,17 @@ class AgentCatalogClient:
     def _require_module(self, qualified: str) -> ModuleModel:
         """Return the module for ``qualified`` or raise a descriptive error.
 
-        <!-- auto:docstring-builder v1 -->
+        Internal helper that ensures a module exists before returning it.
 
         Parameters
         ----------
         qualified : str
-            Describe ``qualified``.
+            Fully qualified module name.
 
         Returns
         -------
         ModuleModel
-            Describe return value.
+            Module model instance.
 
         Raises
         ------
@@ -265,29 +252,27 @@ class AgentCatalogClient:
     def list_packages(self) -> list[PackageModel]:
         """Return the packages present in the catalog.
 
-        <!-- auto:docstring-builder v1 -->
-
         Returns
         -------
         list[PackageModel]
-            Describe return value.
+            List of package models in the catalog.
         """
         return list(self._catalog.packages)
 
     def list_modules(self, package: str | PackageModel) -> list[ModuleModel]:
         """Return modules for the specified package.
 
-        <!-- auto:docstring-builder v1 -->
+        Lists all modules contained in a package.
 
         Parameters
         ----------
         package : str | PackageModel
-            Describe ``package``.
+            Package name or PackageModel instance.
 
         Returns
         -------
         list[ModuleModel]
-            Describe return value.
+            List of module models in the package.
 
         Raises
         ------
@@ -304,63 +289,63 @@ class AgentCatalogClient:
     def get_module(self, qualified: str) -> ModuleModel | None:
         """Return module metadata for ``qualified``.
 
-        <!-- auto:docstring-builder v1 -->
+        Retrieves a module by its fully qualified name.
 
         Parameters
         ----------
         qualified : str
-            Describe ``qualified``.
+            Fully qualified module name.
 
         Returns
         -------
-        ModuleModel | NoneType
-            Describe return value.
+        ModuleModel | None
+            Module model if found, None otherwise.
         """
         return self._catalog.get_module(qualified)
 
     def iter_symbols(self) -> Iterable[SymbolModel]:
         """Yield all symbol records within the catalog.
 
-        <!-- auto:docstring-builder v1 -->
+        Iterates through all packages and modules to yield every symbol.
 
         Yields
         ------
         SymbolModel
-            Symbol record from the catalog.
+            Symbol model from the catalog.
         """
         yield from self._catalog.iter_symbols()
 
     def get_symbol(self, symbol_id: str) -> SymbolModel | None:
         """Return symbol metadata for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Retrieves a symbol by its unique identifier.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
-        SymbolModel | NoneType
-            Describe return value.
+        SymbolModel | None
+            Symbol model if found, None otherwise.
         """
         return self._catalog.get_symbol(symbol_id)
 
     def find_callers(self, symbol_id: str) -> list[str]:
         """Return callers recorded for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Finds all symbols that reference the given symbol.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            List of caller symbol IDs.
         """
         symbol = self._require_symbol(symbol_id)
         return list(symbol.change_impact.callers)
@@ -368,17 +353,17 @@ class AgentCatalogClient:
     def find_callees(self, symbol_id: str) -> list[str]:
         """Return callees recorded for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Finds all symbols that are called by the given symbol.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            List of callee symbol IDs.
         """
         symbol = self._require_symbol(symbol_id)
         return list(symbol.change_impact.callees)
@@ -386,17 +371,17 @@ class AgentCatalogClient:
     def change_impact(self, symbol_id: str) -> ChangeImpactModel:
         """Return change impact metadata for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Retrieves change impact analysis showing affected symbols and modules.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         ChangeImpactModel
-            Describe return value.
+            Change impact model with callers, callees, and test suggestions.
         """
         symbol = self._require_symbol(symbol_id)
         return symbol.change_impact
@@ -404,17 +389,17 @@ class AgentCatalogClient:
     def suggest_tests(self, symbol_id: str) -> list[dict[str, JsonValue]]:
         """Return suggested tests to run for ``symbol_id``.
 
-        <!-- auto:docstring-builder v1 -->
+        Retrieves test suggestions from change impact metadata.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
-        list[dict[str, object]]
-            Describe return value.
+        list[dict[str, JsonValue]]
+            List of test suggestion dictionaries.
         """
         # ChangeImpactModel.tests is a list of dicts from Pydantic model_dump
         # Cast to JsonValue since these are JSON-serializable structures
@@ -429,23 +414,22 @@ class AgentCatalogClient:
     ) -> list[SearchResult]:
         """Execute hybrid search against the catalog.
 
-        <!-- auto:docstring-builder v1 -->
+        Performs semantic search combining lexical and vector search
+        with optional facet filters.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query text.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
-        facets : dict[str, str] | NoneType, optional
-            Describe ``facets``.
-            Defaults to ``None``.
+            Number of results to return. Defaults to 10.
+        facets : dict[str, str] | None, optional
+            Facet filters (package, module, kind, stability). Defaults to None.
 
         Returns
         -------
         list[SearchResult]
-            Describe return value.
+            List of search results with scores and metadata.
         """
         if facets:
             options = build_faceted_search_options(facets=facets)
@@ -469,17 +453,17 @@ class AgentCatalogClient:
     def open_anchor(self, symbol_id: str) -> dict[str, str]:
         """Return anchor URLs for the requested symbol.
 
-        <!-- auto:docstring-builder v1 -->
+        Generates editor and GitHub links for opening the symbol in source.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier.
 
         Returns
         -------
         dict[str, str]
-            Describe return value.
+            Dictionary with "editor" and "github" keys containing URLs.
         """
         symbol = self._require_symbol(symbol_id)
         module_name = _module_name_from_qname(symbol.qname)

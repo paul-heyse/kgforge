@@ -42,93 +42,82 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor MockKG]
 class MockKG:
-    """Describe MockKG.
+    """In-memory knowledge graph for testing and development.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight how the class supports nearby
-    modules to guide readers through the codebase.
+    Provides a simple dictionary-based implementation of a knowledge graph with concept mentions and
+    edges for use in tests and fixtures.
     """
 
     def __init__(self) -> None:
-        """Describe   init  .
+        """Initialize empty mock knowledge graph.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Python's object protocol for this class. Use it to integrate with built-in operators,
-        protocols, or runtime behaviours that expect instances to participate in the language's data
-        model.
+        Creates empty mappings for chunk-to-concepts and concept neighbors.
         """
         self.chunk2concepts: dict[str, set[str]] = {}
         self.neighbors: dict[str, set[str]] = {}
 
     def add_mention(self, chunk_id: str, concept_id: str) -> None:
-        """Describe add mention.
+        """Record a concept mention in a chunk.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Associates a concept with a chunk, creating the mapping if needed.
 
         Parameters
         ----------
         chunk_id : str
-            Describe ``chunk_id``.
+            Chunk identifier.
         concept_id : str
-            Describe ``concept_id``.
+            Concept identifier.
         """
         self.chunk2concepts.setdefault(chunk_id, set()).add(concept_id)
 
     def add_edge(self, a: str, b: str) -> None:
-        """Describe add edge.
+        """Add a bidirectional edge between two concepts.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Creates an undirected edge between concepts, adding both to each
+        other's neighbor sets.
 
         Parameters
         ----------
         a : str
-            Describe ``a``.
+            First concept identifier.
         b : str
-            Describe ``b``.
+            Second concept identifier.
         """
         self.neighbors.setdefault(a, set()).add(b)
         self.neighbors.setdefault(b, set()).add(a)
 
     def linked_concepts(self, chunk_id: str) -> list[str]:
-        """Describe linked concepts.
+        """Return concepts linked to a chunk.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Returns all concepts that have been mentioned in the given chunk,
+        sorted alphabetically.
 
         Parameters
         ----------
         chunk_id : str
-            Describe ``chunk_id``.
+            Chunk identifier.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            Sorted list of concept IDs linked to the chunk.
         """
         return sorted(self.chunk2concepts.get(chunk_id, set()))
 
     def one_hop(self, concept_id: str) -> list[str]:
-        """Describe one hop.
+        """Return one-hop neighbors of a concept.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Returns all concepts directly connected to the given concept via
+        edges, sorted alphabetically.
 
         Parameters
         ----------
         concept_id : str
-            Describe ``concept_id``.
+            Concept identifier.
 
         Returns
         -------
         list[str]
-            Describe return value.
+            Sorted list of neighbor concept IDs.
         """
         return sorted(self.neighbors.get(concept_id, set()))

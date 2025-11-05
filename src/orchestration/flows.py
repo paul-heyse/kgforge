@@ -44,21 +44,20 @@ __navmap__: Final[NavMap] = {
 
 
 def _t_echo_impl(msg: str) -> str:
-    """Describe  t echo impl.
+    """Echo a message string.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Simple task implementation that returns the input message unchanged.
+    Used for testing Prefect flow orchestration.
 
     Parameters
     ----------
     msg : str
-        Describe ``msg``.
+        Message string to echo.
 
     Returns
     -------
     str
-        Describe return value.
+        The input message unchanged.
     """
     return msg
 
@@ -68,16 +67,16 @@ t_echo = task(_t_echo_impl)
 
 
 def _e2e_flow_impl() -> list[str]:
-    """Describe  e2e flow impl.
+    """Execute end-to-end pipeline skeleton flow.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Runs a sequence of echo tasks representing the complete kgfoundry
+    pipeline stages: harvest, doctags, chunk, embed_dense, encode_splade,
+    bm25, faiss, ontology, concept_embed, linker, and kg.
 
     Returns
     -------
     list[str]
-        Describe return value.
+        List of task result strings.
     """
     return [
         t_echo.submit(x).result()

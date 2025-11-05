@@ -49,21 +49,20 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor urn_doc_from_text]
 def urn_doc_from_text(text: str) -> str:
-    """Describe urn doc from text.
+    """Generate a deterministic URN for a document from its text content.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates a SHA256-based URN identifier for a document by hashing
+    its text content and encoding the hash in base32.
 
     Parameters
     ----------
     text : str
-        Describe ``text``.
+        Document text content to hash.
 
     Returns
     -------
     str
-        Describe return value.
+        URN string in format "urn:doc:sha256:{base32_hash}".
     """
     h = hashlib.sha256(text.encode("utf-8")).digest()[:16]
     b32 = base64.b32encode(h).decode("ascii").strip("=").lower()
@@ -72,24 +71,23 @@ def urn_doc_from_text(text: str) -> str:
 
 # [nav:anchor urn_chunk]
 def urn_chunk(doc_hash: str, start: int, end: int) -> str:
-    """Describe urn chunk.
+    """Generate a URN for a chunk referencing a document.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates a URN identifier for a text chunk by extracting the hash
+    from the document URN and appending the start and end positions.
 
     Parameters
     ----------
     doc_hash : str
-        Describe ``doc_hash``.
+        Document URN hash (e.g., "urn:doc:sha256:{hash}").
     start : int
-        Describe ``start``.
+        Start character position of the chunk.
     end : int
-        Describe ``end``.
+        End character position of the chunk.
 
     Returns
     -------
     str
-        Describe return value.
+        URN string in format "urn:chunk:{hash}:{start}-{end}".
     """
     return f"urn:chunk:{doc_hash.rsplit(':', maxsplit=1)[-1]}:{start}-{end}"

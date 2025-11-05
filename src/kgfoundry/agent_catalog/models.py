@@ -23,22 +23,19 @@ logger.addHandler(logging.NullHandler())
 class AnchorsModel(BaseModel):
     """Source anchor metadata for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains source location information including line numbers,
+    fingerprint, and remap order for symbol anchors.
 
     Parameters
     ----------
-    start_line : int | NoneType, optional
-        Describe ``start_line``.
-        Defaults to ``None``.
-    end_line : int | NoneType, optional
-        Describe ``end_line``.
-        Defaults to ``None``.
-    cst_fingerprint : str | NoneType, optional
-        Describe ``cst_fingerprint``.
-        Defaults to ``None``.
-    remap_order : list[dict[str, object]], optional
-        Describe ``remap_order``.
-        Defaults to ``<factory>``.
+    start_line : int | None, optional
+        Starting line number for the symbol. Defaults to None.
+    end_line : int | None, optional
+        Ending line number for the symbol. Defaults to None.
+    cst_fingerprint : str | None, optional
+        CST fingerprint for the symbol. Defaults to None.
+    remap_order : list[dict[str, JsonValue]], optional
+        Remap order information. Defaults to empty list.
     """
 
     start_line: int | None = None
@@ -50,28 +47,23 @@ class AnchorsModel(BaseModel):
 class QualityModel(BaseModel):
     """Quality signals captured for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains code quality metrics including type checking status,
+    linting rules, docstring coverage, and doctest status.
 
     Parameters
     ----------
-    pyright_status : str | NoneType, optional
-        Describe ``pyright_status``.
-        Defaults to ``None``.
-    pyrefly_status : str | NoneType, optional
-        Describe ``pyrefly_status``.
-        Defaults to ``None``.
+    pyright_status : str | None, optional
+        Pyright type checking status. Defaults to None.
+    pyrefly_status : str | None, optional
+        Pyrefly type checking status. Defaults to None.
     ruff_rules : list[str], optional
-        Describe ``ruff_rules``.
-        Defaults to ``<factory>``.
-    pydoclint_parity : bool | NoneType, optional
-        Describe ``pydoclint_parity``.
-        Defaults to ``None``.
-    docstring_coverage : float | NoneType, optional
-        Describe ``docstring_coverage``.
-        Defaults to ``None``.
-    doctest_status : str | NoneType, optional
-        Describe ``doctest_status``.
-        Defaults to ``None``.
+        List of Ruff rule violations. Defaults to empty list.
+    pydoclint_parity : bool | None, optional
+        Pydoclint parity status. Defaults to None.
+    docstring_coverage : float | None, optional
+        Docstring coverage percentage. Defaults to None.
+    doctest_status : str | None, optional
+        Doctest execution status. Defaults to None.
     """
 
     pyright_status: str | None = None
@@ -85,28 +77,23 @@ class QualityModel(BaseModel):
 class MetricsModel(BaseModel):
     """Metric snapshot for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains runtime and code metrics including complexity, lines of code,
+    last modification time, codeowners, stability, and deprecation status.
 
     Parameters
     ----------
-    complexity : float | NoneType, optional
-        Describe ``complexity``.
-        Defaults to ``None``.
-    loc : int | NoneType, optional
-        Describe ``loc``.
-        Defaults to ``None``.
-    last_modified : str | NoneType, optional
-        Describe ``last_modified``.
-        Defaults to ``None``.
+    complexity : float | None, optional
+        Cyclomatic complexity score. Defaults to None.
+    loc : int | None, optional
+        Lines of code count. Defaults to None.
+    last_modified : str | None, optional
+        Last modification timestamp. Defaults to None.
     codeowners : list[str], optional
-        Describe ``codeowners``.
-        Defaults to ``<factory>``.
-    stability : str | NoneType, optional
-        Describe ``stability``.
-        Defaults to ``None``.
-    deprecated : bool | NoneType, optional
-        Describe ``deprecated``.
-        Defaults to ``None``.
+        List of code owner identifiers. Defaults to empty list.
+    stability : str | None, optional
+        Stability level (e.g., "stable", "experimental"). Defaults to None.
+    deprecated : bool | None, optional
+        Whether the symbol is deprecated. Defaults to None.
     """
 
     complexity: float | None = None
@@ -120,25 +107,23 @@ class MetricsModel(BaseModel):
 class AgentHintsModel(BaseModel):
     """Structured hints for downstream agents.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains metadata hints for AI agents including intent tags,
+    safe operations, test suggestions, performance budgets, and
+    breaking change notes.
 
     Parameters
     ----------
     intent_tags : list[str], optional
-        Describe ``intent_tags``.
-        Defaults to ``<factory>``.
+        Tags describing the symbol's intent. Defaults to empty list.
     safe_ops : list[str], optional
-        Describe ``safe_ops``.
-        Defaults to ``<factory>``.
+        List of safe operations for this symbol. Defaults to empty list.
     tests_to_run : list[str], optional
-        Describe ``tests_to_run``.
-        Defaults to ``<factory>``.
+        List of tests that should be run when this symbol changes.
+        Defaults to empty list.
     perf_budgets : list[str], optional
-        Describe ``perf_budgets``.
-        Defaults to ``<factory>``.
+        Performance budget constraints. Defaults to empty list.
     breaking_change_notes : list[str], optional
-        Describe ``breaking_change_notes``.
-        Defaults to ``<factory>``.
+        Notes about breaking changes. Defaults to empty list.
     """
 
     intent_tags: list[str] = Field(default_factory=list)
@@ -151,25 +136,22 @@ class AgentHintsModel(BaseModel):
 class ChangeImpactModel(BaseModel):
     """Change impact metadata for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains information about which symbols and modules would be
+    affected by changes to this symbol, including callers, callees,
+    test suggestions, and churn metrics.
 
     Parameters
     ----------
     callers : list[str], optional
-        Describe ``callers``.
-        Defaults to ``<factory>``.
+        List of symbol IDs that call this symbol. Defaults to empty list.
     callees : list[str], optional
-        Describe ``callees``.
-        Defaults to ``<factory>``.
-    tests : list[dict[str, object]], optional
-        Describe ``tests``.
-        Defaults to ``<factory>``.
+        List of symbol IDs called by this symbol. Defaults to empty list.
+    tests : list[dict[str, JsonValue]], optional
+        List of test suggestions. Defaults to empty list.
     codeowners : list[str], optional
-        Describe ``codeowners``.
-        Defaults to ``<factory>``.
-    churn_last_n : int | NoneType, optional
-        Describe ``churn_last_n``.
-        Defaults to ``None``.
+        List of code owner identifiers. Defaults to empty list.
+    churn_last_n : int | None, optional
+        Code churn metric for recent changes. Defaults to None.
     """
 
     callers: list[str] = Field(default_factory=list)
@@ -182,32 +164,32 @@ class ChangeImpactModel(BaseModel):
 class SymbolModel(BaseModel):
     """Catalog entry for a concrete symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Represents a symbol (function, class, module, etc.) in the catalog
+    with all associated metadata including docfacts, anchors, quality
+    metrics, and change impact.
 
     Parameters
     ----------
     qname : str
-        Describe ``qname``.
+        Fully qualified symbol name.
     kind : str
-        Describe ``kind``.
+        Symbol kind (e.g., "class", "function", "module").
     symbol_id : str
-        Describe ``symbol_id``.
-    docfacts : dict[str, object] | NoneType, optional
-        Describe ``docfacts``.
-        Defaults to ``None``.
+        Unique symbol identifier.
+    docfacts : dict[str, JsonValue] | None, optional
+        Documentation facts (summary, docstring). Defaults to None.
     anchors : AnchorsModel
-        Describe ``anchors``.
+        Source anchor metadata.
     quality : QualityModel
-        Describe ``quality``.
+        Quality metrics and signals.
     metrics : MetricsModel
-        Describe ``metrics``.
+        Runtime and code metrics.
     agent_hints : AgentHintsModel
-        Describe ``agent_hints``.
+        Agent-specific hints and metadata.
     change_impact : ChangeImpactModel
-        Describe ``change_impact``.
-    exemplars : list[dict[str, object]], optional
-        Describe ``exemplars``.
-        Defaults to ``<factory>``.
+        Change impact analysis data.
+    exemplars : list[dict[str, JsonValue]], optional
+        Example usage snippets. Defaults to empty list.
     """
 
     qname: str
@@ -229,16 +211,14 @@ class SymbolModel(BaseModel):
 class ModuleGraphModel(BaseModel):
     """Graph adjacency lists for a module.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains import relationships and call graph edges for a module.
 
     Parameters
     ----------
     imports : list[str], optional
-        Describe ``imports``.
-        Defaults to ``<factory>``.
-    calls : list[dict[str, object]], optional
-        Describe ``calls``.
-        Defaults to ``<factory>``.
+        List of imported module names. Defaults to empty list.
+    calls : list[dict[str, JsonValue]], optional
+        List of call graph edges. Defaults to empty list.
     """
 
     imports: list[str] = Field(default_factory=list)
@@ -248,26 +228,25 @@ class ModuleGraphModel(BaseModel):
 class ModuleModel(BaseModel):
     """Representation of a module within a package.
 
-    <!-- auto:docstring-builder v1 -->
+    Represents a Python module with its symbols, source information,
+    documentation pages, imports, and call graph.
 
     Parameters
     ----------
     name : str
-        Describe ``name``.
+        Module name (short name).
     qualified : str
-        Describe ``qualified``.
+        Fully qualified module name.
     source : dict[str, str]
-        Describe ``source``.
-    pages : dict[str, str | NoneType]
-        Describe ``pages``.
+        Source file information.
+    pages : dict[str, str | None]
+        Documentation page mappings.
     imports : list[str], optional
-        Describe ``imports``.
-        Defaults to ``<factory>``.
+        List of imported module names. Defaults to empty list.
     symbols : list[SymbolModel], optional
-        Describe ``symbols``.
-        Defaults to ``<factory>``.
+        List of symbols in this module. Defaults to empty list.
     graph : ModuleGraphModel
-        Describe ``graph``.
+        Import and call graph for this module.
     """
 
     name: str
@@ -286,15 +265,14 @@ class ModuleModel(BaseModel):
 class PackageModel(BaseModel):
     """Grouping of modules under a package name.
 
-    <!-- auto:docstring-builder v1 -->
+    Represents a Python package containing multiple modules.
 
     Parameters
     ----------
     name : str
-        Describe ``name``.
+        Package name.
     modules : list[ModuleModel], optional
-        Describe ``modules``.
-        Defaults to ``<factory>``.
+        List of modules in this package. Defaults to empty list.
     """
 
     name: str
@@ -304,23 +282,20 @@ class PackageModel(BaseModel):
 class SemanticIndexModel(BaseModel):
     """Metadata describing persisted semantic index artifacts.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains paths and metadata for semantic search index files.
 
     Parameters
     ----------
     index : str
-        Describe ``index``.
+        Relative path to FAISS index file.
     mapping : str
-        Describe ``mapping``.
-    model : str | NoneType, optional
-        Describe ``model``.
-        Defaults to ``None``.
-    dimension : int | NoneType, optional
-        Describe ``dimension``.
-        Defaults to ``None``.
-    count : int | NoneType, optional
-        Describe ``count``.
-        Defaults to ``None``.
+        Relative path to symbol-to-row mapping file.
+    model : str | None, optional
+        Embedding model name used. Defaults to None.
+    dimension : int | None, optional
+        Vector dimension. Defaults to None.
+    count : int | None, optional
+        Number of indexed vectors. Defaults to None.
     """
 
     index: str
@@ -333,17 +308,16 @@ class SemanticIndexModel(BaseModel):
 class ShardEntryModel(BaseModel):
     """Entry describing a package shard.
 
-    <!-- auto:docstring-builder v1 -->
+    Represents a single shard entry in a sharded catalog.
 
     Parameters
     ----------
     name : str
-        Describe ``name``.
+        Package name in this shard.
     path : str
-        Describe ``path``.
-    modules : int | NoneType, optional
-        Describe ``modules``.
-        Defaults to ``None``.
+        Relative path to shard JSON file.
+    modules : int | None, optional
+        Number of modules in this shard. Defaults to None.
     """
 
     name: str
@@ -354,15 +328,15 @@ class ShardEntryModel(BaseModel):
 class ShardsModel(BaseModel):
     """Shard index metadata when the catalog is split.
 
-    <!-- auto:docstring-builder v1 -->
+    Contains metadata for sharded catalogs where packages are split
+    across multiple files.
 
     Parameters
     ----------
     index : str
-        Describe ``index``.
+        Relative path to shard index file.
     packages : list[ShardEntryModel], optional
-        Describe ``packages``.
-        Defaults to ``<factory>``.
+        List of shard entries. Defaults to empty list.
     """
 
     index: str
@@ -372,32 +346,29 @@ class ShardsModel(BaseModel):
 class AgentCatalogModel(BaseModel):
     """Top-level representation of the Agent Catalog.
 
-    <!-- auto:docstring-builder v1 -->
+    Root model for the entire catalog containing version, metadata,
+    packages, optional shards, and semantic index information.
 
     Parameters
     ----------
     version : str
-        Describe ``version``.
+        Catalog schema version.
     generated_at : str
-        Describe ``generated_at``.
+        ISO timestamp of catalog generation.
     repo : dict[str, str]
-        Describe ``repo``.
-    link_policy : dict[str, object]
-        Describe ``link_policy``.
-    artifacts : dict[str, object]
-        Describe ``artifacts``.
+        Repository metadata.
+    link_policy : dict[str, JsonValue]
+        Link policy configuration.
+    artifacts : dict[str, JsonValue]
+        Artifact metadata.
     packages : list[PackageModel], optional
-        Describe ``packages``.
-        Defaults to ``<factory>``.
-    shards : ShardsModel | NoneType, optional
-        Describe ``shards``.
-        Defaults to ``None``.
-    semantic_index : SemanticIndexModel | NoneType, optional
-        Describe ``semantic_index``.
-        Defaults to ``None``.
-    search : dict[str, object] | NoneType, optional
-        Describe ``search``.
-        Defaults to ``None``.
+        List of packages in the catalog. Defaults to empty list.
+    shards : ShardsModel | None, optional
+        Shard metadata if catalog is sharded. Defaults to None.
+    semantic_index : SemanticIndexModel | None, optional
+        Semantic index metadata if available. Defaults to None.
+    search : dict[str, JsonValue] | None, optional
+        Search configuration. Defaults to None.
     """
 
     version: str
@@ -417,7 +388,7 @@ class AgentCatalogModel(BaseModel):
     def iter_symbols(self) -> Iterable[SymbolModel]:
         """Yield all symbol entries in the catalog.
 
-        <!-- auto:docstring-builder v1 -->
+        Iterates through all packages and modules to yield every symbol.
 
         Yields
         ------
@@ -431,17 +402,17 @@ class AgentCatalogModel(BaseModel):
     def get_symbol(self, symbol_id: str) -> SymbolModel | None:
         """Return the symbol entry for ``symbol_id`` when available.
 
-        <!-- auto:docstring-builder v1 -->
+        Searches all packages and modules to find a symbol by ID.
 
         Parameters
         ----------
         symbol_id : str
-            Describe ``symbol_id``.
+            Unique symbol identifier to search for.
 
         Returns
         -------
-        SymbolModel | NoneType
-            Describe return value.
+        SymbolModel | None
+            Symbol model if found, None otherwise.
         """
         for symbol in self.iter_symbols():
             if symbol.symbol_id == symbol_id:
@@ -451,17 +422,17 @@ class AgentCatalogModel(BaseModel):
     def get_module(self, qualified: str) -> ModuleModel | None:
         """Return the module entry with the given qualified name.
 
-        <!-- auto:docstring-builder v1 -->
+        Searches all packages to find a module by qualified name.
 
         Parameters
         ----------
         qualified : str
-            Describe ``qualified``.
+            Fully qualified module name.
 
         Returns
         -------
-        ModuleModel | NoneType
-            Describe return value.
+        ModuleModel | None
+            Module model if found, None otherwise.
         """
         for package in self.packages:
             for module in package.modules:
@@ -473,25 +444,26 @@ class AgentCatalogModel(BaseModel):
 def load_catalog_payload(path: Path, *, load_shards: bool = True) -> dict[str, JsonValue]:
     """Load a catalog payload from disk, expanding shards if requested.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads JSON catalog payload from file or SQLite database, optionally
+    expanding sharded catalogs by loading referenced shard files.
 
     Parameters
     ----------
     path : Path
-        Describe ``path``.
+        Path to catalog JSON file or SQLite database.
     load_shards : bool, optional
-        Describe ``load_shards``.
-        Defaults to ``True``.
+        Whether to expand shards if present. Defaults to True.
 
     Returns
     -------
-    dict[str, object]
-        Describe return value.
+    dict[str, JsonValue]
+        Catalog payload dictionary.
 
     Raises
     ------
     CatalogLoadError
-        If the catalog file is not found, contains invalid JSON, or has an invalid format.
+        If the catalog file is not found, contains invalid JSON, or has
+        an invalid format.
     """
     try:
         payload_raw: object = json.loads(path.read_text(encoding="utf-8"))
@@ -520,7 +492,8 @@ def _expand_shards_if_present(
 ) -> dict[str, JsonValue]:
     """Expand shard payloads into the main catalog if shards are present.
 
-    <!-- auto:docstring-builder v1 -->
+    Checks for shard metadata and loads referenced shard files to populate
+    the packages list.
 
     Parameters
     ----------
@@ -578,7 +551,7 @@ def _load_shard_packages(
 ) -> list[dict[str, JsonValue]]:
     """Load all package shards referenced in the index payload.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads individual shard JSON files referenced in the shard index.
 
     Parameters
     ----------
@@ -590,7 +563,7 @@ def _load_shard_packages(
     Returns
     -------
     list[dict[str, JsonValue]]
-        List of loaded shard packages.
+        List of loaded shard package dictionaries.
     """
     packages: list[dict[str, JsonValue]] = []
     packages_raw: JsonValue = index_payload.get("packages", [])
@@ -646,20 +619,20 @@ else:  # pragma: no cover - runtime behaviour
 def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogModel:
     """Return a validated catalog model from the JSON artifact.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads catalog from JSON file or SQLite database and validates it
+    against the Pydantic schema.
 
     Parameters
     ----------
     path : Path
-        Describe ``path``.
+        Path to catalog JSON file or SQLite database.
     load_shards : bool, optional
-        Describe ``load_shards``.
-        Defaults to ``True``.
+        Whether to expand shards if present. Defaults to True.
 
     Returns
     -------
     AgentCatalogModel
-        Describe return value.
+        Validated catalog model instance.
     """
 
     # Pydantic BaseModel classes contain Any in their type signatures.

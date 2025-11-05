@@ -863,47 +863,41 @@ class CatalogSessionServer:
         self._shutdown = True
 
     def _handle_exit(self, _params: JsonObject, _context: RequestContext) -> None:
-        """Document  handle exit.
+        """Handle exit JSON-RPC method.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Signals the server to shutdown gracefully after processing the
+        current request. Same as shutdown method.
 
         Parameters
         ----------
-        _params : dict[str, object]
-            Configure the  params.
+        _params : JsonObject
+            Method parameters (unused for exit).
         _context : RequestContext
-            Configure the  context.
+            Request context (unused for exit).
         """
         self._shutdown = True
 
 
 def _resolve_role(value: str) -> Role:
-    """Document  resolve role.
+    """Resolve role string to Role enum.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+    Converts a role string to a Role enum value, raising ValueError
+    with a helpful message if the role is invalid.
 
     Parameters
     ----------
     value : str
-        Configure the value.
+        Role string value (e.g., "viewer", "editor", "admin").
 
     Returns
     -------
     Role
-        Describe return value.
+        Role enum value.
 
     Raises
     ------
     ValueError
-        Raised when message.
+        If the role string is not a valid Role enum value.
     """
     try:
         return Role(value)
@@ -916,12 +910,13 @@ def _resolve_role(value: str) -> Role:
 def build_parser() -> argparse.ArgumentParser:
     """Return an argument parser for the stdio server.
 
-    <!-- auto:docstring-builder v1 -->
+    Creates and configures an ArgumentParser with command-line arguments
+    for catalog path, repository root, hosted mode, role, and audit log.
 
     Returns
     -------
     argparse.ArgumentParser
-        Describe return value.
+        Configured argument parser for the catalog session server.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -961,18 +956,19 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     """Run the stdio session server.
 
-    <!-- auto:docstring-builder v1 -->
+    Main entry point for the catalog session server. Parses arguments,
+    initializes the client and server, and starts the JSON-RPC request
+    processing loop.
 
     Parameters
     ----------
-    argv : list[str] | NoneType, optional
-        Describe ``argv``.
-        Defaults to ``None``.
+    argv : list[str] | None, optional
+        Command-line arguments. If None, uses sys.argv. Defaults to None.
 
     Returns
     -------
     int
-        Describe return value.
+        Exit code (0 for normal shutdown).
 
     Raises
     ------

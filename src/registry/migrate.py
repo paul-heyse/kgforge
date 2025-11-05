@@ -50,18 +50,18 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor apply]
 def apply(db: str, migrations_dir: str) -> None:
-    """Describe apply.
+    """Apply migration SQL files to a DuckDB database.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Reads all SQL files from the migrations directory in sorted order
+    and executes them against the database. Skips errors related to
+    missing Parquet table functions.
 
     Parameters
     ----------
     db : str
-        Describe ``db``.
+        Path to DuckDB database file.
     migrations_dir : str
-        Describe ``migrations_dir``.
+        Directory containing migration SQL files.
 
     Raises
     ------
@@ -100,12 +100,10 @@ def apply(db: str, migrations_dir: str) -> None:
 
 # [nav:anchor main]
 def main() -> None:
-    """Describe main.
+    """CLI entrypoint for registry migration operations.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Python's object protocol for this class. Use it to integrate with built-in operators, protocols,
-    or runtime behaviours that expect instances to participate in the language's data model.
+    Parses command-line arguments and executes the apply command to run migrations against a DuckDB
+    database.
     """
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)

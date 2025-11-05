@@ -42,16 +42,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor OntologyLoader]
 class OntologyLoader:
-    """Describe OntologyLoader.
+    """Placeholder class for ontology loading functionality.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    This class serves as a placeholder for future ontology ingestion and caching helpers.
+    Implementation details will be added later.
     """
