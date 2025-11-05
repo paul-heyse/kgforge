@@ -42,16 +42,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Qwen3Embedder]
 class Qwen3Embedder:
-    """Describe Qwen3Embedder.
+    """Placeholder class for Qwen-3 dense embedding adapter.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    This class serves as a placeholder for future Qwen-3 embedding model integration. Implementation
+    details will be added later.
     """

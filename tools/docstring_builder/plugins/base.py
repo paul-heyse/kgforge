@@ -82,18 +82,18 @@ class PluginFactory(Protocol[T_Plugin_co]):
 class PluginRegistryError(KgFoundryError):
     """Raised when plugin registration or validation fails.
 
-    <!-- auto:docstring-builder v1 -->
+    This exception is raised when a plugin cannot be registered or
+    validated, typically due to incorrect plugin type or configuration
+    issues.
 
     Parameters
     ----------
     message : str
-        Human-readable error message.
+        Human-readable error message describing the failure.
     cause : Exception | None, optional
-        The underlying exception that caused this error.
-        Defaults to ``None``.
+        The underlying exception that caused this error. Defaults to None.
     context : dict[str, object] | None, optional
-        Additional context fields for Problem Details.
-        Defaults to ``None``.
+        Additional context fields for Problem Details. Defaults to None.
 
     Examples
     --------
@@ -116,18 +116,14 @@ class PluginRegistryError(KgFoundryError):
     ) -> None:
         """Initialize plugin registry error.
 
-        <!-- auto:docstring-builder v1 -->
-
         Parameters
         ----------
         message : str
             Error message describing the registration failure.
         cause : Exception | None, optional
-            The underlying exception, if any.
-            Defaults to ``None``.
+            The underlying exception, if any. Defaults to None.
         context : dict[str, object] | None, optional
-            Additional context for Problem Details.
-            Defaults to ``None``.
+            Additional context for Problem Details. Defaults to None.
         """
         super().__init__(
             message,

@@ -42,16 +42,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Neo4jStore]
 class Neo4jStore:
-    """Describe Neo4jStore.
+    """Placeholder interface for a Neo4j-backed knowledge graph store.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    This class serves as a placeholder for future Neo4j integration for storing knowledge graph
+    data. Implementation details will be added later.
     """

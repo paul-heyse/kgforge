@@ -42,16 +42,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Linker]
 class Linker:
-    """Describe Linker.
+    """Placeholder class for linking orchestration and scoring.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    This class serves as a placeholder for future linking functionality that orchestrates concept
+    linking and scoring operations. Implementation details will be added later.
     """

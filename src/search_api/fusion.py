@@ -42,24 +42,25 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor rrf_fuse]
 def rrf_fuse(rankers: list[list[tuple[str, float]]], k_rrf: int = 60) -> dict[str, float]:
-    """Describe rrf fuse.
+    """Fuse multiple ranked lists using Reciprocal Rank Fusion (RRF).
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Combines multiple ranked lists into a single fused ranking by summing
+    reciprocal rank scores across all lists. Items appearing in multiple
+    lists receive higher scores.
 
     Parameters
     ----------
     rankers : list[list[tuple[str, float]]]
-        Describe ``rankers``.
+        List of ranked lists, where each inner list contains (item_id, score)
+        tuples sorted by score (descending).
     k_rrf : int, optional
-        Describe ``k_rrf``.
-        Defaults to ``60``.
+        RRF constant used to dampen the contribution of lower ranks.
+        Defaults to 60.
 
     Returns
     -------
     dict[str, float]
-        Describe return value.
+        Dictionary mapping item IDs to their fused RRF scores.
     """
     agg: dict[str, float] = {}
     for ranked in rankers:

@@ -44,21 +44,21 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor canonicalize_text]
 def canonicalize_text(blocks: list[str]) -> str:
-    """Describe canonicalize text.
+    """Canonicalize text blocks by normalizing Unicode and whitespace.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Normalizes Unicode characters (NFC), standardizes line endings,
+    replaces bullet points and dashes with hyphens, removes control
+    characters, and collapses whitespace. Returns a single joined string.
 
     Parameters
     ----------
     blocks : list[str]
-        Describe `blocks`.
+        List of text blocks to canonicalize.
 
     Returns
     -------
     str
-        Describe return value.
+        Canonicalized text joined with newlines, with empty blocks filtered.
     """
 
     def norm(s: str) -> str:

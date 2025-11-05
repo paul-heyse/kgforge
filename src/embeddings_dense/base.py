@@ -47,42 +47,28 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor DenseEmbeddingModel]
 class DenseEmbeddingModel(Protocol):
-    """Describe DenseEmbeddingModel.
+    """Protocol for dense embedding model implementations.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Parameters
-    ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    Defines the interface for models that generate dense vector embeddings from text sequences.
+    Implementations must provide an encode method that accepts a sequence of text strings and
+    returns a NumPy array of float32 vectors.
     """
 
     def encode(self, texts: Sequence[str]) -> NDArray[np.float32]:
-        """Describe encode.
+        """Encode text sequences into dense embedding vectors.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Converts a sequence of text strings into a NumPy array of dense
+        float32 vectors where each row corresponds to one input text.
 
         Parameters
         ----------
-        texts : str
-            Describe ``texts``.
+        texts : Sequence[str]
+            Sequence of text strings to encode.
 
         Returns
         -------
-        tuple[int, ...] | np.float32
-            Describe return value.
+        NDArray[np.float32]
+            NumPy array of shape (len(texts), embedding_dim) containing
+            the dense embedding vectors.
         """
         ...

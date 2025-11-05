@@ -55,23 +55,22 @@ ALLOWED_FACET_KEYS = {"package", "module", "kind", "stability", "deprecated"}
 def _should_use_typed_envelope() -> bool:
     """Check if typed envelope should be used by default.
 
-    <!-- auto:docstring-builder v1 -->
+    Checks the AGENT_SEARCH_TYPED environment variable to determine
+    whether typed JSON envelopes should be used by default.
 
     Returns
     -------
     bool
-        Describe return value.
+        True if AGENT_SEARCH_TYPED is set to "1", "true", or "yes".
     """
     return os.getenv("AGENT_SEARCH_TYPED", "0").lower() in {"1", "true", "yes"}
 
 
 class CLIEnvelope(TypedDict, total=False):
-    """Document CLIEnvelope.
+    """Typed envelope for CLI command output.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Defines the structure for typed JSON envelopes emitted by CLI commands. Conforms to
+    schema/tools/cli_envelope.json.
     """
 
     schemaVersion: str
@@ -180,19 +179,11 @@ def _emit_problem_response(
 
 
 class CatalogctlError(RuntimeError):
-    """Document CatalogctlError.
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
-    """
+    """Exception raised for CLI-specific errors."""
 
 
 def _parse_facets(raw: list[str]) -> dict[str, str]:
     """Return a mapping of facet filters parsed from ``raw`` expressions.
-
-    <!-- auto:docstring-builder v1 -->
 
     Validates that facet keys are from the allowed set (package, module, kind,
     stability, deprecated) and raises CatalogctlError with friendly messages
@@ -253,12 +244,12 @@ def _extract_facet_args(namespace: argparse.Namespace) -> list[str]:
 def _render_json(payload: object) -> None:
     """Write ``payload`` as formatted JSON to stdout.
 
-    <!-- auto:docstring-builder v1 -->
+    Serializes the payload to JSON and writes it to stdout with indentation.
 
     Parameters
     ----------
     payload : object
-        Describe ``payload``.
+        JSON-serializable payload to write.
     """
     json.dump(payload, fp=sys.stdout, indent=2, ensure_ascii=False)
     sys.stdout.write("\n")
@@ -267,15 +258,16 @@ def _render_json(payload: object) -> None:
 def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> None:
     """Render ``message`` to stderr with optional Problem Details.
 
-    <!-- auto:docstring-builder v1 -->
+    Writes error message to stderr. If problem details are provided,
+    writes JSON-formatted error with problem details.
 
     Parameters
     ----------
     message : str
         Human-readable error message.
-    problem : dict[str, object] | NoneType, optional
+    problem : dict[str, JsonValue] | None, optional
         RFC 9457 Problem Details payload to include in JSON output.
-        Defaults to ``None``.
+        Defaults to None.
     """
     if problem is not None:
         error_payload = {"message": message, "problem": problem}
@@ -288,17 +280,18 @@ def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> 
 def search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
     """Convert SearchResult dataclass to VectorSearchResultTypedDict-compatible dict.
 
-    <!-- auto:docstring-builder v1 -->
+    Converts a SearchResult dataclass instance to a dictionary format
+    compatible with the VectorSearchResultTypedDict schema.
 
     Parameters
     ----------
     result : SearchResult
-        Describe ``result``.
+        SearchResult instance to convert.
 
     Returns
     -------
-    dict[str, object]
-        Describe return value.
+    dict[str, JsonValue]
+        Dictionary representation of the search result.
     """
     return {
         "symbol_id": result.symbol_id,
@@ -328,21 +321,20 @@ def _build_cli_envelope(
 ) -> CLIEnvelope:
     """Build a typed CLI envelope conforming to schema/tools/cli_envelope.json.
 
-    <!-- auto:docstring-builder v1 -->
+    Constructs a typed envelope with metadata, optional payload, errors,
+    and problem details.
 
     Parameters
     ----------
     context : EnvelopeContext
-        Envelope metadata containing the subcommand, status, duration, and correlation ID.
-    payload : dict[str, object] | NoneType, optional
-        Command-specific payload (e.g., search results).
-        Defaults to ``None``.
-    errors : list[dict[str, object]] | NoneType, optional
-        Error entries (for non-success status).
-        Defaults to ``None``.
-    problem : dict[str, object] | NoneType, optional
-        RFC 9457 Problem Details (for error status).
-        Defaults to ``None``.
+        Envelope metadata containing the subcommand, status, duration, and
+        correlation ID.
+    payload : dict[str, JsonValue] | None, optional
+        Command-specific payload (e.g., search results). Defaults to None.
+    errors : list[dict[str, JsonValue]] | None, optional
+        Error entries (for non-success status). Defaults to None.
+    problem : dict[str, JsonValue] | None, optional
+        RFC 9457 Problem Details (for error status). Defaults to None.
 
     Returns
     -------
@@ -371,12 +363,13 @@ def _build_cli_envelope(
 def build_parser() -> argparse.ArgumentParser:
     """Return the argument parser configured for the CLI.
 
-    <!-- auto:docstring-builder v1 -->
+    Creates and configures an ArgumentParser with subcommands for catalog
+    operations including search, symbol lookup, and module listing.
 
     Returns
     -------
     argparse.ArgumentParser
-        Describe return value.
+        Configured argument parser with all subcommands.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -467,12 +460,10 @@ def build_parser() -> argparse.ArgumentParser:
 def _raise_unknown_command_error(command: str) -> None:
     """Raise CatalogctlError for unknown command.
 
-    <!-- auto:docstring-builder v1 -->
-
     Parameters
     ----------
     command : str
-        Describe ``command``.
+        Unknown command name.
 
     Raises
     ------
@@ -486,17 +477,18 @@ def _raise_unknown_command_error(command: str) -> None:
 def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
     """Return an ``AgentCatalogClient`` configured from CLI arguments.
 
-    <!-- auto:docstring-builder v1 -->
+    Creates an AgentCatalogClient instance from parsed CLI arguments,
+    validating that catalog path and repository root exist.
 
     Parameters
     ----------
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed command-line arguments.
 
     Returns
     -------
     AgentCatalogClient
-        Describe return value.
+        Configured client instance.
 
     Raises
     ------
@@ -519,17 +511,18 @@ def _load_client(args: argparse.Namespace) -> AgentCatalogClient:
 def _determine_output_format(args: argparse.Namespace) -> tuple[bool, bool]:
     """Determine output format based on flags and feature flag.
 
-    <!-- auto:docstring-builder v1 -->
+    Determines whether to use typed envelope or legacy JSON format based
+    on command-line flags and environment variable.
 
     Parameters
     ----------
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed command-line arguments.
 
     Returns
     -------
     tuple[bool, bool]
-        (use_envelope, use_legacy) flags indicating output format.
+        Tuple of (use_envelope, use_legacy) flags indicating output format.
     """
     legacy_json: bool = args.legacy_json
     if legacy_json:
@@ -544,14 +537,14 @@ def _determine_output_format(args: argparse.Namespace) -> tuple[bool, bool]:
 def _cmd_capabilities(client: AgentCatalogClient, _: argparse.Namespace) -> None:
     """Render the available packages in the catalog.
 
-    <!-- auto:docstring-builder v1 -->
+    Lists all packages present in the catalog and renders them as JSON.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     _ : argparse.Namespace
-        Describe ``_``.
+        Parsed arguments (unused for capabilities command).
     """
     packages = [pkg.name for pkg in client.list_packages()]
     _render_json(packages)
@@ -560,14 +553,14 @@ def _cmd_capabilities(client: AgentCatalogClient, _: argparse.Namespace) -> None
 def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render the catalog entry for a specific symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Retrieves and renders symbol metadata for the given symbol_id.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing symbol_id.
 
     Raises
     ------
@@ -586,14 +579,14 @@ def _cmd_symbol(client: AgentCatalogClient, args: argparse.Namespace) -> None:
 def _cmd_find_callers(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render callers recorded for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Finds and renders all symbols that reference the given symbol.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing symbol_id.
     """
     symbol_id: str = args.symbol_id
     _render_json(client.find_callers(symbol_id))
@@ -602,14 +595,14 @@ def _cmd_find_callers(client: AgentCatalogClient, args: argparse.Namespace) -> N
 def _cmd_find_callees(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render callees recorded for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Finds and renders all symbols that are called by the given symbol.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing symbol_id.
     """
     symbol_id: str = args.symbol_id
     _render_json(client.find_callees(symbol_id))
@@ -618,14 +611,15 @@ def _cmd_find_callees(client: AgentCatalogClient, args: argparse.Namespace) -> N
 def _cmd_change_impact(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render change impact metadata for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Retrieves and renders change impact analysis showing affected symbols
+    and modules.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing symbol_id.
     """
     symbol_id: str = args.symbol_id
     # model_dump returns dict[str, object], cast to JsonValue since it's JSON-serializable
@@ -635,14 +629,15 @@ def _cmd_change_impact(client: AgentCatalogClient, args: argparse.Namespace) -> 
 def _cmd_suggest_tests(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render suggested tests for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Retrieves and renders test suggestions including test files and test
+    functions that should be run when the symbol changes.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing symbol_id.
     """
     symbol_id: str = args.symbol_id
     # suggest_tests already returns list[dict[str, JsonValue]], no cast needed
@@ -652,14 +647,15 @@ def _cmd_suggest_tests(client: AgentCatalogClient, args: argparse.Namespace) -> 
 def _cmd_open_anchor(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render editor and GitHub anchors for a symbol.
 
-    <!-- auto:docstring-builder v1 -->
+    Retrieves and renders anchor information for opening the symbol in
+    an editor or viewing it on GitHub.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing symbol_id.
     """
     symbol_id: str = args.symbol_id
     _render_json(client.open_anchor(symbol_id))
@@ -668,14 +664,15 @@ def _cmd_open_anchor(client: AgentCatalogClient, args: argparse.Namespace) -> No
 def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Execute hybrid search and render the resulting documents.
 
-    <!-- auto:docstring-builder v1 -->
+    Performs semantic search over the catalog and renders results in
+    the configured output format (envelope or legacy JSON).
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing query, k, and optional facets.
 
     Raises
     ------
@@ -785,14 +782,15 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
 def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render hybrid search results with detailed scoring metadata.
 
-    <!-- auto:docstring-builder v1 -->
+    Performs search and renders results with detailed lexical and vector
+    scores for debugging ranking behavior.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing query and k.
 
     Raises
     ------
@@ -873,14 +871,14 @@ def _cmd_explain_ranking(client: AgentCatalogClient, args: argparse.Namespace) -
 def _cmd_list_modules(client: AgentCatalogClient, args: argparse.Namespace) -> None:
     """Render the module names for a package.
 
-    <!-- auto:docstring-builder v1 -->
+    Lists all modules contained in the specified package.
 
     Parameters
     ----------
     client : AgentCatalogClient
-        Describe ``client``.
+        Catalog client instance.
     args : argparse.Namespace
-        Describe ``args``.
+        Parsed arguments containing package name.
     """
     package: str = args.package
     modules = client.list_modules(package)
@@ -890,18 +888,18 @@ def _cmd_list_modules(client: AgentCatalogClient, args: argparse.Namespace) -> N
 def main(argv: list[str] | None = None) -> int:
     """Execute the CLI and return an exit code.
 
-    <!-- auto:docstring-builder v1 -->
+    Main entry point for the catalogctl CLI. Parses arguments, executes
+    the requested command, and handles errors with appropriate output formats.
 
     Parameters
     ----------
-    argv : list[str] | NoneType, optional
-        Describe ``argv``.
-        Defaults to ``None``.
+    argv : list[str] | None, optional
+        Command-line arguments. If None, uses sys.argv. Defaults to None.
 
     Returns
     -------
     int
-        Describe return value.
+        Exit code (0 for success, 2 for client errors, 3 for internal errors).
     """
     parser = build_parser()
     args = parser.parse_args(argv)

@@ -42,21 +42,21 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor isotonic_calibrate]
 def isotonic_calibrate(pairs: list[tuple[float, int]]) -> dict[str, object]:
-    """Describe isotonic calibrate.
+    """Placeholder for isotonic calibration of linking scores.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    This function is a placeholder for future isotonic regression
+    calibration functionality. Currently returns a dummy calibration
+    dictionary.
 
     Parameters
     ----------
     pairs : list[tuple[float, int]]
-        Describe ``pairs``.
+        List of (score, label) pairs for calibration training.
 
     Returns
     -------
     dict[str, object]
-        Describe return value.
+        Dictionary with calibration parameters (currently placeholder).
     """
     # NOTE: fit isotonic regression parameters when calibrator is implemented
     del pairs  # placeholder until calibration logic is wired

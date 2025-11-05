@@ -58,21 +58,20 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor t_prepare_dirs]
 def _t_prepare_dirs_impl(root: str) -> dict[str, bool]:
-    """Describe  t prepare dirs impl.
+    """Prepare directory structure for fixture dataset.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates necessary subdirectories for parquet outputs (dense, sparse,
+    chunks) and catalog artifacts.
 
     Parameters
     ----------
     root : str
-        Describe ``root``.
+        Root directory path where fixture data will be stored.
 
     Returns
     -------
     dict[str, bool]
-        Describe return value.
+        Status dictionary with "ok" key set to True.
     """
     path = Path(root)
     (path / "parquet" / "dense").mkdir(parents=True, exist_ok=True)
@@ -88,21 +87,19 @@ t_prepare_dirs = task(_t_prepare_dirs_impl)
 
 # [nav:anchor t_write_fixture_chunks]
 def _t_write_fixture_chunks_impl(chunks_root: str) -> tuple[str, int]:
-    """Describe  t write fixture chunks impl.
+    """Write fixture chunk data to parquet.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates a fixture dataset with a single chunk entry for testing.
 
     Parameters
     ----------
     chunks_root : str
-        Describe ``chunks_root``.
+        Root directory for chunk parquet files.
 
     Returns
     -------
     tuple[str, int]
-        Describe return value.
+        Tuple of (dataset_root_path, row_count).
     """
     writer = ParquetChunkWriter(chunks_root, model="docling_hybrid", run_id="fixture")
     rows: list[ChunkRow] = [
@@ -128,21 +125,20 @@ t_write_fixture_chunks = task(_t_write_fixture_chunks_impl)
 
 # [nav:anchor t_write_fixture_dense]
 def _t_write_fixture_dense_impl(dense_root: str) -> tuple[str, int]:
-    """Describe  t write fixture dense impl.
+    """Write fixture dense embedding vectors to parquet.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates a fixture dataset with a single dense embedding vector
+    using Qwen3-Embedding-4B model.
 
     Parameters
     ----------
     dense_root : str
-        Describe ``dense_root``.
+        Root directory for dense embedding parquet files.
 
     Returns
     -------
     tuple[str, int]
-        Describe return value.
+        Tuple of (dataset_root_path, row_count).
     """
     writer = ParquetVectorWriter(dense_root)
     vector = [0.0] * 2560
@@ -158,21 +154,20 @@ t_write_fixture_dense = task(_t_write_fixture_dense_impl)
 
 # [nav:anchor t_write_fixture_splade]
 def _t_write_fixture_splade_impl(sparse_root: str) -> tuple[str, int]:
-    """Describe  t write fixture splade impl.
+    """Write fixture sparse SPLADE vectors to parquet.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates a fixture dataset with a single sparse embedding vector
+    using SPLADE-v3-distilbert model.
 
     Parameters
     ----------
     sparse_root : str
-        Describe ``sparse_root``.
+        Root directory for sparse embedding parquet files.
 
     Returns
     -------
     tuple[str, int]
-        Describe return value.
+        Tuple of (dataset_root_path, row_count).
     """
     writer = ParquetVectorWriter(sparse_root)
     out_root = writer.write_splade(
@@ -195,27 +190,26 @@ def _t_register_in_duckdb_impl(
     dense_info: tuple[str, int],
     sparse_info: tuple[str, int],
 ) -> dict[str, list[str]]:
-    """Describe  t register in duckdb impl.
+    """Register fixture datasets in DuckDB registry.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Creates runs and datasets for chunks, dense, and sparse embeddings,
+    then registers a fixture document.
 
     Parameters
     ----------
     db_path : str
-        Describe ``db_path``.
+        Path to DuckDB database file.
     chunks_info : tuple[str, int]
-        Describe ``chunks_info``.
+        Tuple of (chunks_dataset_path, row_count).
     dense_info : tuple[str, int]
-        Describe ``dense_info``.
+        Tuple of (dense_dataset_path, row_count).
     sparse_info : tuple[str, int]
-        Describe ``sparse_info``.
+        Tuple of (sparse_dataset_path, row_count).
 
     Returns
     -------
     dict[str, list[str]]
-        Describe return value.
+        Dictionary with "runs" key containing list of run IDs.
     """
     registry = DuckDBRegistryHelper(db_path)
     dense_run = registry.new_run("dense_embed", "Qwen3-Embedding-4B", "main", {"dim": 2560})
@@ -262,25 +256,22 @@ t_register_in_duckdb = task(_t_register_in_duckdb_impl)
 def _fixture_pipeline_impl(
     root: str = "/data", db_path: str = "/data/catalog/catalog.duckdb"
 ) -> dict[str, list[str]]:
-    """Describe  fixture pipeline impl.
+    """Execute the complete fixture pipeline flow.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Orchestrates creation of fixture directories, writes chunk/dense/sparse
+    parquet files, and registers everything in DuckDB registry.
 
     Parameters
     ----------
     root : str, optional
-        Describe ``root``.
-        Defaults to ``'/data'``.
+        Root directory for fixture data. Defaults to "/data".
     db_path : str, optional
-        Describe ``db_path``.
-        Defaults to ``'/data/catalog/catalog.duckdb'``.
+        Path to DuckDB catalog database. Defaults to "/data/catalog/catalog.duckdb".
 
     Returns
     -------
     dict[str, list[str]]
-        Describe return value.
+        Dictionary with "runs" key containing list of created run IDs.
     """
     t_prepare_dirs(root)
     chunks_info = t_write_fixture_chunks(f"{root}/parquet/chunks")

@@ -25,19 +25,8 @@ if TYPE_CHECKING:  # pragma: no cover - imported solely for typing information
     class DocstringYields(DocstringReturns):
         """Type-checking placeholder for generator metadata entries.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Parameters
-        ----------
-        *args : inspect._empty
-        Describe ``args``.
-        **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-        Returns
-        -------
-        inspect._empty
-        Describe return value.
+        Placeholder class used for type checking to represent generator yield metadata entries from
+        docstring_parser.
         """
 
 else:  # pragma: no cover - imported lazily when type checking is disabled
@@ -50,26 +39,12 @@ else:  # pragma: no cover - imported lazily when type checking is disabled
 class DocstringMetaProto(Protocol):
     """Common surface shared by docstring ``meta`` entries.
 
-    <!-- auto:docstring-builder v1 -->
-
     ``docstring_parser`` represents return blocks, attributes, and parameter
     annotations as ``meta`` objects.  Each metadata entry exposes a short
     textual description that may be ``None`` when the source docstring omitted
     additional context.  The concrete subclasses supplied by
     ``docstring_parser`` add extra fields, but they all share this description
     surface which is the only part we need for compatibility.
-
-    Parameters
-    ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
     """
 
     description: str | None
@@ -78,25 +53,11 @@ class DocstringMetaProto(Protocol):
 class DocstringAttrProto(DocstringMetaProto, Protocol):
     """Protocol describing attribute metadata entries.
 
-    <!-- auto:docstring-builder v1 -->
-
     ``docstring_parser`` represents both attributes and parameters using
     :class:`DocstringParam`.  Attribute metadata entries expose their marker and
     attribute name via ``args`` while reusing ``description`` for human readable
     explanations.  We only need the attribute name list to populate the
     ``attrs`` property in the shimmed ``Docstring`` objects.
-
-    Parameters
-    ----------
-    *args : Sequence[str]
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
     """
 
     args: Sequence[str]
@@ -105,21 +66,21 @@ class DocstringAttrProto(DocstringMetaProto, Protocol):
 class DocstringReturnsProto(DocstringMetaProto, Protocol):
     """Protocol describing return metadata entries.
 
-    <!-- auto:docstring-builder v1 -->
+    Defines the interface for return/yield metadata entries from
+    docstring_parser, including type information and generator flags.
 
     Parameters
     ----------
     args : Sequence[str]
-        Describe ``args``.
+        Argument list for the return entry.
     description : str | None
-        Describe ``description``.
+        Human-readable description of the return value.
     type_name : str | None
-        Describe ``type_name``.
+        Type name annotation.
     is_generator : bool
-        Describe ``is_generator``.
+        Whether this is a generator return.
     return_name : str | None, optional
-        Describe ``return_name``.
-        Defaults to ``None``.
+        Named return value identifier. Defaults to None.
     """
 
     args: Sequence[str]
@@ -130,20 +91,21 @@ class DocstringReturnsProto(DocstringMetaProto, Protocol):
 class DocstringYieldsProto(DocstringReturnsProto, Protocol):
     """Protocol describing generator metadata entries.
 
-    <!-- auto:docstring-builder v1 -->
+    Defines the interface for yield metadata entries from docstring_parser,
+    extending return metadata with generator-specific fields.
 
     Parameters
     ----------
     args : Sequence[str]
-        Describe ``args``.
+        Argument list for the yield entry.
     description : str | None
-        Describe ``description``.
+        Human-readable description of the yielded value.
     type_name : str | None
-        Describe ``type_name``.
+        Type name annotation.
     is_generator : bool
-        Describe ``is_generator``.
+        Always True for yield entries.
     return_name : str | None
-        Describe ``return_name``.
+        Named yield value identifier.
     """
 
     return_name: str | None
@@ -152,16 +114,17 @@ class DocstringYieldsProto(DocstringReturnsProto, Protocol):
 class DocstringProto(Protocol):
     """Protocol describing :class:`docstring_parser.common.Docstring`.
 
-    <!-- auto:docstring-builder v1 -->
+    Defines the interface for parsed docstring objects, including
+    short/long descriptions and metadata entries.
 
     Parameters
     ----------
     meta : Sequence[DocstringMetaProto]
-        Describe ``meta``.
+        Sequence of metadata entries (params, returns, yields, etc.).
     short_description : str | None
-        Describe ``short_description``.
+        Short one-line summary.
     long_description : str | None
-        Describe ``long_description``.
+        Extended description text.
     """
 
     meta: list[DocstringMetaProto]
@@ -172,18 +135,21 @@ class DocstringProto(Protocol):
 class DocstringCommonModuleProto(Protocol):
     """Protocol describing the ``docstring_parser.common`` module surface.
 
-    <!-- auto:docstring-builder v1 -->
+    Defines the interface for the docstring_parser.common module,
+    including all class types used for parsing docstrings.
 
     Parameters
     ----------
     Docstring : DocstringProto
-        Describe ``Docstring``.
+        Docstring class type.
     DocstringAttr : DocstringAttrProto
-        Describe ``DocstringAttr``.
+        Attribute metadata class type (may be None).
     DocstringParam : DocstringAttrProto
-        Describe ``DocstringParam``.
+        Parameter metadata class type (may be None).
     DocstringReturns : DocstringReturnsProto
-        Describe ``DocstringReturns``.
+        Return metadata class type.
+    DocstringYields : DocstringYieldsProto
+        Yield metadata class type (may be None).
     """
 
     Docstring: type[DocstringProto]

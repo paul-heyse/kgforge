@@ -24,22 +24,20 @@ __path__ = list(_module.__path__)
 
 
 def __getattr__(name: str) -> object:
-    """Document   getattr  .
+    """Forward attribute lookups to the underlying module.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+    Provides a fallback for unknown attribute lookups, delegating
+    to the namespace bridge helper.
 
     Parameters
     ----------
     name : str
-        Configure the name.
-
+        Attribute name to look up.
 
     Returns
     -------
     object
-        Describe return value.
+        Attribute value from the underlying module.
     """
     return namespace_getattr(_module, name)
 
@@ -47,11 +45,9 @@ def __getattr__(name: str) -> object:
 def __dir__() -> list[str]:
     """Return the combined attribute listing.
 
-    <!-- auto:docstring-builder v1 -->
-
     Returns
     -------
-    inspect._empty
+    list[str]
         Sorted union of exports and implementation attributes.
     """
     return namespace_dir(_module, _EXPORTS)

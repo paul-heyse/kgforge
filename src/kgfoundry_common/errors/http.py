@@ -38,20 +38,22 @@ def problem_details_response(
 ) -> JSONResponse:
     """Convert KgFoundryError to RFC 9457 Problem Details JSONResponse.
 
-    <!-- auto:docstring-builder v1 -->
+    Converts a KgFoundryError exception into a FastAPI JSONResponse
+    conforming to RFC 9457 Problem Details format, including appropriate
+    HTTP status code and content type headers.
 
     Parameters
     ----------
     error : KgFoundryError
-        Exception to convert.
-    request : Request | NoneType, optional
-        FastAPI request object for instance URI. Defaults to None.
-        Defaults to ``None``.
+        Exception to convert to Problem Details response.
+    request : Request | None, optional
+        FastAPI request object for generating instance URI. Defaults to None.
 
     Returns
     -------
     JSONResponse
-        Problem Details JSON response with appropriate status code.
+        Problem Details JSON response with appropriate status code and
+        Content-Type header.
 
     Examples
     --------

@@ -42,15 +42,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor HybridChunker]
 class HybridChunker:
-    """Describe HybridChunker.
+    """Placeholder class for hybrid docling chunking pipeline.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    This class serves as a placeholder for future hybrid chunking functionality that combines layout
+    and text cues for document processing. Implementation details will be added later.
     """

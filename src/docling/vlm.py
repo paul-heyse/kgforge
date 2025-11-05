@@ -42,15 +42,8 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor GraniteDoclingVLM]
 class GraniteDoclingVLM:
-    """Describe GraniteDoclingVLM.
+    """Placeholder class for vision-language model tagging helpers.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    This class serves as a placeholder for future Granite vision-language model integration for
+    docling document processing. Implementation details will be added later.
     """
