@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
@@ -10,47 +11,17 @@ from pathlib import Path
 import mkdocs_gen_files
 import yaml
 
+from . import load_repo_settings
+
 SUITE_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[4]
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
-MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
-EDIT_URI_BRANCH_INDEX = 1
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.NullHandler())
 
 
-def _load_repo_settings() -> tuple[str | None, str | None]:
-    """Return repo URL and default branch configured for MkDocs.
-
-    Returns
-    -------
-    tuple[str | None, str | None]
-        Pair of ``(repo_url, branch)`` with ``None`` when unavailable.
-    """
-    if not MKDOCS_CONFIG_PATH.exists():
-        return None, None
-    repo_url: str | None = None
-    edit_uri: str | None = None
-    try:
-        for raw_line in MKDOCS_CONFIG_PATH.read_text(encoding="utf-8").splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if line.startswith("repo_url:") and repo_url is None:
-                repo_url = line.split(":", 1)[1].strip().strip("\"'")
-            if line.startswith("edit_uri:") and edit_uri is None:
-                edit_uri = line.split(":", 1)[1].strip().strip("\"'")
-    except OSError:  # pragma: no cover - defensive guard
-        return None, None
-    branch: str | None = None
-    if isinstance(edit_uri, str):
-        parts = edit_uri.strip("/").split("/")
-        if parts and parts[0] == "edit" and len(parts) > EDIT_URI_BRANCH_INDEX:
-            branch = parts[EDIT_URI_BRANCH_INDEX]
-    if not branch:
-        branch = "main"
-    return (str(repo_url) if isinstance(repo_url, str) and repo_url else None, branch)
-
-
-REPO_URL, DEFAULT_BRANCH = _load_repo_settings()
+REPO_URL, DEFAULT_BRANCH = load_repo_settings()
 
 
 def _load_registry() -> dict[str, dict[str, object]]:
@@ -74,10 +45,27 @@ def _ensure_str_list(value: object) -> list[str]:
 
 def _collect_nav_interfaces() -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
-    for nav_path in REPO_ROOT.glob("src/**/_nav.json"):
-        module_name = nav_path.parent.name
+    src_root = REPO_ROOT / "src"
+    if not src_root.exists():
+        return records
+    for nav_path in src_root.glob("**/_nav.json"):
+        try:
+            relative_parent = nav_path.parent.relative_to(src_root)
+        except ValueError:  # pragma: no cover - defensive guard
+            relative_parent = nav_path.parent
+            normalized_module = relative_parent.name
+        else:
+            parts = tuple(part for part in relative_parent.parts if part not in {"", "."})
+            if parts:
+                normalized_module = ".".join(parts)
+            else:
+                normalized_module = nav_path.parent.name
         with nav_path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
+            try:
+                data = json.load(handle)
+            except json.JSONDecodeError as error:
+                LOGGER.warning("Failed to decode nav metadata from %s: %s", nav_path, error)
+                continue
         interfaces = data.get("interfaces") or []
         if not isinstance(interfaces, list):
             continue
@@ -85,7 +73,7 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
             if not isinstance(entry, dict):
                 continue
             record = dict(entry)
-            record.setdefault("module", module_name)
+            record["_nav_module_path"] = normalized_module
             records.append(record)
     return records
 
@@ -202,10 +190,11 @@ def _write_interface_table(
         description = record.get("description") or reg_entry.get("description") or "—"
         spec_cell = _spec_link(record)
         owner = record.get("owner") or reg_entry.get("owner") or "—"
+        module_path = record.get("module") or reg_entry.get("module") or record.get("_nav_module_path")
         row = "| {id} | {type} | {module} | {owner} | {stability} | {spec} | {desc} | {problems} |".format(
             id=identifier,
             type=record.get("type", "—"),
-            module=_module_doc_link(record.get("module")),
+            module=_module_doc_link(module_path),
             owner=owner,
             stability=record.get("stability", "—"),
             spec=spec_cell,
@@ -292,9 +281,14 @@ def _write_interface_details(
         handle.write(
             "* **Type:** {type}\n".format(type=nav_meta.get("type") or reg_entry.get("type") or "—")
         )
+        module_value = (
+            nav_meta.get("module")
+            or reg_entry.get("module")
+            or nav_meta.get("_nav_module_path")
+        )
         handle.write(
             "* **Module:** {module}\n".format(
-                module=nav_meta.get("module") or reg_entry.get("module") or "—"
+                module=module_value or "—"
             )
         )
         handle.write(
