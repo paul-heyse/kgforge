@@ -22,8 +22,13 @@ def git_diff_names() -> set[str]:
 
     Returns
     -------
-    collections.abc.Set
-        Description of return value.
+    set[str]
+        Set of changed file names.
+
+    Raises
+    ------
+    SystemExit
+        If git command execution fails.
 
     Examples
     --------

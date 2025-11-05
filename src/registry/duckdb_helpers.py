@@ -58,7 +58,22 @@ def connect(
     read_only: bool = False,
     pragmas: Mapping[str, object] | None = None,
 ) -> DuckDBPyConnection:
-    """Create a DuckDB connection with standard pragmas applied."""
+    """Create a DuckDB connection with standard pragmas applied.
+
+    Parameters
+    ----------
+    db_path : Path | str
+        Path to DuckDB database file.
+    read_only : bool, optional
+        Whether to open in read-only mode. Defaults to False.
+    pragmas : Mapping[str, object] | None, optional
+        Additional pragma settings.
+
+    Returns
+    -------
+    DuckDBPyConnection
+        Configured DuckDB connection.
+    """
     database_path = Path(db_path)
     if not read_only:
         database_path.parent.mkdir(parents=True, exist_ok=True)
@@ -246,6 +261,11 @@ def execute(
     -------
     DuckDBPyConnection
         Describe return value.
+
+    Raises
+    ------
+    RegistryError
+        If query execution fails or parameterization is required but missing.
     """
     opts = _coerce_options(options, operation="duckdb.execute")
     require_flag = (
@@ -402,6 +422,11 @@ def validate_identifier(
     -------
     str
         Describe return value.
+
+    Raises
+    ------
+    RegistryError
+        If identifier is not in the allowed set.
     """
     allowed_set = set(allowed)
     if identifier in allowed_set:

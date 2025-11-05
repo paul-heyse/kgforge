@@ -106,7 +106,13 @@ def _format_section(title: str, values: Iterable[str]) -> str:
 
 
 def run() -> int:
-    """Execute the drift checker CLI."""
+    """Execute the drift checker CLI.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     parser = argparse.ArgumentParser(
         description="Validate stub coverage for optional dependencies."
     )

@@ -106,11 +106,6 @@ def load_optional_dependencies() -> OptionalDependencies:
     OptionalDependencies
         Aggregate facade providing access to optional components.
 
-    Raises
-    ------
-    MissingDependencyError
-        If sphinx_autoapi or astroid is not installed.
-
     Examples
     --------
     >>> from docs._types.sphinx_optional import load_optional_dependencies

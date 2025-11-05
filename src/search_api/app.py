@@ -409,7 +409,18 @@ except (FileNotFoundError, DeserializationError, RuntimeError) as exc:
 
 # [nav:anchor auth]
 def _validate_authorization_header(authorization: str | None) -> None:
-    """Validate bearer token authentication."""
+    """Validate bearer token authentication.
+
+    Parameters
+    ----------
+    authorization : str | None
+        Authorization header value.
+
+    Raises
+    ------
+    HTTPException
+        If authorization header is missing, invalid, or API key is invalid.
+    """
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Bearer token")
     token = authorization.split(" ", 1)[1]
@@ -545,7 +556,18 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
 
             # Rank and craft results
             def sort_key(item: tuple[str, float]) -> float:
-                """Sort key function for ranking results."""
+                """Sort key function for ranking results.
+
+                Parameters
+                ----------
+                item : tuple[str, float]
+                    Result tuple containing (chunk_id, score).
+
+                Returns
+                -------
+                float
+                    Score value for sorting.
+                """
                 return item[1]
 
             top = sorted(boosted.items(), key=sort_key, reverse=True)[: req.k]

@@ -102,7 +102,13 @@ class StubParityIssueRecord:
         return count
 
     def to_context_entry(self) -> StubParityIssueEntry:
-        """Return a Problem Details-compatible representation."""
+        """Return a Problem Details-compatible representation.
+
+        Returns
+        -------
+        StubParityIssueEntry
+            Problem Details issue entry dictionary.
+        """
         return {
             "module": self.module,
             "stub_path": str(self.stub_path),
@@ -116,7 +122,18 @@ class StubParityIssueRecord:
 
     @classmethod
     def from_context_entry(cls, entry: StubParityIssueEntry) -> StubParityIssueRecord:
-        """Hydrate an issue record from Problem Details context."""
+        """Hydrate an issue record from Problem Details context.
+
+        Parameters
+        ----------
+        entry : StubParityIssueEntry
+            Problem Details issue entry dictionary.
+
+        Returns
+        -------
+        StubParityIssueRecord
+            Issue record instance.
+        """
         stub_path = Path(entry["stub_path"]).resolve()
         any_usages = tuple((usage["line"], usage["preview"]) for usage in entry["any_usages"])
         return cls(
@@ -129,6 +146,18 @@ class StubParityIssueRecord:
 
 
 def _issue_sort_key(issue: StubParityIssueRecord) -> tuple[str, str]:
+    """Return a deterministic sort key for issue records.
+
+    Parameters
+    ----------
+    issue : StubParityIssueRecord
+        Issue record.
+
+    Returns
+    -------
+    tuple[str, str]
+        (module_name, stub_path) sort key tuple.
+    """
     return (issue.module, issue.stub_path.as_posix())
 
 
@@ -158,12 +187,34 @@ class StubParityReport:
         return self.issue_count > 0
 
     def to_context(self) -> StubParityContext:
-        """Produce a problem details context payload."""
+        """Produce a problem details context payload.
+
+        Returns
+        -------
+        StubParityContext
+            Problem Details context dictionary.
+        """
         return build_stub_parity_context(self)
 
     @classmethod
     def from_context(cls, context: StubParityContext) -> StubParityReport:
-        """Reconstruct a report from Problem Details context."""
+        """Reconstruct a report from Problem Details context.
+
+        Parameters
+        ----------
+        context : StubParityContext
+            Problem Details context dictionary.
+
+        Returns
+        -------
+        StubParityReport
+            Report instance.
+
+        Raises
+        ------
+        ValueError
+            If issue or error count mismatch is detected.
+        """
         issues = tuple(
             StubParityIssueRecord.from_context_entry(entry) for entry in context["issues"]
         )
@@ -352,7 +403,23 @@ def evaluate_stub(module_name: str, stub_path: Path) -> StubEvaluationResult:
 
 
 def run_stub_parity_checks(checks: list[tuple[str, Path]]) -> StubParityReport:
-    """Run stub parity checks on multiple module/stub pairs."""
+    """Run stub parity checks on multiple module/stub pairs.
+
+    Parameters
+    ----------
+    checks : list[tuple[str, Path]]
+        List of (module_name, stub_path) tuples.
+
+    Returns
+    -------
+    StubParityReport
+        Final report.
+
+    Raises
+    ------
+    ConfigurationError
+        If stub parity issues are found.
+    """
     issues: list[StubParityIssueRecord] = []
 
     for module_name, stub_path in checks:
@@ -378,7 +445,18 @@ def run_stub_parity_checks(checks: list[tuple[str, Path]]) -> StubParityReport:
 
 
 def build_stub_parity_context(report: StubParityReport) -> StubParityContext:
-    """Construct the canonical stub parity context payload."""
+    """Construct the canonical stub parity context payload.
+
+    Parameters
+    ----------
+    report : StubParityReport
+        Report to convert.
+
+    Returns
+    -------
+    StubParityContext
+        Problem Details context dictionary.
+    """
     issues = [issue.to_context_entry() for issue in report.issues]
 
     return {
@@ -389,7 +467,18 @@ def build_stub_parity_context(report: StubParityReport) -> StubParityContext:
 
 
 def _extract_stub_parity_report(error: ConfigurationError) -> StubParityReport | None:
-    """Normalize the context associated with a stub parity failure."""
+    """Normalize the context associated with a stub parity failure.
+
+    Parameters
+    ----------
+    error : ConfigurationError
+        Error with context payload.
+
+    Returns
+    -------
+    StubParityReport | None
+        Extracted report or None if parsing fails.
+    """
     try:
         context = cast("StubParityContext", dict(error.context))
         return StubParityReport.from_context(context)
@@ -401,11 +490,29 @@ def _extract_stub_parity_report(error: ConfigurationError) -> StubParityReport |
 def _normalize_issues(
     issues: Iterable[StubParityIssueRecord],
 ) -> tuple[StubParityIssueRecord, ...]:
+    """Return issues sorted by module name and stub path.
+
+    Parameters
+    ----------
+    issues : Iterable[StubParityIssueRecord]
+        Issues to normalize.
+
+    Returns
+    -------
+    tuple[StubParityIssueRecord, ...]
+        Sorted tuple of issues.
+    """
     return tuple(sorted(issues, key=_issue_sort_key))
 
 
 def main() -> int:
-    """Check parity between stubs and runtime modules."""
+    """Check parity between stubs and runtime modules.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
     project_root = Path(__file__).parent.parent
     stubs_dir = project_root / "stubs" / "kgfoundry"
 

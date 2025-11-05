@@ -339,10 +339,13 @@ class KGFoundryClient:
         Raises
         ------
         requests.HTTPError
-        Raised when the API responds with a non-success status code.
+            Raised when the API responds with a non-success status code.
         """
         response = self._http.get(f"{self.base_url}/healthz", timeout=self.timeout)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.HTTPError:
+            raise
         return response.json()
 
     def search(
@@ -379,7 +382,7 @@ class KGFoundryClient:
         Raises
         ------
         requests.HTTPError
-        Raised when the API responds with a non-success status code.
+            Raised when the API responds with a non-success status code.
         """
         filters_payload: dict[str, JsonValue] = filters.copy() if filters is not None else {}
         payload: dict[str, JsonValue] = {
@@ -394,7 +397,10 @@ class KGFoundryClient:
             headers=self._headers(),
             timeout=self.timeout,
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.HTTPError:
+            raise
         return response.json()
 
     def concepts(self, q: str, limit: int = 50) -> JsonValue:
@@ -418,7 +424,7 @@ class KGFoundryClient:
         Raises
         ------
         requests.HTTPError
-        Raised when the API responds with a non-success status code.
+            Raised when the API responds with a non-success status code.
         """
         body: dict[str, JsonValue] = {"q": q, "limit": limit}
         response = self._http.post(
@@ -427,5 +433,8 @@ class KGFoundryClient:
             headers=self._headers(),
             timeout=self.timeout,
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.HTTPError:
+            raise
         return response.json()

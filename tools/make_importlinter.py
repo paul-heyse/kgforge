@@ -88,6 +88,18 @@ def _format_forbid_contract(
 
 
 def _build_template(root_package: str) -> str:
+    """Build the import-linter configuration template.
+
+    Parameters
+    ----------
+    root_package : str
+        Root package name.
+
+    Returns
+    -------
+    str
+        Configuration file content.
+    """
     docbuilder_domain = _iter_module_names("tools.docstring_builder", DOCBUILDER_EXCLUDES)
     docs_domain = _iter_module_names("tools.docs", DOCS_ADAPTERS)
     navmap_domain = _iter_module_names("tools.navmap", NAVMAP_ADAPTERS)
@@ -146,7 +158,13 @@ def _build_template(root_package: str) -> str:
 
 
 def _import_detect_primary() -> str:
-    """Resolve the primary package name using the detect_pkg helper."""
+    """Resolve the primary package name using the detect_pkg helper.
+
+    Returns
+    -------
+    str
+        Primary package name.
+    """
     return detect_primary()
 
 
@@ -165,7 +183,26 @@ def main(
     detect: Callable[[], str] | None = None,
     check: bool = False,
 ) -> Path:
-    """Generate the import-linter configuration and optionally run the check."""
+    """Generate the import-linter configuration and optionally run the check.
+
+    Parameters
+    ----------
+    root_package : str | None
+        Root package name (None uses detection).
+    output_path : Path | None
+        Output file path (None uses default).
+    root_dir : Path | None
+        Root directory (None uses default).
+    detect : Callable[[], str] | None
+        Detection function (None uses default).
+    check : bool
+        Whether to run import-linter after generation.
+
+    Returns
+    -------
+    Path
+        Path to generated configuration file.
+    """
     detected_root = root_dir or Path(__file__).resolve().parents[1]
     package = root_package or (detect or _import_detect_primary)()
     destination = Path(output_path) if output_path is not None else detected_root / ".importlinter"
@@ -177,7 +214,13 @@ def main(
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
-    """Return the CLI parser for the import-linter generator."""
+    """Return the CLI parser for the import-linter generator.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Configured argument parser.
+    """
     parser = argparse.ArgumentParser(
         description="Generate .importlinter contracts for tooling packages"
     )
@@ -208,7 +251,18 @@ class _CLIArguments(argparse.Namespace):
 
 
 def _parse_args(argv: Sequence[str] | None = None) -> ImportLinterArgs:
-    """Return typed arguments parsed from ``argv``."""
+    """Return typed arguments parsed from ``argv``.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    ImportLinterArgs
+        Parsed arguments.
+    """
     parser = _build_arg_parser()
     namespace = _CLIArguments()
     parser.parse_args(argv, namespace=namespace)

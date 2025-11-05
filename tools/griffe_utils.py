@@ -44,6 +44,11 @@ def resolve_griffe() -> GriffeAPI:
     ``griffe.dataclasses`` respectively. We import both variants eagerly and
     fall back to the top-level attributes whenever the nested modules are
     unavailable.
+
+    Returns
+    -------
+    GriffeAPI
+        Griffe API instance with loader and symbol types.
     """
     if _GRIFFE_CACHE.instance is not None:
         return _GRIFFE_CACHE.instance

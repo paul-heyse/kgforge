@@ -63,6 +63,11 @@ def detect_gpu_context(
         ``GpuClonerOptions`` flag. Defaults to ``True``.
     device_ids : Sequence[int] | None, optional
         Specific GPU device IDs to target. Defaults to ``(0,)`` when omitted.
+
+    Returns
+    -------
+    GpuContext | None
+        GPU context if GPU helpers are available, None otherwise.
     """
     standard_gpu_resources_raw = cast(
         "object | None", getattr(module, "StandardGpuResources", None)
@@ -92,6 +97,18 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
     If GPU helpers are unavailable or cloning fails, the original CPU index is returned. All
     exceptions are caught and logged at debug level so callers can emit typed Problem Details
     without leaking driver internals to clients.
+
+    Parameters
+    ----------
+    index : FaissIndexProtocol
+        CPU index to clone.
+    context : GpuContext
+        GPU context for cloning.
+
+    Returns
+    -------
+    FaissIndexProtocol
+        GPU index if cloning succeeds, otherwise the original CPU index.
     """
     module = context.module
     devices = context.device_ids

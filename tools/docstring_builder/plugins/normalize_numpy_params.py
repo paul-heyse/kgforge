@@ -33,7 +33,20 @@ class NormalizeNumpyParamsPlugin(TransformerPlugin):
         del self, context
 
     def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
-        """Normalise parameter and return descriptions for ``payload``."""
+        """Normalise parameter and return descriptions for ``payload``.
+
+        Parameters
+        ----------
+        context : PluginContext
+            Plugin context.
+        payload : SemanticResult
+            Semantic result to process.
+
+        Returns
+        -------
+        SemanticResult
+            Updated semantic result with normalized descriptions, or original if unchanged.
+        """
         del self
         del context
         schema = payload.schema

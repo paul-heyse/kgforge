@@ -104,11 +104,6 @@ def has_required_parameters(func: InspectableCallable) -> bool:
     -------
     bool
         True if the callable has required parameters.
-
-    Raises
-    ------
-    ValueError
-        If signature cannot be obtained.
     """
     params = get_signature(func)
 

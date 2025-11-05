@@ -58,7 +58,10 @@ def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     >>> ensure_dir(Path("/tmp/data/subdir"))
     Path('/tmp/data/subdir')
     """
-    path.mkdir(parents=True, exist_ok=exist_ok)
+    try:
+        path.mkdir(parents=True, exist_ok=exist_ok)
+    except (PermissionError, FileExistsError):
+        raise
     return path
 
 
@@ -137,7 +140,10 @@ def read_text(path: Path, encoding: str = "utf-8") -> str:
     >>> read_text(Path("/tmp/test.txt"))
     'hello'
     """
-    return path.read_text(encoding=encoding)
+    try:
+        return path.read_text(encoding=encoding)
+    except (FileNotFoundError, UnicodeDecodeError):
+        raise
 
 
 def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
@@ -169,8 +175,14 @@ def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
     >>> read_text(Path("/tmp/output.txt"))
     'content'
     """
-    ensure_dir(path.parent, exist_ok=True)
-    path.write_text(data, encoding=encoding)
+    try:
+        ensure_dir(path.parent, exist_ok=True)
+    except (PermissionError, OSError):
+        raise
+    try:
+        path.write_text(data, encoding=encoding)
+    except PermissionError:
+        raise
 
 
 def atomic_write(
@@ -206,7 +218,10 @@ def atomic_write(
     >>> read_text(Path("/tmp/atomic.txt"))
     'safe content'
     """
-    ensure_dir(path.parent, exist_ok=True)
+    try:
+        ensure_dir(path.parent, exist_ok=True)
+    except PermissionError:
+        raise
     tmp_path: Path | None = None
     try:
         dir_arg = str(path.parent) if path.parent else None
@@ -236,7 +251,10 @@ def atomic_write(
                 temp_file.write(data)
                 temp_file.flush()
         if tmp_path is not None:
-            tmp_path.replace(path)
+            try:
+                tmp_path.replace(path)
+            except PermissionError:
+                raise
     finally:
         if tmp_path is not None and sys.exc_info()[0] is not None:
             tmp_path.unlink(missing_ok=True)

@@ -81,7 +81,18 @@ logger = logging.getLogger(__name__)
 
 
 def _is_faiss_index(candidate: object) -> TypeGuard[FaissIndexProtocol]:
-    """Return True when ``candidate`` exposes the FAISS index protocol surface."""
+    """Return True when ``candidate`` exposes the FAISS index protocol surface.
+
+    Parameters
+    ----------
+    candidate : object
+        Candidate object to check.
+
+    Returns
+    -------
+    TypeGuard[FaissIndexProtocol]
+        True if candidate matches the protocol.
+    """
     if candidate is None:
         return False
 
@@ -320,8 +331,13 @@ class FaissAdapter:
         ------
         IndexBuildError
             If index construction fails.
+        VectorSearchError
+            If vector loading fails.
         """
-        vectors = self._load_dense_vectors()
+        try:
+            vectors = self._load_dense_vectors()
+        except VectorSearchError:
+            raise
         self.vecs = vectors
         self.idmap = vectors.ids
         self._cpu_matrix = vectors.matrix
@@ -377,6 +393,11 @@ class FaissAdapter:
     def load_or_build(self, cpu_index_path: str | None = None) -> None:
         """Load an existing CPU index or fall back to rebuilding from vectors.
 
+        Parameters
+        ----------
+        cpu_index_path : str | None, optional
+            Path to CPU index file.
+
         Raises
         ------
         VectorSearchError
@@ -384,7 +405,10 @@ class FaissAdapter:
         """
         module = faiss
         if module is None or not HAVE_FAISS:
-            self.build()
+            try:
+                self.build()
+            except VectorSearchError:
+                raise
             return
         faiss_module: FaissModuleProtocol = module
 
@@ -393,7 +417,10 @@ class FaissAdapter:
             if index_path.exists():
                 try:
                     cpu_index = faiss_module.read_index(str(index_path))
-                    vectors = self._load_dense_vectors()
+                    try:
+                        vectors = self._load_dense_vectors()
+                    except VectorSearchError:
+                        raise
                     self.vecs = vectors
                     self.idmap = vectors.ids
                     self._cpu_matrix = vectors.matrix
@@ -455,6 +482,8 @@ class FaissAdapter:
         ------
         ValueError
             If k is not positive.
+        RuntimeError
+            If FAISS module is not available, index is not initialized, or ID map is missing.
         """
         if k <= 0:
             msg = "k must be positive"
@@ -520,7 +549,18 @@ class FaissAdapter:
     # Internal helpers -------------------------------------------------------
 
     def _require_index(self) -> FaissIndexProtocol:
-        """Return the initialized FAISS index or raise."""
+        """Return the initialized FAISS index or raise.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Initialized FAISS index.
+
+        Raises
+        ------
+        RuntimeError
+            If index is not initialized or fails protocol validation.
+        """
         index_candidate = self.index
         if index_candidate is None:
             msg = "FAISS index not initialized"
@@ -533,7 +573,20 @@ class FaissAdapter:
         return index_candidate
 
     def _cpu_search(self, query: FloatVector, k: int) -> list[tuple[str, float]]:
-        """Search using CPU fallback (inner product)."""
+        """Search using CPU fallback (inner product).
+
+        Parameters
+        ----------
+        query : FloatVector
+            Query vector.
+        k : int
+            Number of results to return.
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            List of (doc_id, score) tuples sorted by score descending.
+        """
         cpu_matrix = self._cpu_matrix
         idmap = self.idmap
         if cpu_matrix is None or idmap is None:  # pragma: no cover - defensive fallback
@@ -559,6 +612,16 @@ class FaissAdapter:
     def _resolve_metric(self, module: FaissModuleProtocol) -> int:
         """Resolve metric string to FAISS metric constant.
 
+        Parameters
+        ----------
+        module : FaissModuleProtocol
+            FAISS module instance.
+
+        Returns
+        -------
+        int
+            FAISS metric constant.
+
         Raises
         ------
         ValueError
@@ -575,6 +638,11 @@ class FaissAdapter:
     def _load_dense_vectors(self) -> DenseVecs:
         """Load dense vectors from DuckDB or Parquet.
 
+        Returns
+        -------
+        DenseVecs
+            Dense vectors container.
+
         Raises
         ------
         VectorSearchError
@@ -582,7 +650,10 @@ class FaissAdapter:
         """
         candidate = Path(self.db_path)
         if candidate.is_dir() or candidate.suffix == ".parquet":
-            return self._load_from_parquet(candidate)
+            try:
+                return self._load_from_parquet(candidate)
+            except VectorSearchError:
+                raise
 
         if not candidate.exists():
             msg = f"DuckDB registry not found: {candidate}"
@@ -613,11 +684,24 @@ class FaissAdapter:
             msg = "dense_runs table is empty or malformed"
             raise VectorSearchError(msg)
 
-        return self._load_from_parquet(Path(root_candidate))
+        try:
+            return self._load_from_parquet(Path(root_candidate))
+        except VectorSearchError:
+            raise
 
     @staticmethod
     def _load_from_parquet(source: Path) -> DenseVecs:
         """Load dense vectors from Parquet file.
+
+        Parameters
+        ----------
+        source : Path
+            Path to Parquet file or directory.
+
+        Returns
+        -------
+        DenseVecs
+            Dense vectors container.
 
         Raises
         ------

@@ -160,7 +160,18 @@ class RuntimeSettings(BaseSettings):
     faiss: FaissConfig = Field(default_factory=FaissConfig, description="FAISS index configuration")
 
     def __init__(self, **overrides: object) -> None:
-        """Initialise settings with fail-fast validation."""
+        """Initialise settings with fail-fast validation.
+
+        Parameters
+        ----------
+        **overrides : object
+            Settings overrides to apply.
+
+        Raises
+        ------
+        SettingsError
+            If settings validation fails.
+        """
         try:
             cast_overrides: dict[str, Any] = {
                 key: cast("Any", value) for key, value in overrides.items()
@@ -185,7 +196,23 @@ KgFoundrySettings = RuntimeSettings
 
 
 def load_settings(**overrides: object) -> KgFoundrySettings:
-    """Load :class:`RuntimeSettings` with optional overrides."""
+    """Load :class:`RuntimeSettings` with optional overrides.
+
+    Parameters
+    ----------
+    **overrides : object
+        Settings overrides to apply.
+
+    Returns
+    -------
+    KgFoundrySettings
+        Loaded settings instance.
+
+    Raises
+    ------
+    SettingsError
+        If settings validation fails.
+    """
     try:
         return RuntimeSettings(**overrides)
     except SettingsError:

@@ -274,7 +274,13 @@ class SafeUnpickler(_StdlibUnpickler):
         return cast("type[object]", super().find_class(module, name))
 
     def load(self) -> object:
-        """Deserialize the payload using the hardened allow-list."""
+        """Deserialize the payload using the hardened allow-list.
+
+        Returns
+        -------
+        object
+            Deserialized object.
+        """
         return super().load()
 
 
@@ -303,7 +309,10 @@ def dump(obj: object, file: BinaryIO) -> None:
     >>> with tempfile.NamedTemporaryFile() as f:
     ...     dump(data, f)
     """
-    _validate_object(obj)
+    try:
+        _validate_object(obj)
+    except ValueError:
+        raise
     _stdlib_pickle.dump(obj, file)
 
 
@@ -336,7 +345,10 @@ def load(file: BinaryIO) -> object:
     ...     assert loaded == data
     """
     unpickler = SafeUnpickler(file)
-    loaded: object = unpickler.load()
+    try:
+        loaded: object = unpickler.load()
+    except UnsafePickleError:
+        raise
     return loaded
 
 

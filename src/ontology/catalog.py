@@ -97,7 +97,20 @@ class OntologyCatalog:
         self.by_id = {concept.id: concept for concept in concepts}
 
     def neighbors(self, concept_id: str, depth: int = 1) -> set[str]:
-        """Return related concept identifiers up to the requested depth."""
+        """Return related concept identifiers up to the requested depth.
+
+        Parameters
+        ----------
+        concept_id : str
+            Concept identifier to find neighbors for.
+        depth : int, optional
+            Maximum depth to traverse. Defaults to 1.
+
+        Returns
+        -------
+        set[str]
+            Set of related concept identifiers.
+        """
         if depth < 1:
             return set()
         concept = self.by_id.get(concept_id)
@@ -108,7 +121,18 @@ class OntologyCatalog:
         return {concept.id}
 
     def hydrate(self, concept_id: str) -> dict[str, JsonValue]:
-        """Return a JSON-serialisable view of the concept metadata."""
+        """Return a JSON-serialisable view of the concept metadata.
+
+        Parameters
+        ----------
+        concept_id : str
+            Concept identifier to hydrate.
+
+        Returns
+        -------
+        dict[str, JsonValue]
+            JSON-serializable dictionary of concept metadata.
+        """
         concept = self.by_id.get(concept_id)
         if concept is None:
             return {}

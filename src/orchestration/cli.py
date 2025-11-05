@@ -270,8 +270,14 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
     str
         Backend identifier that successfully produced the index.
     """
-    docs = _load_bm25_documents(config.chunks_path)
-    builder, backend_used = _instantiate_bm25_builder(config)
+    try:
+        docs = _load_bm25_documents(config.chunks_path)
+    except (FileNotFoundError, TypeError, json.JSONDecodeError):
+        raise
+    try:
+        builder, backend_used = _instantiate_bm25_builder(config)
+    except RuntimeError:
+        raise
 
     try:
         builder.build(docs)
@@ -307,7 +313,23 @@ def _build_bm25_index(config: BM25BuildConfig) -> str:
 
 
 def _instantiate_bm25_builder(config: BM25BuildConfig) -> tuple[_BM25Builder, str]:
-    """Instantiate a BM25 builder, falling back to pure backend if Lucene fails."""
+    """Instantiate a BM25 builder, falling back to pure backend if Lucene fails.
+
+    Parameters
+    ----------
+    config : BM25BuildConfig
+        Build configuration.
+
+    Returns
+    -------
+    tuple[_BM25Builder, str]
+        (builder instance, backend identifier).
+
+    Raises
+    ------
+    RuntimeError
+        If builder instantiation fails and fallback is unavailable.
+    """
     requested_backend = config.backend.strip().lower()
     try:
         builder = cast(
@@ -353,7 +375,13 @@ _VECTOR_VALIDATOR_CACHE: dict[str, Draft202012ValidatorProtocol] = {}
 
 
 def _vector_batch_validator() -> Draft202012ValidatorProtocol:
-    """Return a cached JSON Schema validator for vector ingestion payloads."""
+    """Return a cached JSON Schema validator for vector ingestion payloads.
+
+    Returns
+    -------
+    Draft202012ValidatorProtocol
+        Cached validator instance.
+    """
     validator = _VECTOR_VALIDATOR_CACHE.get("validator")
     if validator is None:
         schema = load_schema(_VECTOR_SCHEMA_PATH)
@@ -363,12 +391,34 @@ def _vector_batch_validator() -> Draft202012ValidatorProtocol:
 
 
 def _error_sort_key(error: ValidationErrorProtocol) -> tuple[str, ...]:
-    """Build a sortable key for JSON Schema validation errors."""
+    """Build a sortable key for JSON Schema validation errors.
+
+    Parameters
+    ----------
+    error : ValidationErrorProtocol
+        Validation error to extract path from.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Sortable tuple of path components.
+    """
     return tuple(str(part) for part in error.path)
 
 
 def _validate_vector_payload(payload: object) -> None:
-    """Validate vector ingestion payloads against the canonical schema."""
+    """Validate vector ingestion payloads against the canonical schema.
+
+    Parameters
+    ----------
+    payload : object
+        Payload to validate.
+
+    Raises
+    ------
+    VectorValidationError
+        If validation fails.
+    """
     validator = _vector_batch_validator()
     errors_iter = validator.iter_errors(payload)
     errors = sorted(errors_iter, key=_error_sort_key)
@@ -395,7 +445,26 @@ def _build_vector_problem_details(
     errors: Sequence[str],
     instance: str,
 ) -> ProblemDetails:
-    """Create Problem Details payload for vector ingestion failures."""
+    """Create Problem Details payload for vector ingestion failures.
+
+    Parameters
+    ----------
+    detail : str
+        Human-readable error detail.
+    correlation_id : str
+        Correlation identifier for tracing.
+    vector_path : str
+        Path to the vector file that failed.
+    errors : Sequence[str]
+        Validation error messages.
+    instance : str
+        Problem instance URI.
+
+    Returns
+    -------
+    ProblemDetails
+        RFC 9457 Problem Details payload.
+    """
     validation_errors = cast("list[JsonValue]", list(errors))
     errors_payload: dict[str, JsonValue] = {
         "schema_id": _VECTOR_SCHEMA_ID,
@@ -418,7 +487,25 @@ def _build_vector_problem_details(
 
 
 def load_vector_batch_from_json(vectors_path: str) -> VectorBatch:
-    """Load and validate dense vectors from JSON file."""
+    """Load and validate dense vectors from JSON file.
+
+    Parameters
+    ----------
+    vectors_path : str
+        Path to JSON file containing vectors.
+
+    Returns
+    -------
+    VectorBatch
+        Validated vector batch.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the vectors file does not exist.
+    VectorValidationError
+        If payload validation fails.
+    """
     vectors_file = Path(vectors_path)
     if not vectors_file.exists():
         msg = f"Vectors file not found: {vectors_path}"
@@ -449,7 +536,10 @@ def _prepare_index_directory(index_path: str) -> None:
     OSError
         If directory creation fails.
     """
-    Path(index_path).parent.mkdir(parents=True, exist_ok=True)
+    try:
+        Path(index_path).parent.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        raise
 
 
 # [nav:anchor index_bm25]
@@ -478,6 +568,17 @@ def index_bm25(
     -----
     - **Idempotency**: Running twice with identical inputs rebuilds the index.
     - **Retries**: No automatic retries. On failure, check logs and re-run.
+
+    Raises
+    ------
+    FileNotFoundError
+        If input file is missing.
+    TypeError
+        If dataset format is invalid.
+    json.JSONDecodeError
+        If JSON parsing fails.
+    typer.Exit
+        If index building fails (exit code 1).
     """
     config = BM25BuildConfig(
         chunks_path=chunks_parquet,
@@ -763,7 +864,10 @@ def index_faiss(
         factory=factory,
         metric=metric,
     )
-    run_index_faiss(config=config)
+    try:
+        run_index_faiss(config=config)
+    except typer.Exit:
+        raise
 
 
 # [nav:anchor api]
@@ -774,6 +878,11 @@ def api(port: int = 8080) -> None:
     ----------
     port : int, optional
         Port to bind to. Defaults to 8080.
+
+    Raises
+    ------
+    typer.Exit
+        If uvicorn is not available or entry point is missing (exit code 1).
     """
     try:
         uvicorn_module: ModuleType = importlib.import_module("uvicorn")

@@ -62,6 +62,11 @@ def apply(db: str, migrations_dir: str) -> None:
         Describe ``db``.
     migrations_dir : str
         Describe ``migrations_dir``.
+
+    Raises
+    ------
+    RegistryError
+        If migrations directory does not exist or migration execution fails.
     """
     path = pathlib.Path(migrations_dir)
     if not path.exists():

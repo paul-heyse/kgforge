@@ -42,6 +42,13 @@ _TEMPLATE = """{{ schema.summary }}\n\n{{ marker }}{% if signature %}\n\nSignatu
 
 
 def _build_environment() -> Environment:
+    """Build Jinja2 template environment for docstring rendering.
+
+    Returns
+    -------
+    Environment
+        Configured Jinja2 environment with strict undefined handling.
+    """
     undefined_cls: type[Undefined] = StrictUndefined
     return Environment(
         undefined=undefined_cls,
@@ -63,7 +70,22 @@ def render_docstring(
     *,
     include_signature: bool = False,
 ) -> str:
-    """Render the provided schema to a concrete docstring string."""
+    """Render the provided schema to a concrete docstring string.
+
+    Parameters
+    ----------
+    schema : DocstringSchema
+        Docstring schema containing all sections.
+    marker : str
+        Ownership marker string.
+    include_signature : bool, default False
+        Whether to include a signature section in the docstring.
+
+    Returns
+    -------
+    str
+        Rendered docstring text with trailing newline.
+    """
     signature = _build_signature(schema) if include_signature else ""
     rendered = _TEMPLATE_OBJ.render(
         schema=schema,
@@ -81,6 +103,18 @@ def write_template_to(path: Path) -> None:
 
 
 def _build_signature(schema: DocstringSchema) -> str:
+    """Build function signature string from parameter schema.
+
+    Parameters
+    ----------
+    schema : DocstringSchema
+        Schema containing parameters.
+
+    Returns
+    -------
+    str
+        Formatted signature string (e.g., "(x: int, y: int = 0)").
+    """
     parameters = schema.parameters
     if not parameters:
         return ""
@@ -90,7 +124,18 @@ def _build_signature(schema: DocstringSchema) -> str:
 
 
 def _format_parameters(parameters: Iterable[ParameterDoc]) -> Iterable[tuple[str, str]]:
-    """Yield parameter kind and formatted signature entry for ``parameters``."""
+    """Yield parameter kind and formatted signature entry for ``parameters``.
+
+    Parameters
+    ----------
+    parameters : Iterable[ParameterDoc]
+        Parameter documentation objects.
+
+    Yields
+    ------
+    tuple[str, str]
+        Tuple of (parameter_kind, formatted_entry) for each parameter.
+    """
     for parameter in parameters:
         token = parameter.display_name or parameter.name
         entry = token
@@ -105,7 +150,18 @@ def _format_parameters(parameters: Iterable[ParameterDoc]) -> Iterable[tuple[str
 
 
 def _format_default(value: str | None) -> str | None:
-    """Return the display form for ``value`` within docstrings."""
+    """Return the display form for ``value`` within docstrings.
+
+    Parameters
+    ----------
+    value : str or None
+        Default value string.
+
+    Returns
+    -------
+    str or None
+        Formatted default value, or None if not provided.
+    """
     if value is None:
         return None
     if not value:
@@ -116,7 +172,18 @@ def _format_default(value: str | None) -> str | None:
 def _group_parameters(
     formatted: Iterable[tuple[str, str]],
 ) -> dict[str, list[str] | str | None]:
-    """Group formatted parameters by signature position semantics."""
+    """Group formatted parameters by signature position semantics.
+
+    Parameters
+    ----------
+    formatted : Iterable[tuple[str, str]]
+        Iterable of (kind, formatted_entry) tuples.
+
+    Returns
+    -------
+    dict[str, list[str] | str | None]
+        Dictionary grouping parameters by kind (positional_only, keyword_only, etc.).
+    """
     groups: dict[str, list[str] | str | None] = {
         "positional_only": [],
         "positional_or_keyword": [],
@@ -146,7 +213,18 @@ def _group_parameters(
 
 
 def _compose_signature(groups: dict[str, list[str] | str | None]) -> str:
-    """Return the rendered signature string for grouped parameters."""
+    """Return the rendered signature string for grouped parameters.
+
+    Parameters
+    ----------
+    groups : dict[str, list[str] | str | None]
+        Dictionary grouping parameters by kind.
+
+    Returns
+    -------
+    str
+        Composed signature string (e.g., "(x: int, y: int = 0, /, *, z: str)").
+    """
     parts: list[str] = []
     pos_only = cast("list[str]", groups.get("positional_only", []))
     if pos_only:

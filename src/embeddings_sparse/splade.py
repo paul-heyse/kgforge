@@ -146,31 +146,32 @@ def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
     """
     signing_key = _decode_signing_key()
     try:
-        with legacy_path.open("rb") as handle:
-            if signing_key:
-                wrapper = SignedPickleWrapper(signing_key)
-                try:
-                    payload_obj = wrapper.load(handle)
-                except UnsafeSerializationError:
+        try:
+            with legacy_path.open("rb") as handle:
+                if signing_key:
+                    wrapper = SignedPickleWrapper(signing_key)
+                    try:
+                        payload_obj = wrapper.load(handle)
+                    except UnsafeSerializationError:
+                        logger.warning(
+                            "Signed pickle validation failed for legacy SPLADE index; falling back to unsigned loader",
+                            extra={"legacy_path": str(legacy_path)},
+                        )
+                        handle.seek(0)
+                        payload = _load_unsigned_payload(handle, legacy_path)
+                    else:
+                        if not isinstance(payload_obj, dict):
+                            msg = f"Invalid signed legacy payload: expected dict, got {type(payload_obj)}"
+                            raise DeserializationError(msg)
+                        payload = cast("dict[str, JsonValue]", payload_obj)
+                else:
                     logger.warning(
-                        "Signed pickle validation failed for legacy SPLADE index; falling back to unsigned loader",
+                        "Missing signing key; using unsigned legacy pickle loader",
                         extra={"legacy_path": str(legacy_path)},
                     )
-                    handle.seek(0)
                     payload = _load_unsigned_payload(handle, legacy_path)
-                else:
-                    if not isinstance(payload_obj, dict):
-                        msg = (
-                            f"Invalid signed legacy payload: expected dict, got {type(payload_obj)}"
-                        )
-                        raise DeserializationError(msg)
-                    payload = cast("dict[str, JsonValue]", payload_obj)
-            else:
-                logger.warning(
-                    "Missing signing key; using unsigned legacy pickle loader",
-                    extra={"legacy_path": str(legacy_path)},
-                )
-                payload = _load_unsigned_payload(handle, legacy_path)
+        except OSError:
+            raise
     except OSError as exc:
         msg = f"Failed to read legacy SPLADE index at {legacy_path}: {exc}"
         raise DeserializationError(msg) from exc
@@ -602,7 +603,7 @@ class LuceneImpactIndex:
         Raises
         ------
         RuntimeError
-        Raised when TODO for RuntimeError.
+            If Pyserini is not available for SPLADE impact search.
         """
         if self._searcher is not None:
             return
@@ -620,8 +621,17 @@ class LuceneImpactIndex:
         self._searcher = searcher
 
     def ensure_available(self) -> None:
-        """Ensure the Lucene searcher is initialized and ready for queries."""
-        self._ensure()
+        """Ensure the Lucene searcher is initialized and ready for queries.
+
+        Raises
+        ------
+        RuntimeError
+            If Pyserini is not available for SPLADE impact search.
+        """
+        try:
+            self._ensure()
+        except RuntimeError:
+            raise
 
     def search(self, query: str, k: int) -> list[tuple[str, float]]:
         """Describe search.
@@ -645,9 +655,12 @@ class LuceneImpactIndex:
         Raises
         ------
         RuntimeError
-        Raised when TODO for RuntimeError.
+            If Lucene searcher is not initialized or Pyserini is not available.
         """
-        self._ensure()
+        try:
+            self._ensure()
+        except RuntimeError:
+            raise
         if self._searcher is None:
             message = "Lucene impact searcher not initialized"
             raise RuntimeError(message)
