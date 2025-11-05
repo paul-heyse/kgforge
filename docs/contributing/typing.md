@@ -75,33 +75,27 @@ Update stub files whenever you:
 #### 1. Implement the Runtime Feature
 
 ```python
-# src/kgfoundry/agent_catalog/search.py
+# src/kgfoundry_common/logging.py
 
-class NewSearchHelper:
-    """A new public helper class."""
-    
-    def __init__(self, config: str) -> None:
-        self.config = config
+def new_logging_adapter(name: str) -> StructuredLoggerAdapter:
+    """Return a structured logger adapter with preconfigured fields."""
 
-# Update __all__
+    adapter = StructuredLoggerAdapter(logging.getLogger(name))
+    adapter = adapter.with_fields(system="kgfoundry", component=name)
+    return adapter
+
 __all__ = [
     # ... existing exports ...
-    "NewSearchHelper",
+    "new_logging_adapter",
 ]
 ```
 
 #### 2. Update the Stub File
 
 ```python
-# stubs/kgfoundry/agent_catalog/search.pyi
+# stubs/kgfoundry_common/logging.pyi
 
-@dataclass(slots=True)
-class NewSearchHelper:
-    """A new public helper class."""
-    
-    config: str
-    
-    def __init__(self, config: str) -> None: ...
+def new_logging_adapter(name: str) -> StructuredLoggerAdapter: ...
 ```
 
 #### 3. Verify Parity
@@ -114,7 +108,7 @@ python tools/check_stub_parity.py
 
 Expected output:
 ```
-Checking: kgfoundry.agent_catalog.search
+Checking: kgfoundry_common.logging
 ======================================================================
   ✓ All runtime exports present in stub
   ✓ No problematic Any types found
@@ -142,7 +136,7 @@ Checking: kgfoundry.agent_catalog.search
 #### Type Aliases for Clarity
 
 ```python
-# stubs/kgfoundry/agent_catalog/search.pyi
+# stubs/kgfoundry_common/logging.pyi
 
 # Define type aliases for JSON-compatible values
 JsonValue = str | int | float | bool | None
@@ -233,8 +227,8 @@ def process_data(data: Any) -> Any: ...  # Defeats type safety goal
 python tools/check_stub_parity.py
 
 # Check specific module
-uv run pyright --warnings --pythonversion=3.13 src/kgfoundry/agent_catalog/search.py
-uv run pyrefly check src/kgfoundry/agent_catalog/search.py
+uv run pyright --warnings --pythonversion=3.13 src/kgfoundry_common/logging.py
+uv run pyrefly check src/kgfoundry_common/logging.py
 
 # Run namespace tests
 uv run pytest tests/test_namespace_proxy.py -v

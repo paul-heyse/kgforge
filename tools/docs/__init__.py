@@ -131,7 +131,6 @@ _PUBLIC_EXPORTS: dict[str, object] = {
 PUBLIC_EXPORTS: Final[Mapping[str, object]] = MappingProxyType(_PUBLIC_EXPORTS)
 
 _MODULE_EXPORTS: dict[str, str] = {
-    "catalog_models": "tools.docs.catalog_models",
     "errors": "tools.docs.errors",
     "observability": "tools.docs.observability",
 }
@@ -139,13 +138,12 @@ _MODULE_EXPORTS: dict[str, str] = {
 MODULE_EXPORTS: Final[Mapping[str, str]] = MappingProxyType(_MODULE_EXPORTS)
 
 if TYPE_CHECKING:
-    from tools.docs import catalog_models, errors, observability
+    from tools.docs import errors, observability
 
 __all__: tuple[str, ...] = (
     "build_artifacts",
     "build_graphs",
     "build_test_map",
-    "catalog_models",
     "errors",
     "export_schemas",
     "observability",

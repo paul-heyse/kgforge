@@ -7,7 +7,6 @@ Test suite package for kgfoundry.
 
 ## Modules
 
-- **`tests.agent_catalog`** — Test package for Agent Catalog functionality. → [open](vscode://file//home/paul/kgfoundry/src/tests/agent_catalog/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/tests/agent_catalog/__init__.py#L1)
 - **`tests.bootstrap`** — Testing bootstrap helpers for kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/tests/bootstrap.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/tests/bootstrap.py#L1)
 - **`tests.codeintel`** → [open](vscode://file//home/paul/kgfoundry/src/tests/codeintel/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/tests/codeintel/__init__.py#L1)
 - **`tests.conftest`** — Shared pytest fixtures for table-driven testing and observability validation. → [open](vscode://file//home/paul/kgfoundry/src/tests/conftest.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/tests/conftest.py#L1)

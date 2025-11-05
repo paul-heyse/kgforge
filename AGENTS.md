@@ -193,7 +193,7 @@ Read these first when editing configs or debugging local vs CI drift:
 - **Types:** `pyrefly.toml` (single source), `pyrightconfig.jsonc` (strict pyright)
 - **Tests:** `pytest.ini` (markers, doctest/xdoctest config)
 - **Docs / Artifacts:** `tools/docs/build_artifacts.py`, `make artifacts`, outputs under `docs/_build/**`, `site/_build/**`
-- **Nav & Catalog:** `tools/navmap/*`, `docs/_build/agent_catalog.json`, `site/_build/agent/` (Agent Portal)
+- **Nav & Catalog:** `tools/navmap/*`, `docs/_build/` navigation artifacts
 - **CI:** `.github/workflows/ci.yaml` (job order: precommit → lint → types → tests → docs; OS matrix; caches; artifacts)
 - **Pre‑commit:** `.pre-commit-config.yaml` (runs the same gates locally)
 
@@ -392,7 +392,7 @@ Example `PATH_MAP`:
 ## Agent Catalog & STDIO API (session‑scoped, no daemon)
 
 - **Artifacts:**
-  - Ground truth: `docs/_build/agent_catalog.json`
+  - Ground truth: navigation artifacts under `docs/_build/`
   - Portal: `site/_build/agent/index.html`
 - **Session API (JSON over stdio):**
   ```json

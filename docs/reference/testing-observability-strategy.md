@@ -244,9 +244,6 @@ def test_error_returns_problem_details(problem_details_loader):
 
 ### Package-Specific Fixtures
 
-**`tests/agent_catalog/conftest.py`**:
-- `search_options_factory` — Create SearchOptions variants
-
 **`tests/orchestration/conftest.py`**:
 - `cli_runner` — Execute CLI commands with captured output
 
@@ -309,14 +306,11 @@ uv run pytest -q tests/
 ### Execute by Module
 
 ```bash
-# Search options
-uv run pytest -q tests/agent_catalog/test_search_options_table.py
-
 # CLI idempotency
 uv run pytest -q tests/orchestration/test_index_cli_idempotency.py
 
 # Doctest examples
-uv run pytest --doctest-modules src/kgfoundry/agent_catalog/search.py
+uv run pytest --doctest-modules src/kgfoundry_common/problem_details.py
 ```
 
 ### With Detailed Output
