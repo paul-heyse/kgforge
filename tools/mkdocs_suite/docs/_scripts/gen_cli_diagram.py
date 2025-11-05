@@ -68,9 +68,7 @@ def _collect_operations(
                 operation_id = str(operation_id_obj).strip() or None
             tags = [str(tag) for tag in (op.get("tags") or ["cli"])]
             summary = (op.get("summary") or "").strip()
-            operations.extend(
-                (tag, method.upper(), path, operation_id, summary) for tag in tags
-            )
+            operations.append((method.upper(), path, operation_id, summary, tags))
     return operations
 
 
@@ -80,11 +78,12 @@ def _write_diagram(
     diagram_path = "diagrams/cli_by_tag.d2"
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
         handle.write('direction: right\nCLI: "CLI" {\n')
-        unique_tags = sorted({tag for tag, *_ in operations})
+        unique_tags = sorted({tag for *_, tags in operations for tag in tags})
         handle.write("\n".join(f'  "{tag}": "{tag}" {{}}' for tag in unique_tags))
         if unique_tags:
             handle.write("\n")
-        for tag, method, path, operation_id, summary in operations:
+        written_nodes: set[str] = set()
+        for method, path, operation_id, summary, tags in operations:
             node_id = f"{method} {path}"
             label = f"{method} {path}\\n{summary}" if summary else node_id
             link_attr = (
@@ -94,6 +93,13 @@ def _write_diagram(
             )
             handle.write(f'  "{node_id}": "{label}"{link_attr}\n')
             handle.write(f'  "{tag}" -> "{node_id}"\n')
+            if node_id not in written_nodes:
+                handle.write(
+                    f'  "{node_id}": "{label}" {{ link: "{_operation_anchor(operation_id)}" }}\n'
+                )
+                written_nodes.add(node_id)
+            for tag in tags:
+                handle.write(f'  "{tag}" -> "{node_id}"\n')
         handle.write("}\n")
 
 
