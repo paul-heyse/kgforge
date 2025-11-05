@@ -1,4 +1,5 @@
 """Expose ``search_api.faiss_adapter`` inside the ``kgfoundry`` namespace."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -10,6 +11,7 @@ from kgfoundry.namespace_bridge import (
     namespace_dir,
     namespace_getattr,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from search_api.faiss_adapter import (
     HAVE_FAISS,
     DenseVecs,
@@ -29,6 +31,9 @@ __all__ = [
     "StrArray",
     "VecArray",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
+
 _namespace = cast("dict[str, object]", globals())
 namespace_attach(_module, _namespace, __all__)
 

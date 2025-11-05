@@ -1,104 +1,68 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
-from typing import Any
+from typing import Protocol, runtime_checkable
 
-# Forward declarations - matched to runtime Griffe 1.14.0
-class Object:
-    path: str
-    canonical_path: str | None
+@runtime_checkable
+class Docstring(Protocol):
+    value: str | None
+
+class _Kind(Protocol):
     name: str
+
+class Object(Protocol):
+    path: str
+    kind: str | _Kind
+    filepath: Path | None
     lineno: int | None
     endlineno: int | None
     docstring: Docstring | None
-    kind: str
-    members: dict[str, Object]
-    is_alias: bool
-    is_async: bool | None
-    is_property: bool | None
     inherited: bool
-    private: bool
+    members: Mapping[str, Object | Alias]
+    inherited_members: Mapping[str, Object | Alias]
 
-    def __init__(self) -> None: ...
+@runtime_checkable
+class Alias(Object, Protocol):
+    final_target: Object | Alias | None
+    target_path: str | None
 
-class Alias(Object):
-    target: str | Object | None
+@runtime_checkable
+class Module(Object, Protocol):
+    members: MutableMapping[str, Object | Alias]
 
-class Module(Object): ...
-class Package: ...
-class Class(Object): ...
-class Function(Object): ...
-class Attribute(Object): ...
-class TypeAlias(Object): ...
+class Extensions(Protocol): ...
+class AliasResolutionError(Exception): ...
+class BuiltinModuleError(Exception): ...
+class CyclicAliasError(Exception): ...
 
-class Docstring:
-    value: str
-    lineno: int | None
-    endlineno: int | None
+def load_extensions(*names: str) -> Extensions: ...
 
-# GriffeLoader - main loader class
 class GriffeLoader:
     def __init__(
         self,
         *,
-        search_paths: Sequence[str | Path] | None = None,
-        allow_inspection: bool = True,
-        force_inspection: bool = False,
-        docstring_parser: Any = None,  # noqa: ANN401
-        docstring_options: dict[str, Any] | None = None,
+        extensions: Extensions | None = ...,
+        search_paths: Sequence[str | Path] | None = ...,
+        docstring_parser: object | None = ...,
+        docstring_options: object | None = ...,
+        lines_collection: object | None = ...,
+        modules_collection: object | None = ...,
+        allow_inspection: bool = ...,
+        force_inspection: bool = ...,
+        store_source: bool = ...,
     ) -> None: ...
-    def load(
-        self,
-        objspec: str | Path | None = None,
-        /,
-        *,
-        submodules: bool = True,
-        try_relative_path: bool = True,
-        find_stubs_package: bool = False,
-    ) -> Object | Alias: ...
-
-# Module-level load function
-def load(
-    objspec: str | Path | None = None,
-    /,
-    *,
-    submodules: bool = True,
-    try_relative_path: bool = True,
-    extensions: Any = None,  # noqa: ANN401
-    search_paths: Sequence[str | Path] | None = None,
-    docstring_parser: Any = None,  # noqa: ANN401
-    docstring_options: Any = None,  # noqa: ANN401
-    allow_inspection: bool = True,
-    force_inspection: bool = False,
-    store_source: bool = True,
-    find_stubs_package: bool = False,
-    resolve_aliases: bool = False,
-    resolve_external: bool | None = None,
-    resolve_implicit: bool = False,
-) -> Object | Alias: ...
-
-# Exceptions from griffe module
-class GriffeError(Exception): ...
-class LoadingError(GriffeError): ...
-class NameResolutionError(GriffeError): ...
-class AliasResolutionError(GriffeError): ...
-class CyclicAliasError(GriffeError): ...
-class UnimportableModuleError(GriffeError): ...
-class BuiltinModuleError(GriffeError): ...
-class ExtensionError(GriffeError): ...
-class ExtensionNotLoadedError(ExtensionError): ...
+    def load(self, module_name: str) -> Module: ...
+    def expand_exports(self, module: Module) -> None: ...
+    def expand_wildcards(self, module: Module) -> None: ...
+    def resolve_aliases(self, *, implicit: bool = ..., external: bool | None = ...) -> None: ...
 
 __all__ = [
     "Alias",
-    "Attribute",
-    "Class",
+    "AliasResolutionError",
+    "BuiltinModuleError",
+    "CyclicAliasError",
     "Docstring",
-    "Function",
-    "GriffeError",
     "GriffeLoader",
-    "LoadingError",
     "Module",
     "Object",
-    "Package",
-    "TypeAlias",
-    "load",
+    "load_extensions",
 ]

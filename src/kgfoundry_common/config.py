@@ -10,6 +10,7 @@ Examples
 >>> settings.log_level  # doctest: +SKIP
 'INFO'
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -22,15 +23,21 @@ from pydantic import AliasChoices, Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings
 
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.types import JsonPrimitive, JsonValue
 
 if TYPE_CHECKING:
     import functools
     from collections.abc import Sequence
 
-    from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["AppSettings", "JsonPrimitive", "JsonValue", "load_config"]
+__all__ = [
+    "AppSettings",
+    "JsonPrimitive",
+    "JsonValue",
+    "load_config",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 logger = get_logger(__name__)
 
@@ -53,47 +60,7 @@ class ModelValidateOptions(TypedDict, total=False):
     by_name: bool | None
 
 
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.config",
-    "synopsis": "Typed configuration management via pydantic_settings",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "AppSettings": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "JsonPrimitive": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "JsonValue": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "load_config": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-    },
-}
-
-
+# [nav:anchor AppSettings]
 class AppSettings(BaseSettings):
     """Application settings with environment variable support.
 
@@ -445,6 +412,7 @@ _load_config_cached: functools._lru_cache_wrapper[AppSettings] = lru_cache(maxsi
 )
 
 
+# [nav:anchor load_config]
 def load_config(*, reload: bool = False) -> AppSettings:
     """Load application configuration from environment variables.
 

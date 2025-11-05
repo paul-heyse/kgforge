@@ -12,6 +12,20 @@ data/**/*
 *.ids
 docs/_build/**/*
 site/_build/**/*
+tools/mkdocs_suite/site-mkdocs-suite/
+# MkDocs suite generated artifacts
+*.d2
+*.min.js
+*.min.js.map
+*.min.css
+*.min.css.map
+objects.inv
+llms.txt
+search_index.json
+sitemap.xml
+sitemap.xml.gz
+redoc-*.html
+.cache/
 
 # envs & build junk
 .venv/
@@ -23,6 +37,7 @@ dist/
 KGForge.egg-info/
 docs/_build/docstrings_manifest.json
 docs/_build/observability_docstrings.json
+.wheelhouse/*
 
 # Node artefacts
 node_modules/

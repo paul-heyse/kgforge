@@ -4,6 +4,7 @@ This module bundles bm25 index logic for the kgfoundry stack. It groups related 
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -12,11 +13,12 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, cast
 
 import duckdb
 
 from kgfoundry_common.errors import ConfigurationError, DeserializationError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import (
     deserialize_json,
@@ -27,36 +29,15 @@ from registry.duckdb_helpers import fetch_all, fetch_one
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
 
-__all__ = ["BM25Doc", "BM25Index", "toks"]
+__all__ = [
+    "BM25Doc",
+    "BM25Index",
+    "toks",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "search_api.bm25_index",
-    "synopsis": "Toy BM25 index backed by DuckDB parquet exports.",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 
@@ -323,17 +304,15 @@ class BM25Index:
         Raises
         ------
         TypeError
-            If parquet_root value in database is not a string.
-        ConfigurationError
-            If parquet path resolves outside allowed directories (path traversal
-            protection).
+            If parquet_root value in the database is not a string.
 
         Notes
         -----
         The method queries for the most recent chunks dataset ordered by
         created_at. If no dataset is found, returns an empty index. Path
         validation prevents path traversal attacks by ensuring resolved paths
-        are within allowed directories.
+        are within allowed directories. Errors raised by
+        :func:`_validate_parquet_path` propagate unchanged.
         """
         index = cls()
         con = duckdb.connect(db_path)
@@ -445,19 +424,12 @@ class BM25Index:
         BM25Index
             Initialized BM25 index with documents loaded from parquet file.
 
-        Raises
-        ------
-        ConfigurationError
-            If parquet path resolves outside allowed directories (path traversal
-            protection).
-        ValueError
-            If path cannot be resolved or does not exist.
-
         Notes
         -----
         Path validation prevents path traversal attacks. The method uses an
         in-memory DuckDB connection to read the parquet file. Title fields are
-        not included from parquet (defaults to empty string).
+        not included from parquet (defaults to empty string). Errors raised by
+        :func:`_validate_parquet_path` propagate unchanged.
         """
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
@@ -501,20 +473,12 @@ class BM25Index:
             Output file path for JSON metadata. A `.sha256` checksum file will
             be written alongside it.
 
-        Raises
-        ------
-        SerializationError
-            If JSON serialization fails or file write fails.
-        SchemaValidationError
-            If the index data does not conform to the BM25 metadata schema.
-        FileNotFoundError
-            If the schema file does not exist.
-
         Notes
         -----
         The serialized payload includes: k1, b, N (document count), avgdl (average
         document length), df (document frequency dictionary), and docs (list of
-        BM25Doc data dictionaries).
+        BM25Doc data dictionaries). Exceptions raised by :func:`serialize_json`
+        propagate unchanged.
 
         Examples
         --------
@@ -567,22 +531,14 @@ class BM25Index:
         BM25Index
             Reconstructed BM25 index instance with all metadata loaded.
 
-        Raises
-        ------
-        DeserializationError
-            If JSON parsing fails, checksum verification fails, or legacy pickle
-            validation fails.
-        SchemaValidationError
-            If the loaded data does not conform to the BM25 metadata schema.
-        FileNotFoundError
-            If the metadata or schema file does not exist.
-
         Notes
         -----
         The method attempts to load from JSON first. If the file has a `.pkl`
         extension and JSON loading fails, it falls back to legacy pickle format
         (with validation). All document frequencies, term frequencies, and
-        document metadata are reconstructed from the payload.
+        document metadata are reconstructed from the payload. Exceptions raised
+        by :func:`deserialize_json` or legacy payload loaders propagate
+        unchanged.
 
         Examples
         --------
@@ -777,4 +733,7 @@ class BM25Index:
         IndexError
             If index is out of range (negative or >= len(docs)).
         """
+        if index < 0 or index >= len(self.docs):
+            msg = f"Document index {index} out of range for {len(self.docs)} documents"
+            raise IndexError(msg)
         return self.docs[index]

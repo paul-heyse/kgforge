@@ -1,0 +1,20 @@
+# KgFoundry MkDocs Suite
+
+How AI agents should navigate this site.
+
+## Overview
+
+- [Overview](https://example.invalid/docs/index.md): Top-level overview and entry points.
+
+## Architecture
+
+- [Architecture](https://example.invalid/docs/architecture/index.md): Architecture narratives and diagrams.
+
+## Modules
+
+- [Modules](https://example.invalid/docs/modules/index.md): Generated module reference powered by Griffe.
+
+## API
+
+- [API](https://example.invalid/docs/api/index.md): HTTP API reference rendered with ReDoc.
+

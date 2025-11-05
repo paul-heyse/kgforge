@@ -1,4 +1,5 @@
 """Thin HTTP client for interacting with the kgfoundry Search API."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -6,10 +7,11 @@ from typing import TYPE_CHECKING, Final, Protocol, cast
 
 import requests
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
 
 __all__ = [
@@ -18,34 +20,10 @@ __all__ = [
     "SupportsHttp",
     "SupportsResponse",
 ]
-
-__navmap__: Final[NavMap] = {
-    "title": "search_client.client",
-    "synopsis": "Lightweight client wrapper around the kgfoundry Search API",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
+# [nav:anchor SupportsResponse]
 class SupportsResponse(Protocol):
     """Protocol describing the minimal HTTP response surface used by the client.
 
@@ -81,6 +59,7 @@ class SupportsResponse(Protocol):
         ...
 
 
+# [nav:anchor SupportsHttp]
 class SupportsHttp(Protocol):
     """Protocol describing the HTTP verbs required by :class:`KGFoundryClient`.
 
@@ -155,6 +134,7 @@ class SupportsHttp(Protocol):
         ...
 
 
+# [nav:anchor RequestsHttp]
 class RequestsHttp(SupportsHttp):
     """HTTP adapter that delegates HTTP verbs to :mod:`requests`.
 
@@ -244,6 +224,7 @@ class RequestsHttp(SupportsHttp):
 _DEFAULT_HTTP: Final[SupportsHttp] = RequestsHttp()
 
 
+# [nav:anchor KGFoundryClient]
 class KGFoundryClient:
     """High-level client for the kgfoundry Search API.
 

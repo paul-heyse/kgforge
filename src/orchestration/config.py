@@ -31,15 +31,23 @@ Create a validation configuration:
 ...     fail_on_warnings=False,
 ... )
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-__all__ = ["ArtifactValidationConfig", "IndexCliConfig"]
+from kgfoundry_common.navmap_loader import load_nav_metadata
+
+__all__ = [
+    "ArtifactValidationConfig",
+    "IndexCliConfig",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor IndexCliConfig]
 class IndexCliConfig:
     """Configuration for FAISS and BM25 index building CLI operations.
 
@@ -67,6 +75,7 @@ class IndexCliConfig:
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor ArtifactValidationConfig]
 class ArtifactValidationConfig:
     """Configuration for artifact validation operations.
 

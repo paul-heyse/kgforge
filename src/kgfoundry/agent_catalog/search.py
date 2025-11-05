@@ -10,6 +10,7 @@ Helpers for constructing SearchOptions and SearchDocument ensure consistent
 defaults and early validation of parameters and dependencies. These helpers
 emit RFC 9457 Problem Details on validation failures.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -29,6 +30,7 @@ import numpy as np
 
 from kgfoundry_common.errors import AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.numpy_typing import (
     normalize_l2 as _normalize_l2_array,
 )
@@ -75,6 +77,7 @@ _DEFAULT_BATCH_SIZE = 32
 _ALLOWED_FACET_KEYS = frozenset(["package", "module", "kind", "stability"])
 
 
+# [nav:anchor SearchOptionsPayload]
 class SearchOptionsPayload(TypedDict, total=False):
     """Typed payload for SearchOptions configuration.
 
@@ -98,6 +101,7 @@ class SearchOptionsOverrides(TypedDict, total=False):
     batch_size: int
 
 
+# [nav:anchor SearchDocumentPayload]
 class SearchDocumentPayload(TypedDict):
     """Typed payload for SearchDocument construction.
 
@@ -174,9 +178,11 @@ __all__ = [
     "make_search_document",
     "search_catalog",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 @dataclass(slots=True)
+# [nav:anchor SearchRequest]
 class SearchRequest:
     """Request parameters for searching the agent catalog.
 
@@ -195,6 +201,7 @@ class SearchRequest:
     k: int
 
 
+# [nav:anchor EmbeddingModelProtocol]
 class EmbeddingModelProtocol(Protocol):
     """Protocol describing the embedding model encode interface.
 
@@ -224,6 +231,7 @@ class EmbeddingModelProtocol(Protocol):
 
 
 @dataclass(slots=True)
+# [nav:anchor SearchConfig]
 class SearchConfig:
     """Configuration used for hybrid search against the catalog.
 
@@ -247,6 +255,7 @@ class SearchConfig:
 
 
 @dataclass(slots=True)
+# [nav:anchor SearchOptions]
 class SearchOptions:
     """Optional tuning parameters for hybrid search.
 
@@ -284,6 +293,7 @@ class SearchOptions:
     batch_size: int | None = None
 
 
+# [nav:anchor build_default_search_options]
 def build_default_search_options(
     *,
     alpha: float | None = None,
@@ -389,6 +399,7 @@ def _validate_facets(facets: Mapping[str, str]) -> None:
     )
 
 
+# [nav:anchor build_faceted_search_options]
 def build_faceted_search_options(
     *,
     facets: Mapping[str, str],
@@ -423,6 +434,7 @@ def build_faceted_search_options(
     return opts
 
 
+# [nav:anchor build_embedding_aware_search_options]
 def build_embedding_aware_search_options(
     *,
     embedding_model: str,
@@ -460,6 +472,7 @@ def build_embedding_aware_search_options(
     return options
 
 
+# [nav:anchor make_search_document]
 def make_search_document(
     *,
     symbol_id: str,
@@ -563,6 +576,7 @@ LEXICAL_FIELDS = [
 
 
 @dataclass(slots=True)
+# [nav:anchor SearchDocument]
 class SearchDocument:
     """Intermediate representation used to build or query the semantic index.
 
@@ -619,6 +633,7 @@ class SearchDocument:
 
 
 @dataclass(slots=True)
+# [nav:anchor SearchResult]
 class SearchResult:
     """Result record returned by hybrid search.
 
@@ -672,6 +687,7 @@ class SearchResult:
 
 
 @dataclass(slots=True)
+# [nav:anchor VectorSearchContext]
 class VectorSearchContext:
     """Supporting data required to execute a vector search."""
 
@@ -697,6 +713,7 @@ class _VectorSearchInputs:
 
 
 @dataclass(slots=True)
+# [nav:anchor PreparedSearchArtifacts]
 class PreparedSearchArtifacts:
     """Documents and optional semantic metadata extracted from the catalog."""
 
@@ -1404,6 +1421,7 @@ def iter_symbol_entries(
     return entries
 
 
+# [nav:anchor documents_from_catalog]
 def documents_from_catalog(
     catalog: CatalogMapping,
     row_lookup: Mapping[str, int] | None = None,
@@ -2020,6 +2038,7 @@ def _compute_vector_scores_safe(
         return {}
 
 
+# [nav:anchor search_catalog]
 def search_catalog(
     catalog: Mapping[str, JsonLike],
     *,

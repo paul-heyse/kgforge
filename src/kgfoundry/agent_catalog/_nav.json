@@ -1,0 +1,104 @@
+{
+  "exports": [
+    "AccessController",
+    "AgentCatalogClient",
+    "AgentCatalogClientError",
+    "AgentCatalogModel",
+    "AuditLogger",
+    "CatalogSession",
+    "CatalogSessionError",
+    "Role",
+    "load_catalog_from_sqlite",
+    "load_catalog_model",
+    "load_catalog_payload",
+    "search",
+    "write_sqlite_catalog"
+  ],
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "AccessController",
+        "AgentCatalogClient",
+        "AgentCatalogClientError",
+        "AgentCatalogModel",
+        "AuditLogger",
+        "CatalogSession",
+        "CatalogSessionError",
+        "Role",
+        "load_catalog_from_sqlite",
+        "load_catalog_model",
+        "load_catalog_payload",
+        "search",
+        "write_sqlite_catalog"
+      ]
+    }
+  ],
+  "symbols": {
+    "AccessController": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "AgentCatalogClient": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "AgentCatalogClientError": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "AgentCatalogModel": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "AuditLogger": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "CatalogSession": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "CatalogSessionError": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "Role": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "load_catalog_from_sqlite": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "load_catalog_model": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "load_catalog_payload": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "search": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "write_sqlite_catalog": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    }
+  }
+}

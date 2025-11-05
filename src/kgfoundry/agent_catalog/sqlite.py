@@ -1,4 +1,5 @@
 """Persistence helpers for storing the Agent Catalog in SQLite."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -15,6 +16,7 @@ from typing import TYPE_CHECKING, assert_never, cast
 
 from kgfoundry.agent_catalog.search import documents_from_catalog
 from kgfoundry_common.errors import SymbolAttachmentError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
@@ -657,6 +659,7 @@ def _prepare_sqlite_rows(
     )
 
 
+# [nav:anchor write_sqlite_catalog]
 def write_sqlite_catalog(
     payload: CatalogPayload,
     path: Path,
@@ -1111,6 +1114,7 @@ def _append_symbol_to_module(
     symbol_list.append(symbol_payload)
 
 
+# [nav:anchor load_catalog_from_sqlite]
 def load_catalog_from_sqlite(path: Path) -> JsonObject:
     """Load a catalogue payload from ``path`` as JSON-compatible dictionaries.
 
@@ -1145,6 +1149,7 @@ def load_catalog_from_sqlite(path: Path) -> JsonObject:
         }
 
 
+# [nav:anchor sqlite_candidates]
 def sqlite_candidates(json_path: Path) -> Iterable[Path]:
     """Yield plausible SQLite catalogue locations for ``json_path``.
 
@@ -1178,6 +1183,7 @@ __all__ = [
     "sqlite_candidates",
     "write_sqlite_catalog",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 def _coerce_packages(packages: Sequence[Mapping[str, JsonValue]]) -> list[PackagePayload]:

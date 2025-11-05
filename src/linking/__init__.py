@@ -1,44 +1,21 @@
-"""Overview of linking.
+"""Expose entity linking utilities and navigation metadata."""
 
-This module bundles linking logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
-"""
+from __future__ import annotations
 
-from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 from linking import calibration, linker
 
-__all__ = ["calibration", "linker"]
+NavMap = _NavMap
 
-__navmap__: NavMap = {
-    "title": "linking",
-    "synopsis": "Entity linking calibration and production pipelines",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@linking",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "calibration": {
-            "stability": "beta",
-            "owner": "@linking",
-            "since": "0.1.0",
-        },
-        "linker": {
-            "stability": "beta",
-            "owner": "@linking",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "NavMap",
+    "calibration",
+    "linker",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
+
+# [nav:section public-api]
 # [nav:anchor calibration]
 # [nav:anchor linker]

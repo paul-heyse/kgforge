@@ -5,6 +5,7 @@ exception handlers retain precise type information while also emitting kgfoundry
 logs and respecting correlation identifiers. All operations enforce a configurable timeout to
 prevent runaway tasks inside the request lifecycle.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ from fastapi import Depends
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from kgfoundry_common.logging import get_correlation_id, get_logger, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from fastapi import FastAPI, Request
@@ -32,7 +34,10 @@ __all__ = [
     "typed_exception_handler",
     "typed_middleware",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
+
+# [nav:anchor DEFAULT_TIMEOUT_SECONDS]
 DEFAULT_TIMEOUT_SECONDS = 10.0
 """Default timeout applied to FastAPI helpers (in seconds)."""
 
@@ -61,6 +66,7 @@ async def _await_with_timeout[T](coro: t.Awaitable[T], timeout_seconds: float | 
     return await asyncio.wait_for(coro, timeout_seconds)
 
 
+# [nav:anchor typed_dependency]
 def typed_dependency[**P, T](
     dependency: Callable[P, t.Awaitable[T]],
     *,
@@ -129,6 +135,7 @@ def typed_dependency[**P, T](
     return cast("object", marker)
 
 
+# [nav:anchor typed_exception_handler]
 def typed_exception_handler[E: Exception](
     app: FastAPI,
     exception_type: type[E],
@@ -188,6 +195,7 @@ def typed_exception_handler[E: Exception](
     app.add_exception_handler(exception_type, handler_callable)
 
 
+# [nav:anchor typed_middleware]
 def typed_middleware(
     app: FastAPI,
     middleware_class: MiddlewareFactory,

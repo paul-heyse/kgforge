@@ -3,6 +3,7 @@
 This module provides command-line interface for building indexes (BM25, FAISS) and running end-to-
 end pipelines using Prefect orchestration.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -13,7 +14,7 @@ import logging
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Final, Protocol, cast
+from typing import TYPE_CHECKING, Annotated, Protocol, cast
 from uuid import uuid4
 
 import typer
@@ -23,6 +24,7 @@ from kgfoundry_common.errors import ConfigurationError, IndexBuildError
 from kgfoundry_common.jsonschema_utils import (
     create_draft202012_validator,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.problem_details import (
     build_configuration_problem,
     build_problem_details,
@@ -45,7 +47,6 @@ if TYPE_CHECKING:
         Draft202012ValidatorProtocol,
         ValidationErrorProtocol,
     )
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import ProblemDetails
     from kgfoundry_common.types import JsonValue
     from kgfoundry_common.vector_types import (
@@ -86,33 +87,15 @@ with contextlib.suppress(ImportError):
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["api", "e2e", "index_bm25", "index_faiss", "run_index_faiss"]
+__all__ = [
+    "api",
+    "e2e",
+    "index_bm25",
+    "index_faiss",
+    "run_index_faiss",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "orchestration.cli",
-    "synopsis": "Prefect command-line entrypoints for orchestration flows",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@orchestration",
-        "stability": "beta",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@orchestration",
-            "stability": "beta",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
 
 app = typer.Typer(help="kgfoundry orchestration CLI")
 
@@ -634,6 +617,7 @@ def _index_bm25_cli(
 
 
 # [nav:anchor index_faiss]
+# [nav:anchor run_index_faiss]
 def run_index_faiss(*, config: IndexCliConfig) -> None:
     """Build FAISS index from dense vectors using typed configuration.
 

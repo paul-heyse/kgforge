@@ -1,0 +1,41 @@
+{
+  "exports": [
+    "cli",
+    "fixture_flow",
+    "flows"
+  ],
+  "module_meta": {
+    "owner": "@orchestration",
+    "since": "0.1.0",
+    "stability": "experimental"
+  },
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "cli",
+        "fixture_flow",
+        "flows"
+      ]
+    }
+  ],
+  "symbols": {
+    "cli": {
+      "owner": "@orchestration",
+      "since": "0.1.0",
+      "stability": "beta"
+    },
+    "fixture_flow": {
+      "owner": "@orchestration",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "flows": {
+      "owner": "@orchestration",
+      "since": "0.1.0",
+      "stability": "experimental"
+    }
+  },
+  "synopsis": "Prefect flows and CLI entrypoints for kgfoundry orchestrations",
+  "title": "orchestration"
+}

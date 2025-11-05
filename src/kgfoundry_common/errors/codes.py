@@ -11,17 +11,28 @@ Examples
 >>> type_uri = get_type_uri(code)
 >>> assert type_uri == "https://kgfoundry.dev/problems/download-failed"
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from enum import StrEnum
 from typing import Final
 
-__all__ = ["BASE_TYPE_URI", "ErrorCode", "get_type_uri"]
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
+__all__ = [
+    "BASE_TYPE_URI",
+    "ErrorCode",
+    "get_type_uri",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
+
+# [nav:anchor BASE_TYPE_URI]
 BASE_TYPE_URI: Final[str] = "https://kgfoundry.dev/problems"
 
 
+# [nav:anchor ErrorCode]
 class ErrorCode(StrEnum):
     """Stable error codes for kgfoundry exceptions.
 
@@ -103,6 +114,7 @@ class ErrorCode(StrEnum):
         return self.value
 
 
+# [nav:anchor get_type_uri]
 def get_type_uri(code: ErrorCode) -> str:
     """Get the RFC 9457 type URI for an error code.
 

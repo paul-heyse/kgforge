@@ -1,4 +1,5 @@
 """Expose ``search_api.bm25_index`` inside the ``kgfoundry`` namespace."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -10,9 +11,17 @@ from kgfoundry.namespace_bridge import (
     namespace_dir,
     namespace_getattr,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from search_api.bm25_index import BM25Doc, BM25Index, toks
 
-__all__ = ["BM25Doc", "BM25Index", "toks"]
+__all__ = [
+    "BM25Doc",
+    "BM25Index",
+    "toks",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
+
 _namespace = cast("dict[str, object]", globals())
 namespace_attach(_module, _namespace, __all__)
 

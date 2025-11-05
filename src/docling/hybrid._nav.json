@@ -1,0 +1,27 @@
+{
+  "exports": [
+    "HybridChunker"
+  ],
+  "module_meta": {
+    "owner": "@docling",
+    "since": "0.1.0",
+    "stability": "beta"
+  },
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "HybridChunker"
+      ]
+    }
+  ],
+  "symbols": {
+    "HybridChunker": {
+      "owner": "@docling",
+      "since": "0.1.0",
+      "stability": "beta"
+    }
+  },
+  "synopsis": "Hybrid docling pipeline combining layout and text cues",
+  "title": "docling.hybrid"
+}

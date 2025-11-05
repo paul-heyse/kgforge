@@ -1,0 +1,132 @@
+{
+  "exports": [
+    "EmbeddingModelProtocol",
+    "MetricsProvider",
+    "PreparedSearchArtifacts",
+    "SearchConfig",
+    "SearchDocument",
+    "SearchDocumentPayload",
+    "SearchOptions",
+    "SearchOptionsPayload",
+    "SearchRequest",
+    "SearchResult",
+    "VectorSearchContext",
+    "build_default_search_options",
+    "build_embedding_aware_search_options",
+    "build_faceted_search_options",
+    "documents_from_catalog",
+    "make_search_document",
+    "search_catalog"
+  ],
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "EmbeddingModelProtocol",
+        "MetricsProvider",
+        "PreparedSearchArtifacts",
+        "SearchConfig",
+        "SearchDocument",
+        "SearchDocumentPayload",
+        "SearchOptions",
+        "SearchOptionsPayload",
+        "SearchRequest",
+        "SearchResult",
+        "VectorSearchContext",
+        "build_default_search_options",
+        "build_embedding_aware_search_options",
+        "build_faceted_search_options",
+        "documents_from_catalog",
+        "make_search_document",
+        "search_catalog"
+      ]
+    }
+  ],
+  "symbols": {
+    "EmbeddingModelProtocol": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "MetricsProvider": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "PreparedSearchArtifacts": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchConfig": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchDocument": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchDocumentPayload": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchOptions": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchOptionsPayload": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchRequest": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "SearchResult": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "VectorSearchContext": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "build_default_search_options": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "build_embedding_aware_search_options": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "build_faceted_search_options": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "documents_from_catalog": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "make_search_document": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    },
+    "search_catalog": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    }
+  }
+}

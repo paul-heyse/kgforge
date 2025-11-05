@@ -1,4 +1,5 @@
 """Role-based access control helpers for Agent Catalog hosted mode."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -6,10 +7,13 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING, ClassVar
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
 
+# [nav:anchor Role]
 class Role(StrEnum):
     """Supported access roles for hosted mode.
 
@@ -42,6 +46,7 @@ class Role(StrEnum):
 
 
 @dataclass(slots=True)
+# [nav:anchor AccessController]
 class AccessController:
     """Authorize catalog operations based on the configured role.
 
@@ -153,4 +158,8 @@ class AccessController:
             raise PermissionError(message)
 
 
-__all__ = ["AccessController", "Role"]
+__all__ = [
+    "AccessController",
+    "Role",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

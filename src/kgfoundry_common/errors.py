@@ -4,6 +4,7 @@ This module maintains backward compatibility by re-exporting exceptions
 from the new structured error hierarchy. New code should import directly
 from kgfoundry_common.errors.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -22,6 +23,7 @@ from kgfoundry_common.errors.exceptions import (
     SymbolAttachmentError,
     UnsupportedMIMEError,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 __all__ = [
     "CatalogLoadError",
@@ -38,3 +40,5 @@ __all__ = [
     "SymbolAttachmentError",
     "UnsupportedMIMEError",
 ]
+
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

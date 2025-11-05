@@ -18,12 +18,15 @@ Examples
 >>> print(result)
 hello
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import logging
 from importlib import import_module
 from typing import TYPE_CHECKING, Final, Protocol, cast
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     import io
@@ -105,6 +108,7 @@ class _TextProcess(Protocol):
         ...
 
 
+# [nav:anchor TextProcess]
 TextProcess = _TextProcess
 
 
@@ -248,9 +252,11 @@ def _load_tools_surface() -> _ToolsSurface:
 _subprocess_module = import_module("sub" + "process")
 _PIPE = cast("int", _subprocess_module.PIPE)
 _Popen = cast("_PopenFactory", _subprocess_module.Popen)
+# [nav:anchor TimeoutExpired]
 TimeoutExpired = cast("type[TimeoutError]", _subprocess_module.TimeoutExpired)
 
 
+# [nav:anchor SubprocessTimeoutError]
 class SubprocessTimeoutError(TimeoutError):
     """Raised when subprocess exceeds configured timeout.
 
@@ -273,6 +279,7 @@ class SubprocessTimeoutError(TimeoutError):
         self.timeout_seconds = timeout_seconds
 
 
+# [nav:anchor SubprocessError]
 class SubprocessError(RuntimeError):
     """Raised when subprocess execution fails.
 
@@ -295,6 +302,7 @@ class SubprocessError(RuntimeError):
         self.stderr = stderr
 
 
+# [nav:anchor run_subprocess]
 def run_subprocess(
     cmd: list[str],
     *,
@@ -423,6 +431,7 @@ def _is_timeout_error(error: _ToolExecutionErrorSurface) -> bool:
     return "timed out" in str(error)
 
 
+# [nav:anchor spawn_text_process]
 def spawn_text_process(
     command: Sequence[str],
     *,
@@ -483,3 +492,4 @@ __all__ = [
     "run_subprocess",
     "spawn_text_process",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

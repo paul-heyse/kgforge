@@ -4,42 +4,19 @@ This module bundles cli logic for the kgfoundry stack. It groups related helpers
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
-
 import typer
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
-__all__ = ["harvest"]
+__all__ = [
+    "harvest",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "download.cli",
-    "synopsis": "Command-line entrypoints for bulk download orchestration",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@download",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        "harvest": {
-            "owner": "@download",
-            "stability": "experimental",
-            "since": "0.2.0",
-        },
-    },
-}
 
 app = typer.Typer(help="Downloader & harvester CLI (skeleton).")
 

@@ -27,7 +27,12 @@
     "site/**",
     "faiss/**",
     "src/kgfoundry.egg-info/**",
-    "kgfoundry.egg-info/**"
+    "kgfoundry.egg-info/**",
+    "codeintel/ts_languages/**"
+  ],
+
+  "ignore": [
+    "codeintel/ts_languages/**"
   ],
 
   // Ensure the src/ layout resolves imports everywhere (tools/, tests/)

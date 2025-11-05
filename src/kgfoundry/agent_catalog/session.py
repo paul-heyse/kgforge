@@ -12,6 +12,7 @@ The server reports errors using RFC 9457 Problem Details payloads. For example::
 This module surfaces those errors via :class:`CatalogSessionError` while providing a
 high-level API for invoking catalog operations.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -22,6 +23,7 @@ from typing import TYPE_CHECKING, Self, cast
 
 from kgfoundry_common.errors import CatalogSessionError
 from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.problem_details import JsonValue
 from kgfoundry_common.subprocess_utils import TimeoutExpired, spawn_text_process
 
@@ -32,6 +34,7 @@ if TYPE_CHECKING:
 
     from kgfoundry_common.subprocess_utils import TextProcess
 
+# [nav:anchor JsonObject]
 JsonObject = dict[str, JsonValue]
 
 logger = get_logger(__name__)
@@ -41,6 +44,7 @@ _MIN_STATUS_CODE = 100
 _MAX_STATUS_CODE = 599
 
 
+# [nav:anchor CatalogSession]
 class CatalogSession:
     """Maintain a JSON-RPC session with ``catalogctl-mcp``.
 
@@ -657,4 +661,10 @@ class CatalogSession:
         self.close()
 
 
-__all__ = ["CatalogSession", "CatalogSessionError", "JsonObject", "JsonValue"]
+__all__ = [
+    "CatalogSession",
+    "CatalogSessionError",
+    "JsonObject",
+    "JsonValue",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

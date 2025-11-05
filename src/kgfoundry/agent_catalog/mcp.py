@@ -1,4 +1,5 @@
 """Stdio server implementing the Model Context Protocol for the Agent Catalog."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -22,6 +23,7 @@ from kgfoundry_common.logging import (
     set_correlation_id,
     with_fields,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.problem_details import JsonValue
 from search_api.service import search_service
@@ -65,6 +67,7 @@ class RequestContext:
     request_id: JsonValue | None
 
 
+# [nav:anchor CatalogSessionServerError]
 class CatalogSessionServerError(RuntimeError):
     """Raised when a JSON-RPC request cannot be fulfilled.
 
@@ -145,6 +148,7 @@ class CatalogSessionServerError(RuntimeError):
 Handler = Callable[[JsonObject, RequestContext], JsonValue]
 
 
+# [nav:anchor CatalogSessionServer]
 class CatalogSessionServer:
     """Minimal JSON-RPC server speaking over stdin/stdout.
 
@@ -907,6 +911,7 @@ def _resolve_role(value: str) -> Role:
         raise ValueError(message) from exc
 
 
+# [nav:anchor build_parser]
 def build_parser() -> argparse.ArgumentParser:
     """Return an argument parser for the stdio server.
 
@@ -953,6 +958,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+# [nav:anchor main]
 def main(argv: list[str] | None = None) -> int:
     """Run the stdio session server.
 
@@ -995,8 +1001,15 @@ def main(argv: list[str] | None = None) -> int:
     access = AccessController(role=role, enabled=hosted_mode)
     audit_log_path = cast("Path", args.audit_log)
     audit_logger = AuditLogger(audit_log_path, enabled=access.enabled)
+
     server = CatalogSessionServer(client, access=access, audit=audit_logger)
     return server.serve()
 
 
-__all__ = ["CatalogSessionServer", "CatalogSessionServerError", "build_parser", "main"]
+__all__ = [
+    "CatalogSessionServer",
+    "CatalogSessionServerError",
+    "build_parser",
+    "main",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

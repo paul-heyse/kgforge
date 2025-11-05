@@ -67,7 +67,7 @@ dependencies = [
     # ============================================================================
     # CLI & User Experience
     # ============================================================================
-    "typer>=0.19.2",
+    "typer<0.20.0",
     "rich",
     "tqdm>=4.67.1",
     "black[jupyter]>=25.9.0",
@@ -439,9 +439,7 @@ dependencies = [
     "mkdocs-llmstxt",
     "jpype1>=1.6.0",
     "myst-parser",
-    "faiss-cpu",
     "pytest-asyncio>=1.2.0",
-    "pip-audit>=2.9.0",
     "pytestarch>=4.0.1",
     "build>=1.2.2",
     "prometheus-client>=0.23.1",
@@ -460,6 +458,27 @@ dependencies = [
     "tree-sitter-yaml",
     "tree-sitter-toml",
     "tree-sitter-markdown",
+    "griffe-inherited-docstrings>=1.1.2",
+    "griffe-typingdoc>=0.3.0",
+    "griffe-pydantic>=1.1.8",
+    "griffe-fieldz>=0.3.0",
+    "griffe-public-wildcard-imports>=0.2.1",
+    "click>=8.3.0",
+    "cyclonedx-python-lib>=11.5.0",
+    "mkdocstrings-python>=1.18.2",
+    "mkdocs-autorefs>=1.4.3",
+    "mkdocs-d2-plugin>=1.6.0",
+    "mkdocs-redoc-tag>=0.2.0",
+    "mkdocs-redirects>=1.2.2",
+    "mkdocs-minify-plugin>=0.8.0",
+    "mkdocs-git-revision-date-localized-plugin>=1.5.0",
+    "mkdocs-glightbox>=0.5.2",
+    "mkdocs-mermaid2-plugin>=1.2.3",
+    "mkdocs-puml>=2.1.0",
+    "mkdocs-awesome-nav>=3.2.0",
+    "mkdocs-include-markdown-plugin>=7.2.0",
+    "mkdocs-macros-plugin>=1.4.1",
+    "mkdocs-monorepo-plugin>=1.1.2",
 ]
 
 [project.scripts]
@@ -525,16 +544,15 @@ gpu = [
     "torch",
     "torchvision",
     "torchaudio",
-    "flashinfer-cubin",
     "apache-tvm-ffi",
     "flashinfer-python",
     "compressed-tensors",
     "accelerate",
     "easyocr",
-    "libcuvs-cu13",
-    "libraft-cu13",
-    "librmm-cu13",
-    "cuvs-cu13",
+    "libcuvs-cu13==25.10.0",
+    "libraft-cu13==25.10.0",
+    "librmm-cu13==25.10.0",
+    "cuvs-cu13==25.10.0",
     "docling",
     "docling-ibm-models",
     "openai",
@@ -548,11 +566,12 @@ gpu = [
     "xgrammar",
     "safetensors",
     "triton",
+    "cupy-cuda13x>=13.6.0",
     "triton-kernels @git+https://github.com/triton-lang/triton.git@v3.5.0#subdirectory=python/triton_kernels",
-    "xformers",
-    "vllm==0.11.0",
+    "vllm",
     "faiss==1.12.0 ; python_version >= '3.13' and python_version < '3.14' and platform_system == 'Linux' and platform_machine == 'x86_64'",
     "ray",
+    "huggingface-hub",
 ]
 
 
@@ -587,6 +606,7 @@ extend-exclude = [
     "src/kgfoundry.egg-info/**",
     "kgfoundry.egg-info/**",
     "faiss/**",
+    "codeintel/ts_languages/**",
 ]
 
 [tool.ruff.format]
@@ -824,14 +844,15 @@ testpaths = ["tests"]
 
 # Tell uv that vllm should come ONLY from the vllm-nightly index.
 [tool.uv.sources]
-#vllm = { index = "vllm-nightly" }
+vllm = { index = "wheelhouse" }
 faiss = { index = "wheelhouse" }
-#xformers = { index = "wheelhouse" }
+xformers = { index = "wheelhouse" }
 
 # point torch packages to the *named* PyTorch cu130 index
-torch = [       { index = "pytorch-cu129" } ]
-torchvision = [ { index = "pytorch-cu129" } ]
-torchaudio = [  { index = "pytorch-cu129" } ]
+torch = [       { index = "pytorch-cu130" } ]
+torchvision = [ { index = "pytorch-cu130" } ]
+torchaudio = [  { index = "pytorch-cu130" } ]
+
 
 
 # Define named indexes uv can use.
@@ -858,8 +879,8 @@ explicit = true
 
 # NEW — define the cu130 index *by name*, then reference it above
 [[tool.uv.index]]
-name = "pytorch-cu129"
-url  = "https://download.pytorch.org/whl/cu129"
+name = "pytorch-cu130"
+url  = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 
@@ -867,6 +888,12 @@ explicit = true
 # Allow pre-releases in resolution so uv can select dev/nightly builds of vLLM.
 # (Default behavior is "if-necessary-or-explicit"; "allow" is simplest here.)
 prerelease = "allow"
+
+override-dependencies = [
+  "xformers @ file:///home/paul/wheelhouse/xformers-0.0.33+5d4b92a5.d20251029-*.whl"
+]
+
+
 
 
 [tool.uv.pip]

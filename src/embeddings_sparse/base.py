@@ -4,47 +4,23 @@ This module bundles base logic for the kgfoundry stack. It groups related helper
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Protocol
+from typing import TYPE_CHECKING, Protocol
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
 
-    from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["SparseEncoder", "SparseIndex"]
-
-__navmap__: Final[NavMap] = {
-    "title": "embeddings_sparse.base",
-    "synopsis": "Protocols for sparse embedding encoders and indices",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@embeddings",
-        "stability": "beta",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "SparseEncoder": {
-            "owner": "@embeddings",
-            "stability": "beta",
-            "since": "0.1.0",
-        },
-        "SparseIndex": {
-            "owner": "@embeddings",
-            "stability": "beta",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "SparseEncoder",
+    "SparseIndex",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor SparseEncoder]

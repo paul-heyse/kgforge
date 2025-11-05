@@ -4,17 +4,19 @@ This module bundles parquet io logic for the kgfoundry stack. It groups related 
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, NotRequired, TypedDict
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from kgfoundry_common.errors import DeserializationError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -22,7 +24,6 @@ if TYPE_CHECKING:
 
     from pandas import DataFrame
 
-    from kgfoundry_common.navmap_types import NavMap
 else:
     DataFrame = Any
 
@@ -41,59 +42,10 @@ __all__ = [
     "read_table_to_dataframe",
     "validate_table_schema",
 ]
-
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.parquet_io",
-    "synopsis": "Utilities for writing embedding vectors and chunks to Parquet",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": [
-                "ParquetVectorWriter",
-                "ParquetChunkWriter",
-                "read_table",
-                "read_table_to_dataframe",
-                "validate_table_schema",
-            ],
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "ParquetVectorWriter": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "ParquetChunkWriter": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "read_table": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "read_table_to_dataframe": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "validate_table_schema": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-    },
-}
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
+# [nav:anchor ChunkDocTags]
 class ChunkDocTags(TypedDict, total=False):
     """Structured metadata describing a chunk's doctags span."""
 
@@ -102,6 +54,7 @@ class ChunkDocTags(TypedDict, total=False):
     end: int
 
 
+# [nav:anchor ChunkRow]
 class ChunkRow(TypedDict, total=False):
     """Row expected by :class:`ParquetChunkWriter`."""
 
@@ -133,6 +86,11 @@ class ParquetVectorWriter:
     root : str
         Root directory path for Parquet output. Vectors will be written to
         subdirectories partitioned by model, run_id, and shard.
+
+    Raises
+    ------
+    ImportError
+        If pandas is not installed.
 
     Notes
     -----
@@ -556,17 +514,12 @@ def read_table_to_dataframe(
     ------
     ImportError
         If pandas is not installed.
-    FileNotFoundError
-        If the Parquet file or directory does not exist (propagated from
-        read_table).
-    DeserializationError
-        If schema validation fails (propagated from read_table).
 
     Notes
     -----
     This function wraps :func:`read_table` and converts the result to a pandas
-    DataFrame. Schema validation errors are propagated from the underlying
-    read_table call.
+    DataFrame. Schema validation or file-related errors raised by
+    :func:`read_table` propagate unchanged.
 
     Examples
     --------

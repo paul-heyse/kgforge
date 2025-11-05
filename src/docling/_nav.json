@@ -1,0 +1,41 @@
+{
+  "exports": [
+    "canonicalizer",
+    "hybrid",
+    "vlm"
+  ],
+  "module_meta": {
+    "owner": "@docling",
+    "since": "0.1.0",
+    "stability": "experimental"
+  },
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "canonicalizer",
+        "hybrid",
+        "vlm"
+      ]
+    }
+  ],
+  "symbols": {
+    "canonicalizer": {
+      "owner": "@docling",
+      "since": "0.1.0",
+      "stability": "beta"
+    },
+    "hybrid": {
+      "owner": "@docling",
+      "since": "0.1.0",
+      "stability": "beta"
+    },
+    "vlm": {
+      "owner": "@docling",
+      "since": "0.1.0",
+      "stability": "experimental"
+    }
+  },
+  "synopsis": "Public surface for docling preprocessing utilities",
+  "title": "docling"
+}

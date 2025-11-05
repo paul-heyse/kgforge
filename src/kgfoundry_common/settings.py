@@ -11,19 +11,18 @@ Examples
 >>> settings = RuntimeSettings()  # Raises ConfigurationError if required vars missing
 >>> assert settings.search_api_url is not None
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, cast
+from typing import Any, cast
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from kgfoundry_common.errors import SettingsError
 from kgfoundry_common.logging import get_logger
-
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 __all__ = [
     "FaissConfig",
@@ -34,36 +33,12 @@ __all__ = [
     "SparseEmbeddingConfig",
     "load_settings",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 logger = get_logger(__name__)
 
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.settings",
-    "synopsis": "Typed runtime configuration with fail-fast validation",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
 
-
+# [nav:anchor SearchConfig]
 class SearchConfig(BaseSettings):
     """Configuration for the hybrid search service (``KGFOUNDRY_SEARCH_*``)."""
 
@@ -91,6 +66,7 @@ class SearchConfig(BaseSettings):
     )
 
 
+# [nav:anchor ObservabilityConfig]
 class ObservabilityConfig(BaseSettings):
     """Logging and telemetry toggles (``KGFOUNDRY_*`` namespace)."""
 
@@ -104,6 +80,7 @@ class ObservabilityConfig(BaseSettings):
     metrics_port: int = Field(default=9090, description="Port for Prometheus metrics endpoint")
 
 
+# [nav:anchor SparseEmbeddingConfig]
 class SparseEmbeddingConfig(BaseSettings):
     """Sparse embedding configuration (``KGFOUNDRY_SPARSE_EMBEDDING_*``)."""
 
@@ -121,6 +98,7 @@ class SparseEmbeddingConfig(BaseSettings):
     )
 
 
+# [nav:anchor FaissConfig]
 class FaissConfig(BaseSettings):
     """FAISS index configuration (``KGFOUNDRY_FAISS_*`` namespace)."""
 
@@ -137,6 +115,7 @@ class FaissConfig(BaseSettings):
     )
 
 
+# [nav:anchor RuntimeSettings]
 class RuntimeSettings(BaseSettings):
     """Aggregate runtime configuration loaded from environment variables."""
 
@@ -192,9 +171,11 @@ class RuntimeSettings(BaseSettings):
 
 
 # Type alias for backward compatibility
+# [nav:anchor KgFoundrySettings]
 KgFoundrySettings = RuntimeSettings
 
 
+# [nav:anchor load_settings]
 def load_settings(**overrides: object) -> KgFoundrySettings:
     """Load :class:`RuntimeSettings` with optional overrides.
 

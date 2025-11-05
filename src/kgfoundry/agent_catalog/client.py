@@ -1,4 +1,5 @@
 """High-level client for querying the Agent Catalog."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ from kgfoundry.agent_catalog import search as catalog_search
 from kgfoundry.agent_catalog.models import (
     load_catalog_model,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -111,10 +113,12 @@ DEFAULT_EDITOR_TEMPLATE = "vscode://file/{path}:{line}"
 DEFAULT_GITHUB_TEMPLATE = "https://github.com/{org}/{repo}/blob/{sha}/{path}#L{line}"
 
 
+# [nav:anchor AgentCatalogClientError]
 class AgentCatalogClientError(RuntimeError):
     """Exception raised for Agent Catalog client errors."""
 
 
+# [nav:anchor AgentCatalogClient]
 class AgentCatalogClient:
     """Typed client for interacting with the Agent Catalog.
 
@@ -479,6 +483,7 @@ __all__ = [
     "AgentCatalogClient",
     "AgentCatalogClientError",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 def _module_name_from_qname(qname: str) -> str:

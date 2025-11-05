@@ -12,10 +12,11 @@ Examples
 ...     details = e.to_problem_details(instance="/api/search")
 ...     assert details["type"] == "https://kgfoundry.dev/problems/runtime-error"
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, NoReturn, Protocol, cast
+from typing import NoReturn, Protocol, cast
 
 from kgfoundry_common.errors.codes import BASE_TYPE_URI, ErrorCode, get_type_uri
 from kgfoundry_common.errors.exceptions import (
@@ -49,9 +50,11 @@ from kgfoundry_common.errors.exceptions import (
     UnsupportedMIMEError,
     VectorSearchError,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+NavMap = _NavMap
+
 
 # Structural protocols for optional FastAPI integration. We keep the
 # expectations minimal so the package does not need FastAPI installed for
@@ -191,6 +194,7 @@ else:
     )
 
 
+# [nav:anchor problem_details_response]
 def problem_details_response(
     error: KgFoundryError,
     request: RequestProtocol | None = None,
@@ -218,6 +222,7 @@ def problem_details_response(
     return _problem_details_response(error, request)
 
 
+# [nav:anchor register_problem_details_handler]
 def register_problem_details_handler(app: FastAPIProtocol) -> None:
     """Register the KgFoundry Problem Details handler on a FastAPI app."""
     _register_problem_details_handler(app)
@@ -243,6 +248,7 @@ __all__ = [
     "IndexBuildError",
     "KgFoundryError",
     "LinkerCalibrationError",
+    "NavMap",
     "Neo4jError",
     "OCRTimeoutError",
     "OntologyParseError",
@@ -259,29 +265,4 @@ __all__ = [
     "problem_details_response",
     "register_problem_details_handler",
 ]
-
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.errors",
-    "synopsis": "Exception hierarchy and Problem Details support",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

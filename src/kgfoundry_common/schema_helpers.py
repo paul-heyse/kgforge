@@ -11,6 +11,7 @@ Examples
 >>> example_path = Path("schema/examples/models/doc.v1.json")
 >>> assert_model_roundtrip(Doc, example_path)
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -28,6 +29,7 @@ from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -38,11 +40,19 @@ if TYPE_CHECKING:
 else:
     from typing import cast
 
-__all__ = ["assert_model_roundtrip", "load_schema", "validate_model_against_schema"]
+
+__all__ = [
+    "assert_model_roundtrip",
+    "load_schema",
+    "validate_model_against_schema",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 logger = get_logger(__name__)
 
 
+# [nav:anchor load_schema]
 def load_schema(schema_path: Path) -> dict[str, JsonValue]:
     """Load and parse a JSON Schema file.
 
@@ -93,6 +103,7 @@ def load_schema(schema_path: Path) -> dict[str, JsonValue]:
     return schema_obj
 
 
+# [nav:anchor validate_model_against_schema]
 def validate_model_against_schema(
     model_instance: BaseModel,
     schema: dict[str, JsonValue],
@@ -136,6 +147,7 @@ def validate_model_against_schema(
         raise SerializationError(msg) from exc
 
 
+# [nav:anchor assert_model_roundtrip]
 def assert_model_roundtrip(
     model_cls: type[BaseModel],
     example_path: Path,

@@ -24,6 +24,7 @@ See Also
 - `schema/models/search_request.v1.json` - SearchRequest JSON Schema
 - `schema/models/search_result.v1.json` - SearchResult JSON Schema
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -54,6 +55,7 @@ from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.schema_helpers import load_schema
 from kgfoundry_common.settings import RuntimeSettings
@@ -77,7 +79,6 @@ if TYPE_CHECKING:
     from kgfoundry_common.jsonschema_utils import (
         ValidationErrorProtocol,
     )
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
     from search_api.schemas import SearchRequest
 
@@ -90,40 +91,8 @@ __all__ = [
     "healthz",
     "search",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "search_api.app",
-    "synopsis": "FastAPI endpoints for hybrid search with FAISS, BM25, and SPLADE",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": [
-                "app",
-                "search",
-                "graph_concepts",
-                "healthz",
-                "auth",
-                "CorrelationIDMiddleware",
-                "ResponseValidationMiddleware",
-            ],
-        }
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
 
 logger = get_logger(__name__)
 metrics = MetricsProvider.default()
@@ -135,6 +104,7 @@ AuthorizationHeader = Annotated[str | None, Header(default=None)]
 
 API_KEYS: set[str] = set()  # NOTE: load from env SEARCH_API_KEYS when secrets wiring is ready
 
+# [nav:anchor app]
 app = FastAPI(title="kgfoundry Search API", version="0.2.0")
 
 # Register Problem Details exception handler
@@ -142,6 +112,7 @@ register_problem_details_handler(app)
 
 
 # Correlation ID middleware
+# [nav:anchor CorrelationIDMiddleware]
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
     """Middleware to extract and set correlation ID from X-Correlation-ID header.
 
@@ -194,6 +165,7 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
 
 
 # Response validation middleware
+# [nav:anchor ResponseValidationMiddleware]
 class ResponseValidationMiddleware(BaseHTTPMiddleware):
     """Middleware to validate JSON responses against schema (dev/staging only).
 

@@ -10,6 +10,7 @@ Examples
 >>> logger = get_logger(__name__)
 >>> logger.info("Operation started", extra={"operation": "search", "status": "started"})
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -20,12 +21,14 @@ import sys
 import time
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, replace
-from typing import TYPE_CHECKING, Any, Final, Protocol, Self, cast, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, Self, cast, runtime_checkable
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
+
+# [nav:anchor FormatterType]
 FormatterType: type[logging.Formatter] = logging.Formatter
 
 if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.types import JsonValue
 
 __all__ = [
@@ -43,35 +46,11 @@ __all__ = [
     "setup_logging",
     "with_fields",
 ]
-
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.logging",
-    "synopsis": "Structured logging helpers with correlation IDs and observability",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 @runtime_checkable
+# [nav:anchor LoggingCache]
 class LoggingCache(Protocol):
     """Protocol for logging cache implementations.
 
@@ -114,6 +93,7 @@ class LoggingCache(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor LogContextExtra]
 class LogContextExtra:
     """Immutable logging context with required and optional structured fields.
 
@@ -242,6 +222,7 @@ _correlation_id: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 )
 
 
+# [nav:anchor JsonFormatter]
 class JsonFormatter(logging.Formatter):
     """JSON formatter for structured logging.
 
@@ -383,6 +364,7 @@ else:
     _LoggerAdapterBase = logging.LoggerAdapter
 
 
+# [nav:anchor LoggerAdapter]
 class LoggerAdapter(_LoggerAdapterBase):
     """Logger adapter that injects structured context fields.
 
@@ -777,6 +759,7 @@ class LoggerAdapter(_LoggerAdapterBase):
         self.info(message, extra=extra)
 
 
+# [nav:anchor get_logger]
 def get_logger(name: str) -> LoggerAdapter:
     """Get a logger adapter with structured logging support.
 
@@ -811,6 +794,7 @@ def get_logger(name: str) -> LoggerAdapter:
     return LoggerAdapter(logger, {})
 
 
+# [nav:anchor setup_logging]
 def setup_logging(level: int = logging.INFO) -> None:
     """Configure root logger with JSON formatter.
 
@@ -835,6 +819,7 @@ def setup_logging(level: int = logging.INFO) -> None:
     logging.basicConfig(level=level, handlers=[handler], force=True)
 
 
+# [nav:anchor set_correlation_id]
 def set_correlation_id(correlation_id: str | None) -> None:
     """Set correlation ID in context for async propagation.
 
@@ -868,6 +853,7 @@ def set_correlation_id(correlation_id: str | None) -> None:
     _correlation_id.set(correlation_id)
 
 
+# [nav:anchor get_correlation_id]
 def get_correlation_id() -> str | None:
     """Get current correlation ID from context.
 
@@ -890,6 +876,7 @@ def get_correlation_id() -> str | None:
     return _correlation_id.get()
 
 
+# [nav:anchor CorrelationContext]
 class CorrelationContext:
     """Context manager for correlation ID propagation using contextvars.
 
@@ -1025,6 +1012,7 @@ class _WithFieldsContext(AbstractContextManager[LoggerAdapter]):
         return None
 
 
+# [nav:anchor with_fields]
 def with_fields(
     logger: logging.Logger | LoggerAdapter,
     **fields: object,
@@ -1063,6 +1051,7 @@ def with_fields(
     return _WithFieldsContext(logger, fields)
 
 
+# [nav:anchor measure_duration]
 def measure_duration() -> tuple[float, float]:
     """Get current monotonic time for measuring operation duration.
 
@@ -1117,6 +1106,7 @@ class _DefaultLoggingCache:
 _logging_cache: _DefaultLoggingCache = _DefaultLoggingCache()
 
 
+# [nav:anchor get_logging_cache]
 def get_logging_cache() -> LoggingCache:
     """Get the global logging cache instance.
 

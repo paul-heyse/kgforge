@@ -7,9 +7,9 @@ Overview of observability.
 
 ## Modules
 
-- **`observability.metrics`** — Prometheus metrics shared across observability surfaces. → [open](vscode://file//home/paul/kgfoundry/src/observability/metrics.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/observability/metrics.py#L1)
+- **`observability.metrics`** — Prometheus metrics shared across observability surfaces. → [open](vscode://file//home/paul/kgfoundry/src/observability/metrics.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/observability/metrics.py#L1)
 
 ## Classes
 
-- **`observability.NavMap`** — Describe NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:82:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/kgfoundry_common/navmap_types.py#L82-L102)
-<!-- agent:readme v1 sha:c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae content:a9db7c9750f5 -->
+- **`observability.NavMap`** — Navigation map metadata structure. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:126:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry_common/navmap_types.py#L126-L172)
+<!-- agent:readme v1 sha:18158918ad31c841b72a8a8cd247c7cb82793385 content:3d72e1a007d4 -->

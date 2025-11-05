@@ -6,6 +6,7 @@ untyped entry points (e.g. :class:`Draft202012Validator`,
 :func:`jsonschema.validate`), so we wrap them with Protocol-based casts and
 re-export the typed surfaces for internal use.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -16,10 +17,13 @@ from jsonschema.exceptions import SchemaError as _SchemaError
 from jsonschema.exceptions import ValidationError as _ValidationError
 from jsonschema.validators import Draft202012Validator as _Draft202012Validator
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
+
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
 
 
+# [nav:anchor ValidationErrorProtocol]
 class ValidationErrorProtocol(Protocol):
     """Typed view over ``jsonschema.exceptions.ValidationError`` instances."""
 
@@ -28,6 +32,7 @@ class ValidationErrorProtocol(Protocol):
     path: Sequence[object]
 
 
+# [nav:anchor Draft202012ValidatorProtocol]
 class Draft202012ValidatorProtocol(Protocol):
     """Typed facade for :class:`jsonschema.validators.Draft202012Validator`."""
 
@@ -49,11 +54,15 @@ class Draft202012ValidatorProtocol(Protocol):
         ...
 
 
+# [nav:anchor Draft202012Validator]
 Draft202012Validator = cast("type[Draft202012ValidatorProtocol]", _Draft202012Validator)
+# [nav:anchor SchemaError]
 SchemaError = cast("type[Exception]", _SchemaError)
+# [nav:anchor ValidationError]
 ValidationError = cast("type[Exception]", _ValidationError)
 
 
+# [nav:anchor validate]
 def validate(instance: object, schema: Mapping[str, object]) -> None:
     """Validate ``instance`` against ``schema`` using jsonschema."""
     _jsonschema_validate(instance=instance, schema=schema)
@@ -68,8 +77,10 @@ __all__ = [
     "create_draft202012_validator",
     "validate",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
+# [nav:anchor create_draft202012_validator]
 def create_draft202012_validator(
     schema: Mapping[str, object],
 ) -> Draft202012ValidatorProtocol:

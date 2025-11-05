@@ -4,40 +4,16 @@ This module bundles fusion logic for the kgfoundry stack. It groups related help
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
-
-__all__ = ["rrf_fuse"]
-
-__navmap__: Final[NavMap] = {
-    "title": "search_api.fusion",
-    "synopsis": "Reciprocal rank fusion helpers for combining retrieval signals",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        "rrf_fuse": {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        },
-    },
-}
+__all__ = [
+    "rrf_fuse",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor rrf_fuse]

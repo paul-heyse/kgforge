@@ -1,56 +1,23 @@
-"""Overview of docling.
-
-This module bundles docling logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
-"""
+"""Expose docling pipelines and navigation metadata for documentation ingestion."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from docling import canonicalizer, hybrid, vlm
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+NavMap = _NavMap
 
-__all__ = ["canonicalizer", "hybrid", "vlm"]
+__all__ = [
+    "NavMap",
+    "canonicalizer",
+    "hybrid",
+    "vlm",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: NavMap = {
-    "title": "docling",
-    "synopsis": "Public surface for docling preprocessing utilities",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@docling",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "canonicalizer": {
-            "stability": "beta",
-            "owner": "@docling",
-            "since": "0.1.0",
-        },
-        "hybrid": {
-            "stability": "beta",
-            "owner": "@docling",
-            "since": "0.1.0",
-        },
-        "vlm": {
-            "stability": "experimental",
-            "owner": "@docling",
-            "since": "0.1.0",
-        },
-    },
-}
 
+# [nav:section public-api]
 # [nav:anchor canonicalizer]
 # [nav:anchor hybrid]
 # [nav:anchor vlm]

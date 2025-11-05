@@ -4,41 +4,20 @@ This module bundles kg mock logic for the kgfoundry stack. It groups related hel
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, TypedDict
+from typing import Final, TypedDict
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
-__all__ = ["detect_query_concepts", "kg_boost", "linked_concepts_for_text"]
-
-__navmap__: Final[NavMap] = {
-    "title": "search_api.kg_mock",
-    "synopsis": "Mock knowledge graph helpers used by the search API",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
+__all__ = [
+    "detect_query_concepts",
+    "kg_boost",
+    "linked_concepts_for_text",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 class ConceptMeta(TypedDict):

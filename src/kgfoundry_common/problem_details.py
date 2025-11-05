@@ -18,6 +18,7 @@ Examples
 >>> json_str = render_problem(problem)
 >>> assert "tool-failure" in json_str
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -36,6 +37,7 @@ from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.types import JsonPrimitive, JsonValue
 
 if TYPE_CHECKING:
@@ -45,7 +47,9 @@ if TYPE_CHECKING:
         ValidationErrorProtocol,
     )
 
+# [nav:anchor JsonObject]
 JsonObject = dict[str, JsonValue]
+# [nav:anchor ProblemDetailsDict]
 ProblemDetailsDict = dict[str, JsonValue]
 
 # JSON Schema type for cached schema objects
@@ -67,13 +71,14 @@ __all__ = [
     "render_problem",
     "validate_problem_details",
 ]
-
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 logger = get_logger(__name__)
 
 # Path to canonical Problem Details schema
 _SCHEMA_PATH = Path(__file__).parent.parent.parent / "schema" / "common" / "problem_details.json"
 
 
+# [nav:anchor ProblemDetails]
 class ProblemDetails(TypedDict, total=False):
     """TypedDict for RFC 9457 Problem Details responses.
 
@@ -91,6 +96,7 @@ class ProblemDetails(TypedDict, total=False):
 
 
 @dataclass(slots=True)
+# [nav:anchor ProblemDetailsParams]
 class ProblemDetailsParams:
     """Parameters used to construct a Problem Details payload."""
 
@@ -104,6 +110,7 @@ class ProblemDetailsParams:
 
 
 @dataclass(slots=True)
+# [nav:anchor ExceptionProblemDetailsParams]
 class ExceptionProblemDetailsParams:
     """Parameters describing an exception converted to Problem Details."""
 
@@ -111,6 +118,7 @@ class ExceptionProblemDetailsParams:
     base: ProblemDetailsParams
 
 
+# [nav:anchor ProblemDetailsValidationError]
 class ProblemDetailsValidationError(Exception):
     """Raised when Problem Details payload fails schema validation.
 
@@ -212,6 +220,7 @@ def _load_schema() -> JsonSchema:
     return schema
 
 
+# [nav:anchor validate_problem_details]
 def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:
     """Validate Problem Details payload against canonical schema.
 
@@ -364,6 +373,7 @@ def build_problem_details(
 ) -> ProblemDetails: ...
 
 
+# [nav:anchor build_problem_details]
 def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
     """Build an RFC 9457 Problem Details payload.
 
@@ -389,16 +399,11 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
         schema. Contains required fields: type, title, status, detail, instance.
         May include optional fields: code, extensions.
 
-    Raises
-    ------
-    ProblemDetailsValidationError
-        If the constructed payload fails schema validation.
-
     Notes
     -----
     The function performs runtime type coercion and validation before
-    constructing the payload. All fields are validated against the schema
-    before return.
+    constructing the payload. Schema validation errors raised by
+    :func:`validate_problem_details` propagate unchanged.
 
     Examples
     --------
@@ -449,6 +454,7 @@ def problem_from_exception(
 ) -> ProblemDetails: ...
 
 
+# [nav:anchor problem_from_exception]
 def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
     """Build Problem Details from an exception.
 
@@ -475,17 +481,13 @@ def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
         string representation. Extensions include ``exception_type`` and
         optionally ``caused_by`` if the exception has a cause chain.
 
-    Raises
-    ------
-    ProblemDetailsValidationError
-        If the constructed payload fails schema validation.
-
     Notes
     -----
     The exception's string representation (via ``str(exc)``) is used as the
     detail field. The exception type name is added to extensions. If the
     exception has a ``__cause__`` attribute, it is included in extensions as
-    ``caused_by``.
+    ``caused_by``. Schema validation errors raised by
+    :func:`validate_problem_details` propagate unchanged.
 
     Examples
     --------
@@ -529,6 +531,7 @@ def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
     )
 
 
+# [nav:anchor build_configuration_problem]
 def build_configuration_problem(
     config_error: Exception,
 ) -> ProblemDetails:
@@ -609,6 +612,7 @@ def build_configuration_problem(
     )
 
 
+# [nav:anchor render_problem]
 def render_problem(problem: ProblemDetails | dict[str, object]) -> str:
     """Render Problem Details as JSON string.
 

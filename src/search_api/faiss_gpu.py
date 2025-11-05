@@ -4,6 +4,7 @@ This module hides optional GPU initialisation and cloning logic behind a small t
 rest of the search stack can import a single, well-typed facade. The helpers are resilient to
 missing GPU extras and fall back to CPU behaviour automatically.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.sequence_guards import (
     first_or_error,
     first_or_error_multi_device,
@@ -34,9 +36,11 @@ __all__ = [
     "configure_search_parameters",
     "detect_gpu_context",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 @dataclass(frozen=True)
+# [nav:anchor GpuContext]
 class GpuContext:
     """Container describing GPU resources associated with a FAISS module."""
 
@@ -46,6 +50,7 @@ class GpuContext:
     device_ids: tuple[int, ...]
 
 
+# [nav:anchor detect_gpu_context]
 def detect_gpu_context(
     module: FaissModuleProtocol,
     *,
@@ -91,6 +96,7 @@ def detect_gpu_context(
     return GpuContext(module=module, resources=resources, options=options, device_ids=devices)
 
 
+# [nav:anchor clone_index_to_gpu]
 def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissIndexProtocol:
     """Clone ``index`` onto GPU hardware described by ``context``.
 
@@ -160,6 +166,7 @@ def clone_index_to_gpu(index: FaissIndexProtocol, context: GpuContext) -> FaissI
         return index
 
 
+# [nav:anchor configure_search_parameters]
 def configure_search_parameters(
     module: FaissModuleProtocol,
     index: FaissIndexProtocol,

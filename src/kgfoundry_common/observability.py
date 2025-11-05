@@ -9,15 +9,17 @@ Examples
 >>> with observe_duration(provider, "search", component="search_api") as observer:
 ...     observer.success()
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Final, Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.opentelemetry_types import (
     load_trace_runtime,
 )
@@ -30,7 +32,6 @@ from kgfoundry_common.prometheus import (
 if TYPE_CHECKING:
     from collections.abc import Iterator, Mapping
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.opentelemetry_types import (
         StatusCodeProtocol,
         TraceRuntime,
@@ -55,32 +56,8 @@ __all__ = [
     "record_operation",
     "start_span",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.observability",
-    "synopsis": "Prometheus metrics and OpenTelemetry tracing helpers",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
 
 LOGGER = get_logger(__name__)
 StatusLiteral = Literal["success", "error"]
@@ -96,6 +73,7 @@ _OBS_CACHE = _ObservabilityCache()
 
 
 @dataclass(slots=True)
+# [nav:anchor MetricsProvider]
 class MetricsProvider:
     """Provide component-level metrics for long-running operations."""
 
@@ -140,6 +118,7 @@ class MetricsProvider:
 
 
 @dataclass(slots=True)
+# [nav:anchor MetricsRegistry]
 class MetricsRegistry:
     """Expose request-level counters and histograms for HTTP surfaces."""
 
@@ -184,6 +163,7 @@ class MetricsRegistry:
         return self._registry
 
 
+# [nav:anchor get_metrics_registry]
 def get_metrics_registry() -> MetricsRegistry:
     """Return the process-wide metrics registry singleton.
 
@@ -228,6 +208,7 @@ class _DurationObserver:
 
 
 @contextmanager
+# [nav:anchor observe_duration]
 def observe_duration(
     metrics: MetricsProvider,
     operation: str,
@@ -289,6 +270,7 @@ def _finalise_observation(observer: _DurationObserver) -> None:
 
 
 @contextmanager
+# [nav:anchor record_operation]
 def record_operation(
     metrics: MetricsRegistry | None = None,
     *,
@@ -324,6 +306,7 @@ def record_operation(
 
 
 @contextmanager
+# [nav:anchor start_span]
 def start_span(
     name: str,
     attributes: Mapping[str, str | int | float | bool] | None = None,

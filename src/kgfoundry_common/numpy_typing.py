@@ -1,10 +1,13 @@
 """Typed NumPy helpers shared across vector search modules."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Final, cast
 
 import numpy as np
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     import numpy.typing as npt
@@ -19,10 +22,12 @@ else:  # pragma: no cover - runtime fallback
     IntVector = np.ndarray
     Float64Matrix = np.ndarray
 
+# [nav:anchor MIN_EPSILON]
 MIN_EPSILON: Final[float] = 1e-9
 """Lower bound used to prevent division by zero during normalisation."""
 
 
+# [nav:anchor normalize_l2]
 def normalize_l2(
     matrix: FloatMatrix,
     *,
@@ -65,6 +70,7 @@ def normalize_l2(
     return matrix_f32
 
 
+# [nav:anchor safe_argpartition]
 def safe_argpartition(values: FloatVector, k: int) -> IntVector:
     """Return indices of the smallest ``k`` values with predictable ordering.
 
@@ -98,6 +104,7 @@ def safe_argpartition(values: FloatVector, k: int) -> IntVector:
     return np.sort(partition).astype(np.int64, copy=False)
 
 
+# [nav:anchor topk_indices]
 def topk_indices(scores: FloatVector, k: int) -> IntVector:
     """Return indices of the top ``k`` scores sorted by descending score.
 
@@ -159,3 +166,4 @@ __all__ = [
     "safe_argpartition",
     "topk_indices",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

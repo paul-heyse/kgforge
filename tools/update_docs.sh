@@ -95,7 +95,7 @@ SCHEMA_DOCFACTS_PATH="docs/_build/schema_docfacts.json"
 SCHEMA_DOCFACTS_CANONICAL="schema/docs/schema_docfacts.json"
 
 # Ensure we rebuild from a clean slate.
-rm -rf docs/_build site
+rm -rf docs/_build site site-mkdocs-suite
 mkdir -p docs/_build
 
 # keep graph small
@@ -139,7 +139,29 @@ if ((status != 0)); then
       "Expected canonical schema at $SCHEMA_DOCFACTS_CANONICAL."
   else
     fail_with_code "KGF-DOC-BLD-005" "DocFacts schema synchronization failed"
-  fi
+  fiplugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            # headings / layout for "one module per page"
+            show_root_heading: false
+            show_root_toc_entry: true
+            # navigation within a module
+            group_by_category: true
+            members_order: source
+            # link to source for each object
+            show_source: true
+theme:
+  name: material
+  features:
+    - navigation.path      # breadcrumbs
+    - toc.integrate        # TOC in sidebar (don’t combine with navigation.indexes)
+    - navigation.instant   # snappy SPA-style page changes
+    - navigation.top       # “back to top” button
+    - navigation.footer    # prev/next links
 fi
 complete_stage "KGF-DOC-BLD-005"
 
@@ -185,6 +207,12 @@ if [[ -n "$PACKAGE_NAME" && -d "src/$PACKAGE_NAME" ]] && uv run which doctoc >/d
   fi
 fi
 complete_stage "KGF-DOC-BLD-015"
+
+announce_stage "KGF-DOC-BLD-009" "Compiling Python sources"
+if ! uv_run python -m compileall -q src; then
+  fail_with_code "KGF-DOC-BLD-009" "Python source compilation failed"
+fi
+complete_stage "KGF-DOC-BLD-009"
 
 announce_stage "KGF-DOC-BLD-010" "Updating navigation map"
 if ! uv_run python tools/update_navmaps.py; then
@@ -260,6 +288,14 @@ if [[ $BUILD_MKDOCS -eq 1 ]]; then
   fi
 fi
 complete_stage "KGF-DOC-BLD-090"
+
+announce_stage "KGF-DOC-BLD-091" "Building MkDocs suite site"
+if [[ $BUILD_MKDOCS -eq 1 ]]; then
+  if ! uv_run mkdocs build --config-file tools/mkdocs_suite/mkdocs.yml --site-dir site-mkdocs-suite; then
+    fail_with_code "KGF-DOC-BLD-091" "MkDocs suite build failed"
+  fi
+fi
+complete_stage "KGF-DOC-BLD-091"
 
 announce_stage "KGF-DOC-BLD-100" "Building agent catalog artifacts"
 if ! uv_run python tools/docs/build_agent_catalog.py; then
