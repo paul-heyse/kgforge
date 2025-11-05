@@ -8,14 +8,22 @@ from typing import Final
 
 import mkdocs_gen_files
 
-
 GROUP_DEPTH_ENV_VAR: Final = "MKDOCS_D2_GROUP_DEPTH"
 DEFAULT_GROUP_DEPTH: Final = 1
 
 
 def _resolve_group_depth() -> int:
-    """Return the configured module prefix depth used for grouping diagrams."""
+    """Return the configured module prefix depth used for grouping diagrams.
 
+    Reads the ``MKDOCS_D2_GROUP_DEPTH`` environment variable to determine
+    how many module path segments should be used for grouping. Defaults to
+    1 if not set or if the value is invalid.
+
+    Returns
+    -------
+    int
+        Group depth (number of module prefix segments), always at least 1.
+    """
     value = os.environ.get(GROUP_DEPTH_ENV_VAR)
     if value is None:
         return DEFAULT_GROUP_DEPTH

@@ -23,7 +23,7 @@ def _make_parser() -> argparse.ArgumentParser:
                 help="Optional Python paths to limit processing",
             )
         configure = spec.get("configure")
-        if configure is not None:
+        if callable(configure):
             configure(subparser)
         subparser.set_defaults(func=spec["handler"])
     return parser

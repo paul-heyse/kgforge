@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import logging
 import sys
-from collections.abc import Mapping
-from dataclasses import dataclass
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import click
@@ -22,12 +23,23 @@ except (ImportError, AttributeError):  # pragma: no cover - Typer may be unavail
     typer_get_command = None  # type: ignore[assignment]
 
 
+LOGGER = logging.getLogger(__name__)
+
 AugmentPayload = dict[str, object]
 JSONMapping = Mapping[str, object]
 
-
 SCRIPT_ROOT = Path(__file__).resolve().parent
 DEFAULT_REGISTRY_PATH = SCRIPT_ROOT / "mkdocs_suite" / "api_registry.yaml"
+HTTP_METHODS: set[str] = {
+    "delete",
+    "get",
+    "head",
+    "options",
+    "patch",
+    "post",
+    "put",
+    "trace",
+}
 
 
 def import_object(path: str) -> object:
@@ -132,16 +144,16 @@ def param_schema(param: click.Parameter) -> tuple[dict[str, object], bool, str]:
     return schema, required, example_name
 
 
-def build_example(bin_name: str, tokens: list[str], params: list[click.Parameter]) -> str:
+def build_example(bin_name: str, tokens: Sequence[str], params: Sequence[click.Parameter]) -> str:
     """Construct a CLI usage example for documentation.
 
     Parameters
     ----------
     bin_name : str
         Binary/command name.
-    tokens : Iterable[str]
+    tokens : Sequence[str]
         Command tokens (subcommands).
-    params : Iterable[click.Parameter]
+    params : Sequence[click.Parameter]
         Command parameters to include in example.
 
     Returns
@@ -190,7 +202,7 @@ def walk_commands(
     return results
 
 
-def _augment_lookup(augment: AugmentPayload, op_id: str, tokens: list[str]) -> JSONMapping:
+def _augment_lookup(augment: AugmentPayload, op_id: str, tokens: Sequence[str]) -> JSONMapping:
     operations = augment.get("operations") or {}
     override = operations.get(op_id)
     if override:
@@ -218,7 +230,7 @@ def _ensure_str_list(value: object) -> list[str]:
 
 def _operation_metadata(
     interface_meta: JSONMapping | None,
-    tokens: list[str],
+    tokens: Sequence[str],
     operation_id: str,
 ) -> dict[str, object]:
     if not interface_meta:
@@ -279,7 +291,9 @@ def _initial_document(
     return document
 
 
-def _request_schema_for_command(params: list[click.Parameter]) -> tuple[dict[str, object], bool]:
+def _request_schema_for_command(
+    params: Sequence[click.Parameter],
+) -> tuple[dict[str, object], bool]:
     properties: dict[str, object] = {}
     required: list[str] = []
     for param in params:
@@ -293,40 +307,6 @@ def _request_schema_for_command(params: list[click.Parameter]) -> tuple[dict[str
     if required:
         schema["required"] = sorted(required)
     return schema, bool(properties)
-
-
-def _build_x_cli_block(
-    tokens: list[str],
-    params: list[click.Parameter],
-    op_meta: JSONMapping,
-    context: OperationContext,
-) -> dict[str, object]:
-    kebab_tokens = [snake_to_kebab(token) for token in tokens]
-    example = build_example(context.bin_name, kebab_tokens, params)
-    block: dict[str, object] = {
-        "bin": context.bin_name,
-        "command": " ".join(kebab_tokens),
-        "examples": [example],
-        "exitCodes": [{"code": 0, "meaning": "success"}],
-    }
-    if context.interface_meta:
-        block.setdefault(
-            "x-interface",
-            context.interface_meta.get("id", context.interface_id),
-        )
-    if op_meta.get("handler"):
-        block["x-handler"] = op_meta["handler"]
-    if op_meta.get("env"):
-        block["x-env"] = list(op_meta["env"])
-    if op_meta.get("code_samples"):
-        block.setdefault("x-codeSamples", []).extend(op_meta["code_samples"])
-    examples = _ensure_str_list(op_meta.get("examples"))
-    if examples:
-        block["examples"].extend(examples)
-    problem_details = _ensure_str_list(op_meta.get("problem_details"))
-    if problem_details:
-        block.setdefault("x-problemDetails", []).extend(problem_details)
-    return block
 
 
 def _apply_override_to_x_cli(block: dict[str, object], override: JSONMapping) -> None:
@@ -368,34 +348,18 @@ def _select_operation_tags(
     return [default_tag]
 
 
-def _build_operation_entry(
-    tokens: list[str],
-    command: click.core.Command,
-    context: OperationContext,
-) -> tuple[str, dict[str, object], list[str]]:
-    cli_tokens = [str(token) for token in tokens] or [command.name or "run"]
-    path = "/cli/" + "/".join(snake_to_kebab(token) for token in cli_tokens)
-    operation_id = "cli." + ".".join(cli_tokens)
-    override = _augment_lookup(context.augment, operation_id, cli_tokens)
-    op_meta = _operation_metadata(context.interface_meta, cli_tokens, operation_id)
-    tags = _select_operation_tags(override, op_meta, context.interface_meta, cli_tokens[0])
-    params = list(getattr(command, "params", []))
-    request_schema, has_properties = _request_schema_for_command(params)
-
-    help_text = (getattr(command, "help", "") or "").strip()
-    summary = str(
-        op_meta.get("summary")
-        or getattr(command, "short_help", "")
-        or (help_text.split("\n", 1)[0] if help_text else "Run CLI command")
-    ).strip()
-    description = str(op_meta.get("description") or help_text)
-
-    x_cli_block = _build_x_cli_block(cli_tokens, params, op_meta, context)
-    _apply_override_to_x_cli(x_cli_block, override)
-
-    operation: dict[str, object] = {
+def _operation_payload(
+    operation_id: str,
+    summary: str,
+    description: str,
+    request_schema: dict[str, object],
+    has_properties: bool,
+    tags: Sequence[str],
+    x_cli_block: dict[str, object],
+) -> dict[str, object]:
+    return {
         "operationId": operation_id,
-        "tags": tags,
+        "tags": list(tags),
         "summary": summary,
         "description": description,
         "x-cli": x_cli_block,
@@ -424,15 +388,151 @@ def _build_operation_entry(
         },
     }
 
-    problem_details = _collect_problem_details(op_meta, context.interface_meta, override)
+
+@dataclass(frozen=True, slots=True)
+class _OperationDescriptor:
+    """Immutable descriptor capturing command metadata for an operation."""
+
+    raw_tokens: tuple[str, ...]
+    command: click.core.Command
+    tokens: tuple[str, ...] = field(init=False)
+    params: tuple[click.Parameter, ...] = field(init=False)
+    help_text: str = field(init=False)
+    short_help: str = field(init=False)
+
+    def __post_init__(self) -> None:
+        tokens = list(self.raw_tokens) or [self.command.name or "run"]
+        object.__setattr__(self, "tokens", tuple(tokens))
+        params = tuple(getattr(self.command, "params", []))
+        object.__setattr__(self, "params", params)
+        help_text = (getattr(self.command, "help", "") or "").strip()
+        object.__setattr__(self, "help_text", help_text)
+        short_help = str(getattr(self.command, "short_help", "") or "").strip()
+        object.__setattr__(self, "short_help", short_help)
+
+    @property
+    def kebab_tokens(self) -> tuple[str, ...]:
+        return tuple(snake_to_kebab(token) for token in self.tokens)
+
+    @property
+    def path(self) -> str:
+        return "/cli/" + "/".join(snake_to_kebab(token) for token in self.tokens)
+
+    @property
+    def operation_id(self) -> str:
+        return "cli." + ".".join(self.tokens)
+
+    @property
+    def default_tag(self) -> str:
+        return self.tokens[0]
+
+    def summary(self, op_meta: JSONMapping) -> str:
+        summary_value = op_meta.get("summary") or self.short_help
+        if summary_value:
+            return str(summary_value).strip()
+        if self.help_text:
+            return self.help_text.split("\n", 1)[0]
+        return "Run CLI command"
+
+    def description(self, op_meta: JSONMapping) -> str:
+        return str(op_meta.get("description") or self.help_text)
+
+
+@dataclass(frozen=True, slots=True)
+class OperationContext:
+    """Context bundle shared across OpenAPI operation builders."""
+
+    bin_name: str
+    augment: JSONMapping
+    interface_id: str | None
+    interface_meta: JSONMapping | None
+
+    def build_operation(
+        self, tokens: Sequence[str], command: click.core.Command
+    ) -> tuple[str, dict[str, object], list[str]]:
+        descriptor = _OperationDescriptor(tuple(tokens), command)
+        override = _augment_lookup(self.augment, descriptor.operation_id, descriptor.tokens)
+        op_meta = _operation_metadata(
+            self.interface_meta, descriptor.tokens, descriptor.operation_id
+        )
+        tags = _select_operation_tags(
+            override, op_meta, self.interface_meta, descriptor.default_tag
+        )
+        params = list(descriptor.params)
+        request_schema, has_properties = _request_schema_for_command(params)
+        x_cli_block = _build_x_cli_block(descriptor, params, op_meta, self)
+        _apply_override_to_x_cli(x_cli_block, override)
+        operation = _operation_payload(
+            descriptor.operation_id,
+            descriptor.summary(op_meta),
+            descriptor.description(op_meta),
+            request_schema,
+            has_properties,
+            tags,
+            x_cli_block,
+        )
+        problem_details = _collect_problem_details(op_meta, self.interface_meta, override)
+        if problem_details:
+            operation["x-problemDetails"] = problem_details
+        interface_extension = _interface_metadata(self.interface_id, self.interface_meta)
+        if interface_extension:
+            operation["x-kgf-interface"] = interface_extension
+        return descriptor.path, operation, tags
+
+
+@dataclass(frozen=True, slots=True)
+class CLIConfig:
+    """Configuration describing the CLI and metadata sources."""
+
+    bin_name: str
+    title: str
+    version: str
+    augment: JSONMapping
+    interface_id: str | None = None
+    interface_meta: JSONMapping | None = None
+
+    @property
+    def operation_context(self) -> OperationContext:
+        return OperationContext(
+            bin_name=self.bin_name,
+            augment=self.augment,
+            interface_id=self.interface_id,
+            interface_meta=self.interface_meta,
+        )
+
+
+def _build_x_cli_block(
+    descriptor: _OperationDescriptor,
+    params: Sequence[click.Parameter],
+    op_meta: JSONMapping,
+    context: OperationContext,
+) -> dict[str, object]:
+    kebab_tokens = list(descriptor.kebab_tokens)
+    example = build_example(context.bin_name, kebab_tokens, params)
+    block: dict[str, object] = {
+        "bin": context.bin_name,
+        "command": " ".join(kebab_tokens),
+        "examples": [example],
+        "exitCodes": [{"code": 0, "meaning": "success"}],
+    }
+    if context.interface_meta:
+        block.setdefault(
+            "x-interface",
+            context.interface_meta.get("id", context.interface_id),
+        )
+    if op_meta.get("handler"):
+        block["x-handler"] = op_meta["handler"]
+    if op_meta.get("env"):
+        block["x-env"] = list(op_meta["env"])
+    if op_meta.get("code_samples"):
+        block.setdefault("x-codeSamples", []).extend(op_meta["code_samples"])
+    examples = _ensure_str_list(op_meta.get("examples"))
+    if examples:
+        block["examples"].extend(examples)
+    problem_details = _ensure_str_list(op_meta.get("problem_details"))
     if problem_details:
-        operation["x-problemDetails"] = problem_details
-
-    interface_extension = _interface_metadata(context.interface_id, context.interface_meta)
-    if interface_extension:
-        operation["x-kgf-interface"] = interface_extension
-
-    return path, operation, tags
+        block.setdefault("x-problemDetails", []).extend(problem_details)
+    return block
 
 
 def _augment_document_tags(document: dict[str, object], referenced_tags: set[str]) -> None:
@@ -446,32 +546,35 @@ def _augment_document_tags(document: dict[str, object], referenced_tags: set[str
             )
 
 
-def make_openapi(
-    click_cmd: click.core.Command,
-    bin_name: str,
-    title: str,
-    version: str,
-    augment: AugmentPayload | None = None,
-    *,
-    interface_id: str | None = None,
-    interface_meta: JSONMapping | None = None,
-) -> dict[str, object]:
-    """Produce an OpenAPI 3.1 document representing the CLI."""
-    augment = augment or {}
-    context = OperationContext(
-        bin_name=bin_name,
-        augment=augment,
-        interface_id=interface_id,
-        interface_meta=interface_meta,
-    )
+def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, object]:
+    """Produce an OpenAPI 3.1 document representing the CLI.
+
+    Parameters
+    ----------
+    click_cmd : click.core.Command
+        Root click command or group to traverse.
+    config : CLIConfig
+        Configuration object containing title, version, augment metadata,
+        interface settings, and operation context.
+
+    Returns
+    -------
+    dict[str, object]
+        Complete OpenAPI 3.1 document dictionary with paths, operations,
+        tags, and extensions.
+    """
     document = _initial_document(
-        title, version, context.augment, context.interface_id, context.interface_meta
+        config.title,
+        config.version,
+        config.augment,
+        config.interface_id,
+        config.interface_meta,
     )
+    context = config.operation_context
     referenced_tags: set[str] = set()
 
     for tokens, command in walk_commands(click_cmd, []):
-        normalized_tokens = list(tokens) if tokens else [command.name or "run"]
-        path, operation, tags = _build_operation_entry(normalized_tokens, command, context)
+        path, operation, tags = context.build_operation(tokens, command)
         document.setdefault("paths", {}).setdefault(path, {})["post"] = operation
         referenced_tags.update(tags)
 
@@ -480,7 +583,7 @@ def make_openapi(
 
 
 def load_augment(path: str) -> AugmentPayload:
-    """Load optional augmentation metadata from ``path``.
+    """Load optional augmentation metadata from a YAML file.
 
     Parameters
     ----------
@@ -491,6 +594,7 @@ def load_augment(path: str) -> AugmentPayload:
     -------
     AugmentPayload
         Mapping describing additional tag metadata and operation overrides.
+        Returns an empty dictionary if the file does not exist.
 
     Raises
     ------
@@ -508,8 +612,20 @@ def load_augment(path: str) -> AugmentPayload:
         return data
 
 
-def parse_args(argv: list[str]) -> argparse.Namespace:
-    """Parse CLI arguments for the OpenAPI generator."""
+def parse_args(argv: Sequence[str]) -> argparse.Namespace:
+    """Parse CLI arguments for the OpenAPI generator.
+
+    Parameters
+    ----------
+    argv : Sequence[str]
+        Command-line arguments to parse.
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed arguments namespace containing app, bin, title, version,
+        augment, out, interface-id, and registry attributes.
+    """
     parser = argparse.ArgumentParser(description="Generate OpenAPI spec for a Typer/Click CLI.")
     parser.add_argument(
         "--app", required=True, help="Import path to Typer or Click app (pkg.mod:attr)"
@@ -540,19 +656,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return parser.parse_args(list(argv))
 
 
-@dataclass(frozen=True, slots=True)
-class OperationContext:
-    """Context bundle shared across OpenAPI operation builders."""
-
-    bin_name: str
-    augment: JSONMapping
-    interface_id: str | None
-    interface_meta: JSONMapping | None
-
-
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """Entry point for generating the CLI OpenAPI specification."""
-    args = parse_args(list(argv) if argv is not None else list(sys.argv[1:]))
+    args = parse_args(argv if argv is not None else sys.argv[1:])
 
     app_obj = import_object(args.app)
     click_cmd = to_click_command(app_obj)
@@ -564,15 +670,15 @@ def main(argv: list[str] | None = None) -> int:
     else:
         interface_meta = None
 
-    spec = make_openapi(
-        click_cmd,
-        args.bin,
-        args.title,
-        args.version,
-        augment,
+    config = CLIConfig(
+        bin_name=args.bin,
+        title=args.title,
+        version=args.version,
+        augment=augment,
         interface_id=args.interface_id,
         interface_meta=interface_meta,
     )
+    spec = make_openapi(click_cmd, config)
     output_path = Path(args.out)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as handle:

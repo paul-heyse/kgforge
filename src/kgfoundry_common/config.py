@@ -17,10 +17,10 @@ from __future__ import annotations
 import base64
 from collections.abc import Mapping
 from functools import lru_cache
-from typing import TYPE_CHECKING, Final, Literal, Self, TypedDict, cast
+from typing import TYPE_CHECKING, ClassVar, Final, Literal, Self, TypedDict, cast
 
 from pydantic import AliasChoices, Field, ValidationError, field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from kgfoundry_common.logging import get_logger
 from kgfoundry_common.navmap_loader import load_nav_metadata

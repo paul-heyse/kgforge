@@ -15,7 +15,7 @@ Examples
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, ClassVar, cast
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict

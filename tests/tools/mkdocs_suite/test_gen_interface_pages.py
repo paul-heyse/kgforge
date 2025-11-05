@@ -1,29 +1,27 @@
-"""Tests for the interface catalog generation helpers."""
-
-from __future__ import annotations
-
-import json
-import logging
 """Regression tests for MkDocs interface catalog generation."""
 
 from __future__ import annotations
 
 import importlib
 import io
-import json
 import sys
 import types
 from pathlib import Path
 
 import pytest
-
 from tools.mkdocs_suite.docs._scripts import gen_interface_pages
 
 
 @pytest.fixture(name="temporary_repo")
 def fixture_temporary_repo(tmp_path: Path) -> Path:
-    """Create a temporary repository layout for nav discovery tests."""
+    """Create a temporary repository layout for nav discovery tests.
 
+    Returns
+    -------
+    Path
+        Path to the temporary repository root directory containing test
+        navigation files.
+    """
     repo_root = tmp_path / "repo"
     (repo_root / "src" / "valid").mkdir(parents=True)
     (repo_root / "src" / "invalid").mkdir(parents=True)
@@ -41,7 +39,6 @@ def test_collect_nav_interfaces_skips_malformed_json(
     temporary_repo: Path, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Malformed nav files should be ignored without raising errors."""
-
     caplog.set_level(logging.WARNING)
     monkeypatch.setattr(gen_interface_pages, "REPO_ROOT", temporary_repo)
 
@@ -50,6 +47,7 @@ def test_collect_nav_interfaces_skips_malformed_json(
     assert any("invalid/_nav.json" in record.message for record in caplog.records)
     assert interfaces == [{"id": "valid-interface", "module": "valid"}]
 
+
 class _DummyFile(io.StringIO):
     """Collect writes made through ``mkdocs_gen_files`` stubs."""
 
@@ -57,11 +55,18 @@ class _DummyFile(io.StringIO):
         super().__init__()
         self._path = path
 
-    def __enter__(self) -> "_DummyFile":
+    def __enter__(self) -> _DummyFile:
         return self
 
     def __exit__(self, exc_type, exc, tb) -> bool:
-        """Store written content keyed by the path before closing."""
+        """Store written content keyed by the path before closing.
+
+        Returns
+        -------
+        bool
+            Always returns ``False`` to indicate exceptions should not
+            be suppressed.
+        """
         _CAPTURED_OUTPUTS[self._path] = self.getvalue()
         return False
 
@@ -84,9 +89,10 @@ def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
 
 
-def test_render_interface_catalog_links_full_module_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_render_interface_catalog_links_full_module_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Interfaces nested under packages should link using the full dotted path."""
-
     _install_mkdocs_stub(monkeypatch)
     module_name = "tools.mkdocs_suite.docs._scripts.gen_interface_pages"
     sys.modules.pop(module_name, None)

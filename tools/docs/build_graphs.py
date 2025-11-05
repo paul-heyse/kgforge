@@ -1746,9 +1746,7 @@ def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
     ------
     SharedValidationError
         If cache directory exists but is not a directory.
-    ValidationError
-        If cache directory validation fails.
-    """  # noqa: DOC502
+    """  # noqa: DOC501, DOC502
     cache_dir = resolve_path(args.cache_dir, strict=False)
     if cache_dir.exists() and not cache_dir.is_dir():
         message = f"Cache directory '{cache_dir}' must be a directory"
@@ -1895,9 +1893,7 @@ def _load_layers_config(path: str) -> LayerConfig:
     ------
     SharedValidationError
         If config file is invalid or missing.
-    ValidationError
-        If config file validation fails.
-    """  # noqa: DOC502
+    """  # noqa: DOC501, DOC502
     file_path = resolve_path(path, strict=False)
     if yaml is None:
         return {"order": [], "packages": {}, "rules": {}}
@@ -1935,9 +1931,7 @@ def _load_allowlist(path: str) -> dict[str, object]:
     ------
     SharedValidationError
         If allowlist file is invalid.
-    ValidationError
-        If allowlist file validation fails.
-    """  # noqa: DOC502
+    """  # noqa: DOC501, DOC502
     file_path = resolve_path(path, strict=False)
     if not file_path.exists():
         LOGGER.warning("Allowlist '%s' does not exist; continuing with empty allowlist", file_path)
