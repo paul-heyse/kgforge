@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Final
 
 import mkdocs_gen_files
 import yaml
@@ -30,10 +31,22 @@ def _operation_anchor(operation_id: str) -> str:
     return f"../{REDOC_PAGE}#operation/{operation_id}"
 
 
+HTTP_METHODS: Final[set[str]] = {
+    "delete",
+    "get",
+    "head",
+    "options",
+    "patch",
+    "post",
+    "put",
+    "trace",
+}
+
+
 def _collect_operations(
     spec: dict[str, object],
-) -> list[tuple[str, str, str, str, tuple[str, ...]]]:
-    operations: list[tuple[str, str, str, str, tuple[str, ...]]] = []
+) -> list[tuple[str, str, str, str | None, str]]:
+    operations: list[tuple[str, str, str, str | None, str]] = []
     paths_section = spec.get("paths")
     if not isinstance(paths_section, dict):
         if paths_section not in (None, {}):
@@ -47,18 +60,20 @@ def _collect_operations(
         if not isinstance(path_item, dict):
             continue
         for method, op in path_item.items():
-            if method.lower() != "post" or not isinstance(op, dict):
+            if method.lower() not in HTTP_METHODS or not isinstance(op, dict):
                 continue
-            operation_id = str(op.get("operationId", ""))
-            tag_values = op.get("tags") or ["cli"]
-            tags = tuple(dict.fromkeys(str(tag) for tag in tag_values))
+            operation_id_obj = op.get("operationId")
+            operation_id: str | None = None
+            if operation_id_obj is not None:
+                operation_id = str(operation_id_obj).strip() or None
+            tags = [str(tag) for tag in (op.get("tags") or ["cli"])]
             summary = (op.get("summary") or "").strip()
             operations.append((method.upper(), path, operation_id, summary, tags))
     return operations
 
 
 def _write_diagram(
-    operations: list[tuple[str, str, str, str, tuple[str, ...]]]
+    operations: list[tuple[str, str, str, str | None, str]]
 ) -> None:
     diagram_path = "diagrams/cli_by_tag.d2"
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
@@ -71,6 +86,13 @@ def _write_diagram(
         for method, path, operation_id, summary, tags in operations:
             node_id = f"{method} {path}"
             label = f"{method} {path}\\n{summary}" if summary else node_id
+            link_attr = (
+                f' {{ link: "{_operation_anchor(operation_id)}" }}'
+                if operation_id
+                else ""
+            )
+            handle.write(f'  "{node_id}": "{label}"{link_attr}\n')
+            handle.write(f'  "{tag}" -> "{node_id}"\n')
             if node_id not in written_nodes:
                 handle.write(
                     f'  "{node_id}": "{label}" {{ link: "{_operation_anchor(operation_id)}" }}\n'
