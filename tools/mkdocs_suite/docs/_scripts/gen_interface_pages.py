@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
@@ -15,6 +16,9 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
 MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
 EDIT_URI_BRANCH_INDEX = 1
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.NullHandler())
 
 
 def _load_repo_settings() -> tuple[str | None, str | None]:
@@ -77,7 +81,11 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
     for nav_path in REPO_ROOT.glob("src/**/_nav.json"):
         module_name = nav_path.parent.name
         with nav_path.open("r", encoding="utf-8") as handle:
-            data = json.load(handle)
+            try:
+                data = json.load(handle)
+            except json.JSONDecodeError as error:
+                LOGGER.warning("Failed to decode nav metadata from %s: %s", nav_path, error)
+                continue
         interfaces = data.get("interfaces") or []
         if not isinstance(interfaces, list):
             continue
