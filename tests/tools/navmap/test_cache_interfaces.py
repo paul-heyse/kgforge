@@ -33,6 +33,15 @@ class MockCollectorCache:
     """Mock implementation of NavmapCollectorCache for testing."""
 
     def __init__(self, root: Path, modules: Sequence[ModuleInfo] | None = None) -> None:
+        """Initialize mock collector cache.
+
+        Parameters
+        ----------
+        root : Path
+            Root directory path.
+        modules : Sequence[ModuleInfo] | None, optional
+            Pre-populated modules.
+        """
         self._root = root
         self._modules = list(modules) if modules else []
 
@@ -57,6 +66,7 @@ class MockRepairCache:
     """Mock implementation of NavmapRepairCache for testing."""
 
     def __init__(self) -> None:
+        """Initialize mock repair cache."""
         self._repairs: list[RepairResult] = []
 
     def record_repair(self, result: RepairResult) -> None:

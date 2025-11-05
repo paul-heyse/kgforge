@@ -47,12 +47,31 @@ if TYPE_CHECKING:  # pragma: no cover - typing assistance only
     JsonPayload = Mapping[str, object] | Sequence[object] | str | int | float | bool | None
 
     class ValidateAgainstSchema(Protocol):
+        """Protocol for schema validation callables."""
+
         def __call__(
             self,
             payload: JsonPayload,
             schema_path: Path,
             *,
             artifact: str,
-        ) -> None: ...
+        ) -> None:
+            """Validate payload against JSON schema.
+
+            Parameters
+            ----------
+            payload : JsonPayload
+                Payload to validate.
+            schema_path : Path
+                Path to JSON schema file.
+            artifact : str
+                Artifact name for error reporting.
+
+            Raises
+            ------
+            ValidationError
+                If payload does not conform to schema.
+            """
+            ...
 
     validate_against_schema: ValidateAgainstSchema

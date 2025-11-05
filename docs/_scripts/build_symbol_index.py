@@ -100,6 +100,7 @@ class NavLookup:
 
     @classmethod
     def empty(cls) -> NavLookup:
+        """Return an empty nav lookup with default mappings."""
         return cls(symbol_meta={}, module_meta={}, sections={})
 
 
@@ -161,15 +162,19 @@ class SymbolIndexArtifacts:
 
     @property
     def symbol_count(self) -> int:
+        """Return the number of symbols captured in the artifact."""
         return len(self.rows)
 
     def rows_payload(self) -> list[dict[str, JsonValue]]:
+        """Serialise the symbol rows into JSON-compatible dictionaries."""
         return [row.to_payload() for row in self.rows]
 
     def by_file_payload(self) -> dict[str, list[str]]:
+        """Return the file-to-symbol mapping as primitive JSON data."""
         return {key: list(values) for key, values in sorted(self.by_file.items())}
 
     def by_module_payload(self) -> dict[str, list[str]]:
+        """Return the module-to-symbol mapping as primitive JSON data."""
         return {key: list(values) for key, values in sorted(self.by_module.items())}
 
 

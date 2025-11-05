@@ -125,28 +125,50 @@ def _default_int_dict() -> defaultdict[str, int]:
 
 
 class LuceneHitProtocol(Protocol):
+    """Protocol describing a single Lucene BM25 hit."""
+
     docid: str
     score: float
 
 
 class LuceneSearcherProtocol(Protocol):
-    def set_bm25(self, k1: float, b: float) -> None: ...
+    """Protocol for Lucene searchers supporting BM25 configuration."""
 
-    def search(self, query: str, k: int) -> Sequence[LuceneHitProtocol]: ...
+    def set_bm25(self, k1: float, b: float) -> None:
+        """Configure the BM25 parameters used by the underlying index."""
+        ...
+
+    def search(self, query: str, k: int) -> Sequence[LuceneHitProtocol]:
+        """Return the top ``k`` hits for ``query`` using the active BM25 settings."""
+        ...
 
 
 class LuceneIndexerProtocol(Protocol):
-    def add_doc_dict(self, doc: Mapping[str, str]) -> None: ...
+    """Protocol for Lucene index writers used by the BM25 adapters."""
 
-    def close(self) -> None: ...
+    def add_doc_dict(self, doc: Mapping[str, str]) -> None:
+        """Add a document mapping to the Lucene index."""
+        ...
+
+    def close(self) -> None:
+        """Finalize the index writer and flush in-memory buffers."""
+        ...
 
 
 class LuceneSearcherFactory(Protocol):
-    def __call__(self, index_dir: str) -> LuceneSearcherProtocol: ...
+    """Factory protocol for creating Lucene BM25 searchers."""
+
+    def __call__(self, index_dir: str) -> LuceneSearcherProtocol:
+        """Return a searcher bound to ``index_dir``."""
+        ...
 
 
 class LuceneIndexerFactory(Protocol):
-    def __call__(self, index_dir: str) -> LuceneIndexerProtocol: ...
+    """Factory protocol for instantiating Lucene BM25 indexers."""
+
+    def __call__(self, index_dir: str) -> LuceneIndexerProtocol:
+        """Create an indexer that writes into ``index_dir``."""
+        ...
 
 
 def _score_value(item: tuple[str, float]) -> float:
@@ -306,8 +328,9 @@ class PurePythonBM25:
         serialize_json(self._metadata_payload(), _BM25_SCHEMA_PATH, metadata_path)
 
     def load(self) -> None:
-        """Load an existing BM25 index from disk with schema validation and checksum
-        verification.
+        """Load an existing BM25 index from disk.
+
+        Performs schema validation and checksum verification.
         """
         payload = self._read_metadata()
         self._initialize_from_payload(payload)

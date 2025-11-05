@@ -1,7 +1,7 @@
 """Tests for hardened logging contexts with immutability and type safety.
 
-This module verifies that LogContextExtra uses frozen dataclasses correctly,
-provides safe accessor patterns, and integrates with RFC 9457 Problem Details.
+This module verifies that LogContextExtra uses frozen dataclasses correctly, provides safe accessor
+patterns, and integrates with RFC 9457 Problem Details.
 """
 
 from __future__ import annotations

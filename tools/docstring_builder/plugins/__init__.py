@@ -441,6 +441,13 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
         plugin_instance: RegisteredPlugin = candidate
 
         def factory() -> PluginInstance:
+            """Return plugin instance factory.
+
+            Returns
+            -------
+            PluginInstance
+                Plugin instance.
+            """
             return plugin_instance
 
         return factory
@@ -449,6 +456,13 @@ def _resolve_factory(candidate: object) -> PluginFactoryCandidateT:
         legacy_instance: LegacyPluginProtocol = candidate
 
         def factory() -> PluginInstance:
+            """Return plugin instance factory.
+
+            Returns
+            -------
+            PluginInstance
+                Plugin instance.
+            """
             return legacy_instance
 
         return factory

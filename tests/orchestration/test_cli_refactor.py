@@ -1,7 +1,7 @@
 """Tests for orchestration CLI refactoring with typed config.
 
-This module verifies that the refactored index_faiss and run_index_faiss
-functions properly use IndexCliConfig and handle error cases correctly.
+This module verifies that the refactored index_faiss and run_index_faiss functions properly use
+IndexCliConfig and handle error cases correctly.
 """
 
 from __future__ import annotations

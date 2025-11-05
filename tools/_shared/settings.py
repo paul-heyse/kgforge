@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, TypeVar
 
 from pydantic import Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -39,6 +39,9 @@ __all__: Final[list[str]] = [
 ]
 
 
+SettingsT = TypeVar("SettingsT", bound=BaseSettings)
+
+
 class SettingsError(RuntimeError):
     """Raised when typed tooling settings fail validation."""
 
@@ -49,6 +52,17 @@ class SettingsError(RuntimeError):
         problem: ProblemDetailsDict,
         errors: Sequence[dict[str, JsonValue]],
     ) -> None:
+        """Initialize settings error.
+
+        Parameters
+        ----------
+        message : str
+            Error message.
+        problem : ProblemDetailsDict
+            RFC 9457 Problem Details payload.
+        errors : Sequence[dict[str, JsonValue]]
+            Validation error details.
+        """
         super().__init__(message)
         self.problem = problem
         self.errors: tuple[dict[str, JsonValue], ...] = tuple(errors)
@@ -57,7 +71,7 @@ class SettingsError(RuntimeError):
 _SETTINGS_CACHE: dict[str, ToolRuntimeSettings] = {}
 
 
-def load_settings[SettingsT: BaseSettings](
+def load_settings(
     settings_factory: Callable[[], SettingsT] | type[SettingsT],
 ) -> SettingsT:
     """Instantiate settings via ``settings_factory`` with structured error handling.

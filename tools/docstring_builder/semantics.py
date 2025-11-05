@@ -166,12 +166,20 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
 
     class _Visitor(ast.NodeVisitor):
         def __init__(self) -> None:
+            """Initialize AST visitor."""
             self.namespace: list[str] = []
 
         def _qualify(self, name: str) -> str:
             return ".".join(part for part in [result.module, *self.namespace, name] if part)
 
         def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            """Visit class definition and index it.
+
+            Parameters
+            ----------
+            node : ast.ClassDef
+                ClassDef AST node.
+            """
             qname = self._qualify(node.name)
             index[qname] = node
             self.namespace.append(node.name)
@@ -179,6 +187,13 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
             self.namespace.pop()
 
         def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            """Visit function definition and index it.
+
+            Parameters
+            ----------
+            node : ast.FunctionDef
+                FunctionDef AST node.
+            """
             qname = self._qualify(node.name)
             index[qname] = node
             self.namespace.append(node.name)
@@ -186,6 +201,13 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
             self.namespace.pop()
 
         def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+            """Visit async function definition and index it.
+
+            Parameters
+            ----------
+            node : ast.AsyncFunctionDef
+                AsyncFunctionDef AST node.
+            """
             qname = self._qualify(node.name)
             index[qname] = node
             self.namespace.append(node.name)

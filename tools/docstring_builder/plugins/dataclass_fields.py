@@ -145,11 +145,25 @@ class _DataclassFieldCollector(ast.NodeVisitor):
     """Collect dataclass field metadata keyed by fully-qualified class name."""
 
     def __init__(self, module: str) -> None:
+        """Initialize field collector.
+
+        Parameters
+        ----------
+        module : str
+            Module qualified name.
+        """
         self.module = module
         self.namespace: list[str] = []
         self.fields: dict[str, list[_FieldInfo]] = {}
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Visit class definition and collect dataclass fields.
+
+        Parameters
+        ----------
+        node : ast.ClassDef
+            ClassDef AST node.
+        """
         qname = ".".join(part for part in [self.module, *self.namespace, node.name] if part)
         if _has_dataclass_decorator(node.decorator_list):
             collected: list[_FieldInfo] = []
@@ -172,6 +186,7 @@ class DataclassFieldDocPlugin(TransformerPlugin):
     stage: PluginStage = "transformer"
 
     def __init__(self) -> None:
+        """Initialize dataclass field doc plugin."""
         self._cache: dict[Path, dict[str, list[_FieldInfo]]] = {}
 
     def on_start(self, context: PluginContext) -> None:

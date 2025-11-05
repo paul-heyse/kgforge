@@ -792,38 +792,127 @@ class _FaissModuleAdapter:
     """Adapter that exposes PEP 8 method names for FAISS modules."""
 
     def __init__(self, module: _LegacyFaissModule) -> None:
+        """Initialize adapter with legacy FAISS module.
+
+        Parameters
+        ----------
+        module : _LegacyFaissModule
+            Legacy FAISS module with UPPER_CASE names.
+        """
         self._module = module
 
     @property
     def metric_inner_product(self) -> int:
+        """Return inner product metric constant."""
         return self._module.METRIC_INNER_PRODUCT
 
     @property
     def metric_l2(self) -> int:
+        """Return L2 metric constant."""
         return self._module.METRIC_L2
 
     def index_flat_ip(self, dimension: int) -> FaissIndexProtocol:
+        """Create flat inner product index.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            FAISS index instance.
+        """
         constructor = _legacy_index_flat_ip(self._module)
         return constructor(dimension)
 
     def index_factory(self, dimension: int, factory_string: str, metric: int) -> FaissIndexProtocol:
+        """Create index from factory string.
+
+        Parameters
+        ----------
+        dimension : int
+            Vector dimension.
+        factory_string : str
+            Factory description string.
+        metric : int
+            Distance metric constant.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            FAISS index instance.
+        """
         return self._module.index_factory(dimension, factory_string, metric)
 
     def index_id_map2(self, index: FaissIndexProtocol) -> FaissIndexProtocol:
+        """Wrap index with 64-bit ID mapping.
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Base index to wrap.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Index with ID mapping.
+        """
         wrapper = _legacy_index_id_map2(self._module)
         return wrapper(index)
 
     def write_index(self, index: FaissIndexProtocol, path: str) -> None:
+        """Write index to disk.
+
+        Parameters
+        ----------
+        index : FaissIndexProtocol
+            Index to serialize.
+        path : str
+            Output file path.
+        """
         self._module.write_index(index, path)
 
     def read_index(self, path: str) -> FaissIndexProtocol:
+        """Read index from disk.
+
+        Parameters
+        ----------
+        path : str
+            Input file path.
+
+        Returns
+        -------
+        FaissIndexProtocol
+            Loaded index instance.
+        """
         return self._module.read_index(path)
 
     def normalize_l2(self, vectors: VectorArray) -> None:
+        """Normalize vectors to unit length in-place.
+
+        Parameters
+        ----------
+        vectors : VectorArray
+            Vector array to normalize (modified in-place).
+        """
         normalizer = _legacy_normalize_l2(self._module)
         normalizer(vectors)
 
     def __getattr__(self, name: str) -> object:
+        """Get attribute with legacy name fallback.
+
+        Parameters
+        ----------
+        name : str
+            Attribute name.
+
+        Returns
+        -------
+        object
+            Attribute value from module.
+        """
         if name == "METRIC_INNER_PRODUCT":
             return self.metric_inner_product
         if name == "METRIC_L2":

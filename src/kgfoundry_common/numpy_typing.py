@@ -90,6 +90,18 @@ def topk_indices(scores: FloatVector, k: int) -> IntVector:
     score_list = cast("list[float]", scores_array.astype(np.float64, copy=False).tolist())
 
     def sort_key(idx: int) -> tuple[float, int]:
+        """Return sort key tuple for index ranking.
+
+        Parameters
+        ----------
+        idx : int
+            Index into score_list.
+
+        Returns
+        -------
+        tuple[float, int]
+            Tuple of (score, negative_index) for stable sorting.
+        """
         return (float(score_list[idx]), -idx)
 
     ranked = sorted(range(total), key=sort_key, reverse=True)[:trimmed_k]

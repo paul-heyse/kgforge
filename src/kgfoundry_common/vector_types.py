@@ -50,6 +50,16 @@ class VectorValidationError(ValueError):
     """Raised when vector payloads fail dtype, shape, or schema validation."""
 
     def __init__(self, message: str, *, errors: Sequence[str] | None = None) -> None:
+        """Initialize validation error.
+
+        Parameters
+        ----------
+        message : str
+            Error message.
+        errors : Sequence[str] | None, optional
+            List of validation error messages.
+            Defaults to None.
+        """
         super().__init__(message)
         self.errors: tuple[str, ...] = tuple(errors or (message,))
 

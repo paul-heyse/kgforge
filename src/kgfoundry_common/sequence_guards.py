@@ -45,7 +45,7 @@ __all__ = [
 T = TypeVar("T")
 
 
-def first_or_error[T](
+def first_or_error(
     sequence: Sequence[T],
     *,
     context: str,
@@ -125,7 +125,7 @@ def first_or_error[T](
     return sequence[0]
 
 
-def first_or_error_multi_device[T](
+def first_or_error_multi_device(
     sequence: Sequence[T],
     *,
     context: str = "device_selection",

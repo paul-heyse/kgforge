@@ -111,6 +111,7 @@ class SymbolRow:
     is_property: bool | None = None
 
     def to_payload(self) -> dict[str, JsonValue]:
+        """Serialise the symbol row into a JSON-compatible mapping."""
         return {
             "path": self.path,
             "canonical_path": self.canonical_path,
@@ -134,6 +135,7 @@ class SymbolRow:
 
     @classmethod
     def from_mapping(cls, payload: Mapping[str, JsonValue]) -> SymbolRow | None:
+        """Create a symbol row from ``payload`` when core fields are present."""
         path_value = payload.get("path")
         if not isinstance(path_value, str):
             return None
@@ -376,6 +378,7 @@ def _build_delta(
 
 
 def write_delta(delta_path: Path, payload: TypedSymbolDeltaPayload) -> bool:
+    """Write ``payload`` to ``delta_path`` and return True when a change occurred."""
     builtins_payload = symbol_delta_to_payload(payload)
     validate_against_schema(
         cast("JsonPayload", builtins_payload),
@@ -421,11 +424,14 @@ def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -
 
 @dataclass(slots=True)
 class DeltaArgs:
+    """Command-line arguments controlling delta computation."""
+
     base: str
     output: str
 
 
 def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
+    """Parse CLI arguments and return a ``DeltaArgs`` instance."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--base",
@@ -444,6 +450,7 @@ def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Entry point for generating symbol delta artifacts."""
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 

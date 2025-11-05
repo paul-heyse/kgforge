@@ -1,7 +1,7 @@
 """Typed configuration objects for docs toolchain operations.
 
-This module provides frozen dataclasses for configuring docs toolchain
-symbol index build and delta operations.
+This module provides frozen dataclasses for configuring docs toolchain symbol index build and delta
+operations.
 """
 
 from __future__ import annotations

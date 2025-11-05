@@ -1,8 +1,7 @@
 """Tests for LoggingCache protocol and logging cache accessor function.
 
-This module verifies that the LoggingCache protocol is properly defined,
-the default implementation works correctly, and the accessor function returns
-a usable cache instance.
+This module verifies that the LoggingCache protocol is properly defined, the default implementation
+works correctly, and the accessor function returns a usable cache instance.
 """
 
 from __future__ import annotations

@@ -88,6 +88,20 @@ class ExecutableDigestVerifier:
     settings_loader: Callable[[], ToolRuntimeSettings] = get_runtime_settings
 
     def verify(self, executable: Path, command: Command) -> None:
+        """Verify executable digest matches expected value.
+
+        Parameters
+        ----------
+        executable : Path
+            Path to executable file.
+        command : Command
+            Command being executed.
+
+        Raises
+        ------
+        ToolExecutionError
+            If digest verification fails or executable is missing.
+        """
         settings = self.settings_loader()
         expected = settings.expected_digest_for(executable)
         if expected is None:
@@ -175,6 +189,21 @@ class ToolExecutionError(RuntimeError):
         streams: tuple[str, str] | None = None,
         problem: ProblemDetailsDict | None = None,
     ) -> None:
+        """Initialize tool execution error.
+
+        Parameters
+        ----------
+        message : str
+            Error message.
+        command : Sequence[str]
+            Command that failed.
+        returncode : int | None, optional
+            Process return code if available.
+        streams : tuple[str, str] | None, optional
+            Tuple of (stdout, stderr) if available.
+        problem : ProblemDetailsDict | None, optional
+            RFC 9457 Problem Details payload.
+        """
         super().__init__(message)
         self.command: tuple[str, ...] = tuple(command)
         self.returncode = returncode
@@ -186,9 +215,13 @@ class ToolExecutionError(RuntimeError):
 class AllowListPolicy(Protocol):
     """Protocol for enforcing executable allow-list checks."""
 
-    def ensure_permitted(self, executable: Path, command: Command) -> None: ...
+    def ensure_permitted(self, executable: Path, command: Command) -> None:
+        """Validate that ``executable`` is permitted to run ``command``."""
+        ...
 
-    def resolve(self, executable: str, command: Command) -> Path: ...
+    def resolve(self, executable: str, command: Command) -> Path:
+        """Resolve ``executable`` to an allow-listed absolute path."""
+        ...
 
 
 @dataclass(slots=True, frozen=True)
@@ -220,6 +253,7 @@ class AllowListEnforcer:
         return resolved_path
 
     def ensure_permitted(self, executable: Path, command: Command) -> None:
+        """Raise ``ToolExecutionError`` if ``executable`` is not allow-listed."""
         settings = self.settings_loader()
         if settings.is_allowed(executable):
             return
@@ -244,7 +278,9 @@ class AllowListEnforcer:
 class EnvironmentPolicy(Protocol):
     """Protocol describing how subprocess environments are constructed."""
 
-    def build(self, overrides: Mapping[str, str] | None) -> dict[str, str]: ...
+    def build(self, overrides: Mapping[str, str] | None) -> dict[str, str]:
+        """Create an environment mapping, applying ``overrides`` when provided."""
+        ...
 
 
 @dataclass(slots=True, frozen=True)
@@ -266,6 +302,7 @@ class SanitisedEnvironment(EnvironmentPolicy):
     )
 
     def build(self, overrides: Mapping[str, str] | None) -> dict[str, str]:
+        """Return an environment dictionary merged with ``overrides``."""
         baseline = {
             key: value
             for key, value in os.environ.items()

@@ -19,6 +19,13 @@ if TYPE_CHECKING:
 def test_clear_lazy_import_caches_invokes_all_facade_clearers(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Test that clear_lazy_import_caches invokes all facade clear_cache methods.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Pytest monkeypatch fixture.
+    """
     facades = (
         shared,
         build_symbol_index,

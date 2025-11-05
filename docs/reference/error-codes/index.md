@@ -19,7 +19,8 @@ extend this registry using the same naming scheme.
 | `KGF-DOC-BLD-002` | Docformatter failed | documentation | format | error | Docformatter detected formatting issues. Run the tool locally to view the file-level diff. |
 | `KGF-DOC-BLD-003` | Pydocstyle validation failed | documentation | lint | error | Pydocstyle reported missing or malformed docstrings. The command output lists offending symbols. |
 | `KGF-DOC-BLD-004` | Docstring coverage threshold not met | documentation | quality | error | Docstring coverage fell below the configured threshold. Add docstrings or update the policy if intentional. |
-| `KGF-DOC-BLD-005` | DocFacts schema generation failed | documentation | build | error | The DocFacts schema could not be regenerated. Run `uv run python -m tools.docstring_builder.cli schema --output docs/_build/schema_docfacts.json` and fix any reported issues. |
+| `KGF-DOC-BLD-005` | DocFacts schema synchronization failed | documentation | build | error | Copying the canonical schema to `docs/_build/schema_docfacts.json` failed. Ensure `schema/docs/schema_docfacts.json` exists and rerun the stage. |
+| `KGF-DOC-BLD-006` | DocFacts schema validation failed | documentation | validation | error | Docstring builder output violated the DocFacts schema. Synchronize the schema and rerun the docstring builder to regenerate artifacts. |
 | `KGF-DOC-BLD-012` | Gallery validation failed | documentation | validation | error | `tools/validate_gallery.py` detected inconsistencies. Run the script with `--verbose` to inspect failing examples. |
 | `KGF-DOC-BLD-013` | Example doctest suite failed | documentation | tests | error | Gallery doctests did not pass. Review the pytest output and update the affected examples. |
 | `KGF-DOC-BLD-015` | README generation failed | documentation | build | error | Automated README generation or doctoc execution failed. Run `uv run python tools/gen_readmes.py` manually for diagnostics. |

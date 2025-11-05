@@ -81,6 +81,15 @@ class SchemaViolationError(DocstringBuilderError):
     problem: ProblemDetails | None
 
     def __init__(self, message: str, *, problem: ProblemDetails | None = None) -> None:
+        """Initialize docstring builder error.
+
+        Parameters
+        ----------
+        message : str
+            Error message.
+        problem : ProblemDetails | None, optional
+            RFC 9457 Problem Details payload.
+        """
         super().__init__(message)
         self.problem = problem
 

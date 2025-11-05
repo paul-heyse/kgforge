@@ -57,6 +57,20 @@ if TYPE_CHECKING:
 
 class _UvicornRun(Protocol):
     def __call__(self, app: str, *, host: str, port: int, reload: bool = False) -> None:
+        """Run uvicorn server.
+
+        Parameters
+        ----------
+        app : str
+            Application module path.
+        host : str
+            Host to bind to.
+        port : int
+            Port to bind to.
+        reload : bool, optional
+            Whether to enable auto-reload.
+            Defaults to False.
+        """
         del self, app, host, port, reload
         raise NotImplementedError
 
@@ -104,7 +118,15 @@ app = typer.Typer(help="kgfoundry orchestration CLI")
 
 
 class _BM25Builder(Protocol):
-    def build(self, docs: Iterable[tuple[str, dict[str, str]]]) -> None: ...
+    def build(self, docs: Iterable[tuple[str, dict[str, str]]]) -> None:
+        """Build BM25 index from documents.
+
+        Parameters
+        ----------
+        docs : Iterable[tuple[str, dict[str, str]]]
+            Iterable of (document_id, document_fields) tuples.
+        """
+        ...
 
 
 @dataclass(frozen=True)

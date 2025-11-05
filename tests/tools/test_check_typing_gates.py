@@ -7,7 +7,6 @@ Tests cover:
 - Actionable autofix suggestions for each violation type
 - Output formats (default, JSON, --list for codemods)
 - TYPE_CHECKING guard detection
-
 """
 
 from __future__ import annotations

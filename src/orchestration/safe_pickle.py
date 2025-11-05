@@ -58,19 +58,81 @@ class _UnpicklerProtocol(Protocol):
         encoding: str = ...,
         errors: str = ...,
         buffers: object | None = ...,
-    ) -> None: ...
+    ) -> None:
+        """Initialize unpickler with file handle.
 
-    def load(self) -> object: ...
+        Parameters
+        ----------
+        file : BinaryIO
+            Binary file handle to read from.
+        fix_imports : bool, optional
+            Whether to fix imports for Python 2 compatibility.
+        encoding : str, optional
+            Text encoding for Python 2 compatibility.
+        errors : str, optional
+            Error handling mode for encoding.
+        buffers : object | None, optional
+            Buffer protocol support.
+        """
+        ...
 
-    def find_class(self, module: str, name: str) -> object: ...
+    def load(self) -> object:
+        """Load and return unpickled object.
+
+        Returns
+        -------
+        object
+            Unpickled object from file.
+        """
+        ...
+
+    def find_class(self, module: str, name: str) -> object:
+        """Find class by module and name.
+
+        Parameters
+        ----------
+        module : str
+            Module name.
+        name : str
+            Class name.
+
+        Returns
+        -------
+        object
+            Class object.
+        """
+        ...
 
 
 class _PickleModule(Protocol):
     Unpickler: type[_UnpicklerProtocol]
 
-    def dump(self, obj: object, file: BinaryIO) -> None: ...
+    def dump(self, obj: object, file: BinaryIO) -> None:
+        """Serialize object to file.
 
-    def dumps(self, obj: object) -> bytes: ...
+        Parameters
+        ----------
+        obj : object
+            Object to serialize.
+        file : BinaryIO
+            Binary file handle to write to.
+        """
+        ...
+
+    def dumps(self, obj: object) -> bytes:
+        """Serialize object to bytes.
+
+        Parameters
+        ----------
+        obj : object
+            Object to serialize.
+
+        Returns
+        -------
+        bytes
+            Serialized object as bytes.
+        """
+        ...
 
 
 if TYPE_CHECKING:
@@ -86,11 +148,50 @@ if TYPE_CHECKING:
             encoding: str = ...,
             errors: str = ...,
             buffers: object | None = ...,
-        ) -> None: ...
+        ) -> None:
+            """Initialize unpickler with file handle.
 
-        def load(self) -> object: ...
+            Parameters
+            ----------
+            file : BinaryIO
+                Binary file handle to read from.
+            fix_imports : bool, optional
+                Whether to fix imports for Python 2 compatibility.
+            encoding : str, optional
+                Text encoding for Python 2 compatibility.
+            errors : str, optional
+                Error handling mode for encoding.
+            buffers : object | None, optional
+                Buffer protocol support.
+            """
+            ...
 
-        def find_class(self, module: str, name: str) -> object: ...
+        def load(self) -> object:
+            """Load and return unpickled object.
+
+            Returns
+            -------
+            object
+                Unpickled object from file.
+            """
+            ...
+
+        def find_class(self, module: str, name: str) -> object:
+            """Find class by module and name.
+
+            Parameters
+            ----------
+            module : str
+                Module name.
+            name : str
+                Class name.
+
+            Returns
+            -------
+            object
+                Class object.
+            """
+            ...
 
     _stdlib_pickle = cast("_PickleModule", None)
 else:  # pragma: no cover - runtime import keeps Ruff S403 quiet
@@ -119,6 +220,25 @@ class SafeUnpickler(_StdlibUnpickler):
         errors: str = "strict",
         buffers: object | None = None,
     ) -> None:
+        """Initialize safe unpickler with file handle.
+
+        Parameters
+        ----------
+        file : BinaryIO
+            Binary file handle to read from.
+        fix_imports : bool, optional
+            Whether to fix imports for Python 2 compatibility.
+            Defaults to True.
+        encoding : str, optional
+            Text encoding for Python 2 compatibility.
+            Defaults to "ASCII".
+        errors : str, optional
+            Error handling mode for encoding.
+            Defaults to "strict".
+        buffers : object | None, optional
+            Buffer protocol support.
+            Defaults to None.
+        """
         super().__init__(
             file,
             fix_imports=fix_imports,

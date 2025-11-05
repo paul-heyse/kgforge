@@ -369,9 +369,25 @@ class _DocfactState:
     sources: dict[str, Path]
 
     def record(self, facts: Iterable[DocFact], file_path: Path) -> None:
+        """Record docfacts for a file.
+
+        Parameters
+        ----------
+        facts : Iterable[DocFact]
+            Docfacts to record.
+        file_path : Path
+            Source file path.
+        """
         _record_docfacts(facts, file_path, self.entries, self.sources)
 
     def filtered(self) -> list[DocFact]:
+        """Return filtered docfacts for output.
+
+        Returns
+        -------
+        list[DocFact]
+            Filtered docfacts list.
+        """
         return _filter_docfacts_for_output(self.entries, self.sources, self.config)
 
 
@@ -386,12 +402,40 @@ class _PipelineDependencies:
     docfact_state: _DocfactState
 
     def record_docfacts(self, facts: Iterable[DocFact], file_path: Path) -> None:
+        """Record docfacts for a file.
+
+        Parameters
+        ----------
+        facts : Iterable[DocFact]
+            Docfacts to record.
+        file_path : Path
+            Source file path.
+        """
         self.docfact_state.record(facts, file_path)
 
     def filter_docfacts(self) -> list[DocFact]:
+        """Return filtered docfacts for output.
+
+        Returns
+        -------
+        list[DocFact]
+            Filtered docfacts list.
+        """
         return self.docfact_state.filtered()
 
     def docfacts_coordinator_factory(self, *, check_mode: bool) -> DocfactsCoordinator:
+        """Create docfacts coordinator factory.
+
+        Parameters
+        ----------
+        check_mode : bool
+            Whether to run in check mode.
+
+        Returns
+        -------
+        DocfactsCoordinator
+            Coordinator instance.
+        """
         return DocfactsCoordinator(
             config=self.config,
             build_provenance=_build_docfacts_provenance,
@@ -572,6 +616,26 @@ def _run_pipeline(
         instance: str | None = None,
         errors: Sequence[ErrorReport] | None = None,
     ) -> ModelProblemDetails:
+        """Build problem details wrapper for pipeline errors.
+
+        Parameters
+        ----------
+        status : ExitStatus
+            Exit status code.
+        request : DocstringBuildRequest
+            Build request.
+        detail : str
+            Error detail message.
+        instance : str | None, optional
+            Problem instance URI.
+        errors : Sequence[ErrorReport] | None, optional
+            Error reports.
+
+        Returns
+        -------
+        ModelProblemDetails
+            Problem details model.
+        """
         return build_problem_details(
             status,
             request,

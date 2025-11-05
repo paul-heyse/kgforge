@@ -37,7 +37,28 @@ def load_attribute(module_name: str, attribute: str) -> object:
 
 
 def load_typed_attribute[T](module_name: str, attribute: str, expected_type: type[T]) -> T:
-    """Load ``attribute`` and ensure it matches ``expected_type`` at runtime.
+    """Load attribute and ensure it matches expected_type at runtime.
+
+    Parameters
+    ----------
+    module_name : str
+        Dotted name of the module.
+    attribute : str
+        Attribute name to load.
+    expected_type : type[T]
+        Expected type (checked at runtime).
+
+    Returns
+    -------
+    T
+        Attribute value typed as T.
+
+    Raises
+    ------
+    TypeError
+        If attribute does not match expected_type.
+    """
+    value = load_attribute(module_name, attribute)
 
     Raises
     ------

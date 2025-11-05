@@ -790,12 +790,18 @@ nitpick_ignore_regex: list[tuple[str, str]] = []
 
 
 class GalleryTagsDirective(Directive):
-    """Lightweight directive so ``.. tags::`` blocks parse without warnings."""
+    """Lightweight directive so ``..
+
+    tags::`` blocks parse without warnings.
+    """
 
     has_content = True
 
     def run(self) -> list[nodes.Node]:
-        """Return an empty node list so Sphinx accepts ``.. tags::`` blocks."""
+        """Return an empty node list so Sphinx accepts ``..
+
+        tags::`` blocks.
+        """
         if self.content:
             LOGGER.debug("tags directive content ignored", extra={"tags": list(self.content)})
         return []

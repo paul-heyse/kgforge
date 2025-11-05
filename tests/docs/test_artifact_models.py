@@ -1,7 +1,7 @@
 """Unit tests for typed artifact models.
 
-Tests cover round-trip serialization, schema compliance, and validation of
-symbol index and delta artifacts.
+Tests cover round-trip serialization, schema compliance, and validation of symbol index and delta
+artifacts.
 """
 
 from __future__ import annotations
@@ -161,6 +161,23 @@ def _symbol_payload(**overrides: JsonValue) -> dict[str, JsonValue]:
 
 
 def expect_json_string(value: JsonValue) -> str:
+    """Expect JSON value to be a string.
+
+    Parameters
+    ----------
+    value : JsonValue
+        JSON value to check.
+
+    Returns
+    -------
+    str
+        String value.
+
+    Raises
+    ------
+    TypeError
+        If value is not a string.
+    """
     if not isinstance(value, str):
         message = f"Expected str JSON value, got {type(value)!r}"
         raise TypeError(message)
@@ -168,6 +185,23 @@ def expect_json_string(value: JsonValue) -> str:
 
 
 def expect_json_int(value: JsonValue) -> int:
+    """Expect JSON value to be an integer.
+
+    Parameters
+    ----------
+    value : JsonValue
+        JSON value to check.
+
+    Returns
+    -------
+    int
+        Integer value.
+
+    Raises
+    ------
+    TypeError
+        If value is not an integer.
+    """
     if not isinstance(value, int):
         message = f"Expected int JSON value, got {type(value)!r}"
         raise TypeError(message)
@@ -175,6 +209,23 @@ def expect_json_int(value: JsonValue) -> int:
 
 
 def expect_json_mapping(value: JsonValue) -> dict[str, JsonValue]:
+    """Expect JSON value to be a mapping (dict).
+
+    Parameters
+    ----------
+    value : JsonValue
+        JSON value to check.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Dictionary value.
+
+    Raises
+    ------
+    TypeError
+        If value is not a dictionary.
+    """
     if not isinstance(value, dict):
         message = f"Expected mapping JSON value, got {type(value)!r}"
         raise TypeError(message)
@@ -182,6 +233,23 @@ def expect_json_mapping(value: JsonValue) -> dict[str, JsonValue]:
 
 
 def expect_json_sequence(value: JsonValue) -> list[JsonValue]:
+    """Expect JSON value to be a sequence (list).
+
+    Parameters
+    ----------
+    value : JsonValue
+        JSON value to check.
+
+    Returns
+    -------
+    list[JsonValue]
+        List value.
+
+    Raises
+    ------
+    TypeError
+        If value is not a list.
+    """
     if not isinstance(value, list):
         message = f"Expected sequence JSON value, got {type(value)!r}"
         raise TypeError(message)
@@ -189,6 +257,18 @@ def expect_json_sequence(value: JsonValue) -> list[JsonValue]:
 
 
 def to_json_payload(rows: JsonObjectArray) -> JsonPayload:
+    """Convert rows array to JSON payload.
+
+    Parameters
+    ----------
+    rows : JsonObjectArray
+        Array of JSON objects.
+
+    Returns
+    -------
+    JsonPayload
+        JSON payload list.
+    """
     return [cast("JsonValue", row) for row in rows]
 
 
@@ -634,9 +714,8 @@ class TestArtifactJSONFormatting:
 class TestCanonicalConstructors:
     """Tests for canonical keyword-based constructor usage with alignment.
 
-    These tests verify that constructors are invoked with canonical field names
-    matching the JSON Schema, and that alignment helpers properly validate
-    payloads before model construction.
+    These tests verify that constructors are invoked with canonical field names matching the JSON
+    Schema, and that alignment helpers properly validate payloads before model construction.
     """
 
     def test_canonical_constructor_with_all_fields(self) -> None:

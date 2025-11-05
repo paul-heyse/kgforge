@@ -651,7 +651,6 @@ def load_catalog_model(path: Path, *, load_shards: bool = True) -> AgentCatalogM
     AgentCatalogModel
         Describe return value.
     """
-
     # Pydantic BaseModel classes contain Any in their type signatures.
     # We use cast() to explicitly acknowledge this typing limitation while
     # maintaining runtime safety through schema validation.

@@ -44,10 +44,33 @@ def assert_frozen_attributes(obj: object, **updates: object) -> None:
 
 
 class _Mutator[T](Protocol):
-    def __call__(self, obj: T, /) -> object: ...
+    """Protocol for mutation callables."""
+
+    def __call__(self, obj: T, /) -> object:
+        """Mutate object.
+
+        Parameters
+        ----------
+        obj : T
+            Object to mutate.
+
+        Returns
+        -------
+        object
+            Mutation result.
+        """
+        ...
 
 
 def assert_frozen_mutation[T](obj: T, mutate: _Mutator[T]) -> None:
-    """Assert that executing ``mutate`` on ``obj`` raises ``FrozenInstanceError``."""
+    """Assert that executing mutate on obj raises FrozenInstanceError.
+
+    Parameters
+    ----------
+    obj : T
+        Object to mutate.
+    mutate : _Mutator[T]
+        Callable that mutates the object.
+    """
     with pytest.raises(FrozenInstanceError):
         mutate(obj)

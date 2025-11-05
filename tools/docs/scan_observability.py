@@ -941,6 +941,13 @@ class _ObservabilityExtractor:
     traces: list[TraceRow] = field(default_factory=list)
 
     def process(self, node: ast.AST) -> None:
+        """Process AST node and collect observability calls.
+
+        Parameters
+        ----------
+        node : ast.AST
+            AST node to process.
+        """
         if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
             return
         attr = node.func.attr

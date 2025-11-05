@@ -48,15 +48,63 @@ from typing import TYPE_CHECKING, NoReturn, Protocol, cast
 
 class _Comparable(Protocol):
     def __lt__(self, other: _Comparable, /) -> bool:
+        """Compare less than.
+
+        Parameters
+        ----------
+        other : _Comparable
+            Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self < other.
+        """
         _protocol_stub("__lt__", self, other)
 
     def __le__(self, other: _Comparable, /) -> bool:
+        """Compare less than or equal.
+
+        Parameters
+        ----------
+        other : _Comparable
+            Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self <= other.
+        """
         _protocol_stub("__le__", self, other)
 
     def __gt__(self, other: _Comparable, /) -> bool:
+        """Compare greater than.
+
+        Parameters
+        ----------
+        other : _Comparable
+            Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self > other.
+        """
         _protocol_stub("__gt__", self, other)
 
     def __ge__(self, other: _Comparable, /) -> bool:
+        """Compare greater than or equal.
+
+        Parameters
+        ----------
+        other : _Comparable
+            Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self >= other.
+        """
         _protocol_stub("__ge__", self, other)
 
 

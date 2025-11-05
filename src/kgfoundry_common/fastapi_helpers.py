@@ -46,13 +46,14 @@ E = TypeVar("E", bound=Exception)
 MiddlewareFactory = Callable[..., BaseHTTPMiddleware]
 
 
-async def _await_with_timeout[T](coro: Awaitable[T], timeout_seconds: float | None) -> T:
+async def _await_with_timeout(coro: Awaitable[T], timeout_seconds: float | None) -> T:
+    """Await ``coro`` while respecting ``timeout_seconds`` when provided."""
     if timeout_seconds is None:
         return await coro
     return await asyncio.wait_for(coro, timeout_seconds)
 
 
-def typed_dependency[T](
+def typed_dependency(
     dependency: Callable[..., Awaitable[T]],
     *,
     name: str,
@@ -65,6 +66,7 @@ def typed_dependency[T](
     """
 
     async def _instrumented(*args: object, **kwargs: object) -> T:
+        """Invoke ``dependency`` with logging, metrics, and timeout enforcement."""
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -103,6 +105,7 @@ def typed_exception_handler(
     """Register ``handler`` for ``exception_type`` with logging and timeouts."""
 
     async def _wrapped(request: Request, exc: E) -> Response:
+        """Execute ``handler`` while recording structured timing metadata."""
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -148,7 +151,10 @@ def typed_middleware(
     """Register ``middleware_class`` with instrumentation and timeouts."""
 
     class _InstrumentedMiddleware(BaseHTTPMiddleware):
+        """Middleware wrapper that adds logging, metrics, and timeout controls."""
+
         def __init__(self, app: ASGIApp) -> None:
+            """Instantiate the wrapped middleware and record configuration."""
             self._delegate = middleware_class(app, *factory_args, **options)
             super().__init__(app)
 
@@ -157,6 +163,7 @@ def typed_middleware(
             request: StarletteRequest,
             call_next: Callable[[StarletteRequest], Awaitable[Response]],
         ) -> Response:
+            """Process ``request`` while capturing timing and error metrics."""
             correlation_id = get_correlation_id()
             with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
                 start = time.perf_counter()

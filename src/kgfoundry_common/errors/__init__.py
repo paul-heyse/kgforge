@@ -80,7 +80,9 @@ class JSONResponseProtocol(Protocol):
 class ExceptionHandlerProtocol(Protocol):
     """Structural type for FastAPI exception handlers."""
 
-    def __call__(self, *args: object, **kwargs: object) -> object: ...
+    def __call__(self, *args: object, **kwargs: object) -> object:
+        """Process an exception raised within the FastAPI request lifecycle."""
+        ...
 
 
 class FastAPIProtocol(Protocol):

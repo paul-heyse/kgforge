@@ -141,7 +141,30 @@ class _CounterConstructor(Protocol):
         registry: CollectorRegistry | None = ...,
         unit: str | None = ...,
         **kwargs: object,
-    ) -> CounterLike: ...
+    ) -> CounterLike:
+        """Construct a Counter metric.
+
+        Parameters
+        ----------
+        name : str
+            Metric name.
+        documentation : str
+            Metric documentation/help text.
+        labelnames : Sequence[str] | None, optional
+            Label names for the metric.
+        registry : CollectorRegistry | None, optional
+            Prometheus registry instance.
+        unit : str | None, optional
+            Unit identifier for the metric.
+        **kwargs : object
+            Additional keyword arguments.
+
+        Returns
+        -------
+        CounterLike
+            Counter metric instance.
+        """
+        ...
 
 
 class _GaugeConstructor(Protocol):
@@ -154,11 +177,49 @@ class _GaugeConstructor(Protocol):
         registry: CollectorRegistry | None = ...,
         unit: str | None = ...,
         **kwargs: object,
-    ) -> GaugeLike: ...
+    ) -> GaugeLike:
+        """Construct a Gauge metric.
+
+        Parameters
+        ----------
+        name : str
+            Metric name.
+        documentation : str
+            Metric documentation/help text.
+        labelnames : Sequence[str] | None, optional
+            Label names for the metric.
+        registry : CollectorRegistry | None, optional
+            Prometheus registry instance.
+        unit : str | None, optional
+            Unit identifier for the metric.
+        **kwargs : object
+            Additional keyword arguments.
+
+        Returns
+        -------
+        GaugeLike
+            Gauge metric instance.
+        """
+        ...
 
 
 class _HistogramConstructor(Protocol):
-    def __call__(self, *args: object, **kwargs: object) -> HistogramLike: ...
+    def __call__(self, *args: object, **kwargs: object) -> HistogramLike:
+        """Construct a Histogram metric.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments (name, documentation, etc.).
+        **kwargs : object
+            Keyword arguments (labelnames, buckets, registry, etc.).
+
+        Returns
+        -------
+        HistogramLike
+            Histogram metric instance.
+        """
+        ...
 
 
 @dataclass(slots=True)

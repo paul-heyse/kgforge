@@ -1,7 +1,7 @@
 """Compute symbol deltas with typed configuration.
 
-This module provides a new public API for computing deltas between symbol
-indices using typed configuration objects instead of positional arguments.
+This module provides a new public API for computing deltas between symbol indices using typed
+configuration objects instead of positional arguments.
 """
 
 from __future__ import annotations

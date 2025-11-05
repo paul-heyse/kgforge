@@ -186,6 +186,14 @@ class RequestsHttp(SupportsHttp):
     """
 
     def __init__(self, session: requests.Session | None = None) -> None:
+        """Initialize search client.
+
+        Parameters
+        ----------
+        session : requests.Session | None, optional
+            HTTP session to use. Creates new session if None.
+            Defaults to None.
+        """
         self._session = session or requests.Session()
 
     def get(

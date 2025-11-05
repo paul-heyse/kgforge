@@ -1,7 +1,7 @@
 """Smoke tests for configuration validation.
 
-These tests verify that configuration fails fast with clear error messages
-when required fields are missing or invalid.
+These tests verify that configuration fails fast with clear error messages when required fields are
+missing or invalid.
 """
 
 from __future__ import annotations

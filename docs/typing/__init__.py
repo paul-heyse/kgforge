@@ -20,7 +20,6 @@ Use this in documentation scripts:
 
     def build_symbol_index(app: FastAPI | None = None) -> NavMap[str, ProblemDetails]:
         ...
-
 """
 
 from __future__ import annotations

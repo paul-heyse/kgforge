@@ -1,7 +1,7 @@
 """Validate artifacts with typed configuration.
 
-This module provides a new public API for validating documentation artifacts
-using typed configuration objects instead of positional arguments.
+This module provides a new public API for validating documentation artifacts using typed
+configuration objects instead of positional arguments.
 """
 
 from __future__ import annotations

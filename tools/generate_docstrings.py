@@ -22,12 +22,31 @@ def run_builder(extra_args: list[str] | None = None) -> None:
     cmd = [sys.executable, "-m", "tools.docstring_builder.cli", "update", *args]
     LOGGER.info("[docstrings] Running docstring builder: %s", " ".join(cmd))
     try:
-        run_tool(cmd, timeout=20.0, check=True)
+        run_tool(cmd, timeout=60.0, check=True)
     except ToolExecutionError as exc:
-        details = exc.stderr.strip() if getattr(exc, "stderr", "") else ""
+        stderr = getattr(exc, "stderr", "") or ""
+        stdout = getattr(exc, "stdout", "") or ""
+        combined_details = (
+            "\n".join(part for part in (stderr.strip(), stdout.strip()) if part) or None
+        )
+        error_code = "KGF-DOC-BLD-001"
+        message = "Docstring builder failed"
+        if combined_details:
+            lowered = combined_details.lower()
+            if "schema validation failed" in lowered or "schema_docfacts" in lowered:
+                error_code = "KGF-DOC-BLD-006"
+                message = "DocFacts schema validation failed during docstring build"
+            elif "missing canonical schema" in lowered:
+                error_code = "KGF-DOC-ENV-002"
+                message = "DocFacts schema not found"
+        formatted = format_error_message(error_code, message, details=combined_details)
         LOGGER.exception(
-            format_error_message("KGF-DOC-BLD-001", "Docstring builder failed", details=details),
-            extra={"error_code": "KGF-DOC-BLD-001"},
+            formatted,
+            extra={
+                "error_code": error_code,
+                "command": cmd,
+                "returncode": exc.returncode,
+            },
         )
         raise SystemExit(exc.returncode if exc.returncode is not None else 1) from exc
 

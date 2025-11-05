@@ -41,7 +41,7 @@ Refactored the docstring-builder plugin registry from Protocol instantiation to 
 
 ### 5. Documentation ✅
 - **File**: `docs/contributing/plugin_registry_migration.md`
-- **File**: `openspec/changes/.../MYPY_RESOLUTION.md`
+- **File**: `openspec/changes/.../TYPE_CHECKING_RESOLUTION.md`
 - **Content**: Migration guide, examples, error handling, troubleshooting
 
 ## Quality Gates - Final Status
@@ -101,7 +101,7 @@ tools/docstring_builder/plugins/__init__.py:289: error: Expression type contains
 
 ### Documentation
 - `docs/contributing/plugin_registry_migration.md` (migration guide, examples)
-- `openspec/changes/.../MYPY_RESOLUTION.md` (detailed technical explanation)
+- `openspec/changes/.../TYPE_CHECKING_RESOLUTION.md` (detailed technical explanation)
 - `openspec/changes/.../IMPLEMENTATION_COMPLETE.md` (this file)
 
 ## Backward Compatibility ✅

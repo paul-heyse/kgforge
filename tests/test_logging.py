@@ -27,6 +27,23 @@ if TYPE_CHECKING:
 
 
 def parse_log_record(raw: str) -> dict[str, object]:
+    """Parse JSON log record string.
+
+    Parameters
+    ----------
+    raw : str
+        JSON-formatted log record string.
+
+    Returns
+    -------
+    dict[str, object]
+        Parsed log record dictionary.
+
+    Raises
+    ------
+    TypeError
+        If parsed value is not a dictionary.
+    """
     parsed: object = json.loads(raw)
     if not isinstance(parsed, dict):
         message = "Expected dict payload from JsonFormatter output"
@@ -36,6 +53,25 @@ def parse_log_record(raw: str) -> dict[str, object]:
 
 
 def expect_str(mapping: Mapping[str, object], key: str) -> str:
+    """Expect mapping value to be a string.
+
+    Parameters
+    ----------
+    mapping : Mapping[str, object]
+        Dictionary to look up value.
+    key : str
+        Key to look up.
+
+    Returns
+    -------
+    str
+        String value.
+
+    Raises
+    ------
+    TypeError
+        If value is not a string.
+    """
     value = mapping[key]
     if not isinstance(value, str):
         message = f"Expected str for {key}, got {type(value)!r}"

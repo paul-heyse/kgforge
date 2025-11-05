@@ -282,7 +282,7 @@
       "type": "object"
     },
     "QualityModel": {
-      "description": "Quality signals captured for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\nmypy_status : str | NoneType, optional\n    Describe ``mypy_status``.\n    Defaults to ``None``.\nruff_rules : list[str], optional\n    Describe ``ruff_rules``.\n    Defaults to ``<factory>``.\npydoclint_parity : bool | NoneType, optional\n    Describe ``pydoclint_parity``.\n    Defaults to ``None``.\ndocstring_coverage : float | NoneType, optional\n    Describe ``docstring_coverage``.\n    Defaults to ``None``.\ndoctest_status : str | NoneType, optional\n    Describe ``doctest_status``.\n    Defaults to ``None``.",
+      "description": "Quality signals captured for a symbol.\n\n<!-- auto:docstring-builder v1 -->\n\nParameters\n----------\npyright_status : str | NoneType, optional\n    Describe ``pyright_status``.\n    Defaults to ``None``.\npyrefly_status : str | NoneType, optional\n    Describe ``pyrefly_status``.\n    Defaults to ``None``.\nruff_rules : list[str], optional\n    Describe ``ruff_rules``.\n    Defaults to ``<factory>``.\npydoclint_parity : bool | NoneType, optional\n    Describe ``pydoclint_parity``.\n    Defaults to ``None``.\ndocstring_coverage : float | NoneType, optional\n    Describe ``docstring_coverage``.\n    Defaults to ``None``.\ndoctest_status : str | NoneType, optional\n    Describe ``doctest_status``.\n    Defaults to ``None``.",
       "properties": {
         "docstring_coverage": {
           "anyOf": [
@@ -308,18 +308,6 @@
           "default": null,
           "title": "Doctest Status"
         },
-        "mypy_status": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Mypy Status"
-        },
         "pydoclint_parity": {
           "anyOf": [
             {
@@ -331,6 +319,30 @@
           ],
           "default": null,
           "title": "Pydoclint Parity"
+        },
+        "pyrefly_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pyrefly Status"
+        },
+        "pyright_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pyright Status"
         },
         "ruff_rules": {
           "items": {
