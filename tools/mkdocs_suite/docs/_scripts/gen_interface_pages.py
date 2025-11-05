@@ -74,8 +74,21 @@ def _ensure_str_list(value: object) -> list[str]:
 
 def _collect_nav_interfaces() -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
-    for nav_path in REPO_ROOT.glob("src/**/_nav.json"):
-        module_name = nav_path.parent.name
+    src_root = REPO_ROOT / "src"
+    if not src_root.exists():
+        return records
+    for nav_path in src_root.glob("**/_nav.json"):
+        try:
+            relative_parent = nav_path.parent.relative_to(src_root)
+        except ValueError:  # pragma: no cover - defensive guard
+            relative_parent = nav_path.parent
+            normalized_module = relative_parent.name
+        else:
+            parts = tuple(part for part in relative_parent.parts if part not in {"", "."})
+            if parts:
+                normalized_module = ".".join(parts)
+            else:
+                normalized_module = nav_path.parent.name
         with nav_path.open("r", encoding="utf-8") as handle:
             data = json.load(handle)
         interfaces = data.get("interfaces") or []
@@ -85,7 +98,7 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
             if not isinstance(entry, dict):
                 continue
             record = dict(entry)
-            record.setdefault("module", module_name)
+            record["_nav_module_path"] = normalized_module
             records.append(record)
     return records
 
@@ -202,10 +215,11 @@ def _write_interface_table(
         description = record.get("description") or reg_entry.get("description") or "—"
         spec_cell = _spec_link(record)
         owner = record.get("owner") or reg_entry.get("owner") or "—"
+        module_path = record.get("module") or reg_entry.get("module") or record.get("_nav_module_path")
         row = "| {id} | {type} | {module} | {owner} | {stability} | {spec} | {desc} | {problems} |".format(
             id=identifier,
             type=record.get("type", "—"),
-            module=_module_doc_link(record.get("module")),
+            module=_module_doc_link(module_path),
             owner=owner,
             stability=record.get("stability", "—"),
             spec=spec_cell,
@@ -292,9 +306,14 @@ def _write_interface_details(
         handle.write(
             "* **Type:** {type}\n".format(type=nav_meta.get("type") or reg_entry.get("type") or "—")
         )
+        module_value = (
+            nav_meta.get("module")
+            or reg_entry.get("module")
+            or nav_meta.get("_nav_module_path")
+        )
         handle.write(
             "* **Module:** {module}\n".format(
-                module=nav_meta.get("module") or reg_entry.get("module") or "—"
+                module=module_value or "—"
             )
         )
         handle.write(
