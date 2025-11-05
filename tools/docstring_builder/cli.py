@@ -55,6 +55,7 @@ from tools.docstring_builder.paths import (
     REQUIRED_PYTHON_MINOR,
 )
 from tools.docstring_builder.policy import PolicyConfigurationError, load_policy_settings
+from tools.docstring_builder.utils import optional_str
 from tools.stubs.drift_check import run as run_stub_drift
 
 if TYPE_CHECKING:
@@ -232,8 +233,8 @@ def _build_request(
     return DocstringBuildRequest(
         command=command,
         subcommand=subcommand,
-        module=(args.module or "") | None,
-        since=(args.since or "") | None,
+        module=optional_str(getattr(args, "module", None)),
+        since=optional_str(getattr(args, "since", None)),
         changed_only=getattr(args, "changed_only", False),
         explicit_paths=explicit_paths,
         force=getattr(args, "force", False),
@@ -242,7 +243,7 @@ def _build_request(
         skip_docfacts=getattr(args, "skip_docfacts", False),
         json_output=getattr(args, "json_output", False),
         jobs=getattr(args, "jobs", 1) or 1,
-        baseline=(getattr(args, "baseline", "") | None),
+        baseline=optional_str(getattr(args, "baseline", None)),
         only_plugins=_parse_plugin_names(getattr(args, "only_plugin", None)),
         disable_plugins=_parse_plugin_names(getattr(args, "disable_plugin", None)),
         policy_overrides=policy_overrides,
@@ -325,8 +326,8 @@ def _command_list(args: argparse.Namespace) -> int:
     config, _ = load_builder_config(getattr(args, "config_path", None))
     try:
         selection = SelectionCriteria(
-            module=(args.module or "") | None,
-            since=(args.since or "") | None,
+            module=optional_str(getattr(args, "module", None)),
+            since=optional_str(getattr(args, "since", None)),
             changed_only=getattr(args, "changed_only", False),
             explicit_paths=getattr(args, "paths", None),
         )

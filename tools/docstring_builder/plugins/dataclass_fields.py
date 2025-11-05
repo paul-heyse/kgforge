@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
     from tools.docstring_builder.plugins.base import (
         PluginContext,
-        PluginStage,
     )
     from tools.docstring_builder.semantics import SemanticResult
 
@@ -186,13 +185,21 @@ class DataclassFieldDocPlugin(TransformerPlugin):
     Initialize dataclass field doc plugin.
     """
 
+    name: str = "dataclass_field_docs"
+    stage: str = "transformer"
+
+    def __init__(self) -> None:
+        self._cache: dict[str, dict[str, list[_FieldInfo]]] = {}
+
     def on_start(self, context: PluginContext) -> None:
         """Reset caches before processing begins."""
-        del self, context
+        del context
+        self._cache.clear()
 
     def on_finish(self, context: PluginContext) -> None:
         """Release cached field metadata at the end of processing."""
-        del self, context
+        del context
+        self._cache.clear()
 
     def apply(self, context: PluginContext, payload: SemanticResult) -> SemanticResult:
         """Populate dataclass parameter metadata for ``payload``.
@@ -216,10 +223,11 @@ class DataclassFieldDocPlugin(TransformerPlugin):
         file_path = context.file_path
         if file_path is None or not file_path.exists():
             return payload
-        field_map = self._cache.get(file_path)
+        cache_key = str(file_path.resolve())
+        field_map = self._cache.get(cache_key)
         if field_map is None:
             field_map = self._collect_fields(file_path, payload.symbol.module)
-            self._cache[file_path] = field_map
+            self._cache[cache_key] = field_map
         dataclass_fields = field_map.get(payload.symbol.qname)
         if dataclass_fields is None:
             return payload

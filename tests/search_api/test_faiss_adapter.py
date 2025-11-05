@@ -19,16 +19,20 @@ if TYPE_CHECKING:
 
 
 class _FakeIndex:
-    """Fake FAISS index for testing."""
+    """Fake FAISS index for testing.
+
+    This class provides a minimal implementation of the FAISS index protocol
+    that records method calls and state changes. It's used to test FAISS
+    adapter behavior without requiring actual FAISS library dependencies.
+
+    Parameters
+    ----------
+    label : str
+        Label identifier for this index instance, used for debugging and
+        distinguishing between multiple index instances in tests.
+    """
 
     def __init__(self, label: str) -> None:
-        """Initialize fake index.
-
-        Parameters
-        ----------
-        label : str
-            Label identifier for this index.
-        """
         self.label = label
         self.last_added: VectorArray | None = None
         self.last_added_with_ids: tuple[VectorArray, IndexArray] | None = None
@@ -93,13 +97,24 @@ class _FakeIndex:
 
 
 class _LegacyFaissModule:
-    """Mock legacy FAISS module with camelCase names."""
+    """Mock legacy FAISS module with camelCase names.
+
+    This mock module simulates the legacy FAISS API that uses camelCase method
+    names (e.g., ``indexFactory``, ``IndexFlatIP``). It records all method calls
+    and provides configurable return values for testing adapter compatibility
+    with legacy FAISS implementations.
+
+    Notes
+    -----
+    This module uses camelCase naming conventions consistent with older FAISS
+    Python bindings. The mock records method invocations to enable verification
+    of adapter behavior.
+    """
 
     METRIC_INNER_PRODUCT = 0
     METRIC_L2 = 1
 
     def __init__(self) -> None:
-        """Initialize legacy FAISS module mock."""
         self.index_factory_calls: list[tuple[int, str, int]] = []
         self.write_calls: list[tuple[FaissIndexProtocol, str]] = []
         self.read_path: str | None = None
@@ -203,13 +218,24 @@ class _LegacyFaissModule:
 
 
 class _ModernFaissModule:
-    """Mock modern FAISS module with PEP-8 names."""
+    """Mock modern FAISS module with PEP-8 names.
+
+    This mock module simulates the modern FAISS API that uses PEP-8 compliant
+    method names (e.g., ``index_factory``, ``index_flat_ip``). It records all
+    method calls and provides configurable return values for testing adapter
+    compatibility with modern FAISS implementations.
+
+    Notes
+    -----
+    This module uses PEP-8 naming conventions consistent with newer FAISS
+    Python bindings. The mock records method invocations to enable verification
+    of adapter behavior.
+    """
 
     METRIC_INNER_PRODUCT = 2
     METRIC_L2 = 3
 
     def __init__(self) -> None:
-        """Initialize modern FAISS module mock."""
         self.records: list[tuple[str, object]] = []
 
     def index_flat_ip(self, dimension: int) -> FaissIndexProtocol:

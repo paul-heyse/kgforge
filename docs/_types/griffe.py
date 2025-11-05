@@ -130,10 +130,10 @@ class MemberIterator(Protocol):
         node : GriffeNode
             Node to iterate members from.
 
-        Yields
-        ------
-        GriffeNode
-            Direct child nodes.
+        Returns
+        -------
+        Iterator[GriffeNode]
+            Direct child nodes yielded as an iterator.
         """
         ...
 
@@ -154,10 +154,19 @@ class GriffeFacade(Protocol):
 
 
 class _GriffeLoaderAdapter:
-    """Adapter wrapping a Griffe loader."""
+    """Adapter wrapping a Griffe loader.
+
+    This adapter wraps a Griffe loader facade and provides a simplified interface
+    for loading package module graphs. It delegates all loading operations to the
+    underlying loader facade.
+
+    Parameters
+    ----------
+    griffe_loader : LoaderFacade
+        Griffe loader facade to wrap and delegate to.
+    """
 
     def __init__(self, griffe_loader: LoaderFacade) -> None:
-        """Initialize with a Griffe loader."""
         self._loader = griffe_loader
 
     def load(self, package: str) -> GriffeNode:
@@ -197,10 +206,20 @@ class _DefaultMemberIterator:
 
 
 class _TypedGriffeFacade:
-    """Concrete implementation of GriffeFacade."""
+    """Concrete implementation of GriffeFacade.
+
+    This class provides a concrete implementation of the GriffeFacade protocol,
+    combining a loader facade with a default member iterator. It serves as the
+    primary implementation for accessing Griffe functionality in the documentation
+    build system.
+
+    Parameters
+    ----------
+    loader : LoaderFacade
+        Griffe loader facade for loading module graphs.
+    """
 
     def __init__(self, loader: LoaderFacade) -> None:
-        """Initialize with a loader facade."""
         self._loader = loader
         self._member_iterator = _DefaultMemberIterator()
 

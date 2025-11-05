@@ -44,6 +44,19 @@ class SearchResponse(BaseModel):
 class SearchRequest(BaseModel):
     """Search API request payload with optional filters and explain flag.
 
+    Attributes
+    ----------
+    query : str
+        Search query string (at least one character).
+    k : int
+        Number of results to return.
+    filters : dict[str, JsonValue] | None
+        Optional filters keyed by field.
+    explain : bool
+        Include explanation metadata flag.
+    model_config : ConfigDict
+        Pydantic configuration forbidding extra parameters.
+
     Examples
     --------
     >>> from pathlib import Path
@@ -74,6 +87,27 @@ class SearchRequest(BaseModel):
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
     """Search result model combining identifiers, score, and auxiliary signals.
+
+    Attributes
+    ----------
+    doc_id : str
+        Document identifier.
+    chunk_id : str
+        Chunk identifier.
+    title : str
+        Document title.
+    section : str
+        Section label.
+    score : float
+        Relevance score.
+    signals : dict[str, float]
+        Signal scores (dense, sparse, kg).
+    spans : dict[str, int]
+        Character spans associated with the result.
+    concepts : list[dict[str, str]]
+        Linked concept metadata.
+    model_config : ConfigDict
+        Pydantic configuration forbidding extra fields.
 
     Examples
     --------

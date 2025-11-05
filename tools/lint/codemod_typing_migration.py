@@ -21,10 +21,15 @@ MIN_MODULE_PARTS = 2
 
 
 class TypingFacadeMigrator(cst.CSTTransformer):
-    """Migrate typing imports to use façades instead of private modules."""
+    """Migrate typing imports to use façades instead of private modules.
+
+    Notes
+    -----
+    This transformer replaces imports from ``docs._types`` with equivalent
+    imports from the public facade modules (e.g., ``docs.types``).
+    """
 
     def __init__(self) -> None:
-        """Initialize the transformer."""
         self.modified = False
 
     def _transform_import_from(self, node: cst.ImportFrom) -> cst.ImportFrom | cst.RemovalSentinel:

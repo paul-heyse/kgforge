@@ -224,6 +224,16 @@ class PipelineRunner:
         Dependency configuration for the pipeline.
     """
 
+    __slots__ = ("_cfg",)
+
+    def __init__(self, config: PipelineConfig) -> None:
+        self._cfg = config
+
+    @property
+    def config(self) -> PipelineConfig:
+        """Return the configured pipeline dependencies."""
+        return self._cfg
+
     def run(self, files: Iterable[Path]) -> DocstringBuildResult:
         """Execute the pipeline for the provided file set.
 
@@ -339,25 +349,39 @@ class PipelineRunner:
     def _ordered_outcomes(
         self, files: Sequence[Path], jobs: int
     ) -> Iterable[tuple[Path, FileOutcome]]:
-        """Process files in order, respecting job count.
+        """Process files in order, respecting job count for parallel execution.
+
+        This method processes files either serially (when jobs <= 1) or in parallel
+        using a thread pool (when jobs > 1). It maintains the original file order
+        by indexing futures and sorting results. KeyboardInterrupt exceptions are
+        propagated immediately to allow for clean shutdown, while other exceptions
+        are caught, logged, and wrapped in FileOutcome objects.
 
         Parameters
         ----------
         files : Sequence[Path]
-            File paths to process.
+            File paths to process for docstring generation or updates.
         jobs : int
-            Number of worker jobs (1 for serial execution).
+            Number of worker jobs (1 for serial execution, >1 for parallel).
 
         Yields
         ------
         (Path, FileOutcome)
-            Tuple of (file_path, outcome) for each processed file.
+            Tuple of (file_path, outcome) for each processed file, maintaining
+            the original order of the input files.
+
+        Notes
+        -----
+        KeyboardInterrupt exceptions are propagated immediately when encountered
+        during file processing to allow for clean shutdown of the pipeline.
+        All other exceptions are caught, logged, and wrapped in FileOutcome objects.
 
         Raises
         ------
-        Exception
-            Any exception raised during file processing is re-raised if it is a
-            KeyboardInterrupt, otherwise it is logged and wrapped in a FileOutcome.
+        KeyboardInterrupt
+            Propagated immediately when encountered during file processing to
+            allow for clean shutdown of the pipeline. This occurs when a worker
+            thread raises KeyboardInterrupt during file processing.
         """
         if jobs <= 1:
             for file_path in files:
@@ -377,7 +401,8 @@ class PipelineRunner:
                     outcome = future.result()
                 else:
                     if isinstance(exception, KeyboardInterrupt):  # pragma: no cover - propagate
-                        raise exception
+                        # Re-raise KeyboardInterrupt to allow clean shutdown
+                        raise KeyboardInterrupt from exception
                     self._cfg.logger.error(
                         "Processing failed for %s", candidate, exc_info=exception
                     )

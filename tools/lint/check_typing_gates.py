@@ -92,16 +92,15 @@ class TypeGateViolation:
 
 
 class TypeGateVisitor(ast.NodeVisitor):
-    """AST visitor to detect unguarded type-only imports."""
+    """AST visitor to detect unguarded type-only imports.
+
+    Parameters
+    ----------
+    filepath : Path
+        Path to the file being analyzed.
+    """
 
     def __init__(self, filepath: Path) -> None:
-        """Initialize visitor.
-
-        Parameters
-        ----------
-        filepath : Path
-            Path to the file being analyzed.
-        """
         self.filepath = filepath
         self.violations: list[TypeGateViolation] = []
         self.in_type_checking_block = False

@@ -21,18 +21,22 @@ __all__ = ["ModuleExportsCache"]
 
 
 class ModuleExportsCache:
-    """Cache for lazily imported modules and their exported names."""
+    """Cache for lazily imported modules and their exported names.
+
+    This cache provides lazy loading of Python modules and their exported names,
+    storing both the module object and its __all__ attribute (if present) for
+    efficient repeated access. The cache is initialized with a module path and
+    loads the module only when first accessed.
+
+    Parameters
+    ----------
+    module_path : str
+        Fully qualified module path to cache (e.g., "package.module").
+    """
 
     __slots__ = ("_exports", "_module", "_module_path")
 
     def __init__(self, module_path: str) -> None:
-        """Initialize module exports cache.
-
-        Parameters
-        ----------
-        module_path : str
-            Fully qualified module path to cache.
-        """
         self._module_path = module_path
         self._module: ModuleType | None = None
         self._exports: tuple[str, ...] | None = None

@@ -82,15 +82,23 @@ class GalleryOptions:
 def validate_title_format(docstring: str) -> tuple[bool, str]:
     """Validate Sphinx-Gallery title and underline formatting requirements.
 
+    This function checks that a gallery example docstring follows Sphinx-Gallery's
+    strict formatting rules: the title must be on the first non-empty line, followed
+    by an underline of '=' characters that matches the title length (±1 character),
+    and a blank line after the underline.
+
     Parameters
     ----------
-    docstring
-        Raw module docstring extracted from a gallery example.
+    docstring : str
+        Raw module docstring extracted from a gallery example file, which should
+        contain a properly formatted title section.
 
     Returns
     -------
     tuple[bool, str]
-        ``(True, "")`` when the title is well-formed, otherwise ``(False, reason)``.
+        ``(True, "")`` when the title is well-formed according to Sphinx-Gallery
+        rules, otherwise ``(False, reason)`` where reason describes the validation
+        failure (e.g., "missing underline", "title exceeds 40 characters").
     """
     lines = [line.rstrip() for line in inspect.cleandoc(docstring).splitlines()]
     while lines and not lines[0].strip():
@@ -221,19 +229,26 @@ def _load_docstring(path: Path) -> str | None:
 def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]:
     """Validate gallery example formatting and return a list of issues.
 
+    This function performs comprehensive validation of a Sphinx-Gallery example
+    file, checking title formatting, required directives (tags, constraints),
+    and optional strict formatting rules. It returns a list of human-readable
+    error messages describing any validation failures.
+
     Parameters
     ----------
-    file_path
-        Path to the Python example file.
-    strict
-        When ``True`` enable extra formatting checks (title punctuation,
-        constraints bullets).
+    file_path : Path
+        Path to the Python example file to validate. The file must contain
+        valid Python syntax and a module docstring.
+    strict : bool, optional
+        When ``True`` enable extra formatting checks including title punctuation
+        validation and constraints section bullet formatting. Defaults to ``False``.
 
     Returns
     -------
     list[str]
         Human-readable validation errors. The list is empty when the example
-        satisfies all rules.
+        satisfies all rules, otherwise contains descriptive messages about each
+        formatting issue found.
     """
     errors: list[str] = []
     docstring = _load_docstring(file_path)
@@ -289,19 +304,27 @@ def _iter_example_files(examples_dir: Path) -> Iterable[Path]:
 def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> int:
     """Validate every example in ``examples_dir`` and emit a summary.
 
+    This function iterates through all Python example files in the specified
+    directory and validates them against Sphinx-Gallery formatting requirements.
+    It reports errors and returns an exit code suitable for CI pipelines.
+
     Parameters
     ----------
-    examples_dir
-        Directory containing Sphinx-Gallery example modules.
-    strict
-        When ``True`` enable the stricter validation rules.
-    verbose
-        When ``True`` print progress for passing files.
+    examples_dir : Path
+        Directory containing Sphinx-Gallery example modules to validate.
+        Files starting with '.' are skipped.
+    strict : bool, optional
+        When ``True`` enable stricter validation rules including title punctuation
+        and constraints formatting. Defaults to ``False``.
+    verbose : bool, optional
+        When ``True`` print progress messages for passing files in addition to
+        errors. Defaults to ``False``.
 
     Returns
     -------
     int
-        ``0`` when all files pass, ``1`` when any fail, ``2`` for CLI errors.
+        Exit code: ``0`` when all files pass validation, ``1`` when any files
+        fail, ``2`` for CLI argument errors.
     """
     results: list[ValidationResult] = []
     exit_code = 0

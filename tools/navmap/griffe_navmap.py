@@ -56,7 +56,36 @@ DEFAULT_EXTENSIONS: list[str] = [
 
 @dataclass(slots=True)
 class Symbol:
-    """Serialized representation of a single symbol.
+    """Serialized representation of a single symbol discovered during navmap generation.
+
+    A symbol represents any Python construct (module, class, function, etc.) that
+    was discovered during the traversal of package roots. This class captures
+    essential metadata including location information, docstring summaries, and
+    relationship metadata (aliases, inheritance).
+
+    Attributes
+    ----------
+    path : str
+        Fully qualified path of the symbol (e.g., ``pkg.module.Class.method``).
+    kind : str
+        Symbol kind such as ``module``, ``class``, ``function``, or ``alias``.
+    file : str | None
+        Repository-relative file path containing the symbol definition.
+    lineno : int | None
+        Starting line number for the symbol definition in the source file.
+    endlineno : int | None
+        Ending line number for the symbol definition in the source file.
+    summary : str | None
+        First line of the docstring, if present, used as a brief description.
+    origin : str | None
+        Fully qualified target when the symbol is an alias or inherited member,
+        indicating where the symbol originally comes from.
+    inherited : bool
+        Flag indicating whether the symbol originates from inheritance rather than
+        being defined directly in the current class.
+    is_alias : bool
+        Flag indicating whether the symbol is represented as a Griffe alias,
+        meaning it's imported or re-exported from another module.
 
     Parameters
     ----------
@@ -93,7 +122,24 @@ class Symbol:
 
 @dataclass(slots=True)
 class NavMap:
-    """Container for navmap metadata.
+    """Container for navmap metadata capturing the symbol structure of a codebase.
+
+    A NavMap represents a snapshot of the symbol structure discovered during
+    a traversal of package roots. It includes metadata about the generation
+    context (commit SHA) and organizes all discovered symbols for efficient
+    lookup and navigation.
+
+    Attributes
+    ----------
+    commit : str | None
+        Commit SHA used to generate the navmap, providing traceability to
+        the exact code version that was analyzed.
+    roots : list[str]
+        Package roots that were loaded during navmap generation, indicating
+        which top-level packages were included in the analysis.
+    symbols : list[Symbol]
+        Symbols discovered during traversal, representing all Python constructs
+        (modules, classes, functions, etc.) found in the scanned packages.
 
     Parameters
     ----------
@@ -137,10 +183,12 @@ def _git_commit_sha() -> str | None:
         ref = head_value[5:].strip()
         ref_path = repo_root / ".git" / ref
         try:
-            return ref_path.read_text(encoding="utf-8").strip() | None
+            content = ref_path.read_text(encoding="utf-8").strip()
         except OSError:  # pragma: no cover - ref missing
             return None
-    return head_value | None
+        else:
+            return content or None
+    return head_value or None
 
 
 def _short_summary(doc: Docstring | None) -> str | None:
@@ -362,7 +410,7 @@ def build_navmap(
         try:
             resolve_aliases(
                 implicit=True,
-                external=settings.resolve_external | None,
+                external=settings.resolve_external or None,
             )
         except (
             AliasResolutionError,

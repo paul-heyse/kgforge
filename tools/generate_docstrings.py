@@ -38,7 +38,7 @@ def run_builder(extra_args: list[str] | None = None) -> None:
         stderr = getattr(exc, "stderr", "") or ""
         stdout = getattr(exc, "stdout", "") or ""
         combined_details = (
-            "\n".join(part for part in (stderr.strip(), stdout.strip()) if part) | None
+            "\n".join(part for part in (stderr.strip(), stdout.strip()) if part) or None
         )
         error_code = "KGF-DOC-BLD-001"
         message = "Docstring builder failed"

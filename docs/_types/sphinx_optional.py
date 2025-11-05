@@ -33,12 +33,17 @@ __all__ = [
 class MissingDependencyError(ImportError):
     """Raised when an optional dependency required for docs building is missing.
 
+    This exception is raised when code attempts to use optional Sphinx extensions
+    (such as AutoAPI or Astroid) that are not installed. It provides a clear
+    error message indicating which dependency is missing and why it's needed.
+
     Parameters
     ----------
     module_name : str
-        Name of the missing module.
+        Name of the missing module (e.g., "sphinx_autoapi").
     reason : str, optional
-        Additional context or reason for the requirement.
+        Explanation of why the dependency is required.
+        Defaults to empty string.
 
     Examples
     --------
@@ -46,7 +51,6 @@ class MissingDependencyError(ImportError):
     """
 
     def __init__(self, module_name: str, reason: str = "") -> None:
-        """Initialize the error."""
         message = f"Missing optional dependency: {module_name}"
         if reason:
             message += f" ({reason})"
@@ -76,14 +80,25 @@ class OptionalDependencies(Protocol):
 
 
 class _OptionalDependenciesImpl:
-    """Concrete implementation of OptionalDependencies."""
+    """Concrete implementation of OptionalDependencies.
+
+    This class provides a concrete implementation of the OptionalDependencies
+    protocol, aggregating optional dependency facades for AutoAPI and Astroid.
+    It encapsulates the initialization and access to these optional components.
+
+    Parameters
+    ----------
+    autoapi_parser : AutoapiParserFacade
+        AutoAPI parser facade class for parsing API documentation.
+    astroid_manager : AstroidManagerFacade
+        Astroid manager facade for AST analysis and introspection.
+    """
 
     def __init__(
         self,
         autoapi_parser: AutoapiParserFacade,
         astroid_manager: AstroidManagerFacade,
     ) -> None:
-        """Initialize with optional dependency instances."""
         self._autoapi_parser = autoapi_parser
         self._astroid_manager = astroid_manager
 
@@ -101,10 +116,20 @@ class _OptionalDependenciesImpl:
 def load_optional_dependencies() -> OptionalDependencies:
     """Load optional Sphinx dependencies with guarded imports.
 
+    This function attempts to import and initialize optional Sphinx dependencies
+    (AutoAPI parser and Astroid manager). If any dependency is missing, it raises
+    MissingDependencyError with a clear error message indicating which dependency
+    failed and why it's needed.
+
     Returns
     -------
     OptionalDependencies
         Aggregate facade providing access to optional components.
+
+    Raises
+    ------
+    MissingDependencyError
+        If AutoAPI parser module or Astroid module cannot be imported.
 
     Examples
     --------
@@ -120,8 +145,7 @@ def load_optional_dependencies() -> OptionalDependencies:
     try:
         parser_module = import_module("autoapi._parser")
     except ImportError as e:
-        autoapi_error = MissingDependencyError("autoapi._parser", autoapi_import_err_msg)
-        raise autoapi_error from e
+        raise MissingDependencyError("autoapi._parser", autoapi_import_err_msg) from e
     parser_cls = coerce_parser_class(parser_module)
 
     # Try to import astroid
@@ -129,8 +153,7 @@ def load_optional_dependencies() -> OptionalDependencies:
     try:
         astroid = import_module("astroid")
     except ImportError as e:
-        astroid_error = MissingDependencyError("astroid", astroid_import_err_msg)
-        raise astroid_error from e
+        raise MissingDependencyError("astroid", astroid_import_err_msg) from e
 
     # If we get here, both are available
     # Return facades wrapping the actual modules/objects

@@ -100,6 +100,7 @@ from tools.docstring_builder.pipeline import PipelineConfig, PipelineRunner
 from tools.docstring_builder.render import render_docstring
 from tools.docstring_builder.schema import DocstringEdit
 from tools.docstring_builder.semantics import build_semantic_schemas
+from tools.docstring_builder.utils import optional_str, optional_str_list
 from tools.docstring_builder.version import BUILDER_VERSION
 
 if TYPE_CHECKING:
@@ -238,7 +239,7 @@ def _git_output(arguments: Sequence[str]) -> str | None:
         adapter.debug("git returned non-zero exit code: %s", result.returncode)
         return None
     output = result.stdout.strip()
-    return output | None
+    return output or None
 
 
 def _resolve_commit_hash() -> str:
@@ -797,10 +798,10 @@ def run_docstring_builder(
         config.normalize_sections = True
     try:
         selection = SelectionCriteria(
-            module=request.module | None,
-            since=request.since | None,
+            module=optional_str(request.module),
+            since=optional_str(request.since),
             changed_only=request.changed_only,
-            explicit_paths=list(request.explicit_paths) | None,
+            explicit_paths=optional_str_list(request.explicit_paths or None),
         )
         files = select_files(config, selection)
     except InvalidPathError:

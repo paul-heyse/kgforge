@@ -29,10 +29,15 @@ def compute_delta(
     ----------
     config : DocsDeltaConfig
         Typed configuration controlling delta computation behavior.
-    baseline : Mapping[str, Mapping[str, object]]
+    baseline : SymbolIndex
         The baseline symbol index to compare against.
-    current : Mapping[str, Mapping[str, object]]
+    current : SymbolIndex
         The current symbol index to compare.
+
+    Returns
+    -------
+    SymbolDelta
+        Delta payload as a dictionary (currently raises NotImplementedError).
 
     Raises
     ------

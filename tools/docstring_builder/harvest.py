@@ -464,14 +464,15 @@ def _walk_members(
 
 
 class _IndexCollector(cst.CSTTransformer):
-    def __init__(self, module_name: str) -> None:
-        """Initialize index collector.
+    """Collect CST nodes for indexing.
 
-        Parameters
-        ----------
-        module_name : str
-            Module qualified name.
-        """
+    Parameters
+    ----------
+    module_name : str
+        Module qualified name.
+    """
+
+    def __init__(self, module_name: str) -> None:
         self.module_name = module_name
         self.namespace: list[str] = []
         self.index: dict[str, cst.CSTNode] = {}

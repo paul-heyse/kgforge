@@ -82,6 +82,11 @@ def has_postponed_annotations(content: str) -> bool:
 def extract_header_and_body(content: str) -> tuple[str, str]:
     """Extract header (shebang, encoding, docstring) from body.
 
+    Parameters
+    ----------
+    content : str
+        File content to parse.
+
     Returns
     -------
     tuple[str, str]

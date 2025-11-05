@@ -16,9 +16,13 @@ SRC = ROOT / "src"
 def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
     """Parse ``path`` and return the module node plus its docstring expression.
 
+    This function parses a Python file and extracts both the complete AST module
+    node and the top-level docstring expression (if present). The docstring is
+    identified as the first expression statement containing a string constant.
+
     Parameters
     ----------
-    path
+    path : Path
         File to parse. The file must contain valid Python syntax.
 
     Returns
@@ -44,9 +48,14 @@ def iter_module_nodes(path: Path) -> tuple[ast.Module, ast.Expr | None]:
 def clean_docstring(text: str) -> str:
     """Remove legacy ``NavMap:`` sections while keeping meaningful text.
 
+    This function strips deprecated NavMap metadata annotations from module
+    docstrings while preserving the actual documentation content. It removes
+    lines starting with "NavMap:" and any content after them, then collapses
+    empty lines and trims whitespace.
+
     Parameters
     ----------
-    text
+    text : str
         Original module docstring including the deprecated NavMap annotations.
 
     Returns
@@ -68,16 +77,21 @@ def clean_docstring(text: str) -> str:
 def rewrite_module(path: Path) -> bool:
     """Rewrite ``path`` in-place when the module docstring encodes NavMap data.
 
+    This function reads a Python module file, checks if its docstring contains
+    deprecated NavMap metadata sections, and if so, rewrites the file with the
+    cleaned docstring. The cleaning process removes NavMap annotations while
+    preserving the actual documentation content.
+
     Parameters
     ----------
-    path
-        Module file to update.
+    path : Path
+        Module file to update in-place. The file must contain valid Python syntax.
 
     Returns
     -------
     bool
         ``True`` if the docstring was replaced with cleaned content, ``False``
-        when no NavMap section was present.
+        when no NavMap section was present or the file had no docstring.
     """
     tree, doc_expr = iter_module_nodes(path)
     if doc_expr is None:

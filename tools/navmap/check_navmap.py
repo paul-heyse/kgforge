@@ -57,18 +57,23 @@ class AllPlaceholder:
 
 
 class AllDictTemplate:
-    """Sentinel for ``{name: TEMPLATE for name in __all__}`` structures."""
+    """Sentinel for ``{name: TEMPLATE for name in __all__}`` structures.
+
+    This class serves as a marker in navmap templates to indicate that a dictionary
+    should be expanded to include all symbols listed in a module's ``__all__``
+    attribute. When resolving navmaps, this template is replaced with a dictionary
+    mapping each exported symbol name to the template value.
+
+    Parameters
+    ----------
+    template : NavTree
+        Template navmap tree structure that will be applied to each symbol
+        listed in ``__all__`` when the navmap is resolved.
+    """
 
     __slots__ = ("template",)
 
     def __init__(self, template: NavTree) -> None:
-        """Initialize template with navmap tree.
-
-        Parameters
-        ----------
-        template : NavTree
-            Template navmap tree to store.
-        """
         self.template = template
 
 

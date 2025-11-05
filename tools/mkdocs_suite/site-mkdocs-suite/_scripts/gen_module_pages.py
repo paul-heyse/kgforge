@@ -258,13 +258,24 @@ def _is_function(obj: object) -> TypeGuard[_GriffeFunction]:
 
 
 def _first_paragraph(module: _GriffeModule) -> str | None:
-    """
-    Return the first paragraph from the module docstring, if present.
+    """Extract the first paragraph from the module docstring for use as a synopsis.
+
+    This function extracts the first paragraph (text before the first blank line)
+    from a module's docstring, which is commonly used as a brief summary or
+    synopsis in documentation. Returns None if the module has no docstring or
+    if the docstring is empty.
+
+    Parameters
+    ----------
+    module : _GriffeModule
+        Griffe module object representing a Python module, containing docstring
+        and other metadata.
 
     Returns
     -------
     str | None
         First paragraph of the module docstring when available; otherwise ``None``.
+        The paragraph is stripped of leading/trailing whitespace.
     """
     if module.docstring is None or not module.docstring.value:
         return None
@@ -275,19 +286,25 @@ def _first_paragraph(module: _GriffeModule) -> str | None:
 
 
 def _discover_extensions(candidates: Iterable[str]) -> tuple[list[str], object | None]:
-    """
-    Return available Griffe extensions and a preloaded bundle.
+    """Discover and load available Griffe extensions, returning successful candidates.
+
+    This function attempts to load Griffe extensions from the provided candidate
+    names. It handles partial failures gracefully by trying each extension
+    individually and returning only those that can be successfully imported. This
+    is useful when some extensions may be optional dependencies.
 
     Parameters
     ----------
-    candidates
-        Extension module names to probe.
+    candidates : Iterable[str]
+        Extension module names to probe, typically Griffe extension packages
+        that enhance type introspection capabilities.
 
     Returns
     -------
     tuple[list[str], object | None]
         A tuple containing the subset of importable extension names and the
-        optional bundle returned by ``griffe.load_extensions``.
+        optional bundle returned by ``griffe.load_extensions``. The bundle may
+        be used for subsequent module loading operations.
     """
     names = list(candidates)
     if not names:
@@ -308,18 +325,24 @@ def _discover_extensions(candidates: Iterable[str]) -> tuple[list[str], object |
 
 
 def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
-    """
-    Load all submodules for the configured package roots.
+    """Load all submodules for the configured package roots using Griffe.
+
+    This function traverses the configured package roots and loads all Python
+    modules using Griffe's introspection system. It uses the provided extension
+    bundle to enhance type detection and handles errors gracefully by logging
+    warnings for modules that cannot be loaded.
 
     Parameters
     ----------
-    extensions_bundle
-        Preloaded extension bundle returned by ``griffe.load_extensions``.
+    extensions_bundle : object
+        Preloaded extension bundle returned by ``griffe.load_extensions``,
+        containing enhanced introspection capabilities for supported type systems.
 
     Returns
     -------
     dict[str, _GriffeModule]
-        Mapping of module path to Griffe module objects.
+        Mapping of module path (e.g., 'kgfoundry.api.search') to Griffe module
+        objects containing symbol metadata, docstrings, and relationships.
     """
     modules: dict[str, _GriffeModule] = {}
     visited: set[str] = set()
@@ -356,6 +379,11 @@ def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
 
 def _code_permalink(relative_path: Path | None) -> str | None:
     """Return a GitHub permalink for ``relative_path`` when configured.
+
+    Parameters
+    ----------
+    relative_path : Path | None
+        Relative path to the source file.
 
     Returns
     -------
@@ -395,6 +423,11 @@ def _load_api_usage() -> dict[str, list[OperationLink]]:
 def _symbol_from_handler(handler: object) -> str | None:
     """Return the fully-qualified symbol path for a registry handler string.
 
+    Parameters
+    ----------
+    handler : object
+        Handler string from registry metadata.
+
     Returns
     -------
     str | None
@@ -415,6 +448,11 @@ def _registry_api_usage(
     registry: Mapping[str, dict[str, object]],
 ) -> dict[str, list[OperationLink]]:
     """Derive symbol → operation mappings from the interface registry.
+
+    Parameters
+    ----------
+    registry : Mapping[str, dict[str, object]]
+        Interface registry mapping identifiers to metadata.
 
     Returns
     -------
@@ -445,6 +483,13 @@ def _merge_api_usage(
     registry_usage: Mapping[str, list[OperationLink]],
 ) -> dict[str, list[OperationLink]]:
     """Merge API usage derived from JSON files and the interface registry.
+
+    Parameters
+    ----------
+    file_usage : Mapping[str, list[OperationLink]]
+        API usage mappings from JSON files.
+    registry_usage : Mapping[str, list[OperationLink]]
+        API usage mappings from interface registry.
 
     Returns
     -------
@@ -490,8 +535,12 @@ def _load_registry() -> dict[str, dict[str, object]]:
 
 
 def _module_exports(module: _GriffeModule) -> set[str]:
-    """
-    Extract export names declared in ``__all__`` for the module.
+    """Extract export names declared in ``__all__`` for the module.
+
+    Parameters
+    ----------
+    module : _GriffeModule
+        Griffe module object.
 
     Returns
     -------
@@ -528,8 +577,14 @@ def _register_member(module_path: str, member: object, tables: _RelationshipTabl
 def _build_relationships(
     modules: Mapping[str, _GriffeModule], api_usage: Mapping[str, list[OperationLink]]
 ) -> ModuleFacts:
-    """
-    Return imports, exports, symbols, and related API usage facts.
+    """Return imports, exports, symbols, and related API usage facts.
+
+    Parameters
+    ----------
+    modules : Mapping[str, _GriffeModule]
+        Mapping of module paths to Griffe module objects.
+    api_usage : Mapping[str, list[OperationLink]]
+        Mapping of symbol paths to operation references.
 
     Returns
     -------
@@ -572,6 +627,13 @@ def _build_relationships(
 def _format_module_links(module_names: Iterable[str], documented: set[str]) -> str:
     """Return a comma-separated list of module names with links where possible.
 
+    Parameters
+    ----------
+    module_names : Iterable[str]
+        Iterable of module names to format.
+    documented : set[str]
+        Set of module names that have documentation pages.
+
     Returns
     -------
     str
@@ -591,6 +653,15 @@ def _nav_metadata_for_module(
     module_path: str, module: _GriffeModule, facts: ModuleFacts
 ) -> dict[str, Any]:
     """Return nav metadata merged with runtime defaults for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Module path identifier.
+    module : _GriffeModule
+        Griffe module object.
+    facts : ModuleFacts
+        Module relationship facts.
 
     Returns
     -------
@@ -651,6 +722,11 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
 def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
     """Return a tuple of (label, href) for the provided spec path.
 
+    Parameters
+    ----------
+    spec_path : object
+        Specification file path.
+
     Returns
     -------
     tuple[str | None, str | None]
@@ -669,6 +745,13 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
     """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``.
+
+    Parameters
+    ----------
+    spec_path : object
+        Specification file path.
+    operation_id : str
+        OpenAPI operation identifier.
 
     Returns
     -------
@@ -753,6 +836,11 @@ def _write_contents(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleF
 def _interface_entries(nav_meta: Mapping[str, Any]) -> list[Mapping[str, object]]:
     """Return validated interface entries from nav metadata.
 
+    Parameters
+    ----------
+    nav_meta : Mapping[str, Any]
+        Navigation metadata dictionary.
+
     Returns
     -------
     list[Mapping[str, object]]
@@ -771,6 +859,15 @@ def _merge_interface_metadata(
     default_identifier: str,
 ) -> tuple[str, dict[str, object], Mapping[str, object]]:
     """Return identifier, merged metadata, and registry entry for ``entry``.
+
+    Parameters
+    ----------
+    entry : Mapping[str, object]
+        Interface entry from nav metadata.
+    registry : Mapping[str, dict[str, object]]
+        Interface registry mapping identifiers to metadata.
+    default_identifier : str
+        Default identifier to use if entry lacks one.
 
     Returns
     -------
@@ -813,6 +910,13 @@ def _write_interface_operations(
 def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
     """Return a Mermaid class diagram for classes defined in ``module_path``.
 
+    Parameters
+    ----------
+    module_path : str
+        Module path identifier.
+    facts : ModuleFacts
+        Module relationship facts.
+
     Returns
     -------
     str
@@ -852,6 +956,13 @@ def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
 
 def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
     """Return a small inline D2 neighborhood diagram for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Module path identifier.
+    facts : ModuleFacts
+        Module relationship facts.
 
     Returns
     -------

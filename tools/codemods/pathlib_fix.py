@@ -120,6 +120,11 @@ class PathlibTransformer(cst.CSTTransformer):
     Initializes transformer with change tracking.
     """
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.changes: list[str] = []
+        self.needs_pathlib_import: bool = False
+
     def on_visit(self, node: cst.CSTNode) -> bool:
         """Track if pathlib import already exists.
 

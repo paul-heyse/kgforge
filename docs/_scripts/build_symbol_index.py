@@ -241,6 +241,22 @@ class GriffeNode(Protocol):
 def safe_getattr(obj: object, name: str, default: object | None = None) -> object | None:
     """Return ``getattr`` with defensive error handling.
 
+    This function safely retrieves attributes from objects, catching common
+    exceptions that can occur during attribute access (AttributeError,
+    RuntimeError, AliasResolutionError). It returns the default value when
+    attribute access fails, making it useful for traversing potentially unstable
+    object graphs.
+
+    Parameters
+    ----------
+    obj : object
+        Object to retrieve attribute from.
+    name : str
+        Attribute name to access.
+    default : object | None, optional
+        Default value to return if attribute cannot be accessed.
+        Defaults to None.
+
     Returns
     -------
     object | None

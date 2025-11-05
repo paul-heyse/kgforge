@@ -38,7 +38,20 @@ class StubResponse:
 
 
 class StubHttpClient:
-    """Deterministic HTTP client stub that returns queued responses."""
+    """Deterministic HTTP client stub that returns queued responses.
+
+    This stub client allows tests to pre-configure HTTP responses for GET and POST
+    requests. It maintains queues of responses that are consumed in order when
+    requests are made. This enables deterministic testing of HTTP interactions
+    without requiring a real HTTP server.
+
+    Parameters
+    ----------
+    get_responses : list[StubResponse] | None, optional
+        Queue of GET responses that will be returned in order.
+    post_responses : list[StubResponse] | None, optional
+        Queue of POST responses that will be returned in order.
+    """
 
     def __init__(
         self,
@@ -46,15 +59,6 @@ class StubHttpClient:
         get_responses: list[StubResponse] | None = None,
         post_responses: list[StubResponse] | None = None,
     ) -> None:
-        """Initialize stub HTTP client.
-
-        Parameters
-        ----------
-        get_responses : list[StubResponse] | None, optional
-            Queue of GET responses.
-        post_responses : list[StubResponse] | None, optional
-            Queue of POST responses.
-        """
         self._get_responses = list(get_responses or [])
         self._post_responses = list(post_responses or [])
         self.get_call_count = 0

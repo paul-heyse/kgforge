@@ -167,6 +167,15 @@ __all__ = [
 class LineSpan(BaseModel):
     """Start/end line numbers for a symbol.
 
+    Attributes
+    ----------
+    start : int | None
+        Starting line number (1-indexed), or None if unknown.
+    end : int | None
+        Ending line number (1-indexed, inclusive), or None if unknown.
+    model_config : dict[str, object]
+        Pydantic model configuration dictionary.
+
     Parameters
     ----------
     start : int | None
@@ -178,7 +187,7 @@ class LineSpan(BaseModel):
     start: int | None = Field(None, ge=0, description="Start line (1-indexed)")
     end: int | None = Field(None, ge=0, description="End line (1-indexed, inclusive)")
 
-    model_config = {"frozen": True}
+    model_config: dict[str, object] = {"frozen": True}
 
 
 class SymbolIndexRow(BaseModel):
@@ -186,6 +195,47 @@ class SymbolIndexRow(BaseModel):
 
     Each row represents one documented symbol (function, class, module, etc.) with
     metadata needed for search, deep linking, and reverse lookups.
+
+    Attributes
+    ----------
+    path : str
+        Fully qualified symbol path (e.g., "pkg.mod.ClassName.method_name").
+    kind : str
+        Symbol kind: "module", "class", "function", "method", etc.
+    doc : str
+        Documentation string/docstring for this symbol.
+    tested_by : Annotated[tuple[str, ...], Field]
+        Test paths (relative to tests/) that cover this symbol.
+    source_link : Annotated[dict[str, str], Field]
+        Links to source code (e.g., GitHub, local paths).
+    canonical_path : str | None
+        If this symbol is an alias, canonical_path points to the real definition.
+    module : str | None
+        Module containing this symbol (e.g., "pkg.mod").
+    package : str | None
+        Top-level package name (e.g., "pkg").
+    file : str | None
+        Relative path to source file (e.g., "pkg/mod.py").
+    span : LineSpan | None
+        Start/end line numbers in the source file.
+    signature : str | None
+        Function/method signature string (e.g., "(x: int) -> str").
+    owner : str | None
+        For methods: qualified path to the owner class.
+    stability : str | None
+        Stability tag (e.g., "stable", "experimental").
+    since : str | None
+        Version when first introduced (e.g., "0.1.0").
+    deprecated_in : str | None
+        Version when deprecated (e.g., "0.2.0").
+    section : str | None
+        Documentation section or category.
+    is_async : bool
+        True if this is an async function/method.
+    is_property : bool
+        True if this is a @property.
+    model_config : dict[str, object]
+        Pydantic model configuration dictionary.
 
     Parameters
     ----------
@@ -378,11 +428,22 @@ class SymbolIndexRow(BaseModel):
             return {str(k): str(val) for k, val in v.items()}
         return {}
 
-    model_config = {"frozen": True}
+    model_config: dict[str, object] = {"frozen": True}
 
 
 class SymbolIndexArtifacts(BaseModel):
     """Complete symbol index payload with forward and reverse lookups.
+
+    Attributes
+    ----------
+    rows : Annotated[tuple[SymbolIndexRow, ...], Field]
+        All symbol entries, sorted by path.
+    by_file : Annotated[dict[str, tuple[str, ...]], Field]
+        Reverse lookup: file path -> sorted tuple of symbol paths.
+    by_module : Annotated[dict[str, tuple[str, ...]], Field]
+        Reverse lookup: module name -> sorted tuple of symbol paths.
+    model_config : dict[str, object]
+        Pydantic model configuration dictionary.
 
     Parameters
     ----------
@@ -428,11 +489,24 @@ class SymbolIndexArtifacts(BaseModel):
             return tuple(v)
         return ()
 
-    model_config = {"frozen": True}
+    model_config: dict[str, object] = {"frozen": True}
 
 
 class SymbolDeltaChange(BaseModel):
     """A single changed symbol between two versions.
+
+    Attributes
+    ----------
+    path : str
+        The symbol path that changed.
+    before : Annotated[dict[str, JsonValue], Field]
+        Previous version of the row (serialized).
+    after : Annotated[dict[str, JsonValue], Field]
+        New version of the row (serialized).
+    reasons : Annotated[tuple[str, ...], Field]
+        List of reasons why the symbol changed (e.g., ["signature_changed"]).
+    model_config : dict[str, object]
+        Pydantic model configuration dictionary.
 
     Parameters
     ----------
@@ -501,11 +575,26 @@ class SymbolDeltaChange(BaseModel):
             return tuple(str(item) for item in v)
         return ()
 
-    model_config = {"frozen": True}
+    model_config: dict[str, object] = {"frozen": True}
 
 
 class SymbolDeltaPayload(BaseModel):
     """Delta (diff) of symbols between two git commits or documentation builds.
+
+    Attributes
+    ----------
+    base_sha : str | None
+        Git SHA or build identifier for the baseline.
+    head_sha : str | None
+        Git SHA or build identifier for the current state.
+    added : Annotated[tuple[str, ...], Field]
+        Sorted tuple of newly added symbol paths.
+    removed : Annotated[tuple[str, ...], Field]
+        Sorted tuple of removed symbol paths.
+    changed : Annotated[tuple[SymbolDeltaChange, ...], Field]
+        List of symbols that changed (sorted by path).
+    model_config : dict[str, object]
+        Pydantic model configuration dictionary.
 
     Parameters
     ----------
@@ -602,7 +691,7 @@ class SymbolDeltaPayload(BaseModel):
         )
         return ()
 
-    model_config = {"frozen": True}
+    model_config: dict[str, object] = {"frozen": True}
 
 
 def _validation_error(

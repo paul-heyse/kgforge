@@ -49,7 +49,7 @@ def get_signature(func: InspectableCallable) -> list[ParameterInfo]:
 
     Parameters
     ----------
-    func : Callable
+    func : InspectableCallable
         The function or class to inspect.
 
     Returns
@@ -97,7 +97,7 @@ def has_required_parameters(func: InspectableCallable) -> bool:
 
     Parameters
     ----------
-    func : Callable
+    func : InspectableCallable
         The function or class to check.
 
     Returns

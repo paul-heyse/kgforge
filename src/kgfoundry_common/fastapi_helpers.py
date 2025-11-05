@@ -253,7 +253,7 @@ def typed_middleware(
             Raises
             ------
             Exception
-            Any exception raised by the middleware is propagated after logging.
+                Any exception raised by the middleware is propagated after logging.
             """
             correlation_id = get_correlation_id()
             with with_fields(logger, operation=name, correlation_id=correlation_id) as log:

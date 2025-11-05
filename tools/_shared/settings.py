@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Final, TypeVar
 from pydantic import Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from kgfoundry_common.errors.exceptions import SettingsError as CoreSettingsError
 from tools._shared.problem_details import (
     ProblemDetailsParams,
     build_problem_details,
@@ -42,20 +43,25 @@ __all__: Final[list[str]] = [
 SettingsT = TypeVar("SettingsT", bound=BaseSettings)
 
 
-class SettingsError(RuntimeError):
-    """Raised when typed tooling settings fail validation.
+class SettingsError(CoreSettingsError):
+    """Settings validation failure carrying Problem Details metadata."""
 
-    Initializes settings error.
-
-    Parameters
-    ----------
-    message : str
-        Error message.
-    problem : ProblemDetailsDict
-        RFC 9457 Problem Details payload.
-    errors : Sequence[dict[str, JsonValue]]
-        Validation error details.
-    """
+    def __init__(
+        self,
+        message: str,
+        *,
+        problem: ProblemDetailsDict,
+        errors: Sequence[dict[str, JsonValue]],
+        cause: Exception | None = None,
+    ) -> None:
+        self.problem: ProblemDetailsDict = dict(problem)
+        self.validation_errors: tuple[dict[str, JsonValue], ...] = tuple(dict(err) for err in errors)
+        super().__init__(
+            message,
+            errors=[dict(err) for err in self.validation_errors],
+            cause=cause,
+            context={"problem_details": dict(problem)},
+        )
 
 
 _SETTINGS_CACHE: dict[str, ToolRuntimeSettings] = {}
@@ -108,7 +114,12 @@ def load_settings(
             )
         )
         message = "Failed to load tooling settings"
-        raise SettingsError(message, problem=problem, errors=error_dicts) from exc
+        raise SettingsError(
+            message,
+            problem=problem,
+            errors=error_dicts,
+            cause=exc,
+        ) from exc
 
 
 class ToolRuntimeSettings(BaseSettings):

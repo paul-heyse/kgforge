@@ -300,8 +300,8 @@ class TestMetricsOnErrorPaths:
         ----------
         prometheus_registry : CollectorRegistry
             Isolated Prometheus registry for test.
-        caplog : fixture
-            Log capture fixture.
+        caplog : LogCaptureFixture
+            Log capture fixture for capturing log messages during test execution.
         """
         error_counter = Counter(
             "operations_failed_total",

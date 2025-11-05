@@ -265,7 +265,19 @@ def _append_section(lines: list[str], heading: str, entries: Iterable[str]) -> N
 
 
 class SummaryGenerator:
-    """Service for generating PR summary markdown with dependency injection."""
+    """Service for generating PR summary markdown with dependency injection.
+
+    Parameters
+    ----------
+    test_strategy : ArtifactEntryStrategy | None, optional
+        Function to generate test result entries. Defaults to internal implementation.
+    docs_strategy : ArtifactEntryStrategy | None, optional
+        Function to generate documentation entries. Defaults to internal implementation.
+    schema_strategy : ArtifactEntryStrategy | None, optional
+        Function to generate schema entries. Defaults to internal implementation.
+    build_strategy : ArtifactEntryStrategy | None, optional
+        Function to generate build entries. Defaults to internal implementation.
+    """
 
     def __init__(
         self,
@@ -274,19 +286,6 @@ class SummaryGenerator:
         schema_strategy: ArtifactEntryStrategy | None = None,
         build_strategy: ArtifactEntryStrategy | None = None,
     ) -> None:
-        """Initialize summary generator with artifact entry strategies.
-
-        Parameters
-        ----------
-        test_strategy : Callable[[ArtifactSnapshot], list[str]] | None
-            Function to generate test result entries. Defaults to internal implementation.
-        docs_strategy : Callable[[ArtifactSnapshot], list[str]] | None
-            Function to generate documentation entries. Defaults to internal implementation.
-        schema_strategy : Callable[[ArtifactSnapshot], list[str]] | None
-            Function to generate schema entries. Defaults to internal implementation.
-        build_strategy : Callable[[ArtifactSnapshot], list[str]] | None
-            Function to generate build entries. Defaults to internal implementation.
-        """
         self._test_strategy = test_strategy or _generate_test_result_entries
         self._docs_strategy = docs_strategy or _generate_documentation_entries
         self._schema_strategy = schema_strategy or _generate_schema_entries
