@@ -361,9 +361,9 @@ def load_policy_settings(
     ----------
     repo_root : Path
         Repository root directory.
-    cli_overrides : Mapping[str, str], optional
+    cli_overrides : Mapping[str, str] | None, optional
         CLI override key-value pairs.
-    env : Mapping[str, str], optional
+    env : Mapping[str, str] | None, optional
         Environment variable mapping (defaults to os.environ).
 
     Returns
@@ -485,7 +485,7 @@ class PolicyEngine:
 
         Returns
         -------
-        PolicyException or None
+        PolicyException | None
             Matching exception if found, None otherwise.
         """
         for exception in self.settings.exceptions:
@@ -604,7 +604,7 @@ class PolicyEngine:
 
         Returns
         -------
-        str or None
+        str | None
             Violation detail message if drift detected, None otherwise.
         """
         if entry.symbol.kind != "class":

@@ -189,21 +189,6 @@ class ToolExecutionError(RuntimeError):
         streams: tuple[str, str] | None = None,
         problem: ProblemDetailsDict | None = None,
     ) -> None:
-        """Initialize tool execution error.
-
-        Parameters
-        ----------
-        message : str
-            Error message.
-        command : Sequence[str]
-            Command that failed.
-        returncode : int | None, optional
-            Process return code if available.
-        streams : tuple[str, str] | None, optional
-            Tuple of (stdout, stderr) if available.
-        problem : ProblemDetailsDict | None, optional
-            RFC 9457 Problem Details payload.
-        """
         super().__init__(message)
         self.command: tuple[str, ...] = tuple(command)
         self.returncode = returncode

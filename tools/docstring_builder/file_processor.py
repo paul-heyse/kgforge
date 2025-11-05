@@ -248,7 +248,7 @@ class FileProcessor:
 
         Returns
         -------
-        HarvestResult or FileOutcome
+        HarvestResult | FileOutcome
             HarvestResult on success, FileOutcome on error.
 
         Raises

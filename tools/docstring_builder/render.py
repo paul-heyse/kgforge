@@ -32,7 +32,7 @@ else:
 
             Returns
             -------
-            Callable[[str | None], bool]
+            typing.Callable[[str | None], bool]
                 Function that always returns False.
             """
             return lambda _filename=None: False
@@ -78,7 +78,7 @@ def render_docstring(
         Docstring schema containing all sections.
     marker : str
         Ownership marker string.
-    include_signature : bool, default False
+    include_signature : bool
         Whether to include a signature section in the docstring.
 
     Returns
@@ -154,13 +154,13 @@ def _format_default(value: str | None) -> str | None:
 
     Parameters
     ----------
-    value : str or None
+    value : str | None
         Default value string.
 
     Returns
     -------
-    str or None
-        Formatted default value, or None if not provided.
+    str | None
+        Formatted default value, | None if not provided.
     """
     if value is None:
         return None

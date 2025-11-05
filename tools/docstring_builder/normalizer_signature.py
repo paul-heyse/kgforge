@@ -111,7 +111,7 @@ def signature_and_hints(
     ----------
     obj : Callable[..., object]
         Callable to introspect.
-    module_globals : Mapping[str, object] or ModuleType or None
+    module_globals : Mapping[str, object] | ModuleType | None
         Mapping of module globals to resolve forward references while
         evaluating annotations.
 

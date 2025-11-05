@@ -129,7 +129,7 @@ def load_config(path: Path | None = None) -> BuilderConfig:
 
     Parameters
     ----------
-    path : Path, optional
+    path : Path | None, optional
         Path to configuration file. If None, uses ``DEFAULT_CONFIG_PATH``.
 
     Returns
@@ -177,7 +177,7 @@ def resolve_config_path(start: Path | None = None) -> Path:
 
     Parameters
     ----------
-    start : Path, optional
+    start : Path | None, optional
         Starting directory for search. If None, uses current working directory.
 
     Returns
@@ -206,7 +206,7 @@ def select_config_path(override: str | Path | None = None) -> ConfigSelection:
 
     Parameters
     ----------
-    override : str or Path, optional
+    override : str | Path | None, optional
         Explicit path override (typically from CLI).
 
     Returns
@@ -239,7 +239,7 @@ def load_config_with_selection(
 
     Parameters
     ----------
-    override : str or Path, optional
+    override : str | Path | None, optional
         Explicit path override (typically from CLI).
 
     Returns

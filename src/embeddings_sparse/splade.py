@@ -242,7 +242,7 @@ class SPLADEv3Encoder:
 
     Attributes
     ----------
-    name : ClassVar[str]
+    name : str
         Encoder name identifier ("SPLADE-v3-distilbert").
 
 

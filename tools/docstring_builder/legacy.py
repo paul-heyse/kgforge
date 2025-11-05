@@ -249,12 +249,12 @@ def annotation_to_text(annotation: ast.AST | None) -> str | None:
 
     Parameters
     ----------
-    annotation : ast.AST or None
+    annotation : ast.AST | None
         AST annotation node.
 
     Returns
     -------
-    str or None
+    str | None
         Source text representation of the annotation, or None if conversion fails.
     """
     if annotation is None:
@@ -488,7 +488,7 @@ def required_sections(
         Symbol kind (e.g., "function", "class").
     parameters : Sequence[DocstringIRParameter]
         Parameter metadata.
-    returns : str or None
+    returns : str | None
         Return annotation text.
     raises : Sequence[str]
         Exception names raised.
@@ -559,12 +559,12 @@ def _extract_exception_name(exc: ast.AST | None) -> str | None:
 
     Parameters
     ----------
-    exc : ast.AST or None
+    exc : ast.AST | None
         Exception AST node.
 
     Returns
     -------
-    str or None
+    str | None
         Exception name if extractable, None otherwise.
     """
     if exc is None:

@@ -44,9 +44,9 @@ class CanonicalErrorCode:
 
         Parameters
         ----------
-        message
+        message : str
             Human-readable failure description.
-        details
+        details : str | None, optional
             Optional additional context appended on separate lines.
 
         Returns

@@ -157,7 +157,7 @@ def _docstring_end(tree: ast.Module) -> int | None:
     Returns
     -------
     int | None
-        Ending line number of docstring, or None if no docstring.
+        Ending line number of docstring, | None if no docstring.
     """
     if not tree.body:
         return None
@@ -183,7 +183,7 @@ def _all_assignment_end(tree: ast.Module) -> int | None:
     Returns
     -------
     int | None
-        Ending line number of __all__ assignment, or None if not found.
+        Ending line number of __all__ assignment, | None if not found.
     """
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -213,7 +213,7 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
     -------
     tuple[int, int] | None
         Tuple of (start_line, end_line) for __navmap__ assignment,
-        or None if not found.
+        | None if not found.
     """
     for node in tree.body:
         if isinstance(node, ast.Assign):

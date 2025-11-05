@@ -43,29 +43,19 @@ SettingsT = TypeVar("SettingsT", bound=BaseSettings)
 
 
 class SettingsError(RuntimeError):
-    """Raised when typed tooling settings fail validation."""
+    """Raised when typed tooling settings fail validation.
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        problem: ProblemDetailsDict,
-        errors: Sequence[dict[str, JsonValue]],
-    ) -> None:
-        """Initialize settings error.
+    Initializes settings error.
 
-        Parameters
-        ----------
-        message : str
-            Error message.
-        problem : ProblemDetailsDict
-            RFC 9457 Problem Details payload.
-        errors : Sequence[dict[str, JsonValue]]
-            Validation error details.
-        """
-        super().__init__(message)
-        self.problem = problem
-        self.errors: tuple[dict[str, JsonValue], ...] = tuple(errors)
+    Parameters
+    ----------
+    message : str
+        Error message.
+    problem : ProblemDetailsDict
+        RFC 9457 Problem Details payload.
+    errors : Sequence[dict[str, JsonValue]]
+        Validation error details.
+    """
 
 
 _SETTINGS_CACHE: dict[str, ToolRuntimeSettings] = {}
@@ -78,12 +68,12 @@ def load_settings(
 
     Parameters
     ----------
-    settings_factory : Callable[[], _SettingsT]
+    settings_factory : Callable[[], SettingsT] | type[SettingsT]
         Zero-argument callable that returns a ``BaseSettings`` subclass.
 
     Returns
     -------
-    _SettingsT
+    SettingsT
         Validated settings instance.
 
     Raises

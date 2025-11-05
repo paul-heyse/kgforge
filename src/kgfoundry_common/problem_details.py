@@ -370,7 +370,7 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
 
     Parameters
     ----------
-    *args : tuple
+    *args : tuple[object, ...]
         Either a single :class:`ProblemDetailsParams` instance or the
         positional fields ``(problem_type, title, status, detail, instance)``
         in that order.
@@ -451,7 +451,7 @@ def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
 
     Parameters
     ----------
-    *args : tuple
+    *args : tuple[object, ...]
         Either a single :class:`ExceptionProblemDetailsParams` instance or
         the legacy positional arguments ``(exc, problem_type, title, status,
         instance)``.

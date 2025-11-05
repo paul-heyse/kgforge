@@ -214,13 +214,15 @@ class PipelineConfig:
 
 
 class PipelineRunner:
-    """Coordinate docstring builder execution across helper components."""
+    """Coordinate docstring builder execution across helper components.
 
-    __slots__ = ("_cfg",)
+    Initialize the pipeline runner with dependency configuration.
 
-    def __init__(self, config: PipelineConfig) -> None:
-        """Initialize the pipeline runner with dependency configuration."""
-        self._cfg = config
+    Parameters
+    ----------
+    config : PipelineConfig
+        Dependency configuration for the pipeline.
+    """
 
     def run(self, files: Iterable[Path]) -> DocstringBuildResult:
         """Execute the pipeline for the provided file set.
@@ -348,8 +350,14 @@ class PipelineRunner:
 
         Yields
         ------
-        tuple[Path, FileOutcome]
+        (Path, FileOutcome)
             Tuple of (file_path, outcome) for each processed file.
+
+        Raises
+        ------
+        Exception
+            Any exception raised during file processing is re-raised if it is a
+            KeyboardInterrupt, otherwise it is logged and wrapped in a FileOutcome.
         """
         if jobs <= 1:
             for file_path in files:
@@ -835,7 +843,7 @@ class PipelineRunner:
 
         Returns
         -------
-        CliResult or None
+        CliResult | None
             CLI result dictionary if JSON output is enabled, None otherwise.
         """
         if not self._cfg.request.json_output:
@@ -915,7 +923,7 @@ class PipelineRunner:
 
         Returns
         -------
-        DocfactsReport or None
+        DocfactsReport | None
             DocFacts report dictionary if checked, None otherwise.
         """
         if not docfacts_checked:

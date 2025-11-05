@@ -20,7 +20,7 @@ def module_name(path: Path) -> str:
 
     Parameters
     ----------
-    path
+    path : Path
         Absolute path to a Python file inside the repository ``src`` tree.
 
     Returns
@@ -44,7 +44,7 @@ def needs_docstring(text: str) -> bool:
 
     Parameters
     ----------
-    text
+    text : str
         Source code of the module to inspect.
 
     Returns
@@ -67,7 +67,7 @@ def insert_docstring(path: Path) -> bool:
 
     Parameters
     ----------
-    path
+    path : Path
         Absolute path to the Python module to update.
 
     Returns

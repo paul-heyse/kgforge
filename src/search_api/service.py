@@ -213,26 +213,10 @@ def search_service(
     AgentSearchResponse
         Typed search response with results and metadata.
 
-    Examples
-    --------
-    >>> from search_api.types import VectorSearchResultTypedDict
-    >>> results: list[VectorSearchResultTypedDict] = [
-    ...     {
-    ...         "symbol_id": "py:test.Foo",
-    ...         "score": 0.9,
-    ...         "lexical_score": 0.8,
-    ...         "vector_score": 0.9,
-    ...         "package": "test",
-    ...         "module": "test",
-    ...         "qname": "Foo",
-    ...         "kind": "class",
-    ...         "anchor": {"start_line": 1},
-    ...         "metadata": {},
-    ...     }
-    ... ]
-    >>> response = search_service(results)
-    >>> response["total"] == len(results)
-    True
+    Raises
+    ------
+    Exception
+        Any exception raised during processing is propagated after logging.
     """
     active_metrics = metrics or MetricsProvider.default()
     start_time = time.time()

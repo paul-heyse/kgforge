@@ -76,18 +76,19 @@ type JsonObject = dict[str, JsonValue]
 
 
 class ReadmeGenerationError(RuntimeError):
-    """Base exception raised when README generation fails."""
+    """Base exception raised when README generation fails.
+
+    Initialize README generation error.
+
+    Parameters
+    ----------
+    message : str
+        Error message.
+    problem : ProblemDetailsDict | None, optional
+        RFC 9457 Problem Details payload.
+    """
 
     def __init__(self, message: str, *, problem: ProblemDetailsDict | None = None) -> None:
-        """Initialize README generation error.
-
-        Parameters
-        ----------
-        message : str
-            Error message.
-        problem : ProblemDetailsDict | None, optional
-            RFC 9457 Problem Details payload.
-        """
         super().__init__(message)
         self.problem = problem
 
@@ -259,11 +260,11 @@ def gh_url(rel_path: str, start: int, end: int | None) -> str:
 
     Parameters
     ----------
-    rel_path
+    rel_path : str
         File path relative to the repository root.
-    start
+    start : int
         1-based starting line number.
-    end
+    end : int | None
         Optional inclusive end line number. When omitted the URL anchors to
         ``start`` only.
 
@@ -355,7 +356,7 @@ def get_open_link(node: GriffeObjectLike, readme_dir: Path) -> str | None:
     Returns
     -------
     str | None
-        Editor link or None if not available.
+        Editor link | None if not available.
     """
     rel_path = node.relative_package_filepath
     if not rel_path:
@@ -381,7 +382,7 @@ def get_view_link(node: GriffeObjectLike) -> str | None:
     Returns
     -------
     str | None
-        GitHub URL or None if not available.
+        GitHub URL | None if not available.
     """
     rel_path = node.relative_package_filepath
     if not rel_path:
@@ -883,7 +884,7 @@ def _format_test_badge(entries: Sequence[TestRecord] | None) -> str | None:
     Returns
     -------
     str | None
-        Formatted badge string or None if no entries.
+        Formatted badge string | None if no entries.
     """
     if not entries:
         return None
@@ -965,9 +966,9 @@ def format_badges(qname: str, base_length: int = 0) -> str:
 
     Parameters
     ----------
-    qname
+    qname : str
         Qualified symbol name used when looking up badges.
-    base_length
+    base_length : int
         Length of the text preceding the badges on the line. Used to decide if
         the badges should wrap.
 
@@ -1002,7 +1003,7 @@ def editor_link(abs_path: Path, lineno: int, editor_mode: EditorMode) -> str | N
     Returns
     -------
     str | None
-        Editor link string or None.
+        Editor link string | None.
     """
     if editor_mode is EditorMode.VSCODE:
         return f"vscode://file/{abs_path}:{lineno}:1"
@@ -1101,7 +1102,7 @@ def render_line(node: GriffeObjectLike, readme_dir: Path, cfg: ReadmeConfig) -> 
     Returns
     -------
     str | None
-        Markdown line or None if no links available.
+        Markdown line | None if no links available.
     """
     qname = node.path
     summary = summarize(node)

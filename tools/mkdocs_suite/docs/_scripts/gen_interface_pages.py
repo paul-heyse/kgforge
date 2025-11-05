@@ -16,6 +16,7 @@ REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
 MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
 EDIT_URI_BRANCH_INDEX = 1
 
+
 def _load_repo_settings() -> tuple[str | None, str | None]:
     """Return repo URL and default branch configured for MkDocs.
 
@@ -34,9 +35,9 @@ def _load_repo_settings() -> tuple[str | None, str | None]:
             if not line or line.startswith("#"):
                 continue
             if line.startswith("repo_url:") and repo_url is None:
-                repo_url = line.split(":", 1)[1].strip().strip('"\'')
+                repo_url = line.split(":", 1)[1].strip().strip("\"'")
             if line.startswith("edit_uri:") and edit_uri is None:
-                edit_uri = line.split(":", 1)[1].strip().strip('"\'')
+                edit_uri = line.split(":", 1)[1].strip().strip("\"'")
     except OSError:  # pragma: no cover - defensive guard
         return None, None
     branch: str | None = None

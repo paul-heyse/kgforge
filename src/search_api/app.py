@@ -448,9 +448,6 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
     req : SearchRequest
         Search request containing query text, k (number of results), and
         optional facets for filtering.
-    _ : AuthDependency, optional
-        Authentication dependency (Bearer token). Injected by FastAPI.
-        Defaults to None (handled by FastAPI dependency injection).
 
     Returns
     -------
@@ -597,9 +594,6 @@ def graph_concepts(
         - `q` (str): Query string to match against concept labels (case-insensitive).
         - `limit` (int, optional): Maximum number of concepts to return.
           Defaults to 50.
-    _ : AuthDependency, optional
-        Authentication dependency (Bearer token). Injected by FastAPI.
-        Defaults to None (handled by FastAPI dependency injection).
 
     Returns
     -------

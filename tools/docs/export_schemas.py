@@ -259,7 +259,7 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
         out["x-version-introduced"] = meta["since"]
     if "deprecated_in" in meta:
         out["x-deprecated-in"] = meta["deprecated_in"]
-    return out or None
+    return out | None
 
 
 # --------------------------- examples (safe synthesis) ---------------------------
@@ -459,12 +459,12 @@ def _diff_summary(old: Mapping[str, object], new: Mapping[str, object]) -> dict[
 
         Parameters
         ----------
-        d : collections.abc.Mapping
+        d : Mapping[str, object]
             Description for ``d``.
 
         Returns
         -------
-        collections.abc.Set
+        set[str]
             Description of return value.
 
         Examples

@@ -43,6 +43,40 @@ class DocumentationMetrics:
     Metrics follow the naming pattern: ``docs_<operation>_runs_total`` for
     counters and ``docs_<operation>_duration_seconds`` for histograms.
 
+    Initializes metrics registry.
+
+    Parameters
+    ----------
+    registry : CollectorRegistry | None, optional
+        Prometheus registry (defaults to default registry).
+
+    Attributes
+    ----------
+    catalog_runs_total : CounterLike
+        Counter for catalog build operations.
+    graphs_runs_total : CounterLike
+        Counter for graph build operations.
+    test_map_runs_total : CounterLike
+        Counter for test map build operations.
+    schemas_runs_total : CounterLike
+        Counter for schema build operations.
+    portal_runs_total : CounterLike
+        Counter for portal build operations.
+    analytics_runs_total : CounterLike
+        Counter for analytics build operations.
+    catalog_duration_seconds : HistogramLike
+        Histogram for catalog build duration.
+    graphs_duration_seconds : HistogramLike
+        Histogram for graph build duration.
+    test_map_duration_seconds : HistogramLike
+        Histogram for test map build duration.
+    schemas_duration_seconds : HistogramLike
+        Histogram for schema build duration.
+    portal_duration_seconds : HistogramLike
+        Histogram for portal build duration.
+    analytics_duration_seconds : HistogramLike
+        Histogram for analytics build duration.
+
     Examples
     --------
     >>> metrics = DocumentationMetrics()
@@ -64,13 +98,6 @@ class DocumentationMetrics:
     analytics_duration_seconds: HistogramLike
 
     def __init__(self, registry: CollectorRegistry | None = None) -> None:
-        """Initialize metrics registry.
-
-        Parameters
-        ----------
-        registry : CollectorRegistry | None, optional
-            Prometheus registry (defaults to default registry).
-        """
         resolved = (
             registry if registry is not None else cast("CollectorRegistry", get_default_registry())
         )
@@ -230,6 +257,12 @@ def record_operation_metrics(
     ------
     None
         Context manager yields control to the operation block.
+
+    Raises
+    ------
+    Exception
+        Any exception raised during the operation is propagated after recording
+        error status and metrics.
 
     Examples
     --------

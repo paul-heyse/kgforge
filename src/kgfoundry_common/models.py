@@ -68,7 +68,7 @@ class Doc(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ConfigDict
         Pydantic model configuration dictionary (class variable).
     id : Id
         Unique document identifier (URN or other unique string).

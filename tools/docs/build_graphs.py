@@ -73,7 +73,7 @@ def _optional_import(name: str) -> ModuleType | None:
     Returns
     -------
     ModuleType | None
-        Imported module or None if import fails.
+        Imported module | None if import fails.
     """
     try:
         return importlib.import_module(name)
@@ -388,7 +388,7 @@ def find_top_packages() -> list[str]:
 
     Returns
     -------
-    List[str]
+    list[str]
         Description of return value.
 
     Examples
@@ -442,7 +442,7 @@ def build_pydeps_for_package(
         Description for ``pkg``.
     out_svg : Path
         Description for ``out_svg``.
-    excludes : List[str]
+    excludes : list[str]
         Description for ``excludes``.
     max_bacon : int
         Description for ``max_bacon``.
@@ -1060,7 +1060,7 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
     ----------
     dot_out : Path
         Description for ``dot_out``.
-    excludes : List[str]
+    excludes : list[str]
         Description for ``excludes``.
     max_bacon : int
         Description for ``max_bacon``.
@@ -1261,7 +1261,7 @@ def write_meta(meta: Mapping[str, object], out_json: Path) -> None:
 
     Parameters
     ----------
-    meta : collections.abc.Mapping
+    meta : Mapping[str, object]
         Description for ``meta``.
     out_json : Path
         Description for ``out_json``.
@@ -1287,9 +1287,9 @@ def enforce_policy(
 
     Parameters
     ----------
-    analysis : collections.abc.Mapping
+    analysis : Mapping[str, object]
         Description for ``analysis``.
-    allow : collections.abc.Mapping
+    allow : Mapping[str, object]
         Description for ``allow``.
     fail_cycles : bool, optional
         Description for ``fail_cycles``. Keyword-only argument.
@@ -1744,7 +1744,7 @@ def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
 
     Raises
     ------
-    ValidationError
+    SharedValidationError
         If cache directory exists but is not a directory.
     """
     cache_dir = resolve_path(args.cache_dir, strict=False)
@@ -1891,7 +1891,7 @@ def _load_layers_config(path: str) -> LayerConfig:
 
     Raises
     ------
-    ValidationError
+    SharedValidationError
         If config file is invalid or missing.
     """
     file_path = resolve_path(path, strict=False)
@@ -1929,7 +1929,7 @@ def _load_allowlist(path: str) -> dict[str, object]:
 
     Raises
     ------
-    ValidationError
+    SharedValidationError
         If allowlist file is invalid.
     """
     file_path = resolve_path(path, strict=False)

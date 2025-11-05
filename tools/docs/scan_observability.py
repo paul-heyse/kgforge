@@ -174,7 +174,7 @@ def _gh_link(path: Path, start: int | None) -> str | None:
     Returns
     -------
     str | None
-        GitHub link URL or None if not configured.
+        GitHub link URL | None if not configured.
     """
     if not (G_ORG and G_REPO):
         return None
@@ -369,6 +369,11 @@ def load_policy() -> ObservabilityPolicy:
     -------
     ObservabilityPolicy
         Loaded policy or default policy.
+
+    Raises
+    ------
+    Exception
+        Any exception raised during policy loading is propagated after logging.
     """
     policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():
@@ -512,7 +517,7 @@ def _first_str(node: ast.AST) -> str | None:
     Returns
     -------
     str | None
-        First string literal or None.
+        First string literal | None.
     """
     if isinstance(node, ast.Call) and node.args:
         arg0 = node.args[0]
@@ -605,7 +610,7 @@ def _recommended_aggregation(mtype: str | None) -> str | None:
     Returns
     -------
     str | None
-        Recommended aggregation query or None.
+        Recommended aggregation query | None.
     """
     if mtype == "counter":
         return "rate(sum by (...) (__metric__[5m]))"
@@ -857,7 +862,7 @@ def read_ast(path: Path) -> tuple[str, ast.AST | None]:
 
     Returns
     -------
-    Tuple[str, ast.AST | None]
+    tuple[str, ast.AST | None]
         Description of return value.
 
     Examples
@@ -990,12 +995,12 @@ def scan_file(
     ----------
     path : Path
         Description for ``path``.
-    policy : collections.abc.Mapping
+    policy : ObservabilityPolicy
         Description for ``policy``.
 
     Returns
     -------
-    Tuple[List[LogRow], List[MetricRow], List[TraceRow]]
+    tuple[list[LogRow], list[MetricRow], list[TraceRow]]
         Description of return value.
 
     Examples

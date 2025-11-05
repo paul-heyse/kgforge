@@ -91,8 +91,6 @@ class ErrorCode(StrEnum):
         Runtime error.
     RESOURCE_UNAVAILABLE : str
         Resource unavailable.
-    REGISTRY_ERROR : str
-        Registry error.
     SESSION_ERROR : str
         Session error.
     ONTOLOGY_PARSE_ERROR : str
@@ -107,14 +105,16 @@ class ErrorCode(StrEnum):
         Deserialization error.
     SCHEMA_VALIDATION_ERROR : str
         Schema validation error.
+    REGISTRY_ERROR : str
+        Registry error.
+    ARTIFACT_MODEL_ERROR : str
+        Artifact model error.
+    ARTIFACT_VALIDATION_ERROR : str
+        Artifact validation error.
     ARTIFACT_SERIALIZATION_ERROR : str
         Artifact serialization error.
     ARTIFACT_DESERIALIZATION_ERROR : str
         Artifact deserialization error.
-    ARTIFACT_VALIDATION_ERROR : str
-        Artifact validation error.
-    ARTIFACT_MODEL_ERROR : str
-        Artifact model error.
     ARTIFACT_DEPENDENCY_ERROR : str
         Artifact dependency error.
 

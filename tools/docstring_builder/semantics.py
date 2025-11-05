@@ -165,8 +165,12 @@ def _ast_index(result: HarvestResult) -> dict[str, ast.AST]:
     index: dict[str, ast.AST] = {}
 
     class _Visitor(ast.NodeVisitor):
+        """AST visitor for collecting class definitions.
+
+        Initialize AST visitor.
+        """
+
         def __init__(self) -> None:
-            """Initialize AST visitor."""
             self.namespace: list[str] = []
 
         def _qualify(self, name: str) -> str:

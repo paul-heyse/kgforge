@@ -122,6 +122,15 @@ else:
 def new_cli_envelope(*, command: str, status: CliStatus, subcommand: str = "") -> CliEnvelope:
     """Return a freshly initialised CLI envelope.
 
+    Parameters
+    ----------
+    command : str
+        Command name.
+    status : CliStatus
+        Status code for the command.
+    subcommand : str, optional
+        Optional subcommand name. Defaults to empty string.
+
     Returns
     -------
     CliEnvelope

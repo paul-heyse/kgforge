@@ -380,6 +380,17 @@ class ErrorReport(TypedDict, total=False):
     - Required: file, status, message
     - Optional: problem
 
+    Attributes
+    ----------
+    file : Required[str]
+        File path where the error occurred.
+    status : Required[str]
+        Status string indicating the error type.
+    message : Required[str]
+        Error message describing the failure.
+    problem : NotRequired[ProblemDetails]
+        Optional RFC 9457 Problem Details payload.
+
     Examples
     --------
     >>> error = ErrorReport(file="example.py", status="error", message="Build failed")
@@ -574,6 +585,45 @@ class CliResult(TypedDict, total=False):
     - Optional: subcommand, durationSeconds, files, errors, summary, policy,
       baseline, cache, inputs, plugins, docfacts, observability, problem
 
+    Attributes
+    ----------
+    schemaVersion : Required[str]
+        Schema version identifier.
+    schemaId : Required[str]
+        Schema identifier URI.
+    status : Required[str]
+        Overall status of the operation.
+    generatedAt : Required[str]
+        ISO 8601 timestamp when the result was generated.
+    command : Required[str]
+        Main command that was executed.
+    subcommand : NotRequired[str]
+        Optional subcommand.
+    durationSeconds : NotRequired[float]
+        Duration of the operation in seconds.
+    files : NotRequired[list[FileReport]]
+        List of file processing results.
+    errors : NotRequired[list[ErrorReport]]
+        List of error reports.
+    summary : NotRequired[RunSummary]
+        Summary of the run.
+    policy : NotRequired[PolicyReport]
+        Policy validation report.
+    baseline : NotRequired[str]
+        Baseline version identifier.
+    cache : NotRequired[CacheSummary]
+        Cache summary.
+    inputs : NotRequired[dict[str, InputHash]]
+        Input file hashes.
+    plugins : NotRequired[PluginReport]
+        Plugin execution report.
+    docfacts : NotRequired[DocfactsReport]
+        DocFacts generation report.
+    observability : NotRequired[ObservabilityReport]
+        Observability metrics report.
+    problem : NotRequired[ProblemDetails]
+        RFC 9457 Problem Details payload if applicable.
+
     Examples
     --------
     >>> result = CliResult(
@@ -656,7 +706,7 @@ def _add_optional_fields(
 
     Parameters
     ----------
-    result : CliResult
+    result : dict[str, object]
         Result dictionary to modify in-place.
     optional : CliResultOptionalFields | None, optional
         Optional fields dictionary. Defaults to ``None``.

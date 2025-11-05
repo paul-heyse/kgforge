@@ -85,13 +85,13 @@ def _new_document(
 
     Parameters
     ----------
-    schema_version : str, default DOCSTRING_CACHE_VERSION
-        Schema version identifier.
-    schema_id : str, default DOCSTRING_CACHE_SCHEMA_ID
-        Schema identifier URI.
-    generated_at : str, optional
+    schema_version : str, optional
+        Schema version identifier. Defaults to DOCSTRING_CACHE_VERSION.
+    schema_id : str, optional
+        Schema identifier URI. Defaults to DOCSTRING_CACHE_SCHEMA_ID.
+    generated_at : str | None, optional
         ISO-8601 timestamp string. If None, uses current UTC time.
-    entries : dict[str, CacheEntry], optional
+    entries : dict[str, CacheEntry] | None, optional
         Cache entries mapping file paths to entry metadata. If None, uses empty dict.
 
     Returns
@@ -118,11 +118,6 @@ class DocstringBuilderCache(Protocol):
     This Protocol defines the contract for any object that implements
     docstring caching. Implementations must track file modification times
     and configuration hashes to determine whether regeneration is needed.
-
-    Attributes
-    ----------
-    path : Path
-        The file path where cache metadata is persisted.
     """
 
     @property
@@ -190,11 +185,6 @@ class DocstringBuilderCache(Protocol):
         specified by the `path` property. Should be called after all
         processing is complete to ensure the cache is persisted.
 
-        Raises
-        ------
-        IOError
-            If the cache file cannot be written.
-
         Examples
         --------
         >>> # cache.write()
@@ -203,16 +193,17 @@ class DocstringBuilderCache(Protocol):
 
 
 class BuilderCache:
-    """Persist and query cache entries keyed by file path."""
+    """Persist and query cache entries keyed by file path.
+
+    Initializes cache with file path.
+
+    Parameters
+    ----------
+    path : Path
+        Path to cache JSON file.
+    """
 
     def __init__(self, path: Path) -> None:
-        """Initialize cache with file path.
-
-        Parameters
-        ----------
-        path : Path
-            Path to cache JSON file.
-        """
         self.path = path
         self._document = _new_document()
         self._lock = threading.Lock()

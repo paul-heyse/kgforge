@@ -174,7 +174,7 @@ def _coerce_provenance_payload(data: object) -> DocfactsProvenancePayload | None
 
     Returns
     -------
-    DocfactsProvenancePayload or None
+    DocfactsProvenancePayload | None
         Provenance payload if data is valid, None otherwise.
     """
     if not isinstance(data, dict):
@@ -224,7 +224,7 @@ def _git_output(arguments: Sequence[str]) -> str | None:
 
     Returns
     -------
-    str or None
+    str | None
         Stripped stdout if command succeeds, None otherwise.
     """
     command_args: list[str] = list(arguments)
@@ -238,7 +238,7 @@ def _git_output(arguments: Sequence[str]) -> str | None:
         adapter.debug("git returned non-zero exit code: %s", result.returncode)
         return None
     output = result.stdout.strip()
-    return output or None
+    return output | None
 
 
 def _resolve_commit_hash() -> str:
@@ -559,7 +559,7 @@ def render_cli_result(result: DocstringBuildResult) -> CliResult | None:
 
     Returns
     -------
-    CliResult or None
+    CliResult | None
         CLI result dictionary if available, None otherwise.
     """
     return result.cli_payload
@@ -603,7 +603,7 @@ def load_builder_config(
 
     Parameters
     ----------
-    override : str, optional
+    override : str | None, optional
         Explicit config path override.
 
     Returns
@@ -780,7 +780,7 @@ def run_docstring_builder(
     ----------
     request : DocstringBuildRequest
         Build request containing command, options, and selection criteria.
-    config_override : str, optional
+    config_override : str | None, optional
         Explicit configuration file path override.
 
     Returns
@@ -797,10 +797,10 @@ def run_docstring_builder(
         config.normalize_sections = True
     try:
         selection = SelectionCriteria(
-            module=request.module or None,
-            since=request.since or None,
+            module=request.module | None,
+            since=request.since | None,
             changed_only=request.changed_only,
-            explicit_paths=list(request.explicit_paths) or None,
+            explicit_paths=list(request.explicit_paths) | None,
         )
         files = select_files(config, selection)
     except InvalidPathError:
@@ -834,6 +834,11 @@ def run_build(
     cache : DocstringBuilderCache
         Cache interface for storing/retrieving processed file metadata.
 
+    Returns
+    -------
+    DocstringBuildResult
+        Build result containing exit status, metrics, and CLI payload.
+
     Raises
     ------
     NotImplementedError
@@ -861,10 +866,15 @@ def run_legacy(
 
     Parameters
     ----------
-    *args
+    *args : object
         Positional arguments (deprecated, accepted for backward compatibility only).
-    **kwargs
+    **kwargs : object
         Keyword arguments (deprecated, accepted for backward compatibility only).
+
+    Returns
+    -------
+    DocstringBuildResult
+        Build result containing exit status, metrics, and CLI payload.
 
     Raises
     ------

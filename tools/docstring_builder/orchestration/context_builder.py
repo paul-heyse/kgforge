@@ -109,7 +109,7 @@ class PipelineContextBuilder:
 
         Returns
         -------
-        tuple[LoggerAdapter | Logger, PluginManager | None, PolicyEngine, ProcessingOptions] | DocstringBuildResult
+        tuple[LoggerLike, PluginManager | None, PolicyEngine, ProcessingOptions] | DocstringBuildResult
             Either a 4-tuple of (logger, plugin_manager, policy_engine, options)
             on success, or a DocstringBuildResult error on configuration failure.
 
@@ -146,7 +146,7 @@ class PipelineContextBuilder:
 
         Returns
         -------
-        LoggerAdapter | Logger
+        LoggerLike
             Logger with correlation ID, command, and subcommand fields.
         """
         correlation_id = get_correlation_id()
@@ -166,7 +166,7 @@ class PipelineContextBuilder:
 
         Returns
         -------
-        PluginManager | None | DocstringBuildResult
+        PluginManager | DocstringBuildResult | None
             The plugin manager on success, None if not available,
             or an error result on configuration failure.
         """
@@ -224,5 +224,5 @@ class PipelineContextBuilder:
             ignore_missing=self.request.ignore_missing,
             missing_patterns=tuple(MISSING_MODULE_PATTERNS),
             skip_docfacts=self.request.skip_docfacts,
-            baseline=self.request.baseline or None,
+            baseline=self.request.baseline | None,
         )

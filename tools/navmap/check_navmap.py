@@ -157,7 +157,7 @@ def _eval_constant(node: ast.Constant) -> NavTree:
     Returns
     -------
     NavTree
-        Constant value if supported (str, int, float, bool, or None).
+        Constant value if supported (str, int, float, bool, | None).
 
     Raises
     ------
@@ -315,7 +315,7 @@ def _literal_eval_navmap(node: ast.AST | None) -> NavTree:
     Parameters
     ----------
     node : ast.AST | None
-        AST node to evaluate, or None for empty literals.
+        AST node to evaluate, | None for empty literals.
 
     Returns
     -------
@@ -524,7 +524,7 @@ def _parse_module(py: Path) -> ast.Module | None:
     Returns
     -------
     ast.Module | None
-        Parsed AST module, or None if file cannot be read or parsed.
+        Parsed AST module, | None if file cannot be read or parsed.
     """
     try:
         source = py.read_text(encoding="utf-8")
@@ -733,6 +733,99 @@ def _scan_inline(py: Path) -> tuple[dict[str, int], dict[str, int]]:
         if m:
             anchors[m.group(1)] = i
     return sections, anchors
+
+
+def _definition_anchors(py: Path) -> dict[str, int]:
+    """Return symbol-to-line mapping derived from top-level definitions.
+
+    Parameters
+    ----------
+    py : Path
+        Python module being analysed.
+
+    Returns
+    -------
+    dict[str, int]
+        Mapping of symbol names to their definition line numbers.
+    """
+    module = _parse_module(py)
+    if module is None:
+        return {}
+    anchors: dict[str, int] = {}
+    for node in module.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            anchors.setdefault(node.name, getattr(node, "lineno", 0))
+            continue
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    anchors.setdefault(target.id, getattr(node, "lineno", 0))
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            anchors.setdefault(node.target.id, getattr(node, "lineno", 0))
+    return anchors
+
+
+def _has_anchor(symbol: str, anchors_inline: dict[str, int], auto_anchors: dict[str, int]) -> bool:
+    """Return ``True`` when ``symbol`` has either inline or inferred anchors.
+
+    Parameters
+    ----------
+    symbol : str
+        Symbol name to inspect.
+    anchors_inline : dict[str, int]
+        Explicit `[nav:anchor]` markers collected from the source file.
+    auto_anchors : dict[str, int]
+        Anchors inferred from top-level definitions in the module.
+
+    Returns
+    -------
+    bool
+        ``True`` when a positive line number exists for the symbol, ``False`` otherwise.
+    """
+    anchor_line = anchors_inline.get(symbol)
+    if isinstance(anchor_line, int) and anchor_line > 0:
+        return True
+    anchor_line = auto_anchors.get(symbol)
+    return isinstance(anchor_line, int) and anchor_line > 0
+
+
+def _validate_section_symbols(
+    py: Path,
+    sid: str,
+    symbols_value: list[object],
+    anchors_inline: dict[str, int],
+    auto_anchors: dict[str, int],
+) -> list[str]:
+    """Validate symbols listed in a navmap section.
+
+    Parameters
+    ----------
+    py : Path
+        Python file being validated.
+    sid : str
+        Section identifier (e.g., ``"public-api"``).
+    symbols_value : list[object]
+        Raw symbols array extracted from the navmap structure.
+    anchors_inline : dict[str, int]
+        Explicit inline anchor markers discovered in the file.
+    auto_anchors : dict[str, int]
+        Anchors inferred from top-level definitions in the module.
+
+    Returns
+    -------
+    list[str]
+        Validation error messages (empty list when all symbols pass).
+    """
+    errors: list[str] = []
+    for symbol in symbols_value:
+        if not isinstance(symbol, str) or not IDENT_RE.match(symbol):
+            errors.append(f"{py}: invalid symbol name '{symbol}' in section '{sid}'")
+            continue
+        if symbol not in auto_anchors and symbol not in anchors_inline:
+            continue
+        if not _has_anchor(symbol, anchors_inline, auto_anchors):
+            errors.append(f"{py}: missing [nav:anchor] for section symbol '{symbol}'")
+    return errors
 
 
 def _parse_navmap_dict(py: Path) -> dict[str, ResolvedNavValue]:
@@ -947,6 +1040,7 @@ def _validate_sections(
     first_id = sections[0].get("id")
     if first_id != "public-api":
         errors.append(f"{py}: first navmap section must have id 'public-api'")
+    auto_anchors = _definition_anchors(py)
     for section in sections:
         sid = section.get("id")
         symbols_value = section.get("symbols")
@@ -956,11 +1050,9 @@ def _validate_sections(
             errors.append(f"{py}: section id '{sid}' is not kebab-case")
         if not isinstance(symbols_value, list):
             continue
-        for symbol in symbols_value:
-            if not isinstance(symbol, str) or not IDENT_RE.match(symbol):
-                errors.append(f"{py}: invalid symbol name '{symbol}' in section '{sid}'")
-            elif symbol not in anchors_inline:
-                errors.append(f"{py}: missing [nav:anchor] for section symbol '{symbol}'")
+        errors.extend(
+            _validate_section_symbols(py, sid, symbols_value, anchors_inline, auto_anchors)
+        )
     return errors
 
 

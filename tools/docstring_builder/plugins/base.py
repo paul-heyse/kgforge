@@ -86,6 +86,8 @@ class PluginRegistryError(KgFoundryError):
     validated, typically due to incorrect plugin type or configuration
     issues.
 
+    Initializes plugin registry error.
+
     Parameters
     ----------
     message : str
@@ -94,18 +96,6 @@ class PluginRegistryError(KgFoundryError):
         The underlying exception that caused this error. Defaults to None.
     context : dict[str, object] | None, optional
         Additional context fields for Problem Details. Defaults to None.
-
-    Examples
-    --------
-    >>> from tools.docstring_builder.plugins.base import PluginRegistryError
-    >>> try:
-    ...     raise PluginRegistryError(
-    ...         "Cannot register Protocol class as plugin",
-    ...         context={"plugin_name": "MyPlugin", "stage": "formatter"},
-    ...     )
-    ... except PluginRegistryError as e:
-    ...     assert e.code == "configuration-error"
-    ...     assert e.http_status == 500
     """
 
     def __init__(
@@ -114,17 +104,6 @@ class PluginRegistryError(KgFoundryError):
         cause: Exception | None = None,
         context: dict[str, object] | None = None,
     ) -> None:
-        """Initialize plugin registry error.
-
-        Parameters
-        ----------
-        message : str
-            Error message describing the registration failure.
-        cause : Exception | None, optional
-            The underlying exception, if any. Defaults to None.
-        context : dict[str, object] | None, optional
-            Additional context for Problem Details. Defaults to None.
-        """
         super().__init__(
             message,
             code=ErrorCode.CONFIGURATION_ERROR,

@@ -71,6 +71,11 @@ class _UvicornRun(Protocol):
         reload : bool, optional
             Whether to enable auto-reload.
             Defaults to False.
+
+        Raises
+        ------
+        NotImplementedError
+            This is a Protocol stub implementation.
         """
         del self, app, host, port, reload
         raise NotImplementedError
