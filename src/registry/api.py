@@ -45,77 +45,63 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor Registry]
 class Registry(Protocol):
-    """Describe Registry.
+    """Protocol defining the registry interface for pipeline artifacts.
 
-    <!-- auto:docstring-builder v1 -->
+    This protocol defines the interface for registry implementations that store pipeline artifacts
+    and metadata. Implementations must provide methods for managing runs, datasets, documents,
+    doctags, and events.
 
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Parameters
-    ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    Implementations include DuckDBRegistry and DuckDBRegistryHelper.
     """
 
     def begin_dataset(self, kind: str, run_id: str) -> str:
-        """Describe begin dataset.
+        """Begin a new dataset within a run.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Creates a new dataset record associated with the specified run.
+        The dataset is initially created with an empty parquet_root; use
+        commit_dataset() to finalize it with data.
 
         Parameters
         ----------
         kind : str
-            Describe ``kind``.
+            Dataset kind (e.g., "embeddings", "chunks", "metadata").
         run_id : str
-            Describe ``run_id``.
+            Run ID that this dataset belongs to.
 
         Returns
         -------
         str
-            Describe return value.
+            Unique dataset ID (UUID) for the newly created dataset.
         """
         ...
 
     def commit_dataset(self, dataset_id: str, parquet_root: str, rows: int) -> None:
-        """Describe commit dataset.
+        """Commit a dataset with Parquet data location.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Finalizes a dataset by updating its parquet_root path and row count.
+        Used after Parquet files have been written to disk.
 
         Parameters
         ----------
         dataset_id : str
-            Describe ``dataset_id``.
+            Dataset ID to commit.
         parquet_root : str
-            Describe ``parquet_root``.
+            Root directory path where Parquet files are stored.
         rows : int
-            Describe ``rows``.
+            Total number of rows in the dataset.
         """
         ...
 
     def rollback_dataset(self, dataset_id: str) -> None:
-        """Describe rollback dataset.
+        """Rollback a dataset by deleting it.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Deletes a dataset record when dataset creation fails or needs to
+        be abandoned. Use this for cleanup when errors occur.
 
         Parameters
         ----------
         dataset_id : str
-            Describe ``dataset_id``.
+            Dataset ID to rollback.
         """
         ...
 
@@ -126,111 +112,109 @@ class Registry(Protocol):
         revision: str | None,
         config: Mapping[str, object],
     ) -> str:
-        """Describe insert run.
+        """Create a run record and return the generated identifier.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Inserts a new run record into the registry with the specified purpose,
+        model information, and configuration. Returns a unique run ID.
 
         Parameters
         ----------
         purpose : str
-            Describe ``purpose``.
-        model_id : str | NoneType
-            Describe ``model_id``.
-        revision : str | NoneType
-            Describe ``revision``.
-        config : str | object
-            Describe ``config``.
+            Purpose description for the run (e.g., "embedding", "indexing").
+        model_id : str | None
+            Model identifier used in this run, or None if not applicable.
+        revision : str | None
+            Model revision or version, or None if not applicable.
+        config : Mapping[str, object]
+            Run configuration dictionary (serialized as JSON).
 
         Returns
         -------
         str
-            Describe return value.
+            Unique run ID (UUID) for the newly created run.
         """
         ...
 
     def close_run(self, run_id: str, *, success: bool, notes: str | None = None) -> None:
-        """Describe close run.
+        """Close a pipeline run and record completion status.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Updates the run's finished_at timestamp and records completion status
+        with optional notes.
 
         Parameters
         ----------
         run_id : str
-            Describe ``run_id``.
+            Run ID to close.
         success : bool
-            Describe ``success``.
-        notes : str | NoneType, optional
-            Describe ``notes``.
-            Defaults to ``None``.
+            Whether the run completed successfully.
+        notes : str | None, optional
+            Optional notes about the run completion. Defaults to None.
         """
         ...
 
     def register_documents(self, docs: list[Doc]) -> None:
-        """Describe register documents.
+        """Register document records in the registry.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Inserts or updates document records in the documents table. Each
+        document's metadata (title, authors, publication date, etc.) is
+        stored with the document ID.
 
         Parameters
         ----------
         docs : list[Doc]
-            Describe ``docs``.
+            List of document objects to register. Each document must have
+            a unique doc_id.
         """
         ...
 
     def register_doctags(self, assets: list[DoctagsAsset]) -> None:
-        """Describe register doctags.
+        """Register doctags asset records in the registry.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Inserts or updates doctags asset records in the doctags table.
+        Doctags represent visual document tags generated by vision-language
+        models.
 
         Parameters
         ----------
         assets : list[DoctagsAsset]
-            Describe ``assets``.
+            List of doctags asset objects to register. Each asset must have
+            doc_id, doctags_uri, and model information.
         """
         ...
 
     def emit_event(self, event_name: str, subject_id: str, payload: Mapping[str, object]) -> None:
-        """Describe emit event.
+        """Emit a pipeline event to the registry.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Records an event in the pipeline_events table with a unique event ID,
+        event name, subject ID, and JSON payload. Used for tracking pipeline
+        operations and state changes.
 
         Parameters
         ----------
         event_name : str
-            Describe ``event_name``.
+            Name of the event (e.g., "RunClosed", "DatasetCommitted").
         subject_id : str
-            Describe ``subject_id``.
-        payload : str | object
-            Describe ``payload``.
+            ID of the subject the event relates to (e.g., run_id, dataset_id).
+        payload : Mapping[str, object]
+            Event payload dictionary (serialized as JSON).
         """
         ...
 
     def incident(self, event: str, subject_id: str, error_class: str, message: str) -> None:
-        """Describe incident.
+        """Record an incident emitted by registry clients.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Inserts an incident record into the incidents table for tracking
+        errors and failures in pipeline operations.
 
         Parameters
         ----------
         event : str
-            Describe ``event``.
+            Event name associated with the incident.
         subject_id : str
-            Describe ``subject_id``.
+            ID of the subject the incident relates to (e.g., run_id, dataset_id).
         error_class : str
-            Describe ``error_class``.
+            Error class or exception type name.
         message : str
-            Describe ``message``.
+            Error message describing the incident.
         """
         ...

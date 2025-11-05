@@ -53,28 +53,23 @@ HTTP_OK = 200
 
 @dataclass(frozen=True)
 class HarvesterConfig:
-    """Describe HarvesterConfig.
+    """Configuration for OpenAccessHarvester.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Provides configuration options for customizing API endpoints and output
+    directory for the harvester. All fields have sensible defaults.
 
     Parameters
     ----------
     openalex_base : str, optional
-        Describe ``openalex_base``.
-        Defaults to ``'https://api.openalex.org'``.
+        Base URL for the OpenAlex API. Defaults to "https://api.openalex.org".
     unpaywall_base : str, optional
-        Describe ``unpaywall_base``.
-        Defaults to ``'https://api.unpaywall.org'``.
-    pdf_host_base : str | NoneType, optional
-        Describe ``pdf_host_base``.
-        Defaults to ``None``.
+        Base URL for the Unpaywall API. Defaults to "https://api.unpaywall.org".
+    pdf_host_base : str | None, optional
+        Optional base URL for a custom PDF hosting service. If provided,
+        PDFs will be resolved using this host. Defaults to None.
     out_dir : str, optional
-        Describe ``out_dir``.
-        Defaults to ``'/data/pdfs'``.
+        Output directory path where downloaded PDFs will be saved.
+        Defaults to "/data/pdfs".
     """
 
     openalex_base: str = "https://api.openalex.org"
@@ -85,30 +80,30 @@ class HarvesterConfig:
 
 # [nav:anchor OpenAccessHarvester]
 class OpenAccessHarvester:
-    """Describe OpenAccessHarvester.
+    """Harvester for downloading open-access PDFs from OpenAlex.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Describe the data structure and how instances collaborate with the surrounding package. Highlight how the class supports nearby modules to guide readers through the codebase.
+    Provides functionality to search for academic works in OpenAlex, resolve
+    PDF URLs through multiple sources (direct links, locations, Unpaywall, or
+    custom PDF host), and download PDFs to local storage.
 
     Parameters
     ----------
     user_agent : str
-        Describe ``user_agent``.
+        User agent string for HTTP requests (required by OpenAlex API).
     contact_email : str
-        Describe ``contact_email``.
+        Contact email address for API requests (required by OpenAlex API).
     config : HarvesterConfig | None, optional
-        Describe ``config``.
-        Defaults to ``None``.
+        Optional configuration object. If None, uses default HarvesterConfig.
+        Defaults to None.
 
     Raises
     ------
     TypeError
-    Raised when TODO for TypeError.
+        If OpenAlex API response has invalid structure.
     DownloadError
-    Raised when TODO for DownloadError.
+        If PDF download fails due to HTTP errors.
     UnsupportedMIMEError
-    Raised when TODO for UnsupportedMIMEError.
+        If downloaded content is not PDF-like.
     """
 
     def __init__(
@@ -117,21 +112,20 @@ class OpenAccessHarvester:
         contact_email: str,
         config: HarvesterConfig | None = None,
     ) -> None:
-        """Describe   init  .
+        """Initialize the harvester with user agent, email, and configuration.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Sets up HTTP session with proper headers and creates output directory
+        if it doesn't exist.
 
         Parameters
         ----------
         user_agent : str
-            Describe ``user_agent``.
+            User agent string for HTTP requests.
         contact_email : str
-            Describe ``contact_email``.
-        config : HarvesterConfig | NoneType, optional
-            Describe ``config``.
-            Defaults to ``None``.
+            Contact email address for API requests.
+        config : HarvesterConfig | None, optional
+            Optional configuration object. If None, uses default HarvesterConfig.
+            Defaults to None.
         """
         cfg = config or HarvesterConfig()
         self.ua = user_agent
@@ -145,25 +139,27 @@ class OpenAccessHarvester:
         self.session.headers.update({"User-Agent": f"{self.ua} ({self.email})"})
 
     def search(self, topic: str, years: str, max_works: int) -> list[dict[str, object]]:
-        """Describe search.
+        """Search for works in OpenAlex matching the topic and year filter.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Queries the OpenAlex API for works matching the specified topic and
+        optional year filter. Returns up to max_works results as a list of
+        work dictionaries.
 
         Parameters
         ----------
         topic : str
-            Describe ``topic``.
+            Topic query string (e.g., "machine learning").
         years : str
-            Describe ``years``.
+            Optional year filter string (e.g., "publication_year:2020-2023").
+            Empty string means no year filter.
         max_works : int
-            Describe ``max_works``.
+            Maximum number of works to return (capped at 200 per request).
 
         Returns
         -------
         list[dict[str, object]]
-            Describe return value.
+            List of work dictionaries from OpenAlex API. Each dictionary
+            contains work metadata (id, title, doi, locations, etc.).
 
         Raises
         ------
@@ -203,21 +199,23 @@ class OpenAccessHarvester:
         return typed_results[:max_works]
 
     def resolve_pdf(self, work: Mapping[str, object]) -> str | None:
-        """Describe resolve pdf.
+        """Resolve PDF URL for a work using multiple fallback strategies.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Attempts to find a PDF URL for the work by trying multiple sources:
+        1. Direct PDF URL from best_oa_location
+        2. PDF URL from locations array
+        3. Unpaywall API lookup (if DOI available)
+        4. Custom PDF host URL (if configured and DOI available)
 
         Parameters
         ----------
-        work : str | object
-            Describe ``work``.
+        work : Mapping[str, object]
+            Work dictionary from OpenAlex API containing work metadata.
 
         Returns
         -------
-        str | NoneType
-            Describe return value.
+        str | None
+            PDF URL if found, None otherwise.
         """
         direct = self._lookup_direct_pdf(work)
         if direct:
@@ -239,21 +237,20 @@ class OpenAccessHarvester:
 
     @staticmethod
     def _lookup_direct_pdf(work: Mapping[str, object]) -> str | None:
-        """Describe  lookup direct pdf.
+        """Look up PDF URL from work's best_oa_location field.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Checks the best_oa_location field in the work dictionary for a
+        direct PDF URL.
 
         Parameters
         ----------
-        work : str | object
-            Describe ``work``.
+        work : Mapping[str, object]
+            Work dictionary from OpenAlex API.
 
         Returns
         -------
-        str | NoneType
-            Describe return value.
+        str | None
+            PDF URL from best_oa_location if found, None otherwise.
         """
         best = work.get("best_oa_location")
         if isinstance(best, Mapping):
@@ -264,21 +261,21 @@ class OpenAccessHarvester:
 
     @staticmethod
     def _lookup_locations_pdf(locations: object) -> str | None:
-        """Describe  lookup locations pdf.
+        """Look up PDF URL from work's locations array.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Searches through the locations array for the first location with
+        a valid PDF URL.
 
         Parameters
         ----------
         locations : object
-            Describe ``locations``.
+            Locations array from work dictionary. Can be a sequence of
+            location dictionaries or other types.
 
         Returns
         -------
-        str | NoneType
-            Describe return value.
+        str | None
+            PDF URL from locations array if found, None otherwise.
         """
         if isinstance(locations, (str, bytes)):
             return None
@@ -292,21 +289,20 @@ class OpenAccessHarvester:
         return None
 
     def _resolve_unpaywall_pdf(self, doi: str) -> str | None:
-        """Describe  resolve unpaywall pdf.
+        """Resolve PDF URL using Unpaywall API.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Queries the Unpaywall API for the given DOI and returns the PDF URL
+        from the best open-access location if available.
 
         Parameters
         ----------
         doi : str
-            Describe ``doi``.
+            Digital Object Identifier (DOI) of the work.
 
         Returns
         -------
-        str | NoneType
-            Describe return value.
+        str | None
+            PDF URL from Unpaywall if found, None otherwise.
         """
         response = self.session.get(
             f"{self.unpaywall}/v2/{doi}", params={"email": self.email}, timeout=15
@@ -324,44 +320,44 @@ class OpenAccessHarvester:
         return None
 
     def _host_pdf_url(self, doi: str) -> str | None:
-        """Describe  host pdf url.
+        """Construct PDF URL from custom PDF host configuration.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Generates a PDF URL using the configured pdf_host_base and the DOI.
+        The DOI is sanitized by replacing slashes with underscores.
 
         Parameters
         ----------
         doi : str
-            Describe ``doi``.
+            Digital Object Identifier (DOI) of the work.
 
         Returns
         -------
-        str | NoneType
-            Describe return value.
+        str | None
+            PDF URL from custom host if pdf_host_base is configured,
+            None otherwise.
         """
         if not self.pdf_host:
             return None
         return f"{self.pdf_host}/pdf/{doi.replace('/', '_')}.pdf"
 
     def download_pdf(self, url: str, target_path: str | Path) -> Path:
-        """Describe download pdf.
+        """Download a PDF file from URL to local path.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Downloads the PDF file from the given URL and saves it to the
+        specified target path. Validates that the response is a PDF-like
+        content type.
 
         Parameters
         ----------
         url : str
-            Describe ``url``.
+            URL of the PDF file to download.
         target_path : str | Path
-            Describe ``target_path``.
+            Local file path where the PDF will be saved.
 
         Returns
         -------
-        str | Path
-            Describe return value.
+        Path
+            Path object pointing to the downloaded file.
 
         Raises
         ------
@@ -384,25 +380,25 @@ class OpenAccessHarvester:
         return path_obj
 
     def run(self, topic: str, years: str, max_works: int) -> list[Doc]:
-        """Describe run.
+        """Run the complete harvesting workflow.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Searches for works, resolves PDF URLs, downloads PDFs, and creates
+        Doc objects for each successfully downloaded document.
 
         Parameters
         ----------
         topic : str
-            Describe ``topic``.
+            Topic query string (e.g., "machine learning").
         years : str
-            Describe ``years``.
+            Optional year filter string (e.g., "publication_year:2020-2023").
+            Empty string means no year filter.
         max_works : int
-            Describe ``max_works``.
+            Maximum number of works to process.
 
         Returns
         -------
         list[Doc]
-            Describe return value.
+            List of Doc objects for successfully downloaded PDFs.
         """
         docs: list[Doc] = []
         works = self.search(topic, years, max_works)
