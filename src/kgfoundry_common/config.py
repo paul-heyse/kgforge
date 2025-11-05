@@ -398,7 +398,10 @@ class AppSettings(BaseSettings):
                     raise TypeError(message)
                 normalized[key_obj] = value
 
-        return cls.model_validate(normalized, context=context)
+        try:
+            return cls.model_validate(normalized, context=context)
+        except ValueError:
+            raise
 
 
 def _load_config_impl() -> AppSettings:
@@ -477,7 +480,10 @@ def load_config(*, reload: bool = False) -> AppSettings:
     if reload:
         _load_config_cached.cache_clear()
 
-    return _load_config_cached()
+    try:
+        return _load_config_cached()
+    except ValueError:
+        raise
 
 
 def _format_validation_error(exc: ValidationError) -> str:

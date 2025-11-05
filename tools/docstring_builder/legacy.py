@@ -824,7 +824,23 @@ def build_docstring(
 
 
 def _lines_to_docstring_text(lines: list[str]) -> str:
-    """Transform emitted docstring lines into the inner text payload."""
+    """Transform emitted docstring lines into the inner text payload.
+
+    Parameters
+    ----------
+    lines : list[str]
+        List of docstring lines including opening/closing triple quotes.
+
+    Returns
+    -------
+    str
+        Inner text content of the docstring (excluding quotes).
+
+    Raises
+    ------
+    ValueError
+        If the lines don't start with triple quotes.
+    """
     opening = lines[0]
     if not opening.startswith('"""'):
         message = "Docstring must start with triple quotes."
@@ -837,7 +853,18 @@ def _lines_to_docstring_text(lines: list[str]) -> str:
 
 
 def process_file(file_path: Path) -> bool:
-    """Generate docstrings for the supplied module."""
+    """Generate docstrings for the supplied module.
+
+    Parameters
+    ----------
+    file_path : Path
+        Path to the Python file to process.
+
+    Returns
+    -------
+    bool
+        True if docstrings were generated and applied, False otherwise.
+    """
     module_name = module_name_for(file_path)
     tree = ast.parse(file_path.read_text(encoding="utf-8"))
     collector = _SymbolCollector(module_name)

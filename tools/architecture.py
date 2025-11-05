@@ -71,13 +71,32 @@ class ArchitectureResult:
         return not self.violations
 
     def to_json(self) -> str:
-        """Return a JSON representation of the architecture check result."""
+        """Return a JSON representation of the architecture check result.
+
+        Returns
+        -------
+        str
+            JSON string representation.
+        """
         payload: dict[str, object] = {"violations": list(self.violations)}
         return json.dumps(payload, indent=2)
 
 
 def _match_modules(modules: Iterable[str], patterns: Sequence[str]) -> set[str]:
-    """Return the subset of ``modules`` matching any of the provided regex ``patterns``."""
+    """Return the subset of ``modules`` matching any of the provided regex ``patterns``.
+
+    Parameters
+    ----------
+    modules : Iterable[str]
+        Module names to match.
+    patterns : Sequence[str]
+        Regex patterns to match against.
+
+    Returns
+    -------
+    set[str]
+        Set of matching module names.
+    """
     regexes = [re.compile(pattern) for pattern in patterns]
     return {module for module in modules if any(regex.match(module) for regex in regexes)}
 
@@ -85,7 +104,18 @@ def _match_modules(modules: Iterable[str], patterns: Sequence[str]) -> set[str]:
 def _build_layered_architecture(
     modules: Sequence[str],
 ) -> tuple[LayeredArchitectureProtocol, list[str], list[str], list[str]]:
-    """Build the layered architecture and return the classified module groups."""
+    """Build the layered architecture and return the classified module groups.
+
+    Parameters
+    ----------
+    modules : Sequence[str]
+        Module names to classify.
+
+    Returns
+    -------
+    tuple[LayeredArchitectureProtocol, list[str], list[str], list[str]]
+        (architecture, domain_modules, adapter_modules, io_modules) tuple.
+    """
     domain_modules = sorted(_match_modules(modules, DOMAIN_PATTERNS))
 
     cli_candidates = _match_modules(modules, CLI_PATTERNS)
@@ -146,7 +176,18 @@ def _collect_violations(
 
 
 def enforce_tooling_layers(root: Path | None = None) -> ArchitectureResult:
-    """Validate the domain → adapters → IO layering of the tooling package."""
+    """Validate the domain → adapters → IO layering of the tooling package.
+
+    Parameters
+    ----------
+    root : Path | None
+        Project root path (defaults to REPO_ROOT).
+
+    Returns
+    -------
+    ArchitectureResult
+        Architecture check result with violations.
+    """
     _, domain_modules, adapter_modules, io_modules, evaluable = _load_tooling_architecture(
         root=root
     )

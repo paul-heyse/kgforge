@@ -774,7 +774,20 @@ def run_docstring_builder(
     *,
     config_override: str | None = None,
 ) -> DocstringBuildResult:
-    """Execute the docstring builder for ``request`` and return a structured result."""
+    """Execute the docstring builder for ``request`` and return a structured result.
+
+    Parameters
+    ----------
+    request : DocstringBuildRequest
+        Build request containing command, options, and selection criteria.
+    config_override : str, optional
+        Explicit configuration file path override.
+
+    Returns
+    -------
+    DocstringBuildResult
+        Build result containing exit status, metrics, and CLI payload.
+    """
     config, config_selection = load_builder_config(config_override)
     if request.llm_summary:
         config.llm_summary_mode = "apply"

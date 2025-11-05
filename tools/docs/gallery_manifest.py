@@ -157,11 +157,6 @@ def load_gallery_manifest(path: Path) -> list[GalleryExample]:
     -------
     list[GalleryExample]
         List of parsed gallery examples.
-
-    Raises
-    ------
-    GalleryManifestError
-        If the manifest is invalid, unsupported version, or contains malformed entries.
     """
     manifest = _read_manifest(path)
     _ensure_supported_version(manifest)

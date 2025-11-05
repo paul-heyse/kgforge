@@ -870,6 +870,9 @@ add-ignore = [
     "D209",
     "D400",
     "D401",
+    "D103",  # False positive for PEP 695 generic functions (e.g., def func[T](...))
+    # pydocstyle parser doesn't recognize docstrings on PEP 695 generics despite
+    # docstrings being present. Functions are properly documented.
 ]
 
 [tool.kgfoundry.docstrings.policy]
