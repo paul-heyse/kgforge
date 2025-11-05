@@ -835,11 +835,17 @@ def run_build(
     cache : DocstringBuilderCache
         Cache interface for storing/retrieving processed file metadata.
 
+    Returns
+    -------
+    DocstringBuildResult
+        Build result containing processed files, statistics, and any errors
+        encountered during processing.
+
     Raises
     ------
     NotImplementedError
         Always raised as this function is a placeholder and not yet implemented.
-    """
+    """  # noqa: DOC202
     # This is a placeholder implementation that delegates to the existing
     # run_docstring_builder function. In a full implementation, this would
     # directly invoke _run_pipeline with a request built from config.
@@ -867,11 +873,17 @@ def run_legacy(
     **kwargs : object
         Keyword arguments (deprecated, accepted for backward compatibility only).
 
+    Returns
+    -------
+    DocstringBuildResult
+        Build result containing processed files, statistics, and any errors
+        encountered during processing.
+
     Raises
     ------
     NotImplementedError
         Always raised as this function is a placeholder and not yet implemented.
-    """
+    """  # noqa: DOC202
     msg = (
         "run_legacy() is deprecated and will be removed in a future release. "
         "Use run_build(config=..., cache=...) instead with typed "

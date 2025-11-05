@@ -167,6 +167,13 @@ class PathlibTransformer(cst.CSTTransformer):
     def leave_With(self, original_node: cst.With, updated_node: cst.With) -> cst.With:  # noqa: N802
         """Apply with-statement rewrites when exiting a ``with`` block.
 
+        Parameters
+        ----------
+        original_node : cst.With
+            Original with statement node before transformation.
+        updated_node : cst.With
+            Updated with statement node after child transformations.
+
         Returns
         -------
         cst.With

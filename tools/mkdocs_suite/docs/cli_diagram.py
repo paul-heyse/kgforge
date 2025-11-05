@@ -12,7 +12,19 @@ __all__ = ["OperationEntry", "collect_operations", "write_diagram"]
 
 
 def collect_operations(spec: Mapping[str, object]) -> list[OperationEntry]:
-    """Return CLI operations extracted from the OpenAPI specification mapping."""
+    """Return CLI operations extracted from the OpenAPI specification mapping.
+
+    Parameters
+    ----------
+    spec : Mapping[str, object]
+        OpenAPI specification dictionary containing paths and operations.
+
+    Returns
+    -------
+    list[OperationEntry]
+        List of operation tuples, each containing ``(method, path, operation_id,
+        summary, tags)`` where ``operation_id`` and ``summary`` may be ``None``.
+    """
     return _impl.collect_operations(spec)
 
 

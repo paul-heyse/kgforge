@@ -17,25 +17,37 @@ _SUITE_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_MKDOCS_PATH = _SUITE_ROOT / "mkdocs.yml"
 
 
-def _construct_python_name(
-    loader: yaml.SafeLoader, _suffix: str, node: Node
-) -> str | None:
-    """Return the raw value for ``!!python/name`` tags used by MkDocs plugins."""
+def _construct_python_name(loader: yaml.SafeLoader, _suffix: str, node: Node) -> str | None:
+    """Return the raw value for ``!!python/name`` tags used by MkDocs plugins.
 
-    # ``mkdocs.yml`` relies on ``!!python/name:...`` tags for plugin wiring. The
-    # default :class:`yaml.SafeLoader` refuses to process those tags, which would
-    # otherwise cause ``yaml.safe_load`` to raise ``ConstructorError``. By
-    # registering a multi-constructor we fall back to the scalar value while
-    # keeping the loader ``safe``.
+    ``mkdocs.yml`` relies on ``!!python/name:...`` tags for plugin wiring. The
+    default :class:`yaml.SafeLoader` refuses to process those tags, which would
+    otherwise cause ``yaml.safe_load`` to raise ``ConstructorError``. By
+    registering a multi-constructor we fall back to the scalar value while
+    keeping the loader ``safe``.
+
+    Parameters
+    ----------
+    loader : yaml.SafeLoader
+        YAML loader instance processing the node.
+    _suffix : str
+        Tag suffix (unused, kept for constructor signature compatibility).
+    node : Node
+        YAML node containing the scalar value.
+
+    Returns
+    -------
+    str | None
+        The scalar value extracted from the node, or ``None`` if the node
+        cannot be constructed as a scalar.
+    """
     return loader.construct_scalar(node)
 
 
 # ``yaml.safe_load`` internally relies on :class:`yaml.SafeLoader`. Register a
 # permissive constructor ahead of time so loading the MkDocs config succeeds
 # even when optional plugins inject ``!!python/name`` tags.
-yaml.SafeLoader.add_multi_constructor(
-    "tag:yaml.org,2002:python/name:", _construct_python_name
-)
+yaml.SafeLoader.add_multi_constructor("tag:yaml.org,2002:python/name:", _construct_python_name)
 
 
 def _coerce_repo_url(value: Any) -> str | None:
@@ -46,12 +58,14 @@ def _coerce_repo_url(value: Any) -> str | None:
     return None
 
 
-def load_repo_settings(mkdocs_config_path: Path | str | None = None) -> tuple[str | None, str | None]:
+def load_repo_settings(
+    mkdocs_config_path: Path | str | None = None,
+) -> tuple[str | None, str | None]:
     """Return the repository URL and default branch from ``mkdocs.yml``.
 
     Parameters
     ----------
-    mkdocs_config_path:
+    mkdocs_config_path : Path | str | None
         Optional override for the MkDocs configuration path. When omitted the
         helper uses the canonical ``tools/mkdocs_suite/mkdocs.yml`` location.
 
@@ -62,7 +76,6 @@ def load_repo_settings(mkdocs_config_path: Path | str | None = None) -> tuple[st
         ``None``. The branch defaults to ``"main"`` when the MkDocs
         configuration omits a resolvable ``edit_uri``.
     """
-
     path = Path(mkdocs_config_path) if mkdocs_config_path is not None else _DEFAULT_MKDOCS_PATH
     if not path.exists():
         return None, None
