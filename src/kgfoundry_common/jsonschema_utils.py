@@ -73,7 +73,18 @@ __all__ = [
 def create_draft202012_validator(
     schema: Mapping[str, object],
 ) -> Draft202012ValidatorProtocol:
-    """Return a typed Draft 2020-12 validator for ``schema``."""
+    """Return a typed Draft 2020-12 validator for ``schema``.
+
+    Parameters
+    ----------
+    schema : Mapping[str, object]
+        JSON Schema to validate against.
+
+    Returns
+    -------
+    Draft202012ValidatorProtocol
+        Typed validator instance.
+    """
     concrete_schema = {str(key): value for key, value in schema.items()}
     instance = _Draft202012Validator(concrete_schema)
     return cast("Draft202012ValidatorProtocol", instance)

@@ -228,14 +228,36 @@ class TypeGateVisitor(ast.NodeVisitor):
 
     @staticmethod
     def _is_type_checking_guard(node: ast.If) -> bool:
-        """Check if an If node is a TYPE_CHECKING guard."""
+        """Check if an If node is a TYPE_CHECKING guard.
+
+        Parameters
+        ----------
+        node : ast.If
+            AST If node to check.
+
+        Returns
+        -------
+        bool
+            True if the node is a TYPE_CHECKING guard.
+        """
         # Pattern: if TYPE_CHECKING:
         test = node.test
         return isinstance(test, ast.Name) and test.id == "TYPE_CHECKING"
 
     @staticmethod
     def _suggest_private_module_fix(module: str) -> str:
-        """Generate suggestion for private module imports."""
+        """Generate suggestion for private module imports.
+
+        Parameters
+        ----------
+        module : str
+            Module name that was imported.
+
+        Returns
+        -------
+        str
+            Suggestion message for fixing the violation.
+        """
         if module.startswith("docs._types"):
             return "Use public façade: from docs.types import ... (or docs.typing for type-only helpers)"
         if module.startswith("docs._cache"):
@@ -244,7 +266,18 @@ class TypeGateVisitor(ast.NodeVisitor):
 
     @staticmethod
     def _suggest_shim_fix(shim_name: str) -> str:
-        """Generate suggestion for deprecated shim usage."""
+        """Generate suggestion for deprecated shim usage.
+
+        Parameters
+        ----------
+        shim_name : str
+            Name of the deprecated shim function.
+
+        Returns
+        -------
+        str
+            Suggestion message for fixing the violation.
+        """
         if shim_name == "resolve_numpy":
             return "Use gate_import('numpy', 'purpose') or TYPE_CHECKING guard + numpy import"
         if shim_name == "resolve_fastapi":
@@ -255,7 +288,18 @@ class TypeGateVisitor(ast.NodeVisitor):
 
     @staticmethod
     def _suggest_heavy_import_fix(module: str) -> str:
-        """Generate suggestion for heavy imports."""
+        """Generate suggestion for heavy imports.
+
+        Parameters
+        ----------
+        module : str
+            Module name that was imported.
+
+        Returns
+        -------
+        str
+            Suggestion message for fixing the violation.
+        """
         module_root = module.split(".", maxsplit=1)[0]
         return (
             f"Guard {module_root} import behind TYPE_CHECKING block, or use "

@@ -52,11 +52,6 @@ def load_facade_module(module_name: str) -> ModuleType:
     ModuleType
         The loaded module object.
 
-    Raises
-    ------
-    ImportError
-        If the module cannot be imported.
-
     Examples
     --------
     >>> module = load_facade_module("kgfoundry_common.typing")
@@ -79,13 +74,6 @@ def load_facade_attribute(module_name: str, attribute: str) -> object:
     -------
     object
         The attribute value.
-
-    Raises
-    ------
-    ImportError
-        If the module cannot be imported.
-    AttributeError
-        If the attribute does not exist on the module.
 
     Examples
     --------
@@ -116,10 +104,6 @@ def load_facade_attribute_typed[T](module_name: str, attribute: str, expected_ty
 
     Raises
     ------
-    ImportError
-        If the module cannot be imported.
-    AttributeError
-        If the attribute does not exist on the module.
     TypeError
         If the attribute does not match the expected type.
 

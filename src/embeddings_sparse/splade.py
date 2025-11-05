@@ -38,17 +38,40 @@ TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
 
 
 def _default_float_dict() -> defaultdict[str, float]:
-    """Return a defaultdict that produces ``float`` zeros for missing keys."""
+    """Return a defaultdict that produces ``float`` zeros for missing keys.
+
+    Returns
+    -------
+    defaultdict[str, float]
+        Defaultdict with float factory.
+    """
     return defaultdict(float)
 
 
 def _score_value(item: tuple[str, float]) -> float:
-    """Extract the score component from a Lucene impact result tuple."""
+    """Extract the score component from a Lucene impact result tuple.
+
+    Parameters
+    ----------
+    item : tuple[str, float]
+        Impact result tuple.
+
+    Returns
+    -------
+    float
+        Score value.
+    """
     return item[1]
 
 
 def _decode_signing_key() -> bytes | None:
-    """Decode the configured signing key, returning ``None`` if unavailable."""
+    """Decode the configured signing key, returning ``None`` if unavailable.
+
+    Returns
+    -------
+    bytes | None
+        Decoded signing key, or None if unavailable.
+    """
     try:
         settings = load_config()
     except ValueError as exc:
@@ -69,7 +92,25 @@ def _decode_signing_key() -> bytes | None:
 
 
 def _load_unsigned_payload(handle: BinaryIO, legacy_path: Path) -> dict[str, JsonValue]:
-    """Load legacy pickle payload with allow-list enforcement."""
+    """Load legacy pickle payload with allow-list enforcement.
+
+    Parameters
+    ----------
+    handle : BinaryIO
+        Binary file handle to read from.
+    legacy_path : Path
+        Path to the legacy pickle file.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Deserialized payload dictionary.
+
+    Raises
+    ------
+    DeserializationError
+        If deserialization fails or payload is invalid.
+    """
     try:
         payload_obj = load_unsigned_legacy(handle)
     except UnsafeSerializationError as exc:
@@ -84,7 +125,25 @@ def _load_unsigned_payload(handle: BinaryIO, legacy_path: Path) -> dict[str, Jso
 
 
 def _load_legacy_metadata(legacy_path: Path) -> dict[str, JsonValue]:
-    """Load SPLADE legacy pickle metadata using signed or unsigned safe loader."""
+    """Load SPLADE legacy pickle metadata using signed or unsigned safe loader.
+
+    Parameters
+    ----------
+    legacy_path : Path
+        Path to the legacy pickle file.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Deserialized metadata dictionary.
+
+    Raises
+    ------
+    DeserializationError
+        If deserialization fails or payload is invalid.
+    OSError
+        If the file cannot be read.
+    """
     signing_key = _decode_signing_key()
     try:
         with legacy_path.open("rb") as handle:
@@ -275,15 +334,14 @@ class SPLADEv3Encoder:
         texts : list[str]
             Describe ``texts``.
 
-        Returns
-        -------
-        list[tuple[list[int], list[float]]]
-            Describe return value.
-
         Raises
         ------
         NotImplementedError
-        Raised when TODO for NotImplementedError.
+            This function is not implemented in the skeleton.
+
+        Notes
+        -----
+        Use the Lucene impact index variant if available.
         """
         message = (
             "SPLADE encoding is not implemented in the skeleton. Use the Lucene "

@@ -1,17 +1,29 @@
 # `tests`
 
-Test package marker ensuring pytest uses fully-qualified module paths.
+Test suite package for kgfoundry.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Modules
 
-- **`tests.conftest`** → [open](vscode://file//home/paul/kgfoundry/src/tests/conftest.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/conftest.py#L1)
-- **`tests.docs`** — Docs-focused test package. → [open](vscode://file//home/paul/kgfoundry/src/tests/docs/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/docs/__init__.py#L1)
-- **`tests.mock_servers`** → [open](vscode://file//home/paul/kgfoundry/src/tests/mock_servers/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/mock_servers/__init__.py#L1)
-- **`tests.test_e2e_smoke`** → [open](vscode://file//home/paul/kgfoundry/src/tests/test_e2e_smoke.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/test_e2e_smoke.py#L1)
-- **`tests.test_imports`** → [open](vscode://file//home/paul/kgfoundry/src/tests/test_imports.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/test_imports.py#L1)
-- **`tests.tools`** — Tools-oriented test package. → [open](vscode://file//home/paul/kgfoundry/src/tests/tools/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/tools/__init__.py#L1)
-- **`tests.unit`** — Unit-level test package. → [open](vscode://file//home/paul/kgfoundry/src/tests/unit/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/3e93a43e5369e5222f2d28b839bae3718d96657a/src/tests/unit/__init__.py#L1)
-<!-- agent:readme v1 sha:3e93a43e5369e5222f2d28b839bae3718d96657a content:24a176decaa0 -->
+- **`tests.agent_catalog`** — Test package for Agent Catalog functionality. → [open](vscode://file//home/paul/kgfoundry/src/tests/agent_catalog/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/agent_catalog/__init__.py#L1)
+- **`tests.bootstrap`** — Testing bootstrap helpers for kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/tests/bootstrap.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/bootstrap.py#L1)
+- **`tests.conftest`** — Shared pytest fixtures for table-driven testing and observability validation. → [open](vscode://file//home/paul/kgfoundry/src/tests/conftest.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/conftest.py#L1)
+- **`tests.docs`** — Docs-related test helpers. → [open](vscode://file//home/paul/kgfoundry/src/tests/docs/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/docs/__init__.py#L1)
+- **`tests.docstring_builder`** — Docstring builder test package. → [open](vscode://file//home/paul/kgfoundry/src/tests/docstring_builder/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/docstring_builder/__init__.py#L1)
+- **`tests.helpers`** — Shared test helpers for kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/tests/helpers/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/helpers/__init__.py#L1)
+- **`tests.kgfoundry_common`** — Tests for kgfoundry_common package functionality. → [open](vscode://file//home/paul/kgfoundry/src/tests/kgfoundry_common/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/kgfoundry_common/__init__.py#L1)
+- **`tests.orchestration`** — Tests for orchestration module. → [open](vscode://file//home/paul/kgfoundry/src/tests/orchestration/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/orchestration/__init__.py#L1)
+- **`tests.search_api`** — Tests for search API functionality. → [open](vscode://file//home/paul/kgfoundry/src/tests/search_api/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/search_api/__init__.py#L1)
+- **`tests.src`** — Tests for src module. → [open](vscode://file//home/paul/kgfoundry/src/tests/src/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/src/__init__.py#L1)
+- **`tests.test_config`** — Tests for configuration management with pydantic_settings. → [open](vscode://file//home/paul/kgfoundry/src/tests/test_config.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_config.py#L1)
+- **`tests.test_logging`** — Tests for structured logging with correlation IDs and observability. → [open](vscode://file//home/paul/kgfoundry/src/tests/test_logging.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_logging.py#L1)
+- **`tests.test_logging_contexts`** — Tests for hardened logging contexts with immutability and type safety. → [open](vscode://file//home/paul/kgfoundry/src/tests/test_logging_contexts.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_logging_contexts.py#L1)
+- **`tests.test_namespace_proxy`** — Tests for the typed namespace registry and proxy helpers. → [open](vscode://file//home/paul/kgfoundry/src/tests/test_namespace_proxy.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_namespace_proxy.py#L1)
+- **`tests.test_regression_public_api_hardening`** — Regression tests for public API hardening (phase 1). → [open](vscode://file//home/paul/kgfoundry/src/tests/test_regression_public_api_hardening.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_regression_public_api_hardening.py#L1)
+- **`tests.test_runtime_determinism`** — Tests for runtime determinism without optional dependencies. → [open](vscode://file//home/paul/kgfoundry/src/tests/test_runtime_determinism.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_runtime_determinism.py#L1)
+- **`tests.test_typing_facade`** — Tests for the typing façade (kgfoundry_common.typing). → [open](vscode://file//home/paul/kgfoundry/src/tests/test_typing_facade.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/test_typing_facade.py#L1)
+- **`tests.tools`** — Tools test utilities package. → [open](vscode://file//home/paul/kgfoundry/src/tests/tools/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/tools/__init__.py#L1)
+- **`tests.vector_ingestion`** — Tests for vector_ingestion module. → [open](vscode://file//home/paul/kgfoundry/src/tests/vector_ingestion/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/tests/vector_ingestion/__init__.py#L1)
+<!-- agent:readme v1 sha:c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae content:8ae9651c4bc8 -->

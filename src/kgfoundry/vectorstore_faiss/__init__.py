@@ -22,10 +22,27 @@ if hasattr(_module, "__path__"):
 
 
 def __getattr__(name: str) -> object:
-    """Return ``name`` from the proxied ``vectorstore_faiss`` module."""
+    """Return ``name`` from the proxied ``vectorstore_faiss`` module.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to look up.
+
+    Returns
+    -------
+    object
+        Attribute value from the proxied module.
+    """
     return namespace_getattr(_module, name)
 
 
 def __dir__() -> list[str]:
-    """Return the combined attribute listing exposed by the namespace bridge."""
+    """Return the combined attribute listing exposed by the namespace bridge.
+
+    Returns
+    -------
+    list[str]
+        Combined list of attributes from the module and exports.
+    """
     return namespace_dir(_module, _EXPORTS)

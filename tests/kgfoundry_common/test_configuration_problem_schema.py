@@ -23,7 +23,13 @@ else:  # pragma: no cover - runtime stand-ins for type aliases
 
 
 def _load_sample_payload() -> dict[str, JsonValue]:
-    """Load the sample payload JSON file."""
+    """Load the sample payload JSON file.
+
+    Returns
+    -------
+    dict[str, JsonValue]
+        Parsed JSON payload.
+    """
     sample_path = (
         Path(__file__).parent.parent.parent
         / "schema"
@@ -36,12 +42,34 @@ def _load_sample_payload() -> dict[str, JsonValue]:
 
 
 def _as_problem_dict(problem: ProblemDetails) -> dict[str, object]:
-    """Return a mutable dictionary view of the problem details payload."""
+    """Return a mutable dictionary view of the problem details payload.
+
+    Parameters
+    ----------
+    problem : ProblemDetails
+        Problem details payload.
+
+    Returns
+    -------
+    dict[str, object]
+        Mutable dictionary view.
+    """
     return cast("dict[str, object]", problem)
 
 
 def _as_problem_mapping(problem: ProblemDetails) -> Mapping[str, JsonValue]:
-    """Return a mapping view for schema validation assertions."""
+    """Return a mapping view for schema validation assertions.
+
+    Parameters
+    ----------
+    problem : ProblemDetails
+        Problem details payload.
+
+    Returns
+    -------
+    Mapping[str, JsonValue]
+        Mapping view for validation.
+    """
     return cast("Mapping[str, JsonValue]", problem)
 
 

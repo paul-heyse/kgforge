@@ -48,6 +48,11 @@ class CanonicalErrorCode:
             Human-readable failure description.
         details
             Optional additional context appended on separate lines.
+
+        Returns
+        -------
+        str
+            Formatted error message string.
         """
         header = f"[ERROR {self.code}] {message}"
         suffix = f"Hint: {self.remediation}" if self.remediation else ""
@@ -286,6 +291,16 @@ CANONICAL_ERROR_CODES: Final[dict[str, CanonicalErrorCode]] = {
 def get_error_code(code: str) -> CanonicalErrorCode:
     """Return metadata for ``code``.
 
+    Parameters
+    ----------
+    code : str
+        Error code identifier.
+
+    Returns
+    -------
+    CanonicalErrorCode
+        Error code metadata.
+
     Raises
     ------
     KeyError
@@ -299,5 +314,20 @@ def get_error_code(code: str) -> CanonicalErrorCode:
 
 
 def format_error_message(code: str, message: str, *, details: str | None = None) -> str:
-    """Return a formatted error message for ``code`` and ``message``."""
+    """Return a formatted error message for ``code`` and ``message``.
+
+    Parameters
+    ----------
+    code : str
+        Error code identifier.
+    message : str
+        Human-readable error message.
+    details : str | None, optional
+        Optional additional context.
+
+    Returns
+    -------
+    str
+        Formatted error message string.
+    """
     return get_error_code(code).format(message, details=details)

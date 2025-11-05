@@ -120,7 +120,18 @@ def validate_title_format(docstring: str) -> tuple[bool, str]:
 
 
 def check_orphan_directive(docstring: str) -> bool:
-    """Return ``True`` when the docstring contains a redundant ``:orphan:`` directive."""
+    """Return ``True`` when the docstring contains a redundant ``:orphan:`` directive.
+
+    Parameters
+    ----------
+    docstring : str
+        Docstring to check.
+
+    Returns
+    -------
+    bool
+        True if :orphan: directive is present.
+    """
     return ":orphan:" in docstring
 
 
@@ -129,20 +140,49 @@ def check_custom_labels(docstring: str) -> list[str]:
 
     Sphinx-Gallery generates its own anchors; any ``.. _gallery_*:`` labels
     should be removed to avoid duplicates.
+
+    Parameters
+    ----------
+    docstring : str
+        Docstring to search for labels.
+
+    Returns
+    -------
+    list[str]
+        List of custom label names found.
     """
     return cast("list[str]", CUSTOM_LABEL_PATTERN.findall(docstring))
 
 
 def _has_tags_directive(docstring: str) -> bool:
-    """Return ``True`` if the docstring declares a ``..
+    """Return ``True`` if the docstring declares a ``.. tags::`` directive.
 
-    tags::`` directive.
+    Parameters
+    ----------
+    docstring : str
+        Docstring to check.
+
+    Returns
+    -------
+    bool
+        True if tags directive is present.
     """
     return TAGS_PATTERN.search(docstring) is not None
 
 
 def _has_constraints_section(docstring: str) -> bool:
-    """Return ``True`` if a ``Constraints`` section header is present."""
+    """Return ``True`` if a ``Constraints`` section header is present.
+
+    Parameters
+    ----------
+    docstring : str
+        Docstring to check.
+
+    Returns
+    -------
+    bool
+        True if Constraints section header is present.
+    """
     match = CONSTRAINTS_HEADER_PATTERN.search(docstring)
     if not match:
         return False
@@ -153,7 +193,23 @@ def _has_constraints_section(docstring: str) -> bool:
 
 
 def _load_docstring(path: Path) -> str | None:
-    """Extract the module docstring from ``path`` using ``ast`` parsing."""
+    """Extract the module docstring from ``path`` using ``ast`` parsing.
+
+    Parameters
+    ----------
+    path : Path
+        Path to Python file.
+
+    Returns
+    -------
+    str | None
+        Module docstring if present, None otherwise.
+
+    Raises
+    ------
+    GalleryValidationError
+        If the file cannot be parsed as valid Python.
+    """
     try:
         module = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     except SyntaxError as exc:  # pragma: no cover - should never happen for examples
@@ -212,7 +268,18 @@ def validate_example_file(file_path: Path, *, strict: bool = False) -> list[str]
 
 
 def _iter_example_files(examples_dir: Path) -> Iterable[Path]:
-    """Yield Python files inside ``examples_dir`` (non-recursive)."""
+    """Yield Python files inside ``examples_dir`` (non-recursive).
+
+    Parameters
+    ----------
+    examples_dir : Path
+        Directory to search for example files.
+
+    Yields
+    ------
+    Path
+        Path to each Python example file found.
+    """
     for path in sorted(examples_dir.glob("*.py")):
         if path.name.startswith("."):
             continue
@@ -260,7 +327,18 @@ def main(examples_dir: Path, *, strict: bool = False, verbose: bool = False) -> 
 
 
 def _parse_args(argv: list[str]) -> GalleryOptions:
-    """Parse CLI arguments."""
+    """Parse CLI arguments.
+
+    Parameters
+    ----------
+    argv : list[str]
+        Command-line arguments.
+
+    Returns
+    -------
+    GalleryOptions
+        Parsed options instance.
+    """
     parser = argparse.ArgumentParser(
         description="Validate Sphinx-Gallery example docstrings for kgfoundry.",
     )
@@ -299,7 +377,18 @@ def _parse_args(argv: list[str]) -> GalleryOptions:
 
 
 def _run_from_cli(argv: list[str]) -> int:
-    """Entry point used by ``if __name__ == '__main__'`` guard."""
+    """Entry point used by ``if __name__ == '__main__'`` guard.
+
+    Parameters
+    ----------
+    argv : list[str]
+        Command-line arguments.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on validation failure, 2 on CLI errors.
+    """
     options = _parse_args(argv)
     if options.fix:
         LOGGER.warning("Automatic fixing is not implemented yet.")

@@ -724,9 +724,9 @@ def _load_docfacts_schema() -> dict[str, JsonValue]:
         try:
             fallback_text = _DOCFACTS_SCHEMA_FALLBACK.read_text(encoding="utf-8")
         except FileNotFoundError as fallback_exc:  # pragma: no cover - defensive guard
-            message = "DocFacts schema missing at %s and fallback %s" % (
-                _DOCFACTS_SCHEMA_PATH,
-                _DOCFACTS_SCHEMA_FALLBACK,
+            message = (
+                f"DocFacts schema missing at {_DOCFACTS_SCHEMA_PATH} "
+                f"and fallback {_DOCFACTS_SCHEMA_FALLBACK}"
             )
             raise RuntimeError(message) from fallback_exc
         _DOCFACTS_SCHEMA_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -752,7 +752,18 @@ def _load_cli_validator() -> Draft202012ValidatorProtocol:
 
 
 def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
-    """Validate ``payload`` against the published DocFacts schema."""
+    """Validate ``payload`` against the published DocFacts schema.
+
+    Parameters
+    ----------
+    payload : DocfactsDocumentPayload
+        Payload dictionary to validate.
+
+    Raises
+    ------
+    SchemaViolationError
+        If the payload fails schema validation.
+    """
     validator = _load_docfacts_validator()
     try:
         validator.validate(payload)
@@ -779,7 +790,18 @@ def validate_docfacts_payload(payload: DocfactsDocumentPayload) -> None:
 
 
 def validate_cli_output(payload: CliResult) -> None:
-    """Validate CLI machine output against the JSON schema."""
+    """Validate CLI machine output against the JSON schema.
+
+    Parameters
+    ----------
+    payload : CliResult
+        CLI result dictionary to validate.
+
+    Raises
+    ------
+    SchemaViolationError
+        If the payload fails schema validation.
+    """
     validator = _load_cli_validator()
     try:
         validator.validate(payload)
@@ -871,7 +893,18 @@ def _build_docfacts_entry(fact: DocFactLike) -> DocfactsEntry:
 
 
 def build_docfacts_document_payload(document: DocfactsDocumentLike) -> DocfactsDocumentPayload:
-    """Convert a legacy :class:`DocfactsDocument` to the typed payload shape."""
+    """Convert a legacy :class:`DocfactsDocument` to the typed payload shape.
+
+    Parameters
+    ----------
+    document : DocfactsDocumentLike
+        Document instance to convert.
+
+    Returns
+    -------
+    DocfactsDocumentPayload
+        Typed payload dictionary.
+    """
     entries = [_build_docfacts_entry(fact) for fact in document.entries]
     provenance = document.provenance
     payload: DocfactsDocumentPayload = {
@@ -888,7 +921,18 @@ def build_docfacts_document_payload(document: DocfactsDocumentLike) -> DocfactsD
 
 
 def build_docstring_ir_from_legacy(ir: IRDocstringLike) -> DocstringIR:
-    """Convert a legacy IR object into the typed :class:`DocstringIR`."""
+    """Convert a legacy IR object into the typed :class:`DocstringIR`.
+
+    Parameters
+    ----------
+    ir : IRDocstringLike
+        Legacy IR docstring instance.
+
+    Returns
+    -------
+    DocstringIR
+        Typed IR docstring instance.
+    """
     parameters = [
         DocstringIRParameter(
             name=parameter.name,
@@ -931,7 +975,18 @@ def build_docstring_ir_from_legacy(ir: IRDocstringLike) -> DocstringIR:
 
 
 def build_cli_result_skeleton(status: RunStatus) -> CliResult:
-    """Return a minimal CLI result payload initialised with required fields."""
+    """Return a minimal CLI result payload initialised with required fields.
+
+    Parameters
+    ----------
+    status : RunStatus
+        Status code for the result.
+
+    Returns
+    -------
+    CliResult
+        Minimal CLI result dictionary with required fields populated.
+    """
     payload: CliResult = {
         "schemaVersion": CLI_SCHEMA_VERSION,
         "schemaId": CLI_SCHEMA_ID,

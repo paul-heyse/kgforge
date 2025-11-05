@@ -234,7 +234,18 @@ class ToolRuntimeSettings(BaseSettings):
         return False
 
     def expected_digest_for(self, executable: Path) -> str | None:
-        """Return the expected SHA256 digest for ``executable`` when configured."""
+        """Return the expected SHA256 digest for ``executable`` when configured.
+
+        Parameters
+        ----------
+        executable : Path
+            Executable path to check.
+
+        Returns
+        -------
+        str | None
+            Expected digest if configured, otherwise None.
+        """
         digest_map = self.exec_digests
         if not digest_map:
             return None

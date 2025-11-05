@@ -28,7 +28,18 @@ from kgfoundry_common.typing import (
 
 
 def _install_fake_faiss(monkeypatch: pytest.MonkeyPatch) -> ModuleType:
-    """Patch gate_import to return a synthetic faiss module during a test."""
+    """Patch gate_import to return a synthetic faiss module during a test.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Pytest monkeypatch fixture.
+
+    Returns
+    -------
+    ModuleType
+        Fake faiss module.
+    """
     fake_module = ModuleType("faiss")
 
     def _patched_gate_import(module_name: str, purpose: str) -> ModuleType:

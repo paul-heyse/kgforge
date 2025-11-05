@@ -63,7 +63,18 @@ class IRDocstring:
 
 
 def build_ir(entry: SemanticResult) -> IRDocstring:
-    """Convert a :class:`SemanticResult` into an :class:`IRDocstring`."""
+    """Convert a :class:`SemanticResult` into an :class:`IRDocstring`.
+
+    Parameters
+    ----------
+    entry : SemanticResult
+        Semantic result containing symbol and schema information.
+
+    Returns
+    -------
+    IRDocstring
+        Intermediate representation docstring instance.
+    """
     symbol = entry.symbol
     schema = entry.schema
     parameters = [
@@ -101,7 +112,19 @@ def build_ir(entry: SemanticResult) -> IRDocstring:
 
 
 def validate_ir(ir: IRDocstring) -> None:
-    """Validate an :class:`IRDocstring` against simple invariants."""
+    """Validate an :class:`IRDocstring` against simple invariants.
+
+    Parameters
+    ----------
+    ir : IRDocstring
+        IR docstring to validate.
+
+    Raises
+    ------
+    ValueError
+        If the IR version is unsupported, symbol_id is missing, kind is invalid,
+        or parameter/return data is malformed.
+    """
     if ir.ir_version != IR_VERSION:
         message = f"Unsupported IR version: {ir.ir_version}"
         raise ValueError(message)
@@ -125,14 +148,31 @@ def validate_ir(ir: IRDocstring) -> None:
 
 
 def serialize_ir(ir: IRDocstring) -> dict[str, object]:
-    """Convert an :class:`IRDocstring` into a JSON-serialisable dictionary."""
+    """Convert an :class:`IRDocstring` into a JSON-serialisable dictionary.
+
+    Parameters
+    ----------
+    ir : IRDocstring
+        IR docstring to serialize.
+
+    Returns
+    -------
+    dict[str, object]
+        JSON-serializable dictionary representation.
+    """
     payload = cast("dict[str, object]", asdict(ir))
     payload["ir_version"] = ir.ir_version
     return payload
 
 
 def generate_schema() -> dict[str, object]:
-    """Return the JSON schema describing the docstring IR."""
+    """Return the JSON schema describing the docstring IR.
+
+    Returns
+    -------
+    dict[str, object]
+        JSON Schema 2020-12 dictionary describing the IR structure.
+    """
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "$id": "https://kgfoundry.dev/schema/docstrings.json",

@@ -618,7 +618,22 @@ class LuceneBM25:
         k: int,
         fields: Mapping[str, str] | None = None,
     ) -> list[tuple[str, float]]:
-        """Execute a Lucene BM25 query using the configured searcher."""
+        """Execute a Lucene BM25 query using the configured searcher.
+
+        Parameters
+        ----------
+        query : str
+            Query string to search.
+        k : int
+            Number of top results to return.
+        fields : Mapping[str, str] | None, optional
+            Optional field mapping for query construction.
+
+        Returns
+        -------
+        list[tuple[str, float]]
+            List of (document_id, score) tuples.
+        """
         searcher = self._ensure_searcher()
         query_string = self._compose_query(query, fields)
         hits: Sequence[LuceneHitProtocol] = searcher.search(query_string, k)
@@ -697,7 +712,31 @@ def get_bm25(
     b: float = 0.4,
     load_existing: bool = True,
 ) -> PurePythonBM25 | LuceneBM25:
-    """Return a BM25 index implementation for the requested backend."""
+    """Return a BM25 index implementation for the requested backend.
+
+    Parameters
+    ----------
+    backend : str
+        Backend name ("pure" or "lucene").
+    index_dir : str
+        Directory path for the index.
+    k1 : float, optional
+        BM25 k1 parameter (default: 0.9).
+    b : float, optional
+        BM25 b parameter (default: 0.4).
+    load_existing : bool, optional
+        Whether to load existing index if available (default: True).
+
+    Returns
+    -------
+    PurePythonBM25 | LuceneBM25
+        BM25 index instance.
+
+    Raises
+    ------
+    ValueError
+        If backend is not one of the supported values.
+    """
     normalized_backend = backend.strip().lower()
     if normalized_backend == "pure":
         index: PurePythonBM25 | LuceneBM25 = PurePythonBM25(

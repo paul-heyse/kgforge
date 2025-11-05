@@ -111,7 +111,13 @@ class SymbolRow:
     is_property: bool | None = None
 
     def to_payload(self) -> dict[str, JsonValue]:
-        """Serialise the symbol row into a JSON-compatible mapping."""
+        """Serialise the symbol row into a JSON-compatible mapping.
+
+        Returns
+        -------
+        dict[str, JsonValue]
+            JSON-compatible dictionary representation of the symbol row.
+        """
         return {
             "path": self.path,
             "canonical_path": self.canonical_path,
@@ -135,7 +141,18 @@ class SymbolRow:
 
     @classmethod
     def from_mapping(cls, payload: Mapping[str, JsonValue]) -> SymbolRow | None:
-        """Create a symbol row from ``payload`` when core fields are present."""
+        """Create a symbol row from ``payload`` when core fields are present.
+
+        Parameters
+        ----------
+        payload : Mapping[str, JsonValue]
+            Dictionary payload containing symbol metadata.
+
+        Returns
+        -------
+        SymbolRow | None
+            Symbol row instance if valid payload, None otherwise.
+        """
         path_value = payload.get("path")
         if not isinstance(path_value, str):
             return None
@@ -378,7 +395,20 @@ def _build_delta(
 
 
 def write_delta(delta_path: Path, payload: TypedSymbolDeltaPayload) -> bool:
-    """Write ``payload`` to ``delta_path`` and return True when a change occurred."""
+    """Write ``payload`` to ``delta_path`` and return True when a change occurred.
+
+    Parameters
+    ----------
+    delta_path : Path
+        Output file path for the delta.
+    payload : TypedSymbolDeltaPayload
+        Symbol delta payload to write.
+
+    Returns
+    -------
+    bool
+        True if file was written or changed, False if unchanged.
+    """
     builtins_payload = symbol_delta_to_payload(payload)
     validate_against_schema(
         cast("JsonPayload", builtins_payload),
@@ -431,7 +461,18 @@ class DeltaArgs:
 
 
 def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
-    """Parse CLI arguments and return a ``DeltaArgs`` instance."""
+    """Parse CLI arguments and return a ``DeltaArgs`` instance.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments, defaults to sys.argv.
+
+    Returns
+    -------
+    DeltaArgs
+        Parsed arguments instance.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--base",
@@ -450,7 +491,23 @@ def parse_args(argv: Sequence[str] | None) -> DeltaArgs:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Entry point for generating symbol delta artifacts."""
+    """Entry point for generating symbol delta artifacts.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments, defaults to sys.argv.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on error, 130 on cancellation.
+
+    Raises
+    ------
+    ToolExecutionError
+        When git operations fail or baseline snapshot cannot be loaded.
+    """
     if not logging.getLogger().handlers:
         logging.basicConfig(level=logging.INFO)
 

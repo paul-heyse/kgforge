@@ -717,7 +717,13 @@ SUBCOMMAND_SPECS: tuple[dict[str, object], ...] = (
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Build the top-level argument parser for the docstring builder CLI."""
+    """Build the top-level argument parser for the docstring builder CLI.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Configured argument parser with all subcommands registered.
+    """
     parser = argparse.ArgumentParser(prog="docstring-builder")
     _apply_cli_arguments(parser)
     _add_llm_arguments(parser)
@@ -728,7 +734,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Execute the docstring builder CLI."""
+    """Execute the docstring builder CLI.
+
+    Parameters
+    ----------
+    argv : list[str], optional
+        Command-line arguments. If None, uses sys.argv.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success, non-zero for errors).
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     _assign_command(args)

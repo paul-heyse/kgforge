@@ -25,7 +25,13 @@ MODULE_CARD_VERSION: Final[str] = "1"
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Return the argument parser for the portal renderer."""
+    """Return the argument parser for the portal renderer.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Configured argument parser.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--catalog",
@@ -49,6 +55,18 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _render_quick_links(artifacts: dict[str, str]) -> str:
+    """Render quick links HTML from artifacts dictionary.
+
+    Parameters
+    ----------
+    artifacts : dict[str, str]
+        Dictionary mapping labels to paths.
+
+    Returns
+    -------
+    str
+        HTML markup for quick links list.
+    """
     entries = []
     for label, path in artifacts.items():
         if not isinstance(path, str):
@@ -60,6 +78,18 @@ def _render_quick_links(artifacts: dict[str, str]) -> str:
 
 
 def _collect_module_metrics(module: ModuleModel) -> dict[str, float | int | str | None]:
+    """Collect aggregate metrics for a module.
+
+    Parameters
+    ----------
+    module : ModuleModel
+        Module to compute metrics for.
+
+    Returns
+    -------
+    dict[str, float | int | str | None]
+        Dictionary with coverage, churn, stability, and parity metrics.
+    """
     coverage_values: list[float] = []
     churn_values: list[int] = []
     stability: str | None = None
@@ -85,6 +115,18 @@ def _collect_module_metrics(module: ModuleModel) -> dict[str, float | int | str 
 
 
 def _collect_module_hints(symbols: Iterable[SymbolModel]) -> dict[str, list[str]]:
+    """Collect agent hints from module symbols.
+
+    Parameters
+    ----------
+    symbols : Iterable[SymbolModel]
+        Symbols to extract hints from.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Dictionary with intent_tags, safe_ops, tests, and notes lists.
+    """
     tags: set[str] = set()
     safe_ops: set[str] = set()
     tests: set[str] = set()
@@ -106,7 +148,20 @@ def _collect_module_hints(symbols: Iterable[SymbolModel]) -> dict[str, list[str]
 
 
 def _module_cache_key(package: str, module: ModuleModel) -> CacheKey:
-    """Return a stable cache key for ``module`` within ``package``."""
+    """Return a stable cache key for ``module`` within ``package``.
+
+    Parameters
+    ----------
+    package : str
+        Package name.
+    module : ModuleModel
+        Module model to generate key for.
+
+    Returns
+    -------
+    CacheKey
+        SHA256 hex digest of serialized module payload.
+    """
     payload = {
         "version": MODULE_CARD_VERSION,
         "package": package,
@@ -117,7 +172,18 @@ def _module_cache_key(package: str, module: ModuleModel) -> CacheKey:
 
 
 def _cache_directory(output_path: Path) -> Path:
-    """Return the directory used to persist cached module cards."""
+    """Return the directory used to persist cached module cards.
+
+    Parameters
+    ----------
+    output_path : Path
+        Output HTML file path.
+
+    Returns
+    -------
+    Path
+        Cache directory path (.module_cache in output directory).
+    """
     return output_path.parent / ".module_cache"
 
 
@@ -313,7 +379,18 @@ def _render_package(
 
 
 def _render_facets(client: AgentCatalogClient) -> str:
-    """Return the HTML markup for interactive facet controls."""
+    """Return the HTML markup for interactive facet controls.
+
+    Parameters
+    ----------
+    client : AgentCatalogClient
+        Catalog client to query for facet values.
+
+    Returns
+    -------
+    str
+        HTML markup for facet form controls.
+    """
     packages = sorted({package.name for package in client.list_packages()})
     stabilities = sorted(
         {
@@ -378,7 +455,13 @@ def _render_facets(client: AgentCatalogClient) -> str:
 
 
 def _render_tutorials() -> str:
-    """Return HTML for the tutorials section."""
+    """Return HTML for the tutorials section.
+
+    Returns
+    -------
+    str
+        HTML markup for tutorials section with links.
+    """
     tutorials = [
         ("Catalog overview", "docs/agent_portal_readme.md"),
         ("Quality checklist", "docs/contributing/quality.md"),
@@ -397,7 +480,13 @@ def _render_tutorials() -> str:
 
 
 def _render_feedback() -> str:
-    """Return HTML for the local-only feedback form."""
+    """Return HTML for the local-only feedback form.
+
+    Returns
+    -------
+    str
+        HTML markup for feedback form section.
+    """
     return """
     <section id="feedback" aria-label="Feedback">
       <h2>Feedback</h2>
@@ -415,7 +504,15 @@ def _render_feedback() -> str:
 
 
 def render_portal(client: AgentCatalogClient, output_path: Path) -> None:
-    """Render the Agent Portal HTML artifact to ``output_path``."""
+    """Render the Agent Portal HTML artifact to ``output_path``.
+
+    Parameters
+    ----------
+    client : AgentCatalogClient
+        Catalog client to query for portal data.
+    output_path : Path
+        Destination path for the rendered HTML file.
+    """
     artifacts = {
         key: value for key, value in client.catalog.artifacts.items() if isinstance(value, str)
     }

@@ -105,7 +105,14 @@ class DocstringBuildConfig:
     normalize_sections: bool = False
 
     def __post_init__(self) -> None:
-        """Validate configuration constraints."""
+        """Validate configuration constraints.
+
+        Raises
+        ------
+        ConfigurationError
+            If ``timeout_seconds`` is not positive, or if ``emit_diff`` is True
+            while ``enable_plugins`` is False.
+        """
         if self.timeout_seconds <= 0:
             msg = "timeout_seconds must be positive"
             raise ConfigurationError(
@@ -154,7 +161,13 @@ class FileProcessConfig:
     max_errors_per_file: int = 10
 
     def __post_init__(self) -> None:
-        """Validate file processing constraints."""
+        """Validate file processing constraints.
+
+        Raises
+        ------
+        ConfigurationError
+            If ``max_errors_per_file`` is not positive.
+        """
         if self.max_errors_per_file <= 0:
             msg = "max_errors_per_file must be positive"
             raise ConfigurationError(
@@ -190,7 +203,13 @@ class DocstringApplyConfig:
     atomic_writes: bool = True
 
     def __post_init__(self) -> None:
-        """Validate apply configuration constraints."""
+        """Validate apply configuration constraints.
+
+        Raises
+        ------
+        ConfigurationError
+            If ``atomic_writes`` is True while ``write_changes`` is False.
+        """
         # Atomic writes require actually writing changes
         if self.atomic_writes and not self.write_changes:
             msg = "atomic_writes requires write_changes=True"

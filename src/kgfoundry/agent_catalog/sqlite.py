@@ -29,12 +29,34 @@ SearchPayload = Mapping[str, SearchPayloadValue]
 
 
 def _to_json_object(mapping: Mapping[str, JsonValue]) -> JsonObject:
-    """Create a JSON object copy from ``mapping``."""
+    """Create a JSON object copy from ``mapping``.
+
+    Parameters
+    ----------
+    mapping : Mapping[str, JsonValue]
+        Source mapping to copy.
+
+    Returns
+    -------
+    JsonObject
+        Copy of the mapping as a dictionary.
+    """
     return dict(mapping)
 
 
 def _to_search_payload(value: JsonValue) -> SearchPayloadValue:
-    """Convert ``value`` into a search payload compatible structure."""
+    """Convert ``value`` into a search payload compatible structure.
+
+    Parameters
+    ----------
+    value : JsonValue
+        Value to convert.
+
+    Returns
+    -------
+    SearchPayloadValue
+        Converted value compatible with search payload structure.
+    """
     if isinstance(value, list):
         return [cast("object", _to_search_payload(item)) for item in value]
     if isinstance(value, dict):
@@ -74,10 +96,10 @@ def _sqlite_connection(path: Path) -> Iterator[sqlite3.Connection]:
     path : Path
         Describe ``path``.
 
-    Returns
-    -------
+    Yields
+    ------
     sqlite3.Connection
-        Describe return value.
+        SQLite connection with foreign keys enabled.
     """
     connection = sqlite3.connect(str(path))
     try:
@@ -212,7 +234,18 @@ def _stringify(value: JsonValue) -> str | None:
 
 
 def _iter_packages(payload: CatalogPayload) -> list[PackagePayload]:
-    """Return package payload mappings extracted from ``payload``."""
+    """Return package payload mappings extracted from ``payload``.
+
+    Parameters
+    ----------
+    payload : CatalogPayload
+        Catalog payload to extract packages from.
+
+    Returns
+    -------
+    list[PackagePayload]
+        List of package payload mappings.
+    """
     packages = payload.get("packages")
     if not isinstance(packages, Sequence):
         return []
@@ -220,7 +253,18 @@ def _iter_packages(payload: CatalogPayload) -> list[PackagePayload]:
 
 
 def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
-    """Return module payloads for ``package``."""
+    """Return module payloads for ``package``.
+
+    Parameters
+    ----------
+    package : PackagePayload
+        Package payload to extract modules from.
+
+    Returns
+    -------
+    list[ModulePayload]
+        List of module payload mappings.
+    """
     modules = package.get("modules")
     if not isinstance(modules, Sequence):
         return []
@@ -228,7 +272,18 @@ def _iter_modules(package: PackagePayload) -> list[ModulePayload]:
 
 
 def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
-    """Return typed symbol payloads from ``module``."""
+    """Return typed symbol payloads from ``module``.
+
+    Parameters
+    ----------
+    module : ModulePayload
+        Module payload to extract symbols from.
+
+    Returns
+    -------
+    list[SymbolPayload]
+        List of symbol payload mappings.
+    """
     symbols = module.get("symbols")
     if not isinstance(symbols, Sequence):
         return []
@@ -236,7 +291,18 @@ def _iter_symbols(module: ModulePayload) -> list[SymbolPayload]:
 
 
 def _iter_call_edges(module: ModulePayload) -> list[CallEdgePayload]:
-    """Return typed call edges from a module graph."""
+    """Return typed call edges from a module graph.
+
+    Parameters
+    ----------
+    module : ModulePayload
+        Module payload to extract call edges from.
+
+    Returns
+    -------
+    list[CallEdgePayload]
+        List of call edge payload mappings.
+    """
     graph = module.get("graph")
     if not isinstance(graph, Mapping):
         return []
@@ -884,6 +950,11 @@ def _attach_symbols_to_modules(
         Describe ``ranking``.
     call_graph : tuple[str | set[str], str | set[str]]
         Describe ``call_graph``.
+
+    Raises
+    ------
+    SymbolAttachmentError
+        If database query fails.
     """
     callers, callees = call_graph
     try:
@@ -1023,7 +1094,18 @@ def _append_symbol_to_module(
 
 
 def load_catalog_from_sqlite(path: Path) -> JsonObject:
-    """Load a catalogue payload from ``path`` as JSON-compatible dictionaries."""
+    """Load a catalogue payload from ``path`` as JSON-compatible dictionaries.
+
+    Parameters
+    ----------
+    path : Path
+        Path to SQLite catalog database.
+
+    Returns
+    -------
+    JsonObject
+        Catalog payload as JSON-compatible dictionaries.
+    """
     with _sqlite_connection(path) as connection:
         metadata = _fetch_metadata(connection)
         packages = _load_packages_table(connection)
@@ -1046,7 +1128,18 @@ def load_catalog_from_sqlite(path: Path) -> JsonObject:
 
 
 def sqlite_candidates(json_path: Path) -> Iterable[Path]:
-    """Yield plausible SQLite catalogue locations for ``json_path``."""
+    """Yield plausible SQLite catalogue locations for ``json_path``.
+
+    Parameters
+    ----------
+    json_path : Path
+        Path to JSON catalog file.
+
+    Yields
+    ------
+    Path
+        Candidate SQLite database paths.
+    """
     if json_path.suffix == ".sqlite":
         yield json_path
         return
@@ -1070,5 +1163,16 @@ __all__ = [
 
 
 def _coerce_packages(packages: Sequence[Mapping[str, JsonValue]]) -> list[PackagePayload]:
-    """Return a list of package payloads from ``packages``."""
+    """Return a list of package payloads from ``packages``.
+
+    Parameters
+    ----------
+    packages : Sequence[Mapping[str, JsonValue]]
+        Sequence of package mappings.
+
+    Returns
+    -------
+    list[PackagePayload]
+        List of package payload mappings.
+    """
     return list(packages)

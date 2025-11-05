@@ -45,7 +45,18 @@ class ManifestContext:
 
 
 def write_manifest(ctx: ManifestContext) -> Path:
-    """Write the manifest file for the docstring builder run."""
+    """Write the manifest file for the docstring builder run.
+
+    Parameters
+    ----------
+    ctx : ManifestContext
+        Context containing run metadata and results.
+
+    Returns
+    -------
+    Path
+        Path to the written manifest file.
+    """
     invoked = str(
         ctx.request.invoked_subcommand or ctx.request.subcommand or ctx.request.command or ""
     )

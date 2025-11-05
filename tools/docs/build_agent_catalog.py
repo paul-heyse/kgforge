@@ -127,15 +127,48 @@ class ModuleAnalyzer:
                 self.call_edges[qname].update(call_collector.calls)
 
     def get_node(self, qname: str) -> ast.AST | None:
-        """Return the AST node for the qualified name, if present."""
+        """Return the AST node for the qualified name, if present.
+
+        Parameters
+        ----------
+        qname : str
+            Qualified symbol name.
+
+        Returns
+        -------
+        ast.AST | None
+            AST node if found, otherwise None.
+        """
         return self.symbol_nodes.get(qname)
 
     def get_scope(self, qname: str) -> tuple[str, ...]:
-        """Return the lexical scope for a qualified name."""
+        """Return the lexical scope for a qualified name.
+
+        Parameters
+        ----------
+        qname : str
+            Qualified symbol name.
+
+        Returns
+        -------
+        tuple[str, ...]
+            Scope tuple (empty if not found).
+        """
         return self.symbol_scopes.get(qname, ())
 
     def get_source_segment(self, node: ast.AST) -> str:
-        """Return the source segment for a node."""
+        """Return the source segment for a node.
+
+        Parameters
+        ----------
+        node : ast.AST
+            AST node to extract source for.
+
+        Returns
+        -------
+        str
+            Source code segment (empty string if unavailable).
+        """
         if not hasattr(node, "lineno") or not hasattr(node, "end_lineno"):
             return ""
         start = max(int(getattr(node, "lineno", 0)) - 1, 0)
@@ -145,7 +178,13 @@ class ModuleAnalyzer:
         return "\n".join(self.source_lines[start : end + 1])
 
     def module_imports(self) -> list[str]:
-        """Return normalized imports for the module."""
+        """Return normalized imports for the module.
+
+        Returns
+        -------
+        list[str]
+            Sorted list of non-standard library imports.
+        """
         imports: set[str] = set()
         for value in self.imports:
             root = value.split(".")[0]
@@ -154,7 +193,18 @@ class ModuleAnalyzer:
         return sorted(imports)
 
     def symbol_calls(self, qname: str) -> set[str]:
-        """Return call targets for a symbol."""
+        """Return call targets for a symbol.
+
+        Parameters
+        ----------
+        qname : str
+            Qualified symbol name.
+
+        Returns
+        -------
+        set[str]
+            Set of called symbol qualified names (empty if none).
+        """
         return self.call_edges.get(qname, set())
 
 
@@ -296,6 +346,18 @@ class _CallCollector(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _resolve_call(self, node: ast.AST) -> str | None:
+        """Resolve call target from AST node.
+
+        Parameters
+        ----------
+        node : ast.AST
+            Call function AST node.
+
+        Returns
+        -------
+        str | None
+            Qualified name of call target if resolvable, otherwise None.
+        """
         if isinstance(node, ast.Name):
             return self._resolve_name(node.id)
         if isinstance(node, ast.Attribute):
@@ -306,6 +368,18 @@ class _CallCollector(ast.NodeVisitor):
         return None
 
     def _resolve_name(self, name: str) -> str | None:
+        """Resolve local or imported name to qualified name.
+
+        Parameters
+        ----------
+        name : str
+            Local or imported name.
+
+        Returns
+        -------
+        str | None
+            Qualified name if found, otherwise None.
+        """
         if name in self.local_name_map:
             return self.local_name_map[name]
         if name in self.import_aliases:
@@ -314,6 +388,18 @@ class _CallCollector(ast.NodeVisitor):
 
     @staticmethod
     def _attribute_chain(node: ast.Attribute) -> list[str]:
+        """Extract attribute chain from AST node.
+
+        Parameters
+        ----------
+        node : ast.Attribute
+            Attribute AST node.
+
+        Returns
+        -------
+        list[str]
+            List of attribute names in chain order.
+        """
         chain: list[str] = []
         current: ast.AST = node
         while isinstance(current, ast.Attribute):
@@ -342,7 +428,18 @@ class _CallCollector(ast.NodeVisitor):
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    """Parse command-line arguments."""
+    """Parse command-line arguments.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments (default: None).
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed arguments namespace.
+    """
     parser = argparse.ArgumentParser(description="Generate the agent catalog.")
     parser.add_argument("--repo-root", type=Path, default=Path.cwd(), help="Repository root path.")
     parser.add_argument(
@@ -528,7 +625,13 @@ class AgentCatalogBuilder:
         self._packages_snapshot: list[dict[str, Any]] = []
 
     def build(self) -> AgentCatalog:
-        """Build the agent catalog."""
+        """Build the agent catalog.
+
+        Returns
+        -------
+        AgentCatalog
+            Built agent catalog with packages, modules, and symbols.
+        """
         self._ensure_artifacts()
         link_policy = self._resolve_link_policy()
         repo_sha = self._resolve_repo_sha()
@@ -579,13 +682,48 @@ class AgentCatalogBuilder:
             raise CatalogBuildError(message)
 
     def _resolve_artifact_path(self, path: Path) -> Path:
+        """Resolve artifact path relative to repo root if needed.
+
+        Parameters
+        ----------
+        path : Path
+            Path to resolve.
+
+        Returns
+        -------
+        Path
+            Absolute path.
+        """
         return path if path.is_absolute() else (self.repo_root / path)
 
     def resolve_artifact_path(self, path: Path) -> Path:
-        """Public resolver returning absolute artifact paths."""
+        """Public resolver returning absolute artifact paths.
+
+        Parameters
+        ----------
+        path : Path
+            Path to resolve.
+
+        Returns
+        -------
+        Path
+            Absolute artifact path.
+        """
         return self._resolve_artifact_path(path)
 
     def _resolve_link_policy(self) -> LinkPolicy:
+        """Resolve link policy from environment or arguments.
+
+        Returns
+        -------
+        LinkPolicy
+            Resolved link policy configuration.
+
+        Raises
+        ------
+        CatalogBuildError
+            If GitHub mode is selected but required values are missing.
+        """
         env_mode = os.environ.get("DOCS_LINK_MODE")
         mode = self.args.link_mode
         if mode == "auto":
@@ -618,6 +756,18 @@ class AgentCatalogBuilder:
         )
 
     def _resolve_repo_sha(self) -> str:
+        """Resolve repository SHA from arguments or git.
+
+        Returns
+        -------
+        str
+            Repository SHA (short form).
+
+        Raises
+        ------
+        CatalogBuildError
+            If git command fails or SHA cannot be determined.
+        """
         if self.args.repo_sha:
             return cast("str", self.args.repo_sha)
         log_adapter = with_fields(logger, command=["git", "rev-parse", "--short", "HEAD"])
@@ -1185,6 +1335,23 @@ class AgentCatalogBuilder:
     def _build_semantic_index(
         self, packages: Sequence[PackageRecord]
     ) -> SemanticIndexMetadata | None:
+        """Build semantic search index from package documents.
+
+        Parameters
+        ----------
+        packages : Sequence[PackageRecord]
+            Packages to index.
+
+        Returns
+        -------
+        SemanticIndexMetadata | None
+            Index metadata if built successfully, None if skipped.
+
+        Raises
+        ------
+        CatalogBuildError
+            If embedding model fails or index creation fails.
+        """
         documents = self._collect_search_documents(packages)
         if not documents:
             return None
@@ -1297,7 +1464,22 @@ class AgentCatalogBuilder:
         }
 
     def write(self, catalog: AgentCatalog, path: Path, schema: Path) -> None:
-        """Write the catalog and validate against the schema."""
+        """Write the catalog and validate against the schema.
+
+        Parameters
+        ----------
+        catalog : AgentCatalog
+            Catalog to write.
+        path : Path
+            Output file path.
+        schema : Path
+            JSON Schema path for validation.
+
+        Raises
+        ------
+        CatalogBuildError
+            If catalog validation fails.
+        """
         catalog_json = json.loads(json.dumps(catalog.model_dump()))
         catalog_payload = cast("dict[str, JsonValue]", catalog_json)
         output_path = self._resolve_artifact_path(path)
@@ -1341,7 +1523,23 @@ class AgentCatalogBuilder:
 
 
 def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
-    """Return the configured embedding model, raising on failure."""
+    """Return the configured embedding model, raising on failure.
+
+    Parameters
+    ----------
+    model_name : str
+        SentenceTransformer model name.
+
+    Returns
+    -------
+    EmbeddingModelProtocol
+        Loaded embedding model.
+
+    Raises
+    ------
+    CatalogBuildError
+        If sentence-transformers is missing or model loading fails.
+    """
     try:
         module = importlib.import_module("sentence_transformers")
     except ImportError as exc:  # pragma: no cover - runtime guard
@@ -1360,12 +1558,36 @@ def _load_embedding_model(model_name: str) -> EmbeddingModelProtocol:
 
 
 def _tokenize(text: str) -> list[str]:
-    """Return normalized word tokens for the given text."""
+    """Return normalized word tokens for the given text.
+
+    Parameters
+    ----------
+    text : str
+        Text to tokenize.
+
+    Returns
+    -------
+    list[str]
+        List of lowercase word tokens.
+    """
     return WORD_RE.findall(text.lower())
 
 
 def _docfacts_int(entry: Mapping[str, Any], *names: str) -> int | None:
-    """Return the first integer value found for ``names`` within ``entry``."""
+    """Return the first integer value found for ``names`` within ``entry``.
+
+    Parameters
+    ----------
+    entry : Mapping[str, Any]
+        Docfacts entry dictionary.
+    *names : str
+        Field names to check in order.
+
+    Returns
+    -------
+    int | None
+        First integer value found, or None if none found.
+    """
     for name in names:
         if not name:
             continue
@@ -1378,7 +1600,18 @@ def _docfacts_int(entry: Mapping[str, Any], *names: str) -> int | None:
 def _extract_docfacts_text(
     docfacts: Mapping[str, Any] | None,
 ) -> tuple[str | None, str | None]:
-    """Extract summary and docstring text from docfacts payloads."""
+    """Extract summary and docstring text from docfacts payloads.
+
+    Parameters
+    ----------
+    docfacts : Mapping[str, Any] | None
+        Docfacts payload dictionary.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        (summary, docstring) tuple.
+    """
     if not isinstance(docfacts, Mapping):
         return None, None
     summary = _stringify(docfacts.get("summary"))
@@ -1391,7 +1624,18 @@ def _extract_docfacts_text(
 
 
 def _stringify(value: object) -> str | None:
-    """Convert nested docfacts data into a normalized string."""
+    """Convert nested docfacts data into a normalized string.
+
+    Parameters
+    ----------
+    value : object
+        Value to convert (string, bool, number, sequence, mapping, etc.).
+
+    Returns
+    -------
+    str | None
+        Normalized string representation, or None if input is None or empty.
+    """
     if value is None:
         return None
     result: str | None
@@ -1418,7 +1662,18 @@ def _stringify(value: object) -> str | None:
 def _iter_symbol_entries(
     catalog: Mapping[str, Any],
 ) -> Iterable[tuple[str, str, Mapping[str, Any]]]:
-    """Yield package, module, and symbol payloads from the catalog."""
+    """Yield package, module, and symbol payloads from the catalog.
+
+    Parameters
+    ----------
+    catalog : Mapping[str, Any]
+        Catalog dictionary.
+
+    Yields
+    ------
+    tuple[str, str, Mapping[str, Any]]
+        (package_name, module_name, symbol_dict) tuples.
+    """
     packages = catalog.get("packages")
     if not isinstance(packages, list):
         return
@@ -1442,7 +1697,18 @@ def _iter_symbol_entries(
 
 
 def _extract_agent_hints_payload(symbol: Mapping[str, Any]) -> tuple[list[str], list[str]]:
-    """Return normalized agent hints for a symbol."""
+    """Return normalized agent hints for a symbol.
+
+    Parameters
+    ----------
+    symbol : Mapping[str, Any]
+        Symbol payload dictionary.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        (intent_tags, tests_to_run) tuple.
+    """
     intent_tags: list[str] = []
     tests_to_run: list[str] = []
     agent_hints = symbol.get("agent_hints")
@@ -1457,7 +1723,18 @@ def _extract_agent_hints_payload(symbol: Mapping[str, Any]) -> tuple[list[str], 
 
 
 def _extract_anchor_lines(symbol: Mapping[str, Any]) -> tuple[int | None, int | None]:
-    """Return anchor line information for a symbol payload."""
+    """Return anchor line information for a symbol payload.
+
+    Parameters
+    ----------
+    symbol : Mapping[str, Any]
+        Symbol payload dictionary.
+
+    Returns
+    -------
+    tuple[int | None, int | None]
+        (start_line, end_line) tuple.
+    """
     anchors = symbol.get("anchors")
     start_line: int | None = None
     end_line: int | None = None
@@ -1478,7 +1755,26 @@ def _build_document_from_payload(
     symbol_id: str,
     row: int,
 ) -> SearchDocument:
-    """Construct a search document from serialized symbol payloads."""
+    """Construct a search document from serialized symbol payloads.
+
+    Parameters
+    ----------
+    package_name : str
+        Package name.
+    module_name : str
+        Module qualified name.
+    symbol : Mapping[str, Any]
+        Symbol payload dictionary.
+    symbol_id : str
+        Symbol identifier.
+    row : int
+        Row index in semantic index.
+
+    Returns
+    -------
+    SearchDocument
+        Constructed search document.
+    """
     docfacts_payload = symbol.get("docfacts")
     summary, docstring = _extract_docfacts_text(
         docfacts_payload if isinstance(docfacts_payload, Mapping) else None
@@ -1529,7 +1825,31 @@ def search_catalog(
     k: int = 10,
     options: SearchOptions | None = None,
 ) -> list[SearchResult]:
-    """Execute hybrid lexical/vector search against the catalog."""
+    """Execute hybrid lexical/vector search against the catalog.
+
+    Parameters
+    ----------
+    catalog : Mapping[str, Any]
+        Catalog dictionary.
+    repo_root : Path
+        Repository root path.
+    query : str
+        Search query string.
+    k : int, optional
+        Number of results to return (default: 10).
+    options : SearchOptions | None, optional
+        Search configuration options (default: None).
+
+    Returns
+    -------
+    list[SearchResult]
+        List of search results sorted by relevance.
+
+    Raises
+    ------
+    CatalogBuildError
+        If search execution fails.
+    """
     request = SearchRequest(repo_root=repo_root, query=query, k=k)
     try:
         return catalog_search.search_catalog(catalog, request=request, options=options)
@@ -1538,7 +1858,20 @@ def search_catalog(
 
 
 def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
-    """Load a catalog JSON file and expand shards if requested."""
+    """Load a catalog JSON file and expand shards if requested.
+
+    Parameters
+    ----------
+    path : Path
+        Path to catalog JSON file.
+    load_shards : bool, optional
+        Whether to expand shard files (default: True).
+
+    Returns
+    -------
+    dict[str, Any]
+        Catalog dictionary with packages loaded.
+    """
     data = cast("dict[str, Any]", json.loads(path.read_text(encoding="utf-8")))
     shards = data.get("shards")
     if load_shards and not data.get("packages") and isinstance(shards, Mapping):
@@ -1563,7 +1896,23 @@ def load_catalog(path: Path, *, load_shards: bool = True) -> dict[str, Any]:
 
 
 def _parse_facet_args(values: Sequence[str]) -> dict[str, str]:
-    """Parse CLI facet arguments into a mapping."""
+    """Parse CLI facet arguments into a mapping.
+
+    Parameters
+    ----------
+    values : Sequence[str]
+        Facet strings in "key=value" format.
+
+    Returns
+    -------
+    dict[str, str]
+        Parsed facet mapping.
+
+    Raises
+    ------
+    CatalogBuildError
+        If facet format is invalid.
+    """
     facets: dict[str, str] = {}
     for raw in values:
         if "=" not in raw:
@@ -1580,7 +1929,18 @@ def _parse_facet_args(values: Sequence[str]) -> dict[str, str]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """CLI entrypoint."""
+    """CLI entrypoint.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments (default: None).
+
+    Returns
+    -------
+    int
+        Exit code (0 for success, non-zero for failure).
+    """
     args = parse_args(argv)
     builder = AgentCatalogBuilder(args)
     if args.search_query:
@@ -1625,7 +1985,18 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _normalize_ast(node: ast.AST) -> str:
-    """Return a normalized AST dump with docstrings stripped."""
+    """Return a normalized AST dump with docstrings stripped.
+
+    Parameters
+    ----------
+    node : ast.AST
+        AST node to normalize.
+
+    Returns
+    -------
+    str
+        AST dump string with docstrings removed.
+    """
     transformer = _DocstringStripper()
     cleaned = transformer.visit(copy.deepcopy(node))
     return ast.dump(cleaned, include_attributes=False)

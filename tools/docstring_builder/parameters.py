@@ -44,7 +44,18 @@ _STRING_TO_KIND: dict[str, ParameterKind] = {
 
 
 def normalize_parameter_kind(value: object) -> ParameterKind:
-    """Coerce arbitrary kind objects into :class:`ParameterKind`."""
+    """Coerce arbitrary kind objects into :class:`ParameterKind`.
+
+    Parameters
+    ----------
+    value : object
+        Value to normalize (can be ParameterKind, inspect.Parameter, or string).
+
+    Returns
+    -------
+    ParameterKind
+        Normalized parameter kind, defaults to POSITIONAL_OR_KEYWORD if unrecognized.
+    """
     if isinstance(value, ParameterKind):
         return value
 
@@ -70,7 +81,20 @@ def normalize_parameter_kind(value: object) -> ParameterKind:
 
 
 def format_parameter_name(name: str, kind: ParameterKind) -> str:
-    """Return the rendered parameter name for docstring sections."""
+    """Return the rendered parameter name for docstring sections.
+
+    Parameters
+    ----------
+    name : str
+        Parameter name.
+    kind : ParameterKind
+        Parameter kind (determines prefix: * for var_positional, ** for var_keyword).
+
+    Returns
+    -------
+    str
+        Formatted parameter name with appropriate prefix.
+    """
     return f"{kind.prefix}{name}"
 
 

@@ -25,12 +25,34 @@ else:  # pragma: no cover - runtime fallbacks for type aliases
 
 
 def _as_problem_dict(problem: ProblemDetails) -> dict[str, object]:
-    """Cast problem details to a mutable dictionary for assertions."""
+    """Cast problem details to a mutable dictionary for assertions.
+
+    Parameters
+    ----------
+    problem : ProblemDetails
+        Problem details payload.
+
+    Returns
+    -------
+    dict[str, object]
+        Mutable dictionary view.
+    """
     return cast("dict[str, object]", problem)
 
 
 def _as_problem_mapping(problem: ProblemDetails) -> Mapping[str, JsonValue]:
-    """Cast problem details to a mapping for schema validation."""
+    """Cast problem details to a mapping for schema validation.
+
+    Parameters
+    ----------
+    problem : ProblemDetails
+        Problem details payload.
+
+    Returns
+    -------
+    Mapping[str, JsonValue]
+        Mapping view for validation.
+    """
     return cast("Mapping[str, JsonValue]", problem)
 
 

@@ -46,12 +46,44 @@ def _coerce_class(module: ModuleType, attribute: str, kind: str) -> type[object]
 
 
 def coerce_astroid_manager_class(module: ModuleType) -> type[AstroidManagerProtocol]:
-    """Return the typed Astroid manager class from ``module``."""
+    """Return the typed Astroid manager class from ``module``.
+
+    Parameters
+    ----------
+    module : ModuleType
+        Astroid module to extract the manager class from.
+
+    Returns
+    -------
+    type[AstroidManagerProtocol]
+        Typed Astroid manager class.
+
+    Raises
+    ------
+    TypeError
+        If the module does not have an AstroidManager class attribute.
+    """
     manager_cls = _coerce_class(module, "AstroidManager", "AstroidManager")
     return cast("type[AstroidManagerProtocol]", manager_cls)
 
 
 def coerce_astroid_builder_class(module: ModuleType) -> type[AstroidBuilderProtocol]:
-    """Return the typed Astroid builder class from ``module``."""
+    """Return the typed Astroid builder class from ``module``.
+
+    Parameters
+    ----------
+    module : ModuleType
+        Astroid module to extract the builder class from.
+
+    Returns
+    -------
+    type[AstroidBuilderProtocol]
+        Typed Astroid builder class.
+
+    Raises
+    ------
+    TypeError
+        If the module does not have an AstroidBuilder class attribute.
+    """
     builder_cls = _coerce_class(module, "AstroidBuilder", "AstroidBuilder")
     return cast("type[AstroidBuilderProtocol]", builder_cls)

@@ -52,7 +52,13 @@ DEFAULT_BASE_URL = os.getenv("SCHEMA_BASE_URL", "https://kgfoundry.dev/schemas")
 
 
 def _load_pandera_module() -> ModuleType | None:
-    """Load ``pandera`` using ``importlib`` to avoid strict import-time failures."""
+    """Load ``pandera`` using ``importlib`` to avoid strict import-time failures.
+
+    Returns
+    -------
+    ModuleType | None
+        Pandera module if available, None otherwise.
+    """
     try:
         module = importlib.import_module("pandera")
     except ModuleNotFoundError:
@@ -64,7 +70,18 @@ def _load_pandera_module() -> ModuleType | None:
 
 
 def _sorted(obj: object) -> object:
-    """Recursively sort dict keys; leave arrays as-is for semantics."""
+    """Recursively sort dict keys; leave arrays as-is for semantics.
+
+    Parameters
+    ----------
+    obj : object
+        Object to sort.
+
+    Returns
+    -------
+    object
+        Sorted object (dicts with sorted keys, lists recursively sorted).
+    """
     if isinstance(obj, dict):
         return {k: _sorted(obj[k]) for k in sorted(obj.keys())}
     if isinstance(obj, list):
@@ -85,7 +102,17 @@ def _write_if_changed(
 ) -> tuple[bool, str | None, str | None]:
     """Write JSON with sorted keys + trailing newline if content changed.
 
-    Return (changed, old, new).
+    Parameters
+    ----------
+    path : Path
+        Output file path.
+    data : Mapping[str, object]
+        Data to write.
+
+    Returns
+    -------
+    tuple[bool, str | None, str | None]
+        (changed, old_text, new_text) tuple.
     """
     new_text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
     old_text = path.read_text(encoding="utf-8") if path.exists() else None
@@ -96,7 +123,13 @@ def _write_if_changed(
 
 
 def _module_iter() -> Iterable[str]:
-    """Walk all subpackages of TOP_PACKAGES."""
+    """Walk all subpackages of TOP_PACKAGES.
+
+    Yields
+    ------
+    str
+        Module qualified names.
+    """
     for pkg in TOP_PACKAGES:
         try:
             module = importlib.import_module(pkg)
@@ -170,16 +203,7 @@ def _load_navmap() -> dict[str, Any]:
     Returns
     -------
     dict[str, Any]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _load_navmap(...)
+        Navmap dictionary (empty if file missing or unreadable).
     """
     if not NAVMAP.exists():
         return {}
@@ -190,6 +214,13 @@ def _load_navmap() -> dict[str, Any]:
 
 
 def _load_pydantic_base_model() -> type[Any] | None:
+    """Load Pydantic BaseModel class.
+
+    Returns
+    -------
+    type[Any] | None
+        BaseModel class if available, None otherwise.
+    """
     try:
         module = importlib.import_module("pydantic")
     except ImportError:
@@ -203,7 +234,19 @@ def _load_pydantic_base_model() -> type[Any] | None:
 def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dict[str, Any] | None:
     """Find navmap version metadata.
 
-    Return {x-version-introduced, x-deprecated-in} when module and symbol names match.
+    Parameters
+    ----------
+    module_name : str
+        Module qualified name.
+    class_name : str
+        Class name.
+    nav : dict[str, Any]
+        Navmap dictionary.
+
+    Returns
+    -------
+    dict[str, Any] | None
+        Version metadata dict with x-version-introduced/x-deprecated-in if found, otherwise None.
     """
     mods = nav.get("modules") or {}
     entry = mods.get(module_name)
@@ -223,7 +266,18 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
 
 
 def _placeholder(py_type: object) -> object:
-    """Generate lightweight placeholders for basic Python types."""
+    """Generate lightweight placeholders for basic Python types.
+
+    Parameters
+    ----------
+    py_type : object
+        Python type to generate placeholder for.
+
+    Returns
+    -------
+    object
+        Placeholder value (empty container, default value, or empty dict).
+    """
     origin = getattr(py_type, "__origin__", None)
     if origin in {list, set, tuple}:
         return []
@@ -242,7 +296,18 @@ def _placeholder(py_type: object) -> object:
 
 
 def _example_for_pydantic(model_cls: type[object]) -> dict[str, object]:
-    """Synthesize a minimal example dict from model_fields (Pydantic v2)."""
+    """Synthesize a minimal example dict from model_fields (Pydantic v2).
+
+    Parameters
+    ----------
+    model_cls : type[object]
+        Pydantic model class.
+
+    Returns
+    -------
+    dict[str, object]
+        Example dictionary with field values.
+    """
     try:
         fields = getattr(model_cls, "model_fields", {})
     except AttributeError:
@@ -259,7 +324,18 @@ def _example_for_pydantic(model_cls: type[object]) -> dict[str, object]:
 
 
 def _example_for_pandera(model_cls: type[object]) -> dict[str, object]:
-    """Produce a minimal 'row' example based on class attributes / schema JSON."""
+    """Produce a minimal 'row' example based on class attributes / schema JSON.
+
+    Parameters
+    ----------
+    model_cls : type[object]
+        Pandera model class.
+
+    Returns
+    -------
+    dict[str, object]
+        Example dictionary with column names.
+    """
     attr_name = "to_schema"
     try:
         to_schema = getattr(model_cls, attr_name)
@@ -292,28 +368,14 @@ def _apply_headers(
 
     Parameters
     ----------
-    schema : dict
-        Description.
+    schema : dict[str, object]
+        Schema dictionary to modify.
     module_name : str
-        Description.
+        Module qualified name.
     class_name : str
-        Description.
+        Class name.
     base_url : str
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _apply_headers(...)
+        Base URL for schema $id.
     """
     schema["$schema"] = JSON_SCHEMA_DIALECT
     schema["$id"] = f"{base_url.rstrip('/')}/{module_name}.{class_name}.json#"
@@ -324,24 +386,10 @@ def _inject_examples(schema: dict[str, object], example: Mapping[str, object] | 
 
     Parameters
     ----------
-    schema : dict
-        Description.
-    example : dict | None
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _inject_examples(...)
+    schema : dict[str, object]
+        Schema dictionary to modify.
+    example : Mapping[str, object] | None
+        Example dictionary to inject.
     """
     if example:
         ex = schema.get("examples") or []
@@ -358,24 +406,10 @@ def _inject_versions(schema: dict[str, object], versions: Mapping[str, object] |
 
     Parameters
     ----------
-    schema : dict
-        Description.
-    versions : dict | None
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _inject_versions(...)
+    schema : dict[str, object]
+        Schema dictionary to modify.
+    versions : Mapping[str, object] | None
+        Version metadata to inject.
     """
     if versions:
         # prefer root-level x- fields so they survive tools that merge properties
@@ -397,7 +431,20 @@ def _preserve_versions(schema: dict[str, object], previous: Mapping[str, object]
 
 
 def _diff_summary(old: Mapping[str, object], new: Mapping[str, object]) -> dict[str, object]:
-    """Summarize differences: top-level keys +/-; property changes (top 10)."""
+    """Summarize differences: top-level keys +/-; property changes (top 10).
+
+    Parameters
+    ----------
+    old : Mapping[str, object]
+        Old schema dictionary.
+    new : Mapping[str, object]
+        New schema dictionary.
+
+    Returns
+    -------
+    dict[str, object]
+        Summary dictionary with added/removed keys and properties.
+    """
     out: dict[str, object] = {}
     old_keys, new_keys = set(old.keys()), set(new.keys())
     add_keys = sorted(new_keys - old_keys)
@@ -463,29 +510,20 @@ def _export_one_pydantic(
     Parameters
     ----------
     module_name : str
-        Description.
+        Module qualified name.
     name : str
-        Description.
-    model_cls
-        Description.
+        Class name.
+    model_cls : type[object]
+        Pydantic model class.
     cfg : Cfg
-        Description.
-    nav : dict
-        Description.
+        Configuration.
+    nav : dict[str, Any]
+        Navmap dictionary.
 
     Returns
     -------
-    tuple[Path, dict]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _export_one_pydantic(...)
+    tuple[Path, dict[str, object]]
+        (output_path, schema_dict) tuple.
     """
     # Generate schema dict (JSON schema 2020-12). Pydantic v2 exposes ref_template.
     # Docs: model_json_schema and ref_template customization.
@@ -512,29 +550,20 @@ def _export_one_pandera(
     Parameters
     ----------
     module_name : str
-        Description.
+        Module qualified name.
     name : str
-        Description.
-    model_cls
-        Description.
+        Class name.
+    model_cls : type[object]
+        Pandera model class.
     cfg : Cfg
-        Description.
-    nav : dict
-        Description.
+        Configuration.
+    nav : dict[str, Any]
+        Navmap dictionary.
 
     Returns
     -------
-    tuple[Path, dict]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _export_one_pandera(...)
+    tuple[Path, dict[str, object]]
+        (output_path, schema_dict) tuple.
     """
     # Pandera emits JSON string; normalize to dict, enrich, and sort.
     attr_name = "to_schema"
@@ -558,14 +587,10 @@ def _export_one_pandera(
 def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
     """Yield Pydantic and Pandera models discovered under ``TOP_PACKAGES``.
 
-    Returns
-    -------
-    Iterator[tuple[str, str, object]]
-        Description.
-
-    Examples
-    --------
-    >>> _iter_models()
+    Yields
+    ------
+    tuple[str, str, type[object]]
+        (module_name, class_name, model_class) tuples.
     """
     for module_name in _module_iter():
         try:
@@ -580,7 +605,18 @@ def _iter_models() -> Iterator[tuple[str, str, type[object]]]:
 
 
 def _parse_args(argv: Sequence[str] | None) -> Cfg:
-    """Parse CLI arguments into a :class:`Cfg`."""
+    """Parse CLI arguments into a :class:`Cfg`.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    Cfg
+        Configuration object.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--ref-template",
@@ -611,7 +647,18 @@ def _parse_args(argv: Sequence[str] | None) -> Cfg:
 
 
 def _load_existing_schema(path: Path) -> dict[str, object] | None:
-    """Read an existing JSON schema from disk."""
+    """Read an existing JSON schema from disk.
+
+    Parameters
+    ----------
+    path : Path
+        Path to schema file.
+
+    Returns
+    -------
+    dict[str, object] | None
+        Schema dictionary if readable, None otherwise.
+    """
     if not path.exists():
         return None
     try:
@@ -622,7 +669,20 @@ def _load_existing_schema(path: Path) -> dict[str, object] | None:
 
 
 def _schemas_match(previous: Mapping[str, object] | None, current: Mapping[str, object]) -> bool:
-    """Return ``True`` when two schema mappings represent the same data."""
+    """Return ``True`` when two schema mappings represent the same data.
+
+    Parameters
+    ----------
+    previous : Mapping[str, object] | None
+        Previous schema dictionary.
+    current : Mapping[str, object]
+        Current schema dictionary.
+
+    Returns
+    -------
+    bool
+        True if schemas match, False otherwise.
+    """
     if previous is None:
         return False
     return _sorted(previous) == current
@@ -634,7 +694,19 @@ def _record_drift(
     current: Mapping[str, object],
     drift_summaries: dict[str, object],
 ) -> None:
-    """Store a drift summary for ``path`` in ``drift_summaries``."""
+    """Store a drift summary for ``path`` in ``drift_summaries``.
+
+    Parameters
+    ----------
+    path : Path
+        Schema file path.
+    previous : Mapping[str, object] | None
+        Previous schema dictionary.
+    current : Mapping[str, object]
+        Current schema dictionary.
+    drift_summaries : dict[str, object]
+        Dictionary to store drift summary in.
+    """
     drift_summaries[str(path)] = _diff_summary(previous or {}, current)
 
 
@@ -645,7 +717,26 @@ def _export_model(
     cfg: Cfg,
     nav: dict[str, Any],
 ) -> tuple[Path, dict[str, object]]:
-    """Dispatch to the correct exporter based on model type."""
+    """Dispatch to the correct exporter based on model type.
+
+    Parameters
+    ----------
+    module_name : str
+        Module qualified name.
+    name : str
+        Class name.
+    model_cls : type[object]
+        Model class.
+    cfg : Cfg
+        Configuration.
+    nav : dict[str, Any]
+        Navmap dictionary.
+
+    Returns
+    -------
+    tuple[Path, dict[str, object]]
+        (output_path, schema_dict) tuple.
+    """
     if is_pydantic_model(model_cls):
         return _export_one_pydantic(module_name, name, model_cls, cfg, nav)
     return _export_one_pandera(module_name, name, model_cls, cfg, nav)
@@ -654,7 +745,22 @@ def _export_model(
 def _remove_stale_schemas(
     produced_paths: set[Path], cfg: Cfg, drift_summaries: dict[str, object]
 ) -> bool:
-    """Remove schema files that were not produced in the current run."""
+    """Remove schema files that were not produced in the current run.
+
+    Parameters
+    ----------
+    produced_paths : set[Path]
+        Set of paths that were produced.
+    cfg : Cfg
+        Configuration.
+    drift_summaries : dict[str, object]
+        Dictionary to store drift summaries in.
+
+    Returns
+    -------
+    bool
+        True if any schemas were removed or would be removed.
+    """
     changed = False
     existing_paths = set(OUT.glob("*.json"))
     for stale_path in sorted(existing_paths - produced_paths):
@@ -669,7 +775,18 @@ def _remove_stale_schemas(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Compute main."""
+    """Compute main.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Command-line arguments (None uses sys.argv).
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 2 if drift detected with --check-drift.
+    """
     cfg = _parse_args(argv)
     nav = _load_navmap()
     drift_summaries: dict[str, object] = {}

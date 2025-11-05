@@ -93,7 +93,14 @@ class DiffManager:
 
     @staticmethod
     def collect_diff_links() -> dict[str, str]:
-        """Return a mapping of available diff artifact labels to relative paths."""
+        """Return a mapping of available diff artifact labels to relative paths.
+
+        Returns
+        -------
+        dict[str, str]
+            Dictionary mapping diff artifact labels (e.g., "docfacts", "docstrings")
+            to relative file paths. Only includes entries for artifacts that exist.
+        """
         links: dict[str, str] = {}
         for label, path in (
             ("docfacts", DOCFACTS_DIFF_PATH),

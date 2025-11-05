@@ -34,10 +34,10 @@ def compute_delta(
     current : Mapping[str, Mapping[str, object]]
         The current symbol index to compare.
 
-    Returns
-    -------
-    Mapping[str, object]
-        Delta containing removals, modifications, and additions.
+    Raises
+    ------
+    NotImplementedError
+        This function is a placeholder for Phase 3.2 implementation.
 
     Examples
     --------

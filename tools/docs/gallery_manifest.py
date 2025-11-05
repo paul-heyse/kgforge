@@ -27,7 +27,23 @@ class GalleryManifestError(RuntimeError):
 
 
 def _read_manifest(path: Path) -> Mapping[str, object]:
-    """Return the raw manifest mapping loaded from ``path``."""
+    """Return the raw manifest mapping loaded from ``path``.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the gallery manifest JSON file.
+
+    Returns
+    -------
+    Mapping[str, object]
+        Parsed manifest mapping.
+
+    Raises
+    ------
+    GalleryManifestError
+        If the manifest file is missing, invalid JSON, or not an object.
+    """
     try:
         raw_text = path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:  # pragma: no cover - validated in CI
@@ -130,7 +146,23 @@ def _parse_example(
 
 
 def load_gallery_manifest(path: Path) -> list[GalleryExample]:
-    """Return gallery metadata loaded from ``path``."""
+    """Return gallery metadata loaded from ``path``.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the gallery manifest JSON file.
+
+    Returns
+    -------
+    list[GalleryExample]
+        List of parsed gallery examples.
+
+    Raises
+    ------
+    GalleryManifestError
+        If the manifest is invalid, unsupported version, or contains malformed entries.
+    """
     manifest = _read_manifest(path)
     _ensure_supported_version(manifest)
     entries = _example_entries(manifest)
@@ -154,5 +186,16 @@ def load_gallery_manifest(path: Path) -> list[GalleryExample]:
 
 
 def explicit_order(manifest: typing.Iterable[GalleryExample]) -> list[str]:
-    """Return filenames for use with ``sphinx_gallery.sorting.ExplicitOrder``."""
+    """Return filenames for use with ``sphinx_gallery.sorting.ExplicitOrder``.
+
+    Parameters
+    ----------
+    manifest : typing.Iterable[GalleryExample]
+        Gallery examples to extract filenames from.
+
+    Returns
+    -------
+    list[str]
+        List of filenames in manifest order.
+    """
     return [entry.filename for entry in manifest]

@@ -46,13 +46,30 @@ else:  # pragma: no cover - pytest provides runtime decorator
 
 @fixture
 def signing_key() -> bytes:
-    """Provide a valid signing key."""
+    """Provide a valid signing key.
+
+    Returns
+    -------
+    bytes
+        Random 32-byte signing key.
+    """
     return os.urandom(32)
 
 
 @fixture
 def wrapper(signing_key: bytes) -> SignedPickleWrapper:
-    """Provide a wrapper instance with a random signing key."""
+    """Provide a wrapper instance with a random signing key.
+
+    Parameters
+    ----------
+    signing_key : bytes
+        Signing key to use.
+
+    Returns
+    -------
+    SignedPickleWrapper
+        Configured wrapper instance.
+    """
     return SignedPickleWrapper(signing_key)
 
 
@@ -146,7 +163,6 @@ class TestSignedPickleWrapper:
 
         class CustomClass:
             """Custom class for disallowed type testing."""
-            pass
 
         with pytest.raises(ValueError, match="not allowed"):
             wrapper.dump(CustomClass(), io.BytesIO())
@@ -157,7 +173,6 @@ class TestSignedPickleWrapper:
         # Create a pickle with a disallowed type (manually, for testing)
         class CustomClass:
             """Custom class for disallowed type testing."""
-            pass
 
         obj = CustomClass()
         pickled = create_unsigned_pickle_payload(obj)

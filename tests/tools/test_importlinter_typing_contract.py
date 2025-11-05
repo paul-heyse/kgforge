@@ -35,7 +35,12 @@ class TestImportLinterTypingContract:
         Returns
         -------
         tuple[int, str, str]
-            (exit_code, stdout, stderr)
+            (exit_code, stdout, stderr).
+
+        Raises
+        ------
+        ToolExecutionError
+            If import-linter execution fails.
         """
         try:
             result = run_tool(

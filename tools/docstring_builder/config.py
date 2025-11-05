@@ -55,7 +55,13 @@ class BuilderConfig:
 
     @property
     def config_hash(self) -> str:
-        """Return a stable hash representing the config values."""
+        """Return a stable hash representing the config values.
+
+        Returns
+        -------
+        str
+            SHA256 hash hex digest of the configuration payload.
+        """
         payload = {
             "include": self.include,
             "exclude": self.exclude,
@@ -119,7 +125,18 @@ def _bool_option(data: Mapping[str, object], key: str, *, default: bool = False)
 
 
 def load_config(path: Path | None = None) -> BuilderConfig:
-    """Load configuration from the provided path or default location."""
+    """Load configuration from the provided path or default location.
+
+    Parameters
+    ----------
+    path : Path, optional
+        Path to configuration file. If None, uses ``DEFAULT_CONFIG_PATH``.
+
+    Returns
+    -------
+    BuilderConfig
+        Loaded configuration instance with defaults applied for missing values.
+    """
     config_path = path or DEFAULT_CONFIG_PATH
     data = _load_toml(config_path)
 
@@ -156,7 +173,18 @@ def load_config(path: Path | None = None) -> BuilderConfig:
 
 
 def resolve_config_path(start: Path | None = None) -> Path:
-    """Find configuration file by walking up the directory tree."""
+    """Find configuration file by walking up the directory tree.
+
+    Parameters
+    ----------
+    start : Path, optional
+        Starting directory for search. If None, uses current working directory.
+
+    Returns
+    -------
+    Path
+        Path to found configuration file, or ``DEFAULT_CONFIG_PATH`` if not found.
+    """
     current = start or Path.cwd()
     for directory in [current, *current.parents]:
         candidate = directory / DEFAULT_CONFIG_PATH
@@ -174,7 +202,18 @@ def _coerce_path(value: str) -> Path:
 
 
 def select_config_path(override: str | Path | None = None) -> ConfigSelection:
-    """Determine the configuration path honouring CLI and environment precedence."""
+    """Determine the configuration path honouring CLI and environment precedence.
+
+    Parameters
+    ----------
+    override : str or Path, optional
+        Explicit path override (typically from CLI).
+
+    Returns
+    -------
+    ConfigSelection
+        Selected configuration path and its source provenance.
+    """
     if override:
         path = _coerce_path(str(override))
         return ConfigSelection(path=path, source="cli")
@@ -196,14 +235,31 @@ def select_config_path(override: str | Path | None = None) -> ConfigSelection:
 def load_config_with_selection(
     override: str | Path | None = None,
 ) -> tuple[BuilderConfig, ConfigSelection]:
-    """Load configuration while also returning metadata about the selection."""
+    """Load configuration while also returning metadata about the selection.
+
+    Parameters
+    ----------
+    override : str or Path, optional
+        Explicit path override (typically from CLI).
+
+    Returns
+    -------
+    tuple[BuilderConfig, ConfigSelection]
+        Loaded configuration and selection metadata.
+    """
     selection = select_config_path(override)
     config = load_config(selection.path)
     return config, selection
 
 
 def load_config_from_env() -> BuilderConfig:
-    """Load configuration using backwards compatible environment precedence."""
+    """Load configuration using backwards compatible environment precedence.
+
+    Returns
+    -------
+    BuilderConfig
+        Loaded configuration instance.
+    """
     config, _ = load_config_with_selection(None)
     return config
 

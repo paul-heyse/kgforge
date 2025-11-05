@@ -13,10 +13,10 @@ def validate_artifacts() -> dict[str, object]:
     This is the new public API for artifact validation that uses typed
     configuration for consistency with other toolchain operations.
 
-    Returns
-    -------
-    dict[str, object]
-        Validation results with status and details.
+    Raises
+    ------
+    NotImplementedError
+        This function is a placeholder for Phase 3.2 implementation.
 
     Examples
     --------

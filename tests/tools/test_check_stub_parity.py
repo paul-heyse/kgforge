@@ -2,29 +2,36 @@
 
 from __future__ import annotations
 
+import importlib
 import sys
 from types import ModuleType
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pytest
-from tools.check_stub_parity import (
-    StubParityContext,
-    StubParityIssueRecord,
-    StubParityReport,
-    build_stub_parity_context,
-    evaluate_stub,
-    run_stub_parity_checks,
-)
 
 from kgfoundry_common.errors import ConfigurationError
 
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from tools.check_stub_parity import (
+        StubParityContext,
+        StubParityIssueRecord,
+        StubParityReport,
+    )
+
+_stub_parity_module = cast("Any", importlib.import_module("tools.check_stub_parity"))
+
+StubParityIssueRecord = _stub_parity_module.StubParityIssueRecord
+StubParityReport = _stub_parity_module.StubParityReport
+build_stub_parity_context = _stub_parity_module.build_stub_parity_context
+evaluate_stub = _stub_parity_module.evaluate_stub
+run_stub_parity_checks = _stub_parity_module.run_stub_parity_checks
+
 
 def _register_runtime_module(name: str, exports: tuple[str, ...]) -> None:
     module = ModuleType(name)
-    module_dict: dict[str, object] = module.__dict__
+    module_dict = cast("dict[str, object]", module.__dict__)
     module_dict["__all__"] = list(exports)
 
     def _placeholder(*args: object, **kwargs: object) -> None:  # noqa: ARG001

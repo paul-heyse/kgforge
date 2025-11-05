@@ -11,7 +11,13 @@ if TYPE_CHECKING:
 
 
 def run() -> Path:
-    """Generate the configuration and run import-linter in check mode."""
+    """Generate the configuration and run import-linter in check mode.
+
+    Returns
+    -------
+    Path
+        Path to the generated import-linter configuration file.
+    """
     return generate_importlinter(check=True)
 
 

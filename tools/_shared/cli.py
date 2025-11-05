@@ -133,17 +133,28 @@ def new_cli_envelope(*, command: str, status: CliStatus, subcommand: str = "") -
 def validate_cli_envelope(envelope: CliEnvelope) -> None:
     """Validate ``envelope`` against the CLI schema.
 
-    Returns
-    -------
-    None
-        This function raises if validation fails.
+    This function calls ``validate_tools_payload`` which may raise validation
+    errors. See :func:`tools._shared.schema.validate_tools_payload` for details.
     """
     payload: dict[str, object] = msgspec.to_builtins(envelope)
     validate_tools_payload(payload, CLI_ENVELOPE_SCHEMA)
 
 
 def render_cli_envelope(envelope: CliEnvelope, *, indent: int = 2) -> str:
-    """Return a JSON string for ``envelope``."""
+    """Return a JSON string for ``envelope``.
+
+    Parameters
+    ----------
+    envelope : CliEnvelope
+        CLI envelope to serialize.
+    indent : int, optional
+        JSON indentation level. Default is 2.
+
+    Returns
+    -------
+    str
+        JSON-encoded envelope string.
+    """
     payload: dict[str, object] = msgspec.to_builtins(envelope)
     return json.dumps(payload, indent=indent)
 
@@ -156,7 +167,22 @@ class CliEnvelopeBuilder:
 
     @classmethod
     def create(cls, *, command: str, status: CliStatus, subcommand: str = "") -> CliEnvelopeBuilder:
-        """Instantiate a builder for ``command`` with the provided status."""
+        """Instantiate a builder for ``command`` with the provided status.
+
+        Parameters
+        ----------
+        command : str
+            Command name.
+        status : CliStatus
+            Initial status for the envelope.
+        subcommand : str, optional
+            Optional subcommand name. Default is empty string.
+
+        Returns
+        -------
+        CliEnvelopeBuilder
+            New builder instance.
+        """
         return cls(new_cli_envelope(command=command, status=status, subcommand=subcommand))
 
     def add_file(
@@ -207,7 +233,23 @@ class CliEnvelopeBuilder:
             )
 
     def finish(self, *, duration_seconds: float | None = None) -> CliEnvelope:
-        """Finalize the envelope, validating it before returning."""
+        """Finalize the envelope, validating it before returning.
+
+        Parameters
+        ----------
+        duration_seconds : float | None, optional
+            Optional execution duration in seconds.
+
+        Returns
+        -------
+        CliEnvelope
+            Validated and finalized envelope.
+
+        Note
+        ----
+        This function calls ``validate_cli_envelope`` which may raise validation
+        errors. See :func:`validate_cli_envelope` for details.
+        """
         if duration_seconds is not None:
             if TYPE_CHECKING:
                 self.envelope = dataclass_replace(

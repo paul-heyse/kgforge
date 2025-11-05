@@ -62,7 +62,18 @@ FAIL_ON_UNTESTED = os.getenv("TESTMAP_FAIL_ON_UNTESTED", "0") == "1"
 
 
 def _load_json(path: Path) -> JSONValue | None:
-    """Return JSON data from ``path`` or ``None`` if the file is unreadable."""
+    """Return JSON data from ``path`` or ``None`` if the file is unreadable.
+
+    Parameters
+    ----------
+    path : Path
+        Path to JSON file.
+
+    Returns
+    -------
+    JSONValue | None
+        Parsed JSON data or None if file is unreadable.
+    """
     try:
         return cast("JSONValue", json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError):
@@ -70,7 +81,18 @@ def _load_json(path: Path) -> JSONValue | None:
 
 
 def _normalize_module_name(name: str) -> str:
-    """Collapse ``__init__`` suffixes to create a canonical module path."""
+    """Collapse ``__init__`` suffixes to create a canonical module path.
+
+    Parameters
+    ----------
+    name : str
+        Module name.
+
+    Returns
+    -------
+    str
+        Normalized module name.
+    """
     return name[: -len(".__init__")] if name.endswith(".__init__") else name
 
 
@@ -97,7 +119,18 @@ def _add_exports(
 
 
 def _candidates_from_symbols_json(symbols_json: Path) -> set[str]:
-    """Load module paths from the symbol index produced during docs generation."""
+    """Load module paths from the symbol index produced during docs generation.
+
+    Parameters
+    ----------
+    symbols_json : Path
+        Path to symbols JSON file.
+
+    Returns
+    -------
+    set[str]
+        Set of module names.
+    """
     payload = _load_json(symbols_json)
     if not isinstance(payload, list):
         return set()
@@ -112,7 +145,18 @@ def _candidates_from_symbols_json(symbols_json: Path) -> set[str]:
 
 
 def _candidates_from_navmap(navmap_json: Path) -> set[str]:
-    """Load modules and exports from the navigation map."""
+    """Load modules and exports from the navigation map.
+
+    Parameters
+    ----------
+    navmap_json : Path
+        Path to navmap JSON file.
+
+    Returns
+    -------
+    set[str]
+        Set of module names and exported symbols.
+    """
     payload = _load_json(navmap_json)
     if not isinstance(payload, Mapping):
         return set()
@@ -135,7 +179,13 @@ def _candidates_from_navmap(navmap_json: Path) -> set[str]:
 
 
 def _candidates_from_source_tree() -> set[str]:
-    """Derive module names by scanning the ``src`` tree."""
+    """Derive module names by scanning the ``src`` tree.
+
+    Returns
+    -------
+    set[str]
+        Set of module names discovered from source tree.
+    """
     candidates: set[str] = set()
     for pyfile in SRC.rglob("*.py"):
         try:
@@ -149,7 +199,13 @@ def _candidates_from_source_tree() -> set[str]:
 
 
 def load_symbol_candidates() -> set[str]:
-    """Return potential module and attribute targets for documentation lookup."""
+    """Return potential module and attribute targets for documentation lookup.
+
+    Returns
+    -------
+    set[str]
+        Set of module names and exported symbols.
+    """
     symbols_json = ROOT / "docs" / "_build" / "symbols.json"
     if symbols_json.exists():
         candidates = _candidates_from_symbols_json(symbols_json)
@@ -267,23 +323,9 @@ def _collect_import(node: ast.Import, names: set[str]) -> None:
     Parameters
     ----------
     node : ast.Import
-        Description.
+        Import AST node.
     names : set[str]
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_import(...)
+        Set to add imported names to.
     """
     for alias in node.names:
         names.add(alias.name)
@@ -295,23 +337,9 @@ def _collect_import_from(node: ast.ImportFrom, names: set[str]) -> None:
     Parameters
     ----------
     node : ast.ImportFrom
-        Description.
+        ImportFrom AST node.
     names : set[str]
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_import_from(...)
+        Set to add imported names to.
     """
     module = node.module or ""
     if module:
@@ -328,30 +356,27 @@ def _collect_attribute(node: ast.Attribute, names: set[str]) -> None:
     Parameters
     ----------
     node : ast.Attribute
-        Description.
+        Attribute AST node.
     names : set[str]
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_attribute(...)
+        Set to add attribute names to.
     """
     if isinstance(node.value, ast.Name):
         names.add(f"{node.value.id}.{node.attr}")
 
 
 def _names_from_ast(tree: ast.AST | None) -> set[str]:
-    """Return identifiers discovered while walking ``tree``."""
+    """Return identifiers discovered while walking ``tree``.
+
+    Parameters
+    ----------
+    tree : ast.AST | None
+        AST to walk.
+
+    Returns
+    -------
+    set[str]
+        Set of discovered identifiers.
+    """
     names: set[str] = set()
     if tree is None:
         return names
@@ -374,21 +399,12 @@ def _read_source(path: Path) -> str | None:
     Parameters
     ----------
     path : Path
-        Description.
+        Path to source file.
 
     Returns
     -------
     str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _read_source(...)
+        Source text or None if file cannot be read.
     """
     try:
         return path.read_text(encoding="utf-8")
@@ -402,21 +418,12 @@ def _parse_source(text: str) -> ast.AST | None:
     Parameters
     ----------
     text : str
-        Description.
+        Source code text.
 
     Returns
     -------
     ast.AST | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _parse_source(...)
+        Parsed AST or None if syntax error.
     """
     try:
         return ast.parse(text)
@@ -430,21 +437,12 @@ def _symbol_tail(symbol: str) -> str:
     Parameters
     ----------
     symbol : str
-        Description.
+        Symbol name.
 
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _symbol_tail(...)
+        Last component of dotted symbol name.
     """
     return symbol.rsplit(".", 1)[-1]
 
@@ -455,25 +453,16 @@ def _match_reason(symbol: str, dotted_tokens: set[str], ast_tokens: set[str]) ->
     Parameters
     ----------
     symbol : str
-        Description.
+        Symbol to match.
     dotted_tokens : set[str]
-        Description.
+        Dotted tokens found in source.
     ast_tokens : set[str]
-        Description.
+        AST tokens found in source.
 
     Returns
     -------
     str | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _match_reason(...)
+        Match reason string or None if no match.
     """
     top = symbol.split(".", 1)[0]
     tail = _symbol_tail(symbol)
@@ -494,23 +483,14 @@ def _line_hits(text: str, symbol: str) -> list[int]:
     Parameters
     ----------
     text : str
-        Description.
+        Source text to search.
     symbol : str
-        Description.
+        Symbol name to find.
 
     Returns
     -------
     list[int]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _line_hits(...)
+        List of line numbers where symbol appears.
     """
     tail = _symbol_tail(symbol)
     hits: list[int] = []
@@ -528,21 +508,12 @@ def _context_windows(line_hits: Iterable[int]) -> list[dict[str, int]]:
     Parameters
     ----------
     line_hits : Iterable[int]
-        Description.
+        Line numbers.
 
     Returns
     -------
     list[dict[str, int]]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _context_windows(...)
+        List of context window dictionaries with start/end line numbers.
     """
     return [{"start": max(1, line - WINDOW), "end": line + WINDOW} for line in line_hits]
 
@@ -553,21 +524,12 @@ def _relative_repo_path(path: Path) -> str:
     Parameters
     ----------
     path : Path
-        Description.
+        Path to convert.
 
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _relative_repo_path(...)
+        Relative path string, or absolute path if not relative to repo root.
     """
     try:
         return str(path.relative_to(ROOT))
@@ -576,7 +538,20 @@ def _relative_repo_path(path: Path) -> str:
 
 
 def scan_test_file(path: Path, symbols: set[str]) -> dict[str, list[dict[str, object]]]:
-    """Return symbol matches discovered inside ``path`` for reporting."""
+    """Return symbol matches discovered inside ``path`` for reporting.
+
+    Parameters
+    ----------
+    path : Path
+        Path to test file.
+    symbols : set[str]
+        Set of symbols to search for.
+
+    Returns
+    -------
+    dict[str, list[dict[str, object]]]
+        Mapping of symbol to list of match dictionaries.
+    """
     text = _read_source(path)
     if text is None:
         return {}
@@ -614,21 +589,12 @@ def _normalize_repo_rel(path_like: str) -> str:
     Parameters
     ----------
     path_like : str
-        Description.
+        Path-like string.
 
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _normalize_repo_rel(...)
+        Normalized relative path string.
     """
     try:
         p = Path(path_like)
@@ -652,21 +618,12 @@ def _executed_lines(info: Mapping[str, object]) -> set[int]:
     Parameters
     ----------
     info : Mapping[str, object]
-        Description.
+        Coverage info dictionary.
 
     Returns
     -------
     set[int]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _executed_lines(...)
+        Set of executed line numbers.
     """
     raw = info.get("executed_lines")
     if not isinstance(raw, list):
@@ -680,23 +637,14 @@ def _contexts_for_file(info: Mapping[str, object], rel: str) -> dict[tuple[str, 
     Parameters
     ----------
     info : Mapping[str, object]
-        Description.
+        Coverage info dictionary.
     rel : str
-        Description.
+        Relative file path.
 
     Returns
     -------
     dict[tuple[str, int], set[str]]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _contexts_for_file(...)
+        Mapping of (file, line) to set of context names.
     """
     contexts = info.get("contexts")
     if not isinstance(contexts, Mapping):

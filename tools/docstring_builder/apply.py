@@ -197,7 +197,22 @@ class _DocstringTransformer(cst.CSTTransformer):
 
 
 def _atomic_write(target: Path, content: str, *, encoding: str = "utf-8") -> None:
-    """Persist content atomically, replacing the target file."""
+    """Persist content atomically, replacing the target file.
+
+    Parameters
+    ----------
+    target : Path
+        Target file path.
+    content : str
+        Content to write.
+    encoding : str, default "utf-8"
+        File encoding.
+
+    Raises
+    ------
+    ConfigurationError
+        If the temporary file cannot be created or the atomic write fails.
+    """
     target.parent.mkdir(parents=True, exist_ok=True)
     temp_path: Path | None = None
     temp_name: str | None = None
@@ -252,11 +267,6 @@ def apply_edits(
         A tuple ``(changed, code)`` where ``changed`` indicates whether any docstrings were
         updated. The ``code`` element contains the rendered module when the configuration runs
         in dry-run mode (``write_changes=False``); otherwise, it is ``None``.
-
-    Raises
-    ------
-    libcst.ParserSyntaxError
-        Raised when the harvested module cannot be parsed by LibCST.
     """
     config = apply_config or DocstringApplyConfig()
     mapping = {edit.qname: edit for edit in edits}

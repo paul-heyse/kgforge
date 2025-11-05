@@ -47,7 +47,25 @@ def coerce_parser_class(
     module: ModuleType,
     attribute: str = "Parser",
 ) -> type[AutoapiParserProtocol]:
-    """Return the ``Parser`` class from ``module`` with precise typing."""
+    """Return the ``Parser`` class from ``module`` with precise typing.
+
+    Parameters
+    ----------
+    module : ModuleType
+        AutoAPI parser module to extract the Parser class from.
+    attribute : str, optional
+        Attribute name to look for (defaults to "Parser").
+
+    Returns
+    -------
+    type[AutoapiParserProtocol]
+        Typed parser class.
+
+    Raises
+    ------
+    TypeError
+        If the module does not have the specified class attribute.
+    """
     candidate_obj = getattr(module, attribute, _MISSING)
     if candidate_obj is _MISSING or not inspect.isclass(candidate_obj):
         message = f"Module '{module.__name__}' attribute '{attribute}' is not a class"

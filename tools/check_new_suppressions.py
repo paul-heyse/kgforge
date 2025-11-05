@@ -18,7 +18,6 @@ import io
 import re
 import sys
 import tokenize
-from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -28,7 +27,7 @@ from kgfoundry_common.errors import ConfigurationError
 from tools._shared.logging import get_logger
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Iterable, Mapping, Sequence
 
 LOGGER = get_logger(__name__)
 

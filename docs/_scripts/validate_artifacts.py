@@ -158,12 +158,34 @@ class ArtifactCheck:
 
 
 def _resolve_schema(name: str) -> Path:
-    """Return the absolute path to a documentation schema file."""
+    """Return the absolute path to a documentation schema file.
+
+    Parameters
+    ----------
+    name : str
+        Schema filename.
+
+    Returns
+    -------
+    Path
+        Absolute path to the schema file.
+    """
     return SCHEMA_ROOT / name
 
 
 def _schema_path(filename: str) -> Path:
-    """Return the absolute path to a docs schema file."""
+    """Return the absolute path to a docs schema file.
+
+    Parameters
+    ----------
+    filename : str
+        Schema filename.
+
+    Returns
+    -------
+    Path
+        Absolute path to the schema file.
+    """
     return ENV.root / "schema" / "docs" / filename
 
 
@@ -199,7 +221,7 @@ def validate_symbol_index(path: Path) -> SymbolIndexArtifacts:
         CoreArtifactValidationError,
         CoreArtifactDeserializationError,
     ) as exc:
-        problem = exc.to_problem_details()
+        problem = cast("ProblemDetailsDict", exc.to_problem_details())
         raise ArtifactValidationError(
             str(exc),
             artifact_name="symbols.json",
@@ -252,7 +274,7 @@ def validate_symbol_delta(path: Path) -> SymbolDeltaPayload:
         CoreArtifactValidationError,
         CoreArtifactDeserializationError,
     ) as exc:
-        problem = exc.to_problem_details()
+        problem = cast("ProblemDetailsDict", exc.to_problem_details())
         raise ArtifactValidationError(
             str(exc),
             artifact_name="symbols.delta.json",
@@ -281,7 +303,27 @@ def _load_reverse_lookup(
     artifact_name: str,
     schema_filename: str,
 ) -> ReverseLookup:
-    """Load and validate a reverse lookup artifact."""
+    """Load and validate a reverse lookup artifact.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the reverse lookup JSON file.
+    artifact_name : str
+        Name of the artifact for error messages.
+    schema_filename : str
+        Schema filename for validation.
+
+    Returns
+    -------
+    ReverseLookup
+        Validated reverse lookup dictionary.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If the file doesn't exist, is invalid JSON, or fails validation.
+    """
     if not path.exists():
         message = f"Reverse lookup not found: {path}"
         raise ArtifactValidationError(message, artifact_name=artifact_name)
@@ -296,9 +338,10 @@ def _load_reverse_lookup(
         message = f"{artifact_name} must be a JSON object mapping strings to arrays"
         raise ArtifactValidationError(message, artifact_name=artifact_name)
 
+    raw_mapping = cast("dict[str, object]", raw_data)
     payload: ReverseLookupPayload = {}
     typed_lookup: ReverseLookup = {}
-    for key, value in raw_data.items():
+    for key, value in raw_mapping.items():
         if not isinstance(key, str) or not key:
             message = f"Invalid key in {artifact_name}: {key!r}"
             raise ArtifactValidationError(message, artifact_name=artifact_name)
@@ -306,8 +349,9 @@ def _load_reverse_lookup(
             message = f"{artifact_name} values must be arrays of strings"
             raise ArtifactValidationError(message, artifact_name=artifact_name)
 
+        entries = cast("list[object]", value)
         values: list[str] = []
-        for index, item in enumerate(value):
+        for index, item in enumerate(entries):
             if not isinstance(item, str) or not item:
                 message = f"{artifact_name} entries must be non-empty strings (key={key!r}, index={index})"
                 raise ArtifactValidationError(message, artifact_name=artifact_name)
@@ -330,7 +374,18 @@ def _load_reverse_lookup(
 
 
 def validate_by_file_lookup(path: Path) -> ReverseLookup:
-    """Validate a by-file reverse lookup JSON file against its schema."""
+    """Validate a by-file reverse lookup JSON file against its schema.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the by_file.json file.
+
+    Returns
+    -------
+    ReverseLookup
+        Validated reverse lookup dictionary.
+    """
     return _load_reverse_lookup(
         path,
         artifact_name="by_file.json",
@@ -339,7 +394,18 @@ def validate_by_file_lookup(path: Path) -> ReverseLookup:
 
 
 def validate_by_module_lookup(path: Path) -> ReverseLookup:
-    """Validate a by-module reverse lookup JSON file against its schema."""
+    """Validate a by-module reverse lookup JSON file against its schema.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the by_module.json file.
+
+    Returns
+    -------
+    ReverseLookup
+        Validated reverse lookup dictionary.
+    """
     return _load_reverse_lookup(
         path,
         artifact_name="by_module.json",

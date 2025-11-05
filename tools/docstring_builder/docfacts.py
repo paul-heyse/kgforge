@@ -45,7 +45,13 @@ class DocFact:
     notes: list[str]
 
     def to_dict(self) -> dict[str, object]:
-        """Return a JSON-serializable representation."""
+        """Return a JSON-serializable representation.
+
+        Returns
+        -------
+        dict[str, object]
+            Dictionary containing all DocFact fields in a JSON-serializable format.
+        """
         return {
             "qname": self.qname,
             "module": self.module,
@@ -65,7 +71,18 @@ class DocFact:
 
     @classmethod
     def from_mapping(cls, data: Mapping[str, object]) -> DocFact | None:
-        """Instantiate a :class:`DocFact` from a mapping if possible."""
+        """Instantiate a :class:`DocFact` from a mapping if possible.
+
+        Parameters
+        ----------
+        data : Mapping[str, object]
+            Dictionary containing DocFact fields.
+
+        Returns
+        -------
+        DocFact or None
+            Instantiated DocFact if mapping is valid, None otherwise.
+        """
         try:
             qname = str(data["qname"])
             module = str(data.get("module", ""))
@@ -137,7 +154,13 @@ class DocfactsProvenance:
     generated_at: str
 
     def to_dict(self) -> dict[str, str]:
-        """Return JSON-serialisable provenance metadata."""
+        """Return JSON-serialisable provenance metadata.
+
+        Returns
+        -------
+        dict[str, str]
+            Dictionary with builderVersion, configHash, commitHash, and generatedAt fields.
+        """
         return {
             "builderVersion": self.builder_version,
             "configHash": self.config_hash,
@@ -155,7 +178,13 @@ class DocfactsDocument:
     entries: list[DocFact]
 
     def to_dict(self) -> dict[str, object]:
-        """Return a JSON payload for the full DocFacts document."""
+        """Return a JSON payload for the full DocFacts document.
+
+        Returns
+        -------
+        dict[str, object]
+            Dictionary containing docfactsVersion, provenance, and entries fields.
+        """
         return {
             "docfactsVersion": self.docfacts_version,
             "provenance": self.provenance.to_dict(),
@@ -220,7 +249,18 @@ def _mapping_items(value: object | None) -> list[Mapping[str, object]]:
 
 
 def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:
-    """Convert semantic results to DocFacts dataclasses."""
+    """Convert semantic results to DocFacts dataclasses.
+
+    Parameters
+    ----------
+    entries : Iterable[SemanticResult]
+        Semantic results to convert to DocFacts.
+
+    Returns
+    -------
+    list[DocFact]
+        List of DocFact instances created from the semantic results.
+    """
     payload: list[DocFact] = []
     for entry in entries:
         schema = entry.schema
@@ -274,7 +314,22 @@ def build_docfacts(entries: Iterable[SemanticResult]) -> list[DocFact]:
 def build_docfacts_document(
     entries: Iterable[DocFact], provenance: DocfactsProvenance, version: str | None = None
 ) -> DocfactsDocument:
-    """Create a :class:`DocfactsDocument` from the provided entries."""
+    """Create a :class:`DocfactsDocument` from the provided entries.
+
+    Parameters
+    ----------
+    entries : Iterable[DocFact]
+        DocFact entries to include in the document.
+    provenance : DocfactsProvenance
+        Provenance metadata for the document.
+    version : str, optional
+        DocFacts version string. If None, uses ``DOCFACTS_VERSION``.
+
+    Returns
+    -------
+    DocfactsDocument
+        Document instance with entries sorted by qualified name.
+    """
     ordered = sorted(entries, key=lambda fact: fact.qname)
     return DocfactsDocument(
         docfacts_version=version or DOCFACTS_VERSION,
@@ -289,7 +344,22 @@ def write_docfacts(
     *,
     validate: bool = True,
 ) -> DocfactsDocumentPayload:
-    """Persist DocFacts to ``path`` returning the typed payload."""
+    """Persist DocFacts to ``path`` returning the typed payload.
+
+    Parameters
+    ----------
+    path : Path
+        Target file path for the DocFacts JSON file.
+    document : DocfactsDocument
+        Document instance to serialize.
+    validate : bool, default True
+        Whether to validate the payload against the schema before writing.
+
+    Returns
+    -------
+    DocfactsDocumentPayload
+        Typed payload dictionary that was written to disk.
+    """
     payload = build_docfacts_document_payload(cast("DocfactsDocumentLike", document))
     if validate:
         validate_docfacts_payload(payload)

@@ -264,6 +264,11 @@ class CatalogSessionServer:
         -------
         dict[str, object]
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionServerError
+            If params is not None and not a dict.
         """
         if raw is None:
             return {}
@@ -705,6 +710,11 @@ class CatalogSessionServer:
         -------
         int
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionServerError
+            If k is not a valid integer or is out of range.
         """
         if isinstance(raw_k, bool):
             message = "k must be an integer"
@@ -757,6 +767,11 @@ class CatalogSessionServer:
         -------
         dict[str, str]
             Describe return value.
+
+        Raises
+        ------
+        CatalogSessionServerError
+            If facets is not None and not a dict, or if an invalid facet key is provided.
         """
         if raw_facets is None:
             return {}
@@ -1004,6 +1019,11 @@ def main(argv: list[str] | None = None) -> int:
     -------
     int
         Describe return value.
+
+    Raises
+    ------
+    SystemExit
+        If catalog path or repository root does not exist, or if role is invalid.
     """
     parser = build_parser()
     args = parser.parse_args(argv)

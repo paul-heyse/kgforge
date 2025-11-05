@@ -185,12 +185,29 @@ class ParameterHarvest:
     default: str | None
 
     def display_name(self) -> str:
-        """Return the formatted name suitable for docstring rendering."""
+        """Return the formatted name suitable for docstring rendering.
+
+        Returns
+        -------
+        str
+            Formatted parameter name with appropriate prefix (* or **) if applicable.
+        """
         return parameter_display_name(self)
 
 
 def parameter_display_name(parameter: ParameterHarvest) -> str:
-    """Format a harvested parameter for docstring sections."""
+    """Format a harvested parameter for docstring sections.
+
+    Parameters
+    ----------
+    parameter : ParameterHarvest
+        Parameter metadata to format.
+
+    Returns
+    -------
+    str
+        Formatted parameter name with kind prefix.
+    """
     return format_parameter_name(parameter.name, parameter.kind)
 
 
@@ -548,7 +565,22 @@ def _build_cst_index(module_name: str, file_path: Path) -> dict[str, cst.CSTNode
 
 
 def harvest_file(file_path: Path, config: BuilderConfig, repo_root: Path) -> HarvestResult:
-    """Collect symbol metadata for a single file."""
+    """Collect symbol metadata for a single file.
+
+    Parameters
+    ----------
+    file_path : Path
+        Path to the Python file to harvest.
+    config : BuilderConfig
+        Builder configuration.
+    repo_root : Path
+        Repository root directory.
+
+    Returns
+    -------
+    HarvestResult
+        Harvested module metadata including symbols and CST index.
+    """
     module_name = _module_name(repo_root, file_path)
     if not module_name:
         module_name = file_path.stem
@@ -560,7 +592,20 @@ def harvest_file(file_path: Path, config: BuilderConfig, repo_root: Path) -> Har
 
 
 def iter_target_files(config: BuilderConfig, repo_root: Path) -> Iterator[Path]:
-    """Yield files matching include/exclude patterns."""
+    """Yield files matching include/exclude patterns.
+
+    Parameters
+    ----------
+    config : BuilderConfig
+        Builder configuration with include/exclude patterns.
+    repo_root : Path
+        Repository root directory.
+
+    Yields
+    ------
+    Path
+        Python file paths matching the include patterns and not excluded.
+    """
     for pattern in config.include:
         for candidate in repo_root.glob(pattern):
             if not candidate.is_file() or candidate.suffix != ".py":

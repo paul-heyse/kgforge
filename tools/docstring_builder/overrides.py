@@ -430,17 +430,52 @@ QUALIFIED_NAME_OVERRIDES: dict[str, str] = {
 
 
 def _is_magic(name: str) -> bool:
-    """Return True when ``name`` matches a known Python magic method."""
+    """Return True when ``name`` matches a known Python magic method.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a known magic method, False otherwise.
+    """
     return name in MAGIC_METHOD_EXTENDED_SUMMARIES
 
 
 def _is_pydantic_artifact(name: str) -> bool:
-    """Return True when ``name`` refers to a Pydantic-specific helper."""
+    """Return True when ``name`` refers to a Pydantic-specific helper.
+
+    Parameters
+    ----------
+    name : str
+        Method name to check.
+
+    Returns
+    -------
+    bool
+        True if name is a Pydantic artifact, False otherwise.
+    """
     return name in PYDANTIC_ARTIFACT_SUMMARIES or name.startswith("__pydantic")
 
 
 def summarize(name: str, kind: str) -> str:
-    """Return a concise summary sentence for a symbol."""
+    """Return a concise summary sentence for a symbol.
+
+    Parameters
+    ----------
+    name : str
+        Symbol name.
+    kind : str
+        Symbol kind (e.g., "class", "function", "module", "attribute").
+
+    Returns
+    -------
+    str
+        Summary sentence template for the symbol.
+    """
     cleaned = name or "object"
     if kind == "class":
         return f"Describe the ``{cleaned}`` class."
@@ -452,7 +487,24 @@ def summarize(name: str, kind: str) -> str:
 
 
 def extended_summary(kind: str, name: str, module: str, node: object | None = None) -> str:
-    """Return the extended summary paragraph for the symbol."""
+    """Return the extended summary paragraph for the symbol.
+
+    Parameters
+    ----------
+    kind : str
+        Symbol kind (e.g., "function", "class", "module").
+    name : str
+        Symbol name.
+    module : str
+        Module name (unused, kept for signature compatibility).
+    node : object, optional
+        AST node for additional context (used for class detection).
+
+    Returns
+    -------
+    str
+        Extended summary paragraph text.
+    """
     del module
     if kind == "function":
         summary = _function_extended_summary(name)

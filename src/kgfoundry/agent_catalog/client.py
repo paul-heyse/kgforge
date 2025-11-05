@@ -81,7 +81,20 @@ _EMPTY_GITHUB_POLICY: GithubLinkPolicy = cast("GithubLinkPolicy", {})
 
 
 def _coerce_str(value: object, default: str = "") -> str:
-    """Return *value* if it is a string; otherwise return *default*."""
+    """Return *value* if it is a string; otherwise return *default*.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce.
+    default : str, optional
+        Default value if coercion fails. Defaults to empty string.
+
+    Returns
+    -------
+    str
+        Coerced string value.
+    """
     return value if isinstance(value, str) else default
 
 
@@ -201,6 +214,11 @@ class AgentCatalogClient:
         -------
         SymbolModel
             Describe return value.
+
+        Raises
+        ------
+        AgentCatalogClientError
+            If the symbol is not found.
         """
         symbol = self.get_symbol(symbol_id)
         if symbol is None:
@@ -222,6 +240,11 @@ class AgentCatalogClient:
         -------
         ModuleModel
             Describe return value.
+
+        Raises
+        ------
+        AgentCatalogClientError
+            If the module is not found.
         """
         module = self.get_module(qualified)
         if module is None:
@@ -265,6 +288,11 @@ class AgentCatalogClient:
         -------
         list[ModuleModel]
             Describe return value.
+
+        Raises
+        ------
+        AgentCatalogClientError
+            If the package is not found.
         """
         package_name = package if isinstance(package, str) else package.name
         for pkg in self._catalog.packages:
@@ -295,10 +323,10 @@ class AgentCatalogClient:
 
         <!-- auto:docstring-builder v1 -->
 
-        Returns
-        -------
+        Yields
+        ------
         SymbolModel
-            Describe return value.
+            Symbol record from the catalog.
         """
         yield from self._catalog.iter_symbols()
 
@@ -542,7 +570,18 @@ def _build_anchor_links(policy: LinkPolicy, location: _SymbolAnchorContext) -> d
 
 
 def _normalize_link_policy(raw_policy: JsonObject | None) -> LinkPolicy:
-    """Normalize catalog link policy structure."""
+    """Normalize catalog link policy structure.
+
+    Parameters
+    ----------
+    raw_policy : JsonObject | None
+        Raw link policy dictionary.
+
+    Returns
+    -------
+    LinkPolicy
+        Normalized link policy dictionary.
+    """
     if raw_policy is None or not isinstance(raw_policy, Mapping):
         return {}
 

@@ -264,7 +264,23 @@ class SymbolIndexRow(BaseModel):
     @field_validator("path", mode="before")
     @classmethod
     def path_not_empty(cls, v: object) -> str:
-        """Ensure path is a non-empty string."""
+        """Ensure path is a non-empty string.
+
+        Parameters
+        ----------
+        v : object
+            Value to validate.
+
+        Returns
+        -------
+        str
+            Validated non-empty string.
+
+        Raises
+        ------
+        ValueError
+            If value is not a non-empty string.
+        """
         if not isinstance(v, str) or not v.strip():
             error_msg = "path must be a non-empty string"
             raise ValueError(error_msg)
@@ -273,7 +289,23 @@ class SymbolIndexRow(BaseModel):
     @field_validator("kind", mode="before")
     @classmethod
     def kind_not_empty(cls, v: object) -> str:
-        """Ensure kind is a non-empty string."""
+        """Ensure kind is a non-empty string.
+
+        Parameters
+        ----------
+        v : object
+            Value to validate.
+
+        Returns
+        -------
+        str
+            Validated non-empty string.
+
+        Raises
+        ------
+        ValueError
+            If value is not a non-empty string.
+        """
         if not isinstance(v, str) or not v.strip():
             error_msg = "kind must be a non-empty string"
             raise ValueError(error_msg)
@@ -282,7 +314,23 @@ class SymbolIndexRow(BaseModel):
     @field_validator("doc", mode="before")
     @classmethod
     def doc_not_empty(cls, v: object) -> str:
-        """Ensure doc is a non-empty string."""
+        """Ensure doc is a non-empty string.
+
+        Parameters
+        ----------
+        v : object
+            Value to validate.
+
+        Returns
+        -------
+        str
+            Validated non-empty string.
+
+        Raises
+        ------
+        ValueError
+            If value is not a non-empty string.
+        """
         if not isinstance(v, str) or not v.strip():
             error_msg = "doc must be a non-empty string"
             raise ValueError(error_msg)
@@ -291,7 +339,18 @@ class SymbolIndexRow(BaseModel):
     @field_validator("tested_by", mode="before")
     @classmethod
     def coerce_tested_by(cls, v: object) -> tuple[str, ...]:
-        """Coerce tested_by to tuple, defaulting to empty."""
+        """Coerce tested_by to tuple, defaulting to empty.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        tuple[str, ...]
+            Coerced tuple of strings.
+        """
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
@@ -301,7 +360,18 @@ class SymbolIndexRow(BaseModel):
     @field_validator("source_link", mode="before")
     @classmethod
     def coerce_source_link(cls, v: object) -> dict[str, str]:
-        """Coerce source_link to dict, defaulting to empty."""
+        """Coerce source_link to dict, defaulting to empty.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        dict[str, str]
+            Coerced dictionary of string keys and values.
+        """
         if v is None:
             return {}
         if isinstance(v, dict):
@@ -340,7 +410,18 @@ class SymbolIndexArtifacts(BaseModel):
     @field_validator("rows", mode="before")
     @classmethod
     def coerce_rows(cls, v: object) -> tuple[SymbolIndexRow, ...]:
-        """Coerce rows to tuple."""
+        """Coerce rows to tuple.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        tuple[SymbolIndexRow, ...]
+            Coerced tuple of symbol index rows.
+        """
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
@@ -377,7 +458,23 @@ class SymbolDeltaChange(BaseModel):
     @field_validator("path", mode="before")
     @classmethod
     def path_not_empty(cls, v: object) -> str:
-        """Ensure path is a non-empty string."""
+        """Ensure path is a non-empty string.
+
+        Parameters
+        ----------
+        v : object
+            Value to validate.
+
+        Returns
+        -------
+        str
+            Validated non-empty string.
+
+        Raises
+        ------
+        ValueError
+            If value is not a non-empty string.
+        """
         if not isinstance(v, str) or not v.strip():
             error_msg = "path must be a non-empty string"
             raise ValueError(error_msg)
@@ -386,7 +483,18 @@ class SymbolDeltaChange(BaseModel):
     @field_validator("reasons", mode="before")
     @classmethod
     def coerce_reasons(cls, v: object) -> tuple[str, ...]:
-        """Coerce reasons to tuple."""
+        """Coerce reasons to tuple.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        tuple[str, ...]
+            Coerced tuple of strings.
+        """
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
@@ -422,7 +530,18 @@ class SymbolDeltaPayload(BaseModel):
     @field_validator("added", mode="before")
     @classmethod
     def coerce_added(cls, v: object) -> tuple[str, ...]:
-        """Coerce added to tuple."""
+        """Coerce added to tuple.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        tuple[str, ...]
+            Coerced tuple of strings.
+        """
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
@@ -432,7 +551,18 @@ class SymbolDeltaPayload(BaseModel):
     @field_validator("removed", mode="before")
     @classmethod
     def coerce_removed(cls, v: object) -> tuple[str, ...]:
-        """Coerce removed to tuple."""
+        """Coerce removed to tuple.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        tuple[str, ...]
+            Coerced tuple of strings.
+        """
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
@@ -442,7 +572,23 @@ class SymbolDeltaPayload(BaseModel):
     @field_validator("changed", mode="before")
     @classmethod
     def coerce_changed(cls, v: object) -> tuple[SymbolDeltaChange, ...]:
-        """Coerce changed to tuple."""
+        """Coerce changed to tuple.
+
+        Parameters
+        ----------
+        v : object
+            Value to coerce.
+
+        Returns
+        -------
+        tuple[SymbolDeltaChange, ...]
+            Coerced tuple of symbol delta changes.
+
+        Raises
+        ------
+        ArtifactValidationError
+            If value is not a sequence of change mappings.
+        """
         if v is None:
             return ()
         if isinstance(v, (list, tuple)):
@@ -485,6 +631,29 @@ def _coerce_optional_str(
     artifact: str,
     row: int | None = None,
 ) -> str | None:
+    """Coerce value to optional string.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce.
+    field : str
+        Field name for error messages.
+    artifact : str
+        Artifact name for error messages.
+    row : int | None, optional
+        Row number for error context.
+
+    Returns
+    -------
+    str | None
+        Coerced string value or None.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If value is not None or a string.
+    """
     if value is None:
         return None
     if isinstance(value, str):
@@ -502,6 +671,29 @@ def _coerce_str_tuple(
     artifact: str,
     row: int | None = None,
 ) -> tuple[str, ...]:
+    """Coerce value to tuple of strings.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce.
+    field : str
+        Field name for error messages.
+    artifact : str
+        Artifact name for error messages.
+    row : int | None, optional
+        Row number for error context.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Coerced tuple of strings, sorted if input was a set.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If value is not a sequence of strings.
+    """
     if value is None:
         return ()
     if isinstance(value, (list, tuple, set)):
@@ -526,6 +718,29 @@ def _coerce_str_mapping(
     artifact: str,
     row: int | None = None,
 ) -> dict[str, str]:
+    """Coerce value to dictionary of string keys and values.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce.
+    field : str
+        Field name for error messages.
+    artifact : str
+        Artifact name for error messages.
+    row : int | None, optional
+        Row number for error context.
+
+    Returns
+    -------
+    dict[str, str]
+        Coerced dictionary, empty if value is None.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If value is not a mapping of strings to strings.
+    """
     if value is None:
         return {}
     if isinstance(value, MappingABC):
@@ -571,7 +786,27 @@ def _coerce_delta_change(
     artifact: str,
     index: int,
 ) -> SymbolDeltaChange:
-    """Coerce a single change entry into a SymbolDeltaChange instance."""
+    """Coerce a single change entry into a SymbolDeltaChange instance.
+
+    Parameters
+    ----------
+    entry : object
+        Entry to coerce.
+    artifact : str
+        Artifact name for error messages.
+    index : int
+        Index of the entry in the sequence.
+
+    Returns
+    -------
+    SymbolDeltaChange
+        Coerced symbol delta change instance.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If entry is not a valid symbol delta change mapping.
+    """
     symbol_delta_cls: type[SymbolDeltaChange] = SymbolDeltaChange
     if isinstance(entry, symbol_delta_cls):
         return entry
@@ -608,7 +843,25 @@ def _coerce_delta_change(
 
 
 def _coerce_delta_changes(value: object, *, artifact: str) -> tuple[SymbolDeltaChange, ...]:
-    """Coerce value to tuple of SymbolDeltaChange."""
+    """Coerce value to tuple of SymbolDeltaChange.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce.
+    artifact : str
+        Artifact name for error messages.
+
+    Returns
+    -------
+    tuple[SymbolDeltaChange, ...]
+        Coerced tuple of symbol delta changes.
+
+    Raises
+    ------
+    ArtifactValidationError
+        If value is not a sequence of change mappings.
+    """
     if value is None:
         return ()
     if isinstance(value, (list, tuple)):
@@ -642,8 +895,10 @@ def symbol_index_from_json(raw: JsonPayload) -> SymbolIndexArtifacts:
 
     Raises
     ------
+    ArtifactDeserializationError
+        If the payload structure is invalid or rows cannot be constructed.
     ArtifactValidationError
-        If the payload is malformed or missing required fields.
+        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -852,8 +1107,10 @@ def symbol_delta_from_json(raw: JsonPayload) -> SymbolDeltaPayload:
 
     Raises
     ------
+    ArtifactDeserializationError
+        If the payload structure is invalid or construction fails.
     ArtifactValidationError
-        If the payload is malformed or missing required fields.
+        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -964,8 +1221,10 @@ def load_symbol_index(path: Path) -> SymbolIndexArtifacts:
 
     Raises
     ------
+    ArtifactDeserializationError
+        If the file cannot be read or parsed.
     ArtifactValidationError
-        If the file cannot be read or the payload is invalid.
+        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -998,8 +1257,8 @@ def dump_symbol_index(path: Path, model: SymbolIndexArtifacts) -> None:
 
     Raises
     ------
-    ArtifactValidationError
-        If the file cannot be written.
+    ArtifactSerializationError
+        If the file cannot be written or serialization fails.
 
     Examples
     --------
@@ -1041,8 +1300,10 @@ def load_symbol_delta(path: Path) -> SymbolDeltaPayload:
 
     Raises
     ------
+    ArtifactDeserializationError
+        If the file cannot be read or parsed.
     ArtifactValidationError
-        If the file cannot be read or the payload is invalid.
+        If field validation fails (raised by coercion helpers).
 
     Examples
     --------
@@ -1075,8 +1336,8 @@ def dump_symbol_delta(path: Path, model: SymbolDeltaPayload) -> None:
 
     Raises
     ------
-    ArtifactValidationError
-        If the file cannot be written.
+    ArtifactSerializationError
+        If the file cannot be written or serialization fails.
 
     Examples
     --------

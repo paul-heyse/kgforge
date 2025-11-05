@@ -79,27 +79,17 @@ class RepairArgs:
 
 
 def _collect_modules(root: Path) -> list[ModuleInfo]:
-    """Collect modules.
+    """Collect all modules under root directory.
 
     Parameters
     ----------
     root : Path
-        Description.
+        Root directory to scan for Python modules.
 
     Returns
     -------
     list[ModuleInfo]
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_modules(...)
+        List of module metadata objects.
     """
     modules: list[ModuleInfo] = []
     for py in sorted(root.rglob("*.py")):
@@ -110,54 +100,34 @@ def _collect_modules(root: Path) -> list[ModuleInfo]:
 
 
 def _load_tree(path: Path) -> ast.Module:
-    """Load tree.
+    """Parse Python file and return AST module.
 
     Parameters
     ----------
     path : Path
-        Description.
+        Python file to parse.
 
     Returns
     -------
     ast.Module
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _load_tree(...)
+        Parsed AST module.
     """
     text = path.read_text(encoding="utf-8")
     return ast.parse(text, filename=str(path))
 
 
 def _definition_lines(tree: ast.Module) -> dict[str, int]:
-    """Definition lines.
+    """Extract line numbers for top-level definitions.
 
     Parameters
     ----------
     tree : ast.Module
-        Description.
+        Module AST to extract definitions from.
 
     Returns
     -------
     dict[str, int]
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _definition_lines(...)
+        Dictionary mapping symbol names to their line numbers.
     """
     lines: dict[str, int] = {}
     for node in tree.body:
@@ -177,27 +147,17 @@ def _definition_lines(tree: ast.Module) -> dict[str, int]:
 
 
 def _docstring_end(tree: ast.Module) -> int | None:
-    """Docstring end.
+    """Return the ending line number of the module docstring.
 
     Parameters
     ----------
     tree : ast.Module
-        Description.
+        Module AST to inspect.
 
     Returns
     -------
     int | None
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _docstring_end(...)
+        Ending line number of docstring, or None if no docstring.
     """
     if not tree.body:
         return None
@@ -213,27 +173,17 @@ def _docstring_end(tree: ast.Module) -> int | None:
 
 
 def _all_assignment_end(tree: ast.Module) -> int | None:
-    """All assignment end.
+    """Return the ending line number of the __all__ assignment.
 
     Parameters
     ----------
     tree : ast.Module
-        Description.
+        Module AST to inspect.
 
     Returns
     -------
     int | None
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _all_assignment_end(...)
+        Ending line number of __all__ assignment, or None if not found.
     """
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -252,27 +202,18 @@ def _all_assignment_end(tree: ast.Module) -> int | None:
 
 
 def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
-    """Navmap assignment span.
+    """Return the line span of the __navmap__ assignment.
 
     Parameters
     ----------
     tree : ast.Module
-        Description.
+        Module AST to inspect.
 
     Returns
     -------
     tuple[int, int] | None
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _navmap_assignment_span(...)
+        Tuple of (start_line, end_line) for __navmap__ assignment,
+        or None if not found.
     """
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -291,54 +232,34 @@ def _navmap_assignment_span(tree: ast.Module) -> tuple[int, int] | None:
 
 
 def _serialize_navmap(navmap: Mapping[str, object]) -> list[str]:
-    """Serialize navmap.
+    """Serialize navmap dictionary to source code lines.
 
     Parameters
     ----------
     navmap : Mapping[str, object]
-        Description.
+        Navmap dictionary to serialize.
 
     Returns
     -------
     list[str]
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _serialize_navmap(...)
+        List of source code lines representing __navmap__ assignment.
     """
     literal = "__navmap__ = " + pformat(dict(navmap), width=88, sort_dicts=True)
     return literal.splitlines()
 
 
 def _ensure_navmap_structure(info: ModuleInfo) -> dict[str, object]:
-    """Ensure navmap structure.
+    """Ensure navmap has required structure with defaults applied.
 
     Parameters
     ----------
     info : ModuleInfo
-        Description.
+        Module metadata to build navmap structure from.
 
     Returns
     -------
     dict[str, object]
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _ensure_navmap_structure(...)
+        Normalized navmap dictionary.
     """
     raw_navmap = info.navmap_dict if info.navmap_dict else {}
     navmap = cast("dict[str, object]", dict(raw_navmap))
@@ -417,32 +338,35 @@ def repair_module(
 
 
 def repair_all(root: Path, *, execution: RepairExecutionConfig) -> list[RepairResult]:
-    """Repair every module under ``root`` and aggregate the results."""
+    """Repair every module under ``root`` and aggregate the results.
+
+    Parameters
+    ----------
+    root : Path
+        Root directory to scan for modules.
+    execution : RepairExecutionConfig
+        Execution configuration controlling repair behavior.
+
+    Returns
+    -------
+    list[RepairResult]
+        List of repair results for all modules found.
+    """
     return [repair_module(info, execution=execution) for info in _collect_modules(root)]
 
 
 def _parse_args(argv: list[str] | None = None) -> RepairArgs:
-    """Parse args.
+    """Parse CLI arguments for navmap repair utility.
 
     Parameters
     ----------
-    argv : list[str] | None
-        Description.
+    argv : list[str] | None, optional
+        Command-line arguments, by default None.
 
     Returns
     -------
-    argparse.Namespace
-        Description.
-
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _parse_args(...)
+    RepairArgs
+        Parsed arguments and configuration.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -488,6 +412,11 @@ def _build_json_envelope(
         Whether any issues were detected.
     execution : RepairExecutionConfig
         Execution configuration used for the repair.
+
+    Returns
+    -------
+    CliEnvelope
+        CLI envelope JSON payload.
     """
     builder = CliEnvelopeBuilder.create(
         command="repair_navmaps",
@@ -543,6 +472,11 @@ def _build_error_envelope(exc: Exception, duration: float) -> CliEnvelope:
         Exception that occurred.
     duration : float
         Operation duration in seconds.
+
+    Returns
+    -------
+    CliEnvelope
+        CLI envelope JSON payload with error details.
     """
     builder = CliEnvelopeBuilder.create(
         command="repair_navmaps", status="error", subcommand="repair"
@@ -567,25 +501,17 @@ def _build_error_envelope(exc: Exception, duration: float) -> CliEnvelope:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Compute main.
-
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    """Run navmap repair utility and return exit code.
 
     Parameters
     ----------
-    argv : List[str] | None
-        Optional parameter default ``None``. Description for ``argv``.
+    argv : list[str] | None, optional
+        Command-line arguments, by default None.
 
     Returns
     -------
     int
-        Description of return value.
-
-    Examples
-    --------
-    >>> from tools.navmap.repair_navmaps import main
-    >>> result = main()
-    >>> result  # doctest: +ELLIPSIS
+        Exit code (0 on success, 1 on errors).
     """
     start_time = time.monotonic()
     args = _parse_args(argv)
@@ -641,7 +567,18 @@ if __name__ == "__main__":
 
 
 def _collect_section_dicts(raw: object) -> list[dict[str, object]]:
-    """Return section dictionaries extracted from ``raw`` when possible."""
+    """Return section dictionaries extracted from ``raw`` when possible.
+
+    Parameters
+    ----------
+    raw : object
+        Value to extract sections from.
+
+    Returns
+    -------
+    list[dict[str, object]]
+        List of section dictionaries, empty if raw is not a list.
+    """
     if not isinstance(raw, list):
         return []
     return [entry for entry in raw if isinstance(entry, dict)]
@@ -650,13 +587,37 @@ def _collect_section_dicts(raw: object) -> list[dict[str, object]]:
 def _build_sections(
     sections: Iterable[dict[str, object]], exports: list[str]
 ) -> list[dict[str, object]]:
-    """Return the canonical ``sections`` payload with the public API section first."""
+    """Return the canonical ``sections`` payload with the public API section first.
+
+    Parameters
+    ----------
+    sections : Iterable[dict[str, object]]
+        Existing section dictionaries.
+    exports : list[str]
+        List of exported symbols.
+
+    Returns
+    -------
+    list[dict[str, object]]
+        Sections list with public-api section first.
+    """
     remaining = [section for section in sections if section.get("id") != "public-api"]
     return [{"id": "public-api", "symbols": exports}, *remaining]
 
 
 def _collect_top_level_meta(navmap: Mapping[str, object]) -> dict[str, object]:
-    """Return module metadata declared at the root of ``navmap``."""
+    """Return module metadata declared at the root of ``navmap``.
+
+    Parameters
+    ----------
+    navmap : Mapping[str, object]
+        Navmap dictionary to extract metadata from.
+
+    Returns
+    -------
+    dict[str, object]
+        Module metadata dictionary.
+    """
     return {
         key: value
         for key in ("owner", "stability", "since", "deprecated_in")
@@ -665,7 +626,18 @@ def _collect_top_level_meta(navmap: Mapping[str, object]) -> dict[str, object]:
 
 
 def _normalized_module_meta(navmap: dict[str, object]) -> dict[str, object]:
-    """Return module metadata after merging root-level defaults."""
+    """Return module metadata after merging root-level defaults.
+
+    Parameters
+    ----------
+    navmap : dict[str, object]
+        Navmap dictionary to normalize.
+
+    Returns
+    -------
+    dict[str, object]
+        Normalized module metadata dictionary.
+    """
     module_meta = _coerce_dict(navmap.get("module_meta"))
     top_level = _collect_top_level_meta(navmap)
     module_meta.update(top_level)
@@ -675,7 +647,18 @@ def _normalized_module_meta(navmap: dict[str, object]) -> dict[str, object]:
 
 
 def _normalized_symbols(raw: object) -> dict[str, SymbolMetadata]:
-    """Return symbol metadata dictionaries keyed by symbol name."""
+    """Return symbol metadata dictionaries keyed by symbol name.
+
+    Parameters
+    ----------
+    raw : object
+        Raw symbol metadata to normalize.
+
+    Returns
+    -------
+    dict[str, SymbolMetadata]
+        Dictionary mapping symbol names to their metadata.
+    """
     if not isinstance(raw, dict):
         return {}
     return {
@@ -697,7 +680,17 @@ def _apply_symbol_defaults(
     exports: Iterable[str],
     module_meta: Mapping[str, object],
 ) -> None:
-    """Ensure every exported symbol inherits module-level defaults."""
+    """Ensure every exported symbol inherits module-level defaults.
+
+    Parameters
+    ----------
+    symbols_meta : dict[str, SymbolMetadata]
+        Symbol metadata dictionary to update in-place.
+    exports : Iterable[str]
+        List of exported symbols.
+    module_meta : Mapping[str, object]
+        Module-level metadata defaults.
+    """
     owner_default = module_meta.get("owner", "@todo-owner")
     if not isinstance(owner_default, str) or not owner_default:
         owner_default = "@todo-owner"
@@ -725,7 +718,20 @@ def _apply_symbol_defaults(
 
 
 def _normalize_exports(value: object, fallback: Iterable[str]) -> list[str]:
-    """Return a deduplicated list of exports derived from ``value`` or ``fallback``."""
+    """Return a deduplicated list of exports derived from ``value`` or ``fallback``.
+
+    Parameters
+    ----------
+    value : object
+        Value to extract exports from.
+    fallback : Iterable[str]
+        Fallback exports if value is not usable.
+
+    Returns
+    -------
+    list[str]
+        Deduplicated list of export names.
+    """
     if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
         candidates = value
     else:
@@ -742,14 +748,31 @@ def _normalize_exports(value: object, fallback: Iterable[str]) -> list[str]:
 
 
 def _coerce_dict(value: object) -> dict[str, object]:
-    """Return ``value`` as a shallow ``dict[str, object]`` when possible."""
+    """Return ``value`` as a shallow ``dict[str, object]`` when possible.
+
+    Parameters
+    ----------
+    value : object
+        Value to coerce to dictionary.
+
+    Returns
+    -------
+    dict[str, object]
+        Dictionary with string keys, empty if value is not a dict.
+    """
     if isinstance(value, dict):
         return {k: v for k, v in value.items() if isinstance(k, str)}
     return {}
 
 
 def _empty_symbol_meta() -> SymbolMetadata:
-    """Return an empty symbol metadata mapping."""
+    """Return an empty symbol metadata mapping.
+
+    Returns
+    -------
+    SymbolMetadata
+        Empty dictionary for symbol metadata.
+    """
     return {}
 
 
@@ -758,7 +781,22 @@ def _collect_anchor_insertions(
     exports: Iterable[str],
     definition_lines: Mapping[str, int],
 ) -> tuple[list[tuple[int, str]], list[str]]:
-    """Return anchor insertion edits and messages for missing exports."""
+    """Return anchor insertion edits and messages for missing exports.
+
+    Parameters
+    ----------
+    info : ModuleInfo
+        Module metadata.
+    exports : Iterable[str]
+        List of exported symbols.
+    definition_lines : Mapping[str, int]
+        Mapping of symbol names to their line numbers.
+
+    Returns
+    -------
+    tuple[list[tuple[int, str]], list[str]]
+        Tuple of insertion edits (line_index, content) and messages.
+    """
     anchors = set(info.anchors)
     insertions: list[tuple[int, str]] = []
     messages: list[str] = []
@@ -775,7 +813,20 @@ def _collect_anchor_insertions(
 
 
 def _public_api_insertion(info: ModuleInfo, tree: ast.Module) -> tuple[int, str] | None:
-    """Return an insertion that ensures the public API section exists."""
+    """Return an insertion that ensures the public API section exists.
+
+    Parameters
+    ----------
+    info : ModuleInfo
+        Module metadata.
+    tree : ast.Module
+        Module AST.
+
+    Returns
+    -------
+    tuple[int, str] | None
+        Insertion tuple (line_index, content) if needed, None otherwise.
+    """
     if "public-api" in set(info.sections):
         return None
     doc_end = _docstring_end(tree) or 0
@@ -783,12 +834,36 @@ def _public_api_insertion(info: ModuleInfo, tree: ast.Module) -> tuple[int, str]
 
 
 def _insertion_index(entry: tuple[int, str]) -> int:
-    """Return the insertion index for sorting."""
+    """Return the insertion index for sorting.
+
+    Parameters
+    ----------
+    entry : tuple[int, str]
+        Insertion entry (line_index, content).
+
+    Returns
+    -------
+    int
+        Line index for sorting.
+    """
     return entry[0]
 
 
 def _apply_insertions(lines: list[str], insertions: list[tuple[int, str]]) -> bool:
-    """Apply ``insertions`` to ``lines`` preserving relative order."""
+    """Apply ``insertions`` to ``lines`` preserving relative order.
+
+    Parameters
+    ----------
+    lines : list[str]
+        Source lines to modify.
+    insertions : list[tuple[int, str]]
+        List of (line_index, content) insertions.
+
+    Returns
+    -------
+    bool
+        True if any insertions were applied, False otherwise.
+    """
     if not insertions:
         return False
     insertions.sort(key=_insertion_index)
@@ -804,7 +879,26 @@ def _sync_navmap_literal(
     lines: list[str],
     exports: Sequence[str],
 ) -> tuple[bool, list[str]]:
-    """Update the inline ``__navmap__`` literal when necessary."""
+    """Update the inline ``__navmap__`` literal when necessary.
+
+    Parameters
+    ----------
+    info : ModuleInfo
+        Module metadata.
+    tree : ast.Module
+        Module AST.
+    original_text : str
+        Original file contents.
+    lines : list[str]
+        Current file lines to modify.
+    exports : Sequence[str]
+        List of exported symbols.
+
+    Returns
+    -------
+    tuple[bool, list[str]]
+        Tuple of (changed, messages) indicating if navmap was updated.
+    """
     messages: list[str] = []
     if not exports:
         return False, messages

@@ -135,7 +135,18 @@ class SchemaProblemDetailsParams:
 
 
 def build_schema_problem_details(params: SchemaProblemDetailsParams) -> ProblemDetailsDict:
-    """Return Problem Details payload describing a schema validation failure."""
+    """Return Problem Details payload describing a schema validation failure.
+
+    Parameters
+    ----------
+    params : SchemaProblemDetailsParams
+        Schema validation error context.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     detail_attr = getattr(params.error, "message", None)
     detail = str(detail_attr) if detail_attr is not None else str(params.error)
     extras: dict[str, JsonValue] = {}
@@ -168,7 +179,18 @@ class ToolProblemDetailsParams:
 
 
 def build_tool_problem_details(params: ToolProblemDetailsParams) -> ProblemDetailsDict:
-    """Return a Problem Details payload describing a tooling subprocess failure."""
+    """Return a Problem Details payload describing a tooling subprocess failure.
+
+    Parameters
+    ----------
+    params : ToolProblemDetailsParams
+        Tool execution failure context.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     command_list = list(params.command)
     tool_name = Path(command_list[0]).name if command_list else "<unknown>"
     command_extension: JsonValue = [str(part) for part in command_list]
@@ -191,7 +213,20 @@ def tool_timeout_problem_details(
     *,
     timeout: float | None,
 ) -> ProblemDetailsDict:
-    """Return Problem Details describing a tooling timeout."""
+    """Return Problem Details describing a tooling timeout.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command that timed out.
+    timeout : float | None
+        Timeout duration in seconds.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     detail = (
         f"Command '{command[0]}' timed out after {timeout} seconds"
         if command and timeout is not None
@@ -219,7 +254,22 @@ def tool_missing_problem_details(
     executable: str,
     detail: str,
 ) -> ProblemDetailsDict:
-    """Return Problem Details describing a missing executable."""
+    """Return Problem Details describing a missing executable.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command that failed.
+    executable : str
+        Executable name that was not found.
+    detail : str
+        Detailed error message.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     return build_tool_problem_details(
         ToolProblemDetailsParams(
             category="tool-missing",
@@ -238,7 +288,22 @@ def tool_disallowed_problem_details(
     executable: Path,
     allowlist: Sequence[str],
 ) -> ProblemDetailsDict:
-    """Return Problem Details describing an allowlisted executable violation."""
+    """Return Problem Details describing an allowlisted executable violation.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command that was rejected.
+    executable : Path
+        Executable path that violated the allowlist.
+    allowlist : Sequence[str]
+        Configured allowlist patterns.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     return build_tool_problem_details(
         ToolProblemDetailsParams(
             category="tool-exec-disallowed",
@@ -265,7 +330,26 @@ def tool_digest_mismatch_problem_details(
     actual_digest: str | None,
     reason: str,
 ) -> ProblemDetailsDict:
-    """Return Problem Details describing an executable digest verification failure."""
+    """Return Problem Details describing an executable digest verification failure.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command that failed verification.
+    executable : Path
+        Executable path.
+    expected_digest : str
+        Expected SHA256 digest.
+    actual_digest : str | None
+        Actual digest if available.
+    reason : str
+        Failure reason.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     extensions: dict[str, JsonValue] = {
         "executable": str(executable),
         "expectedDigest": expected_digest,
@@ -294,7 +378,22 @@ def tool_failure_problem_details(
     returncode: int,
     detail: str,
 ) -> ProblemDetailsDict:
-    """Return Problem Details describing a non-zero tooling exit code."""
+    """Return Problem Details describing a non-zero tooling exit code.
+
+    Parameters
+    ----------
+    command : Sequence[str]
+        Command that failed.
+    returncode : int
+        Non-zero exit code.
+    detail : str
+        Detailed error message.
+
+    Returns
+    -------
+    ProblemDetailsDict
+        Problem Details payload.
+    """
     return build_tool_problem_details(
         ToolProblemDetailsParams(
             category="tool-failure",

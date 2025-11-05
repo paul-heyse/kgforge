@@ -86,7 +86,13 @@ class ModuleEntryPayload(TypedDict):
 
 
 def _utc_iso_now() -> str:
-    """Return the current UTC timestamp as an ISO-8601 string."""
+    """Return the current UTC timestamp as an ISO-8601 string.
+
+    Returns
+    -------
+    str
+        ISO-8601 formatted UTC timestamp string.
+    """
     return datetime.now(tz=UTC).isoformat()
 
 
@@ -157,7 +163,24 @@ def navmap_document_from_index(
     policy_version: str,
     link_mode: str,
 ) -> NavmapDocument:
-    """Build a :class:`NavmapDocument` from a :class:`NavIndex` instance."""
+    """Build a :class:`NavmapDocument` from a :class:`NavIndex` instance.
+
+    Parameters
+    ----------
+    index : NavIndex
+        Nav index to convert.
+    commit : str
+        Git commit hash.
+    policy_version : str
+        Policy version string.
+    link_mode : str
+        Link mode configuration.
+
+    Returns
+    -------
+    NavmapDocument
+        Navmap document instance.
+    """
     modules: dict[str, ModuleEntryDocument] = {}
     for name, entry in index.modules.items():
         section_models = entry.sections

@@ -39,7 +39,18 @@ if TYPE_CHECKING:
 
 
 def _coerce_provenance_payload(data: object) -> dict[str, str] | None:
-    """Return a typed DocFacts provenance payload when ``data`` is valid."""
+    """Return a typed DocFacts provenance payload when ``data`` is valid.
+
+    Parameters
+    ----------
+    data : object
+        Object to coerce to provenance payload.
+
+    Returns
+    -------
+    dict[str, str] or None
+        Provenance payload dictionary if data is valid, None otherwise.
+    """
     if not isinstance(data, Mapping):
         return None
     builder_version = data.get("builderVersion")
@@ -71,7 +82,18 @@ class DocfactsCoordinator:
     logger: LoggerLike = field(default_factory=lambda: logging.getLogger(__name__))
 
     def reconcile(self, docfacts: list[DocFact]) -> DocfactsResult:
-        """Reconcile DocFacts artifacts for the current run."""
+        """Reconcile DocFacts artifacts for the current run.
+
+        Parameters
+        ----------
+        docfacts : list[DocFact]
+            DocFact entries to reconcile.
+
+        Returns
+        -------
+        DocfactsResult
+            Result indicating success, violation, config error, or general error.
+        """
         provenance = self.build_provenance(self.config)
         document = build_docfacts_document(docfacts, provenance, DOCFACTS_VERSION)
         payload = build_docfacts_document_payload(cast("DocfactsDocumentLike", document))
@@ -80,7 +102,18 @@ class DocfactsCoordinator:
         return self._update_payload(document, payload)
 
     def _check_payload(self, payload: DocfactsDocumentPayload) -> DocfactsResult:
-        """Validate DocFacts payload against the stored baseline."""
+        """Validate DocFacts payload against the stored baseline.
+
+        Parameters
+        ----------
+        payload : DocfactsDocumentPayload
+            Payload to validate against baseline.
+
+        Returns
+        -------
+        DocfactsResult
+            Result indicating success or violation with drift details if applicable.
+        """
         if not DOCFACTS_PATH.exists():
             self.logger.error("DocFacts missing at %s", DOCFACTS_PATH)
             return DocfactsResult(status="config", message="docfacts missing")
@@ -136,7 +169,20 @@ class DocfactsCoordinator:
         document: DocfactsDocument,
         _payload: DocfactsDocumentPayload,
     ) -> DocfactsResult:
-        """Write DocFacts payload and validate when required."""
+        """Write DocFacts payload and validate when required.
+
+        Parameters
+        ----------
+        document : DocfactsDocument
+            Document to write.
+        _payload : DocfactsDocumentPayload
+            Payload representation (unused, kept for signature compatibility).
+
+        Returns
+        -------
+        DocfactsResult
+            Result indicating success.
+        """
         written_payload = write_docfacts(
             DOCFACTS_PATH,
             document,

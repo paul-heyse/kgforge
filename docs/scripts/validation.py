@@ -15,12 +15,34 @@ __all__: tuple[str, ...] = ("JsonPayload", "validate_against_schema")
 
 
 def _load_module() -> ModuleType:
-    """Import and return the lazily loaded validation module."""
+    """Import and return the lazily loaded validation module.
+
+    Returns
+    -------
+    ModuleType
+        Imported validation module.
+    """
     return import_module(MODULE_PATH)
 
 
 def __getattr__(name: str) -> object:
-    """Expose attributes from the lazily loaded validation module."""
+    """Expose attributes from the lazily loaded validation module.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to get.
+
+    Returns
+    -------
+    object
+        Attribute value from the validation module.
+
+    Raises
+    ------
+    AttributeError
+        If the attribute is not in __all__.
+    """
     if name in __all__:
         module = _load_module()
         return cast("object", getattr(module, name))
@@ -29,7 +51,13 @@ def __getattr__(name: str) -> object:
 
 
 def __dir__() -> list[str]:
-    """Return the set of exported attributes provided by the validation module."""
+    """Return the set of exported attributes provided by the validation module.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of exported attribute names.
+    """
     module = _load_module()
     exports_obj: object | None = getattr(module, "__all__", None)
     if isinstance(exports_obj, Iterable) and not isinstance(exports_obj, (str, bytes)):

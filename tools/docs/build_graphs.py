@@ -138,7 +138,13 @@ class PackageBuildConfig:
     verbose: bool
 
     def excludes_list(self) -> list[str]:
-        """Return a mutable copy of the package exclusion patterns."""
+        """Return a mutable copy of the package exclusion patterns.
+
+        Returns
+        -------
+        list[str]
+            List copy of exclusion patterns.
+        """
         return list(self.excludes)
 
 
@@ -157,7 +163,18 @@ yaml = _optional_import("yaml")
 
 
 def _require_pydot() -> ModuleType:
-    """Return the imported :mod:`pydot` module, raising if unavailable."""
+    """Return the imported :mod:`pydot` module, raising if unavailable.
+
+    Returns
+    -------
+    ModuleType
+        Imported pydot module.
+
+    Raises
+    ------
+    RuntimeError
+        If pydot module is not available.
+    """
     if pydot is None:
         message = "pydot is required for graph rendering"
         raise RuntimeError(message)
@@ -389,7 +406,18 @@ def find_top_packages() -> list[str]:
 
 
 def _rel(p: Path) -> str:
-    """Return ``p`` relative to the repository root when possible."""
+    """Return ``p`` relative to the repository root when possible.
+
+    Parameters
+    ----------
+    p : Path
+        Path to convert.
+
+    Returns
+    -------
+    str
+        Relative path string, or absolute path if not relative to root.
+    """
     try:
         return str(p.relative_to(ROOT))
     except ValueError:
@@ -526,7 +554,18 @@ def build_pyreverse_for_package(pkg: str, out_dir: Path, fmt: str) -> None:
 
 
 def _pkg_of(dotted: str) -> str:
-    """Return the top-level package segment from a dotted module path."""
+    """Return the top-level package segment from a dotted module path.
+
+    Parameters
+    ----------
+    dotted : str
+        Dotted module path.
+
+    Returns
+    -------
+    str
+        Top-level package name.
+    """
     head, *_rest = dotted.split(".", 1)
     if head == "src" and "." in dotted:
         return dotted.split(".", 2)[1]
@@ -534,7 +573,20 @@ def _pkg_of(dotted: str) -> str:
 
 
 def _module_label(node: object, data: Mapping[str, object]) -> str:
-    """Normalize the label associated with a pydeps node."""
+    """Normalize the label associated with a pydeps node.
+
+    Parameters
+    ----------
+    node : object
+        Graph node.
+    data : Mapping[str, object]
+        Node data dictionary.
+
+    Returns
+    -------
+    str
+        Normalized label string.
+    """
     label = data.get("label")
     if label is None:
         return str(node)
@@ -549,21 +601,12 @@ def _coerce_sequence(value: object) -> list[str]:
     Parameters
     ----------
     value : object
-        Description.
+        Value to coerce.
 
     Returns
     -------
     list[str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _coerce_sequence(...)
+        List of string items if value is a sequence, otherwise empty list.
     """
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         return [str(item) for item in value]
@@ -576,21 +619,12 @@ def _coerce_mapping(value: object) -> dict[str, str]:
     Parameters
     ----------
     value : object
-        Description.
+        Value to coerce.
 
     Returns
     -------
     dict[str, str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _coerce_mapping(...)
+        Dictionary mapping if value is a mapping, otherwise empty dict.
     """
     if isinstance(value, Mapping):
         return {str(key): str(val) for key, val in value.items()}
@@ -603,21 +637,12 @@ def _allow_outward_rule(layers: LayerConfig) -> bool:
     Parameters
     ----------
     layers : LayerConfig
-        Description.
+        Layer configuration.
 
     Returns
     -------
     bool
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _allow_outward_rule(...)
+        True if outward edges are allowed, False otherwise.
     """
     rules = layers.get("rules")
     if not isinstance(rules, Mapping):
@@ -631,23 +656,14 @@ def _env_int(name: str, default: int) -> int:
     Parameters
     ----------
     name : str
-        Description.
+        Environment variable name.
     default : int
-        Description.
+        Default value if variable is missing or invalid.
 
     Returns
     -------
     int
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _env_int(...)
+        Integer value from environment or default.
     """
     value = os.getenv(name)
     if value is None:
@@ -659,7 +675,13 @@ def _env_int(name: str, default: int) -> int:
 
 
 def _cycle_config() -> CycleConfig:
-    """Return cycle enumeration configuration derived from the environment."""
+    """Return cycle enumeration configuration derived from the environment.
+
+    Returns
+    -------
+    CycleConfig
+        Cycle configuration with limits and budget from environment.
+    """
     return CycleConfig(
         limit=_env_int(CYCLE_LIMIT_ENV, 0),
         length_bound=_env_int(CYCLE_LENGTH_ENV, 0),
@@ -668,7 +690,20 @@ def _cycle_config() -> CycleConfig:
 
 
 def _centrality_threshold(centrality: Mapping[str, float], fraction: float) -> float:
-    """Return the value at ``fraction`` of the sorted centrality scores."""
+    """Return the value at ``fraction`` of the sorted centrality scores.
+
+    Parameters
+    ----------
+    centrality : Mapping[str, float]
+        Centrality scores mapping.
+    fraction : float
+        Fraction of sorted values (0-1).
+
+    Returns
+    -------
+    float
+        Threshold value at the specified fraction.
+    """
     values = sorted(centrality.values())
     if not values:
         return 0.0
@@ -677,7 +712,18 @@ def _centrality_threshold(centrality: Mapping[str, float], fraction: float) -> f
 
 
 def _extract_cycle_edges(cycles: CycleList) -> set[tuple[str, str]]:
-    """Return directed edges participating in enumerated cycles."""
+    """Return directed edges participating in enumerated cycles.
+
+    Parameters
+    ----------
+    cycles : CycleList
+        List of cycle node lists.
+
+    Returns
+    -------
+    set[tuple[str, str]]
+        Set of (source, target) edge tuples.
+    """
     edges: set[tuple[str, str]] = set()
     for cycle in cycles:
         for idx, node in enumerate(cycle):
@@ -740,21 +786,12 @@ def _rank_map(order: Sequence[str]) -> dict[str, int]:
     Parameters
     ----------
     order : Sequence[str]
-        Description.
+        Layer names in order.
 
     Returns
     -------
     dict[str, int]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _rank_map(...)
+        Mapping of layer name to rank (0-indexed).
     """
     return {name: idx for idx, name in enumerate(order)}
 
@@ -771,27 +808,18 @@ def _prune_outward_edges(
     Parameters
     ----------
     graph : DiGraph
-        Description.
+        Graph to prune.
     pkg2layer : Mapping[str, str]
-        Description.
+        Package to layer mapping.
     layer_rank : Mapping[str, int]
-        Description.
-    allow_outward : bool, optional
-        Description. Keyword-only argument.
+        Layer rank mapping.
+    allow_outward : bool
+        Whether to allow outward edges.
 
     Returns
     -------
     DiGraph
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _prune_outward_edges(...)
+        Pruned graph.
     """
     if allow_outward:
         return graph.copy()
@@ -819,23 +847,14 @@ def _cycle_generator(graph: DiGraph, length_bound: int) -> Iterator[list[str]]:
     Parameters
     ----------
     graph : DiGraph
-        Description.
+        Graph to enumerate cycles in.
     length_bound : int
-        Description.
+        Maximum cycle length (0 for no bound).
 
     Returns
     -------
     Iterator[list[str]]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _cycle_generator(...)
+        Iterator over cycle node lists.
     """
     if nx is None:
         return iter(())
@@ -859,29 +878,20 @@ def _enumerate_cycles(
     Parameters
     ----------
     pruned_graph : DiGraph
-        Description.
+        Pruned graph to enumerate cycles in.
     cycle_limit : int
-        Description.
+        Maximum number of cycles to enumerate (0 for unlimited).
     length_bound : int
-        Description.
+        Maximum cycle length (0 for no bound).
     edge_budget : int
-        Description.
+        Maximum edges before skipping enumeration.
     scc_graph : DiGraph
-        Description.
+        Strongly connected components graph.
 
     Returns
     -------
     tuple[CycleList, bool, list[dict[str, object]]]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _enumerate_cycles(...)
+        (cycles, skipped, scc_summary) tuple.
     """
     generator = _cycle_generator(pruned_graph, length_bound)
     if cycle_limit > 0:
@@ -949,27 +959,18 @@ def _collect_layer_violations(
     Parameters
     ----------
     graph : DiGraph
-        Description.
+        Graph to check.
     layer_rank : Mapping[str, int]
-        Description.
+        Layer rank mapping.
     pkg2layer : Mapping[str, str]
-        Description.
-    allow_outward : bool, optional
-        Description. Keyword-only argument.
+        Package to layer mapping.
+    allow_outward : bool
+        Whether to allow outward edges.
 
     Returns
     -------
     CycleList
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _collect_layer_violations(...)
+        List of violation records.
     """
     if allow_outward:
         return []
@@ -994,21 +995,12 @@ def _degree_centrality(graph: DiGraph) -> dict[str, float]:
     Parameters
     ----------
     graph : DiGraph
-        Description.
+        Graph to compute centrality for.
 
     Returns
     -------
     dict[str, float]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _degree_centrality(...)
+        Node to centrality score mapping (empty if networkx unavailable or graph empty).
     """
     if nx is None or graph.number_of_nodes() == 0:
         return {}
@@ -1021,21 +1013,12 @@ def _sequence_of_sequences(value: object) -> list[list[str]]:
     Parameters
     ----------
     value : object
-        Description.
+        Value to coerce.
 
     Returns
     -------
     list[list[str]]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _sequence_of_sequences(...)
+        List of string lists (empty if value is not a sequence of sequences).
     """
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         return []
@@ -1052,21 +1035,12 @@ def _edge_from_violation(record: Sequence[str]) -> tuple[str, str] | None:
     Parameters
     ----------
     record : Sequence[str]
-        Description.
+        Violation record.
 
     Returns
     -------
     tuple[str, str] | None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _edge_from_violation(...)
+        (source, target) edge tuple if parseable, otherwise None.
     """
     if not record:
         return None
@@ -1136,7 +1110,23 @@ def build_global_pydeps(dot_out: Path, excludes: list[str], max_bacon: int) -> N
 
 
 def collapse_to_packages(dot_path: Path) -> DiGraph:
-    """Load a pydeps graph and collapse modules into package-level edges."""
+    """Load a pydeps graph and collapse modules into package-level edges.
+
+    Parameters
+    ----------
+    dot_path : Path
+        Path to DOT file.
+
+    Returns
+    -------
+    DiGraph
+        Collapsed graph with package-level nodes and weighted edges.
+
+    Raises
+    ------
+    RuntimeError
+        If networkx or pydot are not available.
+    """
     if nx is None or pydot is None:
         message = "networkx and pydot are required to collapse graphs"
         raise RuntimeError(message)
@@ -1165,7 +1155,25 @@ def collapse_to_packages(dot_path: Path) -> DiGraph:
 
 
 def analyze_graph(graph: DiGraph, layers: LayerConfig) -> AnalysisResult:
-    """Analyse a collapsed dependency graph and surface policy signals."""
+    """Analyse a collapsed dependency graph and surface policy signals.
+
+    Parameters
+    ----------
+    graph : DiGraph
+        Collapsed package dependency graph.
+    layers : LayerConfig
+        Layer configuration mapping.
+
+    Returns
+    -------
+    AnalysisResult
+        Dictionary with cycle analysis, SCC summary, and policy signals.
+
+    Raises
+    ------
+    RuntimeError
+        If networkx is not available.
+    """
     if nx is None:
         message = "networkx is required for graph analysis"
         raise RuntimeError(message)
@@ -1220,21 +1228,16 @@ def style_and_render(
 
     Parameters
     ----------
-    graph : networkx.DiGraph
+    graph : DiGraph
         Directed dependency graph collapsed to packages.
-    layers : Mapping[str, object]
+    layers : LayerConfig
         Layer configuration describing allowed dependencies.
     analysis : Mapping[str, object]
         Precomputed metrics produced by :func:`analyze_graph`.
     out_svg : Path
         Destination path for the rendered image.
     fmt : str, optional
-        Rendering format (``"svg"`` or ``"png"``).
-
-    Raises
-    ------
-    RuntimeError
-        If the required rendering dependencies are unavailable.
+        Rendering format (``"svg"`` or ``"png"``) (default: "svg").
     """
     pydot_module = _require_pydot()
     pkg2layer = _coerce_mapping(layers.get("packages"))
@@ -1378,7 +1381,18 @@ def package_snapshot_digest(pkg: str) -> str:
 
 
 def last_tree_commit(pkg: str) -> str:
-    """Return the content-based cache key for ``pkg``."""
+    """Return the content-based cache key for ``pkg``.
+
+    Parameters
+    ----------
+    pkg : str
+        Package name.
+
+    Returns
+    -------
+    str
+        Tree hash for the package.
+    """
     return package_snapshot_digest(pkg)
 
 
@@ -1416,23 +1430,14 @@ def _final_output_paths(pkg: str, fmt: str) -> tuple[Path, Path]:
     Parameters
     ----------
     pkg : str
-        Description.
+        Package name.
     fmt : str
-        Description.
+        Output format.
 
     Returns
     -------
     tuple[Path, Path]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _final_output_paths(...)
+        (imports_path, uml_path) tuple.
     """
     return OUT / f"{pkg}-imports.{fmt}", OUT / f"{pkg}-uml.{fmt}"
 
@@ -1450,29 +1455,20 @@ def _maybe_restore_from_cache(
     Parameters
     ----------
     pkg : str
-        Description.
+        Package name.
     fmt : str
-        Description.
+        Output format.
     cache_dir : Path
-        Description.
-    use_cache : bool, optional
-        Description. Keyword-only argument.
-    verbose : bool, optional
-        Description. Keyword-only argument.
+        Cache directory.
+    use_cache : bool
+        Whether to use cache.
+    verbose : bool
+        Verbose logging flag.
 
     Returns
     -------
     CacheContext
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _maybe_restore_from_cache(...)
+        Cache context with usage status.
     """
     imports_out, uml_out = _final_output_paths(pkg, fmt)
     if not use_cache:
@@ -1501,23 +1497,14 @@ def _prepare_staging(pkg: str, fmt: str) -> StagePaths:
     Parameters
     ----------
     pkg : str
-        Description.
+        Package name.
     fmt : str
-        Description.
+        Output format.
 
     Returns
     -------
     StagePaths
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _prepare_staging(...)
+        Staging paths configuration.
     """
     imports_out, uml_out = _final_output_paths(pkg, fmt)
     staging_dir = Path(tempfile.mkdtemp(prefix=f"{pkg}-"))
@@ -1542,29 +1529,20 @@ def _build_artifacts(
     Parameters
     ----------
     pkg : str
-        Description.
+        Package name.
     fmt : str
-        Description.
+        Output format.
     excludes : list[str]
-        Description.
+        Exclusion patterns.
     max_bacon : int
-        Description.
+        Maximum bacon number.
     stage : StagePaths
-        Description.
+        Staging paths.
 
     Returns
     -------
     tuple[bool, bool]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _build_artifacts(...)
+        (pydeps_ok, pyrev_ok) success flags.
     """
     pydeps_ok = True
     try:
@@ -1589,21 +1567,12 @@ def _promote_outputs(stage: StagePaths) -> bool:
     Parameters
     ----------
     stage : StagePaths
-        Description.
+        Staging paths.
 
     Returns
     -------
     bool
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _promote_outputs(...)
+        True if promotion succeeded, False otherwise.
     """
     stage.final_imports.parent.mkdir(parents=True, exist_ok=True)
     stage.final_uml.parent.mkdir(parents=True, exist_ok=True)
@@ -1628,27 +1597,13 @@ def _update_cache(
     Parameters
     ----------
     pkg : str
-        Description.
+        Package name.
     cache_ctx : CacheContext
-        Description.
+        Cache context.
     stage : StagePaths
-        Description.
-    verbose : bool, optional
-        Description. Keyword-only argument.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _update_cache(...)
+        Staging paths.
+    verbose : bool
+        Verbose logging flag.
     """
     if cache_ctx.bucket is None or cache_ctx.tree_hash is None:
         return
@@ -1731,19 +1686,9 @@ def build_one_package(pkg: str, config: PackageBuildConfig) -> tuple[str, bool, 
 def _validate_runtime_dependencies() -> None:
     """Validate runtime dependencies.
 
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _validate_runtime_dependencies(...)
+    Notes
+    -----
+    Exits with code 2 if dependencies are missing.
     """
     missing = []
     if pydot is None:
@@ -1772,21 +1717,12 @@ def _resolve_packages(args: argparse.Namespace) -> list[str]:
     Parameters
     ----------
     args : argparse.Namespace
-        Description.
+        Parsed arguments.
 
     Returns
     -------
     list[str]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _resolve_packages(...)
+        List of package names.
     """
     if args.packages:
         return [s.strip() for s in args.packages.split(",") if s.strip()]
@@ -1799,21 +1735,17 @@ def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
     Parameters
     ----------
     args : argparse.Namespace
-        Description.
+        Parsed arguments.
 
     Returns
     -------
     tuple[Path, bool]
-        Description.
+        (cache_dir, use_cache) tuple.
 
     Raises
     ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _prepare_cache(...)
+    ValidationError
+        If cache directory exists but is not a directory.
     """
     cache_dir = resolve_path(args.cache_dir, strict=False)
     if cache_dir.exists() and not cache_dir.is_dir():
@@ -1834,28 +1766,14 @@ def _log_configuration(
 
     Parameters
     ----------
-    verbose : bool, optional
-        Description. Keyword-only argument.
+    verbose : bool
+        Enable verbose logging.
     packages : Sequence[str]
-        Description.
+        Package names.
     cache_dir : Path
-        Description.
-    use_cache : bool, optional
-        Description. Keyword-only argument.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _log_configuration(...)
+        Cache directory path.
+    use_cache : bool
+        Whether to use cache.
     """
     if not verbose:
         return
@@ -1873,25 +1791,16 @@ def _build_per_package_graphs(
     Parameters
     ----------
     packages : Sequence[str]
-        Description.
+        Package names to build.
     config : PackageBuildConfig
-        Description.
+        Build configuration.
     max_workers : int | None
-        Description.
+        Maximum worker processes.
 
     Returns
     -------
     list[tuple[str, bool, bool, bool]]
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _build_per_package_graphs(...)
+        List of (pkg, used_cache, pydeps_ok, pyrev_ok) tuples.
     """
     worker_count = max_workers or os.cpu_count() or 1
     results: list[tuple[str, bool, bool, bool]] = []
@@ -1920,21 +1829,11 @@ def _report_package_failures(results: Sequence[tuple[str, bool, bool, bool]]) ->
     Parameters
     ----------
     results : Sequence[tuple[str, bool, bool, bool]]
-        Description.
+        Build results tuples.
 
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _report_package_failures(...)
+    Notes
+    -----
+    Exits with code 3 if failures are detected.
     """
     failed = [(pkg, ok1, ok2) for pkg, _, ok1, ok2 in results if not (ok1 and ok2)]
     if not failed:
@@ -1956,26 +1855,17 @@ def _build_global_graph(_fmt: str, excludes: list[str], max_bacon: int) -> DiGra
 
     Parameters
     ----------
-    fmt : str
-        Description.
+    _fmt : str
+        Format (unused).
     excludes : list[str]
-        Description.
+        Exclusion patterns.
     max_bacon : int
-        Description.
+        Maximum bacon number.
 
     Returns
     -------
     DiGraph
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _build_global_graph(...)
+        Collapsed global dependency graph.
     """
     dot_path = OUT / "subsystems.dot"
     build_global_pydeps(dot_path, excludes, max_bacon)
@@ -1992,21 +1882,17 @@ def _load_layers_config(path: str) -> LayerConfig:
     Parameters
     ----------
     path : str
-        Description.
+        Config file path.
 
     Returns
     -------
     LayerConfig
-        Description.
+        Layer configuration mapping.
 
     Raises
     ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _load_layers_config(...)
+    ValidationError
+        If config file is invalid or missing.
     """
     file_path = resolve_path(path, strict=False)
     if yaml is None:
@@ -2034,21 +1920,17 @@ def _load_allowlist(path: str) -> dict[str, object]:
     Parameters
     ----------
     path : str
-        Description.
+        Allowlist file path.
 
     Returns
     -------
     dict[str, object]
-        Description.
+        Allowlist dictionary (empty if file missing).
 
     Raises
     ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _load_allowlist(...)
+    ValidationError
+        If allowlist file is invalid.
     """
     file_path = resolve_path(path, strict=False)
     if not file_path.exists():
@@ -2074,21 +1956,12 @@ def _render_summary_markdown(meta: Mapping[str, object]) -> str:
     Parameters
     ----------
     meta : Mapping[str, object]
-        Description.
+        Analysis metadata.
 
     Returns
     -------
     str
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _render_summary_markdown(...)
+        Markdown summary string.
     """
     lines = ["# Subsystem Graph Metadata", ""]
     skipped = bool(meta.get("cycle_enumeration_skipped"))
@@ -2123,27 +1996,13 @@ def _write_global_artifacts(
     Parameters
     ----------
     graph : DiGraph
-        Description.
+        Collapsed graph.
     layers : LayerConfig
-        Description.
+        Layer configuration.
     fmt : str
-        Description.
+        Output format.
     analysis : AnalysisResult
-        Description.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _write_global_artifacts(...)
+        Analysis results.
     """
     style_and_render(graph, layers, analysis, OUT / f"subsystems.{fmt}", fmt=fmt)
     meta: AnalysisResult = {
@@ -2172,30 +2031,16 @@ def _log_run_summary(
 
     Parameters
     ----------
-    use_cache : bool, optional
-        Description. Keyword-only argument.
+    use_cache : bool
+        Whether cache was used.
     cache_dir : Path
-        Description.
+        Cache directory path.
     results : Sequence[tuple[str, bool, bool, bool]]
-        Description.
+        Build results.
     duration_s : float
-        Description.
-    verbose : bool, optional
-        Description. Keyword-only argument.
-
-    Returns
-    -------
-    None
-        Description.
-
-    Raises
-    ------
-    Exception
-        Description.
-
-    Examples
-    --------
-    >>> _log_run_summary(...)
+        Duration in seconds.
+    verbose : bool
+        Enable verbose logging.
     """
     built = sum(1 for _, used_cache, _, _ in results if not used_cache)
     cached = sum(1 for _, used_cache, _, _ in results if used_cache)

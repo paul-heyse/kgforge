@@ -65,7 +65,18 @@ def migrate_navmaps(
 
 
 def _parse_args(argv: list[str] | None = None) -> MigrateArgs:
-    """Parse CLI arguments for the navmap migration utility."""
+    """Parse CLI arguments for the navmap migration utility.
+
+    Parameters
+    ----------
+    argv : list[str] | None, optional
+        Command-line arguments, by default None.
+
+    Returns
+    -------
+    MigrateArgs
+        Parsed arguments and configuration.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output",

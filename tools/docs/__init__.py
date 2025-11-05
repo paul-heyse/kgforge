@@ -20,7 +20,18 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 def _coerce_argv(argv: Sequence[str] | None) -> list[str] | None:
-    """Return a list copy of ``argv`` or ``None`` when no arguments are provided."""
+    """Return a list copy of ``argv`` or ``None`` when no arguments are provided.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None
+        Optional sequence of strings to convert.
+
+    Returns
+    -------
+    list[str] | None
+        List copy of ``argv`` if provided, otherwise ``None``.
+    """
     return list(argv) if argv is not None else None
 
 

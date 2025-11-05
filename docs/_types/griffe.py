@@ -161,7 +161,18 @@ class _GriffeLoaderAdapter:
         self._loader = griffe_loader
 
     def load(self, package: str) -> GriffeNode:
-        """Delegate to the Griffe loader."""
+        """Delegate to the Griffe loader.
+
+        Parameters
+        ----------
+        package : str
+            Package name to load.
+
+        Returns
+        -------
+        GriffeNode
+            Root node of the module graph.
+        """
         return self._loader.load(package)
 
 
@@ -170,7 +181,18 @@ class _DefaultMemberIterator:
 
     @staticmethod
     def iter_members(node: GriffeNode) -> Iterator[GriffeNode]:
-        """Yield direct members of the node."""
+        """Yield direct members of the node.
+
+        Parameters
+        ----------
+        node : GriffeNode
+            Node to iterate members from.
+
+        Yields
+        ------
+        GriffeNode
+            Direct child nodes.
+        """
         yield from node.members.values()
 
 

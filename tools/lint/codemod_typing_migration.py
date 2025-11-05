@@ -28,7 +28,18 @@ class TypingFacadeMigrator(cst.CSTTransformer):
         self.modified = False
 
     def _transform_import_from(self, node: cst.ImportFrom) -> cst.ImportFrom | cst.RemovalSentinel:
-        """Return an updated import replacing private docs types with facades."""
+        """Return an updated import replacing private docs types with facades.
+
+        Parameters
+        ----------
+        node : cst.ImportFrom
+            ImportFrom node to transform.
+
+        Returns
+        -------
+        cst.ImportFrom | cst.RemovalSentinel
+            Transformed node or removal sentinel if unchanged.
+        """
         if isinstance(node.module, cst.Attribute):
             module_parts = self._get_module_parts(node.module)
             if (
@@ -49,7 +60,18 @@ class TypingFacadeMigrator(cst.CSTTransformer):
         return node
 
     def _transform_call(self, node: cst.Call) -> cst.Call:
-        """Convert resolve_* shim invocations to gate_import calls."""
+        """Convert resolve_* shim invocations to gate_import calls.
+
+        Parameters
+        ----------
+        node : cst.Call
+            Call node to transform.
+
+        Returns
+        -------
+        cst.Call
+            Transformed call node with gate_import.
+        """
         shim_map = {
             "resolve_numpy": ("gate_import", "numpy", "numpy array operations"),
             "resolve_fastapi": ("gate_import", "fastapi", "FastAPI integration"),
@@ -71,7 +93,18 @@ class TypingFacadeMigrator(cst.CSTTransformer):
 
     @staticmethod
     def _get_module_parts(node: cst.BaseExpression) -> list[str]:
-        """Extract module path as list of parts."""
+        """Extract module path as list of parts.
+
+        Parameters
+        ----------
+        node : cst.BaseExpression
+            Module expression node to parse.
+
+        Returns
+        -------
+        list[str]
+            List of module name parts.
+        """
         parts: list[str] = []
         current = node
         while isinstance(current, cst.Attribute):
@@ -83,7 +116,18 @@ class TypingFacadeMigrator(cst.CSTTransformer):
 
     @staticmethod
     def _build_module(parts: list[str]) -> cst.BaseExpression:
-        """Build a module expression from parts."""
+        """Build a module expression from parts.
+
+        Parameters
+        ----------
+        parts : list[str]
+            List of module name parts.
+
+        Returns
+        -------
+        cst.BaseExpression
+            Constructed module expression node.
+        """
         result: cst.BaseExpression = cst.Name(parts[0])
         for part in parts[1:]:
             result = cst.Attribute(value=result, attr=cst.Name(part))
@@ -93,13 +137,39 @@ class TypingFacadeMigrator(cst.CSTTransformer):
     def leave_ImportFrom(
         self, original_node: cst.ImportFrom, updated_node: cst.ImportFrom
     ) -> cst.ImportFrom | cst.RemovalSentinel | cst.FlattenSentinel[cst.BaseSmallStatement]:
-        """Rewrite ``ImportFrom`` statements using docstring façade rules."""
+        """Rewrite ``ImportFrom`` statements using docstring façade rules.
+
+        Parameters
+        ----------
+        original_node : cst.ImportFrom
+            Original node before transformation.
+        updated_node : cst.ImportFrom
+            Updated node after generic visitor processing.
+
+        Returns
+        -------
+        cst.ImportFrom | cst.RemovalSentinel | cst.FlattenSentinel[cst.BaseSmallStatement]
+            Transformed import node or sentinel.
+        """
         del original_node
         return self._transform_import_from(updated_node)
 
     @override
     def leave_Call(self, original_node: cst.Call, updated_node: cst.Call) -> cst.Call:
-        """Rewrite shim calls such as ``resolve_numpy`` to ``gate_import``."""
+        """Rewrite shim calls such as ``resolve_numpy`` to ``gate_import``.
+
+        Parameters
+        ----------
+        original_node : cst.Call
+            Original call node before transformation.
+        updated_node : cst.Call
+            Updated call node after generic visitor processing.
+
+        Returns
+        -------
+        cst.Call
+            Transformed call node with gate_import.
+        """
         del original_node
         return self._transform_call(updated_node)
 

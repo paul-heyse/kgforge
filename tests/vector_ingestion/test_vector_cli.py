@@ -25,7 +25,22 @@ def _filter_index_records(
     level: str | None = None,
     message: str | None = None,
 ) -> list[logging.LogRecord]:
-    """Return records emitted by the FAISS index operation."""
+    """Return records emitted by the FAISS index operation.
+
+    Parameters
+    ----------
+    records : list[logging.LogRecord]
+        Log records to filter.
+    level : str | None, optional
+        Optional log level filter.
+    message : str | None, optional
+        Optional message filter.
+
+    Returns
+    -------
+    list[logging.LogRecord]
+        Filtered log records.
+    """
     filtered: list[logging.LogRecord] = []
     for record in records:
         operation = cast("str | None", getattr(record, "operation", None))
@@ -40,7 +55,23 @@ def _filter_index_records(
 
 
 def _parse_problem(stderr: str) -> dict[str, object]:
-    """Extract the Problem Details JSON object from CLI stderr."""
+    """Extract the Problem Details JSON object from CLI stderr.
+
+    Parameters
+    ----------
+    stderr : str
+        Standard error output from CLI.
+
+    Returns
+    -------
+    dict[str, object]
+        Parsed Problem Details dictionary.
+
+    Raises
+    ------
+    AssertionError
+        If Problem Details JSON not found in stderr.
+    """
     lines = [line for line in stderr.splitlines() if line.strip()]
     json_line = next((line for line in reversed(lines) if line.strip().startswith("{")), "")
     if not json_line:

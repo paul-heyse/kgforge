@@ -279,7 +279,13 @@ class TestMetricsOnErrorPaths:
 
     @staticmethod
     def _simulate_value_error() -> None:
-        """Raise ValueError for testing."""
+        """Raise ValueError for testing.
+
+        Raises
+        ------
+        ValueError
+            Always raised with a test message.
+        """
         msg = "Test error"
         raise ValueError(msg) from None
 

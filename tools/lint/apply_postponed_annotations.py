@@ -45,7 +45,18 @@ from tools._shared.logging import get_logger
 
 
 def should_skip_file(path: Path) -> bool:
-    """Determine if a file should be skipped."""
+    """Determine if a file should be skipped.
+
+    Parameters
+    ----------
+    path : Path
+        File path to check.
+
+    Returns
+    -------
+    bool
+        True if the file should be skipped (hidden or cache directories).
+    """
     # Skip __pycache__, .git, .venv, etc.
     if any(part.startswith(".") for part in path.parts):
         return True
@@ -53,7 +64,18 @@ def should_skip_file(path: Path) -> bool:
 
 
 def has_postponed_annotations(content: str) -> bool:
-    """Check if file already has postponed annotations import."""
+    """Check if file already has postponed annotations import.
+
+    Parameters
+    ----------
+    content : str
+        File content to check.
+
+    Returns
+    -------
+    bool
+        True if the content contains the postponed annotations import.
+    """
     return "from __future__ import annotations" in content
 
 
@@ -166,19 +188,54 @@ class RewritePlan:
 
 
 def _parse_rewrite_config(path: Path, *, check_only: bool) -> RewriteConfig:
-    """Create rewrite configuration for ``path``."""
+    """Create rewrite configuration for ``path``.
+
+    Parameters
+    ----------
+    path : Path
+        File path to configure.
+    check_only : bool
+        Whether to only check without modifying files.
+
+    Returns
+    -------
+    RewriteConfig
+        Configuration for the rewrite operation.
+    """
     return RewriteConfig(path=path, check_only=check_only)
 
 
 def _update_imports(config: RewriteConfig) -> RewritePlan:
-    """Compute rewritten content for the provided configuration."""
+    """Compute rewritten content for the provided configuration.
+
+    Parameters
+    ----------
+    config : RewriteConfig
+        Configuration for the rewrite operation.
+
+    Returns
+    -------
+    RewritePlan
+        Plan containing original and updated content.
+    """
     original = config.path.read_text(encoding=config.encoding)
     updated = apply_postponed_annotations(original)
     return RewritePlan(config=config, original=original, updated=updated)
 
 
 def _write_back(plan: RewritePlan) -> bool:
-    """Persist rewritten content when changes are detected."""
+    """Persist rewritten content when changes are detected.
+
+    Parameters
+    ----------
+    plan : RewritePlan
+        Plan containing changes to persist.
+
+    Returns
+    -------
+    bool
+        True if changes were detected (and written if not check-only).
+    """
     if not plan.has_changes:
         return False
     if plan.config.check_only:
@@ -188,14 +245,38 @@ def _write_back(plan: RewritePlan) -> bool:
 
 
 def rewrite_file(path: Path, *, check_only: bool) -> bool:
-    """Rewrite a Python file and return True when the content changes."""
+    """Rewrite a Python file and return True when the content changes.
+
+    Parameters
+    ----------
+    path : Path
+        File path to rewrite.
+    check_only : bool
+        Whether to only check without modifying files.
+
+    Returns
+    -------
+    bool
+        True if the file content would change (or was changed).
+    """
     config = _parse_rewrite_config(path, check_only=check_only)
     plan = _update_imports(config)
     return _write_back(plan)
 
 
 def _normalize_directories(raw_directories: Sequence[Path]) -> list[Path]:
-    """Normalize user-provided directories, defaulting to ``src/``."""
+    """Normalize user-provided directories, defaulting to ``src/``.
+
+    Parameters
+    ----------
+    raw_directories : Sequence[Path]
+        User-provided directory paths.
+
+    Returns
+    -------
+    list[Path]
+        Normalized list of directories, or [Path("src")] if empty.
+    """
     return list(raw_directories) if raw_directories else [Path("src")]
 
 
@@ -205,7 +286,22 @@ def _aggregate_results(
     check_only: bool,
     logger: LoggerAdapter,
 ) -> tuple[int, int, int]:
-    """Process each directory and return aggregate statistics."""
+    """Process each directory and return aggregate statistics.
+
+    Parameters
+    ----------
+    directories : Sequence[Path]
+        Directories to process.
+    check_only : bool
+        Whether to only check without modifying files.
+    logger : LoggerAdapter
+        Logger instance for reporting.
+
+    Returns
+    -------
+    tuple[int, int, int]
+        (files_processed, files_modified, errors) statistics.
+    """
     total_processed = 0
     total_modified = 0
     total_errors = 0

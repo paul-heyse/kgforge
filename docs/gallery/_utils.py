@@ -31,7 +31,13 @@ from __future__ import annotations
 
 
 def tiny_corpus() -> list[dict[str, str]]:
-    """Return a tiny in-memory corpus shared across gallery examples."""
+    """Return a tiny in-memory corpus shared across gallery examples.
+
+    Returns
+    -------
+    list[dict[str, str]]
+        List of tiny documents with id and text fields.
+    """
     return [
         {"id": "1", "text": "cats like naps"},
         {"id": "2", "text": "dogs enjoy walks"},

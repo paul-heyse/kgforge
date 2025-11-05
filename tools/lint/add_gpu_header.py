@@ -52,7 +52,18 @@ GPU_MODULE_FULL: set[str] = {
 
 
 def contains_gpu_import(source: str) -> bool:
-    """Return True when the source imports a known GPU module."""
+    """Return True when the source imports a known GPU module.
+
+    Parameters
+    ----------
+    source : str
+        Source code to check for GPU imports.
+
+    Returns
+    -------
+    bool
+        True if the source contains imports from known GPU modules.
+    """
     for match in GPU_IMPORT_RE.finditer(source):
         mod_from = match.group("mod_from")
         mod_imp = match.group("mod_imp")
@@ -69,12 +80,34 @@ def contains_gpu_import(source: str) -> bool:
 
 
 def has_header(source: str) -> bool:
-    """Return True when the GPU header already exists."""
+    """Return True when the GPU header already exists.
+
+    Parameters
+    ----------
+    source : str
+        Source code to check for GPU header.
+
+    Returns
+    -------
+    bool
+        True if the source contains both pytest.mark.gpu and HAS_GPU_STACK.
+    """
     return "pytest.mark.gpu" in source and "HAS_GPU_STACK" in source
 
 
 def insert_header(source: str) -> str:
-    """Insert the standard header near the top of the file."""
+    """Insert the standard header near the top of the file.
+
+    Parameters
+    ----------
+    source : str
+        Source code to insert header into.
+
+    Returns
+    -------
+    str
+        Source code with GPU header inserted after shebang/encoding/docstring.
+    """
     lines = source.splitlines(keepends=True)
     index = 0
     while index < len(lines):
@@ -91,7 +124,13 @@ def insert_header(source: str) -> str:
 
 
 def main() -> int:
-    """Apply the GPU header to any matching test files."""
+    """Apply the GPU header to any matching test files.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success).
+    """
     changed = 0
     root_conftest = (TESTS_ROOT / "conftest.py").resolve()
     for path in TESTS_ROOT.rglob("*.py"):

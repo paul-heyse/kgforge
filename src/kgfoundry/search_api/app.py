@@ -21,10 +21,27 @@ if hasattr(_module, "__path__"):
 
 
 def __getattr__(name: str) -> object:
-    """Delegate dynamic attribute lookup to the implementation module."""
+    """Delegate dynamic attribute lookup to the implementation module.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to look up.
+
+    Returns
+    -------
+    object
+        Attribute value from the implementation module.
+    """
     return namespace_getattr(_module, name)
 
 
 def __dir__() -> list[str]:
-    """Return the combined attribute listing."""
+    """Return the combined attribute listing.
+
+    Returns
+    -------
+    list[str]
+        Combined list of attributes from the module and exports.
+    """
     return namespace_dir(_module, _EXPORTS)

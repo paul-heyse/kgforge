@@ -23,10 +23,10 @@ def build_symbol_index(*, config: DocsSymbolIndexConfig) -> dict[str, object]:
     config : DocsSymbolIndexConfig
         Typed configuration controlling symbol index build behavior.
 
-    Returns
-    -------
-    dict[str, object]
-        Symbol index data structure containing documented symbols.
+    Raises
+    ------
+    NotImplementedError
+        This function is a placeholder for Phase 3.2 implementation.
 
     Examples
     --------

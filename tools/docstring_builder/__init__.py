@@ -42,7 +42,18 @@ CliMain = Callable[[list[str] | None], int]
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Dispatch to the CLI entry point without eagerly importing it."""
+    """Dispatch to the CLI entry point without eagerly importing it.
+
+    Parameters
+    ----------
+    argv : list[str] or None, optional
+        Command-line arguments. If None, uses sys.argv.
+
+    Returns
+    -------
+    int
+        Exit code (0 for success, non-zero for errors).
+    """
     cli_module = import_module("tools.docstring_builder.cli")
     cli_main = cast("CliMain", cli_module.main)
     return cli_main(argv)

@@ -422,7 +422,10 @@ def build_faceted_search_options(
         If any facet key is not in the allow-list.
     """
     # Validate facet keys against allow-list
-    _validate_facets(facets)
+    try:
+        _validate_facets(facets)
+    except AgentCatalogSearchError:
+        raise
 
     opts = build_default_search_options(**overrides)
     opts.facets = dict(facets)
@@ -802,6 +805,11 @@ class _SimpleFaissIndex(FaissIndexProtocol):
             Describe ``vectors``.
         ids : tuple[int, ...] | np.int64
             Describe ``ids``.
+
+        Raises
+        ------
+        AgentCatalogSearchError
+            If IDs length does not match vector count.
         """
         id_array = np.asarray(ids, dtype=np.int64)
         vector_array = np.asarray(vectors, dtype=np.float32)
@@ -1093,6 +1101,11 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
     -------
     FaissModuleProtocol
         Describe return value.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If FAISS is required but cannot be imported and fallback is disabled.
     """
     override = os.getenv(_FAISS_ENV_OVERRIDE)
     candidates: tuple[str, ...] = (override,) if override else _FAISS_DEFAULT_MODULES
@@ -1107,7 +1120,12 @@ def load_faiss(purpose: str) -> FaissModuleProtocol:
                     module=r"faiss.*",
                 )
                 module = importlib.import_module(module_name)
-        except Exception as exc:  # pragma: no cover - runtime guard
+        except (
+            ImportError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+        ) as exc:  # pragma: no cover - runtime guard
             failures.append(f"{module_name}: {exc}")
             continue
         has_index_builder = hasattr(module, "IndexFlatIP") or hasattr(module, "index_flat_ip")
@@ -1191,7 +1209,18 @@ def _stringify(value: object) -> str | None:
 
 
 def _extract_agent_hints_payload(symbol: CatalogMapping) -> tuple[list[str], list[str]]:
-    """Return curated ``intent_tags`` and ``tests_to_run`` lists for ``symbol``."""
+    """Return curated ``intent_tags`` and ``tests_to_run`` lists for ``symbol``.
+
+    Parameters
+    ----------
+    symbol : CatalogMapping
+        Symbol mapping to extract hints from.
+
+    Returns
+    -------
+    tuple[list[str], list[str]]
+        Tuple of (intent_tags, tests_to_run) lists.
+    """
     intent_tags: list[str] = []
     tests_to_run: list[str] = []
     agent_hints = symbol.get("agent_hints")
@@ -1208,7 +1237,18 @@ def _extract_agent_hints_payload(symbol: CatalogMapping) -> tuple[list[str], lis
 def _extract_docfacts_text(
     docfacts: Mapping[str, JsonLike] | None,
 ) -> tuple[str | None, str | None]:
-    """Return summary/docstring text pulled from the ``docfacts`` mapping."""
+    """Return summary/docstring text pulled from the ``docfacts`` mapping.
+
+    Parameters
+    ----------
+    docfacts : Mapping[str, JsonLike] | None
+        Docfacts mapping to extract text from.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Tuple of (summary, docstring) strings.
+    """
     summary = None
     docstring = None
     if isinstance(docfacts, Mapping):
@@ -1222,7 +1262,18 @@ def _extract_docfacts_text(
 def _extract_anchor_lines(
     symbol: CatalogMapping,
 ) -> tuple[int | None, int | None]:
-    """Return source anchor line numbers for ``symbol`` when present."""
+    """Return source anchor line numbers for ``symbol`` when present.
+
+    Parameters
+    ----------
+    symbol : CatalogMapping
+        Symbol mapping to extract anchor lines from.
+
+    Returns
+    -------
+    tuple[int | None, int | None]
+        Tuple of (start_line, end_line) numbers.
+    """
     anchors = symbol.get("anchors")
     start_line: int | None = None
     end_line: int | None = None
@@ -1483,7 +1534,24 @@ def resolve_search_parameters(
     document_count: int,
     k: int,
 ) -> tuple[float, int]:
-    """Return the `(alpha_value, candidate_limit)` pair for catalog search."""
+    """Return the `(alpha_value, candidate_limit)` pair for catalog search.
+
+    Parameters
+    ----------
+    search_config : CatalogMapping | None
+        Search configuration mapping.
+    options : SearchOptions
+        Search options instance.
+    document_count : int
+        Total number of documents in the catalog.
+    k : int
+        Number of results requested.
+
+    Returns
+    -------
+    tuple[float, int]
+        Tuple of (alpha_value, candidate_limit).
+    """
     config = search_config or {}
 
     alpha_value = options.alpha
@@ -1597,6 +1665,11 @@ def _resolve_semantic_index_metadata(
     -------
     tuple[str | str | int | float | bool | NoneType | list[object] | dict[str, object], Path, Path] | NoneType
         Describe return value.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If semantic index metadata is missing, artifact paths are invalid, or artifacts are missing from disk.
     """
     semantic_meta = catalog.get("semantic_index")
     if not isinstance(semantic_meta, Mapping):
@@ -1644,6 +1717,11 @@ def _load_row_lookup(
     -------
     tuple[dict[str, int], str | str | int | float | bool | NoneType | list[object] | dict[str, object]]
         Describe return value.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If mapping file does not contain valid JSON object or symbols list.
     """
     # Load JSON and immediately validate the top-level type
     mapping_payload_raw: object = json.loads(mapping_path.read_text(encoding="utf-8"))
@@ -1684,6 +1762,11 @@ def _load_sentence_transformer(model_name: str) -> EmbeddingModelProtocol:
     -------
     EmbeddingModelProtocol
         Describe return value.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If sentence-transformers cannot be imported, SentenceTransformer class is missing, or model cannot be loaded.
     """
     try:
         module = importlib.import_module("sentence_transformers")
@@ -1724,6 +1807,11 @@ def _resolve_embedding_model(
     -------
     tuple[str, EmbeddingModelProtocol]
         Describe return value.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If semantic index metadata does not include model name or model cannot be loaded.
     """
     model_name_raw = options.embedding_model or _stringify(semantic_meta.get("model"))
     model_name: str | None = model_name_raw
@@ -1747,7 +1835,22 @@ def _encode_query(
     *,
     batch_size: int,
 ) -> FloatMatrix:
-    """Return a single-row embedding matrix for ``query``."""
+    """Return a single-row embedding matrix for ``query``.
+
+    Parameters
+    ----------
+    model : EmbeddingModelProtocol
+        Embedding model to use for encoding.
+    query : str
+        Query string to encode.
+    batch_size : int
+        Batch size for encoding.
+
+    Returns
+    -------
+    FloatMatrix
+        Single-row embedding matrix.
+    """
     sentences = [query]
     embeddings = model.encode(sentences, batch_size=batch_size)
     return np.asarray(embeddings, dtype=np.float32, order="C")
@@ -1836,11 +1939,14 @@ def compute_vector_scores(
     AgentCatalogSearchError
         If vector encoding or search fails.
     """
-    inputs = _prepare_vector_search_inputs(options, context)
-    query_embedding = _encode_query(inputs.model, query, batch_size=inputs.batch_size)
-    query_normalized = _normalize_l2_array(query_embedding, axis=1)
-    distances, indices = inputs.index.search(query_normalized, inputs.candidate_limit)
-    return _scores_from_indices(distances, indices, inputs.row_lookup)
+    try:
+        inputs = _prepare_vector_search_inputs(options, context)
+        query_embedding = _encode_query(inputs.model, query, batch_size=inputs.batch_size)
+        query_normalized = _normalize_l2_array(query_embedding, axis=1)
+        distances, indices = inputs.index.search(query_normalized, inputs.candidate_limit)
+        return _scores_from_indices(distances, indices, inputs.row_lookup)
+    except AgentCatalogSearchError:
+        raise
 
 
 def _build_vector_search_context(
@@ -1850,23 +1956,51 @@ def _build_vector_search_context(
     candidate_limit: int,
     documents: Sequence[SearchDocument],
 ) -> VectorSearchContext | None:
-    semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
-    if semantic_index_meta is None:
-        return None
+    """Build vector search context from catalog metadata.
 
-    semantic_meta, index_path, mapping_path = semantic_index_meta
-    _, mapping_payload = _load_row_lookup(mapping_path)
+    Parameters
+    ----------
+    catalog : Mapping[str, JsonLike]
+        Catalog payload.
+    request : SearchRequest
+        Search request parameters.
+    lexical_candidates : Sequence[SearchDocument]
+        Lexical search candidates.
+    candidate_limit : int
+        Maximum number of candidates.
+    documents : Sequence[SearchDocument]
+        All documents in catalog.
 
-    return VectorSearchContext(
-        semantic_meta=semantic_meta,
-        mapping_payload=mapping_payload,
-        index_path=index_path,
-        documents=lexical_candidates,
-        candidate_limit=candidate_limit,
-        k=request.k,
-        candidate_ids={doc.symbol_id for doc in lexical_candidates},
-        row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
-    )
+    Returns
+    -------
+    VectorSearchContext | None
+        Vector search context if semantic index is available, None otherwise.
+
+    Raises
+    ------
+    AgentCatalogSearchError
+        If semantic index metadata is invalid or artifacts are missing.
+    """
+    try:
+        semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
+        if semantic_index_meta is None:
+            return None
+
+        semantic_meta, index_path, mapping_path = semantic_index_meta
+        _, mapping_payload = _load_row_lookup(mapping_path)
+
+        return VectorSearchContext(
+            semantic_meta=semantic_meta,
+            mapping_payload=mapping_payload,
+            index_path=index_path,
+            documents=lexical_candidates,
+            candidate_limit=candidate_limit,
+            k=request.k,
+            candidate_ids={doc.symbol_id for doc in lexical_candidates},
+            row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
+        )
+    except AgentCatalogSearchError:
+        raise
 
 
 def _compute_vector_scores_safe(
@@ -1944,13 +2078,16 @@ def search_catalog(
     )
 
     lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
-    vector_context = _build_vector_search_context(
-        catalog,
-        request,
-        lexical_candidates,
-        candidate_limit,
-        documents,
-    )
+    try:
+        vector_context = _build_vector_search_context(
+            catalog,
+            request,
+            lexical_candidates,
+            candidate_limit,
+            documents,
+        )
+    except AgentCatalogSearchError:
+        raise
     vector_scores = _compute_vector_scores_safe(request.query, opts, vector_context)
 
     results: list[SearchResult] = []

@@ -80,13 +80,25 @@ class MultiDeviceGuard(Protocol):
 
 @pytest.fixture(name="sequence_guard")
 def sequence_guard_fixture() -> SequenceGuard:
-    """Provide a typed fixture for the generic sequence guard."""
+    """Provide a typed fixture for the generic sequence guard.
+
+    Returns
+    -------
+    SequenceGuard
+        first_or_error function.
+    """
     return first_or_error
 
 
 @pytest.fixture(name="multi_device_guard")
 def multi_device_guard_fixture() -> MultiDeviceGuard:
-    """Provide a typed fixture for the multi-device sequence guard."""
+    """Provide a typed fixture for the multi-device sequence guard.
+
+    Returns
+    -------
+    MultiDeviceGuard
+        first_or_error_multi_device function.
+    """
     return first_or_error_multi_device
 
 

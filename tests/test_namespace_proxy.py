@@ -72,7 +72,7 @@ class TestNamespaceRegistry:
             Returns
             -------
             object
-                Symbol value with call count.
+                Symbol value with call count. Never returns None.
             """
             nonlocal call_count
             call_count += 1
@@ -139,11 +139,6 @@ class TestNamespaceRegistry:
         def failing_loader() -> object:
             """Load symbol that always raises RuntimeError.
 
-            Returns
-            -------
-            object
-                Never returns.
-
             Raises
             ------
             RuntimeError
@@ -170,7 +165,18 @@ class TestNamespaceRegistry:
 
         # Create factories with explicit types that return captured values
         def make_factory(val: object) -> Callable[[], object]:
-            """Create a factory that properly type-narrows lambda captures."""
+            """Create a factory that properly type-narrows lambda captures.
+
+            Parameters
+            ----------
+            val : object
+                Value to capture and return.
+
+            Returns
+            -------
+            Callable[[], object]
+                Factory function returning val.
+            """
 
             def _factory() -> object:
                 return val
