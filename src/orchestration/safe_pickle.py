@@ -297,10 +297,9 @@ def dump(obj: object, file: BinaryIO) -> None:
     file : BinaryIO
         File-like object opened in binary write mode.
 
-    Raises
-    ------
-    ValueError
-        If object contains disallowed types.
+    Notes
+    -----
+    Propagates :class:`ValueError` when the object contains disallowed types.
 
     Examples
     --------
@@ -309,10 +308,7 @@ def dump(obj: object, file: BinaryIO) -> None:
     >>> with tempfile.NamedTemporaryFile() as f:
     ...     dump(data, f)
     """
-    try:
-        _validate_object(obj)
-    except ValueError:
-        raise
+    _validate_object(obj)
     _stdlib_pickle.dump(obj, file)
 
 
@@ -329,10 +325,10 @@ def load(file: BinaryIO) -> object:
     object
         Deserialized object (guaranteed primitives/dict/list only).
 
-    Raises
-    ------
-    UnsafePickleError
-        If pickle stream contains disallowed types.
+    Notes
+    -----
+    Propagates :class:`UnsafePickleError` when the pickle stream contains
+    disallowed types.
 
     Examples
     --------
@@ -345,10 +341,7 @@ def load(file: BinaryIO) -> object:
     ...     assert loaded == data
     """
     unpickler = SafeUnpickler(file)
-    try:
-        loaded: object = unpickler.load()
-    except UnsafePickleError:
-        raise
+    loaded: object = unpickler.load()
     return loaded
 
 

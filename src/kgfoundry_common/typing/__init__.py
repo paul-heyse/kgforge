@@ -261,20 +261,16 @@ def resolve_numpy() -> object:
     object
         The numpy module.
 
-    Raises
-    ------
-    ImportError
-        If numpy is not installed.
+    Notes
+    -----
+    Propagates :class:`ImportError` when ``numpy`` is not installed.
     """
     warnings.warn(
         "resolve_numpy() is deprecated; use gate_import('numpy', ...) instead",
         DeprecationWarning,
         stacklevel=2,
     )
-    try:
-        return gate_import("numpy", "numpy array processing")
-    except ImportError:
-        raise
+    return gate_import("numpy", "numpy array processing")
 
 
 def resolve_fastapi() -> object:
@@ -288,20 +284,16 @@ def resolve_fastapi() -> object:
     object
         The fastapi module.
 
-    Raises
-    ------
-    ImportError
-        If fastapi is not installed.
+    Notes
+    -----
+    Propagates :class:`ImportError` when ``fastapi`` is not installed.
     """
     warnings.warn(
         "resolve_fastapi() is deprecated; use gate_import('fastapi', ...) instead",
         DeprecationWarning,
         stacklevel=2,
     )
-    try:
-        return gate_import("fastapi", "FastAPI application")
-    except ImportError:
-        raise
+    return gate_import("fastapi", "FastAPI application")
 
 
 def resolve_faiss() -> object:
@@ -315,20 +307,16 @@ def resolve_faiss() -> object:
     object
         The faiss module.
 
-    Raises
-    ------
-    ImportError
-        If faiss is not installed.
+    Notes
+    -----
+    Propagates :class:`ImportError` when ``faiss`` is not installed.
     """
     warnings.warn(
         "resolve_faiss() is deprecated; use gate_import('faiss', ...) instead",
         DeprecationWarning,
         stacklevel=2,
     )
-    try:
-        return gate_import("faiss", "vector similarity search")
-    except ImportError:
-        raise
+    return gate_import("faiss", "vector similarity search")
 
 
 # =============================================================================

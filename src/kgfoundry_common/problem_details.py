@@ -114,33 +114,40 @@ class ExceptionProblemDetailsParams:
 class ProblemDetailsValidationError(Exception):
     """Raised when Problem Details payload fails schema validation.
 
-    <!-- auto:docstring-builder v1 -->
+    This exception is raised when a Problem Details dictionary does not conform
+    to the RFC 9457 schema or fails validation against the canonical JSON Schema.
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the validation failure.
     validation_errors : list[str] | None, optional
-        Describe ``validation_errors``.
-        Defaults to ``None``.
+        List of specific validation error messages from the schema validator.
+        Provides detailed path and constraint information. Defaults to None.
+
+    Attributes
+    ----------
+    validation_errors : list[str]
+        List of validation error messages (empty list if not provided).
 
     Examples
     --------
     >>> raise ProblemDetailsValidationError("Missing required field: type")
+    Traceback (most recent call last):
+        ...
+    ProblemDetailsValidationError: Missing required field: type
     """
 
     def __init__(self, message: str, validation_errors: list[str] | None = None) -> None:
         """Initialize validation error.
 
-        <!-- auto:docstring-builder v1 -->
-
         Parameters
         ----------
         message : str
             Error message describing the validation failure.
-        validation_errors : list[str] | NoneType, optional
-            List of specific validation error messages. Defaults to None.
-            Defaults to ``None``.
+        validation_errors : list[str] | None, optional
+            List of specific validation error messages from the schema validator.
+            Defaults to None.
         """
         super().__init__(message)
         self.validation_errors = validation_errors or []
@@ -150,19 +157,22 @@ _SCHEMA_CACHE: dict[str, JsonSchema] = {}
 
 
 def _load_schema_impl() -> JsonSchema:
-    """Load and cache the Problem Details schema.
+    """Load and parse the Problem Details schema from disk.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads the canonical RFC 9457 Problem Details schema file, validates it
+    against the JSON Schema 2020-12 meta-schema, and returns the parsed
+    dictionary.
 
     Returns
     -------
-    str | object
-        Parsed schema dictionary.
+    JsonSchema
+        Parsed schema dictionary conforming to JSON Schema 2020-12.
 
     Raises
     ------
     ProblemDetailsValidationError
-        If schema file is missing or invalid.
+        If schema file is missing, invalid JSON, or fails meta-schema
+        validation.
     """
     if not _SCHEMA_PATH.exists():
         msg = f"Problem Details schema not found: {_SCHEMA_PATH}"
@@ -205,17 +215,22 @@ def _load_schema() -> JsonSchema:
 def validate_problem_details(payload: Mapping[str, JsonValue]) -> None:
     """Validate Problem Details payload against canonical schema.
 
-    <!-- auto:docstring-builder v1 -->
+    Validates a Problem Details dictionary against the RFC 9457 schema
+    (JSON Schema 2020-12). Raises an exception if validation fails with
+    detailed error information including the JSON path where validation
+    failed.
 
     Parameters
     ----------
-    payload : dict[str, object]
-        Problem Details payload to validate.
+    payload : Mapping[str, JsonValue]
+        Problem Details payload to validate. Must conform to RFC 9457
+        structure with required fields: type, title, status, detail, instance.
 
     Raises
     ------
     ProblemDetailsValidationError
-        If payload fails schema validation.
+        If payload fails schema validation. The exception includes
+        validation_errors list with specific constraint violations.
 
     Examples
     --------
@@ -352,29 +367,38 @@ def build_problem_details(
 def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
     """Build an RFC 9457 Problem Details payload.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This function constructs a Problem Details dictionary conforming to
-    RFC 9457 and validates it against the canonical schema.
+    Constructs a Problem Details dictionary conforming to RFC 9457 and
+    validates it against the canonical schema. Supports both dataclass
+    and positional/keyword argument calling styles.
 
     Parameters
     ----------
     *args : tuple
-        Either a single :class:`ProblemDetailsParams` instance or the positional fields
-        ``(problem_type, title, status, detail, instance)`` in that order.
+        Either a single :class:`ProblemDetailsParams` instance or the
+        positional fields ``(problem_type, title, status, detail, instance)``
+        in that order.
     **kwargs : dict[str, object]
-        Optional keyword arguments accepted when the dataclass form is not used. Supports
-        ``code`` and ``extensions`` for the legacy calling style.
+        Optional keyword arguments accepted when the dataclass form is not
+        used. Supports ``code`` and ``extensions`` for the legacy calling
+        style.
 
     Returns
     -------
     ProblemDetails
-        Problem Details payload conforming to RFC 9457 and validated against schema.
+        Problem Details payload conforming to RFC 9457 and validated against
+        schema. Contains required fields: type, title, status, detail, instance.
+        May include optional fields: code, extensions.
 
     Raises
     ------
     ProblemDetailsValidationError
         If the constructed payload fails schema validation.
+
+    Notes
+    -----
+    The function performs runtime type coercion and validation before
+    constructing the payload. All fields are validated against the schema
+    before return.
 
     Examples
     --------
@@ -403,10 +427,7 @@ def build_problem_details(*args: object, **kwargs: object) -> ProblemDetails:
         payload["extensions"] = dict(params.extensions)
 
     # Validate against schema (cast since dict[str, object] ⊇ Mapping[str, JsonValue])
-    try:
-        validate_problem_details(cast("Mapping[str, JsonValue]", payload))
-    except ProblemDetailsValidationError:
-        raise
+    validate_problem_details(cast("Mapping[str, JsonValue]", payload))
 
     return cast("ProblemDetails", payload)
 
@@ -431,24 +452,40 @@ def problem_from_exception(
 def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
     """Build Problem Details from an exception.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This function extracts detail from the exception message and optionally
-    includes exception type and traceback information in extensions.
+    Constructs a Problem Details payload from an exception instance,
+    extracting the exception message as the detail field and automatically
+    including exception type and cause chain information in extensions.
 
     Parameters
     ----------
     *args : tuple
-        Either a single :class:`ExceptionProblemDetailsParams` instance or the legacy
-        positional arguments ``(exc, problem_type, title, status, instance)``.
+        Either a single :class:`ExceptionProblemDetailsParams` instance or
+        the legacy positional arguments ``(exc, problem_type, title, status,
+        instance)``.
     **kwargs : dict[str, object]
-        Optional keyword arguments accepted when the dataclass form is not used. Supports
-        ``code`` and ``extensions`` for backward compatibility.
+        Optional keyword arguments accepted when the dataclass form is not used.
+        Supports ``code`` and ``extensions`` for backward compatibility. Note
+        that ``detail`` cannot be provided as a keyword argument; it is
+        automatically extracted from the exception.
 
     Returns
     -------
     ProblemDetails
-        Problem Details payload.
+        Problem Details payload with detail field set to the exception's
+        string representation. Extensions include ``exception_type`` and
+        optionally ``caused_by`` if the exception has a cause chain.
+
+    Raises
+    ------
+    ProblemDetailsValidationError
+        If the constructed payload fails schema validation.
+
+    Notes
+    -----
+    The exception's string representation (via ``str(exc)``) is used as the
+    detail field. The exception type name is added to extensions. If the
+    exception has a ``__cause__`` attribute, it is included in extensions as
+    ``caused_by``.
 
     Examples
     --------
@@ -463,6 +500,7 @@ def problem_from_exception(*args: object, **kwargs: object) -> ProblemDetails:
     ...         instance="urn:validation:input",
     ...     )
     >>> assert "Invalid input" in problem["detail"]
+    >>> assert problem["extensions"]["exception_type"] == "ValueError"
     """
     params = _coerce_exception_params(*args, **kwargs)
     exc = params.exception
@@ -574,25 +612,25 @@ def build_configuration_problem(
 def render_problem(problem: ProblemDetails | dict[str, object]) -> str:
     """Render Problem Details as JSON string.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This function serializes a Problem Details payload to JSON for stdout
-    or HTTP response bodies.
+    Serializes a Problem Details payload to a JSON string suitable for
+    stdout output or HTTP response bodies. The output is minified (no
+    indentation) and does not include a trailing newline.
 
     Parameters
     ----------
     problem : ProblemDetails | dict[str, object]
-        Problem Details payload.
+        Problem Details payload to serialize. Must be JSON-serializable.
 
     Returns
     -------
     str
-        JSON-encoded Problem Details (minified, no trailing newline).
+        JSON-encoded Problem Details string (minified, no trailing newline).
+        Uses UTF-8 encoding and preserves non-ASCII characters.
 
     Examples
     --------
     >>> problem = build_problem_details(
-    ...     type="https://kgfoundry.dev/problems/tool-failure",
+    ...     problem_type="https://kgfoundry.dev/problems/tool-failure",
     ...     title="Tool failed",
     ...     status=500,
     ...     detail="Command failed",

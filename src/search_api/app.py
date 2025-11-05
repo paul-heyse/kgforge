@@ -145,15 +145,17 @@ register_problem_details_handler(app)
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
     """Middleware to extract and set correlation ID from X-Correlation-ID header.
 
-    <!-- auto:docstring-builder v1 -->
+    Extracts correlation ID from the X-Correlation-ID HTTP header or generates a
+    new UUID if not present. Sets the correlation ID in contextvars for async
+    propagation and includes it in the response headers.
 
     Parameters
     ----------
     app : ASGIApp
-        Describe ``app``.
-    dispatch : DispatchFunction | None, optional
-        Describe ``dispatch``.
-        Defaults to ``None``.
+        ASGI application instance to wrap.
+    dispatch : Callable[[StarletteRequest], Awaitable[Response]] | None, optional
+        Custom dispatch function (typically None for default behavior).
+        Defaults to None.
     """
 
     HEADER_NAME: Final[str] = "X-Correlation-ID"
@@ -165,19 +167,21 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         """Extract correlation ID from header or generate new one.
 
-        <!-- auto:docstring-builder v1 -->
+        Checks for X-Correlation-ID header in the request. If present, uses it;
+        otherwise generates a new UUID. Sets the correlation ID in contextvars
+        and includes it in the response headers.
 
         Parameters
         ----------
         request : StarletteRequest
-            Describe ``request``.
-        call_next : [<class 'starlette.requests.Request'>] | Response
-            Describe ``call_next``.
+            HTTP request object containing headers.
+        call_next : Callable[[StarletteRequest], Awaitable[Response]]
+            Next middleware or route handler in the chain.
 
         Returns
         -------
         Response
-            Describe return value.
+            HTTP response with X-Correlation-ID header set.
         """
         header_name = self.HEADER_NAME
         correlation_id = request.headers.get(header_name)
@@ -193,21 +197,20 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
 class ResponseValidationMiddleware(BaseHTTPMiddleware):
     """Middleware to validate JSON responses against schema (dev/staging only).
 
-    <!-- auto:docstring-builder v1 -->
-
     Validates responses against search_response.json schema when enabled.
-    Logs validation failures and returns Problem Details on schema mismatch.
+    Logs validation failures and returns Problem Details (RFC 9457) on schema
+    mismatch. Only validates JSON responses from the /search endpoint.
 
     Parameters
     ----------
-    app : FastAPI
-        Describe ``app``.
+    app : ASGIApp
+        ASGI application instance to wrap.
     enabled : bool, optional
-        Describe ``enabled``.
-        Defaults to ``False``.
+        Whether to enable response validation. Defaults to False.
     schema_path : Path | None, optional
-        Describe ``schema_path``.
-        Defaults to ``None``.
+        Path to search_response.json schema file. If None, searches for
+        schema/search/search_response.json relative to repo root.
+        Defaults to None.
     """
 
     def __init__(
@@ -219,21 +222,19 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
     ) -> None:
         """Initialize response validation middleware.
 
-        <!-- auto:docstring-builder v1 -->
+        Sets up the middleware with optional schema validation. Loads the
+        JSON Schema 2020-12 from the provided path or default location.
 
         Parameters
         ----------
         app : FastAPI
-            FastAPI application instance.
+            FastAPI application instance to wrap.
         enabled : bool, optional
-            Whether to enable response validation.
-            Defaults to False.
-            Defaults to ``False``.
-        schema_path : Path | NoneType, optional
-            Path to search_response.json schema file.
-            If None, searches for schema/search/search_response.json.
+            Whether to enable response validation. Defaults to False.
+        schema_path : Path | None, optional
+            Path to search_response.json schema file. If None, searches for
+            schema/search/search_response.json relative to repo root.
             Defaults to None.
-            Defaults to ``None``.
         """
         super().__init__(cast("ASGIApp", app))
         self.enabled = enabled
@@ -265,19 +266,22 @@ class ResponseValidationMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         """Validate response against schema if enabled.
 
-        <!-- auto:docstring-builder v1 -->
+        Validates JSON responses from the /search endpoint against the loaded
+        schema. Logs validation failures and returns Problem Details (RFC 9457)
+        if validation fails.
 
         Parameters
         ----------
         request : StarletteRequest
-            Describe ``request``.
-        call_next : [<class 'starlette.requests.Request'>] | Response
-            Describe ``call_next``.
+            HTTP request object.
+        call_next : Callable[[StarletteRequest], Awaitable[Response]]
+            Next middleware or route handler in the chain.
 
         Returns
         -------
         Response
-            Describe return value.
+            Original response if validation passes or is disabled, or Problem
+            Details JSON response if validation fails.
         """
         if not self.enabled or self.schema is None:
             return await call_next(request)
@@ -445,12 +449,16 @@ AuthDependency = Annotated[
 def healthz() -> dict[str, str | dict[str, str]]:
     """Health check endpoint.
 
-    <!-- auto:docstring-builder v1 -->
+    Returns the health status of the search API and its components (BM25,
+    SPLADE, embeddings, knowledge graph). Used for monitoring and readiness
+    checks.
 
     Returns
     -------
     dict[str, str | dict[str, str]]
-        Health status with component availability.
+        Dictionary with "status" key set to "ok" and "components" key containing
+        a dictionary mapping component names to their availability status
+        ("available", "unavailable", or "mocked").
     """
     return {
         "status": "ok",
@@ -467,8 +475,6 @@ def healthz() -> dict[str, str | dict[str, str]]:
 def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
     """Execute hybrid search query.
 
-    <!-- auto:docstring-builder v1 -->
-
     Combines dense (FAISS), sparse (BM25/SPLADE), and knowledge graph signals
     using Reciprocal Rank Fusion and KG boosts. Returns ranked results with
     structured logging and metrics.
@@ -476,26 +482,23 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
     Parameters
     ----------
     req : SearchRequest
-        Search request containing query text, k, and optional facets.
-    _ : None, optional
-        Authentication dependency (Bearer token).
-        Defaults to ``Depends(auth)``.
-        Defaults to ``Depends(dependency=<function auth at 0x73d12bcbe020>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x73a51e5e4c20>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x7e8041099800>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x7b8c3c365760>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x72c0c6f89760>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x7876585e9760>, use_cache=True)``.
+        Search request containing query text, k (number of results), and
+        optional facets for filtering.
+    _ : AuthDependency, optional
+        Authentication dependency (Bearer token). Injected by FastAPI.
+        Defaults to None (handled by FastAPI dependency injection).
 
     Returns
     -------
     SearchResponse
-        Search results with metadata and performance metrics.
+        Search results with metadata and performance metrics. Results are
+        ranked by combined relevance scores from all search channels.
 
     Raises
     ------
     VectorSearchError
-        Returns Problem Details JSON (RFC 9457) on errors.
+        Returns Problem Details JSON (RFC 9457) on errors such as missing
+        indexes, invalid queries, or backend failures.
 
     Examples
     --------
@@ -619,26 +622,20 @@ def graph_concepts(
 ) -> dict[str, list[dict[str, str]]]:
     """Retrieve knowledge graph concepts matching query.
 
-    <!-- auto:docstring-builder v1 -->
-
     Returns concepts from the knowledge graph that match the query string.
-    Includes structured logging and error handling.
+    Searches concept labels for substring matches and returns a limited number
+    of results. Includes structured logging and error handling.
 
     Parameters
     ----------
-    body : str | object
+    body : Mapping[str, JsonValue]
         Request body containing:
-        - `q` (str): Query string to match against concept labels.
-        - `limit` (int, optional): Maximum number of concepts to return. Defaults to 50.
-    _ : None, optional
-        Authentication dependency (Bearer token).
-        Defaults to ``Depends(auth)``.
-        Defaults to ``Depends(dependency=<function auth at 0x73d12bcbe020>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x73a51e5e4c20>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x7e8041099800>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x7b8c3c365760>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x72c0c6f89760>, use_cache=True)``.
-        Defaults to ``Depends(dependency=<function auth at 0x7876585e9760>, use_cache=True)``.
+        - `q` (str): Query string to match against concept labels (case-insensitive).
+        - `limit` (int, optional): Maximum number of concepts to return.
+          Defaults to 50.
+    _ : AuthDependency, optional
+        Authentication dependency (Bearer token). Injected by FastAPI.
+        Defaults to None (handled by FastAPI dependency injection).
 
     Returns
     -------
@@ -649,7 +646,8 @@ def graph_concepts(
     Raises
     ------
     VectorSearchError
-        Returns Problem Details JSON (RFC 9457) on errors.
+        Returns Problem Details JSON (RFC 9457) on errors such as invalid
+        request body or backend failures.
 
     Examples
     --------

@@ -679,10 +679,13 @@ def _cmd_search(client: AgentCatalogClient, args: argparse.Namespace) -> None:
 
     Raises
     ------
-    CatalogctlError
-        If facet parsing fails.
     AgentCatalogSearchError
-        If search execution fails.
+        Propagated when search execution fails after rendering an error.
+
+    Notes
+    -----
+    Handles :class:`CatalogctlError` by emitting Problem Details envelopes or
+    CLI-friendly error messages instead of raising.
     """
     use_envelope, _ = _determine_output_format(args)
     correlation_id = str(uuid.uuid4())

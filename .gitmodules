@@ -1,0 +1,15 @@
+[submodule "codeintel/ts_languages/tree-sitter-python"]
+	path = codeintel/ts_languages/tree-sitter-python
+	url = https://github.com/tree-sitter/tree-sitter-python
+[submodule "codeintel/ts_languages/tree-sitter-json"]
+	path = codeintel/ts_languages/tree-sitter-json
+	url = https://github.com/tree-sitter/tree-sitter-json
+[submodule "codeintel/ts_languages/tree-sitter-yaml"]
+	path = codeintel/ts_languages/tree-sitter-yaml
+	url = https://github.com/ikatyang/tree-sitter-yaml
+[submodule "codeintel/ts_languages/tree-sitter-toml"]
+	path = codeintel/ts_languages/tree-sitter-toml
+	url = https://github.com/tree-sitter/tree-sitter-toml
+[submodule "codeintel/ts_languages/tree-sitter-markdown"]
+	path = codeintel/ts_languages/tree-sitter-markdown
+	url = https://github.com/MDeiml/tree-sitter-markdown

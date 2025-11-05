@@ -618,17 +618,17 @@ def build_histogram(*args: object, **kwargs: object) -> HistogramLike:
     ------
     ValueError
         If metric registration fails and no existing collector is found.
-    TypeError
-        If arguments are invalid or missing required parameters.
+
+    Notes
+    -----
+    Propagates :class:`TypeError` when the provided arguments are invalid or
+    missing required parameters.
     """
     constructor = _HISTOGRAM_CONSTRUCTOR
     if constructor is None:
         return _NoopHistogram()
 
-    try:
-        params = _coerce_histogram_params(*args, **kwargs)
-    except TypeError:
-        raise
+    params = _coerce_histogram_params(*args, **kwargs)
     label_tuple = _labels_or_default(params.labelnames)
     call_kwargs: dict[str, object] = {}
     if params.registry is not None:

@@ -59,6 +59,11 @@ def check_file(path: Path) -> list[tuple[int, str]]:
     -------
     list[tuple[int, str]]
         List of (line_number, line_content) tuples for unmanaged suppressions.
+
+    Raises
+    ------
+    ValueError
+        If the file cannot be read.
     """
     try:
         content = path.read_text(encoding="utf-8")

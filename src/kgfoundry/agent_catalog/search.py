@@ -416,16 +416,13 @@ def build_faceted_search_options(
     SearchOptions
         Validated options with facets included.
 
-    Raises
-    ------
-    AgentCatalogSearchError
-        If any facet key is not in the allow-list.
+    Notes
+    -----
+    Propagates :class:`AgentCatalogSearchError` when facet keys are not in the
+    allow-list.
     """
     # Validate facet keys against allow-list
-    try:
-        _validate_facets(facets)
-    except AgentCatalogSearchError:
-        raise
+    _validate_facets(facets)
 
     opts = build_default_search_options(**overrides)
     opts.facets = dict(facets)
@@ -1934,19 +1931,16 @@ def compute_vector_scores(
     dict[str, float]
         Mapping from symbol_id to vector similarity score.
 
-    Raises
-    ------
-    AgentCatalogSearchError
-        If vector encoding or search fails.
+    Notes
+    -----
+    Propagates :class:`AgentCatalogSearchError` when vector encoding or search
+    fails.
     """
-    try:
-        inputs = _prepare_vector_search_inputs(options, context)
-        query_embedding = _encode_query(inputs.model, query, batch_size=inputs.batch_size)
-        query_normalized = _normalize_l2_array(query_embedding, axis=1)
-        distances, indices = inputs.index.search(query_normalized, inputs.candidate_limit)
-        return _scores_from_indices(distances, indices, inputs.row_lookup)
-    except AgentCatalogSearchError:
-        raise
+    inputs = _prepare_vector_search_inputs(options, context)
+    query_embedding = _encode_query(inputs.model, query, batch_size=inputs.batch_size)
+    query_normalized = _normalize_l2_array(query_embedding, axis=1)
+    distances, indices = inputs.index.search(query_normalized, inputs.candidate_limit)
+    return _scores_from_indices(distances, indices, inputs.row_lookup)
 
 
 def _build_vector_search_context(
@@ -1976,31 +1970,28 @@ def _build_vector_search_context(
     VectorSearchContext | None
         Vector search context if semantic index is available, None otherwise.
 
-    Raises
-    ------
-    AgentCatalogSearchError
-        If semantic index metadata is invalid or artifacts are missing.
+    Notes
+    -----
+    Propagates :class:`AgentCatalogSearchError` when semantic index metadata is
+    invalid or artifacts are missing.
     """
-    try:
-        semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
-        if semantic_index_meta is None:
-            return None
+    semantic_index_meta = _resolve_semantic_index_metadata(catalog, request.repo_root)
+    if semantic_index_meta is None:
+        return None
 
-        semantic_meta, index_path, mapping_path = semantic_index_meta
-        _, mapping_payload = _load_row_lookup(mapping_path)
+    semantic_meta, index_path, mapping_path = semantic_index_meta
+    _, mapping_payload = _load_row_lookup(mapping_path)
 
-        return VectorSearchContext(
-            semantic_meta=semantic_meta,
-            mapping_payload=mapping_payload,
-            index_path=index_path,
-            documents=lexical_candidates,
-            candidate_limit=candidate_limit,
-            k=request.k,
-            candidate_ids={doc.symbol_id for doc in lexical_candidates},
-            row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
-        )
-    except AgentCatalogSearchError:
-        raise
+    return VectorSearchContext(
+        semantic_meta=semantic_meta,
+        mapping_payload=mapping_payload,
+        index_path=index_path,
+        documents=lexical_candidates,
+        candidate_limit=candidate_limit,
+        k=request.k,
+        candidate_ids={doc.symbol_id for doc in lexical_candidates},
+        row_to_document={doc.row: doc for doc in documents if doc.row >= 0},
+    )
 
 
 def _compute_vector_scores_safe(
@@ -2045,10 +2036,10 @@ def search_catalog(
     list[SearchResult]
         Sorted list of top-k search results with combined scores.
 
-    Raises
-    ------
-    AgentCatalogSearchError
-        If catalog parsing, indexing, or search fails.
+    Notes
+    -----
+    Propagates :class:`AgentCatalogSearchError` when catalog parsing, indexing,
+    or search fails.
 
     Examples
     --------
@@ -2078,16 +2069,13 @@ def search_catalog(
     )
 
     lexical_candidates = select_lexical_candidates(lexical_scores, documents, candidate_limit)
-    try:
-        vector_context = _build_vector_search_context(
-            catalog,
-            request,
-            lexical_candidates,
-            candidate_limit,
-            documents,
-        )
-    except AgentCatalogSearchError:
-        raise
+    vector_context = _build_vector_search_context(
+        catalog,
+        request,
+        lexical_candidates,
+        candidate_limit,
+        documents,
+    )
     vector_scores = _compute_vector_scores_safe(request.query, opts, vector_context)
 
     results: list[SearchResult] = []

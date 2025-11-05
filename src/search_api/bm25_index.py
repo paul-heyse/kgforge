@@ -19,8 +19,6 @@ import duckdb
 from kgfoundry_common.errors import ConfigurationError, DeserializationError
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import (
-    SchemaValidationError,
-    SerializationError,
     deserialize_json,
     serialize_json,
 )
@@ -166,21 +164,29 @@ def _as_str(value: object) -> str:
 
 # [nav:anchor toks]
 def toks(text: str) -> list[str]:
-    """Describe toks.
+    """Extract tokens from text using word boundary regex.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Tokenizes input text by finding all sequences of alphanumeric characters
+    (using regex pattern ``[A-Za-z0-9]+``) and converting them to lowercase.
+    Used for BM25 indexing and query processing.
 
     Parameters
     ----------
     text : str
-        Describe ``text``.
+        Input text to tokenize. May be empty or None (treated as empty).
 
     Returns
     -------
     list[str]
-        Describe return value.
+        List of lowercase tokens extracted from the text. Empty list if input
+        is empty or contains no alphanumeric sequences.
+
+    Examples
+    --------
+    >>> toks("Hello World 123")
+    ['hello', 'world', '123']
+    >>> toks("")
+    []
     """
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN_RE.findall(text or "")
@@ -190,28 +196,32 @@ def toks(text: str) -> list[str]:
 # [nav:anchor BM25Doc]
 @dataclass
 class BM25Doc:
-    """Describe BM25Doc.
+    """Document representation for BM25 indexing and retrieval.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Stores term frequency statistics and document metadata for a single
+    document chunk. Used by :class:`BM25Index` to compute BM25 relevance scores
+    during search.
 
     Parameters
     ----------
     chunk_id : str
-        Describe ``chunk_id``.
+        Unique identifier for this document chunk.
     doc_id : str
-        Describe ``doc_id``.
+        Parent document identifier that this chunk belongs to.
     title : str
-        Describe ``title``.
+        Document title (used for weighted term frequency in indexing).
     section : str
-        Describe ``section``.
+        Section name or heading where this chunk appears.
     tf : dict[str, float]
-        Describe ``tf``.
+        Term frequency dictionary mapping token strings to their frequencies
+        in this chunk. Title terms have weight 2.0, section terms 1.2, body
+        terms 1.0.
     dl : float
-        Describe ``dl``.
+        Document length (sum of all term frequencies in this chunk).
+
+    See Also
+    --------
+    BM25Index : BM25 index using these document representations.
     """
 
     chunk_id: str
@@ -224,39 +234,65 @@ class BM25Doc:
 
 # [nav:anchor BM25Index]
 class BM25Index:
-    """Describe BM25Index.
+    r"""BM25 ranking function implementation for text search.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Implements the Best Matching 25 (BM25) ranking algorithm for document
+    retrieval. BM25 computes relevance scores based on term frequency (TF),
+    inverse document frequency (IDF), and document length normalization.
 
     Parameters
     ----------
     k1 : float, optional
-        Describe ``k1``.
-        Defaults to ``0.9``.
+        Term frequency saturation parameter. Controls how quickly term frequency
+        saturates. Higher values allow more influence from repeated terms.
+        Defaults to 0.9.
     b : float, optional
-        Describe ``b``.
-        Defaults to ``0.4``.
+        Document length normalization parameter. Controls the degree of length
+        normalization. Values closer to 1.0 normalize more aggressively.
+        Defaults to 0.4.
+
+    Attributes
+    ----------
+    k1 : float
+        Term frequency saturation parameter.
+    b : float
+        Document length normalization parameter.
+    docs : list[BM25Doc]
+        List of indexed documents.
+    df : dict[str, int]
+        Document frequency dictionary mapping tokens to the number of
+        documents containing them.
+    N : int
+        Total number of documents in the index.
+    avgdl : float
+        Average document length across all documents.
+
+    Notes
+    -----
+    BM25 scoring formula:
+    :math:`score(D, Q) = \sum_{t \in Q} IDF(t) \cdot \frac{TF(t, D) \cdot (k1 + 1)}{TF(t, D) + k1 \cdot (1 - b + b \cdot \frac{|D|}{avgdl})}`
+
+    Where:
+    - :math:`TF(t, D)` is the term frequency of term :math:`t` in document :math:`D`
+    - :math:`IDF(t)` is the inverse document frequency of term :math:`t`
+    - :math:`|D|` is the document length
+    - :math:`avgdl` is the average document length
+
+    See Also
+    --------
+    BM25Doc : Document representation used by this index.
+    toks : Tokenization function used for indexing and queries.
     """
 
     def __init__(self, k1: float = 0.9, b: float = 0.4) -> None:
-        """Describe   init  .
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Initialize BM25 index with scoring parameters.
 
         Parameters
         ----------
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+            Term frequency saturation parameter. Defaults to 0.9.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
+            Document length normalization parameter. Defaults to 0.4.
         """
         self.k1 = k1
         self.b = b
@@ -267,26 +303,37 @@ class BM25Index:
 
     @classmethod
     def build_from_duckdb(cls, db_path: str) -> BM25Index:
-        """Describe build from duckdb.
+        """Build BM25 index from DuckDB database.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Queries a DuckDB database for the most recent chunks dataset and
+        builds a BM25 index from the parquet files. Reads chunk text, document
+        titles, and sections, then computes term frequencies and document
+        frequencies.
 
         Parameters
         ----------
         db_path : str
-            Describe ``db_path``.
+            Path to DuckDB database file containing datasets and documents tables.
 
         Returns
         -------
         BM25Index
-            Describe return value.
+            Initialized BM25 index with documents loaded from DuckDB.
 
         Raises
         ------
         TypeError
-            If parquet_root type is invalid.
+            If parquet_root value in database is not a string.
+        ConfigurationError
+            If parquet path resolves outside allowed directories (path traversal
+            protection).
+
+        Notes
+        -----
+        The method queries for the most recent chunks dataset ordered by
+        created_at. If no dataset is found, returns an empty index. Path
+        validation prevents path traversal attacks by ensuring resolved paths
+        are within allowed directories.
         """
         index = cls()
         con = duckdb.connect(db_path)
@@ -328,16 +375,24 @@ class BM25Index:
         return index
 
     def _build(self, rows: Iterable[tuple[str, str, str, str, str]]) -> None:
-        """Describe  build.
+        """Build index from document rows.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Processes an iterable of document rows, tokenizes text fields, computes
+        term frequencies with weighted scoring (title 2.0, section 1.2, body
+        1.0), and updates document frequency statistics.
 
         Parameters
         ----------
-        rows : tuple[str, str, str, str, str]
-            Describe ``rows``.
+        rows : Iterable[tuple[str, str, str, str, str]]
+            Iterable of tuples containing (chunk_id, doc_id, section, body, title).
+            Each tuple represents one document chunk to index.
+
+        Notes
+        -----
+        This method clears existing index state before building. Term frequencies
+        are computed separately for title, section, and body fields with different
+        weights. The average document length (avgdl) is computed after processing
+        all rows.
         """
         self.docs.clear()
         self.df.clear()
@@ -369,27 +424,40 @@ class BM25Index:
 
     @classmethod
     def from_parquet(cls, path: str, *, k1: float = 0.9, b: float = 0.4) -> BM25Index:
-        """Describe from parquet.
+        """Build BM25 index from a single parquet file.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Creates a BM25 index by reading document chunks from a parquet file.
+        Uses DuckDB to read the parquet file and extracts chunk_id, doc_id,
+        section, and text fields for indexing.
 
         Parameters
         ----------
         path : str
-            Describe ``path``.
+            Path to parquet file containing document chunks. Must exist and be
+            within allowed directories (validated to prevent path traversal).
         k1 : float, optional
-            Describe ``k1``.
-            Defaults to ``0.9``.
+            Term frequency saturation parameter. Defaults to 0.9.
         b : float, optional
-            Describe ``b``.
-            Defaults to ``0.4``.
+            Document length normalization parameter. Defaults to 0.4.
 
         Returns
         -------
         BM25Index
-            Describe return value.
+            Initialized BM25 index with documents loaded from parquet file.
+
+        Raises
+        ------
+        ConfigurationError
+            If parquet path resolves outside allowed directories (path traversal
+            protection).
+        ValueError
+            If path cannot be resolved or does not exist.
+
+        Notes
+        -----
+        Path validation prevents path traversal attacks. The method uses an
+        in-memory DuckDB connection to read the parquet file. Title fields are
+        not included from parquet (defaults to empty string).
         """
         index = cls(k1=k1, b=b)
         con = duckdb.connect(database=":memory:")
@@ -423,24 +491,30 @@ class BM25Index:
     def save(self, path: str) -> None:
         """Save BM25 index metadata to JSON with schema validation and checksum.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Serializes index metadata using secure JSON serialization with schema
-        validation and SHA256 checksum for data integrity.
+        Serializes index metadata (parameters, document frequencies, and document
+        list) to JSON format, validates it against the BM25 metadata schema, and
+        writes a SHA256 checksum file for integrity verification.
 
         Parameters
         ----------
         path : str
-            Output file path for JSON metadata (will also write .sha256 checksum).
+            Output file path for JSON metadata. A `.sha256` checksum file will
+            be written alongside it.
 
         Raises
         ------
         SerializationError
-            If serialization fails.
+            If JSON serialization fails or file write fails.
         SchemaValidationError
-            If schema validation fails.
+            If the index data does not conform to the BM25 metadata schema.
         FileNotFoundError
-            If schema file is missing.
+            If the schema file does not exist.
+
+        Notes
+        -----
+        The serialized payload includes: k1, b, N (document count), avgdl (average
+        document length), df (document frequency dictionary), and docs (list of
+        BM25Doc data dictionaries).
 
         Examples
         --------
@@ -472,36 +546,43 @@ class BM25Index:
             "df": self.df,
             "docs": docs_data,
         }
-        try:
-            serialize_json(payload, schema_path, path_obj)
-        except (SerializationError, FileNotFoundError, SchemaValidationError):
-            raise
+        serialize_json(payload, schema_path, path_obj)
 
     @classmethod
     def load(cls, path: str) -> BM25Index:
         """Load BM25 index metadata from JSON with schema validation and checksum verification.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Deserializes index metadata from JSON, verifying checksum and validating
-        against the schema before reconstructing the index.
+        Deserializes index metadata from JSON, verifies the SHA256 checksum (if
+        present), validates against the BM25 metadata schema, and reconstructs
+        the index instance. Supports legacy pickle format as fallback.
 
         Parameters
         ----------
         path : str
-            Path to JSON metadata file (checksum file will be verified if present).
+            Path to JSON metadata file. A `.sha256` checksum file will be
+            verified if present.
 
         Returns
         -------
         BM25Index
-            Reconstructed BM25 index instance.
+            Reconstructed BM25 index instance with all metadata loaded.
 
         Raises
         ------
         DeserializationError
-            If deserialization, schema validation, or checksum verification fails.
+            If JSON parsing fails, checksum verification fails, or legacy pickle
+            validation fails.
+        SchemaValidationError
+            If the loaded data does not conform to the BM25 metadata schema.
         FileNotFoundError
-            If metadata or schema file is missing.
+            If the metadata or schema file does not exist.
+
+        Notes
+        -----
+        The method attempts to load from JSON first. If the file has a `.pkl`
+        extension and JSON loading fails, it falls back to legacy pickle format
+        (with validation). All document frequencies, term frequencies, and
+        document metadata are reconstructed from the payload.
 
         Examples
         --------
@@ -512,10 +593,7 @@ class BM25Index:
         schema_path = (
             Path(__file__).parent.parent.parent / "schema" / "models" / "bm25_metadata.v1.json"
         )
-        try:
-            payload = cls._load_payload(path_obj, schema_path)
-        except (DeserializationError, FileNotFoundError):
-            raise
+        payload = cls._load_payload(path_obj, schema_path)
         return cls._index_from_payload(payload)
 
     @staticmethod
@@ -594,21 +672,27 @@ class BM25Index:
         return docs
 
     def _idf(self, term: str) -> float:
-        """Describe  idf.
+        """Compute inverse document frequency (IDF) for a term.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Calculates IDF using the formula: log((N - df + 0.5) / (df + 0.5) + 1.0)
+        where N is the total number of documents and df is the document frequency.
 
         Parameters
         ----------
         term : str
-            Describe ``term``.
+            Token string to compute IDF for.
 
         Returns
         -------
         float
-            Describe return value.
+            IDF score for the term. Returns 0.0 if term is not in any document
+            or if the index is empty.
+
+        Notes
+        -----
+        Uses the standard BM25 IDF formula with smoothing to avoid division by
+        zero. The 0.5 smoothing factor prevents negative IDF values for terms
+        appearing in all documents.
         """
         df = self.df.get(term, 0)
         if self.N == 0 or df == 0:
@@ -616,24 +700,30 @@ class BM25Index:
         return math.log((self.N - df + 0.5) / (df + 0.5) + 1.0)
 
     def search(self, query: str, k: int = 10) -> list[tuple[str, float]]:
-        """Describe search.
+        """Search index and return top-k results ranked by BM25 score.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Tokenizes the query, computes BM25 relevance scores for all documents,
+        and returns the top-k results sorted by score in descending order.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query string to tokenize and match against documents.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+            Maximum number of results to return. Defaults to 10.
 
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+            List of (chunk_id, score) tuples sorted by score descending. Only
+            includes documents with score > 0.0. Returns empty list if index is
+            empty or no documents match.
+
+        Notes
+        -----
+        BM25 scoring combines term frequency (TF), inverse document frequency
+        (IDF), and document length normalization. Documents with higher scores
+        are more relevant to the query.
         """
         if self.N == 0:
             return []
@@ -670,20 +760,21 @@ class BM25Index:
         return [(self.docs[index].chunk_id, score) for index, score in ranked[:k] if score > 0.0]
 
     def doc(self, index: int) -> BM25Doc:
-        """Describe doc.
-
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        """Get document at the specified index.
 
         Parameters
         ----------
         index : int
-            Describe ``index``.
+            Zero-based index of the document to retrieve.
 
         Returns
         -------
         BM25Doc
-            Describe return value.
+            Document at the specified index.
+
+        Raises
+        ------
+        IndexError
+            If index is out of range (negative or >= len(docs)).
         """
         return self.docs[index]
