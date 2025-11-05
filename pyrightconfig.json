@@ -1,0 +1,30 @@
+{
+  "typeCheckingMode": "standard",
+  "pythonVersion": "3.13",
+  "pythonPlatform": "Linux",
+  "useLibraryCodeForTypes": true,
+  "stubPath": "stubs",
+  "include": ["src"],
+  "exclude": [
+    ".git",
+    ".hg",
+    ".venv",
+    ".ruff_cache",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "node_modules",
+    "docs/_build/**",
+    "site/**",
+    "faiss/**",
+    "src/kgfoundry.egg-info/**",
+    "kgfoundry.egg-info/**"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "src",
+      "extraPaths": ["src", "stubs"],
+      "pythonVersion": "3.13"
+    }
+  ]
+}

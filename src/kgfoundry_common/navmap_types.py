@@ -4,12 +4,22 @@ This module bundles navmap types logic for the kgfoundry stack. It groups relate
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-from typing import Final, Literal, NotRequired, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
-__all__ = ["ModuleMeta", "NavMap", "NavSection", "Stability", "SymbolMeta"]
+from kgfoundry_common.navmap_loader import load_nav_metadata
+
+__all__ = [
+    "ModuleMeta",
+    "NavMap",
+    "NavSection",
+    "Stability",
+    "SymbolMeta",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 # [nav:anchor Stability]
 type Stability = Literal[
@@ -170,30 +180,3 @@ class NavMap(TypedDict, total=False):
     edit_scopes: dict[str, list[str]]
     deps: list[str]
     module_meta: ModuleMeta
-
-
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.navmap_types",
-    "synopsis": "Shared navigation metadata structures used across kgfoundry.",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}

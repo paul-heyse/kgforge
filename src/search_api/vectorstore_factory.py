@@ -18,6 +18,7 @@ Examples
 ...     factory = FaissVectorstoreFactory(settings)
 ...     adapter = factory.build_adapter()
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -27,13 +28,20 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Final
 
 from kgfoundry_common.errors import IndexBuildError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.prometheus import build_counter, build_histogram
 from search_api.faiss_adapter import FaissAdapter
 
 if TYPE_CHECKING:
     from kgfoundry_common.prometheus import CounterLike, HistogramLike
 
-__all__ = ["FaissAdapterSettings", "FaissVectorstoreFactory"]
+
+__all__ = [
+    "FaissAdapterSettings",
+    "FaissVectorstoreFactory",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +86,7 @@ def _observe_metrics(operation: str, status: str, duration_seconds: float) -> No
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor FaissAdapterSettings]
 class FaissAdapterSettings:
     """Configuration for FAISS adapter instances.
 
@@ -135,6 +144,7 @@ class FaissAdapterSettings:
 
 
 @dataclass(slots=True)
+# [nav:anchor FaissVectorstoreFactory]
 class FaissVectorstoreFactory:
     """Factory for building FAISS adapters with observability and error handling.
 

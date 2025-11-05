@@ -1,4 +1,5 @@
 """Command-line interface for querying the Agent Catalog artifacts."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from kgfoundry.agent_catalog.client import AgentCatalogClient, AgentCatalogClien
 from kgfoundry.agent_catalog.sqlite import sqlite_candidates
 from kgfoundry_common.errors import AgentCatalogSearchError
 from kgfoundry_common.logging import get_logger, set_correlation_id, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.problem_details import JsonValue
 
 if TYPE_CHECKING:
@@ -48,6 +50,7 @@ CommandHandler = Callable[[AgentCatalogClient, argparse.Namespace], None]
 logger = get_logger(__name__)
 
 # Allowed facet keys (from schema/search/mcp_payload.json)
+# [nav:anchor ALLOWED_FACET_KEYS]
 ALLOWED_FACET_KEYS = {"package", "module", "kind", "stability", "deprecated"}
 
 
@@ -277,6 +280,7 @@ def _render_error(message: str, problem: dict[str, JsonValue] | None = None) -> 
         sys.stderr.write(f"{message}\n")
 
 
+# [nav:anchor search_result_to_dict]
 def search_result_to_dict(result: SearchResult) -> dict[str, JsonValue]:
     """Convert SearchResult dataclass to VectorSearchResultTypedDict-compatible dict.
 
@@ -360,6 +364,7 @@ def _build_cli_envelope(
     return envelope
 
 
+# [nav:anchor build_parser]
 def build_parser() -> argparse.ArgumentParser:
     """Return the argument parser configured for the CLI.
 
@@ -885,6 +890,7 @@ def _cmd_list_modules(client: AgentCatalogClient, args: argparse.Namespace) -> N
     _render_json([module.qualified for module in modules])
 
 
+# [nav:anchor main]
 def main(argv: list[str] | None = None) -> int:
     """Execute the CLI and return an exit code.
 
@@ -1037,3 +1043,4 @@ __all__ = [
     "main",
     "search_result_to_dict",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

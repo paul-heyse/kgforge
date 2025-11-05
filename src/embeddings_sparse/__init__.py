@@ -1,50 +1,23 @@
-"""Overview of embeddings sparse.
+"""Expose sparse embedding integrations under a unified namespace."""
 
-This module bundles embeddings sparse logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+from __future__ import annotations
 
 from embeddings_sparse import base, bm25, splade
-from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 
-__all__ = ["base", "bm25", "splade"]
+NavMap = _NavMap
 
-__navmap__: NavMap = {
-    "title": "embeddings_sparse",
-    "synopsis": "Sparse embedding adapters and indices",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@embeddings",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "base": {
-            "stability": "beta",
-            "owner": "@embeddings",
-            "since": "0.1.0",
-        },
-        "bm25": {
-            "stability": "beta",
-            "owner": "@embeddings",
-            "since": "0.1.0",
-        },
-        "splade": {
-            "stability": "experimental",
-            "owner": "@embeddings",
-            "since": "0.2.0",
-        },
-    },
-}
+__all__ = [
+    "NavMap",
+    "base",
+    "bm25",
+    "splade",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
+
+# [nav:section public-api]
 # [nav:anchor base]
 # [nav:anchor bm25]
 # [nav:anchor splade]

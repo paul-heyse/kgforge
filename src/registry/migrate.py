@@ -4,48 +4,25 @@ This module bundles migrate logic for the kgfoundry stack. It groups related hel
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import argparse
 import pathlib
 from contextlib import closing
-from typing import TYPE_CHECKING, Final, cast
+from typing import cast
 
 from kgfoundry_common.errors import RegistryError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from registry import duckdb_helpers
 from registry.duckdb_helpers import DuckDBQueryOptions
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
-
-__all__ = ["apply", "main"]
-
-__navmap__: Final[NavMap] = {
-    "title": "registry.migrate",
-    "synopsis": "Migration helpers for DuckDB registry schemas",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@registry",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@registry",
-            "stability": "experimental",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
+__all__ = [
+    "apply",
+    "main",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor apply]

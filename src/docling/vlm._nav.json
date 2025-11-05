@@ -1,0 +1,27 @@
+{
+  "exports": [
+    "GraniteDoclingVLM"
+  ],
+  "module_meta": {
+    "owner": "@docling",
+    "since": "0.1.0",
+    "stability": "experimental"
+  },
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "GraniteDoclingVLM"
+      ]
+    }
+  ],
+  "symbols": {
+    "GraniteDoclingVLM": {
+      "owner": "@docling",
+      "since": "0.1.0",
+      "stability": "experimental"
+    }
+  },
+  "synopsis": "Vision-language tagging helpers for docling",
+  "title": "docling.vlm"
+}

@@ -13,6 +13,7 @@ Examples
 ...     assert e.http_status == 503
 ...     details = e.to_problem_details(instance="/api/download")
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ from typing import TYPE_CHECKING, cast
 
 from kgfoundry_common.errors.codes import ErrorCode, get_type_uri
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.problem_details import build_problem_details
 
 if TYPE_CHECKING:
@@ -61,9 +63,11 @@ __all__ = [
     "UnsupportedMIMEError",
     "VectorSearchError",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 @dataclass(slots=True)
+# [nav:anchor KgFoundryErrorConfig]
 class KgFoundryErrorConfig:
     """Configuration options used when instantiating :class:`KgFoundryError`."""
 
@@ -133,6 +137,7 @@ def _coerce_error_config(
     )
 
 
+# [nav:anchor KgFoundryError]
 class KgFoundryError(Exception):
     """Base exception for all kgfoundry errors.
 
@@ -278,6 +283,7 @@ class KgFoundryError(Exception):
         return base
 
 
+# [nav:anchor DownloadError]
 class DownloadError(KgFoundryError):
     """Error during download or resource fetch operations.
 
@@ -327,6 +333,7 @@ class DownloadError(KgFoundryError):
         )
 
 
+# [nav:anchor UnsupportedMIMEError]
 class UnsupportedMIMEError(KgFoundryError):
     """Error for unsupported MIME types.
 
@@ -376,6 +383,7 @@ class UnsupportedMIMEError(KgFoundryError):
         )
 
 
+# [nav:anchor DoclingError]
 class DoclingError(KgFoundryError):
     """Error during document processing with Docling.
 
@@ -425,6 +433,7 @@ class DoclingError(KgFoundryError):
         )
 
 
+# [nav:anchor OCRTimeoutError]
 class OCRTimeoutError(KgFoundryError):
     """Error when OCR operation times out.
 
@@ -474,6 +483,7 @@ class OCRTimeoutError(KgFoundryError):
         )
 
 
+# [nav:anchor ChunkingError]
 class ChunkingError(KgFoundryError):
     """Error during text chunking operations.
 
@@ -523,6 +533,7 @@ class ChunkingError(KgFoundryError):
         )
 
 
+# [nav:anchor EmbeddingError]
 class EmbeddingError(KgFoundryError):
     """Error during embedding generation.
 
@@ -572,6 +583,7 @@ class EmbeddingError(KgFoundryError):
         )
 
 
+# [nav:anchor SpladeOOMError]
 class SpladeOOMError(KgFoundryError):
     """Error when SPLADE operation runs out of memory.
 
@@ -622,6 +634,7 @@ class SpladeOOMError(KgFoundryError):
         )
 
 
+# [nav:anchor IndexBuildError]
 class IndexBuildError(KgFoundryError):
     """Error during index construction.
 
@@ -671,6 +684,7 @@ class IndexBuildError(KgFoundryError):
         )
 
 
+# [nav:anchor OntologyParseError]
 class OntologyParseError(KgFoundryError):
     """Error during ontology parsing.
 
@@ -720,6 +734,7 @@ class OntologyParseError(KgFoundryError):
         )
 
 
+# [nav:anchor LinkerCalibrationError]
 class LinkerCalibrationError(KgFoundryError):
     """Error during linker calibration.
 
@@ -769,6 +784,7 @@ class LinkerCalibrationError(KgFoundryError):
         )
 
 
+# [nav:anchor Neo4jError]
 class Neo4jError(KgFoundryError):
     """Error during Neo4j operations.
 
@@ -818,6 +834,7 @@ class Neo4jError(KgFoundryError):
         )
 
 
+# [nav:anchor ConfigurationError]
 class ConfigurationError(KgFoundryError):
     """Error during configuration validation or loading.
 
@@ -972,6 +989,7 @@ class SettingsError(KgFoundryError):
         )
 
 
+# [nav:anchor SerializationError]
 class SerializationError(KgFoundryError):
     """Error during JSON serialization or schema validation.
 
@@ -1021,6 +1039,7 @@ class SerializationError(KgFoundryError):
         )
 
 
+# [nav:anchor RegistryError]
 class RegistryError(KgFoundryError):
     """Errors raised during registry or DuckDB operations.
 
@@ -1071,6 +1090,7 @@ class RegistryError(KgFoundryError):
         )
 
 
+# [nav:anchor DeserializationError]
 class DeserializationError(KgFoundryError):
     """Error during JSON deserialization, schema validation, or checksum verification.
 
@@ -1120,6 +1140,7 @@ class DeserializationError(KgFoundryError):
         )
 
 
+# [nav:anchor SchemaValidationError]
 class SchemaValidationError(KgFoundryError):
     """Error raised when schema validation fails.
 
@@ -1180,6 +1201,7 @@ class SchemaValidationError(KgFoundryError):
         )
 
 
+# [nav:anchor RetryExhaustedError]
 class RetryExhaustedError(KgFoundryError):
     """Raised when retry logic exhausts all attempts.
 
@@ -1283,6 +1305,7 @@ class RetryExhaustedError(KgFoundryError):
         )
 
 
+# [nav:anchor VectorSearchError]
 class VectorSearchError(KgFoundryError):
     """Error during vector search operations.
 
@@ -1332,6 +1355,7 @@ class VectorSearchError(KgFoundryError):
         )
 
 
+# [nav:anchor AgentCatalogSearchError]
 class AgentCatalogSearchError(KgFoundryError):
     """Error during agent catalog search operations.
 
@@ -1383,6 +1407,7 @@ class AgentCatalogSearchError(KgFoundryError):
         )
 
 
+# [nav:anchor CatalogSessionError]
 class CatalogSessionError(KgFoundryError):
     """Error during catalog session operations (JSON-RPC, subprocess).
 
@@ -1432,6 +1457,7 @@ class CatalogSessionError(KgFoundryError):
         )
 
 
+# [nav:anchor CatalogLoadError]
 class CatalogLoadError(KgFoundryError):
     """Error during catalog payload loading or parsing.
 
@@ -1483,6 +1509,7 @@ class CatalogLoadError(KgFoundryError):
         )
 
 
+# [nav:anchor SymbolAttachmentError]
 class SymbolAttachmentError(KgFoundryError):
     """Error during symbol attachment to modules in catalog.
 
@@ -1534,6 +1561,7 @@ class SymbolAttachmentError(KgFoundryError):
         )
 
 
+# [nav:anchor ArtifactModelError]
 class ArtifactModelError(KgFoundryError):
     """Error during artifact model loading or validation.
 
@@ -1585,6 +1613,7 @@ class ArtifactModelError(KgFoundryError):
         )
 
 
+# [nav:anchor ArtifactValidationError]
 class ArtifactValidationError(KgFoundryError):
     """Error during artifact validation.
 
@@ -1636,6 +1665,7 @@ class ArtifactValidationError(KgFoundryError):
         )
 
 
+# [nav:anchor ArtifactSerializationError]
 class ArtifactSerializationError(KgFoundryError):
     """Error during artifact serialization.
 
@@ -1687,6 +1717,7 @@ class ArtifactSerializationError(KgFoundryError):
         )
 
 
+# [nav:anchor ArtifactDeserializationError]
 class ArtifactDeserializationError(KgFoundryError):
     """Error during artifact deserialization.
 
@@ -1738,6 +1769,7 @@ class ArtifactDeserializationError(KgFoundryError):
         )
 
 
+# [nav:anchor ArtifactDependencyError]
 class ArtifactDependencyError(KgFoundryError):
     """Error during artifact dependency resolution.
 

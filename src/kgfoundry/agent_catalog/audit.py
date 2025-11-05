@@ -1,4 +1,5 @@
 """Audit logging helpers for hosted Agent Catalog deployments."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -7,6 +8,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from kgfoundry_common.logging import get_correlation_id
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
     from kgfoundry_common.problem_details import JsonValue
 
 
+# [nav:anchor AuditLogger]
 class AuditLogger:
     """Append structured audit events to a JSONL file.
 
@@ -114,4 +117,7 @@ class AuditLogger:
             stream.write("\n")
 
 
-__all__ = ["AuditLogger"]
+__all__ = [
+    "AuditLogger",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

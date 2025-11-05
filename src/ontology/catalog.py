@@ -4,14 +4,16 @@ This module bundles catalog logic for the kgfoundry stack. It groups related hel
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
 
 
@@ -34,32 +36,10 @@ class Concept:
     label: str | None = None
 
 
-__all__ = ["OntologyCatalog"]
-
-__navmap__: Final[NavMap] = {
-    "title": "ontology.catalog",
-    "synopsis": "Utility catalogue for lightweight ontology lookups.",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@ontology",
-        "stability": "beta",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "OntologyCatalog": {
-            "owner": "@ontology",
-            "stability": "beta",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "OntologyCatalog",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor OntologyCatalog]

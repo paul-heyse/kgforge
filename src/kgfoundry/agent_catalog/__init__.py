@@ -1,4 +1,5 @@
 """Public interface for the agent catalog client and utilities."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ from kgfoundry.agent_catalog.session import (
     CatalogSessionError,
 )
 from kgfoundry.agent_catalog.sqlite import load_catalog_from_sqlite, write_sqlite_catalog
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 __all__ = [
     "AccessController",
@@ -32,3 +34,5 @@ __all__ = [
     "search",
     "write_sqlite_catalog",
 ]
+
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

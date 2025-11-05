@@ -1,4 +1,5 @@
 """Utilities for detecting GPU stack availability."""
+# [nav:section public-api]
 
 from __future__ import annotations
 

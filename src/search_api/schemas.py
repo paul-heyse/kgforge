@@ -4,49 +4,29 @@ This module bundles schemas logic for the kgfoundry stack. It groups related hel
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import importlib
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 from pydantic import ConfigDict, Field
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.types import JsonValue
 else:
     JsonValue = importlib.import_module("kgfoundry_common.types").JsonValue
 
-__all__ = ["SearchRequest", "SearchResponse", "SearchResult"]
-
-__navmap__: Final[NavMap] = {
-    "title": "search_api.schemas",
-    "synopsis": "Pydantic models used by the search API",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
+__all__ = [
+    "SearchRequest",
+    "SearchResponse",
+    "SearchResult",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor SearchResponse]

@@ -8,6 +8,7 @@ supported way to expose third-party modules (for example, ``search_client`` or
 Install the ``kgfoundry[tools]`` optional extra to ensure the tooling package is
 available in the current environment before importing this module.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -25,6 +26,7 @@ from kgfoundry._namespace_proxy import (
 from kgfoundry._namespace_proxy import (
     namespace_getattr as _namespace_getattr,
 )
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, MutableMapping
@@ -36,8 +38,10 @@ __all__ = [
     "namespace_exports",
     "namespace_getattr",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
+# [nav:anchor namespace_attach]
 def namespace_attach(
     module: ModuleType,
     target: MutableMapping[str, object],
@@ -58,6 +62,7 @@ def namespace_attach(
     _namespace_attach(module, target, names)
 
 
+# [nav:anchor namespace_exports]
 def namespace_exports(module: ModuleType) -> list[str]:
     """Return the public export list for ``module``.
 
@@ -77,6 +82,7 @@ def namespace_exports(module: ModuleType) -> list[str]:
     return _namespace_exports(module)
 
 
+# [nav:anchor namespace_dir]
 def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
     """Compose the ``dir()`` listing for a proxied module.
 
@@ -95,6 +101,7 @@ def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
     return _namespace_dir(module, exports)
 
 
+# [nav:anchor namespace_getattr]
 def namespace_getattr(module: ModuleType, name: str) -> object:
     """Resolve ``name`` from ``module`` while preserving the original attribute.
 

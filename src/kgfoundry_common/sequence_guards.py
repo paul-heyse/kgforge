@@ -20,10 +20,13 @@ When sequence is empty, raises a Problem Details error:
 ... except Exception as e:
 ...     assert "empty" in str(e).lower()
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -45,8 +48,10 @@ __all__ = [
     "first_or_error",
     "first_or_error_multi_device",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
+# [nav:anchor first_or_error]
 def first_or_error[T](
     sequence: Sequence[T],
     *,
@@ -127,6 +132,7 @@ def first_or_error[T](
     return sequence[0]
 
 
+# [nav:anchor first_or_error_multi_device]
 def first_or_error_multi_device[T](
     sequence: Sequence[T],
     *,

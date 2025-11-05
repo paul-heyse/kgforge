@@ -1,4 +1,5 @@
 """Pydantic models describing the Agent Catalog payload."""
+# [nav:section public-api]
 
 from __future__ import annotations
 

@@ -1,0 +1,20 @@
+{
+  "exports": [
+    "DuckDBRegistryHelper"
+  ],
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "DuckDBRegistryHelper"
+      ]
+    }
+  ],
+  "symbols": {
+    "DuckDBRegistryHelper": {
+      "owner": "@todo-owner",
+      "since": "0.0.0",
+      "stability": "experimental"
+    }
+  }
+}

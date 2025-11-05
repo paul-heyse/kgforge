@@ -1,4 +1,5 @@
 """Typed DuckDB helper utilities for parameterized queries and logging."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -12,6 +13,7 @@ import duckdb
 
 from kgfoundry_common.errors import RegistryError
 from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 
 if TYPE_CHECKING:
@@ -21,13 +23,16 @@ if TYPE_CHECKING:
 
 Params = Sequence[object] | Mapping[str, object] | None
 
+# [nav:anchor DEFAULT_TIMEOUT_S]
 DEFAULT_TIMEOUT_S: Final[float] = 5.0
+# [nav:anchor DEFAULT_SLOW_QUERY_THRESHOLD_S]
 DEFAULT_SLOW_QUERY_THRESHOLD_S: Final[float] = 0.5
 DEFAULT_THREADS: Final[int] = 4
 MAX_SQL_PREVIEW_CHARS: Final[int] = 160
 
 
 @dataclass(slots=True, frozen=True)
+# [nav:anchor DuckDBQueryOptions]
 class DuckDBQueryOptions:
     """Configuration for DuckDB query execution helpers."""
 
@@ -47,11 +52,13 @@ __all__ = [
     "fetch_one",
     "validate_identifier",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 logger = get_logger(__name__)
 metrics = MetricsProvider.default()
 
 
+# [nav:anchor connect]
 def connect(
     db_path: Path | str,
     *,
@@ -227,6 +234,7 @@ def _coerce_options(
     return replace(options, operation=operation)
 
 
+# [nav:anchor execute]
 def execute(
     conn: DuckDBPyConnection,
     sql: str,
@@ -316,6 +324,7 @@ def execute(
             return relation
 
 
+# [nav:anchor fetch_all]
 def fetch_all(
     conn: DuckDBPyConnection,
     sql: str,
@@ -357,6 +366,7 @@ def fetch_all(
     return typed_rows
 
 
+# [nav:anchor fetch_one]
 def fetch_one(
     conn: DuckDBPyConnection,
     sql: str,
@@ -399,6 +409,7 @@ def fetch_one(
     return tuple(raw_row)
 
 
+# [nav:anchor validate_identifier]
 def validate_identifier(
     identifier: str,
     allowed: Iterable[str],

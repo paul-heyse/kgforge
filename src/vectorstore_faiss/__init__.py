@@ -1,38 +1,19 @@
-"""Overview of vectorstore faiss.
+"""Expose FAISS-based vector store integrations and metadata."""
 
-This module bundles vectorstore faiss logic for the kgfoundry stack. It groups related helpers so
-downstream packages can import a single cohesive namespace. Refer to the functions and classes below
-for implementation specifics.
-"""
+from __future__ import annotations
 
-from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 from vectorstore_faiss import gpu
 
-__all__ = ["gpu"]
+NavMap = _NavMap
 
-__navmap__: NavMap = {
-    "title": "vectorstore_faiss",
-    "synopsis": "FAISS GPU vector store wrappers",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        "gpu": {
-            "stability": "experimental",
-            "owner": "@search-api",
-            "since": "0.2.0",
-        },
-    },
-}
+__all__ = [
+    "NavMap",
+    "gpu",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
+
+# [nav:section public-api]
 # [nav:anchor gpu]

@@ -38,12 +38,15 @@ postponed annotations (PEP 563) eliminate eager evaluation.
 JSON Schema 2020-12 examples and validation helpers are exported here for
 cross-package use; see `kgfoundry_common.jsonschema_utils` for validators.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
 from typing import TYPE_CHECKING, NoReturn, Protocol, cast
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 
 class _Comparable(Protocol):
@@ -126,6 +129,7 @@ __all__ = [
     "resolve_numpy",
     "safe_get_type",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # =============================================================================
@@ -150,6 +154,7 @@ type SymbolID = str
 # =============================================================================
 
 
+# [nav:anchor gate_import]
 def gate_import(
     module_name: str,
     purpose: str,
@@ -209,6 +214,7 @@ def gate_import(
     return module
 
 
+# [nav:anchor safe_get_type]
 def safe_get_type(
     module_name: str,
     type_name: str,
@@ -250,6 +256,7 @@ def safe_get_type(
 # =============================================================================
 
 
+# [nav:anchor resolve_numpy]
 def resolve_numpy() -> object:
     """Resolve and return the numpy module (deprecated).
 
@@ -273,6 +280,7 @@ def resolve_numpy() -> object:
     return gate_import("numpy", "numpy array processing")
 
 
+# [nav:anchor resolve_fastapi]
 def resolve_fastapi() -> object:
     """Resolve and return the fastapi module (deprecated).
 
@@ -296,6 +304,7 @@ def resolve_fastapi() -> object:
     return gate_import("fastapi", "FastAPI application")
 
 
+# [nav:anchor resolve_faiss]
 def resolve_faiss() -> object:
     """Resolve and return the faiss module (deprecated).
 

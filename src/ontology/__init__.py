@@ -1,43 +1,21 @@
-"""Overview of ontology.
+"""Expose ontology catalog helpers and navigation metadata."""
 
-This module bundles ontology logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
-"""
+from __future__ import annotations
 
-# [nav:anchor catalog]
-# [nav:anchor loader]
-from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 from ontology import catalog, loader
 
-__all__ = ["catalog", "loader"]
+NavMap = _NavMap
 
-__navmap__: NavMap = {
-    "title": "ontology",
-    "synopsis": "Ontology loading and lookup helpers",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@ontology",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "catalog": {
-            "stability": "beta",
-            "owner": "@ontology",
-            "since": "0.1.0",
-        },
-        "loader": {
-            "stability": "beta",
-            "owner": "@ontology",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "NavMap",
+    "catalog",
+    "loader",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
+
+# [nav:section public-api]
+# [nav:anchor catalog]
+# [nav:anchor loader]

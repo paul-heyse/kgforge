@@ -141,6 +141,15 @@ CANONICAL_ERROR_CODES: Final[dict[str, CanonicalErrorCode]] = {
         severity="error",
         remediation="Ensure docs/_build/schema_docfacts.json matches the canonical schema and re-run the docstring builder.",
     ),
+    "KGF-DOC-BLD-009": _code(
+        "KGF-DOC-BLD-009",
+        title="Python compilation failed",
+        summary="Static compilation of sources with compileall detected syntax errors",
+        domain="documentation",
+        category="build",
+        severity="error",
+        remediation="Run 'uv run python -m compileall -q src' locally to locate and fix the syntax error.",
+    ),
     "KGF-DOC-BLD-012": _code(
         "KGF-DOC-BLD-012",
         title="Gallery validation failed",
@@ -266,6 +275,15 @@ CANONICAL_ERROR_CODES: Final[dict[str, CanonicalErrorCode]] = {
         category="build",
         severity="error",
         remediation="Inspect MkDocs output; ensure mkdocs and plugins are installed.",
+    ),
+    "KGF-DOC-BLD-091": _code(
+        "KGF-DOC-BLD-091",
+        title="MkDocs suite build failed",
+        summary="MkDocs suite configuration failed to build",
+        domain="documentation",
+        category="build",
+        severity="error",
+        remediation="Run 'uv run mkdocs build --config-file tools/mkdocs_suite/mkdocs.yml --strict' to reproduce and fix configuration issues.",
     ),
     "KGF-DOC-BLD-100": _code(
         "KGF-DOC-BLD-100",

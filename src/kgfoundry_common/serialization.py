@@ -15,6 +15,7 @@ Examples
 >>> loaded = deserialize_json(output_path, schema_path)
 >>> assert loaded == data
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -38,6 +39,7 @@ from kgfoundry_common.jsonschema_utils import (
     validate as jsonschema_validate,
 )
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 # JSON Schema type (from jsonschema stubs: Mapping[str, object])
 JsonSchema = Mapping[str, object]
@@ -49,6 +51,8 @@ __all__ = [
     "validate_payload",
     "verify_checksum",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 logger = get_logger(__name__)
 
@@ -139,6 +143,7 @@ def _load_schema_cached(schema_path: Path) -> dict[str, object]:
     return schema_obj
 
 
+# [nav:anchor validate_payload]
 def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
     """Validate a payload against a JSON Schema 2020-12.
 
@@ -189,6 +194,7 @@ def validate_payload(payload: Mapping[str, object], schema_path: Path) -> None:
         raise SchemaValidationError(msg) from exc
 
 
+# [nav:anchor compute_checksum]
 def compute_checksum(data: bytes) -> str:
     """Compute SHA256 checksum of binary data.
 
@@ -216,6 +222,7 @@ def compute_checksum(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+# [nav:anchor verify_checksum]
 def verify_checksum(data: bytes, expected: str) -> None:
     """Verify SHA256 checksum matches expected value.
 
@@ -247,6 +254,7 @@ def verify_checksum(data: bytes, expected: str) -> None:
         raise SerializationError(msg)
 
 
+# [nav:anchor serialize_json]
 def serialize_json(
     obj: object,  # JSON-serializable: dict, list, str, int, float, bool, None
     schema_path: Path,
@@ -450,6 +458,7 @@ def _load_data_file(data_path: Path) -> str:
     return read_text(data_path)
 
 
+# [nav:anchor deserialize_json]
 def deserialize_json(
     data_path: Path,
     schema_path: Path,

@@ -4,20 +4,21 @@ This module bundles fixture flow logic for the kgfoundry stack. It groups relate
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 from prefect import flow, task
 
 from kgfoundry_common.models import Doc
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.parquet_io import ParquetChunkWriter, ParquetVectorWriter
 from registry.helper import DuckDBRegistryHelper
 
 if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.parquet_io import ChunkRow
 
 __all__ = [
@@ -28,32 +29,7 @@ __all__ = [
     "t_write_fixture_dense",
     "t_write_fixture_splade",
 ]
-
-__navmap__: Final[NavMap] = {
-    "title": "orchestration.fixture_flow",
-    "synopsis": "Prefect flows that build local fixture datasets",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@orchestration",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@orchestration",
-            "stability": "experimental",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor t_prepare_dirs]

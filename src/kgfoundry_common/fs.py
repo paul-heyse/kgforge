@@ -13,6 +13,7 @@ Examples
 >>> write_text(base / "file.txt", "content")
 >>> content = read_text(base / "file.txt")
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -46,12 +47,10 @@ def ensure_dir(path: Path, *, exist_ok: bool = True) -> Path:
     Path
         The created or existing directory path (same as input).
 
-    Raises
-    ------
-    PermissionError
-        If the filesystem denies creation due to insufficient permissions.
-    FileExistsError
-        If exist_ok=False and the path exists as a file (not a directory).
+    Notes
+    -----
+    This call delegates to :meth:`pathlib.Path.mkdir`. Filesystem-level errors
+    such as ``PermissionError`` or ``FileExistsError`` propagate unchanged.
 
     Examples
     --------
@@ -129,14 +128,11 @@ def read_text(path: Path, encoding: str = "utf-8") -> str:
     str
         File contents as a decoded string.
 
-    Raises
-    ------
-    FileNotFoundError
-        If the file does not exist.
-    UnicodeDecodeError
-        If the file cannot be decoded with the specified encoding.
-    PermissionError
-        If the file is not readable.
+    Notes
+    -----
+    This helper delegates to :meth:`pathlib.Path.read_text`, so filesystem
+    errors such as ``FileNotFoundError`` or ``PermissionError`` will surface
+    unchanged.
 
     Examples
     --------
@@ -164,12 +160,10 @@ def write_text(path: Path, data: str, encoding: str = "utf-8") -> None:
     encoding : str, optional
         Text encoding to use for encoding the string to bytes. Defaults to "utf-8".
 
-    Raises
-    ------
-    PermissionError
-        If the filesystem denies write access.
-    OSError
-        If parent directory creation fails or file write fails.
+    Notes
+    -----
+    Exceptions raised by :func:`ensure_dir` or :meth:`pathlib.Path.write_text`
+    (for example ``OSError`` or ``PermissionError``) propagate to callers.
 
     Examples
     --------
@@ -208,11 +202,11 @@ def atomic_write(
     ------
     ValueError
         If mode is "text" but data is bytes, or mode is "binary" but data is str.
-    PermissionError
-        If the filesystem denies write access.
-    OSError
-        If parent directory creation fails, temporary file creation fails, or
-        rename operation fails.
+
+    Notes
+    -----
+    Filesystem errors raised by :func:`ensure_dir`, :func:`tempfile.NamedTemporaryFile`,
+    or :meth:`pathlib.Path.replace` propagate to the caller.
 
     Notes
     -----

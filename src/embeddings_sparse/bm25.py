@@ -4,6 +4,7 @@ This module bundles bm25 logic for the kgfoundry stack. It groups related helper
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Final, Protocol, cast
 
 from kgfoundry_common.errors import DeserializationError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.safe_pickle_v2 import UnsafeSerializationError, load_unsigned_legacy
 from kgfoundry_common.serialization import deserialize_json, serialize_json
 
@@ -25,7 +27,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
     from re import Pattern
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,13 @@ def _normalize_field_boosts(boosts: Mapping[str, float] | None) -> dict[str, flo
     return normalized
 
 
-__all__ = ["BM25Doc", "LuceneBM25", "PurePythonBM25", "get_bm25"]
+__all__ = [
+    "BM25Doc",
+    "LuceneBM25",
+    "PurePythonBM25",
+    "get_bm25",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 def _load_json_metadata(metadata_path: Path, schema_path: Path) -> dict[str, JsonValue]:
@@ -60,62 +67,6 @@ def _load_json_metadata(metadata_path: Path, schema_path: Path) -> dict[str, Jso
         raise DeserializationError(msg)
     return cast("dict[str, JsonValue]", data_raw)
 
-
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry.embeddings_sparse.bm25",
-    "synopsis": "Pure Python and Lucene-backed BM25 adapters for sparse retrieval",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        }
-    ],
-    "module_meta": {
-        "owner": "@embeddings",
-        "stability": "experimental",
-        "since": "2024.10",
-    },
-    "symbols": {
-        "BM25Doc": {
-            "owner": "@embeddings",
-            "stability": "experimental",
-            "since": "2024.10",
-        },
-        "PurePythonBM25": {
-            "owner": "@embeddings",
-            "since": "2024.10",
-            "stability": "experimental",
-            "side_effects": ["fs"],
-            "thread_safety": "not-threadsafe",
-            "async_ok": False,
-            "tests": [
-                "tests/unit/test_bm25_adapter.py::test_bm25_build_and_search_from_fixtures",
-            ],
-        },
-        "LuceneBM25": {
-            "owner": "@embeddings",
-            "since": "2024.10",
-            "stability": "experimental",
-            "side_effects": ["fs"],
-            "thread_safety": "not-threadsafe",
-            "async_ok": False,
-        },
-        "get_bm25": {
-            "owner": "@embeddings",
-            "since": "2024.10",
-            "stability": "stable",
-            "side_effects": ["none"],
-            "thread_safety": "not-threadsafe",
-            "async_ok": False,
-        },
-    },
-    "edit_scopes": {"safe": ["get_bm25"], "risky": ["PurePythonBM25", "LuceneBM25"]},
-    "tags": ["bm25", "retrieval", "sparse"],
-    "see_also": ["kgfoundry.search_api.bm25_index"],
-    "deps": ["pyserini"],
-}
 
 TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
 
@@ -793,6 +744,7 @@ def _load_lucene_searcher_factory() -> LuceneSearcherFactory:
     return candidate_callable
 
 
+# [nav:anchor get_bm25]
 def get_bm25(
     backend: str,
     index_dir: str,

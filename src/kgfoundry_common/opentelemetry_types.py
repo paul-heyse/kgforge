@@ -5,6 +5,7 @@ codebase relies on.  We define lightweight ``Protocol`` interfaces that mirror
 the runtime behaviour we exercise and provide helpers for loading the optional
 dependency safely at runtime without leaking ``Any`` into the type graph.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 

@@ -4,47 +4,20 @@ This module bundles ids logic for the kgfoundry stack. It groups related helpers
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import base64
 import hashlib
-from typing import TYPE_CHECKING, Final
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
-__all__ = ["urn_chunk", "urn_doc_from_text"]
-
-__navmap__: Final[NavMap] = {
-    "title": "kgfoundry_common.ids",
-    "synopsis": "Helpers for generating deterministic URNs",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@kgfoundry-common",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "urn_doc_from_text": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-        "urn_chunk": {
-            "owner": "@kgfoundry-common",
-            "stability": "stable",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "urn_chunk",
+    "urn_doc_from_text",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor urn_doc_from_text]

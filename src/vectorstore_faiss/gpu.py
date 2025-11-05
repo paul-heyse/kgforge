@@ -1,13 +1,15 @@
 """GPU-aware FAISS index helpers backed by the shared search API facade."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Final, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.numpy_typing import normalize_l2
 from search_api.faiss_gpu import (
     clone_index_to_gpu,
@@ -36,18 +38,21 @@ else:  # pragma: no cover - runtime fallback
     StrArray = np.ndarray
     VecArray = np.ndarray
 
-__all__: Final[list[str]] = [
+__all__ = [
     "FaissGpuIndex",
     "FloatArray",
     "IntArray",
     "StrArray",
     "VecArray",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass(slots=True)
+# [nav:anchor FaissGpuIndex]
 class FaissGpuIndex:
     """Small GPU-aware facade that delegates to :mod:`search_api.faiss_gpu`.
 

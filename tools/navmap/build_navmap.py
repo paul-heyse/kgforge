@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import ast
+import copy
+import importlib
 import json
 import os
 import re
@@ -47,6 +49,9 @@ OUT.mkdir(parents=True, exist_ok=True)
 INDEX_PATH = OUT / "navmap.json"
 DRIFT_DIR = REPO / "docs" / "_build" / "drift"
 NAVMAP_DIFF_PATH = DRIFT_DIR / "navmap.html"
+
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
 # Link settings
 G_ORG = os.getenv("DOCS_GITHUB_ORG")
@@ -928,6 +933,33 @@ def _parse_py(py: Path) -> tuple[dict[str, ResolvedNavValue], list[str]]:
     return nav_map, exports
 
 
+def _load_runtime_navmap(
+    module_name: str, exports: list[str]
+) -> tuple[dict[str, ResolvedNavValue], list[str]]:
+    """Load ``__navmap__`` by importing ``module_name`` when AST parsing fails.
+
+    Returns
+    -------
+    tuple[dict[str, ResolvedNavValue], list[str]]
+        Tuple containing the navmap dictionary (if discovered) and the deduped export list.
+    """
+    try:
+        module = importlib.import_module(module_name)
+    except ImportError as exc:  # pragma: no cover - runtime fallback
+        LOGGER.debug("Unable to import %s for nav metadata: %s", module_name, exc)
+        return {}, exports
+
+    nav_data = getattr(module, "__navmap__", None)
+    if not isinstance(nav_data, dict):
+        return {}, exports
+
+    nav_copy: dict[str, ResolvedNavValue] = copy.deepcopy(nav_data)
+    nav_exports = nav_copy.get("exports")
+    if isinstance(nav_exports, list):
+        exports = _dedupe_exports([item for item in nav_exports if isinstance(item, str)])
+    return nav_copy, exports
+
+
 def _scan_inline_markers(py: Path) -> tuple[dict[str, int], dict[str, int]]:
     """Scan file for inline navigation markers.
 
@@ -993,6 +1025,8 @@ def _collect_module(py: Path) -> ModuleInfo | None:
     if not mod:
         return None
     navmap_dict, exports = _parse_py(py)
+    if not navmap_dict:
+        navmap_dict, exports = _load_runtime_navmap(mod, exports)
     sections, anchors = _scan_inline_markers(py)
 
     # Normalize sections to kebab-case and ensure symbol lists are unique & stable

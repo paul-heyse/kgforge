@@ -4,6 +4,7 @@ This module bundles fixture index logic for the kgfoundry stack. It groups relat
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -11,44 +12,24 @@ import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 import duckdb
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from registry.duckdb_helpers import fetch_all, fetch_one
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
 
-    from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["FixtureDoc", "FixtureIndex", "tokenize"]
+__all__ = [
+    "FixtureDoc",
+    "FixtureIndex",
+    "tokenize",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "search_api.fixture_index",
-    "synopsis": "In-memory fixture index used for tests and tutorials",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 

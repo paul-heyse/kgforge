@@ -1,0 +1,90 @@
+{
+  "exports": [
+    "app",
+    "bm25_index",
+    "faiss_adapter",
+    "fixture_index",
+    "fusion",
+    "kg_mock",
+    "schemas",
+    "service",
+    "splade_index",
+    "types"
+  ],
+  "module_meta": {
+    "owner": "@search-api",
+    "since": "0.1.0",
+    "stability": "experimental"
+  },
+  "sections": [
+    {
+      "id": "public-api",
+      "symbols": [
+        "app",
+        "bm25_index",
+        "faiss_adapter",
+        "fixture_index",
+        "fusion",
+        "kg_mock",
+        "schemas",
+        "service",
+        "splade_index",
+        "types"
+      ]
+    }
+  ],
+  "symbols": {
+    "app": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "bm25_index": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "faiss_adapter": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "fixture_index": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "fusion": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "kg_mock": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "schemas": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "service": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "splade_index": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    },
+    "types": {
+      "owner": "@search-api",
+      "since": "0.1.0",
+      "stability": "experimental"
+    }
+  },
+  "synopsis": "Search service endpoints and retrieval adapters",
+  "title": "search_api"
+}

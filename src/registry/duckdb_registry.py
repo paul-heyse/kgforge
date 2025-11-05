@@ -4,13 +4,15 @@ This module bundles duckdb registry logic for the kgfoundry stack. It groups rel
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import json
 import uuid
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from registry import duckdb_helpers
 from registry.duckdb_helpers import DuckDBQueryOptions
 
@@ -20,34 +22,11 @@ if TYPE_CHECKING:
     import duckdb
 
     from kgfoundry_common.models import Doc, DoctagsAsset
-    from kgfoundry_common.navmap_types import NavMap
 
-__all__ = ["DuckDBRegistry"]
-
-__navmap__: Final[NavMap] = {
-    "title": "registry.duckdb_registry",
-    "synopsis": "Minimal registry wrapper storing pipeline artefacts in DuckDB.",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@registry",
-        "stability": "beta",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "DuckDBRegistry": {
-            "owner": "@registry",
-            "stability": "beta",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "DuckDBRegistry",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor DuckDBRegistry]

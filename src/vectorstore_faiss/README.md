@@ -7,9 +7,9 @@ Overview of vectorstore faiss.
 
 ## Modules
 
-- **`vectorstore_faiss.gpu`** — GPU-aware FAISS index helpers backed by the shared search API facade. → [open](vscode://file//home/paul/kgfoundry/src/vectorstore_faiss/gpu.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/vectorstore_faiss/gpu.py#L1)
+- **`vectorstore_faiss.gpu`** — GPU-aware FAISS index helpers backed by the shared search API facade. → [open](vscode://file//home/paul/kgfoundry/src/vectorstore_faiss/gpu.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/vectorstore_faiss/gpu.py#L1)
 
 ## Classes
 
-- **`vectorstore_faiss.NavMap`** — Describe NavMap. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:82:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae/src/kgfoundry_common/navmap_types.py#L82-L102)
-<!-- agent:readme v1 sha:c81c95bcb3ab0b1fe08a3bb6ef491b4ee6defdae content:ec15ddcfbdc8 -->
+- **`vectorstore_faiss.NavMap`** — Navigation map metadata structure. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry_common/navmap_types.py:126:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry_common/navmap_types.py#L126-L172)
+<!-- agent:readme v1 sha:18158918ad31c841b72a8a8cd247c7cb82793385 content:812f31333dba -->

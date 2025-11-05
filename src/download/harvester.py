@@ -4,6 +4,7 @@ This module bundles harvester logic for the kgfoundry stack. It groups related h
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -11,42 +12,19 @@ import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, cast
+from typing import cast
 
 import requests
 
 from kgfoundry_common.errors import DownloadError, UnsupportedMIMEError
 from kgfoundry_common.models import Doc
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+__all__ = [
+    "OpenAccessHarvester",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__all__ = ["OpenAccessHarvester"]
-
-__navmap__: Final[NavMap] = {
-    "title": "download.harvester",
-    "synopsis": "Utilities for harvesting open-access PDFs from OpenAlex.",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@download",
-        "stability": "beta",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        "OpenAccessHarvester": {
-            "owner": "@download",
-            "stability": "beta",
-            "since": "0.2.0",
-        },
-    },
-}
 
 HTTP_OK = 200
 

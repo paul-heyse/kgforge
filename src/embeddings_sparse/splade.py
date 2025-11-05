@@ -4,6 +4,7 @@ This module bundles splade logic for the kgfoundry stack. It groups related help
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -15,10 +16,11 @@ import math
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, BinaryIO, Final, Protocol, cast
+from typing import TYPE_CHECKING, BinaryIO, Protocol, cast
 
 from kgfoundry_common.config import load_config
 from kgfoundry_common.errors import DeserializationError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.safe_pickle_v2 import (
     SignedPickleWrapper,
     UnsafeSerializationError,
@@ -31,7 +33,6 @@ if TYPE_CHECKING:
     from re import Pattern
     from types import ModuleType
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
 
 TOKEN_RE: Pattern[str] = re.compile(r"[A-Za-z0-9_]+")
@@ -212,53 +213,13 @@ class LuceneImpactSearcherFactory(Protocol):
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["LuceneImpactIndex", "PureImpactIndex", "SPLADEv3Encoder", "get_splade"]
-
-__navmap__: Final[NavMap] = {
-    "title": "embeddings_sparse.splade",
-    "synopsis": "SPLADE sparse embedding helpers",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@embeddings",
-        "stability": "experimental",
-        "since": "2024.10",
-    },
-    "symbols": {
-        "SPLADEv3Encoder": {
-            "owner": "@embeddings",
-            "stability": "experimental",
-            "since": "2024.10",
-        },
-        "PureImpactIndex": {
-            "owner": "@embeddings",
-            "stability": "experimental",
-            "since": "2024.10",
-            "side_effects": ["fs"],
-            "thread_safety": "not-threadsafe",
-            "async_ok": False,
-        },
-        "LuceneImpactIndex": {
-            "owner": "@embeddings",
-            "stability": "experimental",
-            "since": "2024.10",
-            "side_effects": ["fs"],
-            "thread_safety": "not-threadsafe",
-            "async_ok": False,
-        },
-        "get_splade": {
-            "owner": "@embeddings",
-            "stability": "experimental",
-            "since": "2024.10",
-        },
-    },
-}
+__all__ = [
+    "LuceneImpactIndex",
+    "PureImpactIndex",
+    "SPLADEv3Encoder",
+    "get_splade",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor SPLADEv3Encoder]
@@ -330,12 +291,6 @@ class SPLADEv3Encoder:
         ----------
         texts : list[str]
             List of text strings to encode.
-
-        Returns
-        -------
-        list[tuple[list[int], list[float]]]
-            List of (vocab_ids, weights) tuples representing sparse embeddings.
-            Not currently implemented.
 
         Raises
         ------

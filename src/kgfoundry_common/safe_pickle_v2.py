@@ -23,6 +23,7 @@ Examples
 ...     loaded = signer.load(f)
 >>> assert loaded == data
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -33,6 +34,7 @@ from importlib import import_module
 from typing import TYPE_CHECKING, BinaryIO, Protocol, cast
 
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -84,6 +86,7 @@ _ALLOWED_TYPES = frozenset(
 )
 
 
+# [nav:anchor UnsafeSerializationError]
 class UnsafeSerializationError(ValueError):
     """Raised when serialization validation fails.
 
@@ -408,6 +411,7 @@ def _validate_object(obj: object, depth: int = 0) -> None:
     raise ValueError(msg)
 
 
+# [nav:anchor SignedPickleWrapper]
 class SignedPickleWrapper:
     """HMAC-signed pickle with allow-list validation.
 
@@ -498,6 +502,7 @@ class SignedPickleWrapper:
         return result
 
 
+# [nav:anchor load_unsigned_legacy]
 def load_unsigned_legacy(file: BinaryIO) -> object:
     """Deserialize an unsigned legacy pickle stream with allow-list validation.
 
@@ -521,6 +526,7 @@ def load_unsigned_legacy(file: BinaryIO) -> object:
     return _load_with_allow_list(buffer)
 
 
+# [nav:anchor create_unsigned_pickle_payload]
 def create_unsigned_pickle_payload(obj: object) -> bytes:
     """Return pickle bytes for constructing negative test fixtures.
 
@@ -559,3 +565,4 @@ __all__ = [
     "create_unsigned_pickle_payload",
     "load_unsigned_legacy",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

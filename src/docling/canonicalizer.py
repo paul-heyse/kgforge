@@ -4,42 +4,19 @@ This module bundles canonicalizer logic for the kgfoundry stack. It groups relat
 downstream packages can import a single cohesive namespace. Refer to the functions and classes below
 for implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import re
 import unicodedata
-from typing import TYPE_CHECKING, Final
 
-if TYPE_CHECKING:
-    from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
-__all__ = ["canonicalize_text"]
-
-__navmap__: Final[NavMap] = {
-    "title": "docling.canonicalizer",
-    "synopsis": "String canonicalisation utilities for docling preprocessing",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@docling",
-        "stability": "beta",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "canonicalize_text": {
-            "owner": "@docling",
-            "stability": "beta",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "canonicalize_text",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 # [nav:anchor canonicalize_text]

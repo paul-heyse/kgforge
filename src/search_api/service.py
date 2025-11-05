@@ -4,54 +4,32 @@ This module provides typed service-layer functions for search operations, includ
 fusion, knowledge graph boosting, and result deduplication. All functions include structured logging
 and metrics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.problem_details import JsonValue
     from search_api.types import AgentSearchResponse, VectorSearchResultTypedDict
 
-__all__ = ["apply_kg_boosts", "mmr_deduplicate", "rrf_fuse", "search_service"]
+__all__ = [
+    "apply_kg_boosts",
+    "mmr_deduplicate",
+    "rrf_fuse",
+    "search_service",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 logger = get_logger(__name__)
-
-__navmap__: Final[NavMap] = {
-    "title": "search_api.service",
-    "synopsis": "Search orchestration helpers that combine retrieval backends",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": ["rrf_fuse", "apply_kg_boosts", "mmr_deduplicate", "search_service"],
-        }
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-    "edit_scopes": {"safe": ["apply_kg_boosts", "mmr_deduplicate"], "risky": ["rrf_fuse"]},
-    "tags": ["search", "ranking"],
-    "since": "2024.10",
-}
 
 
 # [nav:anchor rrf_fuse]

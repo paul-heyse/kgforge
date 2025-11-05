@@ -21,6 +21,7 @@ Examples
 ...     idx.add(vecs)
 ...     distances, indices = idx.search(vecs, k=5)
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -28,16 +29,16 @@ from collections.abc import Mapping
 from contextlib import suppress
 from dataclasses import dataclass
 from operator import attrgetter
-from typing import TYPE_CHECKING, Final, Protocol, TypedDict, cast
+from typing import TYPE_CHECKING, Protocol, TypedDict, cast
 
 import numpy as np
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.problem_details import JsonValue
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from kgfoundry_common.navmap_types import NavMap
 
 __all__ = [
     "AgentSearchQuery",
@@ -54,32 +55,8 @@ __all__ = [
     "VectorSearchResultTypedDict",
     "wrap_faiss_module",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "search_api.types",
-    "synopsis": "Vector search protocols and typed result structures",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "stable",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "stable",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}
 
 # Type aliases for numpy arrays
 if TYPE_CHECKING:
@@ -109,6 +86,7 @@ with suppress(AttributeError, TypeError):  # pragma: no cover - ndarray may forb
     )
 
 
+# [nav:anchor FaissIndexProtocol]
 class FaissIndexProtocol(Protocol):
     """Protocol for FAISS-compatible vector indexes.
 
@@ -236,6 +214,7 @@ class FaissIndexProtocol(Protocol):
         ...
 
 
+# [nav:anchor FaissModuleProtocol]
 class FaissModuleProtocol(Protocol):
     """Protocol for FAISS module surface used by adapters.
 
@@ -345,6 +324,7 @@ class FaissModuleProtocol(Protocol):
     """Normalize vectors to unit length in-place."""
 
 
+# [nav:anchor GpuResourcesProtocol]
 class GpuResourcesProtocol(Protocol):
     """Protocol for FAISS GPU resources.
 
@@ -368,6 +348,7 @@ class GpuResourcesProtocol(Protocol):
         ...
 
 
+# [nav:anchor GpuClonerOptionsProtocol]
 class GpuClonerOptionsProtocol(Protocol):
     """Protocol for FAISS GPU cloner options.
 
@@ -388,6 +369,7 @@ class GpuClonerOptionsProtocol(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor VectorSearchResult]
 class VectorSearchResult:
     """Typed result from vector search operations.
 
@@ -441,6 +423,7 @@ class VectorSearchResult:
         # is primarily for documentation. The type checker ensures correct usage.
 
 
+# [nav:anchor SpladeEncoderProtocol]
 class SpladeEncoderProtocol(Protocol):
     """Protocol for SPLADE encoder implementations.
 
@@ -489,6 +472,7 @@ class SpladeEncoderProtocol(Protocol):
         ...
 
 
+# [nav:anchor BM25IndexProtocol]
 class BM25IndexProtocol(Protocol):
     """Protocol for BM25 lexical search index implementations.
 
@@ -538,6 +522,7 @@ class BM25IndexProtocol(Protocol):
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor AgentSearchQuery]
 class AgentSearchQuery:
     """Query parameters for agent catalog search operations.
 
@@ -615,6 +600,7 @@ class AgentSearchQuery:
             raise ValueError(msg)
 
 
+# [nav:anchor VectorSearchResultTypedDict]
 class VectorSearchResultTypedDict(TypedDict, total=True):
     """TypedDict representation of vector search results.
 
@@ -677,6 +663,7 @@ class VectorSearchResultTypedDict(TypedDict, total=True):
     """Additional metadata (stability, deprecated, summary, etc.)."""
 
 
+# [nav:anchor AgentSearchResponse]
 class AgentSearchResponse(TypedDict, total=True):
     """TypedDict representation of agent catalog search response.
 
@@ -888,6 +875,7 @@ class _FaissModuleAdapter:
         return cast("object", getattr(self._module, name))
 
 
+# [nav:anchor wrap_faiss_module]
 def wrap_faiss_module(module: object) -> FaissModuleProtocol:
     """Return a :class:`FaissModuleProtocol` with PEP 8 method names.
 

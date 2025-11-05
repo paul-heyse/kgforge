@@ -15,6 +15,7 @@ Examples
 ... except ArtifactDependencyError as e:
 ...     print(f"Griffe unavailable: {e.problem_details()}")
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -24,6 +25,7 @@ import uuid
 from typing import TYPE_CHECKING, TypeVar, cast
 
 from kgfoundry_common.errors import ArtifactDependencyError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.problem_details import build_problem_details
 
 if TYPE_CHECKING:
@@ -37,12 +39,15 @@ __all__ = [
     "safe_import_griffe",
     "safe_import_sphinx",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
 
+# [nav:anchor OptionalDependencyError]
 class OptionalDependencyError(ArtifactDependencyError):
     """Raised when an optional dependency cannot be imported.
 
@@ -116,6 +121,7 @@ def _make_remediation_guidance(module_name: str) -> dict[str, str]:
     return guidance_map.get(module_name, {"install": f"pip install {module_name}"})
 
 
+# [nav:anchor safe_import_griffe]
 def safe_import_griffe() -> object:
     """Safely import Griffe with Problem Details on failure.
 
@@ -195,6 +201,7 @@ def safe_import_griffe() -> object:
         return griffe
 
 
+# [nav:anchor safe_import_autoapi]
 def safe_import_autoapi() -> object:
     """Safely import AutoAPI with Problem Details on failure.
 
@@ -273,6 +280,7 @@ def safe_import_autoapi() -> object:
         return autoapi
 
 
+# [nav:anchor safe_import_sphinx]
 def safe_import_sphinx() -> object:
     """Safely import Sphinx with Problem Details on failure.
 

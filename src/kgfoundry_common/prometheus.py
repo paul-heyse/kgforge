@@ -22,12 +22,14 @@ Fallback behaviour (no Prometheus import required):
 ...     noop.inc()
 ...     noop.labels(status="success").inc()
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, NoReturn, Protocol, cast, overload
 
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.sequence_guards import first_or_error
 
 __all__ = [
@@ -42,6 +44,7 @@ __all__ = [
     "build_histogram",
     "get_default_registry",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -128,6 +131,7 @@ else:  # pragma: no cover - runtime fallback when dependency missing
     CollectorRegistry = object
 
 
+# [nav:anchor CounterLike]
 class CounterLike(Protocol):
     """Protocol describing Prometheus counter behaviour relied upon."""
 
@@ -140,6 +144,7 @@ class CounterLike(Protocol):
         ...
 
 
+# [nav:anchor GaugeLike]
 class GaugeLike(Protocol):
     """Protocol describing Prometheus gauge behaviour relied upon."""
 
@@ -152,6 +157,7 @@ class GaugeLike(Protocol):
         ...
 
 
+# [nav:anchor HistogramLike]
 class HistogramLike(Protocol):
     """Protocol describing Prometheus histogram behaviour relied upon."""
 
@@ -256,6 +262,7 @@ class _HistogramConstructor(Protocol):
 
 
 @dataclass(slots=True)
+# [nav:anchor HistogramParams]
 class HistogramParams:
     """Configuration for building a histogram metric."""
 
@@ -420,6 +427,7 @@ def _histogram_type_error(message: str) -> NoReturn:
     raise TypeError(message)
 
 
+# [nav:anchor build_counter]
 def build_counter(
     name: str,
     documentation: str,
@@ -471,6 +479,7 @@ def build_counter(
         return cast("CounterLike", existing)
 
 
+# [nav:anchor build_gauge]
 def build_gauge(
     name: str,
     documentation: str,
@@ -599,6 +608,7 @@ def build_histogram(
 ) -> HistogramLike: ...
 
 
+# [nav:anchor build_histogram]
 def build_histogram(*args: object, **kwargs: object) -> HistogramLike:
     """Return a histogram metric or a no-op stub.
 
@@ -652,6 +662,7 @@ def build_histogram(*args: object, **kwargs: object) -> HistogramLike:
         return cast("HistogramLike", existing)
 
 
+# [nav:anchor get_default_registry]
 def get_default_registry() -> object | None:
     """Return the global Prometheus registry when the dependency is available.
 

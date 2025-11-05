@@ -7,11 +7,14 @@ The NamespaceRegistry provides a typed, lazy-loading mechanism for resolving
 module exports without relying on dynamic Any types. Symbols are explicitly
 registered with type-aware loaders, enabling full type-checking support.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar, cast
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, MutableMapping
@@ -22,6 +25,7 @@ T = TypeVar("T")
 
 
 @dataclass(slots=True)
+# [nav:anchor NamespaceRegistry]
 class NamespaceRegistry:
     """Typed registry for lazy-loading module symbols.
 
@@ -101,6 +105,7 @@ class NamespaceRegistry:
         return sorted(self._registry.keys())
 
 
+# [nav:anchor namespace_getattr]
 def namespace_getattr(module: ModuleType, name: str) -> object:
     """Return ``name`` from ``module`` while preserving the original attribute.
 
@@ -120,6 +125,7 @@ def namespace_getattr(module: ModuleType, name: str) -> object:
     return cast("object", getattr(module, name))
 
 
+# [nav:anchor namespace_exports]
 def namespace_exports(module: ModuleType) -> list[str]:
     """Return the public export list for ``module`` respecting ``__all__``.
 
@@ -140,6 +146,7 @@ def namespace_exports(module: ModuleType) -> list[str]:
     return [attr for attr in dir(module) if not attr.startswith("_")]
 
 
+# [nav:anchor namespace_attach]
 def namespace_attach(
     module: ModuleType,
     target: MutableMapping[str, object],
@@ -151,6 +158,7 @@ def namespace_attach(
         target[name] = cast("object", getattr(module, name))
 
 
+# [nav:anchor namespace_dir]
 def namespace_dir(module: ModuleType, exports: Iterable[str]) -> list[str]:
     """Return the combined attribute listing exposed by a namespace bridge.
 
@@ -178,3 +186,5 @@ __all__ = [
     "namespace_exports",
     "namespace_getattr",
 ]
+
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

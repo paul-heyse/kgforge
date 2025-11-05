@@ -10,6 +10,7 @@ Examples
 >>> app = FastAPI()
 >>> register_problem_details_handler(app)
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -21,17 +22,25 @@ from fastapi.responses import JSONResponse
 from kgfoundry_common.errors.exceptions import KgFoundryError
 from kgfoundry_common.fastapi_helpers import typed_exception_handler
 from kgfoundry_common.logging import get_logger
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:
     from fastapi import FastAPI, Request
 
     from kgfoundry_common.problem_details import ProblemDetails
 
-__all__ = ["problem_details_response", "register_problem_details_handler"]
+
+__all__ = [
+    "problem_details_response",
+    "register_problem_details_handler",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 logger = get_logger(__name__)
 
 
+# [nav:anchor problem_details_response]
 def problem_details_response(
     error: KgFoundryError,
     request: Request | None = None,
@@ -84,6 +93,7 @@ def problem_details_response(
     )
 
 
+# [nav:anchor register_problem_details_handler]
 def register_problem_details_handler(app: FastAPI) -> None:
     """Register FastAPI exception handler for KgFoundryError."""
 

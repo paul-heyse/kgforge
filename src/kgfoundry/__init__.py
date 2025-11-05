@@ -4,6 +4,7 @@ This module bundles kgfoundry logic for the kgfoundry stack. It groups related h
 packages can import a single cohesive namespace. Refer to the functions and classes below for
 implementation specifics.
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -11,6 +12,8 @@ import sys
 from contextlib import suppress
 from importlib import import_module
 from typing import TYPE_CHECKING as _TYPE_CHECKING
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 _ALIASES: dict[str, str] = {
     "docling": "kgfoundry.docling",
@@ -29,7 +32,7 @@ _ALIASES: dict[str, str] = {
     "vectorstore_faiss": "kgfoundry.vectorstore_faiss",
 }
 
-__all__: list[str] = [
+__all__ = [
     "docling",
     "download",
     "embeddings_dense",
@@ -45,6 +48,8 @@ __all__: list[str] = [
     "search_client",
     "vectorstore_faiss",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
 
 # Remove the helper introduced by ``from __future__ import annotations`` so Griffe
 # does not interpret it as a public alias (it points to ``__future__.annotations``).

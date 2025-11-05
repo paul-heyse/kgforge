@@ -6,6 +6,7 @@ project-excludes = [
     "site/**",
     "**/.venv/**",
     "**/__pycache__/**",
+    "codeintel/ts_languages/**",
 ]
 search-path = ["src", "stubs", "."]
 python-version = "3.13.9"

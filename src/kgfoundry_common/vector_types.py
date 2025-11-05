@@ -20,6 +20,7 @@ dtype('float32')
 >>> batch.matrix.shape
 (2, 3)
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -28,6 +29,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final, NewType, cast
 
 import numpy as np
+
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from collections.abc import Iterable, Sequence
@@ -42,10 +45,12 @@ VECTOR_MATRIX_NDIM: Final[int] = 2
 """Expected number of dimensions for vector matrices."""
 
 
+# [nav:anchor VectorId]
 VectorId = NewType("VectorId", str)
 """Unique identifier for a vector element."""
 
 
+# [nav:anchor VectorValidationError]
 class VectorValidationError(ValueError):
     """Raised when vector payloads fail dtype, shape, or schema validation."""
 
@@ -65,6 +70,7 @@ class VectorValidationError(ValueError):
 
 
 @dataclass(frozen=True, slots=True)
+# [nav:anchor VectorBatch]
 class VectorBatch:
     """Immutable collection of typed vectors with shared dimensionality.
 
@@ -101,6 +107,7 @@ class VectorBatch:
         return len(self.ids)
 
 
+# [nav:anchor assert_vector_matrix]
 def assert_vector_matrix(arr: object) -> VectorMatrix:
     """Return a contiguous ``float32`` matrix derived from ``arr``.
 
@@ -137,6 +144,7 @@ def assert_vector_matrix(arr: object) -> VectorMatrix:
     return contiguous
 
 
+# [nav:anchor validate_vector_batch]
 def validate_vector_batch(batch: VectorBatch) -> VectorBatch:
     """Return ``batch`` after re-validating matrix invariants.
 
@@ -171,6 +179,7 @@ def validate_vector_batch(batch: VectorBatch) -> VectorBatch:
     return batch
 
 
+# [nav:anchor coerce_vector_batch]
 def coerce_vector_batch(records: Iterable[object]) -> VectorBatch:
     """Construct a :class:`VectorBatch` from vector payload mappings.
 
@@ -300,3 +309,4 @@ __all__ = [
     "coerce_vector_batch",
     "validate_vector_batch",
 ]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))

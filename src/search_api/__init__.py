@@ -10,21 +10,15 @@ See Also
 - `schema/models/search_request.v1.json` - Request schema
 - `schema/models/search_result.v1.json` - Response schema
 """
+# [nav:section public-api]
 
 from __future__ import annotations
 
-import importlib
 import sys
-from typing import TYPE_CHECKING
+from importlib import import_module
+from types import ModuleType
 
-# [nav:anchor app]
-# [nav:anchor bm25_index]
-# [nav:anchor faiss_adapter]
-# [nav:anchor fixture_index]
-# [nav:anchor fusion]
-# [nav:anchor kg_mock]
-# [nav:anchor schemas]
-# [nav:anchor service]
+from kgfoundry_common.navmap_loader import load_nav_metadata
 
 _ALIASES: dict[str, str] = {
     "app": "search_api.app",
@@ -39,100 +33,23 @@ _ALIASES: dict[str, str] = {
     "types": "search_api.types",
 }
 
-if TYPE_CHECKING:
-    from search_api import (
-        app,
-        bm25_index,
-        faiss_adapter,
-        fixture_index,
-        fusion,
-        kg_mock,
-        schemas,
-        service,
-        splade_index,
-        types,
-    )
+__all__ = list(_ALIASES)
 
-__all__: tuple[str, ...] = (
-    "app",
-    "bm25_index",
-    "faiss_adapter",
-    "fixture_index",
-    "fusion",
-    "kg_mock",
-    "schemas",
-    "service",
-    "splade_index",
-    "types",
-)
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
-def __getattr__(name: str) -> object:
-    """Provide lazy module loading for submodules.
-
-    Implements lazy loading for submodules in the search_api package.
-    When a submodule is accessed (e.g., `search_api.app`), it is
-    dynamically imported and cached in sys.modules.
-
-    Parameters
-    ----------
-    name : str
-        Submodule name to import (e.g., "app", "bm25_index").
-
-    Returns
-    -------
-    object
-        Imported module object.
-
-    Raises
-    ------
-    AttributeError
-        If the requested name is not in the allowed aliases.
-    """
-    if name not in _ALIASES:
-        message = f"module {__name__!r} has no attribute {name!r}"
-        raise AttributeError(message) from None
-    module = importlib.import_module(_ALIASES[name])
+def _load(name: str) -> ModuleType:
+    module = import_module(_ALIASES[name])
     sys.modules[f"{__name__}.{name}"] = module
     return module
 
 
+def __getattr__(name: str) -> ModuleType:
+    if name not in _ALIASES:
+        message = f"module {__name__!r} has no attribute {name!r}"
+        raise AttributeError(message)
+    return _load(name)
+
+
 def __dir__() -> list[str]:
-    """Return list of public module names.
-
-    Returns the list of public submodule names available in this package.
-    Used by dir() to show available attributes.
-
-    Returns
-    -------
-    list[str]
-        Sorted list of public module names from __all__.
-    """
     return sorted(set(__all__))
-
-
-__navmap__ = {
-    "title": "search_api",
-    "synopsis": "Search service endpoints and retrieval adapters",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.1.0",
-        }
-        for name in __all__
-    },
-}

@@ -1,4 +1,5 @@
 """FAISS adapter with typed GPU fallbacks and DuckDB integration."""
+# [nav:section public-api]
 
 from __future__ import annotations
 
@@ -13,6 +14,7 @@ import duckdb
 import numpy as np
 
 from kgfoundry_common.errors import IndexBuildError, VectorSearchError
+from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.numpy_typing import (
     normalize_l2,
     topk_indices,
@@ -28,7 +30,6 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
     import numpy.typing as npt
     from numpy.typing import NDArray
 
-    from kgfoundry_common.navmap_types import NavMap
     from kgfoundry_common.numpy_typing import (
         FloatMatrix,
         FloatVector,
@@ -49,33 +50,16 @@ else:  # pragma: no cover - runtime fallback
     StrArray = np.ndarray
     VecArray = np.ndarray
 
-__all__ = ["DenseVecs", "FaissAdapter", "FloatArray", "IntArray", "StrArray", "VecArray"]
+__all__ = [
+    "DenseVecs",
+    "FaissAdapter",
+    "FloatArray",
+    "IntArray",
+    "StrArray",
+    "VecArray",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
-__navmap__: Final[NavMap] = {
-    "title": "search_api.faiss_adapter",
-    "synopsis": "FAISS adapter with typed GPU fallbacks and DuckDB persistence",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@search-api",
-        "stability": "experimental",
-        "since": "0.2.0",
-    },
-    "symbols": {
-        name: {
-            "owner": "@search-api",
-            "stability": "experimental",
-            "since": "0.2.0",
-        }
-        for name in __all__
-    },
-}
 
 logger = logging.getLogger(__name__)
 
@@ -167,6 +151,7 @@ HAVE_FAISS = faiss is not None
 
 
 @dataclass
+# [nav:anchor DenseVecs]
 class DenseVecs:
     """Dense vector matrix and ID mapping used to seed FAISS indexes."""
 
@@ -186,6 +171,7 @@ class FaissAdapterConfig:
     gpu_devices: Sequence[int] | None = None
 
 
+# [nav:anchor FaissAdapter]
 class FaissAdapter:
     """Build FAISS indexes with optional GPU acceleration and CPU fallback."""
 

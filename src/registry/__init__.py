@@ -1,60 +1,25 @@
-"""Overview of registry.
+"""Expose registry persistence helpers via a cohesive namespace."""
 
-This module bundles registry logic for the kgfoundry stack. It groups related helpers so downstream
-packages can import a single cohesive namespace. Refer to the functions and classes below for
-implementation specifics.
-"""
+from __future__ import annotations
 
-from kgfoundry_common.navmap_types import NavMap
+from kgfoundry_common.navmap_loader import load_nav_metadata
+from kgfoundry_common.navmap_types import NavMap as _NavMap
 from registry import api, duckdb_helpers, duckdb_registry, helper, migrate
 
-__all__ = ["api", "duckdb_helpers", "duckdb_registry", "helper", "migrate"]
+NavMap = _NavMap
 
-__navmap__: NavMap = {
-    "title": "registry",
-    "synopsis": "DuckDB-backed registry APIs and helpers",
-    "exports": __all__,
-    "sections": [
-        {
-            "id": "public-api",
-            "title": "Public API",
-            "symbols": __all__,
-        },
-    ],
-    "module_meta": {
-        "owner": "@registry",
-        "stability": "experimental",
-        "since": "0.1.0",
-    },
-    "symbols": {
-        "api": {
-            "stability": "beta",
-            "owner": "@registry",
-            "since": "0.1.0",
-        },
-        "duckdb_helpers": {
-            "stability": "beta",
-            "owner": "@registry",
-            "since": "0.1.0",
-        },
-        "duckdb_registry": {
-            "stability": "beta",
-            "owner": "@registry",
-            "since": "0.1.0",
-        },
-        "helper": {
-            "stability": "beta",
-            "owner": "@registry",
-            "since": "0.1.0",
-        },
-        "migrate": {
-            "stability": "experimental",
-            "owner": "@registry",
-            "since": "0.1.0",
-        },
-    },
-}
+__all__ = [
+    "NavMap",
+    "api",
+    "duckdb_helpers",
+    "duckdb_registry",
+    "helper",
+    "migrate",
+]
+__navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
+
+# [nav:section public-api]
 # [nav:anchor api]
 # [nav:anchor duckdb_helpers]
 # [nav:anchor duckdb_registry]
