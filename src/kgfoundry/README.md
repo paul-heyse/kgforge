@@ -11,7 +11,6 @@ Overview of kgfoundry.
 
 ## Modules
 
-- **`kgfoundry.agent_catalog`** — Public interface for the agent catalog client and utilities. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/agent_catalog/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/agent_catalog/__init__.py#L1)
 - **`kgfoundry.docling`** — Namespace bridge that exposes the docling package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/docling/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/docling/__init__.py#L1)
 - **`kgfoundry.download`** — Namespace bridge that exposes the download package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/download/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/download/__init__.py#L1)
 - **`kgfoundry.embeddings_dense`** — Namespace bridge that exposes the embeddings_dense package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_dense/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/embeddings_dense/__init__.py#L1)
