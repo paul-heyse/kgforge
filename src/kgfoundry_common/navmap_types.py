@@ -24,12 +24,19 @@ type Stability = Literal[
 
 # [nav:anchor NavSection]
 class NavSection(TypedDict):
-    """Describe NavSection.
+    """Navigation section metadata.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+    TypedDict representing a section in the navigation map. Sections
+    group related symbols together for documentation organization.
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Parameters
+    ----------
+    id : str
+        Unique section identifier.
+    title : str
+        Human-readable section title.
+    symbols : list[str]
+        List of symbol names included in this section.
     """
 
     id: str
@@ -39,12 +46,40 @@ class NavSection(TypedDict):
 
 # [nav:anchor SymbolMeta]
 class SymbolMeta(TypedDict, total=False):
-    """Describe SymbolMeta.
+    """Symbol metadata for documentation and tooling.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+    TypedDict representing metadata about a symbol (function, class, etc.)
+    in the navigation map. Used for documentation generation, testing,
+    and tooling support.
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Parameters
+    ----------
+    since : str
+        Version when the symbol was introduced.
+    stability : Stability
+        Stability level of the symbol.
+    side_effects : list[Literal['none', 'fs', 'net', 'gpu', 'db']]
+        List of side effects the symbol may have.
+    thread_safety : Literal['reentrant', 'threadsafe', 'not-threadsafe']
+        Thread safety guarantee of the symbol.
+    async_ok : bool
+        Whether the symbol is safe to use in async contexts.
+    perf_budget_ms : float
+        Performance budget in milliseconds.
+    tests : list[str]
+        List of test file paths or identifiers.
+    owner : str, optional
+        Owner or team responsible for the symbol.
+    deprecated_in : str, optional
+        Version when the symbol was deprecated.
+    replaced_by : str, optional
+        Symbol name that replaces this deprecated symbol.
+    deprecated_msg : str, optional
+        Deprecation message explaining the change.
+    contracts : list[str], optional
+        List of contract identifiers (e.g., JSON Schema URIs).
+    coverage_target : float, optional
+        Test coverage target percentage.
     """
 
     since: str
@@ -64,12 +99,21 @@ class SymbolMeta(TypedDict, total=False):
 
 # [nav:anchor ModuleMeta]
 class ModuleMeta(TypedDict, total=False):
-    """Describe ModuleMeta.
+    """Module-level metadata for documentation.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+    TypedDict representing metadata about a module in the navigation map.
+    Used for documentation generation and module organization.
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Parameters
+    ----------
+    owner : str
+        Owner or team responsible for the module.
+    stability : Stability
+        Stability level of the module.
+    since : str
+        Version when the module was introduced.
+    deprecated_in : str, optional
+        Version when the module was deprecated.
     """
 
     owner: str
@@ -80,12 +124,38 @@ class ModuleMeta(TypedDict, total=False):
 
 # [nav:anchor NavMap]
 class NavMap(TypedDict, total=False):
-    """Describe NavMap.
+    """Navigation map metadata structure.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+    TypedDict representing the complete navigation map for a module.
+    Contains all metadata needed for documentation generation, including
+    exports, sections, symbol metadata, and module information.
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Parameters
+    ----------
+    title : str
+        Module title.
+    synopsis : str
+        Brief description of the module.
+    exports : list[str]
+        List of public symbol names exported by the module.
+    sections : list[NavSection]
+        List of navigation sections organizing the symbols.
+    see_also : list[str], optional
+        List of related modules or resources.
+    tags : list[str], optional
+        List of tags for categorization.
+    since : str, optional
+        Version when the module was introduced.
+    deprecated : str, optional
+        Version when the module was deprecated.
+    symbols : dict[str, SymbolMeta], optional
+        Dictionary mapping symbol names to their metadata.
+    edit_scopes : dict[str, list[str]], optional
+        Dictionary mapping edit scopes to symbol lists.
+    deps : list[str], optional
+        List of dependency module names.
+    module_meta : ModuleMeta, optional
+        Module-level metadata.
     """
 
     title: str

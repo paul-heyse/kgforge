@@ -17,33 +17,45 @@ if TYPE_CHECKING:
 class AuditLogger:
     """Append structured audit events to a JSONL file.
 
-    <!-- auto:docstring-builder v1 -->
+    Provides a simple audit logging mechanism that writes structured JSON
+    events to a JSONL (JSON Lines) file. Each event includes timestamp, action,
+    role, status, and optional detail and correlation_id fields.
 
     Parameters
     ----------
     path : Path
-        Describe ``path``.
+        Path to the JSONL audit log file. Parent directory will be created
+        if it doesn't exist.
     enabled : bool, optional
-        Describe ``enabled``.
-        Defaults to ``True``.
+        Whether audit logging is enabled. If False, log() calls are no-ops.
+        Defaults to True.
+
+    Attributes
+    ----------
+    _path : Path
+        Path to the audit log file.
+    _enabled : bool
+        Whether audit logging is enabled.
+
+    Examples
+    --------
+    >>> from pathlib import Path
+    >>> logger = AuditLogger(Path("/tmp/audit.jsonl"))
+    >>> logger.log(action="search", role="user", status="success")
     """
 
     def __init__(self, path: Path, *, enabled: bool = True) -> None:
-        """Document   init  .
+        """Initialize the audit logger.
 
-        <!-- auto:docstring-builder v1 -->
-
-        &lt;!-- auto:docstring-builder v1 --&gt;
-
-        Special method customising Python&#39;s object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language&#39;s data model.
+        Creates the audit logger with the specified log file path and enabled
+        state. If enabled, creates the parent directory if it doesn't exist.
 
         Parameters
         ----------
         path : Path
-            Configure the path.
+            Path to the JSONL audit log file.
         enabled : bool, optional
-            Indicate whether enabled. Defaults to ``True``.
-            Defaults to ``True``.
+            Whether audit logging is enabled. Defaults to True.
         """
         self._path = path
         self._enabled = enabled
@@ -61,22 +73,28 @@ class AuditLogger:
     ) -> None:
         """Append an audit entry if logging is enabled.
 
-        <!-- auto:docstring-builder v1 -->
+        Writes a structured JSON audit event to the log file. Each event
+        includes timestamp, action, role, and status. Optionally includes
+        detail and correlation_id fields if provided.
 
         Parameters
         ----------
         action : str
-            Describe ``action``.
+            Action being audited (e.g., "search", "open_anchor", "capabilities").
         role : str
-            Describe ``role``.
+            Role of the actor performing the action (e.g., "user", "admin").
         status : str
-            Describe ``status``.
-        detail : str | NoneType, optional
-            Describe ``detail``.
-            Defaults to ``None``.
-        correlation_id : str | NoneType, optional
-            Describe ``correlation_id``.
-            Defaults to ``None``.
+            Status of the action (e.g., "success", "error", "unauthorized").
+        detail : str | None, optional
+            Optional detailed information about the action. Defaults to None.
+        correlation_id : str | None, optional
+            Optional correlation ID for tracing requests. If None, attempts to
+            retrieve from contextvars. Defaults to None.
+
+        Notes
+        -----
+        If logging is disabled (_enabled=False), this method is a no-op.
+        Events are appended to the JSONL file in ISO format with UTC timestamps.
         """
         if not self._enabled:
             return

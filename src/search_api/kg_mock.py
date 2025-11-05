@@ -42,12 +42,17 @@ __navmap__: Final[NavMap] = {
 
 
 class ConceptMeta(TypedDict):
-    """Describe ConceptMeta.
+    """Metadata for knowledge graph concepts.
 
-    &lt;!-- auto:docstring-builder v1 --&gt;
+    TypedDict representing concept metadata with label and keywords.
+    Used by mock knowledge graph functions for concept matching.
 
-    Describe the data structure and how instances collaborate with the surrounding package.
-    Highlight how the class supports nearby modules to guide readers through the codebase.
+    Parameters
+    ----------
+    label : str
+        Human-readable concept label.
+    keywords : list[str]
+        List of keywords that match this concept.
     """
 
     label: str
@@ -68,21 +73,20 @@ CONCEPTS: Final[dict[str, ConceptMeta]] = {
 
 # [nav:anchor detect_query_concepts]
 def detect_query_concepts(query: str) -> set[str]:
-    """Describe detect query concepts.
+    """Detect knowledge graph concepts mentioned in a query.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Searches for concept keywords in the query text and returns matching
+    concept IDs from the mock knowledge graph.
 
     Parameters
     ----------
     query : str
-        Describe ``query``.
+        Query text to analyze for concept mentions.
 
     Returns
     -------
     set[str]
-        Describe return value.
+        Set of concept IDs that match keywords in the query.
     """
     lowered = query.lower()
     hits: set[str] = set()
@@ -94,21 +98,20 @@ def detect_query_concepts(query: str) -> set[str]:
 
 # [nav:anchor linked_concepts_for_text]
 def linked_concepts_for_text(text: str) -> list[str]:
-    """Describe linked concepts for text.
+    """Find knowledge graph concepts linked to text content.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Searches for concept keywords in the text and returns matching
+    concept IDs from the mock knowledge graph.
 
     Parameters
     ----------
     text : str
-        Describe ``text``.
+        Text content to analyze for concept mentions.
 
     Returns
     -------
     list[str]
-        Describe return value.
+        List of concept IDs that match keywords in the text.
     """
     lowered = text.lower()
     hits = []
@@ -125,29 +128,28 @@ def kg_boost(
     direct: float = 0.08,
     one_hop: float = 0.04,
 ) -> float:
-    """Describe kg boost.
+    """Calculate knowledge graph boost score for a chunk.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Computes a boost score based on concept overlap between query and chunk.
+    Returns direct boost if there are direct concept matches, otherwise 0.0.
+    The one_hop parameter is reserved for future graph traversal heuristics.
 
     Parameters
     ----------
     query_concepts : list[str]
-        Describe ``query_concepts``.
+        List of concept IDs extracted from the query.
     chunk_concepts : list[str]
-        Describe ``chunk_concepts``.
+        List of concept IDs linked to the chunk.
     direct : float, optional
-        Describe ``direct``.
-        Defaults to ``0.08``.
+        Boost amount for direct concept matches. Defaults to 0.08.
     one_hop : float, optional
-        Describe ``one_hop``.
-        Defaults to ``0.04``.
+        Boost amount for one-hop concept matches (currently unused).
+        Defaults to 0.04.
 
     Returns
     -------
     float
-        Describe return value.
+        Boost score (direct if concepts overlap, otherwise 0.0).
     """
     _ = one_hop  # placeholder for future graph traversal heuristics
     return direct if set(query_concepts) & set(chunk_concepts) else 0.0

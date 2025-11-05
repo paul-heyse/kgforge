@@ -53,14 +53,14 @@ __navmap__: Final[NavMap] = {
 class SearchResponse(BaseModel):
     """Search API response containing results.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Response envelope for search API endpoints.
+    Response envelope for search API endpoints. Contains a list of
+    search results with optional metadata.
 
     Parameters
     ----------
-    **data : Any
-        Describe ``data``.
+    results : list[SearchResult]
+        List of search results, ordered by relevance score descending.
+        Defaults to empty list.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -70,26 +70,21 @@ class SearchResponse(BaseModel):
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """Describe SearchRequest.
+    """Search API request model.
 
-    <!-- auto:docstring-builder v1 -->
-
-    the behaviour it provides to callers. Callers interact with
-    validated data through this model.
+    Pydantic model for search API requests. Validates query parameters
+    and request structure according to the search API schema.
 
     Parameters
     ----------
     query : str
-        Describe ``query``.
+        Search query text. Must be non-empty (min_length=1).
     k : int, optional
-        Describe ``k``.
-        Defaults to ``10``.
-    filters : dict[str, object] | NoneType, optional
-        Describe ``filters``.
-        Defaults to ``None``.
+        Number of results to return. Defaults to 10.
+    filters : dict[str, object] | None, optional
+        Optional filters to apply to search results. Defaults to None.
     explain : bool, optional
-        Describe ``explain``.
-        Defaults to ``False``.
+        Whether to include explanation metadata in results. Defaults to False.
 
     Examples
     --------
@@ -115,34 +110,31 @@ class SearchRequest(BaseModel):
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """Describe SearchResult.
+    """Search result model.
 
-    <!-- auto:docstring-builder v1 -->
-
-    the behaviour it provides to callers. Callers interact with
-    validated data through this model.
+    Pydantic model representing a single search result. Contains document
+    and chunk identifiers, metadata, relevance score, and optional signals,
+    spans, and concept links.
 
     Parameters
     ----------
     doc_id : str
-        Describe ``doc_id``.
+        Document identifier.
     chunk_id : str
-        Describe ``chunk_id``.
+        Chunk identifier within the document.
     title : str
-        Describe ``title``.
+        Document title.
     section : str
-        Describe ``section``.
+        Section name or identifier within the document.
     score : float
-        Describe ``score``.
+        Relevance score for this result.
     signals : dict[str, float], optional
-        Describe ``signals``.
-        Defaults to ``<factory>``.
+        Dictionary of signal scores (e.g., "dense", "sparse", "kg").
+        Defaults to empty dictionary.
     spans : dict[str, int], optional
-        Describe ``spans``.
-        Defaults to ``<factory>``.
+        Dictionary of character span information. Defaults to empty dictionary.
     concepts : list[dict[str, str]], optional
-        Describe ``concepts``.
-        Defaults to ``<factory>``.
+        List of linked concept dictionaries. Defaults to empty list.
 
     Examples
     --------

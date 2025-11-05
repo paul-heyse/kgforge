@@ -22,23 +22,21 @@ if hasattr(_module, "__path__"):
 
 
 def __getattr__(name: str) -> object:
-    """Document   getattr  .
+    """Provide lazy module loading for namespace bridge.
 
-    <!-- auto:docstring-builder v1 -->
-
-    &lt;!-- auto:docstring-builder v1 --&gt;
-
-    Provide a fallback for unknown attribute lookups. This special method integrates the class with Python&#39;s data model so instances behave consistently with the language expectations.
+    Implements lazy loading for attributes from the underlying search_api
+    module. This allows the namespace bridge to expose search_api symbols
+    under the kgfoundry namespace.
 
     Parameters
     ----------
     name : str
-        Configure the name.
+        Attribute name to retrieve from the underlying module.
 
     Returns
     -------
     object
-        Describe return value.
+        Attribute value from the underlying search_api module.
     """
     return namespace_getattr(_module, name)
 
@@ -46,7 +44,8 @@ def __getattr__(name: str) -> object:
 def __dir__() -> list[str]:
     """Return the combined attribute listing.
 
-    <!-- auto:docstring-builder v1 -->
+    Returns the sorted union of exports and implementation attributes
+    from the namespace bridge.
 
     Returns
     -------

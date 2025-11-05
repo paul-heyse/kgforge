@@ -478,6 +478,16 @@ docs = [
     "sphinx>=8.2.3,<9",
     "sphinx-autoapi>=3.2.0",
 ]
+codeintel = [
+    "anyio>=4.4.0",
+    "orjson>=3.10.0",
+    "pydantic>=2.8.0",
+    "typer>=0.12.5",
+]
+http-bridge = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+]
 tools = [
     "build>=1.2.2",
     "prometheus-client>=0.23.1",

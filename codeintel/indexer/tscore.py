@@ -31,6 +31,8 @@ LANGUAGE_ALIAS: Final[dict[str, str]] = {
     "markdown": "md",
 }
 
+LANGUAGE_NAMES: Final[tuple[str, ...]] = tuple(LANGUAGE_ALIAS.keys())
+
 _QUERY_ATTR = "Query"
 _QUERY_CURSOR_ATTR = "QueryCursor"
 _QUERY_CLS = cast("type[Any]", getattr(ts, _QUERY_ATTR))
@@ -108,6 +110,34 @@ def load_langs() -> Langs:
     return Langs(**languages)
 
 
+def get_language(langs: Langs, language: str) -> Language:
+    """Return the Tree-sitter language associated with ``language``.
+
+    Parameters
+    ----------
+    langs : Langs
+        Bundle of pre-loaded Tree-sitter languages.
+    language : str
+        Canonical language identifier (for example ``"python"``).
+
+    Returns
+    -------
+    Language
+        The requested Tree-sitter language instance.
+
+    Raises
+    ------
+    ValueError
+        If the language name is not recognised.
+    """
+    try:
+        attr = LANGUAGE_ALIAS[language]
+    except KeyError as exc:  # pragma: no cover - caller validates
+        message = f"Unsupported language '{language}'."
+        raise ValueError(message) from exc
+    return getattr(langs, attr)
+
+
 def parse_bytes(lang: Language, data: bytes) -> Tree:
     """Parse a byte buffer with the supplied Tree-sitter language.
 
@@ -149,19 +179,26 @@ def run_query(lang: Language, query_src: str, tree: Tree, data: bytes) -> list[d
     """
     query = _QUERY_CLS(lang, query_src)
     cursor = _QUERY_CURSOR_CLS(query)
-    captures_map = cursor.captures(tree.root_node)
     out: list[dict[str, Any]] = []
-    for capture_name, nodes in captures_map.items():
-        out.extend(
-            {
-                "capture": capture_name,
-                "kind": node.type,
-                "start_byte": node.start_byte,
-                "end_byte": node.end_byte,
-                "start_point": {"row": node.start_point[0], "column": node.start_point[1]},
-                "end_point": {"row": node.end_point[0], "column": node.end_point[1]},
-                "text": data[node.start_byte : node.end_byte].decode("utf-8", "ignore"),
-            }
-            for node in nodes
-        )
+    for match_id, captures in cursor.matches(tree.root_node):
+        for capture_name, nodes in captures.items():
+            out.extend(
+                {
+                    "capture": capture_name,
+                    "match_id": match_id,
+                    "kind": node.type,
+                    "start_byte": node.start_byte,
+                    "end_byte": node.end_byte,
+                    "start_point": {
+                        "row": node.start_point[0],
+                        "column": node.start_point[1],
+                    },
+                    "end_point": {
+                        "row": node.end_point[0],
+                        "column": node.end_point[1],
+                    },
+                    "text": data[node.start_byte : node.end_byte].decode("utf-8", "ignore"),
+                }
+                for node in nodes
+            )
     return out

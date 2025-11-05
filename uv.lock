@@ -3148,6 +3148,12 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+codeintel = [
+    { name = "anyio" },
+    { name = "orjson" },
+    { name = "pydantic" },
+    { name = "typer" },
+]
 docs = [
     { name = "griffe" },
     { name = "sphinx" },
@@ -3213,6 +3219,10 @@ gpu = [
     { name = "xformers" },
     { name = "xgrammar" },
 ]
+http-bridge = [
+    { name = "fastapi" },
+    { name = "uvicorn", extra = ["standard"] },
+]
 tools = [
     { name = "build" },
     { name = "msgspec" },
@@ -3225,6 +3235,7 @@ tools = [
 [package.metadata]
 requires-dist = [
     { name = "accelerate", marker = "extra == 'gpu'" },
+    { name = "anyio", marker = "extra == 'codeintel'", specifier = ">=4.4.0" },
     { name = "apache-tvm-ffi", marker = "extra == 'gpu'" },
     { name = "arelle", specifier = ">=2.2" },
     { name = "astroid", specifier = ">=4.0.0" },
@@ -3255,6 +3266,7 @@ requires-dist = [
     { name = "faiss", marker = "python_full_version == '3.13.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'gpu'", specifier = "==1.12.0", index = "file:///home/paul/kgfoundry/.wheelhouse" },
     { name = "faiss-cpu" },
     { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "fastapi", marker = "extra == 'http-bridge'", specifier = ">=0.115.0" },
     { name = "filelock", specifier = ">=3.20.0" },
     { name = "flashinfer-cubin", marker = "extra == 'gpu'" },
     { name = "flashinfer-python", marker = "extra == 'gpu'" },
@@ -3322,6 +3334,7 @@ requires-dist = [
     { name = "opentelemetry-api", marker = "extra == 'tools'", specifier = ">=1.24.0" },
     { name = "opentelemetry-sdk", specifier = ">=1.24.0" },
     { name = "opentelemetry-sdk", marker = "extra == 'tools'", specifier = ">=1.24.0" },
+    { name = "orjson", marker = "extra == 'codeintel'", specifier = ">=3.10.0" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pandas-stubs", specifier = ">=2.3.2.250926" },
     { name = "pandera", specifier = ">=0.20.0" },
@@ -3339,6 +3352,7 @@ requires-dist = [
     { name = "pyarrow-stubs", specifier = ">=13.0.0" },
     { name = "pybreaker" },
     { name = "pydantic", specifier = ">=2.0" },
+    { name = "pydantic", marker = "extra == 'codeintel'", specifier = ">=2.8.0" },
     { name = "pydantic-core", specifier = ">=2.41.4" },
     { name = "pydantic-settings", specifier = ">=2.11.0" },
     { name = "pydata-sphinx-theme", specifier = ">=0.15.4" },
@@ -3413,6 +3427,7 @@ requires-dist = [
     { name = "triton", marker = "extra == 'gpu'" },
     { name = "triton-kernels", marker = "extra == 'gpu'", git = "https://github.com/triton-lang/triton.git?subdirectory=python%2Ftriton_kernels&rev=v3.5.0" },
     { name = "typer", specifier = ">=0.19.2" },
+    { name = "typer", marker = "extra == 'codeintel'", specifier = ">=0.12.5" },
     { name = "types-aiofiles" },
     { name = "types-annoy" },
     { name = "types-antlr4-python3-runtime" },
@@ -3684,6 +3699,7 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.15.0" },
     { name = "url-normalize", specifier = ">=2.2.0" },
     { name = "uvicorn", specifier = ">=0.38.0" },
+    { name = "uvicorn", extras = ["standard"], marker = "extra == 'http-bridge'", specifier = ">=0.30.0" },
     { name = "vllm", marker = "extra == 'gpu'", specifier = "==0.11.0" },
     { name = "vulture", specifier = ">=2.14" },
     { name = "waybackpy", specifier = ">=3.0.6" },
@@ -3691,7 +3707,7 @@ requires-dist = [
     { name = "xformers", marker = "extra == 'gpu'" },
     { name = "xgrammar", marker = "extra == 'gpu'" },
 ]
-provides-extras = ["docs", "tools", "gpu"]
+provides-extras = ["docs", "codeintel", "http-bridge", "tools", "gpu"]
 
 [package.metadata.requires-dev]
 dev = []

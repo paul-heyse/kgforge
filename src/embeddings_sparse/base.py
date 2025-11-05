@@ -49,108 +49,87 @@ __navmap__: Final[NavMap] = {
 
 # [nav:anchor SparseEncoder]
 class SparseEncoder(Protocol):
-    """Describe SparseEncoder.
+    """Protocol for sparse embedding encoders.
 
-    <!-- auto:docstring-builder v1 -->
+    Defines the interface for encoders that convert text into sparse
+    embeddings. Sparse embeddings consist of token indices and weights,
+    typically used for learned sparse retrieval (e.g., SPLADE).
 
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Parameters
+    Attributes
     ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    name : str
+        Encoder name or identifier.
     """
 
     name: str
 
     def encode(self, texts: list[str]) -> list[tuple[list[int], list[float]]]:
-        """Describe encode.
+        """Encode texts into sparse embeddings.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Converts a list of text strings into sparse embeddings represented
+        as (token_indices, weights) tuples.
 
         Parameters
         ----------
         texts : list[str]
-            Describe ``texts``.
+            List of text strings to encode.
 
         Returns
         -------
         list[tuple[list[int], list[float]]]
-            Describe return value.
+            List of sparse embeddings. Each tuple contains:
+            - token_indices: List of vocabulary token indices
+            - weights: List of weights corresponding to the token indices
         """
         ...
 
 
 # [nav:anchor SparseIndex]
 class SparseIndex(Protocol):
-    """Describe SparseIndex.
+    """Protocol for sparse embedding indexes.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
-
-    Parameters
-    ----------
-    *args : inspect._empty
-        Describe ``args``.
-    **kwargs : inspect._empty
-        Describe ``kwargs``.
-
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    Defines the interface for indexes that store and search sparse embeddings. Used for sparse
+    retrieval operations where documents are represented as sparse vectors (token indices with
+    weights).
     """
 
     def build(self, docs_iterable: Iterable[tuple[str, dict[str, str]]]) -> None:
-        """Describe build.
+        """Build the index from documents.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Indexes documents from the provided iterable. Each document is
+        represented as a tuple of (doc_id, fields_dict) where fields_dict
+        contains field names mapped to text content.
 
         Parameters
         ----------
-        docs_iterable : tuple[str, dict[str, str]]
-            Describe ``docs_iterable``.
+        docs_iterable : Iterable[tuple[str, dict[str, str]]]
+            Iterable of document tuples. Each tuple contains:
+            - doc_id: Document identifier
+            - fields_dict: Dictionary mapping field names to text content
         """
         ...
 
     def search(
         self, query: str, k: int, fields: Mapping[str, str] | None = None
     ) -> list[tuple[str, float]]:
-        """Describe search.
+        """Search the index for documents matching the query.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Performs sparse retrieval to find top-k documents matching the query.
+        Supports optional field boosting through the fields parameter.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query text.
         k : int
-            Describe ``k``.
-        fields : str | str | NoneType, optional
-            Describe ``fields``.
-            Defaults to ``None``.
+            Number of top results to return.
+        fields : Mapping[str, str] | None, optional
+            Optional field boost weights. Maps field names to boost values.
+            If None, uses default field weights. Defaults to None.
 
         Returns
         -------
         list[tuple[str, float]]
-            Describe return value.
+            List of (doc_id, score) tuples sorted by score descending.
         """
         ...

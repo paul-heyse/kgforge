@@ -13,17 +13,27 @@ if TYPE_CHECKING:
 class Role(StrEnum):
     """Supported access roles for hosted mode.
 
-    <!-- auto:docstring-builder v1 -->
+    Enumeration of access roles used for role-based access control (RBAC)
+    in hosted Agent Catalog deployments. Roles define different permission
+    levels for catalog operations.
 
-    Parameters
-    ----------
-    *values : inspect._empty
-        Describe ``values``.
+    Roles
+    -----
+    VIEWER
+        Read-only access. Can search and view catalog contents but cannot
+        modify or perform advanced operations.
+    CONTRIBUTOR
+        Read-write access. Can search, view, and perform analysis operations
+        like find_callers, find_callees, change_impact, and suggest_tests.
+    ADMIN
+        Full access. Can perform all operations including open_anchor,
+        session management, and shutdown operations.
 
-    Returns
-    -------
-    inspect._empty
-        Describe return value.
+    Examples
+    --------
+    >>> role = Role.VIEWER
+    >>> assert role == "viewer"
+    >>> assert isinstance(role, Role)
     """
 
     VIEWER = "viewer"
@@ -35,15 +45,32 @@ class Role(StrEnum):
 class AccessController:
     """Authorize catalog operations based on the configured role.
 
-    <!-- auto:docstring-builder v1 -->
+    Provides role-based access control (RBAC) for Agent Catalog operations.
+    Each role has a predefined set of permitted methods. When enabled, the
+    controller raises PermissionError for unauthorized method calls.
 
     Parameters
     ----------
     role : Role
-        Describe ``role``.
+        Access role assigned to this controller.
     enabled : bool, optional
-        Describe ``enabled``.
-        Defaults to ``False``.
+        Whether RBAC is enabled. If False, all method calls are allowed.
+        Defaults to False.
+
+    Attributes
+    ----------
+    role : Role
+        Access role assigned to this controller.
+    enabled : bool
+        Whether RBAC is enabled.
+    _PERMISSIONS : ClassVar[Mapping[Role, frozenset[str]]]
+        Mapping of roles to their permitted method names.
+
+    Examples
+    --------
+    >>> controller = AccessController(Role.VIEWER, enabled=True)
+    >>> controller.authorize("catalog.search")  # OK
+    >>> controller.authorize("catalog.open_anchor")  # Raises PermissionError
     """
 
     role: Role
@@ -91,19 +118,32 @@ class AccessController:
     }
 
     def authorize(self, method: str) -> None:
-        """Raise :class:`PermissionError` if ``method`` is not permitted.
+        """Raise PermissionError if method is not permitted.
 
-        <!-- auto:docstring-builder v1 -->
+        Checks if the given method is permitted for the current role.
+        If RBAC is disabled or the method is permitted, returns normally.
+        Otherwise, raises PermissionError with a descriptive message.
 
         Parameters
         ----------
         method : str
-            Describe ``method``.
+            Method name to authorize (e.g., "catalog.search", "catalog.open_anchor").
 
         Raises
         ------
         PermissionError
             If the method is not permitted for the current role.
+
+        Notes
+        -----
+        If RBAC is disabled (enabled=False), this method always returns
+        without raising an error.
+
+        Examples
+        --------
+        >>> controller = AccessController(Role.VIEWER, enabled=True)
+        >>> controller.authorize("catalog.search")  # OK
+        >>> controller.authorize("catalog.open_anchor")  # Raises PermissionError
         """
         if not self.enabled:
             return

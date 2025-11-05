@@ -53,21 +53,20 @@ PARQUET_ROW_WIDTH: Final = 4
 
 # [nav:anchor tok]
 def tok(text: str) -> list[str]:
-    """Describe tok.
+    """Tokenize text into lowercase alphanumeric tokens.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+    Extracts alphanumeric sequences from the input text and converts them
+    to lowercase. Uses a regex pattern to match alphanumeric characters.
 
     Parameters
     ----------
     text : str
-        Describe ``text``.
+        Input text to tokenize. Empty strings are handled gracefully.
 
     Returns
     -------
     list[str]
-        Describe return value.
+        List of lowercase alphanumeric tokens extracted from the text.
     """
     # re.findall returns list[str] when pattern has no groups
     matches: list[str] = TOKEN.findall(text or "")
@@ -77,24 +76,21 @@ def tok(text: str) -> list[str]:
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Describe SpladeDoc.
+    """Document fixture for SPLADE index.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Represents a document chunk loaded from the SPLADE index. Contains
+    metadata and text content for sparse retrieval testing and demonstrations.
 
     Parameters
     ----------
     chunk_id : str
-        Describe ``chunk_id``.
+        Unique identifier for the chunk.
     doc_id : str
-        Describe ``doc_id``.
+        Document identifier that this chunk belongs to.
     section : str
-        Describe ``section``.
+        Section name or identifier within the document.
     text : str
-        Describe ``text``.
+        Text content of the chunk.
     """
 
     chunk_id: str
@@ -105,24 +101,22 @@ class SpladeDoc:
 
 # [nav:anchor SpladeIndex]
 class SpladeIndex:
-    """Describe SpladeIndex.
+    """In-memory SPLADE index for tests and tutorials.
 
-    <!-- auto:docstring-builder v1 -->
-
-    how instances collaborate with the surrounding package. Highlight
-    how the class supports nearby modules to guide readers through the
-    codebase.
+    Simple in-memory search index that loads document chunks from a DuckDB
+    catalog and builds document frequency (DF) indexes for sparse retrieval.
+    Used primarily for testing and tutorials as an example SPLADE index.
 
     Parameters
     ----------
     db_path : str
-        Describe ``db_path``.
+        Path to DuckDB catalog database file.
     chunks_dataset_root : str | None, optional
-        Describe ``chunks_dataset_root``.
-        Defaults to ``None``.
+        Optional override path to chunks dataset root. If None, uses the
+        latest chunks dataset from the catalog. Defaults to None.
     sparse_root : str | None, optional
-        Describe ``sparse_root``.
-        Defaults to ``None``.
+        Optional sparse embeddings root (retained for interface compatibility).
+        Currently unused. Defaults to None.
     """
 
     def __init__(
@@ -131,22 +125,22 @@ class SpladeIndex:
         chunks_dataset_root: str | None = None,
         sparse_root: str | None = None,
     ) -> None:
-        """Describe   init  .
+        """Initialize the SPLADE index and load documents from DuckDB.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Connects to the DuckDB catalog, loads document chunks from the
+        specified or latest chunks dataset, and builds the document frequency
+        index for search.
 
         Parameters
         ----------
         db_path : str
-            Describe ``db_path``.
-        chunks_dataset_root : str | NoneType, optional
-            Describe ``chunks_dataset_root``.
-            Defaults to ``None``.
-        sparse_root : str | NoneType, optional
-            Describe ``sparse_root``.
-            Defaults to ``None``.
+            Path to DuckDB catalog database file.
+        chunks_dataset_root : str | None, optional
+            Optional override path to chunks dataset root. If None, uses the
+            latest chunks dataset from the catalog. Defaults to None.
+        sparse_root : str | None, optional
+            Optional sparse embeddings root (retained for interface compatibility).
+            Currently unused. Defaults to None.
         """
         _ = sparse_root  # retained for interface compatibility
         self.db_path = db_path
@@ -225,24 +219,24 @@ class SpladeIndex:
                 self.df[term] = self.df.get(term, 0) + 1
 
     def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
-        """Describe search.
+        """Search documents using TF-IDF scoring.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Tokenizes the query and scores each document using TF-IDF (term
+        frequency-inverse document frequency). Returns top-k results sorted
+        by relevance score.
 
         Parameters
         ----------
         query : str
-            Describe ``query``.
+            Search query text.
         k : int, optional
-            Describe ``k``.
-            Defaults to ``10``.
+            Number of top results to return. Defaults to 10.
 
         Returns
         -------
         list[tuple[int, float]]
-            Describe return value.
+            List of (document_index, score) tuples sorted by score descending.
+            Only documents with score > 0 are included.
         """
         if self.N == 0:
             return []
@@ -281,20 +275,19 @@ class SpladeIndex:
         return [(idx, value) for idx, value in ranked[:k] if value > 0.0]
 
     def doc(self, index: int) -> SpladeDoc:
-        """Describe doc.
+        """Get document by index.
 
-        <!-- auto:docstring-builder v1 -->
-
-        Special method customising Python's object protocol for this class. Use it to integrate with built-in operators, protocols, or runtime behaviours that expect instances to participate in the language's data model.
+        Retrieves the document at the specified index from the loaded
+        documents list.
 
         Parameters
         ----------
         index : int
-            Describe ``index``.
+            Document index (0-based).
 
         Returns
         -------
         SpladeDoc
-            Describe return value.
+            Document fixture at the specified index.
         """
         return self.docs[index]

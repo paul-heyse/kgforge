@@ -46,7 +46,8 @@ logger = get_logger(__name__)
 def load_schema(schema_path: Path) -> dict[str, JsonValue]:
     """Load and parse a JSON Schema file.
 
-    <!-- auto:docstring-builder v1 -->
+    Loads a JSON Schema 2020-12 file from disk, parses it, and validates
+    it against the JSON Schema 2020-12 meta-schema.
 
     Parameters
     ----------
@@ -55,7 +56,7 @@ def load_schema(schema_path: Path) -> dict[str, JsonValue]:
 
     Returns
     -------
-    dict[str, object]
+    dict[str, JsonValue]
         Parsed schema dictionary.
 
     Raises
@@ -98,19 +99,20 @@ def validate_model_against_schema(
 ) -> None:
     """Validate a Pydantic model instance against a JSON Schema.
 
-    <!-- auto:docstring-builder v1 -->
+    Converts the model instance to a dictionary and validates it against
+    the provided JSON Schema 2020-12.
 
     Parameters
     ----------
     model_instance : BaseModel
         Pydantic model instance to validate.
-    schema : dict[str, object]
+    schema : dict[str, JsonValue]
         JSON Schema 2020-12 dictionary.
 
     Raises
     ------
     SerializationError
-        If validation fails.
+        If validation fails or schema is invalid.
 
     Examples
     --------
@@ -142,9 +144,7 @@ def assert_model_roundtrip(
 ) -> None:
     """Assert that a Pydantic model round-trips correctly with an example JSON file.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This function:
+    This function performs a complete round-trip validation:
     1. Loads the example JSON file
     2. Validates it against the schema (if provided)
     3. Deserializes it into a model instance
@@ -154,14 +154,13 @@ def assert_model_roundtrip(
 
     Parameters
     ----------
-    model_cls : BaseModel
+    model_cls : type[BaseModel]
         Pydantic model class to test.
     example_path : Path
         Path to example JSON file.
-    schema_path : Path | NoneType, optional
+    schema_path : Path | None, optional
         Path to JSON Schema file. If None, schema validation is skipped.
         Defaults to None.
-        Defaults to ``None``.
 
     Raises
     ------

@@ -136,23 +136,34 @@ def _coerce_error_config(
 class KgFoundryError(Exception):
     """Base exception for all kgfoundry errors.
 
-    <!-- auto:docstring-builder v1 -->
-
-    Provides structured fields (code, http_status, log_level) and
-    RFC 9457 Problem Details mapping.
+    Provides structured fields (code, http_status, log_level) and RFC 9457
+    Problem Details mapping. All kgfoundry exceptions inherit from this
+    base class and can be converted to Problem Details JSON for HTTP responses.
 
     Parameters
     ----------
     message : str
         Human-readable error message.
     config : KgFoundryErrorConfig | None, optional
-        Structured configuration for the error including ``code``,
-        ``http_status``, ``log_level``, ``cause`` and ``context``. When
-        omitted these fields fall back to sensible defaults.
-        Defaults to ``None``.
+        Structured configuration for the error including code, http_status,
+        log_level, cause and context. When omitted, these fields fall back
+        to sensible defaults. Defaults to None.
     **legacy_kwargs : dict[str, object]
         Backwards-compatible keyword arguments mirroring the fields of
-        :class:`KgFoundryErrorConfig`. Cannot be combined with ``config``.
+        KgFoundryErrorConfig. Cannot be combined with config.
+
+    Attributes
+    ----------
+    message : str
+        Human-readable error message.
+    code : ErrorCode
+        Error code enum value.
+    http_status : int
+        HTTP status code for Problem Details responses.
+    log_level : int
+        Logging level for error logging.
+    context : dict[str, object]
+        Additional context dictionary for error details.
 
     Examples
     --------
@@ -172,17 +183,18 @@ class KgFoundryError(Exception):
     ) -> None:
         """Initialize error with structured fields.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a new KgFoundryError instance with the provided message
+        and configuration. Resolves configuration from either the config
+        parameter or legacy keyword arguments.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
+            Human-readable error message.
         config : KgFoundryErrorConfig | None, optional
-            Structured configuration for the error surface.
-            Defaults to ``None``.
+            Structured configuration for the error. Defaults to None.
         legacy_kwargs : dict[str, object]
-            Backwards-compatible keywords mirroring ``config`` fields.
+            Backwards-compatible keyword arguments mirroring config fields.
 
         Examples
         --------
@@ -208,16 +220,17 @@ class KgFoundryError(Exception):
     ) -> ProblemDetails:
         """Convert to RFC 9457 Problem Details JSON.
 
-        <!-- auto:docstring-builder v1 -->
+        Converts the exception to a Problem Details JSON structure suitable
+        for HTTP error responses. Includes type URI, title, status, detail,
+        instance, code, and optional context extensions.
 
         Parameters
         ----------
-        instance : str | NoneType, optional
+        instance : str | None, optional
             URI identifying the specific occurrence. Defaults to None.
-            Defaults to ``None``.
-        title : str | NoneType, optional
+        title : str | None, optional
             Short summary. Defaults to the exception class name.
-            Defaults to ``None``.
+            Defaults to None.
 
         Returns
         -------
@@ -250,12 +263,14 @@ class KgFoundryError(Exception):
     def __str__(self) -> str:
         """Return formatted error string.
 
-        <!-- auto:docstring-builder v1 -->
+        Returns a string representation of the error including the class
+        name, error code, and message. If a cause exception is present,
+        includes information about the cause.
 
         Returns
         -------
         str
-            Describe return value.
+            Formatted error string (e.g., "DownloadError[download-failed]: Failed to fetch resource").
         """
         base = f"{self.__class__.__name__}[{self.code.value}]: {self.message}"
         if self.__cause__:
@@ -266,18 +281,17 @@ class KgFoundryError(Exception):
 class DownloadError(KgFoundryError):
     """Error during download or resource fetch operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when download or resource fetch operations fail. Uses error code
+    DOWNLOAD_FAILED and HTTP status 503 (Service Unavailable).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the download failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the download failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -292,18 +306,17 @@ class DownloadError(KgFoundryError):
     ) -> None:
         """Initialize download error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a DownloadError with DOWNLOAD_FAILED error code and
+        HTTP status 503.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -317,18 +330,17 @@ class DownloadError(KgFoundryError):
 class UnsupportedMIMEError(KgFoundryError):
     """Error for unsupported MIME types.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when a file or resource has an unsupported MIME type. Uses error
+    code UNSUPPORTED_MIME and HTTP status 415 (Unsupported Media Type).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the unsupported MIME type.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the error. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -343,18 +355,17 @@ class UnsupportedMIMEError(KgFoundryError):
     ) -> None:
         """Initialize unsupported MIME error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an UnsupportedMIMEError with UNSUPPORTED_MIME error code
+        and HTTP status 415.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -368,18 +379,17 @@ class UnsupportedMIMEError(KgFoundryError):
 class DoclingError(KgFoundryError):
     """Error during document processing with Docling.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when document processing operations fail in Docling. Uses error
+    code DOCLING_ERROR and HTTP status 422 (Unprocessable Entity).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the processing failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the processing failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -394,18 +404,17 @@ class DoclingError(KgFoundryError):
     ) -> None:
         """Initialize docling error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a DoclingError with DOCLING_ERROR error code and
+        HTTP status 422.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -419,18 +428,17 @@ class DoclingError(KgFoundryError):
 class OCRTimeoutError(KgFoundryError):
     """Error when OCR operation times out.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when OCR (Optical Character Recognition) operations exceed their
+    timeout limit. Uses error code OCR_TIMEOUT and HTTP status 504 (Gateway Timeout).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the timeout.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the timeout. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -445,18 +453,17 @@ class OCRTimeoutError(KgFoundryError):
     ) -> None:
         """Initialize OCR timeout error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an OCRTimeoutError with OCR_TIMEOUT error code and
+        HTTP status 504.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -470,18 +477,17 @@ class OCRTimeoutError(KgFoundryError):
 class ChunkingError(KgFoundryError):
     """Error during text chunking operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when text chunking operations fail. Uses error code CHUNKING_ERROR
+    and HTTP status 422 (Unprocessable Entity).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the chunking failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the chunking failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -496,18 +502,17 @@ class ChunkingError(KgFoundryError):
     ) -> None:
         """Initialize chunking error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a ChunkingError with CHUNKING_ERROR error code and
+        HTTP status 422.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -521,18 +526,17 @@ class ChunkingError(KgFoundryError):
 class EmbeddingError(KgFoundryError):
     """Error during embedding generation.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when embedding generation operations fail. Uses error code
+    EMBEDDING_ERROR and HTTP status 503 (Service Unavailable).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the embedding failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the embedding failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -547,18 +551,17 @@ class EmbeddingError(KgFoundryError):
     ) -> None:
         """Initialize embedding error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an EmbeddingError with EMBEDDING_ERROR error code and
+        HTTP status 503.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -572,18 +575,18 @@ class EmbeddingError(KgFoundryError):
 class SpladeOOMError(KgFoundryError):
     """Error when SPLADE operation runs out of memory.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when SPLADE (Sparse Lexical and Expansion) operations exceed
+    available memory. Uses error code SPLADE_OOM and HTTP status 507
+    (Insufficient Storage).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the out-of-memory condition.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the OOM. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -598,18 +601,17 @@ class SpladeOOMError(KgFoundryError):
     ) -> None:
         """Initialize SPLADE OOM error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a SpladeOOMError with SPLADE_OOM error code and
+        HTTP status 507.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -623,18 +625,17 @@ class SpladeOOMError(KgFoundryError):
 class IndexBuildError(KgFoundryError):
     """Error during index construction.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when index construction operations fail (e.g., FAISS index build).
+    Uses error code INDEX_BUILD_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the index build failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the build failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -649,18 +650,17 @@ class IndexBuildError(KgFoundryError):
     ) -> None:
         """Initialize index build error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an IndexBuildError with INDEX_BUILD_ERROR error code and
+        HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -674,18 +674,17 @@ class IndexBuildError(KgFoundryError):
 class OntologyParseError(KgFoundryError):
     """Error during ontology parsing.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when ontology parsing operations fail (e.g., OWL file parsing).
+    Uses error code ONTOLOGY_PARSE_ERROR and HTTP status 422 (Unprocessable Entity).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the parsing failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the parsing failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -700,18 +699,17 @@ class OntologyParseError(KgFoundryError):
     ) -> None:
         """Initialize ontology parse error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an OntologyParseError with ONTOLOGY_PARSE_ERROR error code
+        and HTTP status 422.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -725,18 +723,17 @@ class OntologyParseError(KgFoundryError):
 class LinkerCalibrationError(KgFoundryError):
     """Error during linker calibration.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when linker calibration operations fail. Uses error code
+    LINKER_CALIBRATION_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the calibration failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the calibration failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -751,18 +748,17 @@ class LinkerCalibrationError(KgFoundryError):
     ) -> None:
         """Initialize linker calibration error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a LinkerCalibrationError with LINKER_CALIBRATION_ERROR error
+        code and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -776,18 +772,17 @@ class LinkerCalibrationError(KgFoundryError):
 class Neo4jError(KgFoundryError):
     """Error during Neo4j operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when Neo4j database operations fail. Uses error code NEO4J_ERROR
+    and HTTP status 503 (Service Unavailable).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the Neo4j operation failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the Neo4j failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -802,18 +797,17 @@ class Neo4jError(KgFoundryError):
     ) -> None:
         """Initialize Neo4j error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a Neo4jError with NEO4J_ERROR error code and
+        HTTP status 503.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -827,18 +821,18 @@ class Neo4jError(KgFoundryError):
 class ConfigurationError(KgFoundryError):
     """Error during configuration validation or loading.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when configuration validation or loading fails. Uses error code
+    CONFIGURATION_ERROR and HTTP status 500 (Internal Server Error) with
+    CRITICAL log level.
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the configuration failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the configuration failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -853,18 +847,17 @@ class ConfigurationError(KgFoundryError):
     ) -> None:
         """Initialize configuration error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a ConfigurationError with CONFIGURATION_ERROR error code,
+        HTTP status 500, and CRITICAL log level.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -923,21 +916,21 @@ class ConfigurationError(KgFoundryError):
 class SettingsError(KgFoundryError):
     """Error raised when runtime settings validation fails.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when runtime settings validation fails. Similar to ConfigurationError
+    but includes structured validation error details. Uses error code
+    CONFIGURATION_ERROR and HTTP status 500.
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the settings validation failure.
     errors : list[dict[str, object]] | None, optional
-        Describe ``errors``.
-        Defaults to ``None``.
+        List of validation error dictionaries with field/issue details.
+        Defaults to None.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the validation failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
     """
 
     def __init__(
@@ -950,21 +943,19 @@ class SettingsError(KgFoundryError):
     ) -> None:
         """Initialize settings error with validation context.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a SettingsError with CONFIGURATION_ERROR error code and
+        HTTP status 500. Merges validation errors into context if provided.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        errors : list[dict[str, object]] | NoneType, optional
-            Describe ``errors``.
-            Defaults to ``None``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        errors : list[dict[str, object]] | None, optional
+            List of validation error dictionaries. Defaults to None.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         combined_context: dict[str, object] = dict(context or {})
         if errors:
@@ -984,18 +975,17 @@ class SettingsError(KgFoundryError):
 class SerializationError(KgFoundryError):
     """Error during JSON serialization or schema validation.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when JSON serialization or schema validation fails. Uses error
+    code SERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the serialization failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the serialization failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1010,18 +1000,17 @@ class SerializationError(KgFoundryError):
     ) -> None:
         """Initialize serialization error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a SerializationError with SERIALIZATION_ERROR error code
+        and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1035,18 +1024,17 @@ class SerializationError(KgFoundryError):
 class RegistryError(KgFoundryError):
     """Errors raised during registry or DuckDB operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when registry or DuckDB database operations fail. Uses error code
+    REGISTRY_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the registry operation failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the registry failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1062,18 +1050,17 @@ class RegistryError(KgFoundryError):
     ) -> None:
         """Initialize registry error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a RegistryError with REGISTRY_ERROR error code and
+        HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1087,18 +1074,17 @@ class RegistryError(KgFoundryError):
 class DeserializationError(KgFoundryError):
     """Error during JSON deserialization, schema validation, or checksum verification.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when JSON deserialization, schema validation, or checksum verification
+    fails. Uses error code DESERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the deserialization failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the deserialization failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1113,18 +1099,17 @@ class DeserializationError(KgFoundryError):
     ) -> None:
         """Initialize deserialization error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a DeserializationError with DESERIALIZATION_ERROR error code
+        and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1138,21 +1123,21 @@ class DeserializationError(KgFoundryError):
 class SchemaValidationError(KgFoundryError):
     """Error raised when schema validation fails.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when schema validation fails. Includes structured validation error
+    details. Uses error code SCHEMA_VALIDATION_ERROR and HTTP status 422
+    (Unprocessable Entity).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the validation failure.
     errors : list[str] | None, optional
-        Describe ``errors``.
-        Defaults to ``None``.
+        List of validation error messages with path and constraint details.
+        Defaults to None.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the validation failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1169,21 +1154,19 @@ class SchemaValidationError(KgFoundryError):
     ) -> None:
         """Initialize schema validation error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a SchemaValidationError with SCHEMA_VALIDATION_ERROR error
+        code and HTTP status 422. Merges validation errors into context if provided.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        errors : list[str] | NoneType, optional
-            Describe ``errors``.
-            Defaults to ``None``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        errors : list[str] | None, optional
+            List of validation error messages. Defaults to None.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         combined_context: dict[str, object] = dict(context or {})
         if errors:
@@ -1200,28 +1183,23 @@ class SchemaValidationError(KgFoundryError):
 class RetryExhaustedError(KgFoundryError):
     """Raised when retry logic exhausts all attempts.
 
-    <!-- auto:docstring-builder v1 -->
-
-    This exception indicates that a retryable operation has exhausted
-    all retry attempts and should surface Problem Details with retry
-    guidance information.
+    This exception indicates that a retryable operation has exhausted all
+    retry attempts and should surface Problem Details with retry guidance
+    information. Uses error code RETRY_EXHAUSTED and HTTP status 503.
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the retry exhaustion.
     operation : str | None, optional
-        Describe ``operation``.
-        Defaults to ``None``.
+        Name of the operation that failed. Defaults to None.
     attempts : int | None, optional
-        Describe ``attempts``.
-        Defaults to ``None``.
+        Number of retry attempts that were made. Defaults to None.
     last_error : Exception | None, optional
-        Describe ``last_error``.
-        Defaults to ``None``.
+        The last exception that occurred before retries were exhausted.
+        Defaults to None.
     retry_after_seconds : int | None, optional
-        Describe ``retry_after_seconds``.
-        Defaults to ``None``.
+        Suggested retry delay in seconds. Defaults to None.
     """
 
     def __init__(
@@ -1235,24 +1213,22 @@ class RetryExhaustedError(KgFoundryError):
     ) -> None:
         """Initialize retry exhausted error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a RetryExhaustedError with RETRY_EXHAUSTED error code and
+        HTTP status 503. Stores retry metadata for Problem Details conversion.
 
         Parameters
         ----------
         message : str
             Error message describing the failure.
-        operation : str | NoneType, optional
-            Name of the operation that failed.
-            Defaults to ``None``.
-        attempts : int | NoneType, optional
-            Number of retry attempts that were made.
-            Defaults to ``None``.
-        last_error : Exception | NoneType, optional
+        operation : str | None, optional
+            Name of the operation that failed. Defaults to None.
+        attempts : int | None, optional
+            Number of retry attempts that were made. Defaults to None.
+        last_error : Exception | None, optional
             The last exception that occurred before retries were exhausted.
-            Defaults to ``None``.
-        retry_after_seconds : int | NoneType, optional
-            Suggested retry delay in seconds.
-            Defaults to ``None``.
+            Defaults to None.
+        retry_after_seconds : int | None, optional
+            Suggested retry delay in seconds. Defaults to None.
         """
         super().__init__(
             message,
@@ -1272,21 +1248,21 @@ class RetryExhaustedError(KgFoundryError):
     ) -> ProblemDetails:
         """Convert to RFC 9457 Problem Details JSON.
 
-        <!-- auto:docstring-builder v1 -->
+        Converts the exception to a Problem Details JSON structure including
+        retry metadata (operation, attempts, retry_after_seconds) in extensions.
 
         Parameters
         ----------
-        instance : str | NoneType, optional
-            Instance URI for the specific error occurrence.
-            Defaults to ``None``.
-        title : str | NoneType, optional
+        instance : str | None, optional
+            Instance URI for the specific error occurrence. Defaults to None.
+        title : str | None, optional
             Short summary. Defaults to the exception class name.
-            Defaults to ``None``.
+            Defaults to None.
 
         Returns
         -------
         ProblemDetails
-            Problem Details JSON structure.
+            Problem Details JSON structure with retry metadata in extensions.
         """
         extensions: dict[str, object] = {}
         if self.operation:
@@ -1310,18 +1286,17 @@ class RetryExhaustedError(KgFoundryError):
 class VectorSearchError(KgFoundryError):
     """Error during vector search operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when vector search operations fail. Uses error code VECTOR_SEARCH_ERROR
+    and HTTP status 503 (Service Unavailable).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the search failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the search failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1336,18 +1311,17 @@ class VectorSearchError(KgFoundryError):
     ) -> None:
         """Initialize vector search error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a VectorSearchError with VECTOR_SEARCH_ERROR error code and
+        HTTP status 503.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1361,18 +1335,17 @@ class VectorSearchError(KgFoundryError):
 class AgentCatalogSearchError(KgFoundryError):
     """Error during agent catalog search operations.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when agent catalog search operations fail. Uses error code
+    AGENT_CATALOG_SEARCH_ERROR and HTTP status 503 (Service Unavailable).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the catalog search failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the catalog search failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1389,18 +1362,17 @@ class AgentCatalogSearchError(KgFoundryError):
     ) -> None:
         """Initialize agent catalog search error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an AgentCatalogSearchError with AGENT_CATALOG_SEARCH_ERROR error
+        code and HTTP status 503.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1414,18 +1386,17 @@ class AgentCatalogSearchError(KgFoundryError):
 class CatalogSessionError(KgFoundryError):
     """Error during catalog session operations (JSON-RPC, subprocess).
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when catalog session operations fail (e.g., JSON-RPC or subprocess
+    spawning). Uses error code SESSION_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the session operation failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the session failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1440,18 +1411,17 @@ class CatalogSessionError(KgFoundryError):
     ) -> None:
         """Initialize catalog session error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a CatalogSessionError with SESSION_ERROR error code and
+        HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1465,18 +1435,17 @@ class CatalogSessionError(KgFoundryError):
 class CatalogLoadError(KgFoundryError):
     """Error during catalog payload loading or parsing.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when catalog payload loading or parsing fails. Uses error code
+    CATALOG_LOAD_ERROR and HTTP status 422 (Unprocessable Entity).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the catalog load failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the catalog load failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1493,18 +1462,17 @@ class CatalogLoadError(KgFoundryError):
     ) -> None:
         """Initialize catalog load error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a CatalogLoadError with CATALOG_LOAD_ERROR error code and
+        HTTP status 422.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1518,18 +1486,17 @@ class CatalogLoadError(KgFoundryError):
 class SymbolAttachmentError(KgFoundryError):
     """Error during symbol attachment to modules in catalog.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when symbol attachment to modules in the catalog fails. Uses error
+    code SYMBOL_ATTACHMENT_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the symbol attachment failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the attachment failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1546,18 +1513,17 @@ class SymbolAttachmentError(KgFoundryError):
     ) -> None:
         """Initialize symbol attachment error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates a SymbolAttachmentError with SYMBOL_ATTACHMENT_ERROR error
+        code and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1571,18 +1537,17 @@ class SymbolAttachmentError(KgFoundryError):
 class ArtifactModelError(KgFoundryError):
     """Error during artifact model loading or validation.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when artifact model loading or validation fails. Uses error code
+    ARTIFACT_MODEL_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the model loading failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the model loading failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1599,18 +1564,17 @@ class ArtifactModelError(KgFoundryError):
     ) -> None:
         """Initialize artifact model error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an ArtifactModelError with ARTIFACT_MODEL_ERROR error code
+        and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1624,18 +1588,17 @@ class ArtifactModelError(KgFoundryError):
 class ArtifactValidationError(KgFoundryError):
     """Error during artifact validation.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when artifact validation fails. Uses error code ARTIFACT_VALIDATION_ERROR
+    and HTTP status 422 (Unprocessable Entity).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the validation failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the validation failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1652,18 +1615,17 @@ class ArtifactValidationError(KgFoundryError):
     ) -> None:
         """Initialize artifact validation error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an ArtifactValidationError with ARTIFACT_VALIDATION_ERROR error
+        code and HTTP status 422.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1677,18 +1639,17 @@ class ArtifactValidationError(KgFoundryError):
 class ArtifactSerializationError(KgFoundryError):
     """Error during artifact serialization.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when artifact serialization fails. Uses error code
+    ARTIFACT_SERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the serialization failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the serialization failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1705,18 +1666,17 @@ class ArtifactSerializationError(KgFoundryError):
     ) -> None:
         """Initialize artifact serialization error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an ArtifactSerializationError with ARTIFACT_SERIALIZATION_ERROR
+        error code and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1730,18 +1690,17 @@ class ArtifactSerializationError(KgFoundryError):
 class ArtifactDeserializationError(KgFoundryError):
     """Error during artifact deserialization.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when artifact deserialization fails. Uses error code
+    ARTIFACT_DESERIALIZATION_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the deserialization failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the deserialization failure. Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1758,18 +1717,17 @@ class ArtifactDeserializationError(KgFoundryError):
     ) -> None:
         """Initialize artifact deserialization error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an ArtifactDeserializationError with ARTIFACT_DESERIALIZATION_ERROR
+        error code and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
@@ -1783,18 +1741,18 @@ class ArtifactDeserializationError(KgFoundryError):
 class ArtifactDependencyError(KgFoundryError):
     """Error during artifact dependency resolution.
 
-    <!-- auto:docstring-builder v1 -->
+    Raised when artifact dependency resolution fails. Uses error code
+    ARTIFACT_DEPENDENCY_ERROR and HTTP status 500 (Internal Server Error).
 
     Parameters
     ----------
     message : str
-        Describe ``message``.
+        Human-readable error message describing the dependency resolution failure.
     cause : Exception | None, optional
-        Describe ``cause``.
-        Defaults to ``None``.
+        Underlying exception that caused the dependency resolution failure.
+        Defaults to None.
     context : Mapping[str, object] | None, optional
-        Describe ``context``.
-        Defaults to ``None``.
+        Additional context dictionary for error details. Defaults to None.
 
     Examples
     --------
@@ -1811,18 +1769,17 @@ class ArtifactDependencyError(KgFoundryError):
     ) -> None:
         """Initialize artifact dependency error.
 
-        <!-- auto:docstring-builder v1 -->
+        Creates an ArtifactDependencyError with ARTIFACT_DEPENDENCY_ERROR error
+        code and HTTP status 500.
 
         Parameters
         ----------
         message : str
-            Describe ``message``.
-        cause : Exception | NoneType, optional
-            Describe ``cause``.
-            Defaults to ``None``.
-        context : str | object | NoneType, optional
-            Describe ``context``.
-            Defaults to ``None``.
+            Human-readable error message.
+        cause : Exception | None, optional
+            Underlying exception that caused the failure. Defaults to None.
+        context : Mapping[str, object] | None, optional
+            Additional context dictionary. Defaults to None.
         """
         super().__init__(
             message,
