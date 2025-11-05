@@ -58,38 +58,16 @@ def tok(text: str) -> list[str]:
 # [nav:anchor SpladeDoc]
 @dataclass
 class SpladeDoc:
-    """Document fixture for SPLADE index.
-
-    Represents a document chunk loaded from the SPLADE index. Contains
-    metadata and text content for sparse retrieval testing and demonstrations.
-
-    Parameters
-    ----------
-    chunk_id : str
-        Unique identifier for the chunk.
-    doc_id : str
-        Document identifier that this chunk belongs to.
-    section : str
-        Section name or identifier within the document.
-    text : str
-        Text content of the chunk.
-
-    Attributes
-    ----------
-    chunk_id : str
-        Unique identifier for the chunk.
-    doc_id : str
-        Document identifier that this chunk belongs to.
-    section : str
-        Section name or identifier within the document.
-    text : str
-        Text content of the chunk.
-    """
+    """Document fixture for SPLADE index backed by sparse retrieval data."""
 
     chunk_id: str
+    """Chunk identifier. Alias: none; name ``chunk_id``."""
     doc_id: str
+    """Document identifier. Alias: none; name ``doc_id``."""
     section: str
+    """Section label within the document. Alias: none; name ``section``."""
     text: str
+    """Chunk text content. Alias: none; name ``text``."""
 
 
 # [nav:anchor SpladeIndex]

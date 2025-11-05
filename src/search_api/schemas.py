@@ -31,60 +31,18 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 # [nav:anchor SearchResponse]
 class SearchResponse(BaseModel):
-    """Search API response containing results.
-
-    Response envelope for search API endpoints. Contains a list of
-    search results with optional metadata.
-
-    Parameters
-    ----------
-    results : list[SearchResult]
-        List of search results, ordered by relevance score descending.
-        Defaults to empty list.
-
-    Attributes
-    ----------
-    model_config : ClassVar[ConfigDict]
-        Pydantic model configuration dictionary (class variable).
-    results : list[SearchResult]
-        List of search results, ordered by relevance score descending.
-    """
+    """Search API response envelope containing ordered results."""
 
     model_config = ConfigDict(extra="forbid")
+    """Pydantic configuration forbidding unexpected fields."""
 
     results: list[SearchResult] = Field(default_factory=list)
+    """Ordered search results. Alias: none; name ``results``."""
 
 
 # [nav:anchor SearchRequest]
 class SearchRequest(BaseModel):
-    """Search API request model.
-
-    Pydantic model for search API requests. Validates query parameters
-    and request structure according to the search API schema.
-
-    Parameters
-    ----------
-    query : str
-        Search query text. Must be non-empty (min_length=1).
-    k : int, optional
-        Number of results to return. Defaults to 10.
-    filters : dict[str, object] | None, optional
-        Optional filters to apply to search results. Defaults to None.
-    explain : bool, optional
-        Whether to include explanation metadata in results. Defaults to False.
-
-    Attributes
-    ----------
-    model_config : ClassVar[ConfigDict]
-        Pydantic model configuration dictionary (class variable).
-    query : str
-        Search query text. Must be non-empty (min_length=1).
-    k : int
-        Number of results to return.
-    filters : dict[str, JsonValue] | None
-        Optional filters to apply to search results.
-    explain : bool
-        Whether to include explanation metadata in results.
+    """Search API request payload with optional filters and explain flag.
 
     Examples
     --------
@@ -101,61 +59,21 @@ class SearchRequest(BaseModel):
     """
 
     model_config = ConfigDict(extra="forbid")
+    """Pydantic configuration forbidding extra parameters."""
 
     query: str = Field(min_length=1)
+    """Search query string (at least one character). Alias: none; name ``query``."""
     k: int = 10
+    """Number of results to return. Alias: none; name ``k``."""
     filters: dict[str, JsonValue] | None = None
+    """Optional filters keyed by field. Alias: none; name ``filters``."""
     explain: bool = False
+    """Include explanation metadata flag. Alias: none; name ``explain``."""
 
 
 # [nav:anchor SearchResult]
 class SearchResult(BaseModel):
-    """Search result model.
-
-    Pydantic model representing a single search result. Contains document
-    and chunk identifiers, metadata, relevance score, and optional signals,
-    spans, and concept links.
-
-    Parameters
-    ----------
-    doc_id : str
-        Document identifier.
-    chunk_id : str
-        Chunk identifier within the document.
-    title : str
-        Document title.
-    section : str
-        Section name or identifier within the document.
-    score : float
-        Relevance score for this result.
-    signals : dict[str, float], optional
-        Dictionary of signal scores (e.g., "dense", "sparse", "kg").
-        Defaults to empty dictionary.
-    spans : dict[str, int], optional
-        Dictionary of character span information. Defaults to empty dictionary.
-    concepts : list[dict[str, str]], optional
-        List of linked concept dictionaries. Defaults to empty list.
-
-    Attributes
-    ----------
-    model_config : ClassVar[ConfigDict]
-        Pydantic model configuration dictionary (class variable).
-    doc_id : str
-        Document identifier.
-    chunk_id : str
-        Chunk identifier within the document.
-    title : str
-        Document title.
-    section : str
-        Section name or identifier within the document.
-    score : float
-        Relevance score for this result.
-    signals : dict[str, float]
-        Dictionary of signal scores (e.g., "dense", "sparse", "kg").
-    spans : dict[str, int]
-        Dictionary of character span information.
-    concepts : list[dict[str, str]]
-        List of linked concept dictionaries.
+    """Search result model combining identifiers, score, and auxiliary signals.
 
     Examples
     --------
@@ -172,12 +90,21 @@ class SearchResult(BaseModel):
     """
 
     model_config = ConfigDict(extra="forbid")
+    """Pydantic configuration forbidding extra fields."""
 
     doc_id: str
+    """Document identifier. Alias: none; name ``doc_id``."""
     chunk_id: str
+    """Chunk identifier. Alias: none; name ``chunk_id``."""
     title: str
+    """Document title. Alias: none; name ``title``."""
     section: str
+    """Section label. Alias: none; name ``section``."""
     score: float
+    """Relevance score. Alias: none; name ``score``."""
     signals: dict[str, float] = Field(default_factory=dict)
+    """Signal scores (dense, sparse, kg). Alias: none; name ``signals``."""
     spans: dict[str, int] = Field(default_factory=dict)
+    """Character spans associated with the result. Alias: none; name ``spans``."""
     concepts: list[dict[str, str]] = Field(default_factory=list)
+    """Linked concept metadata. Alias: none; name ``concepts``."""

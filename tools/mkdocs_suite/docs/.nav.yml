@@ -1,0 +1,13 @@
+title: KgFoundry Documentation
+nav:
+  - Overview:
+      - index.md
+      - architecture/
+      - diagrams/
+  - Interfaces & APIs:
+      - cli/index.md
+      - api/index.md
+      - api/interfaces.md
+      - api/openapi-cli.md
+  - Modules & Components: modules/
+

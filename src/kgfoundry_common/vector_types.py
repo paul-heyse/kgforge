@@ -74,29 +74,17 @@ class VectorValidationError(ValueError):
 class VectorBatch:
     """Immutable collection of typed vectors with shared dimensionality.
 
-    Parameters
-    ----------
-    ids : tuple[VectorId, ...]
-        Unique identifiers associated with each vector row.
-    matrix : VectorMatrix
-        Two-dimensional ``float32`` matrix whose row count matches ``ids``.
-
-    Attributes
-    ----------
-    ids : tuple[VectorId, ...]
-        Unique identifiers associated with each vector row.
-    matrix : VectorMatrix
-        Two-dimensional ``float32`` matrix whose row count matches ``ids``.
-
     Raises
     ------
     VectorValidationError
         If the matrix is not two dimensional, contains zero-length vectors, or
-        the id count does not match the number of rows.
+        the identifier count does not match the number of rows.
     """
 
     ids: tuple[VectorId, ...]
+    """Identifiers for each vector row. Alias: none; name ``ids``."""
     matrix: VectorMatrix
+    """Two-dimensional ``float32`` matrix. Alias: none; name ``matrix``."""
 
     def __post_init__(self) -> None:
         """Normalise matrix representation without enforcing ids invariants."""
