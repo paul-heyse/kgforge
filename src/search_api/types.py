@@ -371,17 +371,6 @@ class VectorSearchResult:
     and performance metadata. Results are immutable to prevent accidental
     modification.
 
-    Parameters
-    ----------
-    doc_id : str
-        Document identifier (URN format, e.g., "urn:doc:abc123").
-    chunk_id : str
-        Chunk identifier within the document (e.g., "urn:chunk:abc123:0-500").
-    score : float
-        Final relevance score combining multiple signals (higher is better).
-    vector_score : float
-        Raw vector similarity score from FAISS search (inner product or L2).
-
     Attributes
     ----------
     doc_id : str
@@ -406,16 +395,16 @@ class VectorSearchResult:
     """
 
     doc_id: str
-    """Document identifier (URN format)."""
+    """Document identifier (URN format). Alias: none; name ``doc_id``."""
 
     chunk_id: str
-    """Chunk identifier within the document."""
+    """Chunk identifier within the document. Alias: none; name ``chunk_id``."""
 
     score: float
-    """Final relevance score (may combine multiple signals)."""
+    """Final relevance score. Alias: none; name ``score``."""
 
     vector_score: float
-    """Raw vector similarity score (inner product or L2 distance)."""
+    """Vector similarity score. Alias: none; name ``vector_score``."""
 
     def __post_init__(self) -> None:
         """Validate result fields.
@@ -521,21 +510,6 @@ class AgentSearchQuery:
     result count, filtering facets, and explanation flags. All fields are
     validated at construction time.
 
-    Parameters
-    ----------
-    query : str
-        Search query text (tokenized and normalized internally). Cannot be empty.
-    k : int, optional
-        Maximum number of results to return. Must be positive.
-        Defaults to 10.
-    facets : Mapping[str, str] | None, optional
-        Optional facet filters for narrowing search results. Common facets include:
-        package, module, kind, stability, deprecated. Values are matched exactly
-        (case-sensitive). Defaults to None.
-    explain : bool, optional
-        Whether to include explanation metadata in results. When True, results include
-        detailed scoring breakdowns and match highlights. Defaults to False.
-
     Attributes
     ----------
     query : str
@@ -564,26 +538,32 @@ class AgentSearchQuery:
     """
 
     query: str
-    """Search query text (tokenized and normalized internally)."""
+    """Search query text. Alias: none; name ``query``."""
 
     k: int = 10
     """Maximum number of results to return.
 
-    Must be positive and typically bounded (e.g., 1 <= k <= 100).
+    Must be positive and typically bounded (for example, ``1 <= k <= 100``).
+
+    Alias: none; name ``k``.
     """
 
     facets: Mapping[str, str] | None = None
     """Optional facet filters for narrowing search results.
 
-    Common facets include: package, module, kind, stability, deprecated.
+    Common facets include ``package``, ``module``, ``kind``, ``stability``, and ``deprecated``.
     Values are matched exactly (case-sensitive).
+
+    Alias: none; name ``facets``.
     """
 
     explain: bool = False
     """Whether to include explanation metadata in results.
 
-    When True, results include detailed scoring breakdowns and match highlights for debugging and
+    When ``True``, results include detailed scoring breakdowns and match highlights for debugging and
     transparency.
+
+    Alias: none; name ``explain``.
     """
 
     def __post_init__(self) -> None:

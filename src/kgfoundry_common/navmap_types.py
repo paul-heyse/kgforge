@@ -34,225 +34,87 @@ type Stability = Literal[
 
 # [nav:anchor NavSection]
 class NavSection(TypedDict):
-    """Navigation section metadata.
-
-    TypedDict representing a section in the navigation map. Sections
-    group related symbols together for documentation organization.
-
-    Parameters
-    ----------
-    id : str
-        Unique section identifier.
-    title : str
-        Human-readable section title.
-    symbols : list[str]
-        List of symbol names included in this section.
-
-    Attributes
-    ----------
-    id : str
-        Unique section identifier.
-    title : str
-        Human-readable section title.
-    symbols : list[str]
-        List of symbol names included in this section.
-    """
+    """Navigation section metadata grouped by documentation theme."""
 
     id: str
+    """Unique section identifier. Alias: none; name ``id``."""
     title: str
+    """Human-readable section title. Alias: none; name ``title``."""
     symbols: list[str]
+    """Symbols contained in the section. Alias: none; name ``symbols``."""
 
 
 # [nav:anchor SymbolMeta]
 class SymbolMeta(TypedDict, total=False):
-    """Symbol metadata for documentation and tooling.
-
-    TypedDict representing metadata about a symbol (function, class, etc.)
-    in the navigation map. Used for documentation generation, testing,
-    and tooling support.
-
-    Parameters
-    ----------
-    since : str
-        Version when the symbol was introduced.
-    stability : Stability
-        Stability level of the symbol.
-    side_effects : list[Literal['none', 'fs', 'net', 'gpu', 'db']]
-        List of side effects the symbol may have.
-    thread_safety : Literal['reentrant', 'threadsafe', 'not-threadsafe']
-        Thread safety guarantee of the symbol.
-    async_ok : bool
-        Whether the symbol is safe to use in async contexts.
-    perf_budget_ms : float
-        Performance budget in milliseconds.
-    tests : list[str]
-        List of test file paths or identifiers.
-    owner : str, optional
-        Owner or team responsible for the symbol.
-    deprecated_in : str, optional
-        Version when the symbol was deprecated.
-    replaced_by : str, optional
-        Symbol name that replaces this deprecated symbol.
-    deprecated_msg : str, optional
-        Deprecation message explaining the change.
-    contracts : list[str], optional
-        List of contract identifiers (e.g., JSON Schema URIs).
-    coverage_target : float, optional
-        Test coverage target percentage.
-
-    Attributes
-    ----------
-    since : str
-        Version when the symbol was introduced.
-    stability : Stability
-        Stability level of the symbol.
-    side_effects : list[Literal['none', 'fs', 'net', 'gpu', 'db']]
-        List of side effects the symbol may have.
-    thread_safety : Literal['reentrant', 'threadsafe', 'not-threadsafe']
-        Thread safety guarantee of the symbol.
-    async_ok : bool
-        Whether the symbol is safe to use in async contexts.
-    perf_budget_ms : float
-        Performance budget in milliseconds.
-    tests : list[str]
-        List of test file paths or identifiers.
-    owner : NotRequired[str]
-        Owner or team responsible for the symbol.
-    deprecated_in : NotRequired[str]
-        Version when the symbol was deprecated.
-    replaced_by : NotRequired[str]
-        Symbol name that replaces this deprecated symbol.
-    deprecated_msg : NotRequired[str]
-        Deprecation message explaining the change.
-    contracts : NotRequired[list[str]]
-        List of contract identifiers (e.g., JSON Schema URIs).
-    coverage_target : NotRequired[float]
-        Test coverage target percentage.
-    """
+    """Symbol metadata for navigation, testing, and documentation tooling."""
 
     since: str
+    """Version introducing the symbol. Alias: none; name ``since``."""
     stability: Stability
+    """Current stability classification. Alias: none; name ``stability``."""
     side_effects: list[Literal["none", "fs", "net", "gpu", "db"]]
+    """Declared side effects. Alias: none; name ``side_effects``."""
     thread_safety: Literal["reentrant", "threadsafe", "not-threadsafe"]
+    """Thread-safety guarantee. Alias: none; name ``thread_safety``."""
     async_ok: bool
+    """Whether usage is safe in async contexts. Alias: none; name ``async_ok``."""
     perf_budget_ms: float
+    """Performance budget in milliseconds. Alias: none; name ``perf_budget_ms``."""
     tests: list[str]
+    """Test artefacts verifying the symbol. Alias: none; name ``tests``."""
     owner: NotRequired[str]
+    """Owning team handle. Alias: none; name ``owner``."""
     deprecated_in: NotRequired[str]
+    """Version marking deprecation. Alias: none; name ``deprecated_in``."""
     replaced_by: NotRequired[str]
+    """Replacement symbol path. Alias: none; name ``replaced_by``."""
     deprecated_msg: NotRequired[str]
+    """Deprecation explanation. Alias: none; name ``deprecated_msg``."""
     contracts: NotRequired[list[str]]
+    """Associated contract identifiers. Alias: none; name ``contracts``."""
     coverage_target: NotRequired[float]
+    """Expected coverage target. Alias: none; name ``coverage_target``."""
 
 
 # [nav:anchor ModuleMeta]
 class ModuleMeta(TypedDict, total=False):
-    """Module-level metadata for documentation.
-
-    TypedDict representing metadata about a module in the navigation map.
-    Used for documentation generation and module organization.
-
-    Parameters
-    ----------
-    owner : str
-        Owner or team responsible for the module.
-    stability : Stability
-        Stability level of the module.
-    since : str
-        Version when the module was introduced.
-    deprecated_in : str, optional
-        Version when the module was deprecated.
-
-    Attributes
-    ----------
-    owner : str
-        Owner or team responsible for the module.
-    stability : Stability
-        Stability level of the module.
-    since : str
-        Version when the module was introduced.
-    deprecated_in : str
-        Version when the module was deprecated.
-    """
+    """Module-level metadata surfaced in navigation artefacts."""
 
     owner: str
+    """Owning team handle. Alias: none; name ``owner``."""
     stability: Stability
+    """Module stability indicator. Alias: none; name ``stability``."""
     since: str
+    """Version introducing the module. Alias: none; name ``since``."""
     deprecated_in: str
+    """Version marking module deprecation. Alias: none; name ``deprecated_in``."""
 
 
 # [nav:anchor NavMap]
 class NavMap(TypedDict, total=False):
-    """Navigation map metadata structure.
-
-    TypedDict representing the complete navigation map for a module.
-    Contains all metadata needed for documentation generation, including
-    exports, sections, symbol metadata, and module information.
-
-    Parameters
-    ----------
-    title : str
-        Module title.
-    synopsis : str
-        Brief description of the module.
-    exports : list[str]
-        List of public symbol names exported by the module.
-    sections : list[NavSection]
-        List of navigation sections organizing the symbols.
-    see_also : list[str], optional
-        List of related modules or resources.
-    tags : list[str], optional
-        List of tags for categorization.
-    since : str, optional
-        Version when the module was introduced.
-    deprecated : str, optional
-        Version when the module was deprecated.
-    symbols : dict[str, SymbolMeta], optional
-        Dictionary mapping symbol names to their metadata.
-    edit_scopes : dict[str, list[str]], optional
-        Dictionary mapping edit scopes to symbol lists.
-    deps : list[str], optional
-        List of dependency module names.
-    module_meta : ModuleMeta, optional
-        Module-level metadata.
-
-    Attributes
-    ----------
-    title : str
-        Module title.
-    synopsis : str
-        Brief description of the module.
-    exports : list[str]
-        List of public symbol names exported by the module.
-    sections : list[NavSection]
-        List of navigation sections organizing the symbols.
-    see_also : list[str]
-        List of related modules or resources.
-    tags : list[str]
-        List of tags for categorization.
-    since : str
-        Version when the module was introduced.
-    deprecated : str
-        Version when the module was deprecated.
-    symbols : dict[str, SymbolMeta]
-        Dictionary mapping symbol names to their metadata.
-    edit_scopes : dict[str, list[str]]
-        Dictionary mapping edit scopes to symbol lists.
-    deps : list[str]
-        List of dependency module names.
-    module_meta : ModuleMeta
-        Module-level metadata.
-    """
+    """Navigation map metadata captured per module for documentation tooling."""
 
     title: str
+    """Module title. Alias: none; name ``title``."""
     synopsis: str
+    """Short summary of the module. Alias: none; name ``synopsis``."""
     exports: list[str]
+    """Public export list. Alias: none; name ``exports``."""
     sections: list[NavSection]
+    """Section definitions. Alias: none; name ``sections``."""
     see_also: list[str]
+    """Related resources. Alias: none; name ``see_also``."""
     tags: list[str]
+    """Tags for categorisation. Alias: none; name ``tags``."""
     since: str
+    """Module introduction version. Alias: none; name ``since``."""
     deprecated: str
+    """Module deprecation version. Alias: none; name ``deprecated``."""
     symbols: dict[str, SymbolMeta]
+    """Symbol metadata mapping. Alias: none; name ``symbols``."""
     edit_scopes: dict[str, list[str]]
+    """Edit scope assignments. Alias: none; name ``edit_scopes``."""
     deps: list[str]
+    """Module dependencies. Alias: none; name ``deps``."""
     module_meta: ModuleMeta
+    """Module-level metadata block. Alias: none; name ``module_meta``."""

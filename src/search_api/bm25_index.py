@@ -180,42 +180,7 @@ class BM25Doc:
     """Document representation for BM25 indexing and retrieval.
 
     Stores term frequency statistics and document metadata for a single
-    document chunk. Used by :class:`BM25Index` to compute BM25 relevance scores
-    during search.
-
-    Parameters
-    ----------
-    chunk_id : str
-        Unique identifier for this document chunk.
-    doc_id : str
-        Parent document identifier that this chunk belongs to.
-    title : str
-        Document title (used for weighted term frequency in indexing).
-    section : str
-        Section name or heading where this chunk appears.
-    tf : dict[str, float]
-        Term frequency dictionary mapping token strings to their frequencies
-    in this chunk. Title terms have weight 2.0, section terms 1.2, body
-        terms 1.0.
-    dl : float
-        Document length (sum of all term frequencies in this chunk).
-
-    Attributes
-    ----------
-    chunk_id : str
-        Unique identifier for this document chunk.
-    doc_id : str
-        Parent document identifier that this chunk belongs to.
-    title : str
-        Document title (used for weighted term frequency in indexing).
-    section : str
-        Section name or heading where this chunk appears.
-    tf : dict[str, float]
-        Term frequency dictionary mapping token strings to their frequencies
-        in this chunk. Title terms have weight 2.0, section terms 1.2, body
-        terms 1.0.
-    dl : float
-        Document length (sum of all term frequencies in this chunk).
+    document chunk. Inline attribute docstrings describe alias usage.
 
     See Also
     --------
@@ -223,11 +188,17 @@ class BM25Doc:
     """
 
     chunk_id: str
+    """Unique identifier for the chunk. Alias: none; name ``chunk_id``."""
     doc_id: str
+    """Parent document identifier. Alias: none; name ``doc_id``."""
     title: str
+    """Document title used for term weighting. Alias: none; name ``title``."""
     section: str
+    """Section label where the chunk appears. Alias: none; name ``section``."""
     tf: dict[str, float]
+    """Term frequency mapping per token. Alias: none; name ``tf``."""
     dl: float
+    """BM25 document length (sum of term frequencies). Alias: none; name ``dl``."""
 
 
 # [nav:anchor BM25Index]

@@ -91,65 +91,33 @@ class FaissAdapterSettings:
     """Configuration for FAISS adapter instances.
 
     This immutable dataclass captures all parameters needed to construct
-    a FaissAdapter with consistent defaults and validation.
-
-    Parameters
-    ----------
-    db_path : str
-        Path to DuckDB registry or Parquet vector file.
-    index_path : str
-        Path where the built index will be saved.
-    factory : str, optional
-        FAISS factory string (e.g., "OPQ64,IVF8192,PQ64"). Defaults to "Flat".
-    metric : str, optional
-        Metric type: "ip" (inner product) or "l2" (L2 distance). Defaults to "ip".
-    nprobe : int, optional
-        IVF search parameter. Defaults to 64.
-    use_gpu : bool, optional
-        Enable GPU acceleration. Defaults to True.
-    use_cuvs : bool, optional
-        Enable cuVS acceleration. Defaults to True.
-    gpu_devices : tuple[int, ...], optional
-        GPU device IDs. Defaults to (0,).
-    timeout_seconds : int, optional
-        Build operation timeout. Defaults to 3600.
-
-    Attributes
-    ----------
-    db_path : str
-        Path to DuckDB registry or Parquet vector file.
-    index_path : str
-        Path where the built index will be saved.
-    factory : str
-        FAISS factory string (e.g., "OPQ64,IVF8192,PQ64").
-    metric : str
-        Metric type: "ip" (inner product) or "l2" (L2 distance).
-    nprobe : int
-        IVF search parameter.
-    use_gpu : bool
-        Enable GPU acceleration.
-    use_cuvs : bool
-        Enable cuVS acceleration.
-    gpu_devices : tuple[int, ...]
-        GPU device IDs.
-    timeout_seconds : int
-        Build operation timeout.
+    a :class:`FaissAdapter` with consistent defaults and validation. Inline
+    attribute docstrings describe alias usage for documentation alignment.
 
     Raises
     ------
     ValueError
-        If metric is not "ip" or "l2".
+        If metric is not ``"ip"`` or ``"l2"``.
     """
 
     db_path: str
+    """DuckDB registry or Parquet vector path. Alias: none; name ``db_path``."""
     index_path: str
+    """Filesystem path for the built index. Alias: none; name ``index_path``."""
     factory: str = "Flat"
+    """FAISS factory string (e.g., ``"OPQ64,IVF8192,PQ64"``). Alias: none; name ``factory``."""
     metric: str = "ip"
+    """Similarity metric (``"ip"`` or ``"l2"``). Alias: none; name ``metric``."""
     nprobe: int = DEFAULT_NPROBE
+    """IVF search parameter ``nprobe``. Alias: none; name ``nprobe``."""
     use_gpu: bool = True
+    """Enable GPU acceleration flag. Alias: none; name ``use_gpu``."""
     use_cuvs: bool = True
+    """Enable cuVS acceleration flag. Alias: none; name ``use_cuvs``."""
     gpu_devices: tuple[int, ...] = field(default_factory=lambda: (0,))
+    """GPU device identifiers. Alias: none; name ``gpu_devices``."""
     timeout_seconds: int = DEFAULT_INDEX_TIMEOUT_SECONDS
+    """Build timeout in seconds. Alias: none; name ``timeout_seconds``."""
 
     def __post_init__(self) -> None:
         """Validate settings.
@@ -171,11 +139,6 @@ class FaissVectorstoreFactory:
 
     This factory manages the lifecycle of FAISS adapter instances, emitting
     structured logs, Prometheus metrics, and Problem Details on error.
-
-    Parameters
-    ----------
-    settings : FaissAdapterSettings
-        Configuration for adapter instances.
 
     Attributes
     ----------

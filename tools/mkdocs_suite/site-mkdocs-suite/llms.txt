@@ -12,13 +12,13 @@ How AI agents should navigate this site.
 
 ## Modules
 
-- [Modules](https://example.invalid/docs/modules/index.md): Generated module reference powered by Griffe.
+- [Modules & Components](https://example.invalid/docs/modules/index.md): Generated module reference powered by Griffe.
 
 ## API
 
-- [Api](https://example.invalid/docs/api/index.md): HTTP API reference rendered with ReDoc.
+- [HTTP API](https://example.invalid/docs/api/index.md): HTTP API reference rendered with ReDoc.
 
 ## CLI
 
-- [Cli](https://example.invalid/docs/cli/index.md): Interactive Typer command reference with live help output.
+- [Interfaces & APIs](https://example.invalid/docs/cli/index.md): Interactive Typer command reference with live help output.
 

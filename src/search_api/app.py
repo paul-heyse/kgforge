@@ -114,24 +114,13 @@ register_problem_details_handler(app)
 # Correlation ID middleware
 # [nav:anchor CorrelationIDMiddleware]
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
-    """Middleware to extract and set correlation ID from X-Correlation-ID header.
+    """Extract and propagate correlation IDs using the X-Correlation-ID header.
 
-    Extracts correlation ID from the X-Correlation-ID HTTP header or generates a
-    new UUID if not present. Sets the correlation ID in contextvars for async
-    propagation and includes it in the response headers.
-
-    Parameters
-    ----------
-    app : ASGIApp
-        ASGI application instance to wrap.
-    dispatch : Callable[[StarletteRequest], Awaitable[Response]] | None, optional
-        Custom dispatch function (typically None for default behavior).
-        Defaults to None.
-
-    Attributes
-    ----------
-    HEADER_NAME : Final[str]
-        HTTP header name for correlation ID ("X-Correlation-ID").
+    The middleware reads the ``X-Correlation-ID`` header (using
+    :attr:`HEADER_NAME`) or generates a new UUID when absent. The value is stored
+    in the request context and appended to the response headers. Base middleware
+    attributes such as ``app`` and ``dispatch`` are inherited from
+    :class:`BaseHTTPMiddleware` and therefore not re-documented here.
     """
 
     HEADER_NAME: Final[str] = "X-Correlation-ID"

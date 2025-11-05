@@ -21,28 +21,12 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 
 class ConceptMeta(TypedDict):
-    """Metadata for knowledge graph concepts.
-
-    TypedDict representing concept metadata with label and keywords.
-    Used by mock knowledge graph functions for concept matching.
-
-    Parameters
-    ----------
-    label : str
-        Human-readable concept label.
-    keywords : list[str]
-        List of keywords that match this concept.
-
-    Attributes
-    ----------
-    label : str
-        Human-readable concept label.
-    keywords : list[str]
-        List of keywords that match this concept.
-    """
+    """Metadata for knowledge graph concepts used by mock scoring."""
 
     label: str
+    """Human-readable concept label. Alias: none; name ``label``."""
     keywords: list[str]
+    """Keywords associated with the concept. Alias: none; name ``keywords``."""
 
 
 CONCEPTS: Final[dict[str, ConceptMeta]] = {

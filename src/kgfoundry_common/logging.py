@@ -229,20 +229,10 @@ class JsonFormatter(logging.Formatter):
     Formats log records as JSON with timestamp, level, name, message,
     and structured fields (correlation_id, operation, status, duration_ms).
     Automatically extracts correlation_id from contextvars if not present
-    in the log record.
-
-    Parameters
-    ----------
-    fmt : str | None, optional
-        Format string (ignored for JSON formatting). Defaults to None.
-    datefmt : str | None, optional
-        Date format string (ignored for JSON formatting). Defaults to None.
-    style : str, optional
-        Format style ("%", "{", or "$"). Defaults to "%".
-    validate : bool, optional
-        Whether to validate format string. Defaults to True.
-    defaults : dict[str, object] | None, optional
-        Default values for format string. Defaults to None.
+    in the log record. Standard ``logging.Formatter`` constructor arguments such
+    as ``fmt``, ``datefmt``, ``style``, ``validate``, and ``defaults`` are
+    supported via inheritance; no additional aliases are introduced by this
+    subclass.
 
     Examples
     --------
