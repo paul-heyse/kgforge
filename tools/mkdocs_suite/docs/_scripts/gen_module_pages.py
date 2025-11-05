@@ -18,7 +18,7 @@ import json
 import logging
 import sys
 from collections import defaultdict
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterable, Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -105,7 +105,22 @@ if TYPE_CHECKING:
     DEFAULT_SEARCH_PATHS = list(_DEFAULT_SEARCH_PATHS)
     load_nav_metadata = _load_nav_metadata
 
-PACKAGE_ROOTS: tuple[str, ...] = ("kgfoundry", "kgfoundry_common")
+PACKAGE_ROOTS: tuple[str, ...] = (
+    "kgfoundry_common",
+    "docling",
+    "download",
+    "embeddings_dense",
+    "embeddings_sparse",
+    "kg_builder",
+    "linking",
+    "observability",
+    "ontology",
+    "orchestration",
+    "registry",
+    "search_api",
+    "search_client",
+    "vectorstore_faiss",
+)
 API_USAGE_FILE = Path(__file__).with_name("api_usage.json")
 
 _griffe = importlib.import_module("griffe")
@@ -164,6 +179,7 @@ class ModuleFacts:
     functions: dict[str, list[str]]
     bases: dict[str, list[str]]
     api_usage: Mapping[str, list[str]]
+    documented_modules: set[str]
 
 
 def _is_kind(obj: object, expected: str) -> bool:
@@ -236,7 +252,7 @@ def _discover_extensions(candidates: Iterable[str]) -> tuple[list[str], object |
         return available, _load_extensions(*available)
 
 
-def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModule]:
+def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
     """
     Load all submodules for the configured package roots.
 
@@ -251,6 +267,7 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
         Mapping of module path to Griffe module objects.
     """
     modules: dict[str, _GriffeModule] = {}
+    visited: set[str] = set()
     for package in PACKAGE_ROOTS:
         try:
             with _suppress_griffe_errors():
@@ -261,7 +278,7 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
                     search_paths=DEFAULT_SEARCH_PATHS,
                     docstring_parser="numpy",
                     resolve_aliases=True,
-                    resolve_external=False,
+                    resolve_external=True,
                 )
         except _GriffeError as exc:  # pragma: no cover - degradation for broken modules
             LOGGER.warning("Skipping package %s due to Griffe load error: %s", package, exc)
@@ -270,6 +287,9 @@ def _collect_modules(extensions_bundle: object | None) -> dict[str, _GriffeModul
             continue
 
         def _visit(module: _GriffeModule) -> None:
+            if module.path in visited:
+                return
+            visited.add(module.path)
             modules[module.path] = module
             for child in module.members.values():
                 if _is_module(child):
@@ -364,7 +384,26 @@ def _build_relationships(
         functions=dict(tables.functions),
         bases=dict(tables.bases),
         api_usage=api_usage,
+        documented_modules=set(modules.keys()),
     )
+
+
+def _format_module_links(module_names: Iterable[str], documented: set[str]) -> str:
+    """Return a comma-separated list of module names with links where possible.
+
+    Returns
+    -------
+    str
+        Comma-separated string where documented modules link to their pages and
+        external modules are rendered as inline code.
+    """
+    links: list[str] = []
+    for name in module_names:
+        if name in documented:
+            links.append(f"[{name}](../modules/{name}.md)")
+        else:
+            links.append(f"`{name}`")
+    return ", ".join(links)
 
 
 def _nav_metadata_for_module(
@@ -375,8 +414,8 @@ def _nav_metadata_for_module(
     Returns
     -------
     dict[str, Any]
-        Normalized navigation metadata incorporating exports, sections, synopsis,
-        and relationship information for the module.
+        Normalized navigation metadata including exports, sections, synopsis,
+        and relationship details for the module.
     """
     exports = sorted(_module_exports(module))
     raw_meta = load_nav_metadata(module_path, tuple(exports))
@@ -437,10 +476,10 @@ def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: Mo
         return
     fd.write("## Relationships\n\n")
     if outgoing:
-        out_links = ", ".join(f"[{name}](../modules/{name}.md)" for name in outgoing)
+        out_links = _format_module_links(outgoing, facts.documented_modules)
         fd.write(f"**Imports:** {out_links}\n\n")
     if incoming:
-        in_links = ", ".join(f"[{name}](../modules/{name}.md)" for name in incoming)
+        in_links = _format_module_links(incoming, facts.documented_modules)
         fd.write(f"**Imported by:** {in_links}\n\n")
     if exported:
         export_list = ", ".join(f"`{name}`" for name in exported)
@@ -457,7 +496,7 @@ def _write_related_operations(
             used_operations.add(operation)
     if not used_operations:
         return
-    links = ", ".join(f"[{op}](../api/index/#operation/{op})" for op in sorted(used_operations))
+    links = ", ".join(f"`{op}`" for op in sorted(used_operations))
     fd.write("## Related API operations\n\n")
     fd.write(f"{links}\n\n")
 

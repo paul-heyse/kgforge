@@ -150,6 +150,15 @@ CANONICAL_ERROR_CODES: Final[dict[str, CanonicalErrorCode]] = {
         severity="error",
         remediation="Run 'uv run python -m compileall -q src' locally to locate and fix the syntax error.",
     ),
+    "KGF-DOC-BLD-016": _code(
+        "KGF-DOC-BLD-016",
+        title="CLI OpenAPI generation failed",
+        summary="The Typer to OpenAPI conversion utility exited with a non-zero status",
+        domain="documentation",
+        category="build",
+        severity="error",
+        remediation="Run 'uv run python tools/typer_to_openapi_cli.py --app orchestration.cli:app' locally to inspect the failure.",
+    ),
     "KGF-DOC-BLD-012": _code(
         "KGF-DOC-BLD-012",
         title="Gallery validation failed",
@@ -284,15 +293,6 @@ CANONICAL_ERROR_CODES: Final[dict[str, CanonicalErrorCode]] = {
         category="build",
         severity="error",
         remediation="Run 'uv run mkdocs build --config-file tools/mkdocs_suite/mkdocs.yml --strict' to reproduce and fix configuration issues.",
-    ),
-    "KGF-DOC-BLD-100": _code(
-        "KGF-DOC-BLD-100",
-        title="Agent catalog build failed",
-        summary="tools/docs/build_agent_catalog.py failed",
-        domain="documentation",
-        category="build",
-        severity="error",
-        remediation="Inspect agent catalog logs and verify docfacts/navmap artifacts are current.",
     ),
     "KGF-DOC-BLD-105": _code(
         "KGF-DOC-BLD-105",

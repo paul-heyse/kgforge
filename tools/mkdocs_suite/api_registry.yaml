@@ -1,0 +1,106 @@
+interfaces:
+  orchestration-cli:
+    type: cli
+    module: orchestration
+    owner: "@orchestration"
+    stability: beta
+    entrypoint: orchestration.cli:app
+    binary: kgf
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - orchestration
+    description: |
+      Typer-powered orchestration command suite covering indexing flows, API bootstrapping,
+      and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
+      consumed by the MkDocs suite.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      index-bm25:
+        operation_id: cli.index_bm25
+        summary: Build BM25 index from JSON/Parquet chunks.
+        description: |
+          Invoke the Lucene-backed BM25 indexing flow. Requires chunk metadata and optional
+          backend selection. Emits structured metrics and Problem Details on failure.
+        handler: orchestration.cli:index_bm25
+        tags:
+          - orchestration
+          - index_bm25
+        env: []
+        code_samples:
+          - lang: bash
+            source: "kgf index-bm25 data/chunks.parquet --backend lucene --index-dir ./_indices/bm25"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      index-faiss:
+        operation_id: cli.index_faiss
+        summary: Build FAISS index from dense vectors.
+        description: |
+          Construct a FAISS ANN index from dense vectors. Supports CPU/GPU factories and exposes
+          detailed diagnostics. Rebuilds existing indices idempotently.
+        handler: orchestration.cli:index_faiss
+        tags:
+          - orchestration
+          - index_faiss
+        env:
+          - KGF_FAISS_RESOURCES
+        code_samples:
+          - lang: bash
+            source: "kgf index-faiss artifacts/vectors.json --factory 'OPQ64,IVF8192,PQ64' --metric ip"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+          - schema/examples/problem_details/faiss-index-build-timeout.json
+      api:
+        operation_id: cli.api
+        summary: Launch FastAPI search service.
+        description: |
+          Start the FastAPI-based search service defined in `search_api.app`. Useful for local
+          validation and integration testing. Requires uvicorn to be available.
+        handler: orchestration.cli:api
+        tags:
+          - orchestration
+          - api
+        env:
+          - KGF_SEARCH_CONFIG
+        code_samples:
+          - lang: bash
+            source: "kgf api --port 8080"
+        problem_details:
+          - schema/examples/problem_details/public-api-invalid-config.json
+      e2e:
+        operation_id: cli.e2e
+        summary: Execute end-to-end orchestration demo.
+        description: |
+          Run the bundled Prefect flow that exercises the full ingestion and search pipeline. Serves
+          as a smoke test and example workflow.
+        handler: orchestration.cli:e2e
+        tags:
+          - orchestration
+          - e2e
+        env:
+          - KGF_PROFILE
+        code_samples:
+          - lang: bash
+            source: "kgf e2e"
+        problem_details:
+          - schema/examples/problem_details/public-api-invalid-config.json
+  search-http:
+    type: http
+    module: search_api
+    owner: "@search-api"
+    stability: experimental
+    entrypoint: search_api.app:create_app
+    protocol: openapi
+    spec: docs/api/openapi.yaml
+    problem_details:
+      - schema/examples/problem_details/search-missing-index.json
+      - schema/examples/problem_details/search-gpu-unavailable.json
+    tags:
+      - search
+      - http
+      - public
+    description: |
+      FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
+

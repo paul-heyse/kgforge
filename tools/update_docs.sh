@@ -26,6 +26,21 @@ fi
 export SPHINXOPTS="-W"
 
 PACKAGE_NAME="$(uv run python tools/detect_pkg.py)"
+PACKAGE_VERSION="$(
+  uv run python - "$PACKAGE_NAME" <<'PY'
+from __future__ import annotations
+
+import importlib.metadata as metadata
+import sys
+
+package = sys.argv[1]
+
+try:
+    print(metadata.version(package))
+except metadata.PackageNotFoundError:
+    print("0.0.0")
+PY
+)"
 
 emit_error_message() {
   KGF_ERROR_CODE="$1" KGF_ERROR_MESSAGE="$2" KGF_ERROR_DETAILS="${3:-}" \
@@ -139,29 +154,7 @@ if ((status != 0)); then
       "Expected canonical schema at $SCHEMA_DOCFACTS_CANONICAL."
   else
     fail_with_code "KGF-DOC-BLD-005" "DocFacts schema synchronization failed"
-  fiplugins:
-  - search
-  - autorefs
-  - mkdocstrings:
-      handlers:
-        python:
-          options:
-            # headings / layout for "one module per page"
-            show_root_heading: false
-            show_root_toc_entry: true
-            # navigation within a module
-            group_by_category: true
-            members_order: source
-            # link to source for each object
-            show_source: true
-theme:
-  name: material
-  features:
-    - navigation.path      # breadcrumbs
-    - toc.integrate        # TOC in sidebar (don’t combine with navigation.indexes)
-    - navigation.instant   # snappy SPA-style page changes
-    - navigation.top       # “back to top” button
-    - navigation.footer    # prev/next links
+  fi
 fi
 complete_stage "KGF-DOC-BLD-005"
 
@@ -190,6 +183,23 @@ if ! uv_run docstr-coverage --fail-under 90 src; then
   fail_with_code "KGF-DOC-BLD-004" "Docstring coverage threshold not met"
 fi
 complete_stage "KGF-DOC-BLD-004"
+
+announce_stage "KGF-DOC-BLD-016" "Generating CLI OpenAPI specification"
+if ! uv_run python tools/typer_to_openapi_cli.py \
+  --app orchestration.cli:app \
+  --bin kgf \
+  --title "KgFoundry CLI" \
+  --version "$PACKAGE_VERSION" \
+  --augment openapi/_augment_cli.yaml \
+  --interface-id orchestration-cli \
+  --out openapi/openapi-cli.yaml; then
+  fail_with_code "KGF-DOC-BLD-016" "CLI OpenAPI generation failed"
+fi
+if ! cp openapi/openapi-cli.yaml tools/mkdocs_suite/docs/openapi/openapi-cli.yaml; then
+  fail_with_code "KGF-DOC-BLD-016" "Failed to publish CLI OpenAPI specification" \
+    "Ensure tools/mkdocs_suite/docs/openapi/ exists and is writable."
+fi
+complete_stage "KGF-DOC-BLD-016"
 
 announce_stage "KGF-DOC-BLD-012" "Validating gallery references"
 if ! uv_run python tools/validate_gallery.py; then
@@ -296,20 +306,5 @@ if [[ $BUILD_MKDOCS -eq 1 ]]; then
   fi
 fi
 complete_stage "KGF-DOC-BLD-091"
-
-announce_stage "KGF-DOC-BLD-100" "Building agent catalog artifacts"
-if ! uv_run python tools/docs/build_agent_catalog.py; then
-  fail_with_code "KGF-DOC-BLD-100" "Agent catalog generation failed"
-fi
-if ! uv_run python tools/docs/build_agent_api.py; then
-  fail_with_code "KGF-DOC-BLD-100" "Agent API schema generation failed"
-fi
-if ! uv_run python tools/docs/render_agent_portal.py; then
-  fail_with_code "KGF-DOC-BLD-100" "Agent portal rendering failed"
-fi
-if ! uv_run python tools/docs/build_agent_analytics.py; then
-  fail_with_code "KGF-DOC-BLD-100" "Agent analytics generation failed"
-fi
-complete_stage "KGF-DOC-BLD-100"
 
 printf '\nDocumentation refresh complete.\n' >&2

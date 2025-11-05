@@ -237,7 +237,7 @@ def get_module_exports(module_name: str) -> set[str]:
     Parameters
     ----------
     module_name : str
-        Fully qualified module name (e.g., 'kgfoundry.agent_catalog.search').
+        Fully qualified module name (e.g., 'kgfoundry.search_api.service').
 
     Returns
     -------
@@ -518,7 +518,6 @@ def main() -> int:
 
     modules_to_check = [
         ("kgfoundry._namespace_proxy", stubs_dir / "_namespace_proxy.pyi"),
-        ("kgfoundry.agent_catalog.search", stubs_dir / "agent_catalog" / "search.pyi"),
     ]
 
     try:

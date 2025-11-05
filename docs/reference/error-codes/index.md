@@ -22,6 +22,7 @@ extend this registry using the same naming scheme.
 | `KGF-DOC-BLD-005` | DocFacts schema synchronization failed | documentation | build | error | Copying the canonical schema to `docs/_build/schema_docfacts.json` failed. Ensure `schema/docs/schema_docfacts.json` exists and rerun the stage. |
 | `KGF-DOC-BLD-006` | DocFacts schema validation failed | documentation | validation | error | Docstring builder output violated the DocFacts schema. Synchronize the schema and rerun the docstring builder to regenerate artifacts. |
 | `KGF-DOC-BLD-009` | Python compilation failed | documentation | build | error | Compiling sources with `python -m compileall -q src` failed. Run the command locally to locate and fix syntax errors before rebuilding docs. |
+| `KGF-DOC-BLD-016` | CLI OpenAPI generation failed | documentation | build | error | Generating the CLI OpenAPI specification via `tools/typer_to_openapi_cli.py` failed. Run `uv run python tools/typer_to_openapi_cli.py --app orchestration.cli:app` locally to inspect detailed errors. |
 | `KGF-DOC-BLD-012` | Gallery validation failed | documentation | validation | error | `tools/validate_gallery.py` detected inconsistencies. Run the script with `--verbose` to inspect failing examples. |
 | `KGF-DOC-BLD-013` | Example doctest suite failed | documentation | tests | error | Gallery doctests did not pass. Review the pytest output and update the affected examples. |
 | `KGF-DOC-BLD-015` | README generation failed | documentation | build | error | Automated README generation or doctoc execution failed. Run `uv run python tools/gen_readmes.py` manually for diagnostics. |
@@ -37,7 +38,6 @@ extend this registry using the same naming scheme.
 | `KGF-DOC-BLD-080` | Sphinx JSON build failed | documentation | build | error | The Sphinx JSON builder aborted due to warnings or errors. Resolve the reported issues before retrying. |
 | `KGF-DOC-BLD-090` | MkDocs build failed | documentation | build | error | MkDocs encountered an error while generating the static site. Inspect MkDocs output for details. |
 | `KGF-DOC-BLD-091` | MkDocs suite build failed | documentation | build | error | The MkDocs suite configuration failed to build. Run `uv run mkdocs build --config-file tools/mkdocs_suite/mkdocs.yml --strict` to reproduce and address configuration issues. |
-| `KGF-DOC-BLD-100` | Agent catalog build failed | documentation | build | error | Agent catalog generation failed. Ensure docfacts, navmap, and schema artifacts are current. |
 | `KGF-DOC-BLD-105` | Documentation artifact validation failed | documentation | validation | error | Artifact validation encountered errors. Review `docs/_scripts/validate_artifacts.py` output for remediation steps. |
 
 ## Using Error Codes

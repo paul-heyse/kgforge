@@ -1,5 +1,5 @@
 
-.PHONY: bootstrap run api e2e test test-gpu test-cpu fmt lint lint-gpu-gates clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts build_agent_catalog
+.PHONY: bootstrap run api e2e test test-gpu test-cpu fmt lint lint-gpu-gates clean migrations mock fixture docstrings docfacts-diff readmes html json symbols watch navmap-build navmap-check doctest test-map obs-catalog schemas graphs docs-html docs-json artifacts
 
 UV := uv
 UV_RUN := $(UV) run
@@ -85,12 +85,6 @@ stubs-check:
 
 artifacts:
 	uv run python tools/docs/build_artifacts.py
-
-build_agent_catalog:
-	uv run python tools/docs/build_agent_catalog.py
-	uv run python tools/docs/build_agent_api.py
-	uv run python tools/docs/render_agent_portal.py
-	uv run python tools/docs/build_agent_analytics.py
 
 readmes:
 	$(PY) tools/gen_readmes.py

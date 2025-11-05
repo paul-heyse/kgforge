@@ -16,26 +16,72 @@ from __future__ import annotations
 
 import sys
 from importlib import import_module
-from types import ModuleType
+from typing import TYPE_CHECKING
 
 from kgfoundry_common.navmap_loader import load_nav_metadata
 
-_ALIASES: dict[str, str] = {
-    "app": "search_api.app",
-    "bm25_index": "search_api.bm25_index",
-    "faiss_adapter": "search_api.faiss_adapter",
-    "fixture_index": "search_api.fixture_index",
-    "fusion": "search_api.fusion",
-    "kg_mock": "search_api.kg_mock",
-    "schemas": "search_api.schemas",
-    "service": "search_api.service",
-    "splade_index": "search_api.splade_index",
-    "types": "search_api.types",
-}
+__all__ = [
+    "app",
+    "bm25_index",
+    "faiss_adapter",
+    "fixture_index",
+    "fusion",
+    "kg_mock",
+    "schemas",
+    "service",
+    "splade_index",
+    "types",
+]
 
-__all__ = list(_ALIASES)
+_ALIASES: dict[str, str] = {name: f"search_api.{name}" for name in __all__}
 
 __navmap__ = load_nav_metadata(__name__, tuple(__all__))
+
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from types import ModuleType
+
+    from search_api import (
+        app as _app_module,
+    )
+    from search_api import (
+        bm25_index as _bm25_module,
+    )
+    from search_api import (
+        faiss_adapter as _faiss_module,
+    )
+    from search_api import (
+        fixture_index as _fixture_module,
+    )
+    from search_api import (
+        fusion as _fusion_module,
+    )
+    from search_api import (
+        kg_mock as _kg_mock_module,
+    )
+    from search_api import (
+        schemas as _schemas_module,
+    )
+    from search_api import (
+        service as _service_module,
+    )
+    from search_api import (
+        splade_index as _splade_module,
+    )
+    from search_api import (
+        types as _types_module,
+    )
+
+    app = _app_module
+    bm25_index = _bm25_module
+    faiss_adapter = _faiss_module
+    fixture_index = _fixture_module
+    fusion = _fusion_module
+    kg_mock = _kg_mock_module
+    schemas = _schemas_module
+    service = _service_module
+    splade_index = _splade_module
+    types = _types_module
 
 
 def _load(name: str) -> ModuleType:

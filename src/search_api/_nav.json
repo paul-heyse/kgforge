@@ -86,5 +86,22 @@
     }
   },
   "synopsis": "Search service endpoints and retrieval adapters",
-  "title": "search_api"
+  "title": "search_api",
+  "interfaces": [
+    {
+      "id": "search-http",
+      "type": "http",
+      "owner": "@search-api",
+      "stability": "experimental",
+      "entrypoint": "search_api.app:create_app",
+      "protocol": "openapi",
+      "spec": "docs/api/openapi.yaml",
+      "description": "FastAPI application exposing search operations via the public HTTP API.",
+      "tags": ["search", "http"],
+      "problem_details": [
+        "schema/examples/problem_details/search-missing-index.json",
+        "schema/examples/problem_details/search-gpu-unavailable.json"
+      ]
+    }
+  ]
 }
