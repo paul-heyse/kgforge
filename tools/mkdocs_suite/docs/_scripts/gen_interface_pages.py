@@ -10,47 +10,14 @@ from pathlib import Path
 import mkdocs_gen_files
 import yaml
 
+from . import load_repo_settings
+
 SUITE_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[4]
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
-MKDOCS_CONFIG_PATH = SUITE_ROOT / "mkdocs.yml"
-EDIT_URI_BRANCH_INDEX = 1
 
 
-def _load_repo_settings() -> tuple[str | None, str | None]:
-    """Return repo URL and default branch configured for MkDocs.
-
-    Returns
-    -------
-    tuple[str | None, str | None]
-        Pair of ``(repo_url, branch)`` with ``None`` when unavailable.
-    """
-    if not MKDOCS_CONFIG_PATH.exists():
-        return None, None
-    repo_url: str | None = None
-    edit_uri: str | None = None
-    try:
-        for raw_line in MKDOCS_CONFIG_PATH.read_text(encoding="utf-8").splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if line.startswith("repo_url:") and repo_url is None:
-                repo_url = line.split(":", 1)[1].strip().strip("\"'")
-            if line.startswith("edit_uri:") and edit_uri is None:
-                edit_uri = line.split(":", 1)[1].strip().strip("\"'")
-    except OSError:  # pragma: no cover - defensive guard
-        return None, None
-    branch: str | None = None
-    if isinstance(edit_uri, str):
-        parts = edit_uri.strip("/").split("/")
-        if parts and parts[0] == "edit" and len(parts) > EDIT_URI_BRANCH_INDEX:
-            branch = parts[EDIT_URI_BRANCH_INDEX]
-    if not branch:
-        branch = "main"
-    return (str(repo_url) if isinstance(repo_url, str) and repo_url else None, branch)
-
-
-REPO_URL, DEFAULT_BRANCH = _load_repo_settings()
+REPO_URL, DEFAULT_BRANCH = load_repo_settings()
 
 
 def _load_registry() -> dict[str, dict[str, object]]:
