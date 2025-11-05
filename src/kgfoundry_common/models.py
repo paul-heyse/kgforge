@@ -40,6 +40,8 @@ class Doc(BaseModel):
 
     Attributes
     ----------
+    model_config : ConfigDict
+        Pydantic configuration forbidding unknown fields.
     id : Id
         Unique document identifier.
     openalex_id : str | None
@@ -66,8 +68,6 @@ class Doc(BaseModel):
         Source identifier (for example ``"openalex"``).
     content_hash : str | None
         SHA256 content hash for deduplication.
-    model_config : ConfigDict
-        Pydantic configuration forbidding unknown fields.
 
     Examples
     --------
@@ -79,7 +79,7 @@ class Doc(BaseModel):
     >>> assert_model_roundtrip(Doc, example_path)
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config: ConfigDict = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding unknown fields."""
 
     id: Id

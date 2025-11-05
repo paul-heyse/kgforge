@@ -23,11 +23,6 @@ def build_symbol_index(*, config: DocsSymbolIndexConfig) -> dict[str, object]:
     config : DocsSymbolIndexConfig
         Typed configuration controlling symbol index build behavior.
 
-    Returns
-    -------
-    dict[str, object]
-        Symbol index payload as a dictionary (currently raises NotImplementedError).
-
     Raises
     ------
     NotImplementedError

@@ -49,74 +49,12 @@ class ErrorCode(StrEnum):
     - 6xx: Knowledge Graph & Ontology
     - 7xx: Serialization & Persistence
 
-    Attributes
-    ----------
-    DOWNLOAD_FAILED : ErrorCode
-        Download operation failed.
-    UNSUPPORTED_MIME : ErrorCode
-        Unsupported MIME type.
-    INVALID_INPUT : ErrorCode
-        Invalid input provided.
-    DOCLING_ERROR : ErrorCode
-        Document parsing error.
-    OCR_TIMEOUT : ErrorCode
-        OCR operation timed out.
-    CHUNKING_ERROR : ErrorCode
-        Document chunking error.
-    EMBEDDING_ERROR : ErrorCode
-        Embedding generation error.
-    INDEX_BUILD_ERROR : ErrorCode
-        Index build error.
-    SPLADE_OOM : ErrorCode
-        SPLADE out of memory error.
-    RETRY_EXHAUSTED : ErrorCode
-        Retry attempts exhausted.
-    SEARCH_INDEX_MISSING : ErrorCode
-        Search index not found.
-    SEARCH_QUERY_INVALID : ErrorCode
-        Invalid search query.
-    SEARCH_TIMEOUT : ErrorCode
-        Search operation timed out.
-    VECTOR_SEARCH_ERROR : ErrorCode
-        Vector search error.
-    AGENT_CATALOG_SEARCH_ERROR : ErrorCode
-        Agent catalog search error.
-    CATALOG_LOAD_ERROR : ErrorCode
-        Catalog load error.
-    SYMBOL_ATTACHMENT_ERROR : ErrorCode
-        Symbol attachment error.
-    CONFIGURATION_ERROR : ErrorCode
-        Configuration error.
-    RUNTIME_ERROR : ErrorCode
-        Runtime error.
-    RESOURCE_UNAVAILABLE : ErrorCode
-        Resource unavailable.
-    SESSION_ERROR : ErrorCode
-        Session error.
-    ONTOLOGY_PARSE_ERROR : ErrorCode
-        Ontology parsing error.
-    LINKER_CALIBRATION_ERROR : ErrorCode
-        Linker calibration error.
-    NEO4J_ERROR : ErrorCode
-        Neo4j database error.
-    SERIALIZATION_ERROR : ErrorCode
-        Serialization error.
-    DESERIALIZATION_ERROR : ErrorCode
-        Deserialization error.
-    SCHEMA_VALIDATION_ERROR : ErrorCode
-        Schema validation error.
-    REGISTRY_ERROR : ErrorCode
-        Registry error.
-    ARTIFACT_MODEL_ERROR : ErrorCode
-        Artifact model error.
-    ARTIFACT_VALIDATION_ERROR : ErrorCode
-        Artifact validation error.
-    ARTIFACT_SERIALIZATION_ERROR : ErrorCode
-        Artifact serialization error.
-    ARTIFACT_DESERIALIZATION_ERROR : ErrorCode
-        Artifact deserialization error.
-    ARTIFACT_DEPENDENCY_ERROR : ErrorCode
-        Artifact dependency error.
+    Notes
+    -----
+    Enum members are instances of ErrorCode and can be used as string values
+    (since ErrorCode inherits from StrEnum). Common enum members include:
+    DOWNLOAD_FAILED, DOCLING_ERROR, EMBEDDING_ERROR, SEARCH_INDEX_MISSING,
+    CONFIGURATION_ERROR, SERIALIZATION_ERROR, and others.
 
     Examples
     --------

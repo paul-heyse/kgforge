@@ -33,7 +33,7 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 class SearchResponse(BaseModel):
     """Search API response envelope containing ordered results."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config: ConfigDict = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding unexpected fields."""
 
     results: list[SearchResult] = Field(default_factory=list)
@@ -46,6 +46,8 @@ class SearchRequest(BaseModel):
 
     Attributes
     ----------
+    model_config : ConfigDict
+        Pydantic configuration forbidding extra parameters.
     query : str
         Search query string (at least one character).
     k : int
@@ -54,8 +56,6 @@ class SearchRequest(BaseModel):
         Optional filters keyed by field.
     explain : bool
         Include explanation metadata flag.
-    model_config : ConfigDict
-        Pydantic configuration forbidding extra parameters.
 
     Examples
     --------
@@ -71,7 +71,7 @@ class SearchRequest(BaseModel):
     >>> assert_model_roundtrip(SearchRequest, example_path)
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config: ConfigDict = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding extra parameters."""
 
     query: str = Field(min_length=1)
@@ -90,6 +90,8 @@ class SearchResult(BaseModel):
 
     Attributes
     ----------
+    model_config : ConfigDict
+        Pydantic configuration forbidding extra fields.
     doc_id : str
         Document identifier.
     chunk_id : str
@@ -106,8 +108,6 @@ class SearchResult(BaseModel):
         Character spans associated with the result.
     concepts : list[dict[str, str]]
         Linked concept metadata.
-    model_config : ConfigDict
-        Pydantic configuration forbidding extra fields.
 
     Examples
     --------
@@ -123,7 +123,7 @@ class SearchResult(BaseModel):
     >>> assert_model_roundtrip(SearchResult, example_path)
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config: ConfigDict = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding extra fields."""
 
     doc_id: str

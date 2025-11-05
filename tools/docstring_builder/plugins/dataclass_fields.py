@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import ast
 from dataclasses import dataclass, replace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from tools.docstring_builder.plugins.base import (
     TransformerPlugin,
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
     from tools.docstring_builder.plugins.base import (
         PluginContext,
+        PluginStage,
     )
     from tools.docstring_builder.semantics import SemanticResult
 
@@ -186,7 +187,7 @@ class DataclassFieldDocPlugin(TransformerPlugin):
     """
 
     name: str = "dataclass_field_docs"
-    stage: str = "transformer"
+    stage = cast("PluginStage", "transformer")
 
     def __init__(self) -> None:
         self._cache: dict[str, dict[str, list[_FieldInfo]]] = {}

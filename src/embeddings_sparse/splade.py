@@ -16,7 +16,7 @@ import math
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, BinaryIO, Protocol, cast
+from typing import TYPE_CHECKING, BinaryIO, ClassVar, Protocol, cast
 
 from kgfoundry_common.config import load_config
 from kgfoundry_common.errors import DeserializationError
@@ -253,7 +253,7 @@ class SPLADEv3Encoder:
     LuceneImpactIndex which integrates with Pyserini's Lucene impact search.
     """
 
-    name = "SPLADE-v3-distilbert"
+    name: ClassVar[str] = "SPLADE-v3-distilbert"
 
     def __init__(
         self,
@@ -277,11 +277,6 @@ class SPLADEv3Encoder:
         ----------
         texts : list[str]
             List of text strings to encode.
-
-        Returns
-        -------
-        list[tuple[list[int], list[float]]]
-            List of (token_ids, weights) tuples, one per input text.
 
         Raises
         ------

@@ -34,11 +34,6 @@ def compute_delta(
     current : SymbolIndex
         The current symbol index to compare.
 
-    Returns
-    -------
-    SymbolDelta
-        Delta payload as a dictionary (currently raises NotImplementedError).
-
     Raises
     ------
     NotImplementedError
