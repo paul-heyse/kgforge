@@ -41,7 +41,7 @@ plugins:
         - docs/_scripts/gen_module_pages.py
         - docs/_scripts/gen_d2_diagrams.py
         - docs/_scripts/gen_cli_diagram.py
-  - d2
+  - !python/name:tools.mkdocs_suite.plugins.optional_d2:OptionalD2Plugin
   - include-markdown
   - macros
   - mermaid2
