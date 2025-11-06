@@ -34,6 +34,9 @@ from tools._shared.augment_registry import (
     render_problem_details,
 )
 from tools.mkdocs_suite.docs._scripts import load_repo_settings
+from tools.mkdocs_suite.docs._scripts._operation_links import (
+    build_operation_href,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -757,28 +760,9 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
-    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``.
+    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``."""
 
-    Parameters
-    ----------
-    spec_path : object
-        Specification file path.
-    operation_id : str
-        OpenAPI operation identifier.
-
-    Returns
-    -------
-    str | None
-        Anchor URL pointing to the operation in the rendered specification, or
-        ``None`` when the operation cannot be linked automatically.
-    """
-    if not operation_id:
-        return None
-    if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
-        return "../api/openapi-cli.md"
-    if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
-        return "../api/index.md"
-    return None
+    return build_operation_href(spec_path, operation_id)
 
 
 def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: ModuleFacts) -> None:
