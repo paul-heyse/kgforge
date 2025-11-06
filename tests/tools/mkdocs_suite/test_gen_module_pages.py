@@ -6,6 +6,7 @@ import ast
 import importlib
 import importlib.machinery
 import io
+import logging
 import sys
 import types
 from collections.abc import Callable
@@ -35,6 +36,12 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
     augment_stub.load_registry = lambda *_args, **_kwargs: None
     augment_stub.render_problem_details = lambda *_args, **_kwargs: {}
     monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", augment_stub)
+
+    operation_links_stub = types.ModuleType("tools.mkdocs_suite.docs._scripts._operation_links")
+    operation_links_stub.build_operation_href = lambda *_args, **_kwargs: None
+    monkeypatch.setitem(
+        sys.modules, "tools.mkdocs_suite.docs._scripts._operation_links", operation_links_stub
+    )
 
     mkdocs_suite_stub = types.ModuleType("tools.mkdocs_suite")
     mkdocs_suite_stub.__path__ = []  # type: ignore[attr-defined]
@@ -94,6 +101,13 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
     monkeypatch.setitem(sys.modules, "kgfoundry_common.logging", logging_stub)
 
     griffe_stub = types.ModuleType("griffe")
+    griffe_stub.Alias = type("Alias", (), {})
+    griffe_stub.AliasResolutionError = Exception
+    griffe_stub.BuiltinModuleError = Exception
+    griffe_stub.CyclicAliasError = Exception
+    griffe_stub.Docstring = type("Docstring", (), {})
+    griffe_stub.GriffeLoader = type("GriffeLoader", (), {})
+    griffe_stub.Module = type("Module", (), {})
     griffe_stub.load = lambda *_args, **_kwargs: object()
     griffe_stub.load_extensions = lambda *_args, **_kwargs: None
     griffe_stub.GriffeError = Exception
@@ -116,6 +130,12 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
 
     def _nav_loader_initializer(module: types.ModuleType) -> None:
         module.load_nav_metadata = lambda *_args, **_kwargs: {}
+
+        class _NavMetadataModel(dict):
+            def as_mapping(self) -> dict[str, object]:
+                return dict(self)
+
+        module.NavMetadataModel = _NavMetadataModel
 
     def _fake_spec_from_file_location(
         name: str, location: str | Path, *args: object, **kwargs: object
@@ -202,6 +222,13 @@ def _install_griffe_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     def _stub_load_extensions(*_args: object, **_kwargs: object) -> object:
         return object()
 
+    stub.Alias = type("Alias", (), {})
+    stub.AliasResolutionError = _StubGriffeError
+    stub.BuiltinModuleError = _StubGriffeError
+    stub.CyclicAliasError = _StubGriffeError
+    stub.Docstring = type("Docstring", (), {})
+    stub.GriffeLoader = type("GriffeLoader", (), {})
+    stub.Module = type("Module", (), {})
     stub.GriffeError = _StubGriffeError
     stub.load = _stub_load
     stub.load_extensions = _stub_load_extensions

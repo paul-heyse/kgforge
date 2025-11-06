@@ -118,7 +118,7 @@ else:
     sys.modules[_nav_loader_spec.name] = _nav_loader
     loader = cast("importlib.abc.Loader", _nav_loader_spec.loader)
     loader.exec_module(_nav_loader)
-    NavMetadataModel = _nav_loader.NavMetadataModel
+    NavMetadataModel = getattr(_nav_loader, "NavMetadataModel", None)
 
     DEFAULT_EXTENSIONS = list(_griffe_navmap.DEFAULT_EXTENSIONS)
     DEFAULT_SEARCH_PATHS = list(_griffe_navmap.DEFAULT_SEARCH_PATHS)
@@ -151,19 +151,37 @@ _GriffeError = getattr(_griffe, "GriffeError", Exception)
 
 
 def _is_package_directory(path: Path) -> bool:
-    """Return ``True`` when ``path`` is a Python package directory."""
+    """Return ``True`` when ``path`` is a Python package directory.
+
+    Returns
+    -------
+    bool
+        ``True`` if ``path`` contains an ``__init__.py`` file.
+    """
     return path.is_dir() and (path / "__init__.py").is_file()
 
 
 def _prioritize_packages(names: Sequence[str]) -> tuple[str, ...]:
-    """Return package names ordered with priority entries at the front."""
+    """Return package names ordered with priority entries at the front.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Package names with priority packages at the beginning.
+    """
     prioritized = [name for name in PACKAGE_PRIORITY_ORDER if name in names]
     remainder = [name for name in names if name not in PACKAGE_PRIORITY_ORDER]
     return tuple(prioritized + remainder)
 
 
 def _discover_package_roots(src_root: Path) -> tuple[str, ...]:
-    """Return first-party package roots discovered from the repository."""
+    """Return first-party package roots discovered from the repository.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Sorted package names filtered by the denylist.
+    """
     discovered: dict[str, None] = {}
 
     try:
@@ -191,7 +209,13 @@ def _discover_package_roots(src_root: Path) -> tuple[str, ...]:
 
 @lru_cache(maxsize=1)
 def _get_package_roots() -> tuple[str, ...]:
-    """Return cached package roots for module collection."""
+    """Return cached package roots for module collection.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Cached package names discovered from the repository sources.
+    """
     return _discover_package_roots(SRC_ROOT)
 
 
@@ -660,7 +684,7 @@ def _format_module_links(module_names: Iterable[str], documented: set[str]) -> s
     return ", ".join(links)
 
 
-def _nav_metadata_for_module(
+def _nav_metadata_for_module(  # noqa: C901
     module_path: str, module: _GriffeModule, facts: ModuleFacts
 ) -> dict[str, Any]:
     """Return nav metadata merged with runtime defaults for ``module_path``.
@@ -682,7 +706,7 @@ def _nav_metadata_for_module(
     """
     exports = sorted(_module_exports(module))
     raw_meta = load_nav_metadata(module_path, tuple(exports))
-    if isinstance(raw_meta, NavMetadataModel):
+    if NavMetadataModel is not None and isinstance(raw_meta, NavMetadataModel):
         meta = copy.deepcopy(raw_meta.as_mapping())
     elif isinstance(raw_meta, Mapping):
         meta = copy.deepcopy(dict(raw_meta))
@@ -760,7 +784,13 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
-    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``."""
+    """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``.
+
+    Returns
+    -------
+    str | None
+        Resolved hyperlink to the OpenAPI operation or ``None`` when unavailable.
+    """
     return build_operation_href(spec_path, operation_id)
 
 

@@ -16,17 +16,20 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from time import monotonic
 from typing import TYPE_CHECKING, cast
 
 from tools import ToolExecutionError, get_logger, run_tool, validate_tools_payload
+from tools._shared.cli import CliEnvelope, CliEnvelopeBuilder, CliErrorStatus, render_cli_envelope
+from tools._shared.logging import LoggerAdapter
+from tools._shared.problem_details import ProblemDetailsParams, build_problem_details
 from tools.drift_preview import write_html_diff
+from tools.navmap import cli_context
 from tools.navmap.document_models import (
     NAVMAP_SCHEMA,
     navmap_document_from_index,
 )
-from tools.navmap.models import (
-    nav_index_from_dict,
-)
+from tools.navmap.models import nav_index_from_dict
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -48,6 +51,83 @@ OUT.mkdir(parents=True, exist_ok=True)
 INDEX_PATH = OUT / "navmap.json"
 DRIFT_DIR = REPO / "docs" / "_build" / "drift"
 NAVMAP_DIFF_PATH = DRIFT_DIR / "navmap.html"
+
+CLI_COMMAND = cli_context.CLI_COMMAND
+CLI_SETTINGS = cli_context.get_cli_settings()
+CLI_CONFIG = cli_context.get_cli_config()
+CLI_OPERATION_IDS = cli_context.CLI_OPERATION_IDS
+CLI_INTERFACE_ID = cli_context.CLI_INTERFACE_ID
+CLI_ENVELOPE_DIR = cli_context.REPO_ROOT / "site" / "_build" / "cli"
+SUBCOMMAND_BUILD = "build"
+CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/navmap/build"
+
+
+def _envelope_path(subcommand: str) -> Path:
+    safe_subcommand = subcommand or "root"
+    filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand}.json"
+    return CLI_ENVELOPE_DIR / filename
+
+
+def _emit_envelope(envelope: CliEnvelope, *, logger: LoggerAdapter, subcommand: str) -> Path:
+    path = _envelope_path(subcommand)
+    CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
+    rendered = render_cli_envelope(envelope)
+    path.write_text(rendered + "\n", encoding="utf-8")
+    logger.debug(
+        "CLI envelope written",
+        extra={"status": envelope.status, "cli_envelope": str(path)},
+    )
+    return path
+
+
+def _build_problem(
+    *,
+    detail: str,
+    status: int,
+    extras: dict[str, object] | None = None,
+) -> dict[str, object]:
+    return build_problem_details(
+        ProblemDetailsParams(
+            type=CLI_PROBLEM_TYPE,
+            title="Navmap build failed",
+            status=status,
+            detail=detail,
+            instance=f"urn:cli:{CLI_INTERFACE_ID}:{SUBCOMMAND_BUILD}",
+            extensions=_normalize_json_mapping(extras or {}),
+        )
+    )
+
+
+def _record_failure(
+    *,
+    logger: LoggerAdapter,
+    detail: str,
+    status: int,
+    error_status: CliErrorStatus,
+    extras: dict[str, object],
+    start_time: float,
+    exc: BaseException | None = None,
+) -> int:
+    problem = _build_problem(detail=detail, status=status, extras=extras)
+    failure_builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=error_status if error_status in {"config", "violation"} else "error",
+        subcommand=SUBCOMMAND_BUILD,
+    )
+    failure_builder.add_error(status=error_status, message=detail, problem=problem)
+    failure_builder.set_problem(problem)
+    envelope = failure_builder.finish(duration_seconds=monotonic() - start_time)
+    path = _emit_envelope(envelope, logger=logger, subcommand=SUBCOMMAND_BUILD)
+    log_extra = {
+        "status": envelope.status,
+        "cli_envelope": str(path),
+        "duration_seconds": envelope.duration_seconds,
+        **_normalize_json_mapping(extras),
+    }
+    logger.error("Command failed", extra=log_extra, exc_info=exc)
+    print(detail, file=sys.stderr)
+    return 2 if error_status in {"config", "violation"} else 1
+
 
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))

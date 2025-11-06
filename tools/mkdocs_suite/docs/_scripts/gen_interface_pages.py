@@ -364,11 +364,11 @@ def render_interface_catalog() -> None:
     registry = _load_registry()
     interfaces = _collect_nav_interfaces()
     if registry is not None:
-        nav_lookup = {
-            str(record["id"]): record
-            for record in interfaces
-            if isinstance(record.get("id"), str) and record["id"].strip()
-        }
+        nav_lookup: dict[str, dict[str, object]] = {}
+        for record in interfaces:
+            candidate_id = record.get("id")
+            if isinstance(candidate_id, str) and candidate_id.strip():
+                nav_lookup[candidate_id] = record
         for identifier, interface_model in registry.interfaces.items():
             key = str(identifier)
             if key in nav_lookup:
