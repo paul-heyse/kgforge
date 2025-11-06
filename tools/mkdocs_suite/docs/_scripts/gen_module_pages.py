@@ -684,7 +684,10 @@ def _nav_metadata_for_module(
     """
     exports = sorted(_module_exports(module))
     raw_meta = load_nav_metadata(module_path, tuple(exports))
-    meta: dict[str, Any] = copy.deepcopy(raw_meta)
+    if isinstance(raw_meta, Mapping):
+        meta: dict[str, Any] = copy.deepcopy(dict(raw_meta))
+    else:
+        meta = copy.deepcopy(cast(dict[str, Any], raw_meta))
     meta["exports"] = exports
 
     symbols_meta = meta.get("symbols")
