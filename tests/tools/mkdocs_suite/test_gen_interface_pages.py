@@ -142,3 +142,37 @@ def test_render_interface_catalog_links_full_module_path(
     assert "[pkg_root.subpkg.leaf](../modules/pkg_root.subpkg.leaf.md)" in output
 
     sys.modules.pop(module_name, None)
+
+
+def test_write_interface_table_escapes_markdown_control_characters() -> None:
+    """User-controlled metadata should be escaped before inserting into tables."""
+
+    handle = io.StringIO()
+    interfaces = [
+        {
+            "id": "interface|id\nwith newline",
+            "type": "service|type",
+            "module": "pkg.module",
+            "owner": "owner|name`tick`",
+            "stability": "beta|1",
+            "spec": "http://example.com/spec|path",
+            "description": "line1|\nline2`",
+            "problem_details": ["issue|one", "issue`two`"],
+        }
+    ]
+
+    gen_interface_pages._write_interface_table(handle, interfaces, registry=None)  # noqa: SLF001
+
+    lines = handle.getvalue().strip().splitlines()
+    row = lines[-1]
+    cells = [cell.strip() for cell in row.strip().strip("|").split(" | ")]
+
+    assert len(cells) == 8
+    assert cells[0] == "interface\\|id<br />with newline"
+    assert cells[1] == "service\\|type"
+    assert cells[2] == "[pkg.module](../modules/pkg.module.md)"
+    assert cells[3] == "owner\\|name\\`tick\\`"
+    assert cells[4] == "beta\\|1"
+    assert cells[5] == "http://example.com/spec\\|path"
+    assert cells[6] == "line1\\|<br />line2\\`"
+    assert cells[7] == "issue\\|one, issue\\`two\\`"

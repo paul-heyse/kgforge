@@ -24,7 +24,13 @@ def _capture_write(buffers: dict[str, io.StringIO], path: str, mode: str) -> Ite
         buffer = io.StringIO()
         buffers[path] = buffer
     else:
+        if "r" in mode and path not in buffers:
+            raise FileNotFoundError(path)
         buffer = buffers.setdefault(path, io.StringIO())
+        if "r" in mode and "w" not in mode:
+            buffer.seek(0)
+        elif "a" in mode:
+            buffer.seek(0, io.SEEK_END)
     yield buffer
 
 
@@ -200,3 +206,31 @@ def test_ensure_cli_index_entry_preserves_existing_content(
         if path == gen_cli_module.DIAGRAM_INDEX_PATH and "r" in mode
     ]
     assert read_modes == ["r", "r"]
+def test_main_skips_diagram_when_dependency_missing(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
+
+    def missing_dependency_loader(*_: object, **__: object) -> None:
+        raise ModuleNotFoundError("missing_cli_dependency")
+
+    monkeypatch.setattr(gen_cli_module, "load_cli_tooling_context", missing_dependency_loader)
+
+    buffers: dict[str, io.StringIO] = {}
+
+    def fake_open(
+        path: str, mode: str = "r", **_: object
+    ) -> contextlib.AbstractContextManager[io.StringIO]:
+        return _capture_write(buffers, path, mode)
+
+    monkeypatch.setattr(gen_cli_module.mkdocs_gen_files, "open", fake_open)
+
+    caplog.set_level("WARNING", logger=gen_cli_module.LOGGER.name)
+
+    gen_cli_module.main()
+
+    warning_messages = " ".join(record.getMessage() for record in caplog.records)
+    assert "unable to load CLI tooling context" in warning_messages
+
+    index_output = buffers["diagrams/index.md"].getvalue()
+    assert index_output.endswith("- [CLI by Tag](./cli_by_tag.d2)\n")
