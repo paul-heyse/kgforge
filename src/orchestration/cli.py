@@ -95,8 +95,8 @@ CLI_SETTINGS = cli_context.get_cli_settings()
 CLI_TITLE = cli_context.CLI_TITLE
 CLI_ENVELOPE_DIR = cli_context.REPO_ROOT / "site" / "_build" / "cli"
 
-SUBCOMMAND_INDEX_BM25 = "index_bm25"
-SUBCOMMAND_INDEX_FAISS = "index_faiss"
+SUBCOMMAND_INDEX_BM25 = "index-bm25"
+SUBCOMMAND_INDEX_FAISS = "index-faiss"
 SUBCOMMAND_API = "api"
 SUBCOMMAND_E2E = "e2e"
 
@@ -142,13 +142,14 @@ def _start_command(
     subcommand: str, **log_fields: object
 ) -> tuple[_CommandContext, CliEnvelopeBuilder]:
     operation_id = CLI_OPERATION_IDS.get(subcommand, subcommand)
+    operation_alias = subcommand.replace("-", "_")
     correlation_id = uuid4().hex
     filtered_fields = {key: value for key, value in log_fields.items() if value is not None}
     logger = with_fields(
         LOGGER,
         correlation_id=correlation_id,
         operation_id=operation_id,
-        operation=operation_id,
+        operation=operation_alias,
         command=CLI_COMMAND,
         subcommand=subcommand,
         **filtered_fields,
@@ -274,6 +275,7 @@ def _handle_failure(
         }
     }
     context.logger.error("Command failed", exc_info=exc, **log_kwargs)
+    typer.echo(json.dumps(problem_payload, sort_keys=True), err=True)
     typer.echo(detail, err=True)
 
 
@@ -600,6 +602,14 @@ def index_faiss(
     )
     try:
         metadata = run_index_faiss(config=config)
+        context.logger.info(
+            "Building FAISS index",
+            extra={
+                "status": "success",
+                "vectors": metadata.get("vector_count"),
+                "dimension": metadata.get("dimension"),
+            },
+        )
         builder.add_file(
             path=str(Path(index_path)),
             status="success",
@@ -621,7 +631,8 @@ def index_faiss(
             error_status="violation",
             extras={
                 "vector_path": dense_vectors,
-                "errors": list(exc.errors) if hasattr(exc, "errors") else [],
+                "schema_id": _VECTOR_SCHEMA_ID,
+                "validation_errors": list(exc.errors) if hasattr(exc, "errors") else [],
             },
             overrides={"type": _VECTOR_PROBLEM_TYPE},
             exc=exc,
@@ -651,6 +662,10 @@ def index_faiss(
         detail = f"Error saving index: {exc}"
         _handle_failure(context, detail=detail, status=STATUS_INTERNAL_ERROR, exc=exc)
         raise typer.Exit(code=1) from exc
+
+
+app.command(name="index_bm25")(index_bm25)
+app.command(name="index_faiss")(index_faiss)
 
 
 @app.command(name=SUBCOMMAND_API)

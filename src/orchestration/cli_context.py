@@ -49,7 +49,9 @@ CLI_INTERFACE_ID = "orchestration-cli"
 
 
 CLI_OPERATION_IDS: dict[str, str] = {
+    "index-bm25": "cli.index_bm25",
     "index_bm25": "cli.index_bm25",
+    "index-faiss": "cli.index_faiss",
     "index_faiss": "cli.index_faiss",
     "api": "cli.api",
     "e2e": "cli.e2e",

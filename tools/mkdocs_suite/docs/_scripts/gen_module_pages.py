@@ -80,6 +80,7 @@ REPO_URL, DEFAULT_BRANCH = load_repo_settings()
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
+    from kgfoundry_common.navmap_loader import NavMetadataModel
     from kgfoundry_common.navmap_loader import load_nav_metadata as _load_nav_metadata
     from tools._shared.augment_registry import (
         RegistryInterfaceModel,
@@ -117,6 +118,7 @@ else:
     sys.modules[_nav_loader_spec.name] = _nav_loader
     loader = cast("importlib.abc.Loader", _nav_loader_spec.loader)
     loader.exec_module(_nav_loader)
+    NavMetadataModel = _nav_loader.NavMetadataModel
 
     DEFAULT_EXTENSIONS = list(_griffe_navmap.DEFAULT_EXTENSIONS)
     DEFAULT_SEARCH_PATHS = list(_griffe_navmap.DEFAULT_SEARCH_PATHS)
@@ -680,8 +682,10 @@ def _nav_metadata_for_module(
     """
     exports = sorted(_module_exports(module))
     raw_meta = load_nav_metadata(module_path, tuple(exports))
-    if isinstance(raw_meta, Mapping):
-        meta: dict[str, Any] = copy.deepcopy(dict(raw_meta))
+    if isinstance(raw_meta, NavMetadataModel):
+        meta = copy.deepcopy(raw_meta.as_mapping())
+    elif isinstance(raw_meta, Mapping):
+        meta = copy.deepcopy(dict(raw_meta))
     else:
         meta = copy.deepcopy(cast("dict[str, Any]", raw_meta))
     meta["exports"] = exports

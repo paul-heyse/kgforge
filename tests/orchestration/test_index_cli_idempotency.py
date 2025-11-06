@@ -157,12 +157,14 @@ class TestIndexingErrorHandling:
         """
         caplog.set_level(logging.ERROR)
 
-        with pytest.raises(FileNotFoundError, match="nonexistent"):
+        with pytest.raises(typer.Exit) as exc_info:
             index_bm25(
                 chunks_parquet=str(temp_index_dir / "nonexistent.json"),
                 backend="lucene",
                 index_dir=str(temp_index_dir / "output"),
             )
+
+        assert exc_info.value.exit_code == 1
 
         # Verify error was logged
         assert any(record.levelname == "ERROR" for record in caplog.records)
@@ -208,26 +210,23 @@ class TestIndexingErrorHandling:
         assert exc_info.value.exit_code == 1
         assert messages, "Expected Problem Details payload to be emitted"
 
-        payload_str, is_err = messages[-1]
-        assert is_err is True
-        problem_raw: object = json.loads(payload_str)
+        json_messages = [msg for msg, err in messages if err and msg.strip().startswith("{")]
+        assert json_messages, "Expected structured Problem Details output"
+        problem_raw: object = json.loads(json_messages[-1])
         assert isinstance(problem_raw, dict)
         problem = cast("dict[str, object]", problem_raw)
-        extensions_raw = problem.get("extensions")
-        assert isinstance(extensions_raw, dict)
-        errors_raw = cast("dict[str, object] | None", extensions_raw.get("errors"))
-        assert isinstance(errors_raw, dict)
-        errors_field: dict[str, object] = {str(key): value for key, value in errors_raw.items()}
+        extensions = cast("dict[str, object]", problem.get("extensions", {}))
 
         assert (
             problem.get("type") == "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
         )
         assert problem.get("status") == 422
+        assert extensions.get("vector_path") == str(vectors_file)
         assert (
-            errors_field.get("schema_id")
+            extensions.get("schema_id")
             == "https://kgfoundry.dev/schema/vector-ingestion/vector-batch.v1.json"
         )
-        assert "validation_errors" in errors_field
+        assert extensions.get("validation_errors") == ["row 1: missing vector"]
 
         # Verify error was logged with correlation id metadata
         assert any(record.levelname == "ERROR" for record in caplog.records)
