@@ -633,6 +633,7 @@ def index_faiss(
                 "vector_path": dense_vectors,
                 "schema_id": _VECTOR_SCHEMA_ID,
                 "validation_errors": list(exc.errors) if hasattr(exc, "errors") else [],
+                "errors": list(exc.errors) if hasattr(exc, "errors") else [],
             },
             overrides={"type": _VECTOR_PROBLEM_TYPE},
             exc=exc,

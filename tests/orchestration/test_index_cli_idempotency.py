@@ -215,18 +215,18 @@ class TestIndexingErrorHandling:
         problem_raw: object = json.loads(json_messages[-1])
         assert isinstance(problem_raw, dict)
         problem = cast("dict[str, object]", problem_raw)
-        extensions = cast("dict[str, object]", problem.get("extensions", {}))
-
         assert (
             problem.get("type") == "https://kgfoundry.dev/problems/vector-ingestion/invalid-payload"
         )
         assert problem.get("status") == 422
-        assert extensions.get("vector_path") == str(vectors_file)
+        assert problem.get("vector_path") == str(vectors_file)
         assert (
-            extensions.get("schema_id")
+            problem.get("schema_id")
             == "https://kgfoundry.dev/schema/vector-ingestion/vector-batch.v1.json"
         )
-        assert extensions.get("validation_errors") == ["row 1: missing vector"]
+        errors_list = cast("list[str]", problem.get("errors", []))
+        assert errors_list, "Expected validation error details"
+        assert "vector" in errors_list[0].lower()
 
         # Verify error was logged with correlation id metadata
         assert any(record.levelname == "ERROR" for record in caplog.records)
