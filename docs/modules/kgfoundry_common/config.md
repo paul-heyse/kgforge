@@ -2,6 +2,8 @@
 
 Typed configuration management via pydantic_settings
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/config.py)
+
 ## Sections
 
 - **Public API**
@@ -64,7 +66,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.config": "kgfoundry_common.config" { link: "config.md" }
+"kgfoundry_common.config": "kgfoundry_common.config" { link: "./kgfoundry_common/config.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.config" -> "__future__.annotations"
 "base64": "base64"
@@ -113,5 +115,7 @@ direction: right
 "kgfoundry_common.config" -> "typing.Unpack"
 "typing.cast": "typing.cast"
 "kgfoundry_common.config" -> "typing.cast"
+"kgfoundry_common.config_code": "kgfoundry_common.config code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/config.py" }
+"kgfoundry_common.config" -> "kgfoundry_common.config_code" { style: dashed }
 ```
 

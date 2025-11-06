@@ -4,6 +4,8 @@ Downloader command suite that sources external corpora (currently OpenAlex) usin
 CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,
 diagrams, documentation) remains in sync without bespoke glue.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/harvester.py)
+
 ## Sections
 
 - **Public API**
@@ -39,7 +41,7 @@ classDiagram
 
 ```d2
 direction: right
-"download.harvester": "download.harvester" { link: "harvester.md" }
+"download.harvester": "download.harvester" { link: "./download/harvester.md" }
 "__future__.annotations": "__future__.annotations"
 "download.harvester" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -64,5 +66,7 @@ direction: right
 "download.harvester" -> "time"
 "typing.cast": "typing.cast"
 "download.harvester" -> "typing.cast"
+"download.harvester_code": "download.harvester code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/download/harvester.py" }
+"download.harvester" -> "download.harvester_code" { style: dashed }
 ```
 

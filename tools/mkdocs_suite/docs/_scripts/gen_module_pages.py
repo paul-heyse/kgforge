@@ -713,10 +713,8 @@ def _module_doc_path(module_path: str) -> str:
 
 
 def _relative_module_href(from_module: str, to_module: str) -> str:
-    source_doc = _module_doc_path(from_module)
-    target_doc = _module_doc_path(to_module)
-    source_dir = posixpath.dirname(source_doc) or "."
-    return posixpath.relpath(target_doc, source_dir)
+    del from_module  # maintained for signature parity
+    return f"./{to_module.replace('.', '/')}.md"
 
 
 def _format_module_links(

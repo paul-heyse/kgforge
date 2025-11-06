@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import yaml
@@ -13,6 +14,13 @@ __all__ = ["__doc__", "load_repo_settings"]
 EDIT_URI_BRANCH_INDEX = 1
 DEFAULT_BRANCH_FALLBACK = "main"
 _SUITE_ROOT = Path(__file__).resolve().parents[2]
+_REPO_ROOT = _SUITE_ROOT.parents[1]
+_SRC_ROOT = _REPO_ROOT / "src"
+
+for candidate in (str(_REPO_ROOT), str(_SRC_ROOT)):
+    while candidate in sys.path:
+        sys.path.remove(candidate)
+    sys.path.insert(0, candidate)
 _DEFAULT_MKDOCS_PATH = _SUITE_ROOT / "mkdocs.yml"
 
 

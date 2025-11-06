@@ -294,7 +294,8 @@ def _emit_envelope(
 ) -> Path | None:
     payload = render_cli_envelope(envelope)
     safe_subcommand = subcommand or "root"
-    filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand.replace('/', '-')}.json"
+    components = [CLI_SETTINGS.bin_name, safe_subcommand.replace("/", "-")]
+    filename = "-".join(components) + ".json"
     output_path = CLI_ENVELOPE_DIR / filename
     try:
         CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)

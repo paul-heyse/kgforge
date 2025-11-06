@@ -2,6 +2,8 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/kg_mock.py)
+
 ## Sections
 
 - **Public API**
@@ -30,7 +32,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 **Imports:** `__future__.annotations`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `typing.Final`, `typing.TypedDict`
 
-**Imported by:** [search_api](../search_api.md)
+**Imported by:** [search_api](./search_api.md)
 
 ## Autorefs Examples
 
@@ -52,7 +54,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.kg_mock": "search_api.kg_mock" { link: "kg_mock.md" }
+"search_api.kg_mock": "search_api.kg_mock" { link: "./search_api/kg_mock.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.kg_mock" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -61,7 +63,9 @@ direction: right
 "search_api.kg_mock" -> "typing.Final"
 "typing.TypedDict": "typing.TypedDict"
 "search_api.kg_mock" -> "typing.TypedDict"
-"search_api": "search_api" { link: "../search_api.md" }
+"search_api": "search_api" { link: "./search_api.md" }
 "search_api" -> "search_api.kg_mock"
+"search_api.kg_mock_code": "search_api.kg_mock code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/kg_mock.py" }
+"search_api.kg_mock" -> "search_api.kg_mock_code" { style: dashed }
 ```
 

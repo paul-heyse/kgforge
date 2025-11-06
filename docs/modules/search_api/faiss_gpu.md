@@ -2,6 +2,8 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/faiss_gpu.py)
+
 ## Sections
 
 - **Public API**
@@ -46,7 +48,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.faiss_gpu": "search_api.faiss_gpu" { link: "faiss_gpu.md" }
+"search_api.faiss_gpu": "search_api.faiss_gpu" { link: "./search_api/faiss_gpu.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.faiss_gpu" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -75,5 +77,7 @@ direction: right
 "search_api.faiss_gpu" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "search_api.faiss_gpu" -> "typing.cast"
+"search_api.faiss_gpu_code": "search_api.faiss_gpu code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/faiss_gpu.py" }
+"search_api.faiss_gpu" -> "search_api.faiss_gpu_code" { style: dashed }
 ```
 

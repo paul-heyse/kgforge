@@ -2,6 +2,8 @@
 
 HTTP adapters for Problem Details exception handling.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py)
+
 ## Sections
 
 - **Public API**
@@ -29,7 +31,7 @@ HTTP adapters for Problem Details exception handling.
 
 ```d2
 direction: right
-"kgfoundry_common.errors.http": "kgfoundry_common.errors.http" { link: "http.md" }
+"kgfoundry_common.errors.http": "kgfoundry_common.errors.http" { link: "./kgfoundry_common/errors/http.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors.http" -> "__future__.annotations"
 "asyncio": "asyncio"
@@ -52,5 +54,7 @@ direction: right
 "kgfoundry_common.errors.http" -> "kgfoundry_common.problem_details.ProblemDetails"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "kgfoundry_common.errors.http" -> "typing.TYPE_CHECKING"
+"kgfoundry_common.errors.http_code": "kgfoundry_common.errors.http code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py" }
+"kgfoundry_common.errors.http" -> "kgfoundry_common.errors.http_code" { style: dashed }
 ```
 

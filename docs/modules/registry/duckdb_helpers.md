@@ -2,6 +2,8 @@
 
 Typed DuckDB helper utilities for parameterized queries and logging.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/duckdb_helpers.py)
+
 ## Sections
 
 - **Public API**
@@ -60,7 +62,7 @@ Typed DuckDB helper utilities for parameterized queries and logging.
 
 **Imports:** `__future__.annotations`, `collections.abc.Iterable`, `collections.abc.Mapping`, `collections.abc.Sequence`, `dataclasses.dataclass`, `dataclasses.replace`, `duckdb`, `duckdb.DuckDBPyConnection`, `kgfoundry_common.errors.RegistryError`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.logging.with_fields`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.observability.MetricsProvider`, `kgfoundry_common.observability.observe_duration`, `pathlib.Path`, `time`, `typing.Final`, `typing.TYPE_CHECKING`, `typing.cast`
 
-**Imported by:** [registry.duckdb_registry](duckdb_registry.md), [registry.helper](helper.md), [registry.migrate](migrate.md)
+**Imported by:** [registry.duckdb_registry](./registry/duckdb_registry.md), [registry.helper](./registry/helper.md), [registry.migrate](./registry/migrate.md)
 
 ## Autorefs Examples
 
@@ -80,7 +82,7 @@ classDiagram
 
 ```d2
 direction: right
-"registry.duckdb_helpers": "registry.duckdb_helpers" { link: "duckdb_helpers.md" }
+"registry.duckdb_helpers": "registry.duckdb_helpers" { link: "./registry/duckdb_helpers.md" }
 "__future__.annotations": "__future__.annotations"
 "registry.duckdb_helpers" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -119,11 +121,13 @@ direction: right
 "registry.duckdb_helpers" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "registry.duckdb_helpers" -> "typing.cast"
-"registry.duckdb_registry": "registry.duckdb_registry" { link: "duckdb_registry.md" }
+"registry.duckdb_registry": "registry.duckdb_registry" { link: "./registry/duckdb_registry.md" }
 "registry.duckdb_registry" -> "registry.duckdb_helpers"
-"registry.helper": "registry.helper" { link: "helper.md" }
+"registry.helper": "registry.helper" { link: "./registry/helper.md" }
 "registry.helper" -> "registry.duckdb_helpers"
-"registry.migrate": "registry.migrate" { link: "migrate.md" }
+"registry.migrate": "registry.migrate" { link: "./registry/migrate.md" }
 "registry.migrate" -> "registry.duckdb_helpers"
+"registry.duckdb_helpers_code": "registry.duckdb_helpers code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/duckdb_helpers.py" }
+"registry.duckdb_helpers" -> "registry.duckdb_helpers_code" { style: dashed }
 ```
 

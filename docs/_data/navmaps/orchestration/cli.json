@@ -154,6 +154,7 @@
       "tools.render_cli_envelope",
       "tools.with_fields",
       "typer",
+      "typing.Annotated",
       "typing.Protocol",
       "typing.TYPE_CHECKING",
       "typing.cast",

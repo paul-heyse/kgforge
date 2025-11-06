@@ -2,6 +2,8 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/gpu.py)
+
 ## Sections
 
 - **Public API**
@@ -29,7 +31,7 @@ Shared utilities and data structures used across KgFoundry services and tools.
 
 ```d2
 direction: right
-"kgfoundry_common.gpu": "kgfoundry_common.gpu" { link: "gpu.md" }
+"kgfoundry_common.gpu": "kgfoundry_common.gpu" { link: "./kgfoundry_common/gpu.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.gpu" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -46,5 +48,7 @@ direction: right
 "kgfoundry_common.gpu" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.gpu" -> "typing.cast"
+"kgfoundry_common.gpu_code": "kgfoundry_common.gpu code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/gpu.py" }
+"kgfoundry_common.gpu" -> "kgfoundry_common.gpu_code" { style: dashed }
 ```
 

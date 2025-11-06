@@ -2,6 +2,8 @@
 
 Typed runtime configuration with fail-fast validation
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/settings.py)
+
 ## Sections
 
 - **Public API**
@@ -74,7 +76,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.settings": "kgfoundry_common.settings" { link: "settings.md" }
+"kgfoundry_common.settings": "kgfoundry_common.settings" { link: "./kgfoundry_common/settings.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.settings" -> "__future__.annotations"
 "kgfoundry_common.errors.SettingsError": "kgfoundry_common.errors.SettingsError"
@@ -95,5 +97,7 @@ direction: right
 "kgfoundry_common.settings" -> "typing.ClassVar"
 "typing.cast": "typing.cast"
 "kgfoundry_common.settings" -> "typing.cast"
+"kgfoundry_common.settings_code": "kgfoundry_common.settings code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/settings.py" }
+"kgfoundry_common.settings" -> "kgfoundry_common.settings_code" { style: dashed }
 ```
 

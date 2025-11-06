@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, Annotated, Protocol, cast
 from uuid import uuid4
 
 import typer
@@ -431,17 +431,18 @@ def _prepare_index_directory(index_path: str) -> None:
 
 @app.command(name=SUBCOMMAND_INDEX_BM25)
 def index_bm25(
-    chunks_parquet: str = typer.Argument(..., help="Path to Parquet/JSONL with chunks"),
-    backend: str = typer.Option(
-        "lucene",
-        help="lucene|pure",
-        show_default=True,
-    ),
-    index_dir: str = typer.Option(
-        "./_indices/bm25",
-        help="Output index directory",
-        show_default=True,
-    ),
+    chunks_parquet: Annotated[
+        str,
+        typer.Argument(..., help="Path to Parquet/JSONL with chunks"),
+    ],
+    backend: Annotated[
+        str,
+        typer.Option(help="lucene|pure", show_default=True),
+    ] = "lucene",
+    index_dir: Annotated[
+        str,
+        typer.Option(help="Output index directory", show_default=True),
+    ] = "./_indices/bm25",
 ) -> None:
     """Build a BM25 index from chunk metadata and emit a CLI envelope.
 
@@ -561,22 +562,22 @@ def run_index_faiss(*, config: IndexCliConfig) -> dict[str, object]:
 
 @app.command(name=SUBCOMMAND_INDEX_FAISS)
 def index_faiss(
-    dense_vectors: str = typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
-    index_path: str = typer.Option(
-        "./_indices/faiss/shard_000.idx",
-        help="Output FAISS index path",
-        show_default=True,
-    ),
-    factory: str = typer.Option(
-        "Flat",
-        help="FAISS factory string",
-        show_default=True,
-    ),
-    metric: str = typer.Option(
-        "ip",
-        help="Similarity metric ('ip' or 'l2')",
-        show_default=True,
-    ),
+    dense_vectors: Annotated[
+        str,
+        typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
+    ],
+    index_path: Annotated[
+        str,
+        typer.Option(help="Output FAISS index path", show_default=True),
+    ] = "./_indices/faiss/shard_000.idx",
+    factory: Annotated[
+        str,
+        typer.Option(help="FAISS factory string", show_default=True),
+    ] = "Flat",
+    metric: Annotated[
+        str,
+        typer.Option(help="Similarity metric ('ip' or 'l2')", show_default=True),
+    ] = "ip",
 ) -> None:
     """Build a FAISS index and emit a structured CLI envelope.
 

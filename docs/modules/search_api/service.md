@@ -2,6 +2,8 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/service.py)
+
 ## Sections
 
 - **Public API**
@@ -28,7 +30,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 **Imports:** `__future__.annotations`, `collections.abc.Mapping`, `kgfoundry_common.errors.exceptions.VectorSearchError`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.logging.with_fields`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.observability.MetricsProvider`, `kgfoundry_common.observability.observe_duration`, `kgfoundry_common.problem_details.JsonValue`, `search_api.types.AgentSearchResponse`, `search_api.types.VectorSearchResultTypedDict`, `time`, `typing.TYPE_CHECKING`
 
-**Imported by:** [search_api](../search_api.md)
+**Imported by:** [search_api](./search_api.md)
 
 ## Autorefs Examples
 
@@ -40,7 +42,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 ```d2
 direction: right
-"search_api.service": "search_api.service" { link: "service.md" }
+"search_api.service": "search_api.service" { link: "./search_api/service.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.service" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -67,7 +69,9 @@ direction: right
 "search_api.service" -> "time"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "search_api.service" -> "typing.TYPE_CHECKING"
-"search_api": "search_api" { link: "../search_api.md" }
+"search_api": "search_api" { link: "./search_api.md" }
 "search_api" -> "search_api.service"
+"search_api.service_code": "search_api.service code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/service.py" }
+"search_api.service" -> "search_api.service_code" { style: dashed }
 ```
 

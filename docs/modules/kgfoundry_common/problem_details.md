@@ -2,6 +2,8 @@
 
 RFC 9457 Problem Details helpers with schema validation.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/problem_details.py)
+
 ## Sections
 
 - **Public API**
@@ -111,7 +113,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.problem_details": "kgfoundry_common.problem_details" { link: "problem_details.md" }
+"kgfoundry_common.problem_details": "kgfoundry_common.problem_details" { link: "./kgfoundry_common/problem_details.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.problem_details" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -152,5 +154,7 @@ direction: right
 "kgfoundry_common.problem_details" -> "typing.cast"
 "typing.overload": "typing.overload"
 "kgfoundry_common.problem_details" -> "typing.overload"
+"kgfoundry_common.problem_details_code": "kgfoundry_common.problem_details code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/problem_details.py" }
+"kgfoundry_common.problem_details" -> "kgfoundry_common.problem_details_code" { style: dashed }
 ```
 

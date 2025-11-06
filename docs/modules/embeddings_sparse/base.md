@@ -2,6 +2,8 @@
 
 Protocols for sparse embedding encoders and indices
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_sparse/base.py)
+
 ## Sections
 
 - **Public API**
@@ -44,7 +46,7 @@ classDiagram
 
 ```d2
 direction: right
-"embeddings_sparse.base": "embeddings_sparse.base" { link: "base.md" }
+"embeddings_sparse.base": "embeddings_sparse.base" { link: "./embeddings_sparse/base.md" }
 "__future__.annotations": "__future__.annotations"
 "embeddings_sparse.base" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -57,5 +59,7 @@ direction: right
 "embeddings_sparse.base" -> "typing.Protocol"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "embeddings_sparse.base" -> "typing.TYPE_CHECKING"
+"embeddings_sparse.base_code": "embeddings_sparse.base code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_sparse/base.py" }
+"embeddings_sparse.base" -> "embeddings_sparse.base_code" { style: dashed }
 ```
 

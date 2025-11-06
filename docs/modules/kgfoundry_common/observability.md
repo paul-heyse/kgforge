@@ -2,6 +2,8 @@
 
 Prometheus metrics and OpenTelemetry tracing helpers
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/observability.py)
+
 ## Sections
 
 - **Public API**
@@ -76,7 +78,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.observability": "kgfoundry_common.observability" { link: "observability.md" }
+"kgfoundry_common.observability": "kgfoundry_common.observability" { link: "./kgfoundry_common/observability.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.observability" -> "__future__.annotations"
 "collections.abc.Iterator": "collections.abc.Iterator"
@@ -123,5 +125,7 @@ direction: right
 "kgfoundry_common.observability" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.observability" -> "typing.cast"
+"kgfoundry_common.observability_code": "kgfoundry_common.observability code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/observability.py" }
+"kgfoundry_common.observability" -> "kgfoundry_common.observability_code" { style: dashed }
 ```
 

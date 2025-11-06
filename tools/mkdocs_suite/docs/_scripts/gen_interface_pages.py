@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import logging
 import posixpath
@@ -391,6 +392,11 @@ def _write_interface_details(
     for identifier in sorted(interface_ids):
         nav_meta = lookup.get(identifier, {})
         interface_model = registry.interface(identifier) if registry else None
+        if interface_model is None and registry is not None:
+            try:
+                interface_model = registry.interfaces.get(identifier)
+            except AttributeError:  # pragma: no cover - defensive
+                interface_model = None
 
         handle.write(f"## {identifier}\n\n")
         handle.write(
@@ -443,6 +449,7 @@ def _write_interface_details(
 
 
 def render_interface_catalog() -> None:
+    globals()["mkdocs_gen_files"] = importlib.import_module("mkdocs_gen_files")
     registry = _load_registry()
     interfaces = _collect_nav_interfaces()
     if registry is not None:

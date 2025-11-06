@@ -4,6 +4,8 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/config.py)
+
 ## Sections
 
 - **Public API**
@@ -39,12 +41,14 @@ classDiagram
 
 ```d2
 direction: right
-"orchestration.config": "orchestration.config" { link: "config.md" }
+"orchestration.config": "orchestration.config" { link: "./orchestration/config.md" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.config" -> "__future__.annotations"
 "dataclasses.dataclass": "dataclasses.dataclass"
 "orchestration.config" -> "dataclasses.dataclass"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "orchestration.config" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
+"orchestration.config_code": "orchestration.config code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/config.py" }
+"orchestration.config" -> "orchestration.config_code" { style: dashed }
 ```
 

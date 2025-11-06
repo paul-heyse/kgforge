@@ -2,6 +2,8 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/fixture_index.py)
+
 ## Sections
 
 - **Public API**
@@ -28,7 +30,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 **Imports:** `__future__.annotations`, `collections.abc.Iterator`, `collections.abc.Sequence`, `dataclasses.dataclass`, `duckdb`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `math`, `pathlib.Path`, `re`, `registry.duckdb_helpers.fetch_all`, `registry.duckdb_helpers.fetch_one`, `typing.TYPE_CHECKING`
 
-**Imported by:** [search_api](../search_api.md)
+**Imported by:** [search_api](./search_api.md)
 
 ## Autorefs Examples
 
@@ -49,7 +51,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.fixture_index": "search_api.fixture_index" { link: "fixture_index.md" }
+"search_api.fixture_index": "search_api.fixture_index" { link: "./search_api/fixture_index.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.fixture_index" -> "__future__.annotations"
 "collections.abc.Iterator": "collections.abc.Iterator"
@@ -74,7 +76,9 @@ direction: right
 "search_api.fixture_index" -> "registry.duckdb_helpers.fetch_one"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "search_api.fixture_index" -> "typing.TYPE_CHECKING"
-"search_api": "search_api" { link: "../search_api.md" }
+"search_api": "search_api" { link: "./search_api.md" }
 "search_api" -> "search_api.fixture_index"
+"search_api.fixture_index_code": "search_api.fixture_index code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/fixture_index.py" }
+"search_api.fixture_index" -> "search_api.fixture_index_code" { style: dashed }
 ```
 

@@ -228,7 +228,6 @@ SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
 CLI_COMMAND_NAME = "docs-build-graphs"
 CLI_DEFINITION = docs_cli_context.get_cli_definition(CLI_COMMAND_NAME)
 CLI_SETTINGS = docs_cli_context.get_cli_settings(CLI_COMMAND_NAME)
-CLI_CONFIG = docs_cli_context.get_cli_config(CLI_COMMAND_NAME)
 CLI_OPERATION_IDS = dict(CLI_DEFINITION.operation_ids)
 CLI_INTERFACE_ID = CLI_DEFINITION.interface_id
 CLI_COMMAND = CLI_DEFINITION.command
@@ -237,6 +236,14 @@ SUBCOMMAND_BUILD_GRAPHS = "build"
 CLI_OPERATION_ID = CLI_OPERATION_IDS[SUBCOMMAND_BUILD_GRAPHS]
 CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/docs/build-graphs"
 CLI_ENVELOPE_DIR = docs_cli_context.REPO_ROOT / "site" / "_build" / "cli"
+
+
+def __getattr__(name: str) -> object:
+    if name == "CLI_CONFIG":
+        context_module = importlib.import_module("docs._scripts.cli_context")
+        return context_module.get_cli_config(CLI_COMMAND_NAME)
+    message = f"module 'tools.docs.build_graphs' has no attribute {name!r}"
+    raise AttributeError(message)
 
 
 def _prepare_run_inputs(args: argparse.Namespace) -> RunInputs:

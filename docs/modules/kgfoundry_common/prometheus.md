@@ -2,6 +2,8 @@
 
 Typed Prometheus helpers with graceful fallbacks.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/prometheus.py)
+
 ## Sections
 
 - **Public API**
@@ -151,7 +153,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.prometheus": "kgfoundry_common.prometheus" { link: "prometheus.md" }
+"kgfoundry_common.prometheus": "kgfoundry_common.prometheus" { link: "./kgfoundry_common/prometheus.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.prometheus" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -184,5 +186,7 @@ direction: right
 "kgfoundry_common.prometheus" -> "typing.cast"
 "typing.overload": "typing.overload"
 "kgfoundry_common.prometheus" -> "typing.overload"
+"kgfoundry_common.prometheus_code": "kgfoundry_common.prometheus code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/prometheus.py" }
+"kgfoundry_common.prometheus" -> "kgfoundry_common.prometheus_code" { style: dashed }
 ```
 
