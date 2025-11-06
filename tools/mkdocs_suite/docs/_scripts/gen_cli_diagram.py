@@ -40,11 +40,23 @@ REPO_ROOT = DOCS_ROOT.parents[2]
 AUGMENT_PATH = REPO_ROOT / "openapi" / "_augment_cli.yaml"
 REGISTRY_PATH = REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml"
 REDOC_PAGE = "api/openapi-cli.md"
+DIAGRAM_INDEX_PATH = "diagrams/index.md"
+CLI_INDEX_ENTRY = "- [CLI by Tag](./cli_by_tag.d2)\n"
 
 DEFAULT_INTERFACE_ID = "orchestration-cli"
 DEFAULT_BIN_NAME = "kgf"
 DEFAULT_TITLE = "KGFoundry CLI"
 DEFAULT_VERSION = "0.0.0"
+
+
+def _escape_d2(value: str) -> str:
+    """Escape characters that would break D2 string literals."""
+
+    return (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+    )
 
 
 def _operation_anchor(operation_id: str | None) -> str:
@@ -131,21 +143,30 @@ def _write_diagram(
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
         handle.write('direction: right\nCLI: "CLI" {\n')
         unique_tags = sorted({tag for *_, tags in operations for tag in tags})
-        handle.write("\n".join(f'  "{tag}": "{tag}" {{}}' for tag in unique_tags))
+        handle.write(
+            "\n".join(
+                f'  "{_escape_d2(tag)}": "{_escape_d2(tag)}" {{}}'
+                for tag in unique_tags
+            )
+        )
         if unique_tags:
             handle.write("\n")
         written_nodes: set[str] = set()
         for method, path, operation_id, summary, tags in operations:
             node_id = f"{method} {path}"
-            label = f"{method} {path}\\n{summary}" if summary else node_id
+            escaped_node_id = _escape_d2(node_id)
+            label_base = f"{node_id}\n{summary}" if summary else node_id
             if node_id not in written_nodes:
+                escaped_label = _escape_d2(label_base)
                 link_attr = (
-                    f' {{ link: "{_operation_anchor(operation_id)}" }}' if operation_id else ""
+                    f' {{ link: "{_escape_d2(_operation_anchor(operation_id))}" }}'
+                    if operation_id
+                    else ""
                 )
-                handle.write(f'  "{node_id}": "{label}"{link_attr}\n')
+                handle.write(f'  "{escaped_node_id}": "{escaped_label}"{link_attr}\n')
                 written_nodes.add(node_id)
             for tag in tags:
-                handle.write(f'  "{tag}" -> "{node_id}"\n')
+                handle.write(f'  "{_escape_d2(tag)}" -> "{escaped_node_id}"\n')
         handle.write("}\n")
 
 
@@ -193,6 +214,28 @@ def write_diagram(operations: Sequence[OperationEntry]) -> None:
     _write_diagram(list(operations))
 
 
+def _ensure_cli_index_entry() -> None:
+    """Ensure the diagrams index links to the CLI diagram."""
+
+    entry_token = CLI_INDEX_ENTRY.strip()
+    try:
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+            existing_content = handle.read()
+    except FileNotFoundError:
+        existing_content = ""
+
+    if entry_token not in existing_content:
+        newline_prefix = "" if not existing_content or existing_content.endswith("\n") else "\n"
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "a") as handle:
+            handle.write(f"{newline_prefix}{CLI_INDEX_ENTRY}")
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+            existing_content = handle.read()
+
+    if entry_token not in existing_content:
+        message = "CLI diagram index entry missing after generation."
+        raise RuntimeError(message)
+
+
 def main() -> None:
     try:
         operations = collect_operations()
@@ -207,8 +250,7 @@ def main() -> None:
         LOGGER.info("No CLI operations discovered in configuration")
         return
     write_diagram(operations)
-    with mkdocs_gen_files.open("diagrams/index.md", "a") as handle:
-        handle.write("- [CLI by Tag](./cli_by_tag.d2)\n")
+    _ensure_cli_index_entry()
 
 
 if __name__ == "__main__":  # pragma: no cover - executed by mkdocs
