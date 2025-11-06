@@ -14,7 +14,7 @@ CLI_SUITES = (
 )
 
 
-@pytest.mark.parametrize("module_path, context_path, command_name", CLI_SUITES)
+@pytest.mark.parametrize(("module_path", "context_path", "command_name"), list(CLI_SUITES))
 def test_cli_configuration_matches_context(
     module_path: str, context_path: str, command_name: str | None
 ) -> None:

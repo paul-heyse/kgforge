@@ -8,7 +8,8 @@ import json
 import logging
 import sys
 import types
-from typing import TYPE_CHECKING, Self
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Self, cast
 
 import pytest
 
@@ -105,10 +106,11 @@ def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     def _fake_open(path: object, *_args: object, **_kwargs: object) -> _DummyFile:
         return _DummyFile(str(path))
 
-    stub = types.ModuleType("mkdocs_gen_files")
+    stub_module = types.ModuleType("mkdocs_gen_files")
+    stub = cast("Any", stub_module)
     stub.open = _fake_open
     stub.files = io.StringIO
-    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
+    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub_module)
 
 
 def test_render_interface_catalog_links_full_module_path(
@@ -182,7 +184,10 @@ def test_write_interface_table_escapes_markdown_control_characters() -> None:
 def test_operation_href_returns_relative_anchor() -> None:
     """Operation links should include encoded anchors relative to the doc path."""
     module = importlib.import_module(MODULE_PATH)
-
-    href = module._operation_href("docs/api/openapi-cli.yaml", "cli.operation/with space")
+    operation_href = cast(
+        "Callable[[object, str], str | None]",
+        getattr(module, "_operation_href"),
+    )
+    href = operation_href("docs/api/openapi-cli.yaml", "cli.operation/with space")
 
     assert href == "openapi-cli.md#operation/cli.operation%2Fwith%20space"

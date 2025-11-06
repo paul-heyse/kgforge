@@ -258,11 +258,10 @@ def record_operation_metrics(
     None
         Context manager that yields control to the wrapped operation block.
 
-    Raises
-    ------
-    Exception
-        Any exception raised during the operation is propagated after recording
-        error status and metrics.
+    Notes
+    -----
+    Any exception raised during the operation is propagated after recording
+    error status and metrics.
 
     Examples
     --------

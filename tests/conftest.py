@@ -269,7 +269,7 @@ def otel_span_exporter() -> SpanExporterProtocol:
     # Lazy import after path setup to avoid E402
     otel_types = import_module("kgfoundry_common.opentelemetry_types")
     load_exporter = cast(
-        "Callable[[], SpanExporterProtocol | None]",
+        "Callable[[], Callable[[], SpanExporterProtocol] | None]",
         otel_types.load_in_memory_span_exporter_cls,
     )
     exporter_factory = load_exporter()
@@ -304,7 +304,7 @@ def otel_tracer_provider(
     # Lazy import after path setup to avoid E402
     otel_types = import_module("kgfoundry_common.opentelemetry_types")
     load_tracer_provider = cast(
-        "Callable[[], TracerProviderProtocol | None]",
+        "Callable[[], Callable[[], TracerProviderProtocol] | None]",
         otel_types.load_tracer_provider_cls,
     )
 

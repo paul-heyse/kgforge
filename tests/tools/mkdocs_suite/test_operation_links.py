@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
+import importlib
+from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 import pytest
-from tools.mkdocs_suite.docs._scripts._operation_links import build_operation_href
+
+operation_links = importlib.import_module("tools.mkdocs_suite.docs._scripts._operation_links")
+build_operation_href = cast(
+    "Callable[[object, str], str | None]",
+    operation_links.build_operation_href,
+)
 
 
 @pytest.mark.parametrize(
     ("spec_path", "operation_id", "expected"),
-    (
+    [
         (
             "docs/api/openapi-cli.yaml",
             "cli.run-command",
@@ -21,7 +29,7 @@ from tools.mkdocs_suite.docs._scripts._operation_links import build_operation_hr
             "http.get-resource",
             "api/index.md#operation/http.get-resource",
         ),
-    ),
+    ],
 )
 def test_build_operation_href_known_specs(
     spec_path: str | Path, operation_id: str, expected: str
@@ -39,7 +47,7 @@ def test_build_operation_href_encodes_operation_id() -> None:
     assert href == "api/index.md#operation/operation%20id%2Fwith%22chars%22%3F"
 
 
-@pytest.mark.parametrize("spec_path", (None, object(), Path("spec/openapi.json")))
+@pytest.mark.parametrize("spec_path", [None, object(), Path("spec/openapi.json")])
 def test_build_operation_href_rejects_unknown_specs(spec_path: object) -> None:
     """Unknown specification files should not produce hyperlinks."""
     href = build_operation_href(spec_path, "ignored")

@@ -218,11 +218,16 @@ def record_operation_metrics(
     None
         Context manager that yields control to the wrapped navmap operation block.
 
-    Raises
-    ------
-    Exception
-        Any exception raised within the context is propagated after metrics
-        are recorded, allowing normal exception handling to proceed.
+    Notes
+    -----
+    Any exception raised within the context is propagated after metrics
+    are recorded, allowing normal exception handling to proceed.
+
+    Examples
+    --------
+    >>> with record_operation_metrics("build", status="success"):
+    ...     # Build operation
+    ...     pass
     """
     if correlation_id is None:
         correlation_id = get_correlation_id()

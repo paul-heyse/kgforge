@@ -67,7 +67,8 @@ app.add_typer(download_app, name=CLI_COMMAND, help=HARVEST_DESCRIPTION)
 
 def _envelope_path(subcommand: str) -> Path:
     safe_subcommand = subcommand or "root"
-    return CLI_ENVELOPE_DIR / f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand}.json"
+    filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand.replace('/', '-')}.json"
+    return CLI_ENVELOPE_DIR / filename
 
 
 def _emit_envelope(

@@ -28,10 +28,11 @@ def _make_module(name: str, *, package: bool = False) -> types.ModuleType:
 
 
 def _install_mkdocs_gen_files_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    stub = _make_module("mkdocs_gen_files")
+    stub_module = _make_module("mkdocs_gen_files")
+    stub = cast("Any", stub_module)
     stub.open = lambda *_args, **_kwargs: io.StringIO()
     stub.files = io.StringIO
-    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
+    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub_module)
 
 
 def _install_tooling_namespace(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -48,27 +49,35 @@ def _install_tooling_namespace(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _install_augment_registry_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    stub = _make_module("tools._shared.augment_registry")
+    stub_module = _make_module("tools._shared.augment_registry")
+    stub = cast("Any", stub_module)
     stub.AugmentRegistryError = type("AugmentRegistryError", (Exception,), {})
     stub.load_registry = lambda *_args, **_kwargs: None
     stub.render_problem_details = lambda *_args, **_kwargs: {}
-    monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", stub)
+    monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", stub_module)
 
 
 def _install_operation_links_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    stub = _make_module("tools.mkdocs_suite.docs._scripts._operation_links")
+    stub_module = _make_module("tools.mkdocs_suite.docs._scripts._operation_links")
+    stub = cast("Any", stub_module)
     stub.build_operation_href = lambda *_args, **_kwargs: None
-    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts._operation_links", stub)
+    monkeypatch.setitem(
+        sys.modules,
+        "tools.mkdocs_suite.docs._scripts._operation_links",
+        stub_module,
+    )
 
 
 def _install_docs_scripts_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    stub = _make_module("tools.mkdocs_suite.docs._scripts", package=True)
+    stub_module = _make_module("tools.mkdocs_suite.docs._scripts", package=True)
+    stub = cast("Any", stub_module)
     stub.load_repo_settings = lambda *_args, **_kwargs: (None, None)
-    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts", stub)
+    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts", stub_module)
 
 
 def _install_msgspec_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    stub = _make_module("msgspec")
+    stub_module = _make_module("msgspec")
+    stub = cast("Any", stub_module)
 
     class _Struct:
         def __init_subclass__(cls, **kwargs: object) -> None:
@@ -81,28 +90,32 @@ def _install_msgspec_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     stub.json = types.SimpleNamespace(
         encode=lambda *_args, **_kwargs: b"", decode=lambda *_args, **_kwargs: None
     )
-    monkeypatch.setitem(sys.modules, "msgspec", stub)
+    monkeypatch.setitem(sys.modules, "msgspec", stub_module)
 
 
 def _install_kgfoundry_stubs(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(
         sys.modules, "kgfoundry_common", _make_module("kgfoundry_common", package=True)
     )
-    typing_stub = _make_module("kgfoundry_common.typing")
+    typing_stub_module = _make_module("kgfoundry_common.typing")
+    typing_stub = cast("Any", typing_stub_module)
     typing_stub.gate_import = lambda *_args, **_kwargs: types.SimpleNamespace(
         ProblemDetailsDict=dict
     )
-    monkeypatch.setitem(sys.modules, "kgfoundry_common.typing", typing_stub)
+    monkeypatch.setitem(sys.modules, "kgfoundry_common.typing", typing_stub_module)
 
-    errors_stub = _make_module("kgfoundry_common.errors")
+    errors_stub_module = _make_module("kgfoundry_common.errors")
+    errors_stub = cast("Any", errors_stub_module)
     errors_stub.SchemaValidationError = type("SchemaValidationError", (Exception,), {})
-    monkeypatch.setitem(sys.modules, "kgfoundry_common.errors", errors_stub)
+    monkeypatch.setitem(sys.modules, "kgfoundry_common.errors", errors_stub_module)
 
-    serialization_stub = _make_module("kgfoundry_common.serialization")
+    serialization_stub_module = _make_module("kgfoundry_common.serialization")
+    serialization_stub = cast("Any", serialization_stub_module)
     serialization_stub.validate_payload = lambda *_args, **_kwargs: None
-    monkeypatch.setitem(sys.modules, "kgfoundry_common.serialization", serialization_stub)
+    monkeypatch.setitem(sys.modules, "kgfoundry_common.serialization", serialization_stub_module)
 
-    logging_stub = _make_module("kgfoundry_common.logging")
+    logging_stub_module = _make_module("kgfoundry_common.logging")
+    logging_stub = cast("Any", logging_stub_module)
 
     class _LoggerAdapter:
         def __init__(
@@ -113,7 +126,7 @@ def _install_kgfoundry_stubs(monkeypatch: pytest.MonkeyPatch) -> None:
 
     logging_stub.LoggerAdapter = _LoggerAdapter
     logging_stub.get_logger = lambda *_args, **_kwargs: _LoggerAdapter()
-    monkeypatch.setitem(sys.modules, "kgfoundry_common.logging", logging_stub)
+    monkeypatch.setitem(sys.modules, "kgfoundry_common.logging", logging_stub_module)
 
 
 def _patch_importlib_for_navmap(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -139,11 +139,6 @@ class TestNamespaceRegistry:
         def failing_loader() -> object:
             """Raise ``RuntimeError`` to simulate a failing loader.
 
-            Returns
-            -------
-            object
-                Never returns; always raises RuntimeError.
-
             Raises
             ------
             RuntimeError

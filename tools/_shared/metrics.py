@@ -134,11 +134,10 @@ def observe_tool_run(
     ToolRunObservation
         Context manager that yields a :class:`ToolRunObservation` capturing runtime details.
 
-    Raises
-    ------
-    Exception
-        Any exception raised during tool execution is propagated after recording
-        error status and metrics.
+    Notes
+    -----
+    Any exception raised during tool execution is propagated after recording
+    error status and metrics.
     """
     settings = get_runtime_settings()
     observation = ToolRunObservation(
