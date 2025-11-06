@@ -11,6 +11,7 @@ from mkdocs.config.base import Config, ConfigErrors, ConfigWarnings
 from mkdocs.plugins import BasePlugin
 
 LOGGER = logging.getLogger("mkdocs.plugins.optional-d2")
+LOGGER.addHandler(logging.NullHandler())
 
 try:  # pragma: no cover - dependency may be missing in minimal environments
     from mkdocs_d2_plugin.plugin import D2Plugin
