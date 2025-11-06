@@ -65,8 +65,8 @@ from tools.docstring_builder.builder_types import (
     status_from_exit,
 )
 from tools.docstring_builder.cache import BuilderCache, DocstringBuilderCache
-from tools.docstring_builder.config import CachePolicy, load_config_with_selection
-from tools.docstring_builder.config_models import DocstringBuildConfig
+from tools.docstring_builder.config import load_config_with_selection
+from tools.docstring_builder.config_models import CachePolicy, DocstringBuildConfig
 from tools.docstring_builder.diff_manager import DiffManager
 from tools.docstring_builder.docfacts import (
     DocFact,

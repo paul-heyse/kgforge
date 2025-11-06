@@ -271,6 +271,11 @@ class NavMetadataModel(BaseModel):
         ------
         tuple[str, JsonValue]
             Key and value pairs for navigation metadata entries.
+
+        Notes
+        -----
+        This method uses ``yield from`` to delegate iteration. The return type
+        ``TupleGenerator`` is Pydantic's type alias for ``Iterator[tuple[str, Any]]``.
         """
         items = self.as_mapping().items()
         yield from items

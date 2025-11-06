@@ -2,8 +2,6 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_loader.py)
-
 ## Sections
 
 - **Public API**
@@ -136,7 +134,7 @@ Shared utilities and data structures used across KgFoundry services and tools.
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `collections.abc.Callable`, `collections.abc.Generator`, `collections.abc.Mapping`, `collections.abc.Sequence`, `contextlib.suppress`, `copy`, `functools.cache`, `importlib`, `importlib.import_module`, `json`, `pathlib.Path`, `pydantic.BaseModel`, `pydantic.ConfigDict`, `pydantic.Field`, `pydantic.model_validator`, `sys`, `tools.AugmentMetadataModel`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryOperationModel`, `tools.ToolingMetadataModel`, `typing.Any`, `typing.TYPE_CHECKING`, `typing.cast`
+**Imports:** `__future__.annotations`, `collections.abc.Callable`, `collections.abc.Mapping`, `collections.abc.Sequence`, `contextlib.suppress`, `copy`, `functools.cache`, `importlib`, `importlib.import_module`, `json`, `pathlib.Path`, `pydantic.BaseModel`, `pydantic.ConfigDict`, `pydantic.Field`, `pydantic.main.TupleGenerator`, `pydantic.model_validator`, `sys`, `tools.AugmentMetadataModel`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryOperationModel`, `tools.ToolingMetadataModel`, `typing.Any`, `typing.TYPE_CHECKING`, `typing.cast`
 
 ## Autorefs Examples
 
@@ -166,13 +164,11 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.navmap_loader": "kgfoundry_common.navmap_loader" { link: "./kgfoundry_common/navmap_loader.md" }
+"kgfoundry_common.navmap_loader": "kgfoundry_common.navmap_loader" { link: "navmap_loader.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.navmap_loader" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
 "kgfoundry_common.navmap_loader" -> "collections.abc.Callable"
-"collections.abc.Generator": "collections.abc.Generator"
-"kgfoundry_common.navmap_loader" -> "collections.abc.Generator"
 "collections.abc.Mapping": "collections.abc.Mapping"
 "kgfoundry_common.navmap_loader" -> "collections.abc.Mapping"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -197,6 +193,8 @@ direction: right
 "kgfoundry_common.navmap_loader" -> "pydantic.ConfigDict"
 "pydantic.Field": "pydantic.Field"
 "kgfoundry_common.navmap_loader" -> "pydantic.Field"
+"pydantic.main.TupleGenerator": "pydantic.main.TupleGenerator"
+"kgfoundry_common.navmap_loader" -> "pydantic.main.TupleGenerator"
 "pydantic.model_validator": "pydantic.model_validator"
 "kgfoundry_common.navmap_loader" -> "pydantic.model_validator"
 "sys": "sys"
@@ -217,7 +215,5 @@ direction: right
 "kgfoundry_common.navmap_loader" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.navmap_loader" -> "typing.cast"
-"kgfoundry_common.navmap_loader_code": "kgfoundry_common.navmap_loader code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_loader.py" }
-"kgfoundry_common.navmap_loader" -> "kgfoundry_common.navmap_loader_code" { style: dashed }
 ```
 

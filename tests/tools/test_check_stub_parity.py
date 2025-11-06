@@ -34,7 +34,7 @@ def _register_runtime_module(name: str, exports: tuple[str, ...]) -> None:
     module_dict = cast("dict[str, object]", module.__dict__)
     module_dict["__all__"] = list(exports)
 
-    def _placeholder(*args: object, **kwargs: object) -> None:  # noqa: ARG001
+    def _placeholder(*_args: object, **_kwargs: object) -> None:
         return None
 
     for export in exports:

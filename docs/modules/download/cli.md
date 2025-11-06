@@ -4,8 +4,6 @@ Downloader command suite that sources external corpora (currently OpenAlex) usin
 CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,
 diagrams, documentation) remains in sync without bespoke glue.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli.py)
-
 ## Sections
 
 - **Public API**
@@ -34,11 +32,11 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 ## Related API operations
 
-[`cli.download.harvest`](../../api/openapi-cli.md) (download-cli · CLI Spec)
+[`cli.download.harvest`](../../api/openapi-cli.md#operation/cli.download.harvest) (download-cli · CLI Spec)
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, [download.cli_context](cli_context.md), `kgfoundry_common.logging.LoggerAdapter`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `logging`, `pathlib.Path`, `time`, `tools.CliEnvelope`, `tools.CliEnvelopeBuilder`, `tools.ProblemDetailsDict`, `tools.ProblemDetailsParams`, `tools.build_problem_details`, `tools.get_logger`, `tools.render_cli_envelope`, `tools.with_fields`, `typer`, `typing.Annotated`, `typing.Any`, `uuid.uuid4`
+**Imports:** `__future__.annotations`, [download.cli_context](cli_context.md), `kgfoundry_common.logging.LoggerAdapter`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `logging`, `pathlib.Path`, `time`, `tools.CliEnvelope`, `tools.CliEnvelopeBuilder`, `tools.ProblemDetailsDict`, `tools.ProblemDetailsParams`, `tools.build_problem_details`, `tools.get_logger`, `tools.render_cli_envelope`, `tools.with_fields`, `typer`, `typing.Any`, `uuid.uuid4`
 
 ## Autorefs Examples
 
@@ -50,10 +48,10 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 ```d2
 direction: right
-"download.cli": "download.cli" { link: "./download/cli.md" }
+"download.cli": "download.cli" { link: "cli.md" }
 "__future__.annotations": "__future__.annotations"
 "download.cli" -> "__future__.annotations"
-"download.cli_context": "download.cli_context" { link: "./download/cli_context.md" }
+"download.cli_context": "download.cli_context" { link: "cli_context.md" }
 "download.cli" -> "download.cli_context"
 "kgfoundry_common.logging.LoggerAdapter": "kgfoundry_common.logging.LoggerAdapter"
 "download.cli" -> "kgfoundry_common.logging.LoggerAdapter"
@@ -83,13 +81,9 @@ direction: right
 "download.cli" -> "tools.with_fields"
 "typer": "typer"
 "download.cli" -> "typer"
-"typing.Annotated": "typing.Annotated"
-"download.cli" -> "typing.Annotated"
 "typing.Any": "typing.Any"
 "download.cli" -> "typing.Any"
 "uuid.uuid4": "uuid.uuid4"
 "download.cli" -> "uuid.uuid4"
-"download.cli_code": "download.cli code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli.py" }
-"download.cli" -> "download.cli_code" { style: dashed }
 ```
 

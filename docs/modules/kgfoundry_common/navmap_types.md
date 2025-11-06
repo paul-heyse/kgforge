@@ -2,8 +2,6 @@
 
 Shared navigation metadata structures used across kgfoundry.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_types.py)
-
 ## Sections
 
 - **Public API**
@@ -63,7 +61,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.navmap_types": "kgfoundry_common.navmap_types" { link: "./kgfoundry_common/navmap_types.md" }
+"kgfoundry_common.navmap_types": "kgfoundry_common.navmap_types" { link: "navmap_types.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.navmap_types" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -74,7 +72,5 @@ direction: right
 "kgfoundry_common.navmap_types" -> "typing.NotRequired"
 "typing.TypedDict": "typing.TypedDict"
 "kgfoundry_common.navmap_types" -> "typing.TypedDict"
-"kgfoundry_common.navmap_types_code": "kgfoundry_common.navmap_types code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_types.py" }
-"kgfoundry_common.navmap_types" -> "kgfoundry_common.navmap_types_code" { style: dashed }
 ```
 

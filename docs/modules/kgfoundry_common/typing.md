@@ -2,8 +2,6 @@
 
 Canonical typing façade for kgfoundry.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/typing/__init__.py)
-
 ## Sections
 
 - **Public API**
@@ -68,7 +66,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.typing": "kgfoundry_common.typing" { link: "./kgfoundry_common/typing.md" }
+"kgfoundry_common.typing": "kgfoundry_common.typing" { link: "typing.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.typing" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -87,7 +85,5 @@ direction: right
 "kgfoundry_common.typing" -> "typing.cast"
 "warnings": "warnings"
 "kgfoundry_common.typing" -> "warnings"
-"kgfoundry_common.typing_code": "kgfoundry_common.typing code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/typing/__init__.py" }
-"kgfoundry_common.typing" -> "kgfoundry_common.typing_code" { style: dashed }
 ```
 

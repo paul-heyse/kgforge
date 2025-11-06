@@ -137,7 +137,7 @@ class TestNamespaceRegistry:
         registry = NamespaceRegistry()
 
         def failing_loader() -> object:
-            """Load symbol that always raises RuntimeError.
+            """Raise ``RuntimeError`` to simulate a failing loader.
 
             Returns
             -------
@@ -147,8 +147,8 @@ class TestNamespaceRegistry:
             Raises
             ------
             RuntimeError
-                Always raised to simulate loader failure.
-            """  # noqa: DOC202
+                Always raised with message "Loader failed" to simulate loader failure.
+            """
             raise RuntimeError("Loader failed")
 
         registry.register("failing", failing_loader)

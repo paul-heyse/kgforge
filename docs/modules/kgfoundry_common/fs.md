@@ -2,8 +2,6 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/fs.py)
-
 ## Sections
 
 - **Public API**
@@ -44,7 +42,7 @@ Shared utilities and data structures used across KgFoundry services and tools.
 
 ```d2
 direction: right
-"kgfoundry_common.fs": "kgfoundry_common.fs" { link: "./kgfoundry_common/fs.md" }
+"kgfoundry_common.fs": "kgfoundry_common.fs" { link: "fs.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.fs" -> "__future__.annotations"
 "kgfoundry_common.logging.get_logger": "kgfoundry_common.logging.get_logger"
@@ -57,7 +55,5 @@ direction: right
 "kgfoundry_common.fs" -> "tempfile"
 "typing.Literal": "typing.Literal"
 "kgfoundry_common.fs" -> "typing.Literal"
-"kgfoundry_common.fs_code": "kgfoundry_common.fs code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/fs.py" }
-"kgfoundry_common.fs" -> "kgfoundry_common.fs_code" { style: dashed }
 ```
 

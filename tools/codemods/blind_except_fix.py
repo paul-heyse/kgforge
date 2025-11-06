@@ -78,7 +78,7 @@ class BlindExceptTransformer(cst.CSTTransformer):
         super().__init__()
         self.changes: list[str] = []
 
-    def leave_ExceptHandler(  # noqa: N802
+    def leave_except_handler(
         self, original_node: cst.ExceptHandler, updated_node: cst.ExceptHandler
     ) -> cst.ExceptHandler:
         """Rewrite blind except handlers when exiting traversal.
@@ -96,6 +96,8 @@ class BlindExceptTransformer(cst.CSTTransformer):
             Transformed exception handler.
         """
         return self._transform_except(original_node, updated_node)
+
+    leave_ExceptHandler = leave_except_handler
 
     def _transform_except(
         self,

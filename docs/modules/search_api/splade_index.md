@@ -2,8 +2,6 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/splade_index.py)
-
 ## Sections
 
 - **Public API**
@@ -46,7 +44,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.splade_index": "search_api.splade_index" { link: "./search_api/splade_index.md" }
+"search_api.splade_index": "search_api.splade_index" { link: "splade_index.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.splade_index" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -65,9 +63,7 @@ direction: right
 "search_api.splade_index" -> "typing.Final"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "search_api.splade_index" -> "typing.TYPE_CHECKING"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "../search_api.md" }
 "search_api" -> "search_api.splade_index"
-"search_api.splade_index_code": "search_api.splade_index code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/splade_index.py" }
-"search_api.splade_index" -> "search_api.splade_index_code" { style: dashed }
 ```
 

@@ -285,7 +285,6 @@ def execute(
     sql_preview = _format_sql(sql)
     query_params = _format_params(params)
 
-    relation: DuckDBPyConnection | None = None
     with (
         with_fields(
             logger,
@@ -325,10 +324,8 @@ def execute(
                     extra={"duration_ms": round(duration * 1000, 2)},
                 )
             return relation
-    if relation is None:
-        message = "DuckDB query execution did not produce a relation"
-        raise RuntimeError(message)
-    return relation
+    message = "DuckDB query execution completed without returning a relation"
+    raise RuntimeError(message)
 
 
 # [nav:anchor fetch_all]

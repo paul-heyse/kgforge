@@ -10,8 +10,19 @@ HTTP_SPEC_DOC = "api/index.md"
 
 
 def _normalize_spec_path(spec_path: object) -> str | None:
-    """Return a string representation for ``spec_path`` when possible."""
+    """Return a string representation for ``spec_path`` when possible.
 
+    Parameters
+    ----------
+    spec_path : object
+        Specification file path to normalize.
+
+    Returns
+    -------
+    str | None
+        Normalized string path when ``spec_path`` can be converted to a file system
+        path, otherwise ``None``.
+    """
     try:
         resolved = os.fspath(spec_path)
     except TypeError:
@@ -37,7 +48,6 @@ def build_operation_href(spec_path: object, operation_id: str) -> str | None:
         Fully-qualified anchor URL pointing to the operation in the rendered
         specification, or ``None`` when the specification cannot be resolved.
     """
-
     if not operation_id:
         return None
 

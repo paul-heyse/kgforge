@@ -2,8 +2,6 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/faiss_adapter.py)
-
 ## Sections
 
 - **Public API**
@@ -66,7 +64,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.faiss_adapter": "search_api.faiss_adapter" { link: "./search_api/faiss_adapter.md" }
+"search_api.faiss_adapter": "search_api.faiss_adapter" { link: "faiss_adapter.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.faiss_adapter" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -131,9 +129,7 @@ direction: right
 "search_api.faiss_adapter" -> "typing.TypeGuard"
 "typing.cast": "typing.cast"
 "search_api.faiss_adapter" -> "typing.cast"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "../search_api.md" }
 "search_api" -> "search_api.faiss_adapter"
-"search_api.faiss_adapter_code": "search_api.faiss_adapter code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/faiss_adapter.py" }
-"search_api.faiss_adapter" -> "search_api.faiss_adapter_code" { style: dashed }
 ```
 

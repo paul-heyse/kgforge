@@ -2,8 +2,6 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/schemas.py)
-
 ## Sections
 
 - **Public API**
@@ -30,7 +28,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `importlib`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.pydantic.BaseModel`, `kgfoundry_common.types.JsonValue`, `pydantic.ConfigDict`, `pydantic.Field`, `typing.TYPE_CHECKING`
+**Imports:** `__future__.annotations`, `importlib`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.pydantic.BaseModel`, `kgfoundry_common.types.JsonValue`, `pydantic.ConfigDict`, `pydantic.Field`, `typing.ClassVar`, `typing.TYPE_CHECKING`
 
 **Imported by:** [search_api](../search_api.md)
 
@@ -57,7 +55,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.schemas": "search_api.schemas" { link: "./search_api/schemas.md" }
+"search_api.schemas": "search_api.schemas" { link: "schemas.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.schemas" -> "__future__.annotations"
 "importlib": "importlib"
@@ -72,11 +70,11 @@ direction: right
 "search_api.schemas" -> "pydantic.ConfigDict"
 "pydantic.Field": "pydantic.Field"
 "search_api.schemas" -> "pydantic.Field"
+"typing.ClassVar": "typing.ClassVar"
+"search_api.schemas" -> "typing.ClassVar"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "search_api.schemas" -> "typing.TYPE_CHECKING"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "../search_api.md" }
 "search_api" -> "search_api.schemas"
-"search_api.schemas_code": "search_api.schemas code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/schemas.py" }
-"search_api.schemas" -> "search_api.schemas_code" { style: dashed }
 ```
 

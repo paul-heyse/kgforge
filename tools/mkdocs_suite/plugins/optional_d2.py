@@ -37,6 +37,13 @@ class OptionalD2Plugin(BasePlugin[dict[str, Any]]):
     def load_config(self, config: dict[str, Any], **kwargs: object) -> dict[str, Any]:
         """Prepare the wrapped mkdocs-d2 plugin when prerequisites are met.
 
+        Parameters
+        ----------
+        config : dict[str, Any]
+            MkDocs plugin configuration dictionary.
+        **kwargs : object
+            Additional keyword arguments forwarded to the base plugin.
+
         Returns
         -------
         dict[str, Any]
@@ -72,9 +79,14 @@ class OptionalD2Plugin(BasePlugin[dict[str, Any]]):
     def __getattr__(self, name: str) -> Callable[..., Any]:
         """Delegate mkdocs lifecycle hooks to the wrapped plugin when active.
 
+        Parameters
+        ----------
+        name : str
+            Attribute name to look up (must start with "on_" for lifecycle hooks).
+
         Returns
         -------
-        collections.abc.Callable[..., Any]
+        Callable[..., Any]
             Lifecycle hook implementation sourced from the wrapped plugin or a
             no-op stub when delegation is disabled.
 

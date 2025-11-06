@@ -2,8 +2,6 @@
 
 Typed models shared across kgfoundry services
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/models.py)
-
 ## Sections
 
 - **Public API**
@@ -36,7 +34,7 @@ Typed models shared across kgfoundry services
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.pydantic.BaseModel`, `pydantic.ConfigDict`, `pydantic.Field`, `typing.Literal`
+**Imports:** `__future__.annotations`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.pydantic.BaseModel`, `pydantic.ConfigDict`, `pydantic.Field`, `typing.ClassVar`, `typing.Literal`
 
 ## Autorefs Examples
 
@@ -63,7 +61,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.models": "kgfoundry_common.models" { link: "./kgfoundry_common/models.md" }
+"kgfoundry_common.models": "kgfoundry_common.models" { link: "models.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.models" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -74,9 +72,9 @@ direction: right
 "kgfoundry_common.models" -> "pydantic.ConfigDict"
 "pydantic.Field": "pydantic.Field"
 "kgfoundry_common.models" -> "pydantic.Field"
+"typing.ClassVar": "typing.ClassVar"
+"kgfoundry_common.models" -> "typing.ClassVar"
 "typing.Literal": "typing.Literal"
 "kgfoundry_common.models" -> "typing.Literal"
-"kgfoundry_common.models_code": "kgfoundry_common.models code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/models.py" }
-"kgfoundry_common.models" -> "kgfoundry_common.models_code" { style: dashed }
 ```
 

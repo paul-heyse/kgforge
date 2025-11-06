@@ -11,13 +11,9 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
 from tools.shared.proc import ToolExecutionError, run_tool
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence  # noqa: F401
 
 
 class TestImportLinterTypingContract:

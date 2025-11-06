@@ -2,8 +2,6 @@
 
 Helpers for generating deterministic URNs
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/ids.py)
-
 ## Sections
 
 - **Public API**
@@ -31,7 +29,7 @@ Helpers for generating deterministic URNs
 
 ```d2
 direction: right
-"kgfoundry_common.ids": "kgfoundry_common.ids" { link: "./kgfoundry_common/ids.md" }
+"kgfoundry_common.ids": "kgfoundry_common.ids" { link: "ids.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.ids" -> "__future__.annotations"
 "base64": "base64"
@@ -40,7 +38,5 @@ direction: right
 "kgfoundry_common.ids" -> "hashlib"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "kgfoundry_common.ids" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"kgfoundry_common.ids_code": "kgfoundry_common.ids code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/ids.py" }
-"kgfoundry_common.ids" -> "kgfoundry_common.ids_code" { style: dashed }
 ```
 

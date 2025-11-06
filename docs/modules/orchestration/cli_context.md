@@ -4,8 +4,6 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli_context.py)
-
 ## Sections
 
 - **Public API**
@@ -68,7 +66,7 @@ consumed by the MkDocs suite.
 
 ```d2
 direction: right
-"orchestration.cli_context": "orchestration.cli_context" { link: "./orchestration/cli_context.md" }
+"orchestration.cli_context": "orchestration.cli_context" { link: "cli_context.md" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.cli_context" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -105,9 +103,7 @@ direction: right
 "orchestration.cli_context" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "orchestration.cli_context" -> "typing.cast"
-"orchestration.cli": "orchestration.cli" { link: "./orchestration/cli.md" }
+"orchestration.cli": "orchestration.cli" { link: "cli.md" }
 "orchestration.cli" -> "orchestration.cli_context"
-"orchestration.cli_context_code": "orchestration.cli_context code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli_context.py" }
-"orchestration.cli_context" -> "orchestration.cli_context_code" { style: dashed }
 ```
 
