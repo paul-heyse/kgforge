@@ -40,7 +40,7 @@ class Doc(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ClassVar[object]
         Pydantic configuration forbidding unknown fields.
     id : Id
         Unique document identifier.
@@ -79,7 +79,7 @@ class Doc(BaseModel):
     >>> assert_model_roundtrip(Doc, example_path)
     """
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config: ClassVar[object] = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding unknown fields."""
 
     id: Id

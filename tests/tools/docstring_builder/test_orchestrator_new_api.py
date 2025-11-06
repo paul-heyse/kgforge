@@ -8,11 +8,15 @@ DocstringBuildConfig and cache interfaces.
 from __future__ import annotations
 
 import tempfile
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, cast
 
 import pytest
-from tools.docstring_builder.cache import BuilderCache
+import tools.docstring_builder.orchestrator as orchestrator_module
+from tools.docstring_builder.builder_types import DocstringBuildResult, ExitStatus
+from tools.docstring_builder.cache import DocstringBuilderCache
+from tools.docstring_builder.config import BuilderConfig, ConfigSelection
 from tools.docstring_builder.config_models import DocstringBuildConfig
 from tools.docstring_builder.orchestrator import run_build, run_docstring_builder, run_legacy
 
@@ -22,12 +26,93 @@ class _AnyCallable(Protocol):
 
 
 if TYPE_CHECKING:
-    from tools.docstring_builder.cache import DocstringBuilderCache
+    from tools.docstring_builder.builder_types import DocstringBuildRequest
 
 
 def _call_untyped_run_build(*args: object, **kwargs: object) -> object:
     untyped = cast("_AnyCallable", run_build)
     return untyped(*args, **kwargs)
+
+
+@dataclass(slots=True)
+class _PipelineCapture:
+    files: list[Path] = field(default_factory=list)
+    request: DocstringBuildRequest | None = None
+    config: BuilderConfig | None = None
+    selection: ConfigSelection | None = None
+    cache: DocstringBuilderCache | None = None
+    plugins_enabled: bool | None = None
+
+
+class RecordingCache(DocstringBuilderCache):
+    """Test double implementing :class:`DocstringBuilderCache` for assertions."""
+
+    def __init__(self, path: Path) -> None:
+        self._path = path
+        self.needs_update_calls: list[tuple[Path, str]] = []
+        self.update_calls: list[tuple[Path, str]] = []
+        self.write_calls = 0
+        self.next_needs_update = False
+
+    @property
+    def path(self) -> Path:
+        return self._path
+
+    def needs_update(self, file_path: Path, config_hash: str) -> bool:
+        self.needs_update_calls.append((file_path, config_hash))
+        return self.next_needs_update
+
+    def update(self, file_path: Path, config_hash: str) -> None:
+        self.update_calls.append((file_path, config_hash))
+
+    def write(self) -> None:
+        self.write_calls += 1
+
+
+def _install_stubbed_pipeline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[_PipelineCapture, DocstringBuildResult, BuilderConfig]:
+    capture = _PipelineCapture()
+    builder_config = BuilderConfig()
+    config_selection = ConfigSelection(path=Path("docstring_builder.toml"), source="default")
+
+    monkeypatch.setattr(
+        orchestrator_module,
+        "load_builder_config",
+        lambda override=None: (builder_config, config_selection),
+    )
+    monkeypatch.setattr(orchestrator_module, "select_files", lambda *_: [Path("src/module.py")])
+
+    result = DocstringBuildResult(
+        exit_status=ExitStatus.SUCCESS,
+        errors=[],
+        file_reports=[],
+        observability_payload={},
+        cli_payload=None,
+        manifest_path=None,
+        problem_details=None,
+        config_selection=config_selection,
+    )
+
+    def fake_run_pipeline(
+        files: list[Path],
+        request: DocstringBuildRequest,
+        config: BuilderConfig,
+        selection: ConfigSelection | None,
+        *,
+        cache: DocstringBuilderCache,
+        plugins_enabled: bool,
+    ) -> DocstringBuildResult:
+        capture.files = list(files)
+        capture.request = request
+        capture.config = config
+        capture.selection = selection
+        capture.cache = cache
+        capture.plugins_enabled = plugins_enabled
+        return result
+
+    monkeypatch.setattr(orchestrator_module, "_run_pipeline", fake_run_pipeline)
+    return capture, result, builder_config
 
 
 class TestRunBuild:
@@ -37,41 +122,126 @@ class TestRunBuild:
         """Verify run_build() enforces keyword-only parameters."""
         with tempfile.TemporaryDirectory() as tmpdir:
             config = DocstringBuildConfig()
-            cache = BuilderCache(Path(tmpdir) / "cache.json")
+            cache = RecordingCache(Path(tmpdir) / "cache.json")
 
             # Should fail with positional args
             with pytest.raises(TypeError, match="positional argument"):
                 _call_untyped_run_build(config, cache)
 
-    def test_run_build_accepts_typed_config(self) -> None:
-        """Verify run_build() accepts DocstringBuildConfig."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = DocstringBuildConfig(enable_plugins=True, emit_diff=False, timeout_seconds=600)
-            cache = BuilderCache(Path(tmpdir) / "cache.json")
+    def test_run_build_executes_pipeline(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """run_build() should execute the pipeline and return its result."""
+        capture, expected_result, _builder_config = _install_stubbed_pipeline(monkeypatch)
+        cache = RecordingCache(tmp_path / "cache.json")
 
-            # Should not raise TypeError for missing args
-            # (will raise NotImplementedError for unimplemented feature)
-            with pytest.raises(NotImplementedError, match="not yet fully implemented"):
-                run_build(config=config, cache=cache)
+        actual = run_build(config=DocstringBuildConfig(), cache=cache)
 
-    def test_run_build_requires_cache_interface(self) -> None:
-        """Verify run_build() accepts DocstringBuilderCache protocol."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = DocstringBuildConfig()
-            cache: DocstringBuilderCache = BuilderCache(Path(tmpdir) / "cache.json")
+        assert actual is expected_result
+        assert capture.files == [Path("src/module.py")]
+        assert capture.request is not None and capture.request.command == "update"
+        assert capture.plugins_enabled is True
+        assert capture.cache is not None
 
-            # Should accept any object satisfying the protocol
-            with pytest.raises(NotImplementedError):
-                run_build(config=config, cache=cache)
+    def test_run_build_disables_plugins_when_configured(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """Setting enable_plugins=False should disable plugin execution."""
+        capture, _result, _builder_config = _install_stubbed_pipeline(monkeypatch)
+        cache = RecordingCache(tmp_path / "cache.json")
 
-    def test_run_build_not_yet_implemented(self) -> None:
-        """Verify run_build() raises NotImplementedError as placeholder."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = DocstringBuildConfig()
-            cache = BuilderCache(Path(tmpdir) / "cache.json")
+        run_build(config=DocstringBuildConfig(enable_plugins=False), cache=cache)
 
-            with pytest.raises(NotImplementedError, match="not yet fully implemented"):
-                run_build(config=config, cache=cache)
+        assert capture.plugins_enabled is False
+
+    def test_run_build_sets_check_mode_for_diff(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """emit_diff=True should trigger check command with diff previews."""
+        capture, _result, _builder_config = _install_stubbed_pipeline(monkeypatch)
+        cache = RecordingCache(tmp_path / "cache.json")
+
+        run_build(
+            config=DocstringBuildConfig(enable_plugins=True, emit_diff=True),
+            cache=cache,
+        )
+
+        assert capture.request is not None
+        assert capture.request.command == "check"
+        assert capture.request.diff is True
+
+    def test_run_build_applies_cache_policy_adapter(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """Cache policy should wrap the provided cache when needed."""
+        capture, _result, _builder_config = _install_stubbed_pipeline(monkeypatch)
+        recording_cache = RecordingCache(tmp_path / "cache.json")
+
+        run_build(
+            config=DocstringBuildConfig(cache_policy=CachePolicy.DISABLED),
+            cache=recording_cache,
+        )
+
+        adapted = capture.cache
+        assert adapted is not None
+        assert adapted is not recording_cache
+        assert adapted.needs_update(Path("src/module.py"), "hash") is True
+        assert recording_cache.needs_update_calls == []
+        adapted.update(Path("src/module.py"), "hash2")
+        assert recording_cache.update_calls == []
+        adapted.write()
+        assert recording_cache.write_calls == 0
+
+    def test_run_build_enforces_timeout(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """run_build() should raise TimeoutError when execution exceeds limit."""
+        builder_config = BuilderConfig()
+        config_selection = ConfigSelection(path=Path("docstring_builder.toml"), source="default")
+
+        monkeypatch.setattr(
+            orchestrator_module,
+            "load_builder_config",
+            lambda override=None: (builder_config, config_selection),
+        )
+        monkeypatch.setattr(
+            orchestrator_module,
+            "select_files",
+            lambda *_: [Path("src/module.py")],
+        )
+
+        result = DocstringBuildResult(
+            exit_status=ExitStatus.SUCCESS,
+            errors=[],
+            file_reports=[],
+            observability_payload={},
+            cli_payload=None,
+            manifest_path=None,
+            problem_details=None,
+            config_selection=config_selection,
+        )
+
+        def slow_run_pipeline(*args: object, **kwargs: object) -> DocstringBuildResult:
+            time.sleep(0.2)
+            return result
+
+        monkeypatch.setattr(orchestrator_module, "_run_pipeline", slow_run_pipeline)
+
+        cache = RecordingCache(tmp_path / "cache.json")
+        config = DocstringBuildConfig(timeout_seconds=0.05)
+
+        with pytest.raises(TimeoutError, match="exceeded timeout"):
+            run_build(config=config, cache=cache)
 
 
 class TestRunLegacy:

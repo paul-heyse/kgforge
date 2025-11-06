@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import logging
 from importlib import import_module
-from typing import TYPE_CHECKING, Final, Protocol, cast
+from typing import TYPE_CHECKING, Final, NoReturn, Protocol, cast
 
 from kgfoundry_common.navmap_loader import load_nav_metadata
 
@@ -249,6 +249,16 @@ def _load_tools_surface() -> _ToolsSurface:
     return cast("_ToolsSurface", module)
 
 
+def _raise_tool_execution_error(
+    tools_surface: _ToolsSurface,
+    message: str,
+    *,
+    command: Sequence[str],
+) -> NoReturn:
+    tool_error = cast("_ToolExecutionErrorConstructor", tools_surface.ToolExecutionError)
+    raise tool_error(message, command=list(command))
+
+
 _subprocess_module = import_module("sub" + "process")
 _PIPE = cast("int", _subprocess_module.PIPE)
 _Popen = cast("_PopenFactory", _subprocess_module.Popen)
@@ -456,25 +466,15 @@ def spawn_text_process(
     TextProcess
         Text process instance.
 
-    Raises
-    ------
-    ToolExecutionError
-        Raised when command validation fails or the command list is empty. The
-        concrete exception type is resolved from the shared tooling facade at
-        runtime.
-
     Notes
     -----
     The tool execution error type is loaded dynamically from the shared tooling
     facade to avoid importing heavy dependencies at module import time.
     """
     tools_surface = _load_tools_surface()
-    ToolExecutionError = cast(  # noqa: N806
-        "_ToolExecutionErrorConstructor", tools_surface.ToolExecutionError
-    )
     if not command:
         msg = "Command must contain at least one argument"
-        raise ToolExecutionError(msg, command=[])
+        _raise_tool_execution_error(tools_surface, msg, command=[])
 
     get_runner = tools_surface.get_process_runner
     runner = get_runner()

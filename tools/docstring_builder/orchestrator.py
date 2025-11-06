@@ -48,6 +48,8 @@ import json
 import os
 import warnings
 from collections.abc import Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as _FuturesTimeoutError
 from dataclasses import dataclass
 from importlib import import_module
 from typing import TYPE_CHECKING, Protocol, cast
@@ -63,9 +65,7 @@ from tools.docstring_builder.builder_types import (
     status_from_exit,
 )
 from tools.docstring_builder.cache import BuilderCache, DocstringBuilderCache
-from tools.docstring_builder.config import (
-    load_config_with_selection,
-)
+from tools.docstring_builder.config import CachePolicy, load_config_with_selection
 from tools.docstring_builder.config_models import DocstringBuildConfig
 from tools.docstring_builder.diff_manager import DiffManager
 from tools.docstring_builder.docfacts import (
@@ -111,7 +111,6 @@ if TYPE_CHECKING:
         LoggerLike,
         StatusCounts,
     )
-    from tools.docstring_builder.cache import DocstringBuilderCache
     from tools.docstring_builder.config import (
         BuilderConfig,
         ConfigSelection,
@@ -462,7 +461,7 @@ class _DocfactState:
 class _PipelineDependencies:
     config: BuilderConfig
     logger: LoggerLike
-    cache: BuilderCache
+    cache: DocstringBuilderCache
     diff_manager: DiffManager
     metrics: MetricsRecorder
     file_processor: FileProcessor
@@ -518,8 +517,10 @@ def _build_pipeline_dependencies(
     options: ProcessingOptions,
     plugin_manager: PluginManager | None,
     logger: LoggerLike,
+    *,
+    cache: DocstringBuilderCache | None = None,
 ) -> _PipelineDependencies:
-    cache = BuilderCache(CACHE_PATH)
+    cache_instance: DocstringBuilderCache = cache or BuilderCache(CACHE_PATH)
     docfact_entries, docfact_sources = _load_docfact_state()
     diff_manager = DiffManager(options)
     metrics = MetricsRecorder(
@@ -528,7 +529,7 @@ def _build_pipeline_dependencies(
     )
     file_processor = FileProcessor(
         config=config,
-        cache=cache,
+        cache=cache_instance,
         options=options,
         collect_edits=_collect_edits,
         plugin_manager=plugin_manager,
@@ -542,12 +543,53 @@ def _build_pipeline_dependencies(
     return _PipelineDependencies(
         config=config,
         logger=logger,
-        cache=cache,
+        cache=cache_instance,
         diff_manager=diff_manager,
         metrics=metrics,
         file_processor=file_processor,
         docfact_state=docfact_state,
     )
+
+
+class _CachePolicyAdapter(DocstringBuilderCache):
+    """Apply cache policy semantics over a delegate cache implementation."""
+
+    def __init__(self, delegate: DocstringBuilderCache, policy: CachePolicy) -> None:
+        self._delegate = delegate
+        self._policy = policy
+
+    @property
+    def path(self) -> Path:
+        return self._delegate.path
+
+    def needs_update(self, file_path: Path, config_hash: str) -> bool:
+        if self._policy is CachePolicy.WRITE_ONLY:
+            return True
+        if self._policy is CachePolicy.DISABLED:
+            return True
+        return self._delegate.needs_update(file_path, config_hash)
+
+    def update(self, file_path: Path, config_hash: str) -> None:
+        if self._policy in {CachePolicy.DISABLED, CachePolicy.READ_ONLY}:
+            return
+        self._delegate.update(file_path, config_hash)
+
+    def write(self) -> None:
+        if self._policy in {CachePolicy.DISABLED, CachePolicy.READ_ONLY}:
+            return
+        self._delegate.write()
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._delegate, name)
+
+
+def _adapt_cache_policy(
+    cache: DocstringBuilderCache,
+    policy: CachePolicy,
+) -> DocstringBuilderCache:
+    if policy is CachePolicy.READ_WRITE:
+        return cache
+    return _CachePolicyAdapter(cache, policy)
 
 
 def render_cli_result(result: DocstringBuildResult) -> CliResult | None:
@@ -685,6 +727,9 @@ def _run_pipeline(
     request: DocstringBuildRequest,
     config: BuilderConfig,
     selection: ConfigSelection | None,
+    *,
+    cache: DocstringBuilderCache | None = None,
+    plugins_enabled: bool = True,
 ) -> DocstringBuildResult:
     files_list = list(files)
 
@@ -694,8 +739,16 @@ def _run_pipeline(
     if isinstance(build_result, DocstringBuildResult):
         return build_result
     logger, plugin_manager, policy_engine, options = build_result
+    if not plugins_enabled:
+        plugin_manager = None
 
-    dependencies = _build_pipeline_dependencies(config, options, plugin_manager, logger)
+    dependencies = _build_pipeline_dependencies(
+        config,
+        options,
+        plugin_manager,
+        logger,
+        cache=cache,
+    )
 
     def build_problem_details_wrapper(
         status: ExitStatus,
@@ -820,38 +873,81 @@ def run_build(
     config: DocstringBuildConfig,
     cache: DocstringBuilderCache,
 ) -> DocstringBuildResult:
-    """Execute docstring build with typed configuration.
-
-    This is the new public API for the docstring builder that accepts
-    a typed configuration object and cache interface instead of positional
-    boolean arguments. This function is the recommended way to invoke the
-    builder from programmatic code.
+    """Execute docstring builder pipeline using typed configuration.
 
     Parameters
     ----------
     config : DocstringBuildConfig
-        Typed configuration controlling plugins, diff emission, timeout, cache
-        policy, and other build parameters.
+        Typed configuration controlling plugin usage, diff emission, cache policy,
+        and execution timeout.
     cache : DocstringBuilderCache
-        Cache interface for storing/retrieving processed file metadata.
+        Cache interface used to determine stale files and persist run metadata.
 
     Returns
     -------
     DocstringBuildResult
-        Build result containing processed files, statistics, and any errors
-        encountered during processing.
+        Build result containing exit status, metrics, and generated artifacts.
 
     Raises
     ------
-    NotImplementedError
-        Always raised as this function is a placeholder and not yet implemented.
-    """  # noqa: DOC202
-    # This is a placeholder implementation that delegates to the existing
-    # run_docstring_builder function. In a full implementation, this would
-    # directly invoke _run_pipeline with a request built from config.
-    # For now, we maintain backward compatibility.
-    msg = "run_build is not yet fully implemented; use run_docstring_builder"
-    raise NotImplementedError(msg)
+    TimeoutError
+        Raised when the build exceeds ``config.timeout_seconds``.
+    """
+    builder_config, config_selection = load_builder_config(None)
+    builder_config.dynamic_probes = config.dynamic_probes
+    if config.normalize_sections:
+        builder_config.normalize_sections = True
+
+    command = "check" if config.emit_diff else "update"
+    request = DocstringBuildRequest(
+        command=command,
+        subcommand=command,
+        diff=config.emit_diff,
+        normalize_sections=config.normalize_sections,
+        invoked_subcommand=command,
+    )
+
+    selection = SelectionCriteria(
+        module=None,
+        since=None,
+        changed_only=False,
+        explicit_paths=None,
+    )
+
+    try:
+        files = select_files(builder_config, selection)
+    except InvalidPathError:
+        _LOGGER.exception("Invalid path supplied to docstring builder")
+        return _build_error_result(
+            ExitStatus.CONFIG,
+            request,
+            "Invalid path supplied to docstring builder",
+            selection=config_selection,
+        )
+
+    adapted_cache = _adapt_cache_policy(cache, config.cache_policy)
+
+    def _execute() -> DocstringBuildResult:
+        return _run_pipeline(
+            files,
+            request,
+            builder_config,
+            config_selection,
+            cache=adapted_cache,
+            plugins_enabled=config.enable_plugins,
+        )
+
+    timeout_seconds = float(config.timeout_seconds)
+    if timeout_seconds > 0:
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_execute)
+            try:
+                return future.result(timeout=timeout_seconds)
+            except _FuturesTimeoutError as exc:  # pragma: no cover - defensive guard
+                future.cancel()
+                message = f"Docstring build exceeded timeout of {config.timeout_seconds} seconds"
+                raise TimeoutError(message) from exc
+    return _execute()
 
 
 def run_legacy(
@@ -873,17 +969,11 @@ def run_legacy(
     **kwargs : object
         Keyword arguments (deprecated, accepted for backward compatibility only).
 
-    Returns
-    -------
-    DocstringBuildResult
-        Build result containing processed files, statistics, and any errors
-        encountered during processing.
-
     Raises
     ------
     NotImplementedError
         Always raised as this function is a placeholder and not yet implemented.
-    """  # noqa: DOC202
+    """
     msg = (
         "run_legacy() is deprecated and will be removed in a future release. "
         "Use run_build(config=..., cache=...) instead with typed "

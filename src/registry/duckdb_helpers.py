@@ -273,6 +273,8 @@ def execute(
     RegistryError
         If query execution fails, parameterization is required but missing,
         or timeout is exceeded.
+    RuntimeError
+        Raised if query execution completes without returning a relation.
     """
     opts = _coerce_options(options, operation="duckdb.execute")
     require_flag = (
@@ -283,6 +285,7 @@ def execute(
     sql_preview = _format_sql(sql)
     query_params = _format_params(params)
 
+    relation: DuckDBPyConnection | None = None
     with (
         with_fields(
             logger,
@@ -322,6 +325,10 @@ def execute(
                     extra={"duration_ms": round(duration * 1000, 2)},
                 )
             return relation
+    if relation is None:
+        message = "DuckDB query execution did not produce a relation"
+        raise RuntimeError(message)
+    return relation
 
 
 # [nav:anchor fetch_all]

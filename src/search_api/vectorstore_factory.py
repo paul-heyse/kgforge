@@ -379,9 +379,9 @@ class FaissVectorstoreFactory:
 
         Raises
         ------
-        Exception
-            Propagates any exception raised by :meth:`FaissAdapter.save` (for
-            example I/O errors or FAISS errors).
+        IndexBuildError
+            Raised when persisting the FAISS index fails. The underlying
+            exception is chained for diagnostics.
 
         Notes
         -----
@@ -416,7 +416,8 @@ class FaissVectorstoreFactory:
             )
             elapsed = time.monotonic() - start_time
             _observe_metrics(operation, "error", elapsed)
-            raise error
+            message = "Failed to persist FAISS index artifacts"
+            raise IndexBuildError(message) from error
 
         elapsed = time.monotonic() - start_time
         logger.info(

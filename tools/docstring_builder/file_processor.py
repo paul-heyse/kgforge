@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from tools.docstring_builder.builder_types import LoggerLike
-    from tools.docstring_builder.cache import BuilderCache
+    from tools.docstring_builder.cache import DocstringBuilderCache
     from tools.docstring_builder.config import BuilderConfig
     from tools.docstring_builder.docfacts import DocFact
     from tools.docstring_builder.harvest import HarvestResult
@@ -103,7 +103,7 @@ class FileProcessor:
     """Process individual files for the docstring builder."""
 
     config: BuilderConfig
-    cache: BuilderCache
+    cache: DocstringBuilderCache
     options: ProcessingOptions
     collect_edits: CollectEditsCallable
     plugin_manager: PluginManager | None = None
