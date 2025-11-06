@@ -166,8 +166,9 @@ def main(argv: list[str] | None = None) -> int:
     env = os.environ.copy()
     repo_root = Path(__file__).resolve().parents[2]
     src_path = (repo_root / "src").resolve()
-    if env.get("PYTHONPATH"):
-        env["PYTHONPATH"] = f"{src_path}:{env['PYTHONPATH']}"
+    existing_pythonpath = env.get("PYTHONPATH")
+    if existing_pythonpath:
+        env["PYTHONPATH"] = os.pathsep.join((str(src_path), existing_pythonpath))
     else:
         env["PYTHONPATH"] = str(src_path)
 
