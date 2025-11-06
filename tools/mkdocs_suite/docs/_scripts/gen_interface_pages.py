@@ -60,6 +60,16 @@ def _ensure_str_list(value: object) -> list[str]:
     return []
 
 
+def _escape_table_text(value: object) -> str:
+    """Escape Markdown table control characters in ``value``."""
+
+    text = str(value)
+    text = text.replace("\\", "\\\\")
+    text = text.replace("|", "\\|")
+    text = text.replace("`", "\\`")
+    return text.replace("\n", "<br />")
+
+
 def _normalized_module_path(nav_path: Path, src_root: Path) -> str:
     try:
         relative_parent = nav_path.parent.relative_to(src_root)
@@ -100,7 +110,8 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
 def _module_doc_link(module: object) -> str:
     if not isinstance(module, str) or not module:
         return "—"
-    return f"[{module}](../modules/{module}.md)"
+    safe_label = _escape_table_text(module)
+    return f"[{safe_label}](../modules/{module}.md)"
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
@@ -146,8 +157,9 @@ def _spec_link(record: dict[str, object]) -> str:
     docs_path = SUITE_ROOT / "docs" / spec_path
     if docs_path.exists():
         rel = Path("..") / spec_path
-        return f"[{spec_path}]({rel.as_posix()})"
-    return spec_path
+        safe_label = _escape_table_text(spec_path)
+        return f"[{safe_label}]({rel.as_posix()})"
+    return _escape_table_text(spec_path)
 
 
 def _problem_details(
@@ -217,32 +229,39 @@ def _write_interface_table(
 
     interface_ids: set[str] = set()
     for record in interfaces:
-        identifier = str(record.get("id") or record.get("entrypoint") or "—")
-        interface_model = registry.interface(identifier) if registry else None
-        description = (
+        identifier_value = str(record.get("id") or record.get("entrypoint") or "—")
+        interface_model = registry.interface(identifier_value) if registry else None
+        description_value = (
             record.get("description")
             or (interface_model.description if interface_model else None)
             or "—"
         )
         spec_candidate = record.get("spec") or (interface_model.spec if interface_model else None)
         spec_cell = _spec_link({"spec": spec_candidate})
-        owner = record.get("owner") or (interface_model.owner if interface_model else None) or "—"
+        owner_value = record.get("owner") or (interface_model.owner if interface_model else None)
+        if isinstance(owner_value, list):
+            owner_value = ", ".join(str(item) for item in owner_value)
+        stability_value = (
+            record.get("stability")
+            or (interface_model.stability if interface_model else None)
+            or "—"
+        )
         module_path = (
             record.get("module")
             or (interface_model.module if interface_model else None)
             or record.get("_nav_module_path")
         )
         row = "| {id} | {type} | {module} | {owner} | {stability} | {spec} | {desc} | {problems} |".format(
-            id=identifier,
-            type=record.get("type") or (interface_model.type if interface_model else "—") or "—",
+            id=_escape_table_text(identifier_value),
+            type=_escape_table_text(
+                record.get("type") or (interface_model.type if interface_model else "—") or "—"
+            ),
             module=_module_doc_link(module_path),
-            owner=owner,
-            stability=record.get("stability")
-            or (interface_model.stability if interface_model else None)
-            or "—",
+            owner=_escape_table_text(owner_value or "—"),
+            stability=_escape_table_text(stability_value),
             spec=spec_cell,
-            desc=description,
-            problems=_problem_details(record, interface_model),
+            desc=_escape_table_text(description_value),
+            problems=_escape_table_text(_problem_details(record, interface_model)),
         )
         handle.write(row + "\n")
         if record.get("id"):
