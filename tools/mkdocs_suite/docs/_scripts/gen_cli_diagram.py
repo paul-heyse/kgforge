@@ -246,7 +246,7 @@ def _ensure_cli_index_entry() -> None:
     """Ensure the diagrams index links to the CLI diagram."""
     entry_token = CLI_INDEX_ENTRY.strip()
     try:
-        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
             existing_content = handle.read()
     except FileNotFoundError:
         existing_content = ""
@@ -255,7 +255,7 @@ def _ensure_cli_index_entry() -> None:
         newline_prefix = "" if not existing_content or existing_content.endswith("\n") else "\n"
         with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "a") as handle:
             handle.write(f"{newline_prefix}{CLI_INDEX_ENTRY}")
-        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
             existing_content = handle.read()
 
     if entry_token not in existing_content:
