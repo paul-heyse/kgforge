@@ -177,3 +177,13 @@ def test_write_interface_table_escapes_markdown_control_characters() -> None:
     assert cells[5] == "http://example.com/spec\\|path"
     assert cells[6] == "line1\\|<br />line2\\`"
     assert cells[7] == "issue\\|one, issue\\`two\\`"
+
+
+def test_operation_href_returns_relative_anchor() -> None:
+    """Operation links should include encoded anchors relative to the doc path."""
+
+    module = importlib.import_module(MODULE_PATH)
+
+    href = module._operation_href("docs/api/openapi-cli.yaml", "cli.operation/with space")
+
+    assert href == "openapi-cli.md#operation/cli.operation%2Fwith%20space"
