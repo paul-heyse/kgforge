@@ -362,7 +362,21 @@ def _load_api_usage() -> dict[str, list[OperationLink]]:
     """
     if not API_USAGE_FILE.exists():
         return {}
-    raw_mapping = json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    try:
+        raw_mapping = json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        LOGGER.warning(
+            "Skipping API usage map at %s due to invalid JSON: %s",
+            API_USAGE_FILE,
+            exc,
+        )
+        return {}
+    if not isinstance(raw_mapping, Mapping):
+        LOGGER.warning(
+            "Skipping API usage map at %s because the payload is not a mapping",
+            API_USAGE_FILE,
+        )
+        return {}
     usage: dict[str, list[OperationLink]] = defaultdict(list)
     for symbol, operations in raw_mapping.items():
         if not isinstance(symbol, str):
