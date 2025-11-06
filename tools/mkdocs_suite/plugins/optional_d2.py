@@ -57,17 +57,19 @@ class OptionalD2Plugin(BasePlugin[Config]):
         """
         errors, warnings = super().load_config(options, config_file_path)
         if D2Plugin is None:
-            self._warn_once(
-                "mkdocs-d2-plugin is not installed; skipping D2 diagram rendering.",
-            )
+            message = "mkdocs-d2-plugin is not installed; skipping D2 diagram rendering."
+            self._warn_once(message)
+            warnings.append(message)
             self._delegate = None
             return errors, warnings
 
         if shutil.which("d2") is None:
-            self._warn_once(
+            message = (
                 "The 'd2' executable was not found on PATH; existing diagrams will be "
-                "served but new renders are skipped. Install the D2 CLI to refresh diagrams.",
+                "served but new renders are skipped. Install the D2 CLI to refresh diagrams."
             )
+            self._warn_once(message)
+            warnings.append(message)
             self._delegate = None
             return errors, warnings
 
