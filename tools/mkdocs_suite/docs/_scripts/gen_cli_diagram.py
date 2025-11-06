@@ -260,21 +260,44 @@ def write_diagram(operations: Sequence[OperationEntry]) -> None:
 def _update_cli_index_entry(*, enabled: bool) -> None:
     """Ensure the diagrams index links to the CLI diagram when available."""
     entry_token = CLI_INDEX_ENTRY.strip()
+    entry_line = CLI_INDEX_ENTRY if CLI_INDEX_ENTRY.endswith("\n") else f"{CLI_INDEX_ENTRY}\n"
     try:
         with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
-            existing_lines = handle.read().splitlines()
+            existing_lines = handle.read().splitlines(keepends=True)
     except FileNotFoundError:
         existing_lines = []
 
     filtered_lines = [line for line in existing_lines if line.strip() != entry_token]
-    if enabled:
-        filtered_lines.append(entry_token)
+    bullet_start = next(
+        (index for index, line in enumerate(filtered_lines) if line.lstrip().startswith("- ")),
+        len(filtered_lines),
+    )
+    prefix_lines = filtered_lines[:bullet_start]
+    bullet_lines = filtered_lines[bullet_start:]
 
-    if not filtered_lines:
+    bullet_lines = [line for line in bullet_lines if line.strip() != entry_token]
+
+    if enabled and not any(line.strip() == entry_token for line in bullet_lines):
+        insert_at = len(bullet_lines)
+        while insert_at > 0 and bullet_lines[insert_at - 1].strip() == "":
+            insert_at -= 1
+        bullet_lines.insert(insert_at, entry_line)
+
+    if not prefix_lines and not bullet_lines:
         return
 
-    content = "\n".join(filtered_lines)
-    if not content.endswith("\n"):
+    prefix_text = "".join(prefix_lines)
+    bullet_text = "".join(bullet_lines)
+
+    if bullet_text and prefix_text:
+        if prefix_text.endswith("\n"):
+            if not prefix_text.endswith("\n\n"):
+                prefix_text += "\n"
+        else:
+            prefix_text += "\n\n"
+
+    content = prefix_text + bullet_text
+    if content and not content.endswith("\n"):
         content += "\n"
     with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "w") as handle:
         handle.write(content)
