@@ -36,6 +36,7 @@
       "stability": "experimental"
     }
   },
-  "synopsis": "Public surface for docling preprocessing utilities",
-  "title": "docling"
+  "synopsis": "Public surface for docling_kg preprocessing utilities",
+  "title": "docling_kg"
 }
+

@@ -18,7 +18,7 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 # [nav:anchor HybridChunker]
 class HybridChunker:
-    """Placeholder class for hybrid docling chunking pipeline.
+    """Placeholder class for hybrid docling_kg chunking pipeline.
 
     This class serves as a placeholder for future hybrid chunking functionality that combines layout
     and text cues for document processing. Implementation details will be added later.

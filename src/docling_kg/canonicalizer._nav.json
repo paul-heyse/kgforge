@@ -1,27 +1,28 @@
 {
   "exports": [
-    "GraniteDoclingVLM"
+    "canonicalize_text"
   ],
   "module_meta": {
     "owner": "@docling",
     "since": "0.1.0",
-    "stability": "experimental"
+    "stability": "beta"
   },
   "sections": [
     {
       "id": "public-api",
       "symbols": [
-        "GraniteDoclingVLM"
+        "canonicalize_text"
       ]
     }
   ],
   "symbols": {
-    "GraniteDoclingVLM": {
+    "canonicalize_text": {
       "owner": "@docling",
       "since": "0.1.0",
-      "stability": "experimental"
+      "stability": "beta"
     }
   },
-  "synopsis": "Vision-language tagging helpers for docling",
-  "title": "docling.vlm"
+  "synopsis": "String canonicalisation utilities for docling_kg preprocessing",
+  "title": "docling_kg.canonicalizer"
 }
+

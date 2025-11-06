@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING as _TYPE_CHECKING
 from kgfoundry_common.navmap_loader import load_nav_metadata
 
 _ALIASES: dict[str, str] = {
-    "docling": "kgfoundry.docling",
+    "docling_kg": "kgfoundry.docling_kg",
     "download": "kgfoundry.download",
     "embeddings_dense": "kgfoundry.embeddings_dense",
     "embeddings_sparse": "kgfoundry.embeddings_sparse",
@@ -32,7 +32,7 @@ _ALIASES: dict[str, str] = {
 }
 
 __all__ = [
-    "docling",
+    "docling_kg",
     "download",
     "embeddings_dense",
     "embeddings_sparse",
@@ -72,7 +72,7 @@ if _TYPE_CHECKING:
     from types import ModuleType
 
     kgfoundry_common: ModuleType = _import_module("kgfoundry_common")
-    docling: ModuleType = _import_module("kgfoundry.docling")
+    docling_kg: ModuleType = _import_module("kgfoundry.docling_kg")
     download: ModuleType = _import_module("kgfoundry.download")
     embeddings_dense: ModuleType = _import_module("kgfoundry.embeddings_dense")
     embeddings_sparse: ModuleType = _import_module("kgfoundry.embeddings_sparse")
@@ -98,7 +98,7 @@ def _load(name: str) -> object:
     Parameters
     ----------
     name : str
-        Alias name of the module to load (e.g., "docling", "search_api").
+        Alias name of the module to load (e.g., "docling_kg", "search_api").
 
     Returns
     -------
@@ -114,13 +114,13 @@ def __getattr__(name: str) -> object:
     """Provide lazy module loading for namespace bridge.
 
     Implements lazy loading for submodules in the kgfoundry package.
-    When a submodule is accessed (e.g., `kgfoundry.docling`), it is
+    When a submodule is accessed (e.g., `kgfoundry.docling_kg`), it is
     dynamically imported and cached in sys.modules.
 
     Parameters
     ----------
     name : str
-        Submodule name to import (e.g., "docling", "search_api").
+        Submodule name to import (e.g., "docling_kg", "search_api").
 
     Returns
     -------

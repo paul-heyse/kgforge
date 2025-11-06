@@ -21,5 +21,5 @@ class GraniteDoclingVLM:
     """Placeholder class for vision-language model tagging helpers.
 
     This class serves as a placeholder for future Granite vision-language model integration for
-    docling document processing. Implementation details will be added later.
+    docling_kg document processing. Implementation details will be added later.
     """

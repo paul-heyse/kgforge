@@ -1,27 +1,28 @@
 {
   "exports": [
-    "HybridChunker"
+    "GraniteDoclingVLM"
   ],
   "module_meta": {
     "owner": "@docling",
     "since": "0.1.0",
-    "stability": "beta"
+    "stability": "experimental"
   },
   "sections": [
     {
       "id": "public-api",
       "symbols": [
-        "HybridChunker"
+        "GraniteDoclingVLM"
       ]
     }
   ],
   "symbols": {
-    "HybridChunker": {
+    "GraniteDoclingVLM": {
       "owner": "@docling",
       "since": "0.1.0",
-      "stability": "beta"
+      "stability": "experimental"
     }
   },
-  "synopsis": "Hybrid docling pipeline combining layout and text cues",
-  "title": "docling.hybrid"
+  "synopsis": "Vision-language tagging helpers for docling_kg",
+  "title": "docling_kg.vlm"
 }
+
