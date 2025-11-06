@@ -259,7 +259,7 @@ def _nav_versions(module_name: str, class_name: str, nav: dict[str, Any]) -> dic
         out["x-version-introduced"] = meta["since"]
     if "deprecated_in" in meta:
         out["x-deprecated-in"] = meta["deprecated_in"]
-    return out | None
+    return out if out else None
 
 
 # --------------------------- examples (safe synthesis) ---------------------------

@@ -179,8 +179,6 @@ class LineSpan(FrozenBaseModel):
         Starting line number (1-indexed), or None if unknown.
     end : int | None
         Ending line number (1-indexed, inclusive), or None if unknown.
-    model_config : ConfigDict
-        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -208,9 +206,9 @@ class SymbolIndexRow(FrozenBaseModel):
         Symbol kind: "module", "class", "function", "method", etc.
     doc : str
         Documentation string/docstring for this symbol.
-    tested_by : Annotated[tuple[str, ...], Field]
+    tested_by : tuple[str, ...]
         Test paths (relative to tests/) that cover this symbol.
-    source_link : Annotated[dict[str, str], Field]
+    source_link : dict[str, str]
         Links to source code (e.g., GitHub, local paths).
     canonical_path : str | None
         If this symbol is an alias, canonical_path points to the real definition.
@@ -238,8 +236,6 @@ class SymbolIndexRow(FrozenBaseModel):
         True if this is an async function/method.
     is_property : bool
         True if this is a @property.
-    model_config : ConfigDict
-        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -438,14 +434,12 @@ class SymbolIndexArtifacts(FrozenBaseModel):
 
     Attributes
     ----------
-    rows : Annotated[tuple[SymbolIndexRow, ...], Field]
+    rows : tuple[SymbolIndexRow, ...]
         All symbol entries, sorted by path.
-    by_file : Annotated[dict[str, tuple[str, ...]], Field]
+    by_file : dict[str, tuple[str, ...]]
         Reverse lookup: file path -> sorted tuple of symbol paths.
-    by_module : Annotated[dict[str, tuple[str, ...]], Field]
+    by_module : dict[str, tuple[str, ...]]
         Reverse lookup: module name -> sorted tuple of symbol paths.
-    model_config : ConfigDict
-        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -499,14 +493,12 @@ class SymbolDeltaChange(FrozenBaseModel):
     ----------
     path : str
         The symbol path that changed.
-    before : Annotated[dict[str, JsonValue], Field]
+    before : dict[str, JsonValue]
         Previous version of the row (serialized).
-    after : Annotated[dict[str, JsonValue], Field]
+    after : dict[str, JsonValue]
         New version of the row (serialized).
-    reasons : Annotated[tuple[str, ...], Field]
+    reasons : tuple[str, ...]
         List of reasons why the symbol changed (e.g., ["signature_changed"]).
-    model_config : ConfigDict
-        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------
@@ -585,14 +577,12 @@ class SymbolDeltaPayload(FrozenBaseModel):
         Git SHA or build identifier for the baseline.
     head_sha : str | None
         Git SHA or build identifier for the current state.
-    added : Annotated[tuple[str, ...], Field]
+    added : tuple[str, ...]
         Sorted tuple of newly added symbol paths.
-    removed : Annotated[tuple[str, ...], Field]
+    removed : tuple[str, ...]
         Sorted tuple of removed symbol paths.
-    changed : Annotated[tuple[SymbolDeltaChange, ...], Field]
+    changed : tuple[SymbolDeltaChange, ...]
         List of symbols that changed (sorted by path).
-    model_config : ConfigDict
-        Pydantic model configuration dictionary shared by all artifacts.
 
     Parameters
     ----------

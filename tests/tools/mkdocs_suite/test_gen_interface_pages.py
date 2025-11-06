@@ -4,17 +4,28 @@ from __future__ import annotations
 
 import importlib
 import io
+import json
+import logging
 import sys
 import types
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
-from tools.mkdocs_suite.docs._scripts import gen_interface_pages
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+from tools.mkdocs_suite.docs._scripts import gen_interface_pages  # noqa: PLC2701
 
 
 @pytest.fixture(name="temporary_repo")
 def fixture_temporary_repo(tmp_path: Path) -> Path:
     """Create a temporary repository layout for nav discovery tests.
+
+    Parameters
+    ----------
+    tmp_path : Path
+        Pytest temporary directory fixture providing a base path for test files.
 
     Returns
     -------
@@ -42,10 +53,10 @@ def test_collect_nav_interfaces_skips_malformed_json(
     caplog.set_level(logging.WARNING)
     monkeypatch.setattr(gen_interface_pages, "REPO_ROOT", temporary_repo)
 
-    interfaces = gen_interface_pages._collect_nav_interfaces()
+    interfaces = gen_interface_pages._collect_nav_interfaces()  # noqa: SLF001
 
     assert any("invalid/_nav.json" in record.message for record in caplog.records)
-    assert interfaces == [{"id": "valid-interface", "module": "valid"}]
+    assert interfaces == [{"id": "valid-interface", "module": "valid", "_nav_module_path": "valid"}]
 
 
 class _DummyFile(io.StringIO):
@@ -55,11 +66,25 @@ class _DummyFile(io.StringIO):
         super().__init__()
         self._path = path
 
-    def __enter__(self) -> _DummyFile:
+    def __enter__(self) -> _DummyFile:  # noqa: PYI034
         return self
 
-    def __exit__(self, exc_type, exc, tb) -> bool:
+    def __exit__(  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
+    ) -> bool:
         """Store written content keyed by the path before closing.
+
+        Parameters
+        ----------
+        exc_type : type[BaseException] | None
+            Exception type if an exception occurred, None otherwise.
+        exc_val : BaseException | None
+            Exception value if an exception occurred, None otherwise.
+        exc_tb : types.TracebackType | None
+            Traceback object if an exception occurred, None otherwise.
 
         Returns
         -------
@@ -82,10 +107,12 @@ def _clear_captured_outputs() -> None:
 def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     """Inject a lightweight ``mkdocs_gen_files`` shim for testing."""
 
-    def _fake_open(path: object, *_, **__) -> _DummyFile:
+    def _fake_open(path: object, *_args: object, **_kwargs: object) -> _DummyFile:
         return _DummyFile(str(path))
 
-    stub = types.SimpleNamespace(open=_fake_open, files=io.StringIO)
+    stub = types.ModuleType("mkdocs_gen_files")
+    setattr(stub, "open", _fake_open)  # noqa: B010
+    setattr(stub, "files", io.StringIO)  # noqa: B010
     monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
 
 

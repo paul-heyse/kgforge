@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from yaml.nodes import Node
+from yaml.nodes import Node, ScalarNode
 
 __all__ = ["__doc__", "load_repo_settings"]
 
@@ -41,6 +41,8 @@ def _construct_python_name(loader: yaml.SafeLoader, _suffix: str, node: Node) ->
         The scalar value extracted from the node, or ``None`` if the node
         cannot be constructed as a scalar.
     """
+    if not isinstance(node, ScalarNode):
+        return None
     return loader.construct_scalar(node)
 
 

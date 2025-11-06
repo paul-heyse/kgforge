@@ -23,17 +23,24 @@ def build_symbol_index(*, config: DocsSymbolIndexConfig) -> dict[str, object]:
     config : DocsSymbolIndexConfig
         Typed configuration controlling symbol index build behavior.
 
+    Returns
+    -------
+    dict[str, object]
+        Symbol index dictionary containing rows, by_file, and by_module mappings.
+
     Raises
     ------
     NotImplementedError
         This function is a placeholder for Phase 3.2 implementation.
+        The return type annotation indicates the intended return value once
+        this function is fully implemented.
 
     Examples
     --------
     >>> from docs.toolchain.config import DocsSymbolIndexConfig
     >>> config = DocsSymbolIndexConfig(include_private=False)
     >>> # index = build_symbol_index(config=config)
-    """
+    """  # noqa: DOC202
     msg = "build_symbol_index is a placeholder for Phase 3.2 implementation"
     raise NotImplementedError(msg)
 

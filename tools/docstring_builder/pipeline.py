@@ -11,7 +11,7 @@ from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from operator import itemgetter
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from tools.docstring_builder.builder_types import (
     DocstringBuildResult,
@@ -184,6 +184,7 @@ class CliResultContext:
     cache_summary: CacheSummary
     input_hashes: Mapping[str, InputHash]
     diff_links: Mapping[str, str]
+    summary: Mapping[str, object]
 
 
 @dataclass(slots=True)
@@ -663,6 +664,7 @@ class PipelineRunner:
                 cache_summary=cache_summary,
                 input_hashes=input_hashes,
                 diff_links=diff_links,
+                summary=summary,
             )
         )
         problem_details: ModelProblemDetails | None = None
@@ -893,17 +895,9 @@ class PipelineRunner:
             "config": context.state.status_counts.get(self._cfg.config_status, 0),
             "error": context.state.status_counts.get(self._cfg.error_status, 0),
         }
-        summary_block: RunSummary = {
-            "processed": context.state.processed_count,
-            "skipped": context.state.skipped_count,
-            "changed": context.state.changed_count,
-            "status_counts": status_counts,
-            "docfacts_checked": context.state.docfacts_checked,
-            "cache_hits": context.state.cache_hits,
-            "cache_misses": context.state.cache_misses,
-            "duration_seconds": context.duration,
-            "subcommand": invoked,
-        }
+        summary_block = cast("RunSummary", dict(context.summary))
+        summary_block["status_counts"] = status_counts
+        summary_block["subcommand"] = invoked
         cli_result["summary"] = summary_block
 
         cli_result["policy"] = {

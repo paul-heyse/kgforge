@@ -3,14 +3,14 @@ from __future__ import annotations
 import contextlib
 import importlib
 import io
-from typing import TYPE_CHECKING
+from types import SimpleNamespace
+from typing import TYPE_CHECKING, Any, ClassVar
 
+import pytest
 from tools.mkdocs_suite.docs.cli_diagram import collect_operations, write_diagram
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-    import pytest
 
 
 @contextlib.contextmanager
@@ -27,18 +27,42 @@ def test_write_diagram_emits_single_node_for_multi_tag_operations(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
-    spec = {
-        "paths": {
-            "/cli/run": {
-                "post": {
+
+    class DummyOperationContext:
+        def build_operation(
+            self, _tokens: list[str], _command: object
+        ) -> tuple[str, dict[str, Any], list[str]]:
+            return (
+                "/cli/run",
+                {
                     "operationId": "runCliCommand",
                     "summary": "Execute the CLI",
                     "tags": ["ingest", "admin", "ingest"],
-                }
-            }
-        }
-    }
-    operations = collect_operations(spec)
+                },
+                ["ingest", "admin"],
+            )
+
+    class DummyCLIConfig:
+        bin_name: ClassVar[str] = "kgf"
+        interface_id: ClassVar[str] = "tools-cli"
+        interface_meta: ClassVar[dict[str, str]] = {"entrypoint": "tests.fixtures.cli:app"}
+
+        @property
+        def operation_context(self) -> DummyOperationContext:
+            return DummyOperationContext()
+
+    class DummyRegistry:
+        def get_interface(self, _interface_id: str) -> dict[str, object]:
+            return {"entrypoint": "tests.fixtures.cli:app"}
+
+    dummy_context = SimpleNamespace(cli_config=DummyCLIConfig(), registry=DummyRegistry())
+
+    def fake_walk_commands(_command: object, _tokens: list[str]) -> list[tuple[list[str], object]]:
+        return [(["run"], object())]
+
+    monkeypatch.setattr(gen_cli_module, "walk_commands", fake_walk_commands)
+
+    operations = collect_operations(context=dummy_context, click_cmd=object())
     assert operations == [
         ("POST", "/cli/run", "runCliCommand", "Execute the CLI", ("ingest", "admin"))
     ]
@@ -59,3 +83,25 @@ def test_write_diagram_emits_single_node_for_multi_tag_operations(
     assert d2_output.count('  "POST /cli/run":') == 1
     assert '  "ingest" -> "POST /cli/run"\n' in d2_output
     assert '  "admin" -> "POST /cli/run"\n' in d2_output
+
+
+def test_collect_operations_surface_loader_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
+
+    error_cls = gen_cli_module.CLIConfigError
+
+    def failing_loader(*_: object, **__: object) -> None:
+        raise error_cls(
+            {
+                "type": "https://kgfoundry.dev/problems/cli-config",
+                "title": "CLI configuration error",
+                "status": 404,
+                "detail": "missing",
+                "instance": "urn:test",
+            }
+        )
+
+    monkeypatch.setattr(gen_cli_module, "load_cli_tooling_context", failing_loader)
+
+    with pytest.raises(error_cls):
+        collect_operations()

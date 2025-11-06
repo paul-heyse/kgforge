@@ -156,6 +156,15 @@ def make_pipeline_config(
 ) -> PipelineConfig:
     """Construct a pipeline configuration tailored for orchestrator tests.
 
+    Parameters
+    ----------
+    request : DocstringBuildRequest
+        Build request containing command and file selection.
+    file_outcomes : Sequence[FileOutcome]
+        Sequence of file processing outcomes to simulate.
+    overrides : PipelineConfigOverrides | None
+        Optional configuration overrides for customizing test behavior.
+
     Returns
     -------
     PipelineConfig
@@ -183,6 +192,11 @@ def make_pipeline_config(
 
         def __call__(self, *, check_mode: bool) -> DocfactsCoordinator:
             """Create a coordinator stub with status tailored to ``check_mode``.
+
+            Parameters
+            ----------
+            check_mode : bool
+                Whether to use check-mode status or success status.
 
             Returns
             -------
@@ -312,7 +326,7 @@ def test_pipeline_runner_records_docfacts_baseline_payload(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    request = DocstringBuildRequest(command="update", subcommand="update")
+    request = DocstringBuildRequest(command="update", subcommand="update", json_output=True)
     outcome = FileOutcome(
         status=ExitStatus.SUCCESS,
         docfacts=_empty_docfacts(),
@@ -356,8 +370,12 @@ def test_pipeline_runner_records_docfacts_baseline_payload(
     assert result.cli_payload is not None
     docfacts_report = result.cli_payload.get("docfacts")
     assert isinstance(docfacts_report, dict)
-    assert docfacts_report["path"].endswith("docfacts.json")
-    assert docfacts_report["diff"].endswith("docfacts.diff.json")
+    path = docfacts_report.get("path")
+    assert path is not None
+    assert path.endswith("docfacts.json")
+    diff = docfacts_report.get("diff")
+    assert diff is not None
+    assert diff.endswith("docfacts.diff.json")
 
 
 def test_pipeline_runner_includes_baseline_in_file_report(
@@ -407,4 +425,6 @@ def test_pipeline_runner_includes_baseline_in_file_report(
     path_recorded, preview_recorded = diff_manager.baseline_calls[0]
     assert path_recorded.endswith("module.py")
     assert preview_recorded == "preview"
-    assert result.file_reports[0]["baseline"] == "main"
+    file_report = result.file_reports[0]
+    baseline = file_report.get("baseline")
+    assert baseline == "main"

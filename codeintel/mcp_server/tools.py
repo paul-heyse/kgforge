@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping  # noqa: TC003
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path

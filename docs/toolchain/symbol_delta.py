@@ -34,17 +34,24 @@ def compute_delta(
     current : SymbolIndex
         The current symbol index to compare.
 
+    Returns
+    -------
+    SymbolDelta
+        Delta dictionary containing added, removed, and changed symbols.
+
     Raises
     ------
     NotImplementedError
         This function is a placeholder for Phase 3.2 implementation.
+        The return type annotation indicates the intended return value once
+        this function is fully implemented.
 
     Examples
     --------
     >>> from docs.toolchain.config import DocsDeltaConfig
     >>> config = DocsDeltaConfig(include_removals=True)
     >>> # delta = compute_delta(config=config, baseline=..., current=...)
-    """
+    """  # noqa: DOC202
     msg = "compute_delta is a placeholder for Phase 3.2 implementation"
     raise NotImplementedError(msg)
 
