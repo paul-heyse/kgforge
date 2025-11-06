@@ -182,6 +182,13 @@ def get_operation_override(
 ) -> OperationOverrideModel | None:
     """Return augment override metadata for the given subcommand when present.
 
+    Parameters
+    ----------
+    subcommand : str
+        CLI subcommand name to look up.
+    tokens : tuple[str, ...] | None, optional
+        Optional command tokens for nested operation resolution.
+
     Returns
     -------
     OperationOverrideModel | None

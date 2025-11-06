@@ -46,7 +46,7 @@ class SearchRequest(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ConfigDict
         Pydantic configuration forbidding extra parameters.
     query : str
         Search query string (at least one character).
@@ -90,7 +90,7 @@ class SearchResult(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ConfigDict
         Pydantic configuration forbidding extra fields.
     doc_id : str
         Document identifier.

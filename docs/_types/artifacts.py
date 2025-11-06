@@ -206,7 +206,7 @@ class SymbolIndexRow(FrozenBaseModel):
         Symbol kind: "module", "class", "function", "method", etc.
     doc : str
         Documentation string/docstring for this symbol.
-    tested_by : tuple[str, ...] | list[str]
+    tested_by : tuple[str, ...]
         Test paths (relative to tests/) that cover this symbol.
     source_link : dict[str, str]
         Links to source code (e.g., GitHub, local paths).
@@ -245,7 +245,7 @@ class SymbolIndexRow(FrozenBaseModel):
         Symbol kind: "module", "class", "function", "method", etc.
     doc : str
         Documentation string/docstring for this symbol.
-    tested_by : tuple[str, ...] | list[str]
+    tested_by : tuple[str, ...]
         Test paths (relative to tests/) that cover this symbol.
     source_link : dict[str, str]
         Links to source code (e.g., GitHub, local paths).
@@ -434,7 +434,7 @@ class SymbolIndexArtifacts(FrozenBaseModel):
 
     Attributes
     ----------
-    rows : tuple[SymbolIndexRow, ...] | list[SymbolIndexRow]
+    rows : tuple[SymbolIndexRow, ...]
         All symbol entries, sorted by path.
     by_file : dict[str, tuple[str, ...]]
         Reverse lookup: file path -> sorted tuple of symbol paths.
@@ -443,7 +443,7 @@ class SymbolIndexArtifacts(FrozenBaseModel):
 
     Parameters
     ----------
-    rows : tuple[SymbolIndexRow, ...] | list[SymbolIndexRow]
+    rows : tuple[SymbolIndexRow, ...]
         All symbol entries, sorted by path.
     by_file : dict[str, tuple[str, ...]]
         Reverse lookup: file path -> sorted tuple of symbol paths.
@@ -497,7 +497,7 @@ class SymbolDeltaChange(FrozenBaseModel):
         Previous version of the row (serialized).
     after : dict[str, JsonValue]
         New version of the row (serialized).
-    reasons : tuple[str, ...] | list[str]
+    reasons : tuple[str, ...]
         List of reasons why the symbol changed (e.g., ["signature_changed"]).
 
     Parameters
@@ -508,7 +508,7 @@ class SymbolDeltaChange(FrozenBaseModel):
         Previous version of the row (serialized).
     after : dict[str, JsonValue]
         New version of the row (serialized).
-    reasons : tuple[str, ...] | list[str]
+    reasons : tuple[str, ...]
         List of reasons why the symbol changed (e.g., ["signature_changed"]).
     """
 
@@ -577,11 +577,11 @@ class SymbolDeltaPayload(FrozenBaseModel):
         Git SHA or build identifier for the baseline.
     head_sha : str | None
         Git SHA or build identifier for the current state.
-    added : tuple[str, ...] | list[str]
+    added : tuple[str, ...]
         Sorted tuple of newly added symbol paths.
-    removed : tuple[str, ...] | list[str]
+    removed : tuple[str, ...]
         Sorted tuple of removed symbol paths.
-    changed : tuple[SymbolDeltaChange, ...] | list[SymbolDeltaChange]
+    changed : tuple[SymbolDeltaChange, ...]
         List of symbols that changed (sorted by path).
 
     Parameters
@@ -590,11 +590,11 @@ class SymbolDeltaPayload(FrozenBaseModel):
         Git SHA or build identifier for the baseline.
     head_sha : str | None
         Git SHA or build identifier for the current state.
-    added : tuple[str, ...] | list[str]
+    added : tuple[str, ...]
         Sorted tuple of newly added symbol paths.
-    removed : tuple[str, ...] | list[str]
+    removed : tuple[str, ...]
         Sorted tuple of removed symbol paths.
-    changed : tuple[SymbolDeltaChange, ...] | list[SymbolDeltaChange]
+    changed : tuple[SymbolDeltaChange, ...]
         List of symbols that changed (sorted by path).
     """
 

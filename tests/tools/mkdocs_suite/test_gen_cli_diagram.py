@@ -9,13 +9,13 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import pytest
 from tools.mkdocs_suite.docs.cli_diagram import collect_operations, write_diagram
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator  # pragma: no cover - typing only
+
 cli_tooling = importlib.import_module("tools._shared.cli_tooling")
 AugmentConfig = cli_tooling.AugmentConfig
 CLIToolingContext = cli_tooling.CLIToolingContext
 RegistryContext = cli_tooling.RegistryContext
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
 
 
 @contextlib.contextmanager
@@ -181,7 +181,7 @@ def test_ensure_cli_index_entry_preserves_existing_content(
     open_calls: list[tuple[str, str]] = []
 
     @contextlib.contextmanager
-    def fake_open(path: str, mode: str = "r", **_: object) -> io.StringIO:
+    def fake_open(path: str, mode: str = "r", **_: object) -> Iterator[io.StringIO]:
         open_calls.append((path, mode))
         buffer = buffers.setdefault(path, io.StringIO())
         if "w" in mode:
@@ -194,8 +194,9 @@ def test_ensure_cli_index_entry_preserves_existing_content(
         yield buffer
 
     monkeypatch.setattr(gen_cli_module.mkdocs_gen_files, "open", fake_open)
+    monkeypatch.setattr(gen_cli_module, "collect_operations", list)
 
-    gen_cli_module._ensure_cli_index_entry()
+    gen_cli_module.main()
 
     updated_content = buffers[gen_cli_module.DIAGRAM_INDEX_PATH].getvalue()
     assert updated_content == existing_content + gen_cli_module.CLI_INDEX_ENTRY
@@ -206,13 +207,16 @@ def test_ensure_cli_index_entry_preserves_existing_content(
         if path == gen_cli_module.DIAGRAM_INDEX_PATH and "r" in mode
     ]
     assert read_modes == ["r", "r"]
+
+
 def test_main_skips_diagram_when_dependency_missing(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
 
     def missing_dependency_loader(*_: object, **__: object) -> None:
-        raise ModuleNotFoundError("missing_cli_dependency")
+        message = "missing_cli_dependency"
+        raise ModuleNotFoundError(message)
 
     monkeypatch.setattr(gen_cli_module, "load_cli_tooling_context", missing_dependency_loader)
 

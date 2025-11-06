@@ -1,0 +1,2121 @@
+<!DOCTYPE html><html class="no-js" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1" name="viewport">
+<link href="https://docs.kgfoundry.dev/modules/registry/api/" rel="canonical">
+<link href="../../../assets/images/favicon.png" rel="icon">
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.23" name="generator">
+<title>registry.api - KgFoundry MkDocs Suite</title>
+<link href="../../../assets/stylesheets/main.84d31ad4.min.css" rel="stylesheet">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet">
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+<link href="../../../assets/stylesheets/mkdocs_d2_plugin.css" rel="stylesheet">
+<link href="../../../assets/mkdocs_puml/puml.css" rel="stylesheet">
+<link href="../../../assets/mkdocs_puml/interaction.css" rel="stylesheet">
+<script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+<body dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox">
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox">
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#registryapi">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--shadow" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="KgFoundry MkDocs Suite" class="md-header__button md-logo" data-md-component="logo" href="../../.." title="KgFoundry MkDocs Suite">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            KgFoundry MkDocs Suite
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              registry.api
+            
+          </span>
+</div>
+</div>
+</div>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text">
+<label class="md-search__icon md-icon" for="__search">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/kgfoundry/kgfoundry" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="KgFoundry MkDocs Suite" class="md-nav__button md-logo" data-md-component="logo" href="../../.." title="KgFoundry MkDocs Suite">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    KgFoundry MkDocs Suite
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/kgfoundry/kgfoundry" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox">
+<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+<span class="md-ellipsis">
+    Overview
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+            Overview
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../..">
+<span class="md-ellipsis">
+    KgFoundry MkDocs Suite
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../architecture/">
+<span class="md-ellipsis">
+    Architecture
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../diagrams/">
+<span class="md-ellipsis">
+    Diagrams
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../cli/">
+<span class="md-ellipsis">
+    Interfaces &amp; APIs
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Interfaces &amp; APIs
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../api/">
+<span class="md-ellipsis">
+    HTTP API
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../api/interfaces/">
+<span class="md-ellipsis">
+    Interface Catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../api/openapi-cli/">
+<span class="md-ellipsis">
+    CLI Specification
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../">
+<span class="md-ellipsis">
+    Modules &amp; Components
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            Modules &amp; Components
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_1" type="checkbox">
+<label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+<span class="md-ellipsis">
+    Core Foundations
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_1">
+<span class="md-nav__icon md-icon"></span>
+            Core Foundations
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../docling/">
+<span class="md-ellipsis">
+    Doc Processing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../kgfoundry_common/">
+<span class="md-ellipsis">
+    Shared Libraries
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2" type="checkbox">
+<label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+<span class="md-ellipsis">
+    Retrieval Stack
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+            Retrieval Stack
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2_1" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../search_api/">
+<span class="md-ellipsis">
+    Search Services
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_2_1" id="__nav_3_2_1_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_1_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_2_1">
+<span class="md-nav__icon md-icon"></span>
+            Search Services
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../search_client/">
+<span class="md-ellipsis">
+    search_client
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../embeddings_dense/">
+<span class="md-ellipsis">
+    Embeddings &amp; Vector Stores
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_2_2" id="__nav_3_2_2_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_2_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Embeddings &amp; Vector Stores
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../embeddings_sparse/">
+<span class="md-ellipsis">
+    embeddings_sparse
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../vectorstore_faiss/">
+<span class="md-ellipsis">
+    vectorstore_faiss
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../linking/">
+<span class="md-ellipsis">
+    Knowledge Linking
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_3" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../download/">
+<span class="md-ellipsis">
+    Data &amp; Knowledge Management
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_3">
+<span class="md-nav__icon md-icon"></span>
+            Data &amp; Knowledge Management
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../kg_builder/">
+<span class="md-ellipsis">
+    kg_builder
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../">
+<span class="md-ellipsis">
+    registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ontology/">
+<span class="md-ellipsis">
+    ontology
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_4" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../orchestration/">
+<span class="md-ellipsis">
+    Operations &amp; Observability
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
+<span class="md-nav__icon md-icon"></span>
+            Operations &amp; Observability
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../observability/">
+<span class="md-ellipsis">
+    observability
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sections">
+<span class="md-ellipsis">
+      Sections
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#contents">
+<span class="md-ellipsis">
+      Contents
+    </span>
+</a>
+<nav aria-label="Contents" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registryapiregistry">
+<span class="md-ellipsis">
+      registry.api.Registry
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry">
+<span class="md-ellipsis">
+      Registry
+    </span>
+</a>
+<nav aria-label="Registry" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.begin_dataset">
+<span class="md-ellipsis">
+      begin_dataset
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.close_run">
+<span class="md-ellipsis">
+      close_run
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.commit_dataset">
+<span class="md-ellipsis">
+      commit_dataset
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.emit_event">
+<span class="md-ellipsis">
+      emit_event
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.incident">
+<span class="md-ellipsis">
+      incident
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.insert_run">
+<span class="md-ellipsis">
+      insert_run
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.register_doctags">
+<span class="md-ellipsis">
+      register_doctags
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.register_documents">
+<span class="md-ellipsis">
+      register_documents
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#registry.api.Registry.rollback_dataset">
+<span class="md-ellipsis">
+      rollback_dataset
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#relationships">
+<span class="md-ellipsis">
+      Relationships
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#autorefs-examples">
+<span class="md-ellipsis">
+      Autorefs Examples
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#inheritance">
+<span class="md-ellipsis">
+      Inheritance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#neighborhood">
+<span class="md-ellipsis">
+      Neighborhood
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="registryapi">registry.api<a class="headerlink" href="#registryapi" title="Permanent link">¶</a></h1>
+<p>Protocol defining the registry interface</p>
+<p><a href="https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/api.py">View source on GitHub</a></p>
+<h2 id="sections">Sections<a class="headerlink" href="#sections" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>Public API</strong></li>
+</ul>
+<h2 id="contents">Contents<a class="headerlink" href="#contents" title="Permanent link">¶</a></h2>
+<h3 id="registryapiregistry">registry.api.Registry<a class="headerlink" href="#registryapiregistry" title="Permanent link">¶</a></h3>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="registry.api.Registry">
+<code>registry.api.Registry</code>
+<a class="headerlink" href="#registry.api.Registry" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+<p>Protocol defining the registry interface for pipeline artifacts.</p>
+<p>This protocol defines the interface for registry implementations that store pipeline artifacts
+and metadata. Implementations must provide methods for managing runs, datasets, documents,
+doctags, and events.</p>
+<p>Implementations include DuckDBRegistry and DuckDBRegistryHelper.</p>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Registry</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Protocol defining the registry interface for pipeline artifacts.</span>
+
+<span class="sd">    This protocol defines the interface for registry implementations that store pipeline artifacts</span>
+<span class="sd">    and metadata. Implementations must provide methods for managing runs, datasets, documents,</span>
+<span class="sd">    doctags, and events.</span>
+
+<span class="sd">    Implementations include DuckDBRegistry and DuckDBRegistryHelper.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">begin_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Begin a new dataset within a run.</span>
+
+<span class="sd">        Creates a new dataset record associated with the specified run.</span>
+<span class="sd">        The dataset is initially created with an empty parquet_root; use</span>
+<span class="sd">        commit_dataset() to finalize it with data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kind : str</span>
+<span class="sd">            Dataset kind (e.g., "embeddings", "chunks", "metadata").</span>
+<span class="sd">        run_id : str</span>
+<span class="sd">            Run ID that this dataset belongs to.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Unique dataset ID (UUID) for the newly created dataset.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">commit_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parquet_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Commit a dataset with Parquet data location.</span>
+
+<span class="sd">        Finalizes a dataset by updating its parquet_root path and row count.</span>
+<span class="sd">        Used after Parquet files have been written to disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset_id : str</span>
+<span class="sd">            Dataset ID to commit.</span>
+<span class="sd">        parquet_root : str</span>
+<span class="sd">            Root directory path where Parquet files are stored.</span>
+<span class="sd">        rows : int</span>
+<span class="sd">            Total number of rows in the dataset.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">rollback_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Rollback a dataset by deleting it.</span>
+
+<span class="sd">        Deletes a dataset record when dataset creation fails or needs to</span>
+<span class="sd">        be abandoned. Use this for cleanup when errors occur.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dataset_id : str</span>
+<span class="sd">            Dataset ID to rollback.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert_run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">purpose</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">revision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create a run record and return the generated identifier.</span>
+
+<span class="sd">        Inserts a new run record into the registry with the specified purpose,</span>
+<span class="sd">        model information, and configuration. Returns a unique run ID.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        purpose : str</span>
+<span class="sd">            Purpose description for the run (e.g., "embedding", "indexing").</span>
+<span class="sd">        model_id : str | None</span>
+<span class="sd">            Model identifier used in this run, or None if not applicable.</span>
+<span class="sd">        revision : str | None</span>
+<span class="sd">            Model revision or version, or None if not applicable.</span>
+<span class="sd">        config : Mapping[str, object]</span>
+<span class="sd">            Run configuration dictionary (serialized as JSON).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Unique run ID (UUID) for the newly created run.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">close_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Close a pipeline run and record completion status.</span>
+
+<span class="sd">        Updates the run's finished_at timestamp and records completion status</span>
+<span class="sd">        with optional notes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        run_id : str</span>
+<span class="sd">            Run ID to close.</span>
+<span class="sd">        success : bool</span>
+<span class="sd">            Whether the run completed successfully.</span>
+<span class="sd">        notes : str | None, optional</span>
+<span class="sd">            Optional notes about the run completion. Defaults to None.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Register document records in the registry.</span>
+
+<span class="sd">        Inserts or updates document records in the documents table. Each</span>
+<span class="sd">        document's metadata (title, authors, publication date, etc.) is</span>
+<span class="sd">        stored with the document ID.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        docs : list[Doc]</span>
+<span class="sd">            List of document objects to register. Each document must have</span>
+<span class="sd">            a unique doc_id.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_doctags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DoctagsAsset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Register doctags asset records in the registry.</span>
+
+<span class="sd">        Inserts or updates doctags asset records in the doctags table.</span>
+<span class="sd">        Doctags represent visual document tags generated by vision-language</span>
+<span class="sd">        models.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        assets : list[DoctagsAsset]</span>
+<span class="sd">            List of doctags asset objects to register. Each asset must have</span>
+<span class="sd">            doc_id, doctags_uri, and model information.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">emit_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Emit a pipeline event to the registry.</span>
+
+<span class="sd">        Records an event in the pipeline_events table with a unique event ID,</span>
+<span class="sd">        event name, subject ID, and JSON payload. Used for tracking pipeline</span>
+<span class="sd">        operations and state changes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event_name : str</span>
+<span class="sd">            Name of the event (e.g., "RunClosed", "DatasetCommitted").</span>
+<span class="sd">        subject_id : str</span>
+<span class="sd">            ID of the subject the event relates to (e.g., run_id, dataset_id).</span>
+<span class="sd">        payload : Mapping[str, object]</span>
+<span class="sd">            Event payload dictionary (serialized as JSON).</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">incident</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Record an incident emitted by registry clients.</span>
+
+<span class="sd">        Inserts an incident record into the incidents table for tracking</span>
+<span class="sd">        errors and failures in pipeline operations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : str</span>
+<span class="sd">            Event name associated with the incident.</span>
+<span class="sd">        subject_id : str</span>
+<span class="sd">            ID of the subject the incident relates to (e.g., run_id, dataset_id).</span>
+<span class="sd">        error_class : str</span>
+<span class="sd">            Error class or exception type name.</span>
+<span class="sd">        message : str</span>
+<span class="sd">            Error message describing the incident.</span>
+<span class="sd">        """</span>
+        <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.begin_dataset">
+<code class="highlight language-python"><span class="n">begin_dataset</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">run_id</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.begin_dataset" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Begin a new dataset within a run.</p>
+<p>Creates a new dataset record associated with the specified run.
+The dataset is initially created with an empty parquet_root; use
+commit_dataset() to finalize it with data.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>kind</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Dataset kind (e.g., "embeddings", "chunks", "metadata").</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>run_id</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Run ID that this dataset belongs to.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Unique dataset ID (UUID) for the newly created dataset.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">begin_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Begin a new dataset within a run.</span>
+
+<span class="sd">    Creates a new dataset record associated with the specified run.</span>
+<span class="sd">    The dataset is initially created with an empty parquet_root; use</span>
+<span class="sd">    commit_dataset() to finalize it with data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kind : str</span>
+<span class="sd">        Dataset kind (e.g., "embeddings", "chunks", "metadata").</span>
+<span class="sd">    run_id : str</span>
+<span class="sd">        Run ID that this dataset belongs to.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Unique dataset ID (UUID) for the newly created dataset.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.close_run">
+<code class="highlight language-python"><span class="n">close_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">notes</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.close_run" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Close a pipeline run and record completion status.</p>
+<p>Updates the run's finished_at timestamp and records completion status
+with optional notes.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>run_id</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Run ID to close.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>success</code>
+</td>
+<td>
+<code><span title="bool">bool</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Whether the run completed successfully.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>notes</code>
+</td>
+<td>
+<code><span title="str">str</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Optional notes about the run completion. Defaults to None.</p>
+</div>
+</td>
+<td>
+<code>None</code>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">close_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Close a pipeline run and record completion status.</span>
+
+<span class="sd">    Updates the run's finished_at timestamp and records completion status</span>
+<span class="sd">    with optional notes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    run_id : str</span>
+<span class="sd">        Run ID to close.</span>
+<span class="sd">    success : bool</span>
+<span class="sd">        Whether the run completed successfully.</span>
+<span class="sd">    notes : str | None, optional</span>
+<span class="sd">        Optional notes about the run completion. Defaults to None.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.commit_dataset">
+<code class="highlight language-python"><span class="n">commit_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">parquet_root</span><span class="p">,</span> <span class="n">rows</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.commit_dataset" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Commit a dataset with Parquet data location.</p>
+<p>Finalizes a dataset by updating its parquet_root path and row count.
+Used after Parquet files have been written to disk.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>dataset_id</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Dataset ID to commit.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>parquet_root</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Root directory path where Parquet files are stored.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>rows</code>
+</td>
+<td>
+<code><span title="int">int</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Total number of rows in the dataset.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">commit_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parquet_root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Commit a dataset with Parquet data location.</span>
+
+<span class="sd">    Finalizes a dataset by updating its parquet_root path and row count.</span>
+<span class="sd">    Used after Parquet files have been written to disk.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset_id : str</span>
+<span class="sd">        Dataset ID to commit.</span>
+<span class="sd">    parquet_root : str</span>
+<span class="sd">        Root directory path where Parquet files are stored.</span>
+<span class="sd">    rows : int</span>
+<span class="sd">        Total number of rows in the dataset.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.emit_event">
+<code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.emit_event" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Emit a pipeline event to the registry.</p>
+<p>Records an event in the pipeline_events table with a unique event ID,
+event name, subject ID, and JSON payload. Used for tracking pipeline
+operations and state changes.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>event_name</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Name of the event (e.g., "RunClosed", "DatasetCommitted").</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>subject_id</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>ID of the subject the event relates to (e.g., run_id, dataset_id).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>payload</code>
+</td>
+<td>
+<code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="object">object</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Event payload dictionary (serialized as JSON).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">emit_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Emit a pipeline event to the registry.</span>
+
+<span class="sd">    Records an event in the pipeline_events table with a unique event ID,</span>
+<span class="sd">    event name, subject ID, and JSON payload. Used for tracking pipeline</span>
+<span class="sd">    operations and state changes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    event_name : str</span>
+<span class="sd">        Name of the event (e.g., "RunClosed", "DatasetCommitted").</span>
+<span class="sd">    subject_id : str</span>
+<span class="sd">        ID of the subject the event relates to (e.g., run_id, dataset_id).</span>
+<span class="sd">    payload : Mapping[str, object]</span>
+<span class="sd">        Event payload dictionary (serialized as JSON).</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.incident">
+<code class="highlight language-python"><span class="n">incident</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">,</span> <span class="n">error_class</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.incident" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Record an incident emitted by registry clients.</p>
+<p>Inserts an incident record into the incidents table for tracking
+errors and failures in pipeline operations.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>event</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Event name associated with the incident.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>subject_id</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>ID of the subject the incident relates to (e.g., run_id, dataset_id).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>error_class</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Error class or exception type name.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>message</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Error message describing the incident.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">incident</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Record an incident emitted by registry clients.</span>
+
+<span class="sd">    Inserts an incident record into the incidents table for tracking</span>
+<span class="sd">    errors and failures in pipeline operations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    event : str</span>
+<span class="sd">        Event name associated with the incident.</span>
+<span class="sd">    subject_id : str</span>
+<span class="sd">        ID of the subject the incident relates to (e.g., run_id, dataset_id).</span>
+<span class="sd">    error_class : str</span>
+<span class="sd">        Error class or exception type name.</span>
+<span class="sd">    message : str</span>
+<span class="sd">        Error message describing the incident.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.insert_run">
+<code class="highlight language-python"><span class="n">insert_run</span><span class="p">(</span><span class="n">purpose</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">revision</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.insert_run" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Create a run record and return the generated identifier.</p>
+<p>Inserts a new run record into the registry with the specified purpose,
+model information, and configuration. Returns a unique run ID.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>purpose</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Purpose description for the run (e.g., "embedding", "indexing").</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>model_id</code>
+</td>
+<td>
+<code><span title="str">str</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Model identifier used in this run, or None if not applicable.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>revision</code>
+</td>
+<td>
+<code><span title="str">str</span> | None</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Model revision or version, or None if not applicable.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+<tr class="doc-section-item">
+<td>
+<code>config</code>
+</td>
+<td>
+<code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="object">object</span>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Run configuration dictionary (serialized as JSON).</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span class="doc-section-title">Returns:</span></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Unique run ID (UUID) for the newly created run.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">insert_run</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">purpose</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">revision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Create a run record and return the generated identifier.</span>
+
+<span class="sd">    Inserts a new run record into the registry with the specified purpose,</span>
+<span class="sd">    model information, and configuration. Returns a unique run ID.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    purpose : str</span>
+<span class="sd">        Purpose description for the run (e.g., "embedding", "indexing").</span>
+<span class="sd">    model_id : str | None</span>
+<span class="sd">        Model identifier used in this run, or None if not applicable.</span>
+<span class="sd">    revision : str | None</span>
+<span class="sd">        Model revision or version, or None if not applicable.</span>
+<span class="sd">    config : Mapping[str, object]</span>
+<span class="sd">        Run configuration dictionary (serialized as JSON).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Unique run ID (UUID) for the newly created run.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.register_doctags">
+<code class="highlight language-python"><span class="n">register_doctags</span><span class="p">(</span><span class="n">assets</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.register_doctags" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Register doctags asset records in the registry.</p>
+<p>Inserts or updates doctags asset records in the doctags table.
+Doctags represent visual document tags generated by vision-language
+models.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>assets</code>
+</td>
+<td>
+<code><span title="list">list</span>[<a class="autorefs autorefs-internal" href="../../kgfoundry_common/models/#kgfoundry_common.models.DoctagsAsset" title="kgfoundry_common.models.DoctagsAsset">DoctagsAsset</a>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>List of doctags asset objects to register. Each asset must have
+doc_id, doctags_uri, and model information.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">register_doctags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DoctagsAsset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Register doctags asset records in the registry.</span>
+
+<span class="sd">    Inserts or updates doctags asset records in the doctags table.</span>
+<span class="sd">    Doctags represent visual document tags generated by vision-language</span>
+<span class="sd">    models.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    assets : list[DoctagsAsset]</span>
+<span class="sd">        List of doctags asset objects to register. Each asset must have</span>
+<span class="sd">        doc_id, doctags_uri, and model information.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.register_documents">
+<code class="highlight language-python"><span class="n">register_documents</span><span class="p">(</span><span class="n">docs</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.register_documents" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Register document records in the registry.</p>
+<p>Inserts or updates document records in the documents table. Each
+document's metadata (title, authors, publication date, etc.) is
+stored with the document ID.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>docs</code>
+</td>
+<td>
+<code><span title="list">list</span>[<a class="autorefs autorefs-internal" href="../../kgfoundry_common/models/#kgfoundry_common.models.Doc" title="kgfoundry_common.models.Doc">Doc</a>]</code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>List of document objects to register. Each document must have
+a unique doc_id.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">register_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Doc</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Register document records in the registry.</span>
+
+<span class="sd">    Inserts or updates document records in the documents table. Each</span>
+<span class="sd">    document's metadata (title, authors, publication date, etc.) is</span>
+<span class="sd">    stored with the document ID.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    docs : list[Doc]</span>
+<span class="sd">        List of document objects to register. Each document must have</span>
+<span class="sd">        a unique doc_id.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+<div class="doc doc-object doc-function">
+<h3 class="doc doc-heading" id="registry.api.Registry.rollback_dataset">
+<code class="highlight language-python"><span class="n">rollback_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span></code>
+<a class="headerlink" href="#registry.api.Registry.rollback_dataset" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Rollback a dataset by deleting it.</p>
+<p>Deletes a dataset record when dataset creation fails or needs to
+be abandoned. Use this for cleanup when errors occur.</p>
+<p><span class="doc-section-title">Parameters:</span></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="doc-section-item">
+<td>
+<code>dataset_id</code>
+</td>
+<td>
+<code><span title="str">str</span></code>
+</td>
+<td>
+<div class="doc-md-description">
+<p>Dataset ID to rollback.</p>
+</div>
+</td>
+<td>
+<em>required</em>
+</td>
+</tr>
+</tbody>
+</table>
+<details class="quote">
+<summary>Source code in <code>src/registry/api.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">rollback_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Rollback a dataset by deleting it.</span>
+
+<span class="sd">    Deletes a dataset record when dataset creation fails or needs to</span>
+<span class="sd">    be abandoned. Use this for cleanup when errors occur.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dataset_id : str</span>
+<span class="sd">        Dataset ID to rollback.</span>
+<span class="sd">    """</span>
+    <span class="o">...</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div><p><em>Bases:</em> Protocol</p>
+<h2 id="relationships">Relationships<a class="headerlink" href="#relationships" title="Permanent link">¶</a></h2>
+<p><strong>Imports:</strong> <code>__future__.annotations</code>, <code>collections.abc.Mapping</code>, <code>kgfoundry_common.models.Doc</code>, <code>kgfoundry_common.models.DoctagsAsset</code>, <code>kgfoundry_common.navmap_loader.load_nav_metadata</code>, <code>typing.Protocol</code>, <code>typing.TYPE_CHECKING</code></p>
+<h2 id="autorefs-examples">Autorefs Examples<a class="headerlink" href="#autorefs-examples" title="Permanent link">¶</a></h2>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#registry.api.Registry">registry.api.Registry</a></li>
+</ul>
+<h2 id="inheritance">Inheritance<a class="headerlink" href="#inheritance" title="Permanent link">¶</a></h2>
+<pre class="mermaid"><code>classDiagram
+    class Registry
+    class Protocol
+    Protocol &lt;|-- Registry
+</code></pre>
+<h2 id="neighborhood">Neighborhood<a class="headerlink" href="#neighborhood" title="Permanent link">¶</a></h2>
+<div class="d2"><svg aria-label="Diagram" data-d2-version="v0.7.1" preserveAspectRatio="xMinYMin meet" role="img" viewBox="0 0 878 1150" xmlns:ns0="http://www.w3.org/1999/xlink"><svg class="d2-f5479ac265874c79a77b430fe9097b99 d2-svg" height="1150" viewBox="-101 -101 878 1150" width="878"><rect class="fill-N7" fill="#FFFFFF" height="1150.000000" rx="0.000000" stroke-width="0" width="878.000000" x="-101.000000" y="-101.000000"></rect><style type="text/css">
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-f5479ac265874c79a77b430fe9097b99 .text-bold {
+	font-family: "d2-f5479ac265874c79a77b430fe9097b99-font-bold";
+}
+@font-face {
+	font-family: d2-f5479ac265874c79a77b430fe9097b99-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}</style><style type="text/css">.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N1{fill:#0A0F25;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N2{fill:#676C7E;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N3{fill:#9499AB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N4{fill:#CFD2DD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N5{fill:#DEE1EB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N6{fill:#EEF1F8;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-N7{fill:#FFFFFF;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-B1{fill:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-B2{fill:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-B3{fill:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-B4{fill:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-B5{fill:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-B6{fill:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-AA2{fill:#4A6FF3;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-AA4{fill:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-AA5{fill:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-AB4{fill:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .fill-AB5{fill:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N1{stroke:#0A0F25;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N2{stroke:#676C7E;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N3{stroke:#9499AB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N4{stroke:#CFD2DD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N5{stroke:#DEE1EB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N6{stroke:#EEF1F8;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-N7{stroke:#FFFFFF;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-B1{stroke:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-B2{stroke:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-B3{stroke:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-B4{stroke:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-B5{stroke:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-B6{stroke:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N1{background-color:#0A0F25;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N2{background-color:#676C7E;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N3{background-color:#9499AB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N4{background-color:#CFD2DD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N5{background-color:#DEE1EB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N6{background-color:#EEF1F8;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-N7{background-color:#FFFFFF;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-B1{background-color:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-B2{background-color:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-B3{background-color:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-B4{background-color:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-B5{background-color:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-B6{background-color:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N1{color:#0A0F25;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N2{color:#676C7E;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N3{color:#9499AB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N4{color:#CFD2DD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N5{color:#DEE1EB;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N6{color:#EEF1F8;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-N7{color:#FFFFFF;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-B1{color:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-B2{color:#0D32B2;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-B3{color:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-B4{color:#E3E9FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-B5{color:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-B6{color:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-AA2{color:#4A6FF3;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-AA4{color:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-AA5{color:#F7F8FE;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-AB4{color:#EDF0FD;}
+		.d2-f5479ac265874c79a77b430fe9097b99 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-f5479ac265874c79a77b430fe9097b99);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}</style><a href="./registry/api.md" ns0:href="./registry/api.md"><g class="JiMzNDtyZWdpc3RyeS5hcGkmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="126.000000" x="0.000000" y="441.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="63.000000" y="479.500000">registry.api</text></g></a><g class="JiMzNDtfX2Z1dHVyZV9fLmFubm90YXRpb25zJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="212.000000" x="345.000000" y="0.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.000000" y="38.500000">__future__.annotations</text></g><g class="JiMzNDtjb2xsZWN0aW9ucy5hYmMuTWFwcGluZyYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="219.000000" x="342.000000" y="126.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.500000" y="164.500000">collections.abc.Mapping</text></g><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm1vZGVscy5Eb2MmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="276.000000" x="313.000000" y="252.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.000000" y="290.500000">kgfoundry_common.models.Doc</text></g><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm1vZGVscy5Eb2N0YWdzQXNzZXQmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="344.000000" x="279.000000" y="378.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.000000" y="416.500000">kgfoundry_common.models.DoctagsAsset</text></g><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm5hdm1hcF9sb2FkZXIubG9hZF9uYXZfbWV0YWRhdGEmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="450.000000" x="226.000000" y="504.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.000000" y="542.500000">kgfoundry_common.navmap_loader.load_nav_metadata</text></g><g class="JiMzNDt0eXBpbmcuUHJvdG9jb2wmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="157.000000" x="373.000000" y="630.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.500000" y="668.500000">typing.Protocol</text></g><g class="JiMzNDt0eXBpbmcuVFlQRV9DSEVDS0lORyYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="213.000000" x="345.000000" y="756.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.500000" y="794.500000">typing.TYPE_CHECKING</text></g><a href="https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/api.py" ns0:href="https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/api.py"><g class="JiMzNDtyZWdpc3RyeS5hcGlfY29kZSYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="164.000000" x="369.000000" y="882.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="451.000000" y="920.500000">registry.api code</text></g></a><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDtfX2Z1dHVyZV9fLmFubm90YXRpb25zJiMzNDspWzBd"><marker id="mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134" markerHeight="12.000000" markerUnits="userSpaceOnUse" markerWidth="10.000000" orient="auto" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000"> <polygon class="connection fill-B1" fill="#0D32B2" points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" stroke-width="2"></polygon> </marker><path class="connection stroke-B1" d="M 71.498462 439.063112 C 155.000000 114.598999 209.800003 33.000000 341.000000 33.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDtjb2xsZWN0aW9ucy5hYmMuTWFwcGluZyYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 75.674362 439.117120 C 155.800003 215.399002 209.100006 159.000000 337.500000 159.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm1vZGVscy5Eb2MmIzM0OylbMF0="><path class="connection stroke-B1" d="M 84.024129 439.282106 C 157.399994 316.200012 203.399994 285.000000 309.000000 285.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm1vZGVscy5Eb2N0YWdzQXNzZXQmIzM0OylbMF0="><path class="connection stroke-B1" d="M 123.748315 440.028714 C 165.199997 417.000000 196.600006 411.000000 275.000000 411.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm5hdm1hcF9sb2FkZXIubG9hZF9uYXZfbWV0YWRhdGEmIzM0OylbMF0="><path class="connection stroke-B1" d="M 123.748315 507.971286 C 165.199997 531.000000 186.000000 537.000000 222.000000 537.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDt0eXBpbmcuUHJvdG9jb2wmIzM0OylbMF0="><path class="connection stroke-B1" d="M 84.024129 508.717894 C 157.399994 631.799988 215.300003 663.000000 368.500000 663.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDt0eXBpbmcuVFlQRV9DSEVDS0lORyYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 75.674364 508.882879 C 155.800003 732.599976 209.699997 789.000000 340.500000 789.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7cmVnaXN0cnkuYXBpJiMzNDsgLSZndDsgJiMzNDtyZWdpc3RyeS5hcGlfY29kZSYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 71.498464 508.936888 C 155.000000 833.400024 214.600006 915.000000 365.000000 915.000000" fill="none" marker-end="url(#mk-d2-f5479ac265874c79a77b430fe9097b99-3488378134)" mask="url(#d2-f5479ac265874c79a77b430fe9097b99)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="appendix-icon" transform="translate(110 425)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-f5479ac265874c79a77b430fe9097b99-EJZGKZ3JON2HE6JOMFYGSIQ)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-f5479ac265874c79a77b430fe9097b99-EJZGKZ3JON2HE6JOMFYGSIQ">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><g class="appendix-icon" transform="translate(517 866)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-f5479ac265874c79a77b430fe9097b99-EJZGKZ3JON2HE6JOMFYGSX3DN5SGKIQ)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-f5479ac265874c79a77b430fe9097b99-EJZGKZ3JON2HE6JOMFYGSX3DN5SGKIQ">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><mask height="1150" id="d2-f5479ac265874c79a77b430fe9097b99" maskUnits="userSpaceOnUse" width="878" x="-101" y="-101">
+<rect fill="white" height="1150" width="878" x="-101" y="-101"></rect>
+</mask></svg></svg></div>
+<aside class="md-source-file">
+<span class="md-source-file__fact">
+<span class="md-icon" title="Last update">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
+</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2025 07:45:03 UTC">November 6, 2025</span>
+</span>
+</aside>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.tracking", "navigation.footer", "content.action.edit", "content.action.view"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+<script src="../../../assets/mkdocs_puml/puml.js"></script>
+<script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<script src="../../../assets/mkdocs_puml/interaction.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+window.mermaidConfig = {default: {
+    startOnLoad: false
+}};</script><script>document$.subscribe(() => {
+            const dark_scheme_name = "slate"
+            
+            window.scheme = document.body.getAttribute("data-md-color-scheme")
+            const options = {
+                attributeFilter: ['data-md-color-scheme'],
+            };
+            function color_scheme_callback(mutations) {
+                for (let mutation of mutations) {
+                    if (mutation.attributeName === "data-md-color-scheme") {
+                        scheme = document.body.getAttribute("data-md-color-scheme")
+                        var iframe_list = document.getElementsByClassName("redoc-iframe")
+                        for(var i = 0; i < iframe_list.length; i++) {
+                            var ele = iframe_list.item(i);
+                            if (ele) {
+                                if (scheme === dark_scheme_name) {
+                                    ele.contentWindow.enable_dark_mode();
+                                } else {
+                                    ele.contentWindow.disable_dark_mode();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            observer = new MutationObserver(color_scheme_callback);
+            observer.observe(document.body, options);
+            })</script>
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

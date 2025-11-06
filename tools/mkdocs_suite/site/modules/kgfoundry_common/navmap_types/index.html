@@ -1,0 +1,1598 @@
+<!DOCTYPE html><html class="no-js" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1" name="viewport">
+<link href="https://docs.kgfoundry.dev/modules/kgfoundry_common/navmap_types/" rel="canonical">
+<link href="../../../assets/images/favicon.png" rel="icon">
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.23" name="generator">
+<title>kgfoundry_common.navmap_types - KgFoundry MkDocs Suite</title>
+<link href="../../../assets/stylesheets/main.84d31ad4.min.css" rel="stylesheet">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet">
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<link href="../../../assets/_mkdocstrings.css" rel="stylesheet">
+<link href="../../../assets/stylesheets/mkdocs_d2_plugin.css" rel="stylesheet">
+<link href="../../../assets/mkdocs_puml/puml.css" rel="stylesheet">
+<link href="../../../assets/mkdocs_puml/interaction.css" rel="stylesheet">
+<script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+<body dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox">
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox">
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#kgfoundry_commonnavmap_types">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--shadow" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="KgFoundry MkDocs Suite" class="md-header__button md-logo" data-md-component="logo" href="../../.." title="KgFoundry MkDocs Suite">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            KgFoundry MkDocs Suite
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              kgfoundry_common.navmap_types
+            
+          </span>
+</div>
+</div>
+</div>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text">
+<label class="md-search__icon md-icon" for="__search">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/kgfoundry/kgfoundry" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="KgFoundry MkDocs Suite" class="md-nav__button md-logo" data-md-component="logo" href="../../.." title="KgFoundry MkDocs Suite">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    KgFoundry MkDocs Suite
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/kgfoundry/kgfoundry" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+</div>
+<div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_1" type="checkbox">
+<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+<span class="md-ellipsis">
+    Overview
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_1">
+<span class="md-nav__icon md-icon"></span>
+            Overview
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../..">
+<span class="md-ellipsis">
+    KgFoundry MkDocs Suite
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../architecture/">
+<span class="md-ellipsis">
+    Architecture
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../diagrams/">
+<span class="md-ellipsis">
+    Diagrams
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../cli/">
+<span class="md-ellipsis">
+    Interfaces &amp; APIs
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            Interfaces &amp; APIs
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../api/">
+<span class="md-ellipsis">
+    HTTP API
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../api/interfaces/">
+<span class="md-ellipsis">
+    Interface Catalog
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../api/openapi-cli/">
+<span class="md-ellipsis">
+    CLI Specification
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../">
+<span class="md-ellipsis">
+    Modules &amp; Components
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            Modules &amp; Components
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_1" type="checkbox">
+<label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+<span class="md-ellipsis">
+    Core Foundations
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_1_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_1">
+<span class="md-nav__icon md-icon"></span>
+            Core Foundations
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../docling/">
+<span class="md-ellipsis">
+    Doc Processing
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../">
+<span class="md-ellipsis">
+    Shared Libraries
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2" type="checkbox">
+<label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+<span class="md-ellipsis">
+    Retrieval Stack
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_2">
+<span class="md-nav__icon md-icon"></span>
+            Retrieval Stack
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2_1" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../search_api/">
+<span class="md-ellipsis">
+    Search Services
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_2_1" id="__nav_3_2_1_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_1_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_2_1">
+<span class="md-nav__icon md-icon"></span>
+            Search Services
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../search_client/">
+<span class="md-ellipsis">
+    search_client
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_2_2" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../embeddings_dense/">
+<span class="md-ellipsis">
+    Embeddings &amp; Vector Stores
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_2_2" id="__nav_3_2_2_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_2_2_label" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="__nav_3_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Embeddings &amp; Vector Stores
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../embeddings_sparse/">
+<span class="md-ellipsis">
+    embeddings_sparse
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../vectorstore_faiss/">
+<span class="md-ellipsis">
+    vectorstore_faiss
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../linking/">
+<span class="md-ellipsis">
+    Knowledge Linking
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_3" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../download/">
+<span class="md-ellipsis">
+    Data &amp; Knowledge Management
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_3">
+<span class="md-nav__icon md-icon"></span>
+            Data &amp; Knowledge Management
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../kg_builder/">
+<span class="md-ellipsis">
+    kg_builder
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../registry/">
+<span class="md-ellipsis">
+    registry
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../ontology/">
+<span class="md-ellipsis">
+    ontology
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" id="__nav_3_4" type="checkbox">
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../orchestration/">
+<span class="md-ellipsis">
+    Operations &amp; Observability
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
+<span class="md-nav__icon md-icon"></span>
+            Operations &amp; Observability
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../observability/">
+<span class="md-ellipsis">
+    observability
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sections">
+<span class="md-ellipsis">
+      Sections
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#contents">
+<span class="md-ellipsis">
+      Contents
+    </span>
+</a>
+<nav aria-label="Contents" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_commonnavmap_typesmodulemeta">
+<span class="md-ellipsis">
+      kgfoundry_common.navmap_types.ModuleMeta
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.ModuleMeta">
+<span class="md-ellipsis">
+      ModuleMeta
+    </span>
+</a>
+<nav aria-label="ModuleMeta" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.ModuleMeta.deprecated_in">
+<span class="md-ellipsis">
+      deprecated_in
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.ModuleMeta.owner">
+<span class="md-ellipsis">
+      owner
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.ModuleMeta.since">
+<span class="md-ellipsis">
+      since
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.ModuleMeta.stability">
+<span class="md-ellipsis">
+      stability
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_commonnavmap_typesnavmap">
+<span class="md-ellipsis">
+      kgfoundry_common.navmap_types.NavMap
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap">
+<span class="md-ellipsis">
+      NavMap
+    </span>
+</a>
+<nav aria-label="NavMap" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.deprecated">
+<span class="md-ellipsis">
+      deprecated
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.deps">
+<span class="md-ellipsis">
+      deps
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.edit_scopes">
+<span class="md-ellipsis">
+      edit_scopes
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.exports">
+<span class="md-ellipsis">
+      exports
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.module_meta">
+<span class="md-ellipsis">
+      module_meta
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.sections">
+<span class="md-ellipsis">
+      sections
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.see_also">
+<span class="md-ellipsis">
+      see_also
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.since">
+<span class="md-ellipsis">
+      since
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.symbols">
+<span class="md-ellipsis">
+      symbols
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.synopsis">
+<span class="md-ellipsis">
+      synopsis
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.tags">
+<span class="md-ellipsis">
+      tags
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavMap.title">
+<span class="md-ellipsis">
+      title
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_commonnavmap_typesnavsection">
+<span class="md-ellipsis">
+      kgfoundry_common.navmap_types.NavSection
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavSection">
+<span class="md-ellipsis">
+      NavSection
+    </span>
+</a>
+<nav aria-label="NavSection" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavSection.id">
+<span class="md-ellipsis">
+      id
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavSection.symbols">
+<span class="md-ellipsis">
+      symbols
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.NavSection.title">
+<span class="md-ellipsis">
+      title
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_commonnavmap_typessymbolmeta">
+<span class="md-ellipsis">
+      kgfoundry_common.navmap_types.SymbolMeta
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta">
+<span class="md-ellipsis">
+      SymbolMeta
+    </span>
+</a>
+<nav aria-label="SymbolMeta" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.async_ok">
+<span class="md-ellipsis">
+      async_ok
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.contracts">
+<span class="md-ellipsis">
+      contracts
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.coverage_target">
+<span class="md-ellipsis">
+      coverage_target
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.deprecated_in">
+<span class="md-ellipsis">
+      deprecated_in
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.deprecated_msg">
+<span class="md-ellipsis">
+      deprecated_msg
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.owner">
+<span class="md-ellipsis">
+      owner
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.perf_budget_ms">
+<span class="md-ellipsis">
+      perf_budget_ms
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.replaced_by">
+<span class="md-ellipsis">
+      replaced_by
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.side_effects">
+<span class="md-ellipsis">
+      side_effects
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.since">
+<span class="md-ellipsis">
+      since
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.stability">
+<span class="md-ellipsis">
+      stability
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.tests">
+<span class="md-ellipsis">
+      tests
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#kgfoundry_common.navmap_types.SymbolMeta.thread_safety">
+<span class="md-ellipsis">
+      thread_safety
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#relationships">
+<span class="md-ellipsis">
+      Relationships
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#autorefs-examples">
+<span class="md-ellipsis">
+      Autorefs Examples
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#inheritance">
+<span class="md-ellipsis">
+      Inheritance
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#neighborhood">
+<span class="md-ellipsis">
+      Neighborhood
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+<h1 id="kgfoundry_commonnavmap_types">kgfoundry_common.navmap_types<a class="headerlink" href="#kgfoundry_commonnavmap_types" title="Permanent link">¶</a></h1>
+<p>Shared navigation metadata structures used across kgfoundry.</p>
+<p><a href="https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_types.py">View source on GitHub</a></p>
+<h2 id="sections">Sections<a class="headerlink" href="#sections" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>Public API</strong></li>
+</ul>
+<h2 id="contents">Contents<a class="headerlink" href="#contents" title="Permanent link">¶</a></h2>
+<h3 id="kgfoundry_commonnavmap_typesmodulemeta">kgfoundry_common.navmap_types.ModuleMeta<a class="headerlink" href="#kgfoundry_commonnavmap_typesmodulemeta" title="Permanent link">¶</a></h3>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="kgfoundry_common.navmap_types.ModuleMeta">
+<code>kgfoundry_common.navmap_types.ModuleMeta</code>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.ModuleMeta" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+<p>Module-level metadata surfaced in navigation artefacts.</p>
+<details class="quote">
+<summary>Source code in <code>src/kgfoundry_common/navmap_types.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ModuleMeta</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Module-level metadata surfaced in navigation artefacts."""</span>
+
+    <span class="n">owner</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Owning team handle. Alias: none; name ``owner``."""</span>
+    <span class="n">stability</span><span class="p">:</span> <span class="n">Stability</span>
+<span class="w">    </span><span class="sd">"""Module stability indicator. Alias: none; name ``stability``."""</span>
+    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Version introducing the module. Alias: none; name ``since``."""</span>
+    <span class="n">deprecated_in</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Version marking module deprecation. Alias: none; name ``deprecated_in``."""</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.ModuleMeta.deprecated_in">
+<code class="highlight language-python"><span class="n">deprecated_in</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.ModuleMeta.deprecated_in" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Version marking module deprecation. Alias: none; name <code>deprecated_in</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.ModuleMeta.owner">
+<code class="highlight language-python"><span class="n">owner</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.ModuleMeta.owner" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Owning team handle. Alias: none; name <code>owner</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.ModuleMeta.since">
+<code class="highlight language-python"><span class="n">since</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.ModuleMeta.since" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Version introducing the module. Alias: none; name <code>since</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.ModuleMeta.stability">
+<code class="highlight language-python"><span class="n">stability</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.ModuleMeta.stability" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Module stability indicator. Alias: none; name <code>stability</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div><p><em>Bases:</em> TypedDict</p>
+<h3 id="kgfoundry_commonnavmap_typesnavmap">kgfoundry_common.navmap_types.NavMap<a class="headerlink" href="#kgfoundry_commonnavmap_typesnavmap" title="Permanent link">¶</a></h3>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap">
+<code>kgfoundry_common.navmap_types.NavMap</code>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+<p>Navigation map metadata captured per module for documentation tooling.</p>
+<details class="quote">
+<summary>Source code in <code>src/kgfoundry_common/navmap_types.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">NavMap</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Navigation map metadata captured per module for documentation tooling."""</span>
+
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Module title. Alias: none; name ``title``."""</span>
+    <span class="n">synopsis</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Short summary of the module. Alias: none; name ``synopsis``."""</span>
+    <span class="n">exports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Public export list. Alias: none; name ``exports``."""</span>
+    <span class="n">sections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NavSection</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Section definitions. Alias: none; name ``sections``."""</span>
+    <span class="n">see_also</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Related resources. Alias: none; name ``see_also``."""</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Tags for categorisation. Alias: none; name ``tags``."""</span>
+    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Module introduction version. Alias: none; name ``since``."""</span>
+    <span class="n">deprecated</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Module deprecation version. Alias: none; name ``deprecated``."""</span>
+    <span class="n">symbols</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SymbolMeta</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Symbol metadata mapping. Alias: none; name ``symbols``."""</span>
+    <span class="n">edit_scopes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+<span class="w">    </span><span class="sd">"""Edit scope assignments. Alias: none; name ``edit_scopes``."""</span>
+    <span class="n">deps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Module dependencies. Alias: none; name ``deps``."""</span>
+    <span class="n">module_meta</span><span class="p">:</span> <span class="n">ModuleMeta</span>
+<span class="w">    </span><span class="sd">"""Module-level metadata block. Alias: none; name ``module_meta``."""</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.deprecated">
+<code class="highlight language-python"><span class="n">deprecated</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.deprecated" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Module deprecation version. Alias: none; name <code>deprecated</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.deps">
+<code class="highlight language-python"><span class="n">deps</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.deps" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Module dependencies. Alias: none; name <code>deps</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.edit_scopes">
+<code class="highlight language-python"><span class="n">edit_scopes</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.edit_scopes" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Edit scope assignments. Alias: none; name <code>edit_scopes</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.exports">
+<code class="highlight language-python"><span class="n">exports</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.exports" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Public export list. Alias: none; name <code>exports</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.module_meta">
+<code class="highlight language-python"><span class="n">module_meta</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.module_meta" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Module-level metadata block. Alias: none; name <code>module_meta</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.sections">
+<code class="highlight language-python"><span class="n">sections</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.sections" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Section definitions. Alias: none; name <code>sections</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.see_also">
+<code class="highlight language-python"><span class="n">see_also</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.see_also" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Related resources. Alias: none; name <code>see_also</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.since">
+<code class="highlight language-python"><span class="n">since</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.since" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Module introduction version. Alias: none; name <code>since</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.symbols">
+<code class="highlight language-python"><span class="n">symbols</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.symbols" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Symbol metadata mapping. Alias: none; name <code>symbols</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.synopsis">
+<code class="highlight language-python"><span class="n">synopsis</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.synopsis" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Short summary of the module. Alias: none; name <code>synopsis</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.tags">
+<code class="highlight language-python"><span class="n">tags</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.tags" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Tags for categorisation. Alias: none; name <code>tags</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavMap.title">
+<code class="highlight language-python"><span class="n">title</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavMap.title" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Module title. Alias: none; name <code>title</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div><p><em>Bases:</em> TypedDict</p>
+<h3 id="kgfoundry_commonnavmap_typesnavsection">kgfoundry_common.navmap_types.NavSection<a class="headerlink" href="#kgfoundry_commonnavmap_typesnavsection" title="Permanent link">¶</a></h3>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavSection">
+<code>kgfoundry_common.navmap_types.NavSection</code>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavSection" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+<p>Navigation section metadata grouped by documentation theme.</p>
+<details class="quote">
+<summary>Source code in <code>src/kgfoundry_common/navmap_types.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">NavSection</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Navigation section metadata grouped by documentation theme."""</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Unique section identifier. Alias: none; name ``id``."""</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Human-readable section title. Alias: none; name ``title``."""</span>
+    <span class="n">symbols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Symbols contained in the section. Alias: none; name ``symbols``."""</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavSection.id">
+<code class="highlight language-python"><span class="nb">id</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavSection.id" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Unique section identifier. Alias: none; name <code>id</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavSection.symbols">
+<code class="highlight language-python"><span class="n">symbols</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavSection.symbols" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Symbols contained in the section. Alias: none; name <code>symbols</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.NavSection.title">
+<code class="highlight language-python"><span class="n">title</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.NavSection.title" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Human-readable section title. Alias: none; name <code>title</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div><p><em>Bases:</em> TypedDict</p>
+<h3 id="kgfoundry_commonnavmap_typessymbolmeta">kgfoundry_common.navmap_types.SymbolMeta<a class="headerlink" href="#kgfoundry_commonnavmap_typessymbolmeta" title="Permanent link">¶</a></h3>
+<div class="doc doc-object doc-class">
+<h2 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta">
+<code>kgfoundry_common.navmap_types.SymbolMeta</code>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta" title="Permanent link">¶</a></h2>
+<div class="doc doc-contents first">
+<p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+<p>Symbol metadata for navigation, testing, and documentation tooling.</p>
+<details class="quote">
+<summary>Source code in <code>src/kgfoundry_common/navmap_types.py</code></summary>
+<div class="highlight"><table class="highlighttable"><tbody><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">SymbolMeta</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Symbol metadata for navigation, testing, and documentation tooling."""</span>
+
+    <span class="n">since</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Version introducing the symbol. Alias: none; name ``since``."""</span>
+    <span class="n">stability</span><span class="p">:</span> <span class="n">Stability</span>
+<span class="w">    </span><span class="sd">"""Current stability classification. Alias: none; name ``stability``."""</span>
+    <span class="n">side_effects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"fs"</span><span class="p">,</span> <span class="s2">"net"</span><span class="p">,</span> <span class="s2">"gpu"</span><span class="p">,</span> <span class="s2">"db"</span><span class="p">]]</span>
+<span class="w">    </span><span class="sd">"""Declared side effects. Alias: none; name ``side_effects``."""</span>
+    <span class="n">thread_safety</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"reentrant"</span><span class="p">,</span> <span class="s2">"threadsafe"</span><span class="p">,</span> <span class="s2">"not-threadsafe"</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Thread-safety guarantee. Alias: none; name ``thread_safety``."""</span>
+    <span class="n">async_ok</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="w">    </span><span class="sd">"""Whether usage is safe in async contexts. Alias: none; name ``async_ok``."""</span>
+    <span class="n">perf_budget_ms</span><span class="p">:</span> <span class="nb">float</span>
+<span class="w">    </span><span class="sd">"""Performance budget in milliseconds. Alias: none; name ``perf_budget_ms``."""</span>
+    <span class="n">tests</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Test artefacts verifying the symbol. Alias: none; name ``tests``."""</span>
+    <span class="n">owner</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Owning team handle. Alias: none; name ``owner``."""</span>
+    <span class="n">deprecated_in</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Version marking deprecation. Alias: none; name ``deprecated_in``."""</span>
+    <span class="n">replaced_by</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Replacement symbol path. Alias: none; name ``replaced_by``."""</span>
+    <span class="n">deprecated_msg</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Deprecation explanation. Alias: none; name ``deprecated_msg``."""</span>
+    <span class="n">contracts</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+<span class="w">    </span><span class="sd">"""Associated contract identifiers. Alias: none; name ``contracts``."""</span>
+    <span class="n">coverage_target</span><span class="p">:</span> <span class="n">NotRequired</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Expected coverage target. Alias: none; name ``coverage_target``."""</span>
+</code></pre></div></td></tr></tbody></table></div>
+</details>
+<div class="doc doc-children">
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.async_ok">
+<code class="highlight language-python"><span class="n">async_ok</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.async_ok" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Whether usage is safe in async contexts. Alias: none; name <code>async_ok</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.contracts">
+<code class="highlight language-python"><span class="n">contracts</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.contracts" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Associated contract identifiers. Alias: none; name <code>contracts</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.coverage_target">
+<code class="highlight language-python"><span class="n">coverage_target</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.coverage_target" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Expected coverage target. Alias: none; name <code>coverage_target</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.deprecated_in">
+<code class="highlight language-python"><span class="n">deprecated_in</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.deprecated_in" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Version marking deprecation. Alias: none; name <code>deprecated_in</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.deprecated_msg">
+<code class="highlight language-python"><span class="n">deprecated_msg</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.deprecated_msg" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Deprecation explanation. Alias: none; name <code>deprecated_msg</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.owner">
+<code class="highlight language-python"><span class="n">owner</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.owner" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Owning team handle. Alias: none; name <code>owner</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.perf_budget_ms">
+<code class="highlight language-python"><span class="n">perf_budget_ms</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.perf_budget_ms" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Performance budget in milliseconds. Alias: none; name <code>perf_budget_ms</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.replaced_by">
+<code class="highlight language-python"><span class="n">replaced_by</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.replaced_by" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Replacement symbol path. Alias: none; name <code>replaced_by</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.side_effects">
+<code class="highlight language-python"><span class="n">side_effects</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.side_effects" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Declared side effects. Alias: none; name <code>side_effects</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.since">
+<code class="highlight language-python"><span class="n">since</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.since" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Version introducing the symbol. Alias: none; name <code>since</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.stability">
+<code class="highlight language-python"><span class="n">stability</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.stability" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Current stability classification. Alias: none; name <code>stability</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.tests">
+<code class="highlight language-python"><span class="n">tests</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.tests" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Test artefacts verifying the symbol. Alias: none; name <code>tests</code>.</p>
+</div>
+</div>
+<div class="doc doc-object doc-attribute">
+<h3 class="doc doc-heading" id="kgfoundry_common.navmap_types.SymbolMeta.thread_safety">
+<code class="highlight language-python"><span class="n">thread_safety</span></code>
+<span class="doc doc-labels">
+<small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+</span>
+<a class="headerlink" href="#kgfoundry_common.navmap_types.SymbolMeta.thread_safety" title="Permanent link">¶</a></h3>
+<div class="doc doc-contents">
+<p>Thread-safety guarantee. Alias: none; name <code>thread_safety</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div><p><em>Bases:</em> TypedDict</p>
+<h2 id="relationships">Relationships<a class="headerlink" href="#relationships" title="Permanent link">¶</a></h2>
+<p><strong>Imports:</strong> <code>__future__.annotations</code>, <code>kgfoundry_common.navmap_loader.load_nav_metadata</code>, <code>typing.Literal</code>, <code>typing.NotRequired</code>, <code>typing.TypedDict</code></p>
+<h2 id="autorefs-examples">Autorefs Examples<a class="headerlink" href="#autorefs-examples" title="Permanent link">¶</a></h2>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#kgfoundry_common.navmap_types.ModuleMeta">kgfoundry_common.navmap_types.ModuleMeta</a></li>
+<li><a class="autorefs autorefs-internal" href="#kgfoundry_common.navmap_types.NavMap">kgfoundry_common.navmap_types.NavMap</a></li>
+<li><a class="autorefs autorefs-internal" href="#kgfoundry_common.navmap_types.NavSection">kgfoundry_common.navmap_types.NavSection</a></li>
+</ul>
+<h2 id="inheritance">Inheritance<a class="headerlink" href="#inheritance" title="Permanent link">¶</a></h2>
+<pre class="mermaid"><code>classDiagram
+    class ModuleMeta
+    class TypedDict
+    TypedDict &lt;|-- ModuleMeta
+    class NavMap
+    TypedDict &lt;|-- NavMap
+    class NavSection
+    TypedDict &lt;|-- NavSection
+    class SymbolMeta
+    TypedDict &lt;|-- SymbolMeta
+</code></pre>
+<h2 id="neighborhood">Neighborhood<a class="headerlink" href="#neighborhood" title="Permanent link">¶</a></h2>
+<div class="d2"><svg aria-label="Diagram" data-d2-version="v0.7.1" preserveAspectRatio="xMinYMin meet" role="img" viewBox="0 0 1049 898" xmlns:ns0="http://www.w3.org/1999/xlink"><svg class="d2-0a84a09e852649328128f75ca8ce06c4 d2-svg" height="898" viewBox="-101 -101 1049 898" width="1049"><rect class="fill-N7" fill="#FFFFFF" height="898.000000" rx="0.000000" stroke-width="0" width="1049.000000" x="-101.000000" y="-101.000000"></rect><style type="text/css">
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-0a84a09e852649328128f75ca8ce06c4 .text-bold {
+	font-family: "d2-0a84a09e852649328128f75ca8ce06c4-font-bold";
+}
+@font-face {
+	font-family: d2-0a84a09e852649328128f75ca8ce06c4-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}</style><style type="text/css">.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N1{fill:#0A0F25;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N2{fill:#676C7E;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N3{fill:#9499AB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N4{fill:#CFD2DD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N5{fill:#DEE1EB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N6{fill:#EEF1F8;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-N7{fill:#FFFFFF;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-B1{fill:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-B2{fill:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-B3{fill:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-B4{fill:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-B5{fill:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-B6{fill:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-AA2{fill:#4A6FF3;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-AA4{fill:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-AA5{fill:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-AB4{fill:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .fill-AB5{fill:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N1{stroke:#0A0F25;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N2{stroke:#676C7E;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N3{stroke:#9499AB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N4{stroke:#CFD2DD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N5{stroke:#DEE1EB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N6{stroke:#EEF1F8;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-N7{stroke:#FFFFFF;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-B1{stroke:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-B2{stroke:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-B3{stroke:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-B4{stroke:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-B5{stroke:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-B6{stroke:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N1{background-color:#0A0F25;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N2{background-color:#676C7E;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N3{background-color:#9499AB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N4{background-color:#CFD2DD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N5{background-color:#DEE1EB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N6{background-color:#EEF1F8;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-N7{background-color:#FFFFFF;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-B1{background-color:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-B2{background-color:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-B3{background-color:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-B4{background-color:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-B5{background-color:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-B6{background-color:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N1{color:#0A0F25;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N2{color:#676C7E;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N3{color:#9499AB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N4{color:#CFD2DD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N5{color:#DEE1EB;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N6{color:#EEF1F8;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-N7{color:#FFFFFF;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-B1{color:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-B2{color:#0D32B2;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-B3{color:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-B4{color:#E3E9FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-B5{color:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-B6{color:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-AA2{color:#4A6FF3;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-AA4{color:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-AA5{color:#F7F8FE;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-AB4{color:#EDF0FD;}
+		.d2-0a84a09e852649328128f75ca8ce06c4 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright-d2-0a84a09e852649328128f75ca8ce06c4);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}</style><a href="./kgfoundry_common/navmap_types.md" ns0:href="./kgfoundry_common/navmap_types.md"><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm5hdm1hcF90eXBlcyYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="297.000000" x="0.000000" y="315.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="148.500000" y="353.500000">kgfoundry_common.navmap_types</text></g></a><g class="JiMzNDtfX2Z1dHVyZV9fLmFubm90YXRpb25zJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="212.000000" x="516.000000" y="0.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="622.000000" y="38.500000">__future__.annotations</text></g><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm5hdm1hcF9sb2FkZXIubG9hZF9uYXZfbWV0YWRhdGEmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="450.000000" x="397.000000" y="126.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="622.000000" y="164.500000">kgfoundry_common.navmap_loader.load_nav_metadata</text></g><g class="JiMzNDt0eXBpbmcuTGl0ZXJhbCYjMzQ7"><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="143.000000" x="551.000000" y="252.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="622.500000" y="290.500000">typing.Literal</text></g><g class="JiMzNDt0eXBpbmcuTm90UmVxdWlyZWQmIzM0Ow=="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="186.000000" x="529.000000" y="378.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="622.000000" y="416.500000">typing.NotRequired</text></g><g class="JiMzNDt0eXBpbmcuVHlwZWREaWN0JiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="168.000000" x="538.000000" y="504.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="622.000000" y="542.500000">typing.TypedDict</text></g><a href="https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_types.py" ns0:href="https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_types.py"><g class="JiMzNDtrZ2ZvdW5kcnlfY29tbW9uLm5hdm1hcF90eXBlc19jb2RlJiMzNDs="><g class="shape"><rect class="stroke-B1 fill-B6" fill="#F7F8FE" height="66.000000" stroke="#0D32B2" style="stroke-width:2;" width="334.000000" x="455.000000" y="630.000000"></rect></g><text class="text-bold fill-N1" fill="#0A0F25" style="text-anchor:middle;font-size:16px" x="622.000000" y="668.500000">kgfoundry_common.navmap_types code</text></g></a><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5uYXZtYXBfdHlwZXMmIzM0OyAtJmd0OyAmIzM0O19fZnV0dXJlX18uYW5ub3RhdGlvbnMmIzM0OylbMF0="><marker id="mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134" markerHeight="12.000000" markerUnits="userSpaceOnUse" markerWidth="10.000000" orient="auto" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000"> <polygon class="connection fill-B1" fill="#0D32B2" points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" stroke-width="2"></polygon> </marker><path class="connection stroke-B1" d="M 170.067531 313.308735 C 311.399994 89.399002 380.799988 33.000000 512.000000 33.000000" fill="none" marker-end="url(#mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134)" mask="url(#d2-0a84a09e852649328128f75ca8ce06c4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5uYXZtYXBfdHlwZXMmIzM0OyAtJmd0OyAmIzM0O2tnZm91bmRyeV9jb21tb24ubmF2bWFwX2xvYWRlci5sb2FkX25hdl9tZXRhZGF0YSYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 184.449116 313.621573 C 314.200012 190.199997 357.000000 159.000000 393.000000 159.000000" fill="none" marker-end="url(#mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134)" mask="url(#d2-0a84a09e852649328128f75ca8ce06c4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5uYXZtYXBfdHlwZXMmIzM0OyAtJmd0OyAmIzM0O3R5cGluZy5MaXRlcmFsJiMzNDspWzBd"><path class="connection stroke-B1" d="M 253.907165 314.397737 C 328.000000 291.000000 387.700012 285.000000 546.500000 285.000000" fill="none" marker-end="url(#mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134)" mask="url(#d2-0a84a09e852649328128f75ca8ce06c4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5uYXZtYXBfdHlwZXMmIzM0OyAtJmd0OyAmIzM0O3R5cGluZy5Ob3RSZXF1aXJlZCYjMzQ7KVswXQ=="><path class="connection stroke-B1" d="M 253.907165 381.602263 C 328.000000 405.000000 383.399994 411.000000 525.000000 411.000000" fill="none" marker-end="url(#mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134)" mask="url(#d2-0a84a09e852649328128f75ca8ce06c4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5uYXZtYXBfdHlwZXMmIzM0OyAtJmd0OyAmIzM0O3R5cGluZy5UeXBlZERpY3QmIzM0OylbMF0="><path class="connection stroke-B1" d="M 184.449116 382.378427 C 314.200012 505.799988 385.200012 537.000000 534.000000 537.000000" fill="none" marker-end="url(#mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134)" mask="url(#d2-0a84a09e852649328128f75ca8ce06c4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="KCYjMzQ7a2dmb3VuZHJ5X2NvbW1vbi5uYXZtYXBfdHlwZXMmIzM0OyAtJmd0OyAmIzM0O2tnZm91bmRyeV9jb21tb24ubmF2bWFwX3R5cGVzX2NvZGUmIzM0OylbMF0="><path class="connection stroke-B1" d="M 170.067535 382.691263 C 311.399994 606.599976 368.600006 663.000000 451.000000 663.000000" fill="none" marker-end="url(#mk-d2-0a84a09e852649328128f75ca8ce06c4-3488378134)" mask="url(#d2-0a84a09e852649328128f75ca8ce06c4)" stroke="#0D32B2" style="stroke-width:2;"></path></g><g class="appendix-icon" transform="translate(281 299)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-0a84a09e852649328128f75ca8ce06c4-EJVWOZTPOVXGI4TZL5RW63LNN5XC43TBOZWWC4C7OR4XAZLTEI)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-0a84a09e852649328128f75ca8ce06c4-EJVWOZTPOVXGI4TZL5RW63LNN5XC43TBOZWWC4C7OR4XAZLTEI">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><g class="appendix-icon" transform="translate(773 614)"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+<g clip-path="url(#clip0_3440_35088111-d2-0a84a09e852649328128f75ca8ce06c4-EJVWOZTPOVXGI4TZL5RW63LNN5XC43TBOZWWC4C7OR4XAZLTL5RW6ZDFEI)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"></path>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111-d2-0a84a09e852649328128f75ca8ce06c4-EJVWOZTPOVXGI4TZL5RW63LNN5XC43TBOZWWC4C7OR4XAZLTL5RW6ZDFEI">
+<rect fill="white" height="32" width="32"></rect>
+</clipPath>
+</defs>
+</svg>
+</g><mask height="898" id="d2-0a84a09e852649328128f75ca8ce06c4" maskUnits="userSpaceOnUse" width="1049" x="-101" y="-101">
+<rect fill="white" height="898" width="1049" x="-101" y="-101"></rect>
+</mask></svg></svg></div>
+<aside class="md-source-file">
+<span class="md-source-file__fact">
+<span class="md-icon" title="Last update">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
+</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 6, 2025 07:45:00 UTC">November 6, 2025</span>
+</span>
+</aside>
+</article>
+</div>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.tracking", "navigation.footer", "content.action.edit", "content.action.view"], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+<script src="../../../assets/mkdocs_puml/puml.js"></script>
+<script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
+<script src="../../../assets/mkdocs_puml/interaction.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+window.mermaidConfig = {default: {
+    startOnLoad: false
+}};</script><script>document$.subscribe(() => {
+            const dark_scheme_name = "slate"
+            
+            window.scheme = document.body.getAttribute("data-md-color-scheme")
+            const options = {
+                attributeFilter: ['data-md-color-scheme'],
+            };
+            function color_scheme_callback(mutations) {
+                for (let mutation of mutations) {
+                    if (mutation.attributeName === "data-md-color-scheme") {
+                        scheme = document.body.getAttribute("data-md-color-scheme")
+                        var iframe_list = document.getElementsByClassName("redoc-iframe")
+                        for(var i = 0; i < iframe_list.length; i++) {
+                            var ele = iframe_list.item(i);
+                            if (ele) {
+                                if (scheme === dark_scheme_name) {
+                                    ele.contentWindow.enable_dark_mode();
+                                } else {
+                                    ele.contentWindow.disable_dark_mode();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            observer = new MutationObserver(color_scheme_callback);
+            observer.observe(document.body, options);
+            })</script>
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

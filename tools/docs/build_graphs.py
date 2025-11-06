@@ -434,6 +434,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
 
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments to parse. When ``None``, uses ``sys.argv``.
+
     Returns
     -------
     argparse.Namespace

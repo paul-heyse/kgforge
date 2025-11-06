@@ -22,9 +22,10 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 from griffe import (
     Alias,
@@ -382,11 +383,31 @@ def build_navmap(
     -------
     NavMap
         Dataclass containing commit metadata and discovered symbols.
+
+    Raises
+    ------
+    ValueError
+        Raised when the requested docstring parser is not supported by Griffe.
     """
+    raw_parser = settings.docstring_parser
+    if raw_parser is None:
+        docstring_parser: Literal["auto", "google", "numpy", "sphinx"] | None = None
+    elif raw_parser in {"auto", "google", "numpy", "sphinx"}:
+        parser_map: dict[str, Literal["auto", "google", "numpy", "sphinx"]] = {
+            "auto": "auto",
+            "google": "google",
+            "numpy": "numpy",
+            "sphinx": "sphinx",
+        }
+        docstring_parser = parser_map[raw_parser]
+    else:  # pragma: no cover - defensive guard
+        message = f"Unsupported docstring parser '{raw_parser}'"
+        raise ValueError(message)
+
     loader = GriffeLoader(
         search_paths=list(search_paths),
         allow_inspection=True,
-        docstring_parser=settings.docstring_parser,
+        docstring_parser=docstring_parser,
         extensions=load_extensions(*extensions) if extensions else None,
     )
 

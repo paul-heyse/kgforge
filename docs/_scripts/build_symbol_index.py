@@ -1107,6 +1107,11 @@ def _handle_unexpected_error(
 def main(argv: Sequence[str] | None = None) -> int:
     """Build documentation symbol index artifacts with CLI envelope output.
 
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments. Currently unused, reserved for future CLI arguments.
+
     Returns
     -------
     int

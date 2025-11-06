@@ -251,6 +251,11 @@ class NavMetadataModel(BaseModel):
     def __getitem__(self, key: str) -> JsonValue:
         """Return flattened navigation metadata value for ``key``.
 
+        Parameters
+        ----------
+        key : str
+            Key to look up in the flattened metadata.
+
         Returns
         -------
         JsonValue

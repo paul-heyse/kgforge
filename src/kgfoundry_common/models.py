@@ -40,7 +40,7 @@ class Doc(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ConfigDict
         Pydantic configuration forbidding unknown fields.
     id : Id
         Unique document identifier.
