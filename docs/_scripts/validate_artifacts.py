@@ -37,21 +37,30 @@ Programmatic usage::
 
 from __future__ import annotations
 
-import argparse
 import json
-import logging
 import sys
-from dataclasses import dataclass
+import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
+from uuid import uuid4
 
 from tools import (
+    CliEnvelope,
+    CliEnvelopeBuilder,
+    JsonValue,
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
     get_logger,
-    observe_tool_run,
+    render_cli_envelope,
+    with_fields,
 )
-from tools._shared.proc import ToolExecutionError
+from tools._shared.error_codes import format_error_message
+from tools._shared.logging import LoggerAdapter
+from tools._shared.proc import ToolExecutionError, run_tool
 
-from docs._scripts import shared
+from docs._scripts import cli_context, shared
 from docs._scripts.validation import validate_against_schema
 from docs.types.artifacts import (
     symbol_delta_from_json,
@@ -67,10 +76,6 @@ from kgfoundry_common.errors import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-
-    from tools._shared.problem_details import ProblemDetailsDict
-
     from docs.types.artifacts import (
         JsonPayload,
         SymbolDeltaPayload,
@@ -85,12 +90,16 @@ shared.ensure_sys_paths(ENV)
 SETTINGS = shared.load_settings()
 SCHEMA_ROOT = ENV.root / "schema" / "docs"
 
-BASE_LOGGER = get_logger(__name__)
-VALIDATION_LOG = shared.make_logger(
-    "docs_artifact_validation",
-    artifact="artifacts",
-    logger=BASE_LOGGER,
-)
+LOGGER = get_logger(__name__)
+
+CLI_COMMAND = cli_context.CLI_COMMAND
+CLI_OPERATION_IDS = cli_context.CLI_OPERATION_IDS
+CLI_SETTINGS = cli_context.get_cli_settings()
+VALIDATE_SUBCOMMAND = "validate"
+VALIDATE_OPERATION_ID = CLI_OPERATION_IDS[VALIDATE_SUBCOMMAND]
+CLI_ENVELOPE_DIR = cli_context.REPO_ROOT / "site" / "_build" / "cli"
+DEFAULT_DOCS_BUILD_DIR = cli_context.REPO_ROOT / "docs" / "_build"
+_DEFAULT_PROBLEM_TYPE = "https://kgfoundry.dev/problems/docs/validate-artifacts"
 
 
 class ArtifactValidationError(RuntimeError):
@@ -124,34 +133,6 @@ class ArtifactValidationError(RuntimeError):
         super().__init__(message)
         self.artifact_name = artifact_name
         self.problem = problem or {}
-
-
-@dataclass(slots=True, frozen=True)
-class ArtifactCheck:
-    """Configuration for validating a single artifact type.
-
-    Attributes
-    ----------
-    name : str
-        Human-readable name (e.g., "Symbol Index").
-    artifact_id : str
-        Logical identifier (e.g., "symbols.json").
-    path : Path
-        Path to the artifact file.
-    schema : Path
-        Path to the JSON Schema file.
-    loader : Callable[[Path], object]
-        Function to load and parse the artifact file.
-    codec : Callable[[object], object]
-        Function to convert loaded data to typed model.
-    """
-
-    name: str
-    artifact_id: str
-    path: Path
-    schema: Path
-    loader: Callable[[Path], object]
-    codec: Callable[[object], object]
 
 
 def _resolve_schema(name: str) -> Path:
@@ -410,123 +391,214 @@ def validate_by_module_lookup(path: Path) -> ReverseLookup:
     )
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    """Validate all documentation artifacts against their canonical schemas.
+def _envelope_path(subcommand: str) -> Path:
+    safe = subcommand or "root"
+    return CLI_ENVELOPE_DIR / f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe}.json"
 
-    Validates `symbols.json`, `symbols.delta.json`, and reverse lookup artifacts
-    (`by_file.json`, `by_module.json`) against their JSON Schema definitions.
-    Emits RFC 9457 Problem Details on validation failure and logs structured
-    metadata including operation, artifact, and status for observability.
 
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Command-line arguments. Defaults to None (uses sys.argv).
-
-    Returns
-    -------
-    int
-        Exit code: 0 for success, non-zero for failure.
-
-    Examples
-    --------
-    >>> main(["--artifacts", "symbols.json"])
-    0
-    """
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+def _write_envelope(envelope: CliEnvelope, *, logger: LoggerAdapter) -> Path:
+    CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
+    path = _envelope_path(VALIDATE_SUBCOMMAND)
+    rendered = render_cli_envelope(envelope)
+    path.write_text(f"{rendered}\n", encoding="utf-8")
+    logger.debug(
+        "CLI envelope written",
+        extra={"status": envelope.status, "cli_envelope": str(path)},
     )
-    parser.add_argument(
-        "--artifacts",
-        nargs="+",
-        type=str,
-        default=None,
-        help="Artifact names to validate (default: all)",
-    )
-    args = parser.parse_args(argv)
-    artifact_names_from_args: list[str] | None = cast("list[str] | None", args.artifacts)
+    return path
 
-    if not logging.getLogger().handlers:
-        logging.basicConfig(level=logging.INFO)
 
-    artifacts_to_check: dict[
-        str,
-        Callable[[Path], SymbolIndexArtifacts | SymbolDeltaPayload | ReverseLookup],
-    ] = {
-        "symbols.json": validate_symbol_index,
-        "symbols.delta.json": validate_symbol_delta,
-        "by_file.json": validate_by_file_lookup,
-        "by_module.json": validate_by_module_lookup,
-    }
+def _normalize_json_mapping(values: Mapping[str, object]) -> dict[str, JsonValue]:
+    payload: dict[str, JsonValue] = {}
+    for key, value in values.items():
+        key_str = str(key)
+        payload[key_str] = _coerce_json_value(value)
+    return payload
 
-    with observe_tool_run(
-        ["docs-validate-artifacts"],
-        cwd=SETTINGS.docs_build_dir,
-        timeout=None,
-    ) as observation:
-        failed_count = 0
-        artifact_names: list[str] = (
-            artifact_names_from_args
-            if artifact_names_from_args is not None
-            else list(artifacts_to_check.keys())
+
+def _coerce_json_value(value: object) -> JsonValue:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, Path):
+        return value.as_posix()
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [_coerce_json_value(item) for item in value]
+    if isinstance(value, Mapping):
+        return {str(k): _coerce_json_value(v) for k, v in value.items()}
+    return str(value)
+
+
+def _build_failure_problem(
+    detail: str,
+    *,
+    status: int,
+    extras: Mapping[str, object] | None = None,
+) -> ProblemDetailsDict:
+    extensions = _normalize_json_mapping(extras) if extras else None
+    return build_problem_details(
+        ProblemDetailsParams(
+            type=_DEFAULT_PROBLEM_TYPE,
+            title="Documentation artifact validation failed",
+            status=status,
+            detail=detail,
+            instance=f"urn:cli:{CLI_SETTINGS.bin_name}:{VALIDATE_SUBCOMMAND}",
+            extensions=extensions,
         )
+    )
 
-        for artifact_name in artifact_names:
-            if artifact_name not in artifacts_to_check:
-                VALIDATION_LOG.warning(
-                    "Unknown artifact: %s",
-                    artifact_name,
-                    extra={"artifact": artifact_name, "status": "skipped"},
-                )
-                continue
 
-            artifact_log = shared.make_logger(
-                "docs_artifact_validation",
-                artifact=artifact_name,
-                logger=BASE_LOGGER,
-            )
+def _parse_problem_from_stream(stderr: str) -> ProblemDetailsDict | None:
+    for line in reversed(stderr.splitlines()):
+        text = line.strip()
+        if not text:
+            continue
+        try:
+            candidate = json.loads(text)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(candidate, dict) and {"type", "title", "status", "detail"}.issubset(
+            candidate.keys()
+        ):
+            return cast("ProblemDetailsDict", candidate)
+    return None
 
-            try:
-                validator = artifacts_to_check[artifact_name]
-                validator(Path(artifact_name))
-                artifact_log.info(
-                    "Artifact validated successfully",
-                    extra={"status": "success"},
-                )
-            except ArtifactValidationError as e:
-                artifact_log.exception(
-                    "Artifact validation failed",
-                    extra={
-                        "status": "failure",
-                        "artifact": artifact_name,
-                        "error_type": type(e).__name__,
-                    },
-                )
-                failed_count += 1
 
-        if failed_count > 0:
-            VALIDATION_LOG.error(
-                "Artifact validation failed for %s artifact(s)",
-                failed_count,
-                extra={
-                    "failed_count": failed_count,
-                    "status": "failure",
-                },
-            )
-            observation.failure("validation_failed", returncode=1)
-            return 1
+def _prepare_failure_context(
+    exc: ToolExecutionError,
+    *,
+    command: Sequence[str],
+    args: Sequence[str],
+) -> tuple[ProblemDetailsDict, str]:
+    stderr = exc.stderr.strip()
+    stdout = exc.stdout.strip()
+    combined_details = "\n".join(part for part in (stderr, stdout) if part) or None
 
-        VALIDATION_LOG.info(
-            "All artifacts validated successfully",
+    problem = exc.problem or _parse_problem_from_stream(stderr)
+
+    error_code = "KGF-DOC-VAL-001"
+    error_message = "Documentation artifact validation failed"
+
+    formatted = format_error_message(error_code, error_message, details=combined_details)
+
+    extras: dict[str, object] = {
+        "command": " ".join(command),
+        "args": list(args),
+        "returncode": exc.returncode,
+        "operation_id": VALIDATE_OPERATION_ID,
+    }
+    if combined_details:
+        extras["details"] = combined_details
+    if stderr:
+        extras["stderr"] = stderr
+    if stdout:
+        extras["stdout"] = stdout
+
+    if problem is None:
+        problem = _build_failure_problem(formatted, status=500, extras=extras)
+    else:
+        merged: ProblemDetailsDict = {
+            str(key): _coerce_json_value(value) for key, value in problem.items()
+        }
+        extensions_raw = merged.get("extensions")
+        existing_extensions: dict[str, JsonValue] = {}
+        if isinstance(extensions_raw, Mapping):
+            existing_extensions = _normalize_json_mapping(extensions_raw)
+        existing_extensions.update(_normalize_json_mapping(extras))
+        merged["extensions"] = existing_extensions
+        problem = merged
+
+    return problem, formatted
+
+
+def _resolve_docs_build_dir(args: Sequence[str]) -> Path:
+    iterator = iter(range(len(args)))
+    for index in iterator:
+        arg = args[index]
+        if arg == "--docs-build-dir" and index + 1 < len(args):
+            return Path(args[index + 1]).resolve()
+        if arg.startswith("--docs-build-dir="):
+            _, value = arg.split("=", 1)
+            return Path(value).resolve()
+    return DEFAULT_DOCS_BUILD_DIR
+
+
+def run_validator(args: Sequence[str] | None = None) -> int:
+    forwarded = list(args or [])
+    cmd = [sys.executable, "-m", "docs.toolchain.validate_artifacts", *forwarded]
+    docs_build_dir = _resolve_docs_build_dir(forwarded)
+    correlation_id = uuid4().hex
+    logger = with_fields(
+        LOGGER,
+        correlation_id=correlation_id,
+        command=CLI_COMMAND,
+        subcommand=VALIDATE_SUBCOMMAND,
+        operation_id=VALIDATE_OPERATION_ID,
+        docs_build_dir=str(docs_build_dir),
+        args=forwarded,
+    )
+
+    logger.info("Validation started", extra={"status": "start"})
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status="success",
+        subcommand=VALIDATE_SUBCOMMAND,
+    )
+
+    start = time.monotonic()
+    try:
+        result = run_tool(cmd, timeout=120.0, check=True)
+    except ToolExecutionError as exc:
+        duration = time.monotonic() - start
+        problem, formatted = _prepare_failure_context(exc, command=cmd, args=forwarded)
+        failure_builder = CliEnvelopeBuilder.create(
+            command=CLI_COMMAND,
+            status="error",
+            subcommand=VALIDATE_SUBCOMMAND,
+        )
+        failure_builder.add_error(status="error", message=formatted, problem=problem)
+        failure_builder.set_problem(problem)
+        failure_builder.add_file(
+            path=str(docs_build_dir),
+            status="error",
+            message="Artifact validation failed",
+            problem=problem,
+        )
+        envelope = failure_builder.finish(duration_seconds=duration)
+        path = _write_envelope(envelope, logger=logger)
+        logger.exception(
+            formatted,
             extra={
-                "artifact_count": len(artifact_names),
-                "status": "success",
+                "status": "error",
+                "cli_envelope": str(path),
+                "duration_seconds": duration,
+                "returncode": exc.returncode,
             },
         )
-        observation.success(0)
-        return 0
+        raise SystemExit(exc.returncode if exc.returncode is not None else 1) from exc
+
+    duration = result.duration_seconds
+    builder.add_file(
+        path=str(docs_build_dir),
+        status="success",
+        message="Documentation artifacts validated",
+    )
+    envelope = builder.finish(duration_seconds=duration)
+    path = _write_envelope(envelope, logger=logger)
+    logger.info(
+        "Validation completed",
+        extra={
+            "status": "success",
+            "cli_envelope": str(path),
+            "duration_seconds": envelope.duration_seconds,
+        },
+    )
+    return result.returncode
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = list(argv) if argv is not None else sys.argv[1:]
+    return run_validator(args)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

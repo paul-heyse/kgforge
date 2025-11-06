@@ -156,20 +156,54 @@ interfaces:
             source: "uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm"
         problem_details:
           - schema/examples/problem_details/tool-execution-error.json
-      symbols:
-        operation_id: codeintel.indexer.symbols
-        summary: Enumerate Python symbols across a directory tree.
+  navmap-cli:
+    type: cli
+    module: tools.navmap
+    owner: "@docs"
+    stability: experimental
+    entrypoint: tools.navmap.build_navmap:main
+    binary: tools-navmap
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - navmap
+    description: |
+      Documentation tooling CLI that generates the canonical navmap JSON artefact. The command
+      scans Python modules, resolves ``__navmap__`` declarations, and emits structured envelopes for
+      downstream automation, diagrams, and observability pipelines.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      build:
+        operation_id: navmap.build
+        summary: Build the documentation navmap JSON artefact.
         description: |
-          Use the MCP-backed symbol extraction helpers to list Python symbols discovered in a
-          directory tree, emitting results via the standardized CLI envelope for downstream
-          automation.
-        handler: codeintel.indexer.cli:symbols
+          Scan repository modules, merge inline navmap metadata, and emit the canonical navmap JSON
+          output along with drift reports when changes are detected.
+        handler: tools.navmap.build_navmap:main
         tags:
-          - codeintel
+          - navmap
         env: []
         code_samples:
           - lang: bash
-            source: "uv run python -m codeintel.indexer.cli symbols src/"
+            source: "uv run python -m tools.navmap.build_navmap --write site/_build/navmap/navmap.json"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      check:
+        operation_id: navmap.check
+        summary: Validate navmap declarations and inline metadata.
+        description: |
+          Execute the navmap validation suite, ensuring inline anchors, section metadata, and
+          generated artefacts stay in sync. Emits structured envelopes and Problem Details when
+          discrepancies are detected.
+        handler: tools.navmap.check_navmap:main
+        tags:
+          - navmap
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.navmap.check_navmap"
         problem_details:
           - schema/examples/problem_details/tool-execution-error.json
   docstring-builder-cli:
@@ -398,6 +432,94 @@ interfaces:
         code_samples:
           - lang: bash
             source: "uv run python -m tools.docstring_builder.cli doctor --stubs"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+  docs-symbol-index-cli:
+    type: cli
+    module: docs.toolchain
+    owner: "@docs"
+    stability: experimental
+    entrypoint: docs.toolchain.build_symbol_index:build_symbol_index
+    binary: docs-build-symbol-index
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - docs
+      - docs-symbol-index
+    description: |
+      Documentation tooling CLI that builds the symbol index, by-file, and by-module artifacts used
+      throughout the documentation pipeline. Emits standardized CLI envelopes and Problem Details
+      for CI gating and observability.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      build:
+        operation_id: docs.symbol_index.build
+        summary: Build documentation symbol index artifacts.
+        description: |
+          Generate the symbol index, file-level, and module-level lookup tables by traversing all
+          configured packages. Each artifact is validated against its canonical JSON Schema prior
+          to being written to disk.
+        handler: docs.toolchain.build_symbol_index:build_symbol_index
+        tags:
+          - docs
+          - docs-symbol-index
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m docs.toolchain.build_symbol_index"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+  docs-validate-cli:
+    type: cli
+    module: docs.toolchain
+    owner: "@docs"
+    stability: experimental
+    entrypoint: docs.toolchain.validate_artifacts:validate_artifacts
+    binary: docs-validate-artifacts
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - docs
+      - docs-validation
+    description: |
+      Documentation tooling CLI that validates generated artifacts (symbol index, delta summaries,
+      and reverse lookups) against their canonical JSON Schemas. Emits standardized CLI envelopes
+      and Problem Details for CI gating and observability pipelines.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      validate:
+        operation_id: docs.validate_artifacts
+        summary: Validate documentation artifacts against canonical schemas.
+        description: |
+          Execute the documentation validation suite to ensure generated artifacts remain schema
+          compliant before publishing. Intended for automated CI checks and local verification.
+        handler: docs.toolchain.validate_artifacts:validate_artifacts
+        tags:
+          - docs
+          - docs-validation
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m docs._scripts.validate_artifacts --docs-build-dir docs/_build"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      build_graphs:
+        operation_id: docs.build_graphs
+        summary: Build documentation dependency graphs.
+        description: |
+          Generate per-package and subsystem dependency graphs (pydeps/pyreverse) with caching and
+          policy enforcement. Results feed documentation artifacts and architectural dashboards.
+        handler: tools.docs.build_graphs:main
+        tags:
+          - docs
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docs.build_graphs --format svg"
         problem_details:
           - schema/examples/problem_details/tool-execution-error.json
   search-http:

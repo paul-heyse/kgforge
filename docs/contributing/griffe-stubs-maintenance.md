@@ -1,199 +1,71 @@
-# Griffe Stubs Maintenance and Upstream Contribution
+# Griffe Typing: Upstream Integration (Stubs Decommissioned)
 
-## Overview
+## Summary
 
-This document describes the maintenance workflow for the vendored Griffe type stubs under `stubs/griffe/` and the typed facades in `docs/_types/griffe.py`. These stubs are aligned with **Griffe 1.14.0** and are designed to be contributed upstream to the Griffe project.
+As of **2025-11-06** the project no longer vendors custom type stubs for the
+`griffe` package. We rely on the upstream library (and its bundled
+`py.typed` metadata) directly in both runtime code and tests. This document
+records the new expectations for keeping the documentation toolchain aligned
+with Griffe without the maintenance burden of a parallel stub tree.
 
-## Stub Files
+## Why the stubs were removed
 
-### Location and Structure
+- **Duplicate maintenance**: the vendored `stubs/griffe/**` mirror had to be
+  kept in sync with every upstream release and frequently drifted.
+- **Upstream coverage**: modern Griffe releases expose robust typing support
+  and ship `py.typed`, making the local copies redundant.
+- **Testing parity**: exercising the real library in our tests gives higher
+  confidence that CLI tooling, MkDocs helpers, and symbol builders behave
+  correctly in production.
 
-```
-stubs/griffe/
-├── __init__.pyi          # Core types (Object, Module, Class, etc.) and loader
-├── exceptions/__init__.pyi   # Exception hierarchy
-└── loader/__init__.pyi    # Loader factory helpers
-```
+## New workflow
 
-### Key Exports
+1. **Runtime and tests use the real library**
+   - Import `griffe` directly; avoid `safe_import_griffe` only when the code path
+     truly needs to degrade gracefully without the dependency.
+   - Tests should monkeypatch `griffe.load` / `griffe.load_extensions` if they need
+     to simulate failure scenarios rather than installing stub modules.
 
-The `stubs/griffe/__init__.pyi` exports:
+2. **Dependency management**
+   - Griffe remains an explicit dependency in `pyproject.toml` and is resolved via
+     `uv sync`.
+   - When upgrading, run the documentation toolchain smoke tests (see below) to
+     confirm compatibility.
 
-- **Object Classes**: `Object`, `Module`, `Package`, `Class`, `Function`, `Attribute`, `TypeAlias`, `Alias`, `Docstring`
-- **Loader**: `GriffeLoader` (main loader class) and `load()` (module-level function)
-- **Exceptions**: `GriffeError` (base), `LoadingError`, `NameResolutionError`, `AliasResolutionError`, `CyclicAliasError`, `UnimportableModuleError`, `BuiltinModuleError`, `ExtensionError`, `ExtensionNotLoadedError`
+3. **Quality gates**
+   - `uv run pyright docs/_scripts` – ensures type checkers see the upstream
+     annotations.
+   - `uv run pytest tests/tools/mkdocs_suite/test_gen_module_pages.py` – covers
+     extension discovery and fallback behaviour with the real loader.
+   - `uv run pytest tests/docs/test_griffe_facade.py` – guards the docs facade
+     that wraps Griffe objects.
 
-### Typing Principles
+4. **Downstream tooling**
+   - The docstring builder doctor now only tracks the remaining vendored stubs
+     (`stubs/libcst`, `stubs/mkdocs_gen_files`). No action is required for Griffe.
 
-1. **No `Any` Types**: All parameters and return types are explicitly typed using Protocols and concrete types.
-2. **Runtime Parity**: Stubs match Griffe 1.14.0 class and method signatures exactly.
-3. **Minimal Docstrings**: Per PYI conventions, stub files contain no docstrings.
-4. **Exception Hierarchy**: Simplified to match runtime (flat hierarchy under `GriffeError`).
+## Migration checklist (completed)
 
-## Typed Facades
+- [x] Delete `stubs/griffe/**`.
+- [x] Update tests to import / monkeypatch the real `griffe` package.
+- [x] Remove doc tooling references to the old stub path.
+- [x] Refresh documentation (`openapi/_augment_cli.yaml`, `tools/mkdocs_suite/api_registry.yaml`,
+  `docs/api/interfaces.md`) to ensure CLI metadata points at the canonical builder.
 
-### `docs/_types/griffe.py`
+## Verifying future upgrades
 
-This module provides high-level, type-safe facades for docs pipeline integration:
+When Griffe releases a new version:
 
-- **Protocols**: `GriffeNode`, `LoaderFacade`, `MemberIterator`, `GriffeFacade` (all `@runtime_checkable`)
-- **Factory**: `build_facade(env)` returns a typed facade from a `BuildEnvironment`
-- **Optional Dependencies**: `get_autoapi_loader()`, `get_sphinx_loader()` with graceful degradation (raise `ArtifactDependencyError`)
+1. Run `uv sync` to pull the update into `uv.lock`.
+2. Execute the documentation toolchain tests mentioned above.
+3. If regressions appear, file an issue with reproduction steps, including
+   the failing command (`render_module_pages`, symbol index build, etc.).
+4. If an upstream typing bug is discovered, prefer opening a patch in Griffe
+   rather than reintroducing local stubs.
 
-## Maintenance Workflow
+## Historical reference
 
-### 1. Version Pinning
-
-When upgrading Griffe, update:
-
-1. `uv.lock` (via `uv sync` or direct dependency update)
-2. Record the new version in this document
-3. Update stub exports/signatures if API changed
-
-**Current Griffe Version**: 1.14.0 (pinned in `uv.lock`)
-
-### 2. Detecting API Changes
-
-Run the regression tests to detect runtime/stub mismatches:
-
-```bash
-uv run pytest -xvs tests/docs/test_griffe_facade.py::TestGriffeStubExports
-```
-
-Tests verify:
-- Symbol exports match runtime
-- Method signatures are present
-- Class hierarchies align
-- Exception hierarchies are correct
-
-### 3. Updating Stubs
-
-If tests fail due to API changes:
-
-1. **Inspect new exports**:
-   ```python
-   import griffe, inspect
-   for name in dir(griffe):
-       if not name.startswith('_'):
-           print(f"{name}: {inspect.signature(getattr(griffe, name))}")
-   ```
-
-2. **Update `stubs/griffe/__init__.pyi`** with:
-   - New classes/functions
-   - Changed signatures
-   - Updated exception hierarchy (if needed)
-
-3. **Run full test suite** to verify parity:
-   ```bash
-   uv run pytest tests/docs/test_griffe_facade.py -q
-   uv run pyright --pythonversion=3.13 stubs/griffe/
-   ```
-
-4. **Format and lint**:
-   ```bash
-   uv run ruff format && uv run ruff check --fix stubs/griffe/
-   ```
-
-## Upstream Contribution (Griffe Project)
-
-### Patch Requirements
-
-When submitting to the Griffe project, include:
-
-1. **Stub Files**: Complete `griffe/**/*.pyi` modules
-2. **Coverage**: All public APIs from the runtime
-3. **Testing**: Regression test demonstrating parity
-4. **Changelog**: Entry describing the stubs addition
-5. **License**: Confirm stubs are under Griffe's license (typically ISSL or similar)
-
-### Submission Checklist
-
-- [ ] Stubs validated against current Griffe version
-- [ ] All regression tests pass
-- [ ] Ruff/Pyright/Pyrefly/MyPy clean
-- [ ] Docstrings removed (PYI conventions)
-- [ ] Exception hierarchies match runtime exactly
-- [ ] PR description includes use case (documentation toolchain)
-- [ ] Author/maintainer contact information included
-
-### Expected Upstream Changes
-
-Once accepted upstream, kgfoundry can:
-
-1. Remove vendored stubs from `stubs/griffe/`
-2. Use Griffe's official stubs from the package (if `py.typed` included)
-3. Reduce maintenance burden
-
-### Communication Template
-
-```markdown
-# Contribution: Type Stubs for Griffe
-
-## Motivation
-The Griffe package is widely used for documentation generation in type-aware tools.
-This PR adds comprehensive PYI stub files that enable IDE autocomplete and static
-type checking for Griffe's public APIs.
-
-## What's Included
-- `griffe/**/*.pyi` modules covering all public exports
-- Overloads for `load()` and `GriffeLoader.load()` with precise parameter types
-- Exception class hierarchy matching runtime
-- Regression tests verifying stub/runtime parity
-
-## Testing
-```bash
-# Type checking
-pyright stubs/
-pyright stubs/
-# Runtime verification
-pytest tests/griffe_stubs_test.py
-```
-
-## Notes
-- Stubs tested with Griffe 1.14.0
-- Compatible with Pyright (strict), Pyrefly, and MyPy (strict baseline)
-- Maintainers can test against new releases; we provide regression test suite
-```
-
-## Maintenance Cadence
-
-### Quarterly Review
-
-1. Check for new Griffe releases
-2. Run regression tests against new version
-3. Update stubs if API changed
-4. Update this document with version and any notes
-
-### Breaking Change Handling
-
-If Griffe releases a breaking change:
-
-1. Create a feature branch: `griffe-stubs-v<new-version>`
-2. Update stubs and regression tests
-3. Update kgfoundry's Griffe version constraint
-4. Commit with message: `chore: update Griffe stubs for <new-version>`
-5. Tag the commit with version metadata
-
-## Related Documentation
-
-- [AGENTS.md](../../AGENTS.md) — Type checking standards and quality gates
-- [typing.md](./typing.md) — Project-wide typing conventions
-- `openspec/changes/griffe-stubs-hardening-phase1/` — Original specification
-
-## FAQ
-
-### Q: Why not use Griffe's own type hints?
-
-**A**: Griffe uses internal `_internal` modules and dynamic runtime construction. The runtime module doesn't export type information. Stubs provide a clean, stable interface for type checkers.
-
-### Q: Should I update stubs when upgrading Griffe?
-
-**A**: Yes. Run regression tests first to detect changes. Most minor versions are compatible; major versions usually require stub updates.
-
-### Q: Can I use these stubs in other projects?
-
-**A**: Yes! The stubs are vendored but can be distributed. Once contributed upstream, any Python project can use Griffe's official stubs.
-
-### Q: What happens if I find a stub bug?
-
-**A**: Open an issue in kgfoundry referencing the test that fails, and the exact Griffe version. Include the error from Pyright/Pyrefly/MyPy.
+For archival purposes, the previous stub-maintenance workflow (covering
+`stubs/griffe/**`) is preserved in Git history prior to commit
+`docs-typing-2025-11-06`. Consult that snapshot only if you need details about
+how the deprecated stubs were structured.

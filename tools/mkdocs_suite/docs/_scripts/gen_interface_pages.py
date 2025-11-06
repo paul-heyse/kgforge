@@ -62,7 +62,6 @@ def _ensure_str_list(value: object) -> list[str]:
 
 def _escape_table_text(value: object) -> str:
     """Escape Markdown table control characters in ``value``."""
-
     text = str(value)
     text = text.replace("\\", "\\\\")
     text = text.replace("|", "\\|")

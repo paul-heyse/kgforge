@@ -4,18 +4,12 @@ This catalog is generated from `_nav.json` sidecars and the shared interface reg
 
 | Interface | Type | Module | Owner | Stability | Spec | Description | Problem Details |
 | --------- | ---- | ------ | ----- | -------- | ---- | ----------- | ---------------- |
-| codeintel-indexer | cli | [codeintel.indexer](../modules/codeintel.indexer.md) | @code-intel | experimental | [CLI Spec](../api/openapi-cli.md) | Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol
-extraction through the shared CLI contracts. The interface integrates with the OpenAPI
-generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.
- | schema/examples/problem_details/tool-execution-error.json |
-| docstring-builder-cli | cli | [tools.docstring_builder](../modules/tools.docstring_builder.md) | @docs | beta | [CLI Spec](../api/openapi-cli.md) | Command suite powering docstring synchronization, validation, policy enforcement, and
-diagnostics. The CLI integrates with shared tooling metadata so documentation helpers,
-diagrams, and automation emit consistent Problem Details and logging envelopes.
- | schema/examples/problem_details/tool-execution-error.json |
-| download-cli | cli | [download](../modules/download.md) | @data-platform | experimental | [CLI Spec](../api/openapi-cli.md) | Downloader command suite that sources external corpora (currently OpenAlex) using the shared
-CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,
-diagrams, documentation) remains in sync without bespoke glue.
- | schema/examples/problem_details/tool-execution-error.json |
+| codeintel-indexer | cli | [codeintel.indexer](../modules/codeintel.indexer.md) | @code-intel | experimental | [CLI Spec](../api/openapi-cli.md) | Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol<br />extraction through the shared CLI contracts. The interface integrates with the OpenAPI<br />generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.<br /> | schema/examples/problem_details/tool-execution-error.json |
+| docs-symbol-index-cli | cli | [docs.toolchain](../modules/docs.toolchain.md) | @docs | experimental | [CLI Spec](../api/openapi-cli.md) | Documentation tooling CLI that builds the symbol index, by-file, and by-module artifacts used<br />throughout the documentation pipeline. Emits standardized CLI envelopes and Problem Details<br />for CI gating and observability.<br /> | schema/examples/problem_details/tool-execution-error.json |
+| docs-validate-cli | cli | [docs.toolchain](../modules/docs.toolchain.md) | @docs | experimental | [CLI Spec](../api/openapi-cli.md) | Documentation tooling CLI that validates generated artifacts (symbol index, delta summaries,<br />and reverse lookups) against their canonical JSON Schemas. Emits standardized CLI envelopes<br />and Problem Details for CI gating and observability pipelines.<br /> | schema/examples/problem_details/tool-execution-error.json |
+| docstring-builder-cli | cli | [tools.docstring_builder](../modules/tools.docstring_builder.md) | @docs | beta | [CLI Spec](../api/openapi-cli.md) | Command suite powering docstring synchronization, validation, policy enforcement, and<br />diagnostics. The CLI integrates with shared tooling metadata so documentation helpers,<br />diagrams, and automation emit consistent Problem Details and logging envelopes.<br /> | schema/examples/problem_details/tool-execution-error.json |
+| download-cli | cli | [download](../modules/download.md) | @data-platform | experimental | [CLI Spec](../api/openapi-cli.md) | Downloader command suite that sources external corpora (currently OpenAlex) using the shared<br />CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,<br />diagrams, documentation) remains in sync without bespoke glue.<br /> | schema/examples/problem_details/tool-execution-error.json |
+| navmap-cli | cli | [tools.navmap](../modules/tools.navmap.md) | @docs | experimental | [CLI Spec](../api/openapi-cli.md) | Documentation tooling CLI that generates the canonical navmap JSON artefact. The command<br />scans Python modules, resolves \`\`__navmap__\`\` declarations, and emits structured envelopes for<br />downstream automation, diagrams, and observability pipelines.<br /> | schema/examples/problem_details/tool-execution-error.json |
 | orchestration-cli | cli | [orchestration](../modules/orchestration.md) | @orchestration | beta | [CLI Spec](../api/openapi-cli.md) | Primary Typer application for orchestration flows and indexing commands. | schema/examples/problem_details/tool-execution-error.json |
 | search-http | http | [search_api](../modules/search_api.md) | @search-api | experimental | [HTTP API](../api/index.md) | FastAPI application exposing search operations via the public HTTP API. | schema/examples/problem_details/search-missing-index.json, schema/examples/problem_details/search-gpu-unavailable.json |
 
@@ -39,13 +33,55 @@ generator, MkDocs diagrams, and documentation lifecycles to keep metadata consis
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
   - Code Samples:
     * (bash) `uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm`
-- [`codeintel.indexer.symbols`](../api/openapi-cli.md#operation/codeintel.indexer.symbols) — Enumerate Python symbols across a directory tree.
-    - Module docs: [codeintel.indexer.cli](../modules/codeintel.indexer.cli.md)
-  - Tags: codeintel
-  - Handler: `codeintel.indexer.cli:symbols`
+
+## docs-symbol-index-cli
+
+* **Type:** cli
+* **Module:** docs.toolchain
+* **Owner:** @docs
+* **Stability:** experimental
+* **Description:** Documentation tooling CLI that builds the symbol index, by-file, and by-module artifacts used
+throughout the documentation pipeline. Emits standardized CLI envelopes and Problem Details
+for CI gating and observability.
+
+
+### Operations
+
+- [`docs.symbol_index.build`](../api/openapi-cli.md#operation/docs.symbol_index.build) — Build documentation symbol index artifacts.
+    - Module docs: [docs.toolchain.build_symbol_index](../modules/docs.toolchain.build_symbol_index.md)
+  - Tags: docs, docs-symbol-index
+  - Handler: `docs.toolchain.build_symbol_index:build_symbol_index`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
   - Code Samples:
-    * (bash) `uv run python -m codeintel.indexer.cli symbols src/`
+    * (bash) `uv run python -m docs.toolchain.build_symbol_index`
+
+## docs-validate-cli
+
+* **Type:** cli
+* **Module:** docs.toolchain
+* **Owner:** @docs
+* **Stability:** experimental
+* **Description:** Documentation tooling CLI that validates generated artifacts (symbol index, delta summaries,
+and reverse lookups) against their canonical JSON Schemas. Emits standardized CLI envelopes
+and Problem Details for CI gating and observability pipelines.
+
+
+### Operations
+
+- [`docs.validate_artifacts`](../api/openapi-cli.md#operation/docs.validate_artifacts) — Validate documentation artifacts against canonical schemas.
+    - Module docs: [docs.toolchain.validate_artifacts](../modules/docs.toolchain.validate_artifacts.md)
+  - Tags: docs, docs-validation
+  - Handler: `docs.toolchain.validate_artifacts:validate_artifacts`
+  - Problem Details: schema/examples/problem_details/tool-execution-error.json
+  - Code Samples:
+    * (bash) `uv run python -m docs._scripts.validate_artifacts --docs-build-dir docs/_build`
+- [`docs.build_graphs`](../api/openapi-cli.md#operation/docs.build_graphs) — Build documentation dependency graphs.
+    - Module docs: [tools.docs.build_graphs](../modules/tools.docs.build_graphs.md)
+  - Tags: docs
+  - Handler: `tools.docs.build_graphs:main`
+  - Problem Details: schema/examples/problem_details/tool-execution-error.json
+  - Code Samples:
+    * (bash) `uv run python -m tools.docs.build_graphs --format svg`
 
 ## docstring-builder-cli
 
@@ -173,6 +209,34 @@ diagrams, documentation) remains in sync without bespoke glue.
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
   - Code Samples:
     * (bash) `kgf download harvest 'foundation models' --years '>=2020' --max-works 5000`
+
+## navmap-cli
+
+* **Type:** cli
+* **Module:** tools.navmap
+* **Owner:** @docs
+* **Stability:** experimental
+* **Description:** Documentation tooling CLI that generates the canonical navmap JSON artefact. The command
+scans Python modules, resolves ``__navmap__`` declarations, and emits structured envelopes for
+downstream automation, diagrams, and observability pipelines.
+
+
+### Operations
+
+- [`navmap.build`](../api/openapi-cli.md#operation/navmap.build) — Build the documentation navmap JSON artefact.
+    - Module docs: [tools.navmap.build_navmap](../modules/tools.navmap.build_navmap.md)
+  - Tags: navmap
+  - Handler: `tools.navmap.build_navmap:main`
+  - Problem Details: schema/examples/problem_details/tool-execution-error.json
+  - Code Samples:
+    * (bash) `uv run python -m tools.navmap.build_navmap --write site/_build/navmap/navmap.json`
+- [`navmap.check`](../api/openapi-cli.md#operation/navmap.check) — Validate navmap declarations and inline metadata.
+    - Module docs: [tools.navmap.check_navmap](../modules/tools.navmap.check_navmap.md)
+  - Tags: navmap
+  - Handler: `tools.navmap.check_navmap:main`
+  - Problem Details: schema/examples/problem_details/tool-execution-error.json
+  - Code Samples:
+    * (bash) `uv run python -m tools.navmap.check_navmap`
 
 ## orchestration-cli
 

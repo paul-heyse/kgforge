@@ -19,7 +19,7 @@ their inline annotations cover the symbols we use.
 | `fastapi>=0.115.0` | `stubs/fastapi/*.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — runtime middleware helpers validate against upstream types. |
 | `starlette` (via FastAPI) | `stubs/starlette/**` | `py.typed` present | ✅ Removed on 2025-11-02 alongside FastAPI stubs. |
 | `duckdb>=1.4.1` | `stubs/duckdb/__init__.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — `registry.duckdb_helpers` now type-checks against upstream hints. |
-| `griffe` (unversioned) | `stubs/griffe/**` | `py.typed` present | ✅ Removed on 2025-11-02 — documentation build passes with upstream typing. |
+| `griffe` (unversioned) | `stubs/griffe/**` | `py.typed` present | ✅ Removed on 2025-11-06 — documentation build passes with upstream typing. |
 | `mkdocs-gen-files` | `stubs/mkdocs_gen_files/__init__.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — doc build validated without local shim. |
 | `prefect>=3.4.25` | `stubs/prefect/logging/*.pyi` | `py.typed` present | ✅ Removed on 2025-11-02 — observability helpers import upstream module directly. |
 | `docstring-parser` | `stubs/docstring_parser/**` | `py.typed` present | ✅ Removed on 2025-11-02 — docstring builder suite covers upstream typing. |

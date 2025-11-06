@@ -12,18 +12,32 @@ import copy
 import json
 import re
 import sys
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, TypedDict, cast
+from time import monotonic
+from typing import TypedDict, cast
+from uuid import uuid4
 
 from packaging.version import InvalidVersion, Version
 
-from tools import get_logger
+from tools import JsonValue, ToolExecutionError, get_logger
+from tools._shared.cli import (
+    CliEnvelope,
+    CliEnvelopeBuilder,
+    CliErrorStatus,
+    CliStatus,
+    render_cli_envelope,
+)
+from tools._shared.logging import LoggerAdapter, with_fields
+from tools._shared.problem_details import (
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
+)
+from tools.navmap import cli_context
 from tools.navmap.build_navmap import NavmapError as BuildNavmapError
 from tools.navmap.build_navmap import build_index
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
 
 LOGGER = get_logger(__name__)
 
@@ -37,6 +51,15 @@ ANCHOR_RE = re.compile(r"^\s*#\s*\[nav:anchor\s+([A-Za-z_]\w*)\]\s*$")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IDENT_RE = re.compile(r"^[A-Za-z_]\w*$")
 STABILITY = {"stable", "beta", "experimental", "deprecated", "internal", "frozen"}
+
+
+CLI_COMMAND = cli_context.CLI_COMMAND
+CLI_SETTINGS = cli_context.get_cli_settings()
+CLI_OPERATION_IDS = cli_context.CLI_OPERATION_IDS
+CLI_INTERFACE_ID = cli_context.CLI_INTERFACE_ID
+CLI_ENVELOPE_DIR = cli_context.REPO_ROOT / "site" / "_build" / "cli"
+SUBCOMMAND_CHECK = "check"
+CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/navmap/check"
 
 
 class NavmapError(Exception):
@@ -706,9 +729,13 @@ def _load_nav_sidecar(py: Path) -> dict[str, ResolvedNavValue]:
         nav_copy = cast("dict[str, ResolvedNavValue]", copy.deepcopy(payload))
         exports = nav_copy.get("exports")
         if isinstance(exports, list):
-            nav_copy["exports"] = _dedupe_str_list(
-                [item for item in exports if isinstance(item, str)]
-            )
+            deduped_strings = _dedupe_str_list([item for item in exports if isinstance(item, str)])
+            normalized_exports: list[ResolvedNavValue] = [
+                cast("ResolvedNavValue", item) for item in deduped_strings
+            ]
+            nav_copy["exports"] = cast("ResolvedNavValue", normalized_exports)
+        elif exports:
+            nav_copy["exports"] = cast("ResolvedNavValue", exports)
         return nav_copy
     return {}
 
@@ -796,7 +823,7 @@ def _has_anchor(symbol: str, anchors_inline: dict[str, int], auto_anchors: dict[
 def _validate_section_symbols(
     py: Path,
     sid: str,
-    symbols_value: list[object],
+    symbols_value: Sequence[object],
     anchors_inline: dict[str, int],
     auto_anchors: dict[str, int],
 ) -> list[str]:
@@ -1315,40 +1342,253 @@ def _inspect(py: Path) -> list[str]:
     return errs
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Run navmap validation checks and return exit code.
+def _coerce_json_value(value: object) -> JsonValue:
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (list, tuple)):
+        return [_coerce_json_value(item) for item in value]
+    if isinstance(value, set):
+        return [_coerce_json_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): _coerce_json_value(val) for key, val in value.items()}
+    return str(value)
+
+
+def _prepare_extensions(values: Mapping[str, object] | None = None) -> dict[str, JsonValue]:
+    if not values:
+        return {}
+    return {str(key): _coerce_json_value(val) for key, val in values.items()}
+
+
+@dataclass(slots=True)
+class _ExecutionContext:
+    logger: LoggerAdapter
+    start: float
+    base_extras: dict[str, JsonValue]
+
+    def elapsed(self) -> float:
+        return monotonic() - self.start
+
+    def extensions(self, overrides: Mapping[str, object] | None = None) -> dict[str, JsonValue]:
+        payload: dict[str, JsonValue] = dict(self.base_extras)
+        payload.update(_prepare_extensions(overrides))
+        return payload
+
+
+def _envelope_path(subcommand: str) -> Path:
+    safe_subcommand = subcommand or "root"
+    filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand}.json"
+    return CLI_ENVELOPE_DIR / filename
+
+
+def _emit_envelope(envelope: CliEnvelope, *, logger: LoggerAdapter, subcommand: str) -> Path:
+    path = _envelope_path(subcommand)
+    CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
+    rendered = render_cli_envelope(envelope)
+    path.write_text(rendered + "\n", encoding="utf-8")
+    logger.debug(
+        "CLI envelope written", extra={"status": envelope.status, "cli_envelope": str(path)}
+    )
+    return path
+
+
+def _run_status_from_error(error_status: CliErrorStatus) -> CliStatus:
+    return cast(
+        "CliStatus",
+        error_status if error_status in {"config", "violation"} else "error",
+    )
+
+
+def _build_problem(
+    context: _ExecutionContext,
+    *,
+    detail: str,
+    status: int,
+    extras: Mapping[str, object] | None = None,
+) -> ProblemDetailsDict:
+    return build_problem_details(
+        ProblemDetailsParams(
+            type=CLI_PROBLEM_TYPE,
+            title="Navmap validation failed",
+            status=status,
+            detail=detail,
+            instance=f"urn:cli:{CLI_INTERFACE_ID}:{SUBCOMMAND_CHECK}",
+            extensions=context.extensions(extras),
+        )
+    )
+
+
+@dataclass(slots=True)
+class _FailureOptions:
+    extras: Mapping[str, object] | None = None
+    exc: BaseException | None = None
+
+
+def _record_failure(
+    context: _ExecutionContext,
+    *,
+    detail: str,
+    status: int,
+    error_status: CliErrorStatus,
+    options: _FailureOptions | None = None,
+) -> int:
+    failure_extras = options.extras if options else None
+    exc = options.exc if options else None
+    problem = _build_problem(context, detail=detail, status=status, extras=failure_extras)
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=_run_status_from_error(error_status),
+        subcommand=SUBCOMMAND_CHECK,
+    )
+    builder.add_error(status=error_status, message=detail, problem=problem)
+    builder.set_problem(problem)
+    envelope = builder.finish(duration_seconds=context.elapsed())
+    path = _emit_envelope(envelope, logger=context.logger, subcommand=SUBCOMMAND_CHECK)
+    log_extra: dict[str, JsonValue] = {
+        "status": envelope.status,
+        "cli_envelope": str(path),
+        "duration_seconds": envelope.duration_seconds,
+    }
+    log_extra.update(context.extensions(failure_extras))
+    context.logger.error("Command failed", extra=log_extra, exc_info=exc)
+    if failure_extras and (errors := failure_extras.get("errors")) and isinstance(errors, list):
+        for message in errors[:10]:
+            context.logger.error("Validation error", extra={"detail": _coerce_json_value(message)})
+    return 1
+
+
+def _finish_success(context: _ExecutionContext, builder: CliEnvelopeBuilder) -> int:
+    envelope = builder.finish(duration_seconds=context.elapsed())
+    path = _emit_envelope(envelope, logger=context.logger, subcommand=SUBCOMMAND_CHECK)
+    log_extra: dict[str, JsonValue] = {
+        "status": envelope.status,
+        "cli_envelope": str(path),
+        "duration_seconds": envelope.duration_seconds,
+    }
+    log_extra.update(context.base_extras)
+    context.logger.info("Command completed", extra=log_extra)
+    return 0
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Run navmap validation checks and emit structured CLI envelopes.
 
     Parameters
     ----------
-    argv : list[str] | None, optional
-        Command-line arguments, by default None.
+    argv : Sequence[str] | None, optional
+        Optional CLI arguments forwarded from the command line.
 
     Returns
     -------
     int
-        Exit code (0 on success, 1 on errors).
+        Exit code (``0`` on success, non-zero when validation fails).
     """
     del argv
+    correlation_id = uuid4().hex
+    base_extras = _prepare_extensions(
+        {
+            "index_path": INDEX,
+            "command": CLI_COMMAND,
+            "subcommand": SUBCOMMAND_CHECK,
+            "bin_name": CLI_SETTINGS.bin_name,
+            "correlation_id": correlation_id,
+        }
+    )
+    logger = with_fields(
+        LOGGER,
+        command=CLI_COMMAND,
+        subcommand=SUBCOMMAND_CHECK,
+        bin_name=CLI_SETTINGS.bin_name,
+        correlation_id=correlation_id,
+        index_path=str(INDEX),
+    )
+    logger.info("Command started", extra={"status": "start"})
+    context = _ExecutionContext(logger=logger, start=monotonic(), base_extras=base_extras)
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=cast("CliStatus", "success"),
+        subcommand=SUBCOMMAND_CHECK,
+    )
+
     errors = _collect_module_errors()
-
     if errors:
-        LOGGER.error("\n".join(errors))
-        return 1
+        error_sample = errors[:20]
+        extras = {
+            "error_count": len(errors),
+            "errors": error_sample,
+            "errors_truncated": max(len(errors) - len(error_sample), 0),
+        }
+        detail = error_sample[0] if error_sample else "Navmap validation errors detected."
+        return _record_failure(
+            context,
+            detail=detail,
+            status=422,
+            error_status="violation",
+            options=_FailureOptions(extras=extras),
+        )
 
-    # Round-trip check: compare freshly built JSON to inline markers
     try:
         index = build_index(json_path=INDEX)
-    except BuildNavmapError:
-        LOGGER.exception("navmap check: build_navmap failed during round-trip")
-        return 1
+    except BuildNavmapError as exc:
+        detail = "Navmap round-trip build failed"
+        extras = {"error": str(exc)}
+        return _record_failure(
+            context,
+            detail=detail,
+            status=500,
+            error_status="error",
+            options=_FailureOptions(extras=extras, exc=exc),
+        )
+    except ToolExecutionError as exc:
+        detail = str(exc)
+        return _record_failure(
+            context,
+            detail=detail,
+            status=500,
+            error_status="error",
+            options=_FailureOptions(extras={"error": detail}, exc=exc),
+        )
+    except (RuntimeError, ValueError, OSError) as exc:  # pragma: no cover - defensive catch
+        detail = str(exc)
+        return _record_failure(
+            context,
+            detail=detail,
+            status=500,
+            error_status="error",
+            options=_FailureOptions(extras={"error": detail}, exc=exc),
+        )
+
     rt_errs = _round_trip_errors(index)
-
     if rt_errs:
-        LOGGER.error("\n".join(rt_errs))
-        return 1
+        error_sample = rt_errs[:20]
+        extras = {
+            "error_count": len(rt_errs),
+            "errors": error_sample,
+            "errors_truncated": max(len(rt_errs) - len(error_sample), 0),
+        }
+        detail = error_sample[0] if error_sample else "Navmap round-trip validation failed."
+        return _record_failure(
+            context,
+            detail=detail,
+            status=422,
+            error_status="violation",
+            options=_FailureOptions(extras=extras),
+        )
 
-    LOGGER.info("navmap check: OK")
-    return 0
+    builder.add_file(
+        path=str(SRC),
+        status="success",
+        message="Validated navmap metadata across source modules",
+    )
+    builder.add_file(
+        path=str(INDEX),
+        status="success",
+        message="Round-trip navmap index matches inline metadata",
+    )
+
+    return _finish_success(context, builder)
 
 
 if __name__ == "__main__":

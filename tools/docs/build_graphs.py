@@ -25,20 +25,44 @@ from functools import partial
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
+from uuid import uuid4
+
+from docs._scripts import cli_context as docs_cli_context  # noqa: PLC2701
 
 from kgfoundry_common.logging import setup_logging
 from tools import (
+    JsonValue,
     ToolExecutionError,
     ToolRunResult,
+    ValidationError,
     get_logger,
     resolve_path,
     run_tool,
     with_fields,
 )
-from tools import (
-    ValidationError as SharedValidationError,
+from tools._shared.cli import (
+    CliEnvelope,
+    CliEnvelopeBuilder,
+    CliErrorStatus,
+    CliStatus,
+    render_cli_envelope,
+)
+from tools._shared.logging import LoggerAdapter
+from tools._shared.problem_details import (
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
 )
 from tools.docs.errors import GraphBuildError
+
+
+class GraphPolicyError(GraphBuildError):
+    """Raised when dependency graph policy checks fail."""
+
+    def __init__(self, message: str, *, errors: Sequence[str] | None = None) -> None:
+        super().__init__(message)
+        self.errors = list(errors or [])
+
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -190,6 +214,19 @@ OUT.mkdir(parents=True, exist_ok=True)
 # Render targets supported by both Graphviz and our docs pipeline.
 SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
 
+CLI_COMMAND_NAME = "docs-build-graphs"
+CLI_DEFINITION = docs_cli_context.get_cli_definition(CLI_COMMAND_NAME)
+CLI_SETTINGS = docs_cli_context.get_cli_settings(CLI_COMMAND_NAME)
+CLI_CONFIG = docs_cli_context.get_cli_config(CLI_COMMAND_NAME)
+CLI_OPERATION_IDS = dict(CLI_DEFINITION.operation_ids)
+CLI_INTERFACE_ID = CLI_DEFINITION.interface_id
+CLI_COMMAND = CLI_DEFINITION.command
+CLI_TITLE = CLI_DEFINITION.title
+SUBCOMMAND_BUILD_GRAPHS = "build"
+CLI_OPERATION_ID = CLI_OPERATION_IDS[SUBCOMMAND_BUILD_GRAPHS]
+CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/docs/build-graphs"
+CLI_ENVELOPE_DIR = docs_cli_context.REPO_ROOT / "site" / "_build" / "cli"
+
 warnings.filterwarnings(
     "ignore",
     category=SyntaxWarning,
@@ -207,6 +244,182 @@ if os.environ.get(_PYTHONWARNINGS):
 else:
     os.environ[_PYTHONWARNINGS] = _PYSERINI_WARNING
 
+
+def _coerce_json_value(value: object) -> JsonValue:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (list, tuple)):
+        return [_coerce_json_value(item) for item in value]
+    if isinstance(value, set):
+        return [_coerce_json_value(item) for item in value]
+    if isinstance(value, Mapping):
+        return {str(key): _coerce_json_value(val) for key, val in value.items()}
+    return str(value)
+
+
+def _prepare_extensions(values: Mapping[str, object] | None = None) -> dict[str, JsonValue]:
+    if not values:
+        return {}
+    return {str(key): _coerce_json_value(val) for key, val in values.items()}
+
+
+@dataclass(slots=True)
+class _CommandContext:
+    args: argparse.Namespace
+    correlation_id: str
+    logger: LoggerAdapter
+    builder: CliEnvelopeBuilder
+    start: float
+
+    def elapsed(self) -> float:
+        return time.monotonic() - self.start
+
+    def extensions(self, extras: Mapping[str, object] | None = None) -> dict[str, JsonValue]:
+        payload: dict[str, JsonValue] = {
+            "operation_id": CLI_OPERATION_ID,
+            "correlation_id": self.correlation_id,
+        }
+        if extras:
+            payload.update(_prepare_extensions(extras))
+        return payload
+
+
+def _envelope_path(subcommand: str) -> Path:
+    safe_subcommand = subcommand or "root"
+    filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand}.json"
+    return CLI_ENVELOPE_DIR / filename
+
+
+def _emit_envelope(envelope: CliEnvelope, *, logger: LoggerAdapter, subcommand: str) -> Path:
+    path = _envelope_path(subcommand)
+    CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
+    rendered = render_cli_envelope(envelope)
+    path.write_text(rendered + "\n", encoding="utf-8")
+    logger.debug(
+        "CLI envelope written",
+        extra={"status": envelope.status, "cli_envelope": str(path)},
+    )
+    return path
+
+
+def _run_status_from_error(error_status: CliErrorStatus) -> CliStatus:
+    return cast("CliStatus", error_status if error_status in {"config", "violation"} else "error")
+
+
+def _build_problem(
+    context: _CommandContext,
+    *,
+    detail: str,
+    status: int,
+    extras: Mapping[str, object] | None = None,
+) -> ProblemDetailsDict:
+    return build_problem_details(
+        ProblemDetailsParams(
+            type=CLI_PROBLEM_TYPE,
+            title=f"{CLI_TITLE} command failed",
+            status=status,
+            detail=detail,
+            instance=f"urn:cli:{CLI_INTERFACE_ID}:{SUBCOMMAND_BUILD_GRAPHS}",
+            extensions=context.extensions(extras),
+        )
+    )
+
+
+@dataclass(slots=True)
+class _FailureOptions:
+    extras: Mapping[str, object] | None = None
+    exc: BaseException | None = None
+
+
+def _record_failure(
+    context: _CommandContext,
+    *,
+    detail: str,
+    status: int,
+    error_status: CliErrorStatus,
+    options: _FailureOptions | None = None,
+) -> int:
+    failure_extras = options.extras if options else None
+    exc = options.exc if options else None
+    problem = _build_problem(context, detail=detail, status=status, extras=failure_extras)
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=_run_status_from_error(error_status),
+        subcommand=SUBCOMMAND_BUILD_GRAPHS,
+    )
+    builder.add_error(status=error_status, message=detail, problem=problem)
+    builder.set_problem(problem)
+    envelope = builder.finish(duration_seconds=context.elapsed())
+    path = _emit_envelope(envelope, logger=context.logger, subcommand=SUBCOMMAND_BUILD_GRAPHS)
+    log_extra: dict[str, JsonValue] = {
+        "status": envelope.status,
+        "cli_envelope": str(path),
+        "duration_seconds": envelope.duration_seconds,
+    }
+    if failure_extras:
+        log_extra.update(context.extensions(failure_extras))
+    context.logger.error("Command failed", extra=log_extra, exc_info=exc)
+    sys.stderr.write(detail + "\n")
+    return 2 if error_status in {"config", "violation"} else 1
+
+
+def _finish_success(context: _CommandContext, summary: Mapping[str, object]) -> int:
+    builder = context.builder
+    builder.add_file(
+        path=str(OUT),
+        status="success",
+        message="Documentation dependency graphs generated",
+    )
+    builder.add_file(
+        path=str(OUT / "graph_meta.json"),
+        status="success",
+        message="Global graph metadata summary",
+    )
+    builder.add_file(
+        path=str(OUT / f"subsystems.{context.args.format}"),
+        status="success",
+        message="Subsystem dependency graph",
+    )
+    envelope = builder.finish(duration_seconds=context.elapsed())
+    path = _emit_envelope(envelope, logger=context.logger, subcommand=SUBCOMMAND_BUILD_GRAPHS)
+    log_extra: dict[str, JsonValue] = {
+        "status": envelope.status,
+        "cli_envelope": str(path),
+        "duration_seconds": envelope.duration_seconds,
+    }
+    log_extra.update(_prepare_extensions(summary))
+    context.logger.info("Command completed", extra=log_extra)
+    return 0
+
+
+def _start_command(args: argparse.Namespace) -> _CommandContext:
+    correlation_id = uuid4().hex
+    logger = with_fields(
+        LOGGER,
+        command=CLI_COMMAND,
+        subcommand=SUBCOMMAND_BUILD_GRAPHS,
+        correlation_id=correlation_id,
+        format=args.format,
+        packages=args.packages,
+        max_workers=args.max_workers,
+    )
+    logger.info("Command started", extra={"status": "start"})
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=cast("CliStatus", "success"),
+        subcommand=SUBCOMMAND_BUILD_GRAPHS,
+    )
+    return _CommandContext(
+        args=args,
+        correlation_id=correlation_id,
+        logger=logger,
+        builder=builder,
+        start=time.monotonic(),
+    )
+
+
 # Defaults / policy files
 LAYER_FILE = ROOT / "docs" / "policies" / "layers.yml"
 ALLOW_FILE = ROOT / "docs" / "policies" / "graph_allowlist.json"
@@ -216,7 +429,7 @@ ALLOW_FILE = ROOT / "docs" / "policies" / "graph_allowlist.json"
 # --------------------------------------------------------------------------------------
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     """Compute parse args.
 
     Carry out the parse args operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
@@ -296,7 +509,7 @@ def parse_args() -> argparse.Namespace:
         help="Disable cache (always rebuild per-package graphs)",
     )
     p.add_argument("--verbose", action="store_true", help="Verbose logging")
-    return p.parse_args()
+    return p.parse_args(argv)
 
 
 # --------------------------------------------------------------------------------------
@@ -1296,10 +1509,10 @@ def enforce_policy(
     fail_layers : bool, optional
         Description for ``fail_layers``. Keyword-only argument.
 
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import enforce_policy
-    >>> enforce_policy(..., ..., ..., ...)  # doctest: +ELLIPSIS
+    Raises
+    ------
+    GraphPolicyError
+        Raised when policy violations are detected.
     """
     allowed_cycle_set = {tuple(cycle) for cycle in _sequence_of_sequences(allow.get("cycles"))}
     allowed_edge_set = {
@@ -1324,8 +1537,8 @@ def enforce_policy(
     if fail_layers and new_violations:
         errs.append(f"{len(new_violations)} layer violation edge(s) not allowlisted")
     if errs:
-        LOGGER.error("Policy violations: %s", "; ".join(errs))
-        sys.exit(2)
+        message = "Policy violations detected"
+        raise GraphPolicyError(message, errors=errs)
 
 
 # --------------------------------------------------------------------------------------
@@ -1686,9 +1899,10 @@ def build_one_package(pkg: str, config: PackageBuildConfig) -> tuple[str, bool, 
 def _validate_runtime_dependencies() -> None:
     """Validate runtime dependencies.
 
-    Notes
-    -----
-    Exits with code 2 if dependencies are missing.
+    Raises
+    ------
+    ValidationError
+        Raised when required dependencies are missing.
     """
     missing = []
     if pydot is None:
@@ -1698,14 +1912,16 @@ def _validate_runtime_dependencies() -> None:
     if yaml is None:
         missing.append("pyyaml")
     if missing:
-        LOGGER.error(
-            "Missing Python packages: %s. Install them in the docs env.", ", ".join(missing)
+        message = (
+            "Missing Python packages: "
+            + ", ".join(missing)
+            + ". Install them in the docs environment."
         )
-        sys.exit(2)
+        raise ValidationError(message)
 
     if not shutil.which("dot"):
-        LOGGER.error("graphviz 'dot' not found on PATH. Install graphviz.")
-        sys.exit(2)
+        message = "graphviz 'dot' not found on PATH. Install graphviz."
+        raise ValidationError(message)
 
     ensure_bin("pydeps")
     ensure_bin("pyreverse")
@@ -1744,13 +1960,13 @@ def _prepare_cache(args: argparse.Namespace) -> tuple[Path, bool]:
 
     Raises
     ------
-    SharedValidationError
+    ValidationError
         If cache directory exists but is not a directory.
-    """  # noqa: DOC501, DOC502
+    """
     cache_dir = resolve_path(args.cache_dir, strict=False)
     if cache_dir.exists() and not cache_dir.is_dir():
         message = f"Cache directory '{cache_dir}' must be a directory"
-        raise SharedValidationError(message)
+        raise ValidationError(message)
     cache_dir.mkdir(parents=True, exist_ok=True)
     return cache_dir, not args.no_cache
 
@@ -1831,23 +2047,24 @@ def _report_package_failures(results: Sequence[tuple[str, bool, bool, bool]]) ->
     results : Sequence[tuple[str, bool, bool, bool]]
         Build results tuples.
 
-    Notes
-    -----
-    Exits with code 3 if failures are detected.
+    Raises
+    ------
+    GraphPolicyError
+        Raised when any per-package build fails.
     """
     failed = [(pkg, ok1, ok2) for pkg, _, ok1, ok2 in results if not (ok1 and ok2)]
     if not failed:
         return
-    lines = ["[graphs] build failures detected during per-package graph generation:"]
+    errors: list[str] = []
     for pkg, pydeps_ok, pyrev_ok in failed:
         parts: list[str] = []
         if not pydeps_ok:
             parts.append("pydeps")
         if not pyrev_ok:
             parts.append("pyreverse")
-        lines.append(f" - {pkg}: {', '.join(parts)} failed")
-    LOGGER.error("Package failures:\n%s", "\n".join(lines))
-    sys.exit(3)
+        errors.append(f"{pkg}: {', '.join(parts)} failed")
+    message = "Per-package graph build failures detected"
+    raise GraphPolicyError(message, errors=errors)
 
 
 def _build_global_graph(_fmt: str, excludes: list[str], max_bacon: int) -> DiGraph:
@@ -1891,26 +2108,26 @@ def _load_layers_config(path: str) -> LayerConfig:
 
     Raises
     ------
-    SharedValidationError
+    ValidationError
         If config file is invalid or missing.
-    """  # noqa: DOC501, DOC502
+    """
     file_path = resolve_path(path, strict=False)
     if yaml is None:
         return {"order": [], "packages": {}, "rules": {}}
     if not file_path.exists():
         message = f"Layers config '{file_path}' does not exist"
-        raise SharedValidationError(message)
+        raise ValidationError(message)
     if not file_path.is_file():
         message = f"Layers config '{file_path}' must be a file"
-        raise SharedValidationError(message)
+        raise ValidationError(message)
     try:
         data = yaml.safe_load(file_path.read_text(encoding="utf-8"))
     except YamlError as exc:
         message = f"Layers config '{file_path}' is not valid YAML"
-        raise SharedValidationError(message) from exc
+        raise ValidationError(message) from exc
     if not isinstance(data, Mapping):
         message = f"Layers config '{file_path}' must contain a mapping"
-        raise SharedValidationError(message)
+        raise ValidationError(message)
     return cast("LayerConfig", data)
 
 
@@ -1929,24 +2146,24 @@ def _load_allowlist(path: str) -> dict[str, object]:
 
     Raises
     ------
-    SharedValidationError
+    ValidationError
         If allowlist file is invalid.
-    """  # noqa: DOC501, DOC502
+    """
     file_path = resolve_path(path, strict=False)
     if not file_path.exists():
         LOGGER.warning("Allowlist '%s' does not exist; continuing with empty allowlist", file_path)
         return {}
     if not file_path.is_file():
         message = f"Allowlist '{file_path}' must be a file"
-        raise SharedValidationError(message)
+        raise ValidationError(message)
     try:
         data = json.loads(file_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:  # pragma: no cover - malformed JSON
         message = f"Allowlist '{file_path}' is not valid JSON"
-        raise SharedValidationError(message) from exc
+        raise ValidationError(message) from exc
     if not isinstance(data, dict):
         message = f"Allowlist '{file_path}' must contain a JSON object"
-        raise SharedValidationError(message)
+        raise ValidationError(message)
     return data
 
 
@@ -2027,21 +2244,6 @@ def _log_run_summary(
     duration_s: float,
     verbose: bool,
 ) -> None:
-    """Log run summary.
-
-    Parameters
-    ----------
-    use_cache : bool
-        Whether cache was used.
-    cache_dir : Path
-        Cache directory path.
-    results : Sequence[tuple[str, bool, bool, bool]]
-        Build results.
-    duration_s : float
-        Duration in seconds.
-    verbose : bool
-        Enable verbose logging.
-    """
     built = sum(1 for _, used_cache, _, _ in results if not used_cache)
     cached = sum(1 for _, used_cache, _, _ in results if used_cache)
     if use_cache:
@@ -2052,64 +2254,64 @@ def _log_run_summary(
         LOGGER.info("done in %.2fs; outputs in %s", duration_s, OUT)
 
 
-# --------------------------------------------------------------------------------------
-# Main
-# --------------------------------------------------------------------------------------
+def _execute(context: _CommandContext) -> dict[str, object]:  # noqa: PLR0914
+    """Execute the graph build workflow and return summary metadata.
 
+    Parameters
+    ----------
+    context : _CommandContext
+        CLI command context containing parsed arguments and logging state.
 
-def main() -> None:
-    """Compute main.
+    Returns
+    -------
+    dict[str, object]
+        Summary metadata describing the run (packages processed, cache usage, duration).
 
-    Carry out the main operation for the surrounding component. Generated documentation highlights how this helper collaborates with neighbouring utilities. Callers rely on the routine to remain stable across releases.
+    Notes
+    -----
+    Exceptions raised by dependency validation, graph construction, or policy enforcement
+    propagate to the caller.
 
-    Examples
-    --------
-    >>> from tools.docs.build_graphs import main
-    >>> main()  # doctest: +ELLIPSIS
+    Raises
+    ------
+    GraphBuildError
+        Raised when global graph construction fails unexpectedly.
     """
-    args = parse_args()
-
-    if not logging.getLogger().handlers:
-        log_level = logging.INFO if args.verbose else logging.WARNING
-        setup_logging(level=log_level)
-
+    args = context.args
     _validate_runtime_dependencies()
 
     packages = _resolve_packages(args)
     excludes = args.exclude or ["tests/.*", "site/.*"]
 
+    cache_dir, use_cache = _prepare_cache(args)
+    _log_configuration(
+        verbose=args.verbose,
+        packages=packages,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+    )
+    config = PackageBuildConfig(
+        fmt=args.format,
+        excludes=tuple(excludes),
+        max_bacon=args.max_bacon,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+        verbose=args.verbose,
+    )
+
+    build_start = time.monotonic()
+    results = _build_per_package_graphs(packages, config, args.max_workers)
+    _report_package_failures(results)
+
     try:
-        cache_dir, use_cache = _prepare_cache(args)
-        _log_configuration(
-            verbose=args.verbose,
-            packages=packages,
-            cache_dir=cache_dir,
-            use_cache=use_cache,
-        )
-        config = PackageBuildConfig(
-            fmt=args.format,
-            excludes=tuple(excludes),
-            max_bacon=args.max_bacon,
-            cache_dir=cache_dir,
-            use_cache=use_cache,
-            verbose=args.verbose,
-        )
-        start = time.monotonic()
-        results = _build_per_package_graphs(packages, config, args.max_workers)
-        _report_package_failures(results)
+        global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
+    except (GraphBuildError, RuntimeError, OSError) as exc:  # pragma: no cover - defensive guard
+        message = "Building global graph failed"
+        raise GraphBuildError(message) from exc
 
-        try:
-            global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
-        except (GraphBuildError, RuntimeError, OSError):  # pragma: no cover - defensive guard
-            LOGGER.exception("Building global graph failed")
-            sys.exit(2)
-
-        layers = _load_layers_config(args.layers)
-        allow = _load_allowlist(args.allowlist)
-    except SharedValidationError:
-        LOGGER.exception("Input validation failed")
-        sys.exit(4)
-    duration = time.monotonic() - start
+    layers = _load_layers_config(args.layers)
+    allow = _load_allowlist(args.allowlist)
+    duration = time.monotonic() - build_start
 
     analysis = analyze_graph(global_graph, layers)
     _write_global_artifacts(global_graph, layers, args.format, analysis)
@@ -2128,6 +2330,88 @@ def main() -> None:
         verbose=args.verbose,
     )
 
+    cached = sum(1 for _, used_cache, _, _ in results if used_cache)
+    built = sum(1 for _, used_cache, _, _ in results if not used_cache)
+
+    summary: dict[str, object] = {
+        "packageCount": len(packages),
+        "cachedPackages": cached,
+        "builtPackages": built,
+        "useCache": use_cache,
+        "cacheDir": str(cache_dir),
+        "durationSeconds": duration,
+        "cycleEnumerationSkipped": bool(analysis.get("cycle_enumeration_skipped", False)),
+    }
+
+    return summary
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Entry point for the documentation graphs CLI.
+
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Optional command-line arguments to parse instead of ``sys.argv``.
+
+    Returns
+    -------
+    int
+        Exit code compatible with CLI conventions (0 success, non-zero failure).
+    """
+    args = parse_args(argv)
+
+    if not logging.getLogger().handlers:
+        log_level = logging.INFO if args.verbose else logging.WARNING
+        setup_logging(level=log_level)
+
+    context = _start_command(args)
+
+    try:
+        summary = _execute(context)
+    except GraphPolicyError as exc:
+        detail = str(exc) or "Graph policy violations detected"
+        extras = {"error_count": len(exc.errors), "errors": exc.errors}
+        return _record_failure(
+            context,
+            detail=detail,
+            status=422,
+            error_status="violation",
+            options=_FailureOptions(extras=extras, exc=exc),
+        )
+    except ValidationError as exc:
+        detail = str(exc) or "Invalid configuration"
+        extras = {"error": detail}
+        return _record_failure(
+            context,
+            detail=detail,
+            status=422,
+            error_status="config",
+            options=_FailureOptions(extras=extras, exc=exc),
+        )
+    except GraphBuildError as exc:
+        detail = str(exc) or "Graph build failed"
+        extras = {"error": detail}
+        return _record_failure(
+            context,
+            detail=detail,
+            status=500,
+            error_status="error",
+            options=_FailureOptions(extras=extras, exc=exc),
+        )
+    except Exception as exc:  # pragma: no cover - defensive catch  # noqa: BLE001
+        detail = str(exc) or exc.__class__.__name__
+        extras = {"error": repr(exc)}
+        return _record_failure(
+            context,
+            detail=detail,
+            status=500,
+            error_status="error",
+            options=_FailureOptions(extras=extras, exc=exc),
+        )
+
+    return _finish_success(context, summary)
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

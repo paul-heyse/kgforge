@@ -20,12 +20,24 @@ tags:
   - name: docstrings-utilities
     x-displayName: Utilities
     description: Auxiliary helpers including schema export, cache management, and metadata harvesting.
+  - name: docs
+    x-displayName: Documentation Tooling
+    description: Commands that operate on generated documentation artifacts and schemas.
+  - name: docs-validation
+    x-displayName: Artifact Validation
+    description: Validate documentation outputs against their canonical schemas before publishing.
+  - name: docs-symbol-index
+    x-displayName: Symbol Index
+    description: Build documentation symbol index artifacts and reverse lookup tables.
   - name: download
     x-displayName: Download
     description: Commands that harvest external corpora for downstream processing.
   - name: codeintel
     x-displayName: Code Intelligence
     description: Commands that surface Tree-sitter-based code intelligence capabilities.
+  - name: navmap
+    x-displayName: Navmap Builder
+    description: Commands that generate and maintain navigation metadata for documentation tooling.
 
 x-tagGroups:
   - name: CLI Suites
@@ -42,7 +54,14 @@ x-tagGroups:
   - name: Data Acquisition
     tags: [download]
   - name: Developer Tooling
-    tags: [codeintel]
+    tags:
+      - codeintel
+      - navmap
+  - name: Documentation Tooling
+    tags:
+      - docs
+      - docs-validation
+      - docs-symbol-index
 
 operations:
   cli.index_bm25:
@@ -153,6 +172,25 @@ operations:
     x-codeSamples:
       - lang: bash
         source: "uv run python -m tools.docstring_builder.cli doctor --stubs"
+  docs.validate_artifacts:
+    tags: [docs, docs-validation]
+    x-handler: "docs.toolchain.validate_artifacts:validate_artifacts"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m docs._scripts.validate_artifacts --docs-build-dir docs/_build"
+  docs.build_graphs:
+    summary: Build dependency graphs for documentation and subsystem analysis.
+    description: |
+      Generate per-package and subsystem-wide dependency graphs using pydeps and pyreverse. The
+      command manages caching, parallel execution, and policy enforcement so documentation tooling
+      stays aligned with architectural guidelines.
+    tags: [docs]
+    x-handler: "tools.docs.build_graphs:main"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docs.build_graphs --format svg"
+    x-problemDetails:
+      - schema/examples/problem_details/tool-execution-error.json
   codeintel.indexer.query:
     summary: Execute a Tree-sitter query against a source file.
     description: |
@@ -179,6 +217,32 @@ operations:
         source: "uv run python -m codeintel.indexer.cli symbols src/"
     x-problemDetails:
       - schema/examples/problem_details/tool-execution-error.json
+  navmap.build:
+    summary: Build the navigation metadata index for documentation tooling.
+    description: |
+      Scan the repository for Python modules, resolve ``__navmap__`` declarations, and emit the
+      navmap JSON artefact consumed by documentation and automation pipelines. Emits structured CLI
+      envelopes so downstream tooling can track drift and failures consistently.
+    tags: [navmap]
+    x-handler: "tools.navmap.build_navmap:main"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.navmap.build_navmap --write site/_build/navmap/navmap.json"
+    x-problemDetails:
+      - schema/examples/problem_details/tool-execution-error.json
+  navmap.check:
+    summary: Validate navmap declarations and ensure documentation metadata is consistent.
+    description: |
+      Run the navmap validation suite against the source tree, verifying inline markers, export
+      metadata, and drift between ``__navmap__`` declarations and generated artefacts. Emits
+      structured CLI envelopes and Problem Details to surface validation results.
+    tags: [navmap]
+    x-handler: "tools.navmap.check_navmap:main"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.navmap.check_navmap"
+    x-problemDetails:
+      - schema/examples/problem_details/tool-execution-error.json
   cli.download.harvest:
     summary: Harvest OpenAlex works for downstream ingestion.
     description: |
@@ -191,4 +255,10 @@ operations:
         source: "kgf download harvest 'foundation models' --years '>=2020' --max-works 5000"
     x-problemDetails:
       - schema/examples/problem_details/tool-execution-error.json
+  docs.symbol_index.build:
+    tags: [docs, docs-symbol-index]
+    x-handler: "docs.toolchain.build_symbol_index:build_symbol_index"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m docs.toolchain.build_symbol_index"
 

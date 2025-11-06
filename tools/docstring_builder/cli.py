@@ -920,7 +920,7 @@ def _collect_doctor_checks(args: argparse.Namespace) -> tuple[list[str], int]:
     issues: list[str] = []
     issues.extend(_check_python_version())
     issues.extend(_check_pyright_configuration(REPO_ROOT / "pyrightconfig.jsonc"))
-    issues.extend(_check_stub_packages(("stubs/griffe", "stubs/libcst", "stubs/mkdocs_gen_files")))
+    issues.extend(_check_stub_packages(("stubs/libcst", "stubs/mkdocs_gen_files")))
     issues.extend(_check_optional_dependencies(("griffe", "libcst")))
     issues.extend(
         _check_writable_directories((REPO_ROOT / "docs" / "_build", REPO_ROOT / ".cache"))
