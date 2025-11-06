@@ -100,7 +100,8 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
 def _module_doc_link(module: object) -> str:
     if not isinstance(module, str) or not module:
         return "—"
-    return f"[{module}](../modules/{module}.md)"
+    module_path = module.replace(".", "/")
+    return f"[{module}](../modules/{module_path}.md)"
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:

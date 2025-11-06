@@ -139,6 +139,6 @@ def test_render_interface_catalog_links_full_module_path(
 
     output = _CAPTURED_OUTPUTS.get("api/interfaces.md")
     assert output is not None
-    assert "[pkg_root.subpkg.leaf](../modules/pkg_root.subpkg.leaf.md)" in output
+    assert "[pkg_root.subpkg.leaf](../modules/pkg_root/subpkg/leaf.md)" in output
 
     sys.modules.pop(module_name, None)
