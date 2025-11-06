@@ -11,7 +11,7 @@ from pathlib import Path
 import mkdocs_gen_files
 import yaml
 
-from . import load_repo_settings
+from tools.mkdocs_suite.docs._scripts import load_repo_settings
 
 SUITE_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -43,23 +43,22 @@ def _ensure_str_list(value: object) -> list[str]:
     return []
 
 
+def _normalized_module_path(nav_path: Path, src_root: Path) -> str:
+    try:
+        relative_parent = nav_path.parent.relative_to(src_root)
+    except ValueError:  # pragma: no cover - defensive guard
+        return nav_path.parent.name
+    parts = [part for part in relative_parent.parts if part not in {"", "."}]
+    return ".".join(parts) if parts else nav_path.parent.name
+
+
 def _collect_nav_interfaces() -> list[dict[str, object]]:
     records: list[dict[str, object]] = []
     src_root = REPO_ROOT / "src"
     if not src_root.exists():
         return records
     for nav_path in src_root.glob("**/_nav.json"):
-        try:
-            relative_parent = nav_path.parent.relative_to(src_root)
-        except ValueError:  # pragma: no cover - defensive guard
-            relative_parent = nav_path.parent
-            normalized_module = relative_parent.name
-        else:
-            parts = tuple(part for part in relative_parent.parts if part not in {"", "."})
-            if parts:
-                normalized_module = ".".join(parts)
-            else:
-                normalized_module = nav_path.parent.name
+        normalized_module = _normalized_module_path(nav_path, src_root)
         with nav_path.open("r", encoding="utf-8") as handle:
             try:
                 data = json.load(handle)
@@ -73,6 +72,9 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
             if not isinstance(entry, dict):
                 continue
             record = dict(entry)
+            module_value = record.get("module")
+            if not isinstance(module_value, str) or not module_value.strip():
+                record["module"] = normalized_module
             record["_nav_module_path"] = normalized_module
             records.append(record)
     return records
@@ -190,7 +192,9 @@ def _write_interface_table(
         description = record.get("description") or reg_entry.get("description") or "—"
         spec_cell = _spec_link(record)
         owner = record.get("owner") or reg_entry.get("owner") or "—"
-        module_path = record.get("module") or reg_entry.get("module") or record.get("_nav_module_path")
+        module_path = (
+            record.get("module") or reg_entry.get("module") or record.get("_nav_module_path")
+        )
         row = "| {id} | {type} | {module} | {owner} | {stability} | {spec} | {desc} | {problems} |".format(
             id=identifier,
             type=record.get("type", "—"),
@@ -282,15 +286,9 @@ def _write_interface_details(
             "* **Type:** {type}\n".format(type=nav_meta.get("type") or reg_entry.get("type") or "—")
         )
         module_value = (
-            nav_meta.get("module")
-            or reg_entry.get("module")
-            or nav_meta.get("_nav_module_path")
+            nav_meta.get("module") or reg_entry.get("module") or nav_meta.get("_nav_module_path")
         )
-        handle.write(
-            "* **Module:** {module}\n".format(
-                module=module_value or "—"
-            )
-        )
+        handle.write("* **Module:** {module}\n".format(module=module_value or "—"))
         handle.write(
             "* **Owner:** {owner}\n".format(
                 owner=nav_meta.get("owner") or reg_entry.get("owner") or "—"

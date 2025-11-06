@@ -6,7 +6,7 @@ import json
 import logging
 import threading
 from datetime import UTC, datetime
-from pathlib import Path  # noqa: TC003
+from pathlib import Path
 from typing import Final, Protocol, TypedDict, cast
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter

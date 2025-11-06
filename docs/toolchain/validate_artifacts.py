@@ -13,15 +13,22 @@ def validate_artifacts() -> dict[str, object]:
     This is the new public API for artifact validation that uses typed
     configuration for consistency with other toolchain operations.
 
+    Returns
+    -------
+    dict[str, object]
+        Validation results dictionary containing validation status and any errors.
+
     Raises
     ------
     NotImplementedError
         This function is a placeholder for Phase 3.2 implementation.
+        The return type annotation indicates the intended return value once
+        this function is fully implemented.
 
     Examples
     --------
     >>> # results = validate_artifacts()
-    """
+    """  # noqa: DOC202
     msg = "validate_artifacts is a placeholder for Phase 3.2 implementation"
     raise NotImplementedError(msg)
 

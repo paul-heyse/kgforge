@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 
+from tools._shared.cli_tooling import CLIToolingContext
 from tools.mkdocs_suite.docs._scripts import gen_cli_diagram as _impl
 
 OperationEntry = _impl.OperationEntry
@@ -11,21 +12,25 @@ OperationEntry = _impl.OperationEntry
 __all__ = ["OperationEntry", "collect_operations", "write_diagram"]
 
 
-def collect_operations(spec: Mapping[str, object]) -> list[OperationEntry]:
-    """Return CLI operations extracted from the OpenAPI specification mapping.
+def collect_operations(
+    *,
+    context: CLIToolingContext | None = None,
+    interface_id: str | None = None,
+    click_cmd: object | None = None,
+) -> list[OperationEntry]:
+    """Return CLI operations derived from the shared CLI tooling context.
 
     Parameters
     ----------
-    spec : Mapping[str, object]
-        OpenAPI specification dictionary containing paths and operations.
-
-    Returns
-    -------
-    list[OperationEntry]
-        List of operation tuples, each containing ``(method, path, operation_id,
-        summary, tags)`` where ``operation_id`` and ``summary`` may be ``None``.
+    context : CLIToolingContext | None, optional
+        Optional pre-loaded tooling context to reuse across calls.
+    interface_id : str | None, optional
+        Override for the CLI interface identifier. Defaults to the repository
+        standard when ``None``.
+    click_cmd : object | None, optional
+        Pre-resolved click command tree used for traversal.
     """
-    return _impl.collect_operations(spec)
+    return _impl.collect_operations(context, interface_id=interface_id, click_cmd=click_cmd)
 
 
 def write_diagram(operations: Sequence[OperationEntry]) -> None:

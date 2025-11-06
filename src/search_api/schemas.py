@@ -9,7 +9,7 @@ implementation specifics.
 from __future__ import annotations
 
 import importlib
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
 from pydantic import ConfigDict, Field
 
@@ -33,7 +33,7 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 class SearchResponse(BaseModel):
     """Search API response envelope containing ordered results."""
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding unexpected fields."""
 
     results: list[SearchResult] = Field(default_factory=list)
@@ -71,7 +71,7 @@ class SearchRequest(BaseModel):
     >>> assert_model_roundtrip(SearchRequest, example_path)
     """
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding extra parameters."""
 
     query: str = Field(min_length=1)
@@ -123,7 +123,7 @@ class SearchResult(BaseModel):
     >>> assert_model_roundtrip(SearchResult, example_path)
     """
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding extra fields."""
 
     doc_id: str

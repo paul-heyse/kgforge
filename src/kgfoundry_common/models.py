@@ -8,7 +8,7 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import ClassVar, Literal
+from typing import Literal
 
 from pydantic import ConfigDict, Field
 
@@ -79,7 +79,7 @@ class Doc(BaseModel):
     >>> assert_model_roundtrip(Doc, example_path)
     """
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding unknown fields."""
 
     id: Id

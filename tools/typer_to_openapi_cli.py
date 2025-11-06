@@ -13,20 +13,52 @@ import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
 import click
-import yaml
+
+from tools._shared.cli_tooling import (
+    AugmentPayload,
+    CLIConfigError,
+    CLIToolSettings,
+    load_cli_tooling_context,
+)
+from tools._shared.problem_details import render_problem
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    type TyperCommandFactory = Callable[[object], click.core.Command]
+else:
+    TyperCommandFactory = object  # type: ignore[assignment]
 
 try:  # Typer is optional at runtime; degrade gracefully when absent.
-    from typer.main import get_command as typer_get_command
+    from typer.main import get_command as _raw_get_command
 except (ImportError, AttributeError):  # pragma: no cover - Typer may be unavailable in slim envs
-    typer_get_command = None  # type: ignore[assignment]
+    TYPER_GET_COMMAND: TyperCommandFactory | None = None
+else:
+    TYPER_GET_COMMAND = cast("TyperCommandFactory", _raw_get_command)
 
 
 LOGGER = logging.getLogger(__name__)
 
-AugmentPayload = dict[str, object]
 JSONMapping = Mapping[str, object]
+
+
+def _looks_like_typer(obj: object) -> bool:
+    """Return ``True`` when ``obj`` appears to be a Typer application.
+
+    Returns
+    -------
+    bool
+        ``True`` if the object resembles a Typer application.
+    """
+    if obj is None:
+        return False
+    module_name = getattr(obj, "__module__", "")
+    class_name = obj.__class__.__name__
+    return module_name.startswith("typer") or class_name == "Typer"
+
 
 SCRIPT_ROOT = Path(__file__).resolve().parent
 DEFAULT_REGISTRY_PATH = SCRIPT_ROOT / "mkdocs_suite" / "api_registry.yaml"
@@ -43,7 +75,7 @@ HTTP_METHODS: set[str] = {
 
 
 def import_object(path: str) -> object:
-    """Import ``pkg.mod:attr`` strings and return the referenced object.
+    """Import a module or attribute by dotted path.
 
     Parameters
     ----------
@@ -53,7 +85,7 @@ def import_object(path: str) -> object:
     Returns
     -------
     object
-        The imported object (module or attribute).
+        Imported module or attribute referenced by ``path``.
     """
     if ":" in path:
         module_name, attribute = path.split(":", 1)
@@ -68,12 +100,12 @@ def to_click_command(obj: object) -> click.core.Command:
     Parameters
     ----------
     obj : object
-        Typer application or click.Command instance.
+        Typer application instance or click ``Command`` / ``Group``.
 
     Returns
     -------
     click.core.Command
-        Click command instance.
+        Click command instance suitable for traversal.
 
     Raises
     ------
@@ -82,40 +114,38 @@ def to_click_command(obj: object) -> click.core.Command:
     """
     if isinstance(obj, click.core.Command):
         return obj
-    if typer_get_command is None:
+    if TYPER_GET_COMMAND is None:
         message = "Typer is not installed; install typer or pass a click.Command."
         raise RuntimeError(message)
-    return typer_get_command(obj)
+    if not _looks_like_typer(obj):
+        message = "Expected Typer application when adapting to click command."
+        raise RuntimeError(message)
+    return TYPER_GET_COMMAND(obj)
 
 
 def snake_to_kebab(value: str) -> str:
-    """Convert snake_case to kebab-case.
-
-    Parameters
-    ----------
-    value : str
-        String in snake_case format.
+    """Convert a snake_case string to kebab-case.
 
     Returns
     -------
     str
-        String converted to kebab-case.
+        Kebab-case variant of ``value``.
     """
     return value.replace("_", "-")
 
 
 def param_schema(param: click.Parameter) -> tuple[dict[str, object], bool, str]:
-    """Return (schema, required, example-name) triple for a click parameter.
+    """Return JSON schema metadata for a click parameter.
 
     Parameters
     ----------
     param : click.Parameter
-        Click parameter to analyze.
+        Click parameter to analyse.
 
     Returns
     -------
     tuple[dict[str, object], bool, str]
-        Schema dictionary, required flag, and example parameter name.
+        Tuple containing the schema dictionary, a required flag, and the parameter name.
     """
     schema: dict[str, object] = {"type": "string"}
     required = bool(getattr(param, "required", False))
@@ -123,7 +153,11 @@ def param_schema(param: click.Parameter) -> tuple[dict[str, object], bool, str]:
 
     param_type = getattr(param, "type", None)
     type_name = getattr(param_type, "name", "").lower()
-    if hasattr(param_type, "choices") and param_type.choices:
+    if (
+        param_type is not None
+        and hasattr(param_type, "choices")
+        and getattr(param_type, "choices", None)
+    ):
         schema["enum"] = list(param_type.choices)
     elif type_name in {"int", "integer"}:
         schema["type"] = "integer"
@@ -145,21 +179,12 @@ def param_schema(param: click.Parameter) -> tuple[dict[str, object], bool, str]:
 
 
 def build_example(bin_name: str, tokens: Sequence[str], params: Sequence[click.Parameter]) -> str:
-    """Construct a CLI usage example for documentation.
-
-    Parameters
-    ----------
-    bin_name : str
-        Binary/command name.
-    tokens : Sequence[str]
-        Command tokens (subcommands).
-    params : Sequence[click.Parameter]
-        Command parameters to include in example.
+    """Construct a CLI usage example string for documentation.
 
     Returns
     -------
     str
-        CLI usage example string.
+        CLI example illustrating invocation of the command.
     """
     parts = [bin_name, *tokens]
     for param in params:
@@ -203,29 +228,35 @@ def walk_commands(
 
 
 def _augment_lookup(augment: AugmentPayload, op_id: str, tokens: Sequence[str]) -> JSONMapping:
-    operations = augment.get("operations") or {}
+    operations = _coerce_mapping(augment.get("operations"))
     override = operations.get(op_id)
-    if override:
-        return override
+    if isinstance(override, Mapping):
+        return _coerce_mapping(override)
     token_key = " ".join(tokens)
-    return operations.get(token_key, {})
-
-
-def _load_registry(path: Path) -> dict[str, object]:
-    if not path.exists():
-        return {}
-    with path.open("r", encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
-    interfaces = payload.get("interfaces") if isinstance(payload, dict) else None
-    return interfaces if isinstance(interfaces, dict) else {}
+    fallback = operations.get(token_key)
+    return _coerce_mapping(fallback)
 
 
 def _ensure_str_list(value: object) -> list[str]:
-    if isinstance(value, list):
-        return [str(item) for item in value]
     if isinstance(value, str):
         return [value]
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return [str(item) for item in value]
     return []
+
+
+def _coerce_mapping(value: object) -> dict[str, object]:
+    if not isinstance(value, Mapping):
+        return {}
+    return {str(key): val for key, val in value.items()}
+
+
+def _coerce_mapping_list(value: object) -> list[dict[str, object]]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        return []
+    return [
+        {str(key): val for key, val in item.items()} for item in value if isinstance(item, Mapping)
+    ]
 
 
 def _operation_metadata(
@@ -235,11 +266,10 @@ def _operation_metadata(
 ) -> dict[str, object]:
     if not interface_meta:
         return {}
-    operations = interface_meta.get("operations")
-    if not isinstance(operations, Mapping):
-        return {}
-    slug = "-".join(snake_to_kebab(token) for token in tokens)
-    candidates = (operation_id, slug, " ".join(tokens))
+    operations = _coerce_mapping(interface_meta.get("operations"))
+    token_list = list(tokens)
+    slug = "-".join(snake_to_kebab(token) for token in token_list)
+    candidates = (operation_id, slug, " ".join(token_list))
     for key in candidates:
         meta = operations.get(key)
         if isinstance(meta, Mapping):
@@ -253,7 +283,7 @@ def _interface_metadata(
 ) -> dict[str, object] | None:
     if not interface_id and not interface_meta:
         return None
-    meta = dict(interface_meta) if isinstance(interface_meta, Mapping) else {}
+    meta = dict(interface_meta) if interface_meta is not None else {}
     identifier = meta.get("id", interface_id)
     return {
         "id": identifier,
@@ -272,9 +302,7 @@ def _initial_document(
     interface_id: str | None,
     interface_meta: JSONMapping | None,
 ) -> dict[str, object]:
-    tag_entries = [
-        dict(raw) for raw in augment.get("tags", []) if isinstance(raw, Mapping) and "name" in raw
-    ]
+    tag_entries = [entry for entry in _coerce_mapping_list(augment.get("tags")) if "name" in entry]
     document: dict[str, object] = {
         "openapi": "3.1.0",
         "info": {"title": title, "version": version},
@@ -284,10 +312,12 @@ def _initial_document(
     if interface_id and interface_meta:
         extension = _interface_metadata(interface_id, interface_meta)
         if extension:
-            document.setdefault("info", {}).setdefault("x-kgf-interface", extension)
+            info_section = document.setdefault("info", {})
+            if isinstance(info_section, dict):
+                info_section.setdefault("x-kgf-interface", extension)
     tag_groups = augment.get("x-tagGroups")
-    if isinstance(tag_groups, list):
-        document["x-tagGroups"] = tag_groups
+    if isinstance(tag_groups, Sequence) and not isinstance(tag_groups, (str, bytes)):
+        document["x-tagGroups"] = list(tag_groups)
     return document
 
 
@@ -348,47 +378,6 @@ def _select_operation_tags(
     return [default_tag]
 
 
-def _operation_payload(
-    operation_id: str,
-    summary: str,
-    description: str,
-    request_schema: dict[str, object],
-    has_properties: bool,
-    tags: Sequence[str],
-    x_cli_block: dict[str, object],
-) -> dict[str, object]:
-    return {
-        "operationId": operation_id,
-        "tags": list(tags),
-        "summary": summary,
-        "description": description,
-        "x-cli": x_cli_block,
-        "requestBody": {
-            "required": has_properties,
-            "content": {"application/json": {"schema": request_schema}},
-        },
-        "responses": {
-            "200": {
-                "description": "CLI result",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "stdout": {"type": "string"},
-                                "stderr": {"type": "string"},
-                                "exitCode": {"type": "integer"},
-                                "artifacts": {"type": "array", "items": {"type": "string"}},
-                            },
-                            "required": ["exitCode"],
-                        }
-                    }
-                },
-            }
-        },
-    }
-
-
 @dataclass(frozen=True, slots=True)
 class _OperationDescriptor:
     """Immutable descriptor capturing command metadata for an operation."""
@@ -403,7 +392,11 @@ class _OperationDescriptor:
     def __post_init__(self) -> None:
         tokens = list(self.raw_tokens) or [self.command.name or "run"]
         object.__setattr__(self, "tokens", tuple(tokens))
-        params = tuple(getattr(self.command, "params", []))
+        raw_params = getattr(self.command, "params", ())
+        if isinstance(raw_params, Sequence) and not isinstance(raw_params, (str, bytes)):
+            params = tuple(item for item in raw_params if isinstance(item, click.Parameter))
+        else:
+            params = ()
         object.__setattr__(self, "params", params)
         help_text = (getattr(self.command, "help", "") or "").strip()
         object.__setattr__(self, "help_text", help_text)
@@ -443,13 +436,20 @@ class OperationContext:
     """Context bundle shared across OpenAPI operation builders."""
 
     bin_name: str
-    augment: JSONMapping
+    augment: AugmentPayload
     interface_id: str | None
     interface_meta: JSONMapping | None
 
     def build_operation(
         self, tokens: Sequence[str], command: click.core.Command
     ) -> tuple[str, dict[str, object], list[str]]:
+        """Build an OpenAPI operation payload for the supplied command.
+
+        Returns
+        -------
+        tuple[str, dict[str, object], list[str]]
+            The OpenAPI path, operation payload, and associated tags.
+        """
         descriptor = _OperationDescriptor(tuple(tokens), command)
         override = _augment_lookup(self.augment, descriptor.operation_id, descriptor.tokens)
         op_meta = _operation_metadata(
@@ -462,15 +462,36 @@ class OperationContext:
         request_schema, has_properties = _request_schema_for_command(params)
         x_cli_block = _build_x_cli_block(descriptor, params, op_meta, self)
         _apply_override_to_x_cli(x_cli_block, override)
-        operation = _operation_payload(
-            descriptor.operation_id,
-            descriptor.summary(op_meta),
-            descriptor.description(op_meta),
-            request_schema,
-            has_properties,
-            tags,
-            x_cli_block,
-        )
+        operation = {
+            "operationId": descriptor.operation_id,
+            "tags": list(tags),
+            "summary": descriptor.summary(op_meta),
+            "description": descriptor.description(op_meta),
+            "x-cli": x_cli_block,
+            "requestBody": {
+                "required": has_properties,
+                "content": {"application/json": {"schema": request_schema}},
+            },
+            "responses": {
+                "200": {
+                    "description": "CLI result",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "stdout": {"type": "string"},
+                                    "stderr": {"type": "string"},
+                                    "exitCode": {"type": "integer"},
+                                    "artifacts": {"type": "array", "items": {"type": "string"}},
+                                },
+                                "required": ["exitCode"],
+                            }
+                        }
+                    },
+                }
+            },
+        }
         problem_details = _collect_problem_details(op_meta, self.interface_meta, override)
         if problem_details:
             operation["x-problemDetails"] = problem_details
@@ -487,12 +508,13 @@ class CLIConfig:
     bin_name: str
     title: str
     version: str
-    augment: JSONMapping
+    augment: AugmentPayload
     interface_id: str | None = None
     interface_meta: JSONMapping | None = None
 
     @property
     def operation_context(self) -> OperationContext:
+        """Return a lightweight context object for building operations."""
         return OperationContext(
             bin_name=self.bin_name,
             augment=self.augment,
@@ -520,30 +542,39 @@ def _build_x_cli_block(
             "x-interface",
             context.interface_meta.get("id", context.interface_id),
         )
-    if op_meta.get("handler"):
-        block["x-handler"] = op_meta["handler"]
-    if op_meta.get("env"):
-        block["x-env"] = list(op_meta["env"])
-    if op_meta.get("code_samples"):
-        block.setdefault("x-codeSamples", []).extend(op_meta["code_samples"])
+    handler = op_meta.get("handler")
+    if isinstance(handler, (str, bytes)):
+        block["x-handler"] = handler
+    env_values = op_meta.get("env")
+    if isinstance(env_values, Sequence) and not isinstance(env_values, (str, bytes)):
+        block["x-env"] = [str(value) for value in env_values]
+    code_samples = op_meta.get("code_samples")
+    if isinstance(code_samples, Sequence) and not isinstance(code_samples, (str, bytes)):
+        sample_block = cast("list[object]", block.setdefault("x-codeSamples", []))
+        sample_block.extend(code_samples)
     examples = _ensure_str_list(op_meta.get("examples"))
     if examples:
-        block["examples"].extend(examples)
+        example_list = cast("list[str]", block.setdefault("examples", []))
+        example_list.extend(examples)
     problem_details = _ensure_str_list(op_meta.get("problem_details"))
     if problem_details:
-        block.setdefault("x-problemDetails", []).extend(problem_details)
+        problem_list = cast("list[str]", block.setdefault("x-problemDetails", []))
+        problem_list.extend(problem_details)
     return block
 
 
 def _augment_document_tags(document: dict[str, object], referenced_tags: set[str]) -> None:
-    existing = {
-        entry.get("name") for entry in document.get("tags", []) if isinstance(entry, Mapping)
-    }
+    existing_tags = document.get("tags")
+    iterable_tags = (
+        existing_tags
+        if isinstance(existing_tags, Sequence) and not isinstance(existing_tags, (str, bytes))
+        else []
+    )
+    existing = {entry.get("name") for entry in iterable_tags if isinstance(entry, Mapping)}
     for tag in sorted(referenced_tags):
         if tag not in existing:
-            document.setdefault("tags", []).append(
-                {"name": tag, "description": f"Commands for {tag}."}
-            )
+            tag_list = cast("list[dict[str, object]]", document.setdefault("tags", []))
+            tag_list.append({"name": tag, "description": f"Commands for {tag}."})
 
 
 def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, object]:
@@ -575,41 +606,17 @@ def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, 
 
     for tokens, command in walk_commands(click_cmd, []):
         path, operation, tags = context.build_operation(tokens, command)
-        document.setdefault("paths", {}).setdefault(path, {})["post"] = operation
+        paths_section = document.setdefault("paths", {})
+        if not isinstance(paths_section, dict):
+            paths_section = {}
+            document["paths"] = paths_section
+        path_entry = paths_section.setdefault(path, {})
+        if isinstance(path_entry, dict):
+            path_entry["post"] = operation
         referenced_tags.update(tags)
 
     _augment_document_tags(document, referenced_tags)
     return document
-
-
-def load_augment(path: str) -> AugmentPayload:
-    """Load optional augmentation metadata from a YAML file.
-
-    Parameters
-    ----------
-    path : str
-        Filesystem path to the YAML augmentation file.
-
-    Returns
-    -------
-    AugmentPayload
-        Mapping describing additional tag metadata and operation overrides.
-        Returns an empty dictionary if the file does not exist.
-
-    Raises
-    ------
-    TypeError
-        If the YAML document does not decode to a mapping.
-    """
-    augment_path = Path(path)
-    if not augment_path.exists():
-        return {}
-    with augment_path.open("r", encoding="utf-8") as handle:
-        data = yaml.safe_load(handle) or {}
-        if not isinstance(data, dict):
-            message = f"Augment file {augment_path} must contain a YAML mapping."
-            raise TypeError(message)
-        return data
 
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
@@ -657,28 +664,38 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Entry point for generating the CLI OpenAPI specification."""
+    """Entry point for generating the CLI OpenAPI specification.
+
+    Returns
+    -------
+    int
+        ``0`` when the OpenAPI document is written successfully.
+    """
     args = parse_args(argv if argv is not None else sys.argv[1:])
 
     app_obj = import_object(args.app)
     click_cmd = to_click_command(app_obj)
-    augment = load_augment(args.augment)
-    registry = _load_registry(Path(args.registry))
-    interface_meta = registry.get(args.interface_id) if args.interface_id else None
-    if interface_meta and isinstance(interface_meta, dict):
-        interface_meta.setdefault("id", args.interface_id)
-    else:
-        interface_meta = None
-
-    config = CLIConfig(
+    settings = CLIToolSettings(
         bin_name=args.bin,
         title=args.title,
         version=args.version,
-        augment=augment,
+        augment_path=Path(args.augment),
+        registry_path=Path(args.registry),
         interface_id=args.interface_id,
-        interface_meta=interface_meta,
     )
-    spec = make_openapi(click_cmd, config)
+
+    try:
+        tooling_context = load_cli_tooling_context(settings)
+    except CLIConfigError as exc:
+        LOGGER.error(
+            "Failed to load CLI tooling context",
+            extra={"status": "error", "detail": exc.problem.get("detail")},
+        )
+        click.echo(render_problem(exc.problem), err=True)
+        return 1
+
+    cli_config = cast("CLIConfig", tooling_context.cli_config)
+    spec = make_openapi(click_cmd, cli_config)
     output_path = Path(args.out)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as handle:

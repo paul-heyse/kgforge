@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import inspect
+import typing
 from collections.abc import Mapping, Sequence
 from importlib import import_module
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
     from types import ModuleType
 
 __all__ = [
@@ -59,7 +59,7 @@ class LayeredArchitectureProtocol(Protocol):
         """Return a new builder stage representing ``name``."""
         ...
 
-    def containing_modules(self, modules: Iterable[str]) -> LayeredArchitectureProtocol:
+    def containing_modules(self, modules: typing.Iterable[str]) -> LayeredArchitectureProtocol:
         """Restrict the current layer to ``modules``."""
         ...
 
@@ -77,8 +77,8 @@ class EvaluableArchitectureProtocol(Protocol):
 
     def get_dependencies(
         self,
-        sources: Iterable[ModuleNameFilterProtocol],
-        targets: Iterable[ModuleNameFilterProtocol],
+        sources: typing.Iterable[ModuleNameFilterProtocol],
+        targets: typing.Iterable[ModuleNameFilterProtocol],
     ) -> ModuleDependencies:
         """Return dependencies between ``sources`` and ``targets``."""
         ...
@@ -97,6 +97,8 @@ class _PytestarchModule(Protocol):
 
         Parameters
         ----------
+        *args : object
+            Positional arguments forwarded to pytestarch implementation.
         **kwargs : object
             Keyword arguments (unused).
 
@@ -115,6 +117,8 @@ class _PytestarchModule(Protocol):
 
         Parameters
         ----------
+        *args : object
+            Positional arguments forwarded to pytestarch implementation.
         **kwargs : object
             Keyword arguments (unused).
 
@@ -168,29 +172,31 @@ def get_module_name_filter_cls() -> type[ModuleNameFilterProtocol]:
     return cast("type[ModuleNameFilterProtocol]", candidate_obj)
 
 
-def get_layered_architecture_factory() -> Callable[[], LayeredArchitectureProtocol]:
+def get_layered_architecture_factory() -> typing.Callable[..., LayeredArchitectureProtocol]:
     """Return a callable that instantiates the layered architecture builder.
 
     Returns
     -------
-    Callable[[], LayeredArchitectureProtocol]
+    Callable[..., LayeredArchitectureProtocol]
         Factory function for layered architecture.
     """
-    return get_layered_architecture_cls()
+    cls = get_layered_architecture_cls()
+    return cast("typing.Callable[..., LayeredArchitectureProtocol]", cls)
 
 
-def get_module_name_filter_factory() -> Callable[[str], ModuleNameFilterProtocol]:
+def get_module_name_filter_factory() -> typing.Callable[..., ModuleNameFilterProtocol]:
     """Return a callable that creates module-name filters.
 
     Returns
     -------
-    Callable[[str], ModuleNameFilterProtocol]
+    Callable[..., ModuleNameFilterProtocol]
         Factory function for module name filters.
     """
-    return get_module_name_filter_cls()
+    cls = get_module_name_filter_cls()
+    return cast("typing.Callable[..., ModuleNameFilterProtocol]", cls)
 
 
-def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtocol]:
+def get_evaluable_architecture_fn() -> typing.Callable[..., EvaluableArchitectureProtocol]:
     """Return the pytestarch entry-point for evaluable architectures.
 
     Returns
@@ -211,7 +217,7 @@ def get_evaluable_architecture_fn() -> Callable[..., EvaluableArchitectureProtoc
     return typed_module.get_evaluable_architecture
 
 
-def get_evaluable_architecture_for_module_objects_fn() -> Callable[
+def get_evaluable_architecture_for_module_objects_fn() -> typing.Callable[
     ..., EvaluableArchitectureProtocol
 ]:
     """Return the evaluable-architecture factory for module objects.

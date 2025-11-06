@@ -55,7 +55,9 @@ class SettingsError(CoreSettingsError):
         cause: Exception | None = None,
     ) -> None:
         self.problem: ProblemDetailsDict = dict(problem)
-        self.validation_errors: tuple[dict[str, JsonValue], ...] = tuple(dict(err) for err in errors)
+        self.validation_errors: tuple[dict[str, JsonValue], ...] = tuple(
+            dict(err) for err in errors
+        )
         super().__init__(
             message,
             errors=[dict(err) for err in self.validation_errors],
