@@ -451,18 +451,14 @@ def spawn_text_process(
     env : Mapping[str, str] | None, optional
         Environment variables.
 
+    Raises the dynamic ``ToolExecutionError`` implementation supplied by the
+    tools surface when command validation fails or the command list is empty.
+
     Returns
     -------
     TextProcess
         Text process instance.
-
-    Raises
-    ------
-    ToolExecutionError
-        If command is empty or command validation fails. The actual exception
-        type is determined by the tools surface and is raised via the
-        tool_execution_error_ctor callable.
-    """  # noqa: DOC502
+    """
     tools_surface = _load_tools_surface()
     tool_execution_error_ctor = cast(
         "_ToolExecutionErrorConstructor", tools_surface.ToolExecutionError

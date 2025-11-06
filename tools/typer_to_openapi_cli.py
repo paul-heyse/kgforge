@@ -10,7 +10,7 @@ import argparse
 import importlib
 import logging
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -26,17 +26,14 @@ from tools._shared.cli_tooling import (
 from tools._shared.problem_details import render_problem
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from tools._shared.augment_registry import (
         AugmentMetadataModel,
         OperationOverrideModel,
         RegistryInterfaceModel,
     )
 
-    type TyperCommandFactory = Callable[[object], click.core.Command]
-else:
-    TyperCommandFactory = object  # type: ignore[assignment]
+
+type TyperCommandFactory = Callable[[object], click.core.Command]
 
 try:  # Typer is optional at runtime; degrade gracefully when absent.
     from typer.main import get_command as _raw_get_command
@@ -242,12 +239,14 @@ def walk_commands(
         List of (token path, command) tuples for all runnable commands.
     """
     results: list[tuple[list[str], click.core.Command]] = []
-    if isinstance(cmd, click.core.Group) and getattr(cmd, "commands", {}):
-        if getattr(cmd, "callback", None):
-            results.append((tokens, cmd))
-        for name, subcommand in cmd.commands.items():  # type: ignore[attr-defined]
-            results.extend(walk_commands(subcommand, [*tokens, name]))
-        return results
+    if isinstance(cmd, click.core.Group):
+        command_map = getattr(cmd, "commands", None)
+        if isinstance(command_map, Mapping):
+            if getattr(cmd, "callback", None):
+                results.append((tokens, cmd))
+            for name, subcommand in command_map.items():
+                results.extend(walk_commands(subcommand, [*tokens, name]))
+            return results
     results.append((tokens, cmd))
     return results
 

@@ -27,7 +27,7 @@ Validator = Callable[[Path], object]
 
 
 def validate_artifacts(argv: Sequence[str] | None = None) -> int:
-    """Entry point for documentation artifact validation.
+    """Entry point to validate documentation artifacts.
 
     Parameters
     ----------

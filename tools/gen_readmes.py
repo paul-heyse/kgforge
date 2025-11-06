@@ -61,14 +61,14 @@ except ImportError:  # pragma: no cover - older Griffe versions
         message = "tools.gen_readmes requires griffe; install kgfoundry[tools] to enable README generation"
         raise ImportError(message) from exc
     try:
-        _AliasResolutionError = _griffe_exceptions.AliasResolutionError  # type: ignore[attr-defined]
+        _AliasResolutionError = _griffe_exceptions.AliasResolutionError
     except AttributeError as attr_exc:  # pragma: no cover - defensive guard
         message = (
             "griffe._internal.exceptions missing AliasResolutionError; incompatible griffe version"
         )
         raise ImportError(message) from attr_exc
 else:
-    _AliasResolutionError = _griffe_exceptions.AliasResolutionError  # type: ignore[attr-defined]
+    _AliasResolutionError = _griffe_exceptions.AliasResolutionError
 
 type JsonPrimitive = str | int | float | bool | None
 type JsonValue = JsonPrimitive | list[JsonValue] | dict[str, JsonValue]

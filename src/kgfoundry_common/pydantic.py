@@ -62,11 +62,6 @@ if TYPE_CHECKING:
             **model_dump_kwargs : object
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump`.
 
-            Returns
-            -------
-            dict[str, object]
-                Dictionary representation of the model (not implemented in stub).
-
             Raises
             ------
             NotImplementedError
@@ -82,11 +77,6 @@ if TYPE_CHECKING:
             ----------
             **model_dump_json_kwargs : object
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump_json`.
-
-            Returns
-            -------
-            str
-                JSON string representation of the model (not implemented in stub).
 
             Raises
             ------
