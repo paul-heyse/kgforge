@@ -55,7 +55,6 @@ from tools._shared.problem_details import (
     ProblemDetailsParams,
     build_problem_details,
 )
-from tools.docstring_builder.builder_types import STATUS_LABELS
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import (
@@ -112,6 +111,14 @@ CLI_OPERATION_IDS: dict[str, str] = {
 }
 
 
+CLI_STATUS_FROM_EXIT: dict[ExitStatus, CliStatus] = {
+    ExitStatus.SUCCESS: "success",
+    ExitStatus.VIOLATION: "violation",
+    ExitStatus.CONFIG: "config",
+    ExitStatus.ERROR: "error",
+}
+
+
 def _resolve_cli_version() -> str:
     try:
         return pkg_version("kgfoundry")
@@ -153,28 +160,28 @@ def _wrap_handler(handler: CommandHandler, subcommand: str) -> CommandHandler:
 
 def _status_label_from_exit_code(exit_code: int) -> CliStatus:
     try:
-        status = STATUS_LABELS[ExitStatus(exit_code)]
+        return CLI_STATUS_FROM_EXIT[ExitStatus(exit_code)]
     except ValueError:
-        status = "success" if exit_code == 0 else "error"
-    if status not in {"success", "violation", "config", "error"}:
-        status = "error"
-    return cast("CliStatus", status)
+        return "error"
 
 
 def _map_file_status(report: Mapping[str, object]) -> CliFileStatus:
     if bool(report.get("skipped")):
-        return cast("CliFileStatus", "skipped")
+        return "skipped"
     status = str(report.get("status", "success"))
-    match status:
-        case "success":
-            mapped = "success"
-        case "violation":
-            mapped = "violation"
-        case "config" | "error":
-            mapped = "error"
-        case _:
-            mapped = "error"
-    return cast("CliFileStatus", mapped)
+    if status == "success":
+        return "success"
+    if status == "violation":
+        return "violation"
+    return "error"
+
+
+def _normalize_error_status(value: str) -> CliErrorStatus:
+    if value == "violation":
+        return "violation"
+    if value == "config":
+        return "config"
+    return "error"
 
 
 def _apply_pipeline_result(
@@ -198,15 +205,13 @@ def _apply_pipeline_result(
         )
     for error in result.errors:
         status = str(error.get("status", "error"))
-        if status not in {"error", "violation", "config"}:
-            status = "error"
         problem_raw = error.get("problem")
         if isinstance(problem_raw, Mapping):
             problem = cast("ProblemDetailsDict", dict(problem_raw))
         else:
             problem = None
         builder.add_error(
-            status=cast("CliErrorStatus", status),
+            status=_normalize_error_status(status),
             message=str(error.get("message", "")),
             file=str(error.get("file", "")) or None,
             problem=problem,
@@ -214,7 +219,7 @@ def _apply_pipeline_result(
     if result.manifest_path is not None:
         builder.add_file(
             path=str(result.manifest_path),
-            status=cast("CliFileStatus", "success"),
+            status="success",
             message="Manifest written",
         )
     if result.problem_details is not None:
@@ -235,20 +240,20 @@ def _apply_additional_annotations(builder: CliEnvelopeBuilder, args: argparse.Na
         for path_obj in output_paths:
             builder.add_file(
                 path=str(path_obj),
-                status=cast("CliFileStatus", "success"),
+                status="success",
             )
     summary = getattr(args, "cli_summary", None)
     if isinstance(summary, Mapping) and summary:
         builder.add_file(
             path="<summary>",
-            status=cast("CliFileStatus", "success"),
+            status="success",
             message=json.dumps(summary, sort_keys=True),
         )
     doctor_issues = getattr(args, "cli_doctor_issues", None)
     if isinstance(doctor_issues, Sequence):
         for issue in doctor_issues:
             builder.add_error(
-                status=cast("CliErrorStatus", "config"),
+                status="config",
                 message=str(issue),
             )
     additional_problem = getattr(args, "cli_problem", None)
@@ -280,12 +285,12 @@ def _build_cli_envelope_from_args(
 def _build_config_error_envelope(subcommand: str, problem: ProblemDetailsDict) -> CliEnvelope:
     builder = CliEnvelopeBuilder.create(
         command=CLI_COMMAND,
-        status=cast("CliStatus", "config"),
+        status="config",
         subcommand=subcommand,
     )
     detail = str(problem.get("detail", "CLI configuration failed."))
     builder.add_error(
-        status=cast("CliErrorStatus", "config"),
+        status="config",
         message=detail,
     )
     builder.set_problem(problem)
@@ -305,11 +310,11 @@ def _build_unexpected_failure_envelope(subcommand: str, exc: BaseException) -> C
     )
     builder = CliEnvelopeBuilder.create(
         command=CLI_COMMAND,
-        status=cast("CliStatus", "error"),
+        status="error",
         subcommand=subcommand,
     )
     builder.add_error(
-        status=cast("CliErrorStatus", "error"),
+        status="error",
         message=detail,
     )
     builder.set_problem(problem)
@@ -738,10 +743,14 @@ def _command_schema(args: argparse.Namespace) -> int:
         target = REPO_ROOT / "docs" / "_build" / "schema_docstrings.json"
     target.parent.mkdir(parents=True, exist_ok=True)
     write_schema(target)
-    rel = target.relative_to(REPO_ROOT)
-    LOGGER.info("Schema written to %s", rel)
+    try:
+        rel_path = target.relative_to(REPO_ROOT)
+        display_path = str(rel_path)
+    except ValueError:
+        display_path = str(target)
+    LOGGER.info("Schema written to %s", display_path)
     args.cli_output_paths = (target,)
-    args.cli_summary = {"schemaPath": str(rel)}
+    args.cli_summary = {"schemaPath": display_path}
     return int(ExitStatus.SUCCESS)
 
 

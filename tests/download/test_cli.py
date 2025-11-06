@@ -12,9 +12,8 @@ from download import cli
 
 def test_harvest_emits_envelope(tmp_path: Path, monkeypatch) -> None:
     """The harvest command should write a structured CLI envelope on success."""
-    envelope_path = tmp_path / "download.json"
-    monkeypatch.setattr(cli, "CLI_ENVELOPE_PATH", envelope_path)
-    monkeypatch.setattr(cli, "CLI_ENVELOPE_DIR", envelope_path.parent)
+    monkeypatch.setattr(cli, "CLI_ENVELOPE_DIR", tmp_path)
+    expected_path = tmp_path / f"{cli.CLI_SETTINGS.bin_name}-{cli.CLI_COMMAND}-harvest.json"
 
     runner = CliRunner()
     result = runner.invoke(
@@ -33,7 +32,7 @@ def test_harvest_emits_envelope(tmp_path: Path, monkeypatch) -> None:
     assert result.exit_code == 0
     assert "dry-run" in result.stdout
 
-    envelope = json.loads(envelope_path.read_text(encoding="utf-8"))
+    envelope = json.loads(expected_path.read_text(encoding="utf-8"))
     assert envelope["command"] == cli.CLI_COMMAND
     assert envelope["subcommand"] == "harvest"
     assert envelope["status"] == "success"

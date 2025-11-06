@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from pathlib import Path
 from typing import Annotated, Any
+from uuid import uuid4
 
 import typer
 from tools import (
     CliEnvelope,
     CliEnvelopeBuilder,
+    ProblemDetailsDict,
     ProblemDetailsParams,
     build_problem_details,
     get_logger,
@@ -18,6 +21,7 @@ from tools import (
 )
 
 from download import cli_context
+from kgfoundry_common.logging import LoggerAdapter as KGFLoggerAdapter
 from kgfoundry_common.navmap_loader import load_nav_metadata
 
 __all__ = [
@@ -32,11 +36,11 @@ CLI_OPERATION_IDS = cli_context.CLI_OPERATION_IDS
 CLI_TITLE = cli_context.CLI_TITLE
 CLI_INTERFACE_ID = cli_context.CLI_INTERFACE_ID
 
+CLI_SETTINGS = cli_context.get_cli_settings()
 CLI_CONFIG = cli_context.get_cli_config()
 
 REPO_ROOT = cli_context.REPO_ROOT
 CLI_ENVELOPE_DIR = REPO_ROOT / "site" / "_build" / "cli"
-CLI_ENVELOPE_PATH = CLI_ENVELOPE_DIR / "download.json"
 
 HARVEST_OPERATION_ID = CLI_OPERATION_IDS["harvest"]
 HARVEST_OVERRIDE = cli_context.get_operation_override("harvest")
@@ -61,16 +65,31 @@ download_app = typer.Typer(help=HARVEST_DESCRIPTION, no_args_is_help=True, add_c
 app.add_typer(download_app, name=CLI_COMMAND, help=HARVEST_DESCRIPTION)
 
 
-def _write_cli_envelope(envelope: CliEnvelope) -> Path:
+def _envelope_path(subcommand: str) -> Path:
+    safe_subcommand = subcommand or "root"
+    return CLI_ENVELOPE_DIR / f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand}.json"
+
+
+def _emit_envelope(
+    envelope: CliEnvelope,
+    *,
+    subcommand: str,
+    logger: logging.Logger | KGFLoggerAdapter,
+) -> Path:
+    path = _envelope_path(subcommand)
     CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
     rendered = render_cli_envelope(envelope)
-    CLI_ENVELOPE_PATH.write_text(rendered, encoding="utf-8")
-    return CLI_ENVELOPE_PATH
+    path.write_text(rendered + "\n", encoding="utf-8")
+    logger.debug(
+        "CLI envelope written",
+        extra={"status": envelope.status, "cli_envelope": str(path)},
+    )
+    return path
 
 
 def _harvest_problem(
     detail: str, *, status: int = 500, extras: dict[str, Any] | None = None
-) -> dict[str, Any]:
+) -> ProblemDetailsDict:
     return build_problem_details(
         ProblemDetailsParams(
             type="https://kgfoundry.dev/problems/download/harvest-error",
@@ -115,36 +134,52 @@ def harvest(
         Raised with a non-zero exit code when the command fails.
     """
     start = time.monotonic()
-    builder = CliEnvelopeBuilder.create(command=CLI_COMMAND, status="success", subcommand="harvest")
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status="success",
+        subcommand="harvest",
+    )
     logger = with_fields(
         LOGGER,
-        {
-            "operation_id": HARVEST_OPERATION_ID,
-            "topic": topic,
-            "years": years,
-            "max_works": max_works,
-        },
+        correlation_id=str(uuid4()),
+        operation_id=HARVEST_OPERATION_ID,
+        topic=topic,
+        years=years,
+        max_works=max_works,
     )
 
-    logger.info("Harvest command started")
+    logger.info("Harvest command started", extra={"status": "start"})
     try:
         message = f"[dry-run] would harvest topic={topic!r} years={years!r} max_works={max_works}"
         builder.add_file(path="openalex", status="success", message=message)
         typer.echo(message)
     except Exception as exc:  # pragma: no cover - defensive catch for future integrations
         problem = _harvest_problem(str(exc))
-        builder.add_error(status="error", message=str(exc), problem=problem)
-        builder.set_problem(problem)
-        envelope = builder.finish(duration_seconds=time.monotonic() - start)
-        path = _write_cli_envelope(envelope)
+        failure_builder = CliEnvelopeBuilder.create(
+            command=CLI_COMMAND,
+            status="error",
+            subcommand="harvest",
+        )
+        failure_builder.add_error(
+            status="error",
+            message=str(exc),
+            problem=problem,
+        )
+        failure_builder.set_problem(problem)
+        envelope = failure_builder.finish(duration_seconds=time.monotonic() - start)
+        path = _emit_envelope(envelope, subcommand="harvest", logger=logger)
         logger.exception(
             "Harvest command failed",
-            extra={"status": "error", "cli_envelope": str(path)},
+            extra={
+                "status": "error",
+                "cli_envelope": str(path),
+                "duration_seconds": envelope.duration_seconds,
+            },
         )
         raise typer.Exit(code=1) from exc
 
     envelope = builder.finish(duration_seconds=time.monotonic() - start)
-    path = _write_cli_envelope(envelope)
+    path = _emit_envelope(envelope, subcommand="harvest", logger=logger)
     logger.info(
         "Harvest command completed",
         extra={
