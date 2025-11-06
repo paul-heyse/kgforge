@@ -846,6 +846,11 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
 def _is_absolute_url(candidate: str) -> bool:
     """Return ``True`` when ``candidate`` is an absolute URL.
 
+    Parameters
+    ----------
+    candidate : str
+        String to check for absolute URL format.
+
     Returns
     -------
     bool

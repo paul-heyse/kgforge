@@ -2365,7 +2365,11 @@ def _execute(context: _CommandContext) -> dict[str, object]:
         _report_package_failures(results)
 
         try:
-            global_graph = _build_global_graph(args.format, inputs.excludes, args.max_bacon)
+            global_graph = _build_global_graph(
+                args.format,
+                list(inputs.excludes),
+                args.max_bacon,
+            )
         except (
             GraphBuildError,
             RuntimeError,

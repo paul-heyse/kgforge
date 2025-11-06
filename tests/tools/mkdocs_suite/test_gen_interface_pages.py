@@ -8,7 +8,6 @@ import json
 import logging
 import sys
 import types
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Self, cast
 
@@ -171,8 +170,6 @@ def test_render_interface_catalog_includes_module_source_link(
 
     monkeypatch.setattr(module, "_load_registry", lambda: None)
     monkeypatch.setattr(module, "REPO_ROOT", tmp_path)
-    resolve_source_path = cast("Callable[..., object]", module._resolve_source_path)
-    resolve_source_path.cache_clear()
     monkeypatch.setattr(module, "REPO_URL", "https://example.invalid/repo")
     monkeypatch.setattr(module, "DEFAULT_BRANCH", "main")
 

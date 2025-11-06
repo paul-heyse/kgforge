@@ -279,7 +279,7 @@ def _update_cli_index_entry(*, enabled: bool) -> None:
 
     if enabled and not any(line.strip() == entry_token for line in bullet_lines):
         insert_at = len(bullet_lines)
-        while insert_at > 0 and bullet_lines[insert_at - 1].strip() == "":
+        while insert_at > 0 and not bullet_lines[insert_at - 1].strip():
             insert_at -= 1
         bullet_lines.insert(insert_at, entry_line)
 
