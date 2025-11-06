@@ -7,7 +7,7 @@ import importlib
 import importlib.util
 import json
 import sys
-from collections.abc import Callable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from importlib import import_module
@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     )
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic.main import TupleGenerator
 
 JsonValue = str | int | float | bool | dict[str, "JsonValue"] | list["JsonValue"] | None
 
@@ -263,7 +264,7 @@ class NavMetadataModel(BaseModel):
         """
         return self.as_mapping()[key]
 
-    def __iter__(self) -> Iterator[tuple[str, JsonValue]]:
+    def __iter__(self) -> TupleGenerator:
         """Yield flattened key-value pairs for dictionary compatibility.
 
         Yields
@@ -271,7 +272,8 @@ class NavMetadataModel(BaseModel):
         tuple[str, JsonValue]
             Key and value pairs for navigation metadata entries.
         """
-        yield from self.as_mapping().items()
+        items = self.as_mapping().items()
+        yield from items
 
     def as_mapping(self) -> dict[str, JsonValue]:
         """Return flattened navigation metadata as a standard dictionary.

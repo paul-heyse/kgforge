@@ -449,6 +449,8 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
     VectorSearchError
         Returns Problem Details JSON (RFC 9457) on errors such as missing
         indexes, invalid queries, or backend failures.
+    RuntimeError
+        Raised if the search operation completes without producing a response.
 
     Examples
     --------
@@ -460,6 +462,7 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
     True
     """
     # Correlation ID is set by middleware, use with_fields for structured logging
+    response: SearchResponse | None = None
     with (
         with_fields(logger, operation="search", query=req.query, k=req.k),
         observe_duration(metrics, "search", component="search_api") as obs,
@@ -555,7 +558,7 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
             )
             obs.success()
 
-            return SearchResponse(results=results)
+            response = SearchResponse(results=results)
         except (RuntimeError, ValueError, AttributeError, OSError) as exc:
             obs.error()
             # Convert to VectorSearchError for proper Problem Details handling
@@ -563,6 +566,10 @@ def search(req: SearchRequest, _: AuthDependency = None) -> SearchResponse:
             # context accepts Mapping[str, object], dict[str, str | int] is compatible
             context_dict: Mapping[str, object] = {"query": req.query, "k": req.k}
             raise VectorSearchError(error_msg, cause=exc, context=context_dict) from exc
+    if response is None:
+        message = "Search operation completed without producing a response"
+        raise RuntimeError(message)
+    return response
 
 
 # [nav:anchor graph_concepts]

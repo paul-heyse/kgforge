@@ -49,7 +49,7 @@ if TYPE_CHECKING:
         LoggerLike,
         StatusCounts,
     )
-    from tools.docstring_builder.cache import BuilderCache
+    from tools.docstring_builder.cache import DocstringBuilderCache
     from tools.docstring_builder.config import BuilderConfig, ConfigSelection
     from tools.docstring_builder.diff_manager import DiffManager
     from tools.docstring_builder.docfacts import DocFact
@@ -246,7 +246,7 @@ class PipelineConfig:
     config: BuilderConfig
     selection: ConfigSelection | None
     options: ProcessingOptions
-    cache: BuilderCache
+    cache: DocstringBuilderCache
     file_processor: FileProcessor
     record_docfacts: Callable[[Iterable[DocFact], Path], None]
     filter_docfacts: Callable[[], list[DocFact]]

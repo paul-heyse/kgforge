@@ -11,6 +11,7 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
 
+from kgfoundry_common.errors.exceptions import VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.observability import MetricsProvider, observe_duration
@@ -215,9 +216,11 @@ def search_service(
 
     Raises
     ------
-    Exception
-        Propagates any exception raised during result processing after logging
-        and metrics collection complete.
+    VectorSearchError
+        Raised when result packaging or instrumentation fails. The original
+        exception is chained for diagnostics.
+    RuntimeError
+        Raised if instrumentation completes without producing a response.
 
     Notes
     -----
@@ -227,6 +230,7 @@ def search_service(
     active_metrics = metrics or MetricsProvider.default()
     start_time = time.time()
 
+    response: AgentSearchResponse | None = None
     with (
         with_fields(logger, operation="search_service") as log_adapter,
         observe_duration(active_metrics, "search", component="search_api") as obs,
@@ -237,7 +241,7 @@ def search_service(
                 "backend": "search_api",
                 "result_count": len(results),
             }
-            response: AgentSearchResponse = {
+            response = {
                 "results": results,
                 "total": len(results),
                 "took_ms": took_ms,
@@ -256,6 +260,10 @@ def search_service(
         except Exception as error:
             log_adapter.exception("Search service failed", exc_info=error)
             obs.error()
-            raise error
-        else:
-            return response
+            context = {"result_count": len(results)}
+            message = "Search service failed to package results"
+            raise VectorSearchError(message, cause=error, context=context) from error
+    if response is None:
+        message = "Search service failed to produce a response"
+        raise RuntimeError(message)
+    return response

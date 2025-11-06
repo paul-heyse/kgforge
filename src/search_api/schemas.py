@@ -33,7 +33,7 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 class SearchResponse(BaseModel):
     """Search API response envelope containing ordered results."""
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config: ClassVar[object] = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding unexpected fields."""
 
     results: list[SearchResult] = Field(default_factory=list)
@@ -46,7 +46,7 @@ class SearchRequest(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ClassVar[object]
         Pydantic configuration forbidding extra parameters.
     query : str
         Search query string (at least one character).
@@ -71,7 +71,7 @@ class SearchRequest(BaseModel):
     >>> assert_model_roundtrip(SearchRequest, example_path)
     """
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config: ClassVar[object] = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding extra parameters."""
 
     query: str = Field(min_length=1)
@@ -90,7 +90,7 @@ class SearchResult(BaseModel):
 
     Attributes
     ----------
-    model_config : ClassVar[ConfigDict]
+    model_config : ClassVar[object]
         Pydantic configuration forbidding extra fields.
     doc_id : str
         Document identifier.
@@ -123,7 +123,7 @@ class SearchResult(BaseModel):
     >>> assert_model_roundtrip(SearchResult, example_path)
     """
 
-    model_config: ClassVar[ConfigDict] = ConfigDict(extra="forbid")
+    model_config: ClassVar[object] = ConfigDict(extra="forbid")
     """Pydantic configuration forbidding extra fields."""
 
     doc_id: str

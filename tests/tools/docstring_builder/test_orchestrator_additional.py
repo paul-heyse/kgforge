@@ -8,13 +8,10 @@ This module extends test_orchestrator_new_api.py with additional coverage for:
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
 from typing import Protocol, cast
 
 import pytest
 import tools.docstring_builder.orchestrator as orchestrator_module
-from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.config_models import DocstringBuildConfig
 from tools.docstring_builder.orchestrator import run_build, run_legacy
 
@@ -33,13 +30,12 @@ class TestPositionalArgumentRejection:
 
     def test_run_build_rejects_positional_config(self) -> None:
         """Verify run_build() rejects config as positional argument."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = DocstringBuildConfig()
-            cache = BuilderCache(Path(tmpdir) / "cache.json")
+        config = DocstringBuildConfig()
+        cache = object()
 
-            # Attempting to pass config positionally should raise TypeError
-            with pytest.raises(TypeError, match="positional"):
-                _call_untyped_run_build(config, cache)
+        # Attempting to pass config positionally should raise TypeError
+        with pytest.raises(TypeError, match="positional"):
+            _call_untyped_run_build(config, cache)
 
     def test_run_build_rejects_all_positional_arguments(self) -> None:
         """Verify run_build() rejects any positional arguments."""
@@ -51,17 +47,16 @@ class TestPositionalArgumentRejection:
 
     def test_run_build_requires_both_keyword_arguments(self) -> None:
         """Verify run_build() requires both explicit keyword arguments."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            config = DocstringBuildConfig()
-            cache = BuilderCache(Path(tmpdir) / "cache.json")
+        config = DocstringBuildConfig()
+        cache = object()
 
-            # Missing cache argument should fail
-            with pytest.raises(TypeError, match=r"missing.*required"):
-                _call_untyped_run_build(config=config)
+        # Missing cache argument should fail
+        with pytest.raises(TypeError, match=r"missing.*required"):
+            _call_untyped_run_build(config=config)
 
-            # Missing config argument should fail
-            with pytest.raises(TypeError, match=r"missing.*required"):
-                _call_untyped_run_build(cache=cache)
+        # Missing config argument should fail
+        with pytest.raises(TypeError, match=r"missing.*required"):
+            _call_untyped_run_build(cache=cache)
 
 
 class TestDeprecationPath:

@@ -14,6 +14,7 @@ Examples
 from __future__ import annotations
 
 import time
+import types
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, cast
@@ -249,7 +250,39 @@ class DurationObservation:
         return time.monotonic() - self._start
 
 
-@contextmanager
+class _DurationObservationContext:
+    """Context manager that finalises :class:`DurationObservation` instances."""
+
+    def __init__(
+        self,
+        *,
+        metrics: MetricsProvider,
+        operation: str,
+        component: str,
+        correlation_id: str | None,
+    ) -> None:
+        self._observation = DurationObservation(
+            metrics=metrics,
+            operation=operation,
+            component=component,
+            correlation_id=correlation_id,
+        )
+
+    def __enter__(self) -> DurationObservation:
+        return self._observation
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        _tb: types.TracebackType | None,
+    ) -> bool:
+        if exc_type is not None:
+            self._observation.mark_error()
+        _finalise_observation(self._observation)
+        return False
+
+
 # [nav:anchor observe_duration]
 def observe_duration(
     metrics: MetricsProvider,
@@ -257,7 +290,7 @@ def observe_duration(
     *,
     component: str = "unknown",
     correlation_id: str | None = None,
-) -> Iterator[DurationObservation]:
+) -> _DurationObservationContext:
     """Record metrics and structured logs for a component operation.
 
     Parameters
@@ -271,36 +304,22 @@ def observe_duration(
     correlation_id : str | None, optional
         Correlation ID for tracing.
 
-    Yields
-    ------
-    DurationObservation
-        Observation instance used to track operation state.
-
-    Raises
-    ------
-    BaseException
-        Propagates any exception raised within the context after metrics and
-        logging have been recorded.
+    Returns
+    -------
+    _DurationObservationContext
+        Context manager yielding a :class:`DurationObservation` instance.
 
     Notes
     -----
-    Exceptions raised within the context propagate after the observation is
-    marked as ``"error"`` and metrics/logs are recorded.
+    Exceptions raised within the managed block propagate after the observation
+    is marked as ``"error"`` and metrics/logs are recorded.
     """
-    observation = DurationObservation(
+    return _DurationObservationContext(
         metrics=metrics,
         operation=operation,
         component=component,
         correlation_id=correlation_id,
     )
-    try:
-        yield observation
-    except Exception as error:
-        observation.mark_error()
-        _finalise_observation(observation)
-        raise error
-    else:
-        _finalise_observation(observation)
 
 
 def _finalise_observation(observation: DurationObservation) -> None:
