@@ -370,16 +370,11 @@ def load_policy() -> ObservabilityPolicy:
     ObservabilityPolicy
         Loaded policy or default policy.
 
-    Raises
-    ------
-    Exception
-        Any exception raised during policy loading that is not a YAMLError is
-        propagated after logging. YAMLErrors are caught and logged, with the
-        default policy returned.
-
     Notes
     -----
-    Any exception raised during policy loading is propagated after logging.
+    Any exception raised during policy loading that is not a YAML parsing error
+    is propagated after logging. YAML parsing issues are logged and result in
+    the default policy being returned.
     """
     policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():

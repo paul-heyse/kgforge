@@ -27,8 +27,6 @@ from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
-from docs._scripts import cli_context as docs_cli_context
-
 from kgfoundry_common.logging import setup_logging
 from tools import (
     JsonValue,
@@ -53,6 +51,7 @@ from tools._shared.problem_details import (
     ProblemDetailsParams,
     build_problem_details,
 )
+from tools.docs import cli_context as docs_cli_context
 from tools.docs.errors import GraphBuildError
 
 

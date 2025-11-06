@@ -97,7 +97,7 @@ class BlindExceptTransformer(cst.CSTTransformer):
         """
         return self._transform_except(original_node, updated_node)
 
-    leave_ExceptHandler = leave_except_handler
+    leave_ExceptHandler = leave_except_handler  # noqa: N815 - required by LibCST visitor API
 
     def _transform_except(
         self,
