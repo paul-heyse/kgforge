@@ -2,8 +2,6 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/bm25_index.py)
-
 ## Sections
 
 - **Public API**
@@ -56,7 +54,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.bm25_index": "search_api.bm25_index" { link: "./search_api/bm25_index.md" }
+"search_api.bm25_index": "search_api.bm25_index" { link: "bm25_index.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.bm25_index" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -97,9 +95,7 @@ direction: right
 "search_api.bm25_index" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "search_api.bm25_index" -> "typing.cast"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "../search_api.md" }
 "search_api" -> "search_api.bm25_index"
-"search_api.bm25_index_code": "search_api.bm25_index code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/bm25_index.py" }
-"search_api.bm25_index" -> "search_api.bm25_index_code" { style: dashed }
 ```
 

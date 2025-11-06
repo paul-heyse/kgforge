@@ -45,6 +45,7 @@
       "typing.Self",
       "typing.TYPE_CHECKING",
       "typing.TypedDict",
+      "typing.Unpack",
       "typing.cast"
     ]
   }

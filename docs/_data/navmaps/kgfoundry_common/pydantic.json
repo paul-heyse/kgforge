@@ -27,7 +27,8 @@
       "pydantic.BaseModel",
       "typing.ClassVar",
       "typing.Self",
-      "typing.TYPE_CHECKING"
+      "typing.TYPE_CHECKING",
+      "typing.cast"
     ]
   }
 }

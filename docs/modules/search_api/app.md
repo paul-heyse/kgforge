@@ -2,8 +2,6 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/app.py)
-
 ## Sections
 
 - **Public API**
@@ -71,7 +69,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.app": "search_api.app" { link: "./search_api/app.md" }
+"search_api.app": "search_api.app" { link: "app.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.app" -> "__future__.annotations"
 "asyncio": "asyncio"
@@ -180,9 +178,7 @@ direction: right
 "search_api.app" -> "typing.cast"
 "uuid": "uuid"
 "search_api.app" -> "uuid"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "../search_api.md" }
 "search_api" -> "search_api.app"
-"search_api.app_code": "search_api.app code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/app.py" }
-"search_api.app" -> "search_api.app_code" { style: dashed }
 ```
 

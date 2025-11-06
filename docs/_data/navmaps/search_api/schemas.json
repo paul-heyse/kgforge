@@ -37,6 +37,7 @@
       "kgfoundry_common.types.JsonValue",
       "pydantic.ConfigDict",
       "pydantic.Field",
+      "typing.ClassVar",
       "typing.TYPE_CHECKING"
     ],
     "imported_by": [

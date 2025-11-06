@@ -2,8 +2,6 @@
 
 Lightweight client wrapper around the kgfoundry Search API
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_client/client.py)
-
 ## Sections
 
 - **Public API**
@@ -61,7 +59,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_client.client": "search_client.client" { link: "./search_client/client.md" }
+"search_client.client": "search_client.client" { link: "client.md" }
 "__future__.annotations": "__future__.annotations"
 "search_client.client" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -80,7 +78,5 @@ direction: right
 "search_client.client" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "search_client.client" -> "typing.cast"
-"search_client.client_code": "search_client.client code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_client/client.py" }
-"search_client.client" -> "search_client.client_code" { style: dashed }
 ```
 

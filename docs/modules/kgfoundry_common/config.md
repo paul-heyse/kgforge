@@ -2,8 +2,6 @@
 
 Typed configuration management via pydantic_settings
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/config.py)
-
 ## Sections
 
 - **Public API**
@@ -22,6 +20,10 @@ Typed configuration management via pydantic_settings
 
 *Bases:* TypedDict
 
+### kgfoundry_common.config._compose_options
+
+::: kgfoundry_common.config._compose_options
+
 ### kgfoundry_common.config._format_validation_error
 
 ::: kgfoundry_common.config._format_validation_error
@@ -36,15 +38,15 @@ Typed configuration management via pydantic_settings
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `base64`, `collections.abc.Mapping`, `collections.abc.Sequence`, `functools`, `functools.lru_cache`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.types.JsonPrimitive`, `kgfoundry_common.types.JsonValue`, `pydantic.AliasChoices`, `pydantic.Field`, `pydantic.ValidationError`, `pydantic.field_validator`, `pydantic_settings.BaseSettings`, `pydantic_settings.SettingsConfigDict`, `typing.ClassVar`, `typing.Final`, `typing.Literal`, `typing.Self`, `typing.TYPE_CHECKING`, `typing.TypedDict`, `typing.cast`
+**Imports:** `__future__.annotations`, `base64`, `collections.abc.Mapping`, `collections.abc.Sequence`, `functools`, `functools.lru_cache`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.types.JsonPrimitive`, `kgfoundry_common.types.JsonValue`, `pydantic.AliasChoices`, `pydantic.Field`, `pydantic.ValidationError`, `pydantic.field_validator`, `pydantic_settings.BaseSettings`, `pydantic_settings.SettingsConfigDict`, `typing.ClassVar`, `typing.Final`, `typing.Literal`, `typing.Self`, `typing.TYPE_CHECKING`, `typing.TypedDict`, `typing.Unpack`, `typing.cast`
 
 ## Autorefs Examples
 
 - [kgfoundry_common.config.AppSettings][]
 - [kgfoundry_common.config.ModelValidateOptions][]
+- [kgfoundry_common.config._compose_options][]
 - [kgfoundry_common.config._format_validation_error][]
 - [kgfoundry_common.config._load_config_impl][]
-- [kgfoundry_common.config.load_config][]
 
 ## Inheritance
 
@@ -62,7 +64,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.config": "kgfoundry_common.config" { link: "./kgfoundry_common/config.md" }
+"kgfoundry_common.config": "kgfoundry_common.config" { link: "config.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.config" -> "__future__.annotations"
 "base64": "base64"
@@ -107,9 +109,9 @@ direction: right
 "kgfoundry_common.config" -> "typing.TYPE_CHECKING"
 "typing.TypedDict": "typing.TypedDict"
 "kgfoundry_common.config" -> "typing.TypedDict"
+"typing.Unpack": "typing.Unpack"
+"kgfoundry_common.config" -> "typing.Unpack"
 "typing.cast": "typing.cast"
 "kgfoundry_common.config" -> "typing.cast"
-"kgfoundry_common.config_code": "kgfoundry_common.config code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/config.py" }
-"kgfoundry_common.config" -> "kgfoundry_common.config_code" { style: dashed }
 ```
 

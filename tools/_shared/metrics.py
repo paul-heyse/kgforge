@@ -118,7 +118,7 @@ def observe_tool_run(
     cwd: Path | None,
     timeout: float | None,
 ) -> Iterator[ToolRunObservation]:
-    """Context manager that records metrics and tracing for a subprocess.
+    """Record metrics and tracing for a subprocess invocation.
 
     Parameters
     ----------
@@ -132,14 +132,14 @@ def observe_tool_run(
     Yields
     ------
     ToolRunObservation
-        Observation object for tracking execution details.
+        Context manager that yields a :class:`ToolRunObservation` capturing runtime details.
 
     Raises
     ------
     Exception
         Any exception raised during tool execution is propagated after recording
         error status and metrics.
-    """  # noqa: DOC502
+    """
     settings = get_runtime_settings()
     observation = ToolRunObservation(
         command=command,

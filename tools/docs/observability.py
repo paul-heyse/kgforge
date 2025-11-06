@@ -240,7 +240,7 @@ def record_operation_metrics(
     metrics: DocumentationMetrics | None = None,
     status: str = "success",
 ) -> Iterator[None]:
-    """Context manager to record operation metrics and duration.
+    """Record documentation operation metrics and duration.
 
     Parameters
     ----------
@@ -256,7 +256,7 @@ def record_operation_metrics(
     Yields
     ------
     None
-        Context manager yields control to the operation block.
+        Context manager that yields control to the wrapped operation block.
 
     Raises
     ------
@@ -274,7 +274,7 @@ def record_operation_metrics(
     >>> with record_operation_metrics("catalog", corr_id):
     ...     # Perform catalog build operation
     ...     pass
-    """  # noqa: DOC502
+    """
     if metrics is None:
         metrics = get_metrics_registry()
 

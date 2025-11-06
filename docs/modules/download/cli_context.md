@@ -4,8 +4,6 @@ Downloader command suite that sources external corpora (currently OpenAlex) usin
 CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,
 diagrams, documentation) remains in sync without bespoke glue.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli_context.py)
-
 ## Sections
 
 - **Public API**
@@ -68,7 +66,7 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 ```d2
 direction: right
-"download.cli_context": "download.cli_context" { link: "./download/cli_context.md" }
+"download.cli_context": "download.cli_context" { link: "cli_context.md" }
 "__future__.annotations": "__future__.annotations"
 "download.cli_context" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -105,9 +103,7 @@ direction: right
 "download.cli_context" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "download.cli_context" -> "typing.cast"
-"download.cli": "download.cli" { link: "./download/cli.md" }
+"download.cli": "download.cli" { link: "cli.md" }
 "download.cli" -> "download.cli_context"
-"download.cli_context_code": "download.cli_context code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli_context.py" }
-"download.cli_context" -> "download.cli_context_code" { style: dashed }
 ```
 

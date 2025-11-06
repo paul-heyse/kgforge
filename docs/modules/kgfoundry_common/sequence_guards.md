@@ -2,8 +2,6 @@
 
 Sequence access guards for observability-critical code paths.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/sequence_guards.py)
-
 ## Sections
 
 - **Public API**
@@ -31,7 +29,7 @@ Sequence access guards for observability-critical code paths.
 
 ```d2
 direction: right
-"kgfoundry_common.sequence_guards": "kgfoundry_common.sequence_guards" { link: "./kgfoundry_common/sequence_guards.md" }
+"kgfoundry_common.sequence_guards": "kgfoundry_common.sequence_guards" { link: "sequence_guards.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.sequence_guards" -> "__future__.annotations"
 "collections.abc": "collections.abc"
@@ -52,7 +50,5 @@ direction: right
 "kgfoundry_common.sequence_guards" -> "kgfoundry_common.problem_details.render_problem"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "kgfoundry_common.sequence_guards" -> "typing.TYPE_CHECKING"
-"kgfoundry_common.sequence_guards_code": "kgfoundry_common.sequence_guards code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/sequence_guards.py" }
-"kgfoundry_common.sequence_guards" -> "kgfoundry_common.sequence_guards_code" { style: dashed }
 ```
 

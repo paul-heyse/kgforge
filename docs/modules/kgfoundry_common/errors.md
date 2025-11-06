@@ -2,8 +2,6 @@
 
 Exception hierarchy and Problem Details support
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py)
-
 ## Sections
 
 - **Public API**
@@ -102,7 +100,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "./kgfoundry_common/errors.md" }
+"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "errors.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors" -> "__future__.annotations"
 "kgfoundry_common.errors.codes.BASE_TYPE_URI": "kgfoundry_common.errors.codes.BASE_TYPE_URI"
@@ -183,7 +181,5 @@ direction: right
 "kgfoundry_common.errors" -> "typing.Protocol"
 "typing.cast": "typing.cast"
 "kgfoundry_common.errors" -> "typing.cast"
-"kgfoundry_common.errors_code": "kgfoundry_common.errors code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py" }
-"kgfoundry_common.errors" -> "kgfoundry_common.errors_code" { style: dashed }
 ```
 

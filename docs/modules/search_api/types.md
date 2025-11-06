@@ -2,8 +2,6 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/types.py)
-
 ## Sections
 
 - **Public API**
@@ -144,7 +142,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.types": "search_api.types" { link: "./search_api/types.md" }
+"search_api.types": "search_api.types" { link: "types.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.types" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -177,9 +175,7 @@ direction: right
 "search_api.types" -> "typing.TypedDict"
 "typing.cast": "typing.cast"
 "search_api.types" -> "typing.cast"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "../search_api.md" }
 "search_api" -> "search_api.types"
-"search_api.types_code": "search_api.types code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/types.py" }
-"search_api.types" -> "search_api.types_code" { style: dashed }
 ```
 

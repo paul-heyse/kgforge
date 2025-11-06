@@ -195,7 +195,7 @@ def record_operation_metrics(
     status: str = "success",
     correlation_id: str | None = None,
 ) -> Iterator[None]:
-    """Context manager to record operation metrics and duration.
+    """Record navmap operation metrics and duration.
 
     This context manager tracks the execution of navmap operations (build, check,
     repair, migrate) by recording Prometheus metrics including duration histograms
@@ -216,20 +216,14 @@ def record_operation_metrics(
     Yields
     ------
     None
-        Context manager yields nothing; use within a ``with`` statement.
+        Context manager that yields control to the wrapped navmap operation block.
 
     Raises
     ------
     Exception
         Any exception raised within the context is propagated after metrics
         are recorded, allowing normal exception handling to proceed.
-
-    Examples
-    --------
-    >>> with record_operation_metrics("build", status="success"):
-    ...     # Build operation
-    ...     pass
-    """  # noqa: DOC502
+    """
     if correlation_id is None:
         correlation_id = get_correlation_id()
 

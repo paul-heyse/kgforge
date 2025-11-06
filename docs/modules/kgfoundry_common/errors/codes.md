@@ -2,8 +2,6 @@
 
 Error code registry and type URIs for Problem Details.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py)
-
 ## Sections
 
 - **Public API**
@@ -42,7 +40,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.errors.codes": "kgfoundry_common.errors.codes" { link: "./kgfoundry_common/errors/codes.md" }
+"kgfoundry_common.errors.codes": "kgfoundry_common.errors.codes" { link: "codes.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors.codes" -> "__future__.annotations"
 "enum.StrEnum": "enum.StrEnum"
@@ -51,7 +49,5 @@ direction: right
 "kgfoundry_common.errors.codes" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
 "typing.Final": "typing.Final"
 "kgfoundry_common.errors.codes" -> "typing.Final"
-"kgfoundry_common.errors.codes_code": "kgfoundry_common.errors.codes code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py" }
-"kgfoundry_common.errors.codes" -> "kgfoundry_common.errors.codes_code" { style: dashed }
 ```
 

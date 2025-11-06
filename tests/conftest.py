@@ -15,6 +15,7 @@ import json
 import logging
 import os
 import sys
+from collections.abc import Callable
 from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -123,9 +124,8 @@ def _get_json_value() -> object:
     object
         JsonValue type alias.
     """
-    from kgfoundry_common.problem_details import JsonValue  # noqa: PLC0415
-
-    return JsonValue
+    module = import_module("kgfoundry_common.problem_details")
+    return module.JsonValue
 
 
 if TYPE_CHECKING:
@@ -267,11 +267,12 @@ def otel_span_exporter() -> SpanExporterProtocol:
         If pytest.skip is called but control flow continues unexpectedly.
     """
     # Lazy import after path setup to avoid E402
-    from kgfoundry_common.opentelemetry_types import (  # noqa: PLC0415
-        load_in_memory_span_exporter_cls,
+    otel_types = import_module("kgfoundry_common.opentelemetry_types")
+    load_exporter = cast(
+        "Callable[[], SpanExporterProtocol | None]",
+        otel_types.load_in_memory_span_exporter_cls,
     )
-
-    exporter_factory = load_in_memory_span_exporter_cls()
+    exporter_factory = load_exporter()
     if exporter_factory is None:
         skip_reason = "OpenTelemetry span exporter required for observability tests"
         pytest.skip(skip_reason)
@@ -301,11 +302,13 @@ def otel_tracer_provider(
         If pytest.skip is called but control flow continues unexpectedly.
     """
     # Lazy import after path setup to avoid E402
-    from kgfoundry_common.opentelemetry_types import (  # noqa: PLC0415
-        load_tracer_provider_cls,
+    otel_types = import_module("kgfoundry_common.opentelemetry_types")
+    load_tracer_provider = cast(
+        "Callable[[], TracerProviderProtocol | None]",
+        otel_types.load_tracer_provider_cls,
     )
 
-    tracer_provider_factory = load_tracer_provider_cls()
+    tracer_provider_factory = load_tracer_provider()
     if tracer_provider_factory is None:
         skip_reason = "OpenTelemetry SDK required for observability tests"
         pytest.skip(skip_reason)

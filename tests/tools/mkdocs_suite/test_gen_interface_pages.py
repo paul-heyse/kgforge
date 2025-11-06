@@ -181,7 +181,6 @@ def test_write_interface_table_escapes_markdown_control_characters() -> None:
 
 def test_operation_href_returns_relative_anchor() -> None:
     """Operation links should include encoded anchors relative to the doc path."""
-
     module = importlib.import_module(MODULE_PATH)
 
     href = module._operation_href("docs/api/openapi-cli.yaml", "cli.operation/with space")

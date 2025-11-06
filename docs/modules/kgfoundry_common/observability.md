@@ -2,8 +2,6 @@
 
 Prometheus metrics and OpenTelemetry tracing helpers
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/observability.py)
-
 ## Sections
 
 - **Public API**
@@ -21,6 +19,10 @@ Prometheus metrics and OpenTelemetry tracing helpers
 ### kgfoundry_common.observability.MetricsRegistry
 
 ::: kgfoundry_common.observability.MetricsRegistry
+
+### kgfoundry_common.observability._DurationObservationContext
+
+::: kgfoundry_common.observability._DurationObservationContext
 
 ### kgfoundry_common.observability._ObservabilityCache
 
@@ -48,7 +50,7 @@ Prometheus metrics and OpenTelemetry tracing helpers
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `collections.abc.Iterator`, `collections.abc.Mapping`, `contextlib.contextmanager`, `dataclasses.dataclass`, `dataclasses.field`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.logging.with_fields`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.opentelemetry_types.StatusCodeProtocol`, `kgfoundry_common.opentelemetry_types.TraceRuntime`, `kgfoundry_common.opentelemetry_types.load_trace_runtime`, `kgfoundry_common.prometheus.CollectorRegistry`, `kgfoundry_common.prometheus.CounterLike`, `kgfoundry_common.prometheus.HistogramLike`, `kgfoundry_common.prometheus.build_counter`, `kgfoundry_common.prometheus.build_histogram`, `kgfoundry_common.prometheus.get_default_registry`, `time`, `typing.Literal`, `typing.TYPE_CHECKING`, `typing.cast`
+**Imports:** `__future__.annotations`, `collections.abc.Iterator`, `collections.abc.Mapping`, `contextlib.contextmanager`, `dataclasses.dataclass`, `dataclasses.field`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.logging.with_fields`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.opentelemetry_types.StatusCodeProtocol`, `kgfoundry_common.opentelemetry_types.TraceRuntime`, `kgfoundry_common.opentelemetry_types.load_trace_runtime`, `kgfoundry_common.prometheus.CollectorRegistry`, `kgfoundry_common.prometheus.CounterLike`, `kgfoundry_common.prometheus.HistogramLike`, `kgfoundry_common.prometheus.build_counter`, `kgfoundry_common.prometheus.build_histogram`, `kgfoundry_common.prometheus.get_default_registry`, `time`, `types`, `typing.Literal`, `typing.TYPE_CHECKING`, `typing.cast`
 
 ## Autorefs Examples
 
@@ -66,6 +68,7 @@ classDiagram
     class DurationObservation
     class MetricsProvider
     class MetricsRegistry
+    class _DurationObservationContext
     class _ObservabilityCache
 ```
 
@@ -73,7 +76,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.observability": "kgfoundry_common.observability" { link: "./kgfoundry_common/observability.md" }
+"kgfoundry_common.observability": "kgfoundry_common.observability" { link: "observability.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.observability" -> "__future__.annotations"
 "collections.abc.Iterator": "collections.abc.Iterator"
@@ -112,13 +115,13 @@ direction: right
 "kgfoundry_common.observability" -> "kgfoundry_common.prometheus.get_default_registry"
 "time": "time"
 "kgfoundry_common.observability" -> "time"
+"types": "types"
+"kgfoundry_common.observability" -> "types"
 "typing.Literal": "typing.Literal"
 "kgfoundry_common.observability" -> "typing.Literal"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "kgfoundry_common.observability" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.observability" -> "typing.cast"
-"kgfoundry_common.observability_code": "kgfoundry_common.observability code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/observability.py" }
-"kgfoundry_common.observability" -> "kgfoundry_common.observability_code" { style: dashed }
 ```
 

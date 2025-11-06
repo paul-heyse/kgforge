@@ -28,6 +28,7 @@
       "kgfoundry_common.pydantic.BaseModel",
       "pydantic.ConfigDict",
       "pydantic.Field",
+      "typing.ClassVar",
       "typing.Literal"
     ]
   }

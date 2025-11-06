@@ -42,6 +42,7 @@
       "kgfoundry_common.prometheus.build_histogram",
       "kgfoundry_common.prometheus.get_default_registry",
       "time",
+      "types",
       "typing.Literal",
       "typing.TYPE_CHECKING",
       "typing.cast"

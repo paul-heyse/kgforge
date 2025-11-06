@@ -161,7 +161,7 @@ def run_ts_query(path: str, *, language: str, query: str) -> QueryResult:
 
 
 def list_python_symbols(directory: str) -> list[dict[str, Any]]:
-    """Collect Python symbol definitions for files within ``directory``.
+    """Collect Tree-sitter symbol definitions for Python source files.
 
     Parameters
     ----------
@@ -171,13 +171,13 @@ def list_python_symbols(directory: str) -> list[dict[str, Any]]:
     Returns
     -------
     list[dict[str, Any]]
-        Collection of files with their discovered symbol metadata.
+        Collection of files paired with their discovered symbol metadata.
 
     Raises
     ------
     FileNotFoundError
-        If the directory does not exist.
-    """  # noqa: DOC502
+        If the directory does not exist (raised by internal directory resolution).
+    """
     query_text = _load_python_symbols_query()
     langs = load_langs()
     lang = get_language(langs, "python")
@@ -242,7 +242,7 @@ def list_calls(
 
 
 def list_errors(path: str, *, language: str = "python") -> list[dict[str, Any]]:
-    """Report syntax errors detected by Tree-sitter for ``path``.
+    """Report Tree-sitter syntax errors for a source file.
 
     Parameters
     ----------
@@ -259,10 +259,10 @@ def list_errors(path: str, *, language: str = "python") -> list[dict[str, Any]]:
     Raises
     ------
     ValueError
-        If the language is not supported.
+        If the language is not supported (raised by internal query execution).
     FileNotFoundError
-        If the file cannot be found.
-    """  # noqa: DOC502
+        If the file cannot be found (raised by internal path resolution).
+    """
     captures = run_ts_query(path, language=language, query=ERROR_QUERY).captures
     return [
         {

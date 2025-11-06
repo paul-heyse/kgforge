@@ -373,8 +373,8 @@ def load_policy() -> ObservabilityPolicy:
     Raises
     ------
     Exception
-        Any exception raised during policy loading is propagated after logging.
-    """  # noqa: DOC502
+        Propagates any exception raised during policy loading after logging.
+    """
     policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():
         return policy

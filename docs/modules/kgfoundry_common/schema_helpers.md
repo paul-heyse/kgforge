@@ -2,8 +2,6 @@
 
 Schema and model round-trip validation helpers.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/schema_helpers.py)
-
 ## Sections
 
 - **Public API**
@@ -36,7 +34,7 @@ Schema and model round-trip validation helpers.
 
 ```d2
 direction: right
-"kgfoundry_common.schema_helpers": "kgfoundry_common.schema_helpers" { link: "./kgfoundry_common/schema_helpers.md" }
+"kgfoundry_common.schema_helpers": "kgfoundry_common.schema_helpers" { link: "schema_helpers.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.schema_helpers" -> "__future__.annotations"
 "json": "json"
@@ -69,7 +67,5 @@ direction: right
 "kgfoundry_common.schema_helpers" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.schema_helpers" -> "typing.cast"
-"kgfoundry_common.schema_helpers_code": "kgfoundry_common.schema_helpers code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/schema_helpers.py" }
-"kgfoundry_common.schema_helpers" -> "kgfoundry_common.schema_helpers_code" { style: dashed }
 ```
 
