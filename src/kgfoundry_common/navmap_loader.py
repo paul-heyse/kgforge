@@ -7,7 +7,7 @@ import importlib
 import importlib.util
 import json
 import sys
-from collections.abc import Callable, Generator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from importlib import import_module
@@ -263,7 +263,7 @@ class NavMetadataModel(BaseModel):
         """
         return self.as_mapping()[key]
 
-    def __iter__(self) -> Generator[tuple[str, JsonValue], None, None]:  # noqa: PYI058,UP043
+    def __iter__(self) -> Iterator[tuple[str, JsonValue]]:
         """Yield flattened key-value pairs for dictionary compatibility.
 
         Yields

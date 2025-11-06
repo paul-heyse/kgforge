@@ -111,7 +111,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping as MappingABC
-from typing import TYPE_CHECKING, Annotated, NoReturn, cast
+from typing import TYPE_CHECKING, NoReturn, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
@@ -293,10 +293,12 @@ class SymbolIndexRow(FrozenBaseModel):
     path: str = Field(..., description="Fully qualified symbol path")
     kind: str = Field(..., description="Symbol kind (module, class, function, etc.)")
     doc: str = Field(..., description="Documentation/docstring for this symbol")
-    tested_by: Annotated[tuple[str, ...], Field(description="Test paths covering this symbol")] = ()
-    source_link: Annotated[
-        dict[str, str], Field(description="Links to source code (GitHub, etc.)")
-    ] = Field(default_factory=dict)
+    tested_by: tuple[str, ...] = Field(
+        default_factory=tuple, description="Test paths covering this symbol"
+    )
+    source_link: dict[str, str] = Field(
+        default_factory=dict, description="Links to source code (GitHub, etc.)"
+    )
     canonical_path: str | None = Field(None, description="Canonical path if this is an alias")
     module: str | None = Field(None, description="Module containing this symbol")
     package: str | None = Field(None, description="Top-level package name")
@@ -451,18 +453,15 @@ class SymbolIndexArtifacts(FrozenBaseModel):
         Reverse lookup: module name -> sorted tuple of symbol paths.
     """
 
-    rows: Annotated[
-        tuple[SymbolIndexRow, ...],
-        Field(description="All symbol entries (sorted by path)"),
-    ] = ()
-    by_file: Annotated[
-        dict[str, tuple[str, ...]],
-        Field(description="Reverse lookup: file -> symbol paths"),
-    ] = Field(default_factory=dict)
-    by_module: Annotated[
-        dict[str, tuple[str, ...]],
-        Field(description="Reverse lookup: module -> symbol paths"),
-    ] = Field(default_factory=dict)
+    rows: tuple[SymbolIndexRow, ...] = Field(
+        default_factory=tuple, description="All symbol entries (sorted by path)"
+    )
+    by_file: dict[str, tuple[str, ...]] = Field(
+        default_factory=dict, description="Reverse lookup: file -> symbol paths"
+    )
+    by_module: dict[str, tuple[str, ...]] = Field(
+        default_factory=dict, description="Reverse lookup: module -> symbol paths"
+    )
 
     @field_validator("rows", mode="before")
     @classmethod
@@ -513,13 +512,11 @@ class SymbolDeltaChange(FrozenBaseModel):
     """
 
     path: str = Field(..., description="Symbol path that changed")
-    before: Annotated[dict[str, JsonValue], Field(description="Previous row (serialized)")] = Field(
-        default_factory=dict
+    before: dict[str, JsonValue] = Field(
+        default_factory=dict, description="Previous row (serialized)"
     )
-    after: Annotated[dict[str, JsonValue], Field(description="New row (serialized)")] = Field(
-        default_factory=dict
-    )
-    reasons: Annotated[tuple[str, ...], Field(description="Reasons for the change")] = ()
+    after: dict[str, JsonValue] = Field(default_factory=dict, description="New row (serialized)")
+    reasons: tuple[str, ...] = Field(default_factory=tuple, description="Reasons for the change")
 
     @field_validator("path", mode="before")
     @classmethod
@@ -600,9 +597,11 @@ class SymbolDeltaPayload(FrozenBaseModel):
 
     base_sha: str | None = Field(None, description="Baseline git SHA or build ID")
     head_sha: str | None = Field(None, description="Current git SHA or build ID")
-    added: Annotated[tuple[str, ...], Field(description="Newly added symbol paths")] = ()
-    removed: Annotated[tuple[str, ...], Field(description="Removed symbol paths")] = ()
-    changed: Annotated[tuple[SymbolDeltaChange, ...], Field(description="Changed symbols")] = ()
+    added: tuple[str, ...] = Field(default_factory=tuple, description="Newly added symbol paths")
+    removed: tuple[str, ...] = Field(default_factory=tuple, description="Removed symbol paths")
+    changed: tuple[SymbolDeltaChange, ...] = Field(
+        default_factory=tuple, description="Changed symbols"
+    )
 
     @field_validator("added", mode="before")
     @classmethod

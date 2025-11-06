@@ -278,6 +278,11 @@ class SPLADEv3Encoder:
         texts : list[str]
             List of text strings to encode.
 
+        Returns
+        -------
+        list[tuple[list[int], list[float]]]
+            Sparse SPLADE embeddings expressed as token indices and weights.
+
         Raises
         ------
         NotImplementedError
@@ -295,6 +300,7 @@ class SPLADEv3Encoder:
             f"Requested device={self.device!r} with {len(texts)} texts."
         )
         raise NotImplementedError(message)
+        return []  # pragma: no cover
 
 
 # [nav:anchor PureImpactIndex]

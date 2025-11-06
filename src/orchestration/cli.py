@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Protocol, cast
+from typing import TYPE_CHECKING, Protocol, cast
 from uuid import uuid4
 
 import typer
@@ -431,11 +431,17 @@ def _prepare_index_directory(index_path: str) -> None:
 
 @app.command(name=SUBCOMMAND_INDEX_BM25)
 def index_bm25(
-    chunks_parquet: Annotated[str, typer.Argument(..., help="Path to Parquet/JSONL with chunks")],
-    backend: Annotated[str, typer.Option(help="lucene|pure", show_default=True)] = "lucene",
-    index_dir: Annotated[
-        str, typer.Option(help="Output index directory", show_default=True)
-    ] = "./_indices/bm25",
+    chunks_parquet: str = typer.Argument(..., help="Path to Parquet/JSONL with chunks"),
+    backend: str = typer.Option(
+        "lucene",
+        help="lucene|pure",
+        show_default=True,
+    ),
+    index_dir: str = typer.Option(
+        "./_indices/bm25",
+        help="Output index directory",
+        show_default=True,
+    ),
 ) -> None:
     """Build a BM25 index from chunk metadata and emit a CLI envelope.
 
@@ -443,9 +449,9 @@ def index_bm25(
     ----------
     chunks_parquet : str
         Path to Parquet/JSONL file with chunks.
-    backend : str, optional
+    backend : str
         Backend to use: 'lucene' or 'pure'. Defaults to 'lucene'.
-    index_dir : str, optional
+    index_dir : str
         Output index directory. Defaults to './_indices/bm25'.
 
     Raises
@@ -555,16 +561,22 @@ def run_index_faiss(*, config: IndexCliConfig) -> dict[str, object]:
 
 @app.command(name=SUBCOMMAND_INDEX_FAISS)
 def index_faiss(
-    dense_vectors: Annotated[
-        str, typer.Argument(..., help="Path to dense vectors JSON (skeleton)")
-    ],
-    index_path: Annotated[
-        str, typer.Option(help="Output FAISS index path", show_default=True)
-    ] = "./_indices/faiss/shard_000.idx",
-    factory: Annotated[str, typer.Option(help="FAISS factory string", show_default=True)] = "Flat",
-    metric: Annotated[
-        str, typer.Option(help="Similarity metric ('ip' or 'l2')", show_default=True)
-    ] = "ip",
+    dense_vectors: str = typer.Argument(..., help="Path to dense vectors JSON (skeleton)"),
+    index_path: str = typer.Option(
+        "./_indices/faiss/shard_000.idx",
+        help="Output FAISS index path",
+        show_default=True,
+    ),
+    factory: str = typer.Option(
+        "Flat",
+        help="FAISS factory string",
+        show_default=True,
+    ),
+    metric: str = typer.Option(
+        "ip",
+        help="Similarity metric ('ip' or 'l2')",
+        show_default=True,
+    ),
 ) -> None:
     """Build a FAISS index and emit a structured CLI envelope.
 
@@ -679,12 +691,12 @@ app.command(name="index_faiss")(index_faiss)
 
 
 @app.command(name=SUBCOMMAND_API)
-def api(port: Annotated[int, typer.Option(help="Port to bind", show_default=True)] = 8080) -> None:
+def api(port: int = typer.Option(8080, help="Port to bind", show_default=True)) -> None:
     """Launch the FastAPI search service using uvicorn.
 
     Parameters
     ----------
-    port : int, optional
+    port : int
         Port to bind the server to. Defaults to 8080.
 
     Raises

@@ -16,6 +16,7 @@ import copy
 import importlib
 import json
 import logging
+import posixpath
 import re
 import sys
 from collections import defaultdict
@@ -234,6 +235,22 @@ def _get_package_roots() -> tuple[str, ...]:
     return _discover_package_roots(SRC_ROOT)
 
 
+def get_package_roots() -> tuple[str, ...]:
+    """Return discovered package roots for documentation generation.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Cached package names discovered from the repository sources.
+    """
+    return _get_package_roots()
+
+
+def reset_package_roots_cache() -> None:
+    """Clear cached package roots to force discovery on next access."""
+    _get_package_roots.cache_clear()
+
+
 class _Docstring(Protocol):
     value: str | None
 
@@ -415,6 +432,22 @@ def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
 
         _visit(root)
     return modules
+
+
+def collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
+    """Public wrapper around module collection to support testing.
+
+    Parameters
+    ----------
+    extensions_bundle : object
+        Griffe extensions bundle for module discovery.
+
+    Returns
+    -------
+    dict[str, _GriffeModule]
+        Dictionary mapping module paths to Griffe module objects.
+    """
+    return _collect_modules(extensions_bundle)
 
 
 def _code_permalink(relative_path: Path | None) -> str | None:
@@ -674,11 +707,28 @@ def _build_relationships(
     )
 
 
-def _format_module_links(module_names: Iterable[str], documented: set[str]) -> str:
+def _module_doc_path(module_path: str) -> str:
+    return posixpath.join("modules", module_path.replace(".", "/") + ".md")
+
+
+def _relative_module_href(from_module: str, to_module: str) -> str:
+    source_doc = _module_doc_path(from_module)
+    target_doc = _module_doc_path(to_module)
+    source_dir = posixpath.dirname(source_doc) or "."
+    return posixpath.relpath(target_doc, source_dir)
+
+
+def _format_module_links(
+    current_module: str,
+    module_names: Iterable[str],
+    documented: set[str],
+) -> str:
     """Return a comma-separated list of module names with links where possible.
 
     Parameters
     ----------
+    current_module : str
+        Module path for the document that is rendering the links.
     module_names : Iterable[str]
         Iterable of module names to format.
     documented : set[str]
@@ -693,33 +743,14 @@ def _format_module_links(module_names: Iterable[str], documented: set[str]) -> s
     links: list[str] = []
     for name in module_names:
         if name in documented:
-            links.append(f"[{name}](../modules/{name}.md)")
+            href = _relative_module_href(current_module, name)
+            links.append(f"[{name}]({href})")
         else:
             links.append(f"`{name}`")
     return ", ".join(links)
 
 
-def _nav_metadata_for_module(  # noqa: C901
-    module_path: str, module: _GriffeModule, facts: ModuleFacts
-) -> dict[str, Any]:
-    """Return nav metadata merged with runtime defaults for ``module_path``.
-
-    Parameters
-    ----------
-    module_path : str
-        Module path identifier.
-    module : _GriffeModule
-        Griffe module object.
-    facts : ModuleFacts
-        Module relationship facts.
-
-    Returns
-    -------
-    dict[str, Any]
-        Normalized navigation metadata including exports, sections, synopsis,
-        and relationship details for the module.
-    """
-    exports = sorted(_module_exports(module))
+def _load_nav_metadata_mapping(module_path: str, exports: Sequence[str]) -> dict[str, Any]:
     raw_meta = load_nav_metadata(module_path, tuple(exports))
     if NavMetadataModel is not None and isinstance(raw_meta, NavMetadataModel):
         meta = copy.deepcopy(raw_meta.as_mapping())
@@ -727,29 +758,40 @@ def _nav_metadata_for_module(  # noqa: C901
         meta = copy.deepcopy(dict(raw_meta))
     else:
         meta = copy.deepcopy(cast("dict[str, Any]", raw_meta))
-    meta["exports"] = exports
+    meta["exports"] = list(exports)
+    return meta
 
+
+def _synchronise_symbol_metadata(meta: dict[str, Any], exports: Sequence[str]) -> None:
     symbols_meta = meta.get("symbols")
-    if not isinstance(symbols_meta, dict):
+    if not isinstance(symbols_meta, Mapping):
         symbols_meta = {}
-    meta["symbols"] = {name: symbols_meta.get(name, {}) for name in exports}
+    meta["symbols"] = {name: dict(symbols_meta.get(name, {})) for name in exports}
 
+
+def _ensure_sections(meta: dict[str, Any], exports: Sequence[str]) -> None:
     sections = meta.get("sections")
-    if not isinstance(sections, list) or not sections:
-        meta["sections"] = [
-            {
-                "id": "public-api",
-                "title": "Public API",
-                "symbols": exports,
-            }
-        ]
+    if isinstance(sections, list) and sections:
+        return
+    meta["sections"] = [
+        {
+            "id": "public-api",
+            "title": "Public API",
+            "symbols": list(exports),
+        }
+    ]
 
+
+def _ensure_synopsis(meta: dict[str, Any], module: _GriffeModule) -> None:
     synopsis = meta.get("synopsis")
-    if not synopsis:
-        synopsis = _first_paragraph(module)
-        if synopsis:
-            meta["synopsis"] = synopsis
+    if synopsis:
+        return
+    first_paragraph = _first_paragraph(module)
+    if first_paragraph:
+        meta["synopsis"] = first_paragraph
 
+
+def _merge_relationships(meta: dict[str, Any], module_path: str, facts: ModuleFacts) -> None:
     imports = sorted(facts.imports.get(module_path, set()))
     imported_by = sorted(facts.imported_by.get(module_path, set()))
     relationships: dict[str, list[str]] = {}
@@ -757,12 +799,38 @@ def _nav_metadata_for_module(  # noqa: C901
         relationships["imports"] = imports
     if imported_by:
         relationships["imported_by"] = imported_by
-    existing_relationships = meta.get("relationships")
-    if isinstance(existing_relationships, dict):
-        relationships = {**existing_relationships, **relationships}
+    existing = meta.get("relationships")
+    if isinstance(existing, dict):
+        relationships = {**existing, **relationships}
     if relationships:
         meta["relationships"] = relationships
 
+
+def _nav_metadata_for_module(
+    module_path: str, module: _GriffeModule, facts: ModuleFacts
+) -> dict[str, Any]:
+    """Return nav metadata merged with runtime defaults for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Fully qualified module path.
+    module : _GriffeModule
+        Griffe module object containing symbol metadata.
+    facts : ModuleFacts
+        Module facts including imports, exports, and relationships.
+
+    Returns
+    -------
+    dict[str, Any]
+        Complete navigation metadata dictionary for the module.
+    """
+    exports = sorted(_module_exports(module))
+    meta = _load_nav_metadata_mapping(module_path, exports)
+    _synchronise_symbol_metadata(meta, exports)
+    _ensure_sections(meta, exports)
+    _ensure_synopsis(meta, module)
+    _merge_relationships(meta, module_path, facts)
     return meta
 
 
@@ -791,11 +859,10 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
     if not isinstance(spec_path, str) or not spec_path:
         return None, None
     if spec_path.endswith("openapi-cli.yaml"):
-        return "CLI Spec", "../api/openapi-cli.md"
+        return "CLI Spec", "api/openapi-cli.md"
     if spec_path.endswith("openapi.yaml"):
-        return "HTTP API", "../api/index.md"
-    rel = Path("..") / spec_path
-    return spec_path, rel.as_posix()
+        return "HTTP API", "api/index.md"
+    return spec_path, spec_path
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
@@ -825,10 +892,10 @@ def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: Mo
         return
     fd.write("## Relationships\n\n")
     if outgoing:
-        out_links = _format_module_links(outgoing, facts.documented_modules)
+        out_links = _format_module_links(module_path, outgoing, facts.documented_modules)
         fd.write(f"**Imports:** {out_links}\n\n")
     if incoming:
-        in_links = _format_module_links(incoming, facts.documented_modules)
+        in_links = _format_module_links(module_path, incoming, facts.documented_modules)
         fd.write(f"**Imported by:** {in_links}\n\n")
     if exported:
         export_list = ", ".join(f"`{name}`" for name in exported)
@@ -852,7 +919,10 @@ def _write_related_operations(
     for _, operation in sorted(collected.items(), key=lambda item: item[0]):
         label = f"`{operation.operation_id}`"
         if operation.href:
-            label = f"[{label}]({operation.href})"
+            module_doc = _module_doc_path(module_path)
+            module_dir = posixpath.dirname(module_doc) or "."
+            href = posixpath.relpath(operation.href, module_dir)
+            label = f"[{label}]({href})"
         context: list[str] = []
         if operation.interface_id:
             context.append(operation.interface_id)
@@ -1068,6 +1138,24 @@ def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
     return "\n".join(lines)
 
 
+def inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
+    """Return the inline D2 neighborhood diagram for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Fully qualified module path.
+    facts : ModuleFacts
+        Module facts including imports and relationships.
+
+    Returns
+    -------
+    str
+        D2 diagram source code as a string.
+    """
+    return _inline_d2_neighborhood(module_path, facts)
+
+
 def _write_module_diagram_file(module_path: str, facts: ModuleFacts) -> None:
     """Write a standalone D2 diagram for ``module_path`` to the virtual FS."""
     d2_path = f"diagrams/modules/{module_path}.d2"
@@ -1151,7 +1239,10 @@ def _write_interfaces(
         spec_candidate = merged.get("spec") or (registry_entry.spec if registry_entry else None)
         spec_label, spec_href = _spec_href(spec_candidate)
         if spec_href:
-            fd.write(f"- **Spec:** [{spec_label}]({spec_href})\n")
+            module_doc = _module_doc_path(module_path)
+            module_dir = posixpath.dirname(module_doc) or "."
+            resolved_href = posixpath.relpath(spec_href, module_dir)
+            fd.write(f"- **Spec:** [{spec_label}]({resolved_href})\n")
         elif spec_label:
             fd.write(f"- **Spec:** {spec_label}\n")
         problems = merged.get("problem_details")

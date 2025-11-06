@@ -16,6 +16,7 @@ import copy
 import importlib
 import json
 import logging
+import posixpath
 import re
 import sys
 from collections import defaultdict
@@ -674,11 +675,28 @@ def _build_relationships(
     )
 
 
-def _format_module_links(module_names: Iterable[str], documented: set[str]) -> str:
+def _module_doc_path(module_path: str) -> str:
+    return posixpath.join("modules", module_path.replace(".", "/") + ".md")
+
+
+def _relative_module_href(from_module: str, to_module: str) -> str:
+    source_doc = _module_doc_path(from_module)
+    target_doc = _module_doc_path(to_module)
+    source_dir = posixpath.dirname(source_doc) or "."
+    return posixpath.relpath(target_doc, source_dir)
+
+
+def _format_module_links(
+    current_module: str,
+    module_names: Iterable[str],
+    documented: set[str],
+) -> str:
     """Return a comma-separated list of module names with links where possible.
 
     Parameters
     ----------
+    current_module : str
+        Module path for the document that is rendering the links.
     module_names : Iterable[str]
         Iterable of module names to format.
     documented : set[str]
@@ -693,7 +711,8 @@ def _format_module_links(module_names: Iterable[str], documented: set[str]) -> s
     links: list[str] = []
     for name in module_names:
         if name in documented:
-            links.append(f"[{name}](../modules/{name}.md)")
+            href = _relative_module_href(current_module, name)
+            links.append(f"[{name}]({href})")
         else:
             links.append(f"`{name}`")
     return ", ".join(links)
@@ -791,11 +810,10 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
     if not isinstance(spec_path, str) or not spec_path:
         return None, None
     if spec_path.endswith("openapi-cli.yaml"):
-        return "CLI Spec", "../api/openapi-cli.md"
+        return "CLI Spec", "api/openapi-cli.md"
     if spec_path.endswith("openapi.yaml"):
-        return "HTTP API", "../api/index.md"
-    rel = Path("..") / spec_path
-    return spec_path, rel.as_posix()
+        return "HTTP API", "api/index.md"
+    return spec_path, spec_path
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
@@ -825,10 +843,10 @@ def _write_relationships(fd: mkdocs_gen_files.files, module_path: str, facts: Mo
         return
     fd.write("## Relationships\n\n")
     if outgoing:
-        out_links = _format_module_links(outgoing, facts.documented_modules)
+        out_links = _format_module_links(module_path, outgoing, facts.documented_modules)
         fd.write(f"**Imports:** {out_links}\n\n")
     if incoming:
-        in_links = _format_module_links(incoming, facts.documented_modules)
+        in_links = _format_module_links(module_path, incoming, facts.documented_modules)
         fd.write(f"**Imported by:** {in_links}\n\n")
     if exported:
         export_list = ", ".join(f"`{name}`" for name in exported)
@@ -852,7 +870,10 @@ def _write_related_operations(
     for _, operation in sorted(collected.items(), key=lambda item: item[0]):
         label = f"`{operation.operation_id}`"
         if operation.href:
-            label = f"[{label}]({operation.href})"
+            module_doc = _module_doc_path(module_path)
+            module_dir = posixpath.dirname(module_doc) or "."
+            href = posixpath.relpath(operation.href, module_dir)
+            label = f"[{label}]({href})"
         context: list[str] = []
         if operation.interface_id:
             context.append(operation.interface_id)
@@ -1151,7 +1172,10 @@ def _write_interfaces(
         spec_candidate = merged.get("spec") or (registry_entry.spec if registry_entry else None)
         spec_label, spec_href = _spec_href(spec_candidate)
         if spec_href:
-            fd.write(f"- **Spec:** [{spec_label}]({spec_href})\n")
+            module_doc = _module_doc_path(module_path)
+            module_dir = posixpath.dirname(module_doc) or "."
+            resolved_href = posixpath.relpath(spec_href, module_dir)
+            fd.write(f"- **Spec:** [{spec_label}]({resolved_href})\n")
         elif spec_label:
             fd.write(f"- **Spec:** {spec_label}\n")
         problems = merged.get("problem_details")

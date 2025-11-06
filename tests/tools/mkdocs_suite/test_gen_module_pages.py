@@ -16,106 +16,93 @@ from typing import Any, cast
 
 import griffe
 import pytest
-from tools._shared import augment_registry
+
+augment_registry: types.ModuleType = importlib.import_module("tools._shared.augment_registry")
 
 
-@pytest.fixture(name="gen_module_pages")
-def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
-    monkeypatch: pytest.MonkeyPatch,
-) -> types.ModuleType:
-    """Load ``gen_module_pages`` without executing its expensive side effects.
+def _make_module(name: str, *, package: bool = False) -> types.ModuleType:
+    module = types.ModuleType(name)
+    if package:
+        module.__path__ = []
+    return module
 
-    Parameters
-    ----------
-    monkeypatch : pytest.MonkeyPatch
-        Pytest monkeypatch fixture for stubbing module imports.
 
-    Returns
-    -------
-    types.ModuleType
-        The loaded module instance with side effects stubbed out.
+def _install_mkdocs_gen_files_stub(monkeypatch: pytest.MonkeyPatch) -> None:
+    stub = _make_module("mkdocs_gen_files")
+    stub.open = lambda *_args, **_kwargs: io.StringIO()
+    stub.files = io.StringIO
+    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
 
-    Raises
-    ------
-    RuntimeError
-        Raised when unable to construct module spec for gen_module_pages.
-    """
 
-    def _module_stub(name: str) -> Any:
-        return cast("Any", types.ModuleType(name))
-
-    mkdocs_stub = cast("Any", types.ModuleType("mkdocs_gen_files"))
-    mkdocs_stub.open = lambda *_args, **_kwargs: io.StringIO()
-    mkdocs_stub.files = io.StringIO
-    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", mkdocs_stub)
-
-    tools_stub = cast("Any", types.ModuleType("tools"))
-    tools_stub.__path__ = []
-    monkeypatch.setitem(sys.modules, "tools", tools_stub)
-
-    shared_stub = cast("Any", types.ModuleType("tools._shared"))
-    shared_stub.__path__ = []
-    monkeypatch.setitem(sys.modules, "tools._shared", shared_stub)
-
-    augment_stub = cast("Any", types.ModuleType("tools._shared.augment_registry"))
-    augment_stub.AugmentRegistryError = type("AugmentRegistryError", (Exception,), {})
-    augment_stub.load_registry = lambda *_args, **_kwargs: None
-    augment_stub.render_problem_details = lambda *_args, **_kwargs: {}
-    monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", augment_stub)
-
-    operation_links_stub = cast(
-        "Any", types.ModuleType("tools.mkdocs_suite.docs._scripts._operation_links")
-    )
-    operation_links_stub.build_operation_href = lambda *_args, **_kwargs: None
+def _install_tooling_namespace(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(sys.modules, "tools", _make_module("tools", package=True))
+    monkeypatch.setitem(sys.modules, "tools._shared", _make_module("tools._shared", package=True))
     monkeypatch.setitem(
-        sys.modules, "tools.mkdocs_suite.docs._scripts._operation_links", operation_links_stub
+        sys.modules, "tools.mkdocs_suite", _make_module("tools.mkdocs_suite", package=True)
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "tools.mkdocs_suite.docs",
+        _make_module("tools.mkdocs_suite.docs", package=True),
     )
 
-    mkdocs_suite_stub = cast("Any", types.ModuleType("tools.mkdocs_suite"))
-    mkdocs_suite_stub.__path__ = []
-    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite", mkdocs_suite_stub)
 
-    docs_stub = cast("Any", types.ModuleType("tools.mkdocs_suite.docs"))
-    docs_stub.__path__ = []
-    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs", docs_stub)
+def _install_augment_registry_stub(monkeypatch: pytest.MonkeyPatch) -> None:
+    stub = _make_module("tools._shared.augment_registry")
+    stub.AugmentRegistryError = type("AugmentRegistryError", (Exception,), {})
+    stub.load_registry = lambda *_args, **_kwargs: None
+    stub.render_problem_details = lambda *_args, **_kwargs: {}
+    monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", stub)
 
-    scripts_stub = cast("Any", types.ModuleType("tools.mkdocs_suite.docs._scripts"))
-    scripts_stub.__path__ = []
-    scripts_stub.load_repo_settings = lambda *_args, **_kwargs: (None, None)
-    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts", scripts_stub)
 
-    msgspec_stub = cast("Any", types.ModuleType("msgspec"))
-    msgspec_stub.UNSET = object()
+def _install_operation_links_stub(monkeypatch: pytest.MonkeyPatch) -> None:
+    stub = _make_module("tools.mkdocs_suite.docs._scripts._operation_links")
+    stub.build_operation_href = lambda *_args, **_kwargs: None
+    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts._operation_links", stub)
+
+
+def _install_docs_scripts_stub(monkeypatch: pytest.MonkeyPatch) -> None:
+    stub = _make_module("tools.mkdocs_suite.docs._scripts", package=True)
+    stub.load_repo_settings = lambda *_args, **_kwargs: (None, None)
+    monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts", stub)
+
+
+def _install_msgspec_stub(monkeypatch: pytest.MonkeyPatch) -> None:
+    stub = _make_module("msgspec")
 
     class _Struct:
-        """Minimal stand-in for :class:`msgspec.Struct`."""
-
         def __init_subclass__(cls, **kwargs: object) -> None:
-            super().__init_subclass__()
+            super().__init_subclass__(**kwargs)
 
-    msgspec_stub.Struct = _Struct
-    msgspec_stub.structs = types.SimpleNamespace(replace=lambda obj, **_kwargs: obj)
-    msgspec_stub.field = lambda *_args, **kwargs: kwargs
-    msgspec_stub.json = types.SimpleNamespace(
+    stub.Struct = _Struct
+    stub.UNSET = object()
+    stub.structs = types.SimpleNamespace(replace=lambda obj, **_kwargs: obj)
+    stub.field = lambda *_args, **kwargs: kwargs
+    stub.json = types.SimpleNamespace(
         encode=lambda *_args, **_kwargs: b"", decode=lambda *_args, **_kwargs: None
     )
-    monkeypatch.setitem(sys.modules, "msgspec", msgspec_stub)
+    monkeypatch.setitem(sys.modules, "msgspec", stub)
 
-    problem_details_stub = types.SimpleNamespace(ProblemDetailsDict=dict)
-    typing_stub = cast("Any", types.ModuleType("kgfoundry_common.typing"))
-    typing_stub.gate_import = lambda *_args, **_kwargs: problem_details_stub
-    kgfoundry_common_stub = cast("Any", types.ModuleType("kgfoundry_common"))
-    kgfoundry_common_stub.__path__ = []
-    monkeypatch.setitem(sys.modules, "kgfoundry_common", kgfoundry_common_stub)
+
+def _install_kgfoundry_stubs(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(
+        sys.modules, "kgfoundry_common", _make_module("kgfoundry_common", package=True)
+    )
+    typing_stub = _make_module("kgfoundry_common.typing")
+    typing_stub.gate_import = lambda *_args, **_kwargs: types.SimpleNamespace(
+        ProblemDetailsDict=dict
+    )
     monkeypatch.setitem(sys.modules, "kgfoundry_common.typing", typing_stub)
-    errors_stub = cast("Any", types.ModuleType("kgfoundry_common.errors"))
+
+    errors_stub = _make_module("kgfoundry_common.errors")
     errors_stub.SchemaValidationError = type("SchemaValidationError", (Exception,), {})
-    serialization_stub = cast("Any", types.ModuleType("kgfoundry_common.serialization"))
-    serialization_stub.validate_payload = lambda *_args, **_kwargs: None
     monkeypatch.setitem(sys.modules, "kgfoundry_common.errors", errors_stub)
+
+    serialization_stub = _make_module("kgfoundry_common.serialization")
+    serialization_stub.validate_payload = lambda *_args, **_kwargs: None
     monkeypatch.setitem(sys.modules, "kgfoundry_common.serialization", serialization_stub)
 
-    logging_stub = cast("Any", types.ModuleType("kgfoundry_common.logging"))
+    logging_stub = _make_module("kgfoundry_common.logging")
 
     class _LoggerAdapter:
         def __init__(
@@ -128,6 +115,8 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
     logging_stub.get_logger = lambda *_args, **_kwargs: _LoggerAdapter()
     monkeypatch.setitem(sys.modules, "kgfoundry_common.logging", logging_stub)
 
+
+def _patch_importlib_for_navmap(monkeypatch: pytest.MonkeyPatch) -> None:
     original_spec = importlib.util.spec_from_file_location
 
     class _StubLoader(importlib.machinery.SourceFileLoader):
@@ -136,7 +125,6 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
             self._initializer = initializer
 
         def exec_module(self, module: types.ModuleType) -> None:
-            """Populate the stub module without reading from disk."""
             self._initializer(module)
 
     def _navmap_initializer(module: types.ModuleType) -> None:
@@ -172,14 +160,8 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
 
     monkeypatch.setattr(importlib.util, "spec_from_file_location", _fake_spec_from_file_location)
 
-    module_path = (
-        Path(__file__).resolve().parents[3]
-        / "tools"
-        / "mkdocs_suite"
-        / "docs"
-        / "_scripts"
-        / "gen_module_pages.py"
-    )
+
+def _load_gen_module_pages_without_render(module_path: Path) -> types.ModuleType:
     module_code = module_path.read_text(encoding="utf-8")
     module_ast = ast.parse(module_code, filename=str(module_path))
     if module_ast.body:
@@ -207,9 +189,43 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
         message = "Unable to construct module spec for gen_module_pages"
         raise RuntimeError(message)
     module = importlib.util.module_from_spec(spec)
-    monkeypatch.setitem(sys.modules, module_name, module)
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
+
+
+@pytest.fixture(name="gen_module_pages")
+def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
+    """Load ``gen_module_pages`` without executing its expensive side effects.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Pytest monkeypatch fixture for stubbing module imports.
+
+    Returns
+    -------
+    types.ModuleType
+        The loaded module instance with side effects stubbed out.
+    """
+    _install_mkdocs_gen_files_stub(monkeypatch)
+    _install_tooling_namespace(monkeypatch)
+    _install_augment_registry_stub(monkeypatch)
+    _install_operation_links_stub(monkeypatch)
+    _install_docs_scripts_stub(monkeypatch)
+    _install_msgspec_stub(monkeypatch)
+    _install_kgfoundry_stubs(monkeypatch)
+    _patch_importlib_for_navmap(monkeypatch)
+
+    module_path = (
+        Path(__file__).resolve().parents[3]
+        / "tools"
+        / "mkdocs_suite"
+        / "docs"
+        / "_scripts"
+        / "gen_module_pages.py"
+    )
+    return _load_gen_module_pages_without_render(module_path)
 
 
 def test_inline_d2_neighborhood_uses_relative_doc_paths(gen_module_pages: types.ModuleType) -> None:
@@ -228,31 +244,19 @@ def test_inline_d2_neighborhood_uses_relative_doc_paths(gen_module_pages: types.
         source_paths={},
     )
 
-    block = gen_module_pages._inline_d2_neighborhood(module_path, facts)  # noqa: SLF001
+    inline_neighborhood = gen_module_pages.inline_d2_neighborhood
+    block = inline_neighborhood(module_path, facts)
 
     assert 'link: "./kgfoundry_common/logging.md"' in block
     assert 'link: "./kgfoundry_common/config.md"' in block
     assert 'link: "./kgfoundry_common/app.md"' in block
 
 
-def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Install a lightweight ``mkdocs_gen_files`` stub for module imports."""
-
-    def _fake_open(path: object, *_args: object, **_kwargs: object) -> io.StringIO:
-        del path
-        return io.StringIO()
-
-    stub = types.ModuleType("mkdocs_gen_files")
-    setattr(stub, "open", _fake_open)  # noqa: B010
-    setattr(stub, "files", io.StringIO)  # noqa: B010
-    monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
-
-
 def test_render_module_pages_warns_and_continues_on_invalid_api_usage(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Invalid API usage JSON should be ignored with a warning during builds."""
-    _install_mkdocs_stub(monkeypatch)
+    _install_mkdocs_gen_files_stub(monkeypatch)
 
     message = "stub discovery failure"
 

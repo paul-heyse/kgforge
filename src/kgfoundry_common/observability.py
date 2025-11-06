@@ -278,15 +278,15 @@ def observe_duration(
 
     Raises
     ------
-    Exception
-        Any exception raised within the context is re-raised after the observation
-        is marked as ``"error"`` and metrics/logs are recorded.
+    BaseException
+        Propagates any exception raised within the context after metrics and
+        logging have been recorded.
 
     Notes
     -----
-    Any exception raised within the context is re-raised after the observation
-    is marked as ``"error"`` and metrics/logs are recorded.
-    """  # noqa: DOC502
+    Exceptions raised within the context propagate after the observation is
+    marked as ``"error"`` and metrics/logs are recorded.
+    """
     observation = DurationObservation(
         metrics=metrics,
         operation=operation,
@@ -295,10 +295,10 @@ def observe_duration(
     )
     try:
         yield observation
-    except Exception:
+    except Exception as error:
         observation.mark_error()
         _finalise_observation(observation)
-        raise
+        raise error
     else:
         _finalise_observation(observation)
 

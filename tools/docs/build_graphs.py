@@ -21,13 +21,11 @@ import warnings
 from collections.abc import Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
-from functools import partial
+from functools import lru_cache, partial
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Protocol, cast
 from uuid import uuid4
-
-from docs._scripts import cli_context as docs_cli_context  # noqa: PLC2701
 
 from kgfoundry_common.logging import setup_logging
 from tools import (
@@ -84,6 +82,16 @@ except (ModuleNotFoundError, ImportError):
 
 
 YamlError = _YamlError
+
+
+class _DocsCliContext(Protocol):
+    REPO_ROOT: Path
+
+    def get_cli_definition(self, command: str) -> Mapping[str, object]: ...
+
+    def get_cli_settings(self, command: str) -> object: ...
+
+    def get_cli_config(self, command: str) -> object: ...
 
 
 def _optional_import(name: str) -> ModuleType | None:
@@ -181,9 +189,27 @@ class CycleConfig:
     edge_budget: int
 
 
+@dataclass(frozen=True)
+class RunInputs:
+    """Normalized configuration derived from CLI arguments."""
+
+    packages: tuple[str, ...]
+    excludes: tuple[str, ...]
+    cache_dir: Path
+    use_cache: bool
+    verbose: bool
+    config: PackageBuildConfig
+
+
 pydot: ModuleType | None = _optional_import("pydot")
 nx: ModuleType | None = _optional_import("networkx")
 yaml = _optional_import("yaml")
+
+
+@lru_cache(maxsize=1)
+def _load_docs_cli_context() -> _DocsCliContext:
+    module = importlib.import_module("docs._scripts.cli_context")
+    return cast("_DocsCliContext", module)
 
 
 def _require_pydot() -> ModuleType:
@@ -215,9 +241,10 @@ OUT.mkdir(parents=True, exist_ok=True)
 SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
 
 CLI_COMMAND_NAME = "docs-build-graphs"
-CLI_DEFINITION = docs_cli_context.get_cli_definition(CLI_COMMAND_NAME)
-CLI_SETTINGS = docs_cli_context.get_cli_settings(CLI_COMMAND_NAME)
-CLI_CONFIG = docs_cli_context.get_cli_config(CLI_COMMAND_NAME)
+DOCS_CLI_CONTEXT = _load_docs_cli_context()
+CLI_DEFINITION = DOCS_CLI_CONTEXT.get_cli_definition(CLI_COMMAND_NAME)
+CLI_SETTINGS = DOCS_CLI_CONTEXT.get_cli_settings(CLI_COMMAND_NAME)
+CLI_CONFIG = DOCS_CLI_CONTEXT.get_cli_config(CLI_COMMAND_NAME)
 CLI_OPERATION_IDS = dict(CLI_DEFINITION.operation_ids)
 CLI_INTERFACE_ID = CLI_DEFINITION.interface_id
 CLI_COMMAND = CLI_DEFINITION.command
@@ -225,7 +252,36 @@ CLI_TITLE = CLI_DEFINITION.title
 SUBCOMMAND_BUILD_GRAPHS = "build"
 CLI_OPERATION_ID = CLI_OPERATION_IDS[SUBCOMMAND_BUILD_GRAPHS]
 CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/docs/build-graphs"
-CLI_ENVELOPE_DIR = docs_cli_context.REPO_ROOT / "site" / "_build" / "cli"
+CLI_ENVELOPE_DIR = DOCS_CLI_CONTEXT.REPO_ROOT / "site" / "_build" / "cli"
+
+
+def _prepare_run_inputs(args: argparse.Namespace) -> RunInputs:
+    packages = tuple(_resolve_packages(args))
+    excludes = tuple(args.exclude or ["tests/.*", "site/.*"])
+    cache_dir, use_cache = _prepare_cache(args)
+    _log_configuration(
+        verbose=args.verbose,
+        packages=packages,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+    )
+    config = PackageBuildConfig(
+        fmt=args.format,
+        excludes=excludes,
+        max_bacon=args.max_bacon,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+        verbose=args.verbose,
+    )
+    return RunInputs(
+        packages=packages,
+        excludes=excludes,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+        verbose=args.verbose,
+        config=config,
+    )
+
 
 warnings.filterwarnings(
     "ignore",
@@ -2259,7 +2315,35 @@ def _log_run_summary(
         LOGGER.info("done in %.2fs; outputs in %s", duration_s, OUT)
 
 
-def _execute(context: _CommandContext) -> dict[str, object]:  # noqa: PLR0914
+def _finalize_run(
+    inputs: RunInputs,
+    results: Sequence[tuple[str, bool, bool, bool]],
+    duration_s: float,
+    analysis: Mapping[str, object],
+) -> dict[str, object]:
+    _log_run_summary(
+        use_cache=inputs.use_cache,
+        cache_dir=inputs.cache_dir,
+        results=results,
+        duration_s=duration_s,
+        verbose=inputs.verbose,
+    )
+
+    cached = sum(1 for _, used_cache, _, _ in results if used_cache)
+    built = sum(1 for _, used_cache, _, _ in results if not used_cache)
+
+    return {
+        "packageCount": len(inputs.packages),
+        "cachedPackages": cached,
+        "builtPackages": built,
+        "useCache": inputs.use_cache,
+        "cacheDir": str(inputs.cache_dir),
+        "durationSeconds": duration_s,
+        "cycleEnumerationSkipped": bool(analysis.get("cycle_enumeration_skipped", False)),
+    }
+
+
+def _execute(context: _CommandContext) -> dict[str, object]:
     """Execute the graph build workflow and return summary metadata.
 
     Parameters
@@ -2281,74 +2365,52 @@ def _execute(context: _CommandContext) -> dict[str, object]:  # noqa: PLR0914
     ------
     GraphBuildError
         Raised when global graph construction fails unexpectedly.
+    GraphPolicyError
+        Raised when graph policy violations are detected during analysis.
+    ValidationError
+        Raised when configuration validation fails (layers config, allowlist, etc.).
     """
     args = context.args
     _validate_runtime_dependencies()
 
-    packages = _resolve_packages(args)
-    excludes = args.exclude or ["tests/.*", "site/.*"]
-
-    cache_dir, use_cache = _prepare_cache(args)
-    _log_configuration(
-        verbose=args.verbose,
-        packages=packages,
-        cache_dir=cache_dir,
-        use_cache=use_cache,
-    )
-    config = PackageBuildConfig(
-        fmt=args.format,
-        excludes=tuple(excludes),
-        max_bacon=args.max_bacon,
-        cache_dir=cache_dir,
-        use_cache=use_cache,
-        verbose=args.verbose,
-    )
-
+    inputs = _prepare_run_inputs(args)
     build_start = time.monotonic()
-    results = _build_per_package_graphs(packages, config, args.max_workers)
-    _report_package_failures(results)
 
     try:
-        global_graph = _build_global_graph(args.format, excludes, args.max_bacon)
-    except (GraphBuildError, RuntimeError, OSError) as exc:  # pragma: no cover - defensive guard
-        message = "Building global graph failed"
+        results = _build_per_package_graphs(inputs.packages, inputs.config, args.max_workers)
+        _report_package_failures(results)
+
+        try:
+            global_graph = _build_global_graph(args.format, inputs.excludes, args.max_bacon)
+        except (
+            GraphBuildError,
+            RuntimeError,
+            OSError,
+        ) as exc:  # pragma: no cover - defensive guard
+            message = "Building global graph failed"
+            raise GraphBuildError(message) from exc
+
+        layers = _load_layers_config(args.layers)
+        allow = _load_allowlist(args.allowlist)
+
+        analysis = analyze_graph(global_graph, layers)
+        _write_global_artifacts(global_graph, layers, args.format, analysis)
+
+        enforce_policy(
+            analysis,
+            allow,
+            fail_cycles=args.fail_on_cycles,
+            fail_layers=args.fail_on_layer_violations,
+        )
+    except (GraphPolicyError, ValidationError, GraphBuildError):
+        raise
+    except Exception as exc:  # pragma: no cover - defensive guard
+        message = "Unexpected failure while building documentation graphs"
         raise GraphBuildError(message) from exc
 
-    layers = _load_layers_config(args.layers)
-    allow = _load_allowlist(args.allowlist)
     duration = time.monotonic() - build_start
 
-    analysis = analyze_graph(global_graph, layers)
-    _write_global_artifacts(global_graph, layers, args.format, analysis)
-
-    enforce_policy(
-        analysis,
-        allow,
-        fail_cycles=args.fail_on_cycles,
-        fail_layers=args.fail_on_layer_violations,
-    )
-    _log_run_summary(
-        use_cache=use_cache,
-        cache_dir=cache_dir,
-        results=results,
-        duration_s=duration,
-        verbose=args.verbose,
-    )
-
-    cached = sum(1 for _, used_cache, _, _ in results if used_cache)
-    built = sum(1 for _, used_cache, _, _ in results if not used_cache)
-
-    summary: dict[str, object] = {
-        "packageCount": len(packages),
-        "cachedPackages": cached,
-        "builtPackages": built,
-        "useCache": use_cache,
-        "cacheDir": str(cache_dir),
-        "durationSeconds": duration,
-        "cycleEnumerationSkipped": bool(analysis.get("cycle_enumeration_skipped", False)),
-    }
-
-    return summary
+    return _finalize_run(inputs, results, duration, analysis)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -2397,16 +2459,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     except GraphBuildError as exc:
         detail = str(exc) or "Graph build failed"
         extras = {"error": detail}
-        return _record_failure(
-            context,
-            detail=detail,
-            status=500,
-            error_status="error",
-            options=_FailureOptions(extras=extras, exc=exc),
-        )
-    except Exception as exc:  # pragma: no cover - defensive catch  # noqa: BLE001
-        detail = str(exc) or exc.__class__.__name__
-        extras = {"error": repr(exc)}
         return _record_failure(
             context,
             detail=detail,

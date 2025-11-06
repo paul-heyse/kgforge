@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from urllib.parse import quote
-
-CLI_SPEC_DOC = "../api/openapi-cli.md"
-HTTP_SPEC_DOC = "../api/index.md"
+CLI_SPEC_DOC = "api/openapi-cli.md"
+HTTP_SPEC_DOC = "api/index.md"
 
 
 def build_operation_href(spec_path: object, operation_id: str) -> str | None:
@@ -27,10 +25,7 @@ def build_operation_href(spec_path: object, operation_id: str) -> str | None:
     if not operation_id or not isinstance(spec_path, str):
         return None
     if spec_path.endswith("openapi-cli.yaml"):
-        base_href = CLI_SPEC_DOC
-    elif spec_path.endswith("openapi.yaml"):
-        base_href = HTTP_SPEC_DOC
-    else:
-        return None
-    encoded_operation = quote(operation_id, safe="")
-    return f"{base_href}#operation/{encoded_operation}"
+        return CLI_SPEC_DOC
+    if spec_path.endswith("openapi.yaml"):
+        return HTTP_SPEC_DOC
+    return None

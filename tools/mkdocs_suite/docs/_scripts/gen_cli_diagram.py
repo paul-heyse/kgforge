@@ -257,31 +257,27 @@ def write_diagram(operations: Sequence[OperationEntry]) -> None:
     _write_diagram(list(operations))
 
 
-def _ensure_cli_index_entry() -> None:
-    """Ensure the diagrams index links to the CLI diagram.
-
-    Raises
-    ------
-    RuntimeError
-        When the CLI diagram index entry cannot be written or verified.
-    """
+def _update_cli_index_entry(*, enabled: bool) -> None:
+    """Ensure the diagrams index links to the CLI diagram when available."""
     entry_token = CLI_INDEX_ENTRY.strip()
     try:
         with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
-            existing_content = handle.read()
+            existing_lines = handle.read().splitlines()
     except FileNotFoundError:
-        existing_content = ""
+        existing_lines = []
 
-    if entry_token not in existing_content:
-        newline_prefix = "" if not existing_content or existing_content.endswith("\n") else "\n"
-        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "a") as handle:
-            handle.write(f"{newline_prefix}{CLI_INDEX_ENTRY}")
-        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
-            existing_content = handle.read()
+    filtered_lines = [line for line in existing_lines if line.strip() != entry_token]
+    if enabled:
+        filtered_lines.append(entry_token)
 
-    if entry_token not in existing_content:
-        message = "CLI diagram index entry missing after generation."
-        raise RuntimeError(message)
+    if not filtered_lines:
+        return
+
+    content = "\n".join(filtered_lines)
+    if not content.endswith("\n"):
+        content += "\n"
+    with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "w") as handle:
+        handle.write(content)
 
 
 def main() -> None:
@@ -295,11 +291,13 @@ def main() -> None:
         )
         LOGGER.debug("CLI diagram problem details: %s", render_problem(exc.problem))
         operations = None
+    diagram_written = False
     if operations:
         write_diagram(operations)
+        diagram_written = True
     elif operations == []:
         LOGGER.info("No CLI operations discovered in configuration")
-    _ensure_cli_index_entry()
+    _update_cli_index_entry(enabled=diagram_written)
 
 
 if __name__ == "__main__":  # pragma: no cover - executed by mkdocs

@@ -17,7 +17,7 @@ from __future__ import annotations
 import base64
 from collections.abc import Mapping
 from functools import lru_cache
-from typing import TYPE_CHECKING, ClassVar, Final, Literal, Self, TypedDict, cast
+from typing import TYPE_CHECKING, ClassVar, Final, Literal, Self, TypedDict, Unpack, cast
 
 from pydantic import AliasChoices, Field, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -58,6 +58,31 @@ class ModelValidateOptions(TypedDict, total=False):
     context: Mapping[str, object] | None
     by_alias: bool | None
     by_name: bool | None
+
+
+def _compose_options(
+    options: ModelValidateOptions | None,
+    overrides: Mapping[str, object],
+) -> ModelValidateOptions:
+    """Return merged validation options prioritising ``overrides``.
+
+    Parameters
+    ----------
+    options : ModelValidateOptions | None
+        Base validation options to merge.
+    overrides : Mapping[str, object]
+        Override values that take precedence over ``options``.
+
+    Returns
+    -------
+    ModelValidateOptions
+        Merged validation options with overrides applied.
+    """
+    merged: dict[str, object] = {}
+    if options:
+        merged.update(options)
+    merged.update(overrides)
+    return cast("ModelValidateOptions", merged)
 
 
 # [nav:anchor AppSettings]
@@ -150,16 +175,12 @@ class AppSettings(BaseSettings):
     }
 
     @classmethod
-    def model_validate(  # noqa: PLR0913
+    def model_validate(
         cls,
         obj: object,
         *,
-        strict: bool | None = None,
-        extra: Literal["allow", "ignore", "forbid"] | None = None,
-        from_attributes: bool | None = None,
-        context: Mapping[str, object] | None = None,
-        by_alias: bool | None = None,
-        by_name: bool | None = None,
+        options: ModelValidateOptions | None = None,
+        **kwargs: Unpack[ModelValidateOptions],
     ) -> Self:
         """Validate ``obj`` returning ``cls`` while normalising pydantic errors.
 
@@ -167,44 +188,28 @@ class AppSettings(BaseSettings):
         exceptions. The many parameters are required to match the parent API,
         but internal logic is encapsulated in helper functions.
 
-        Note: PLR0913 suppression is required here because this method must match
-        the parent class signature from pydantic, which has 7 parameters total.
-        The actual validation logic is delegated to ``_validate_with_options``
-        which has only 2 parameters, reducing complexity.
-
         Parameters
         ----------
         obj : object
             Object to validate.
-        strict : bool | None
-            Whether to use strict mode validation.
-        extra : Literal["allow", "ignore", "forbid"] | None
-            Extra field handling mode ('allow', 'ignore', or 'forbid').
-        from_attributes : bool | None
-            Whether to validate from attributes.
-        context : Mapping[str, object] | None
-            Validation context.
-        by_alias : bool | None
-            Whether to use aliases.
-        by_name : bool | None
-            Whether to use names.
+        options : ModelValidateOptions | None
+            Preconfigured validation options applied before ``kwargs`` overrides.
+        **kwargs : Unpack[ModelValidateOptions]
+            Validation parameters forwarded directly to :mod:`pydantic` and
+            merged with ``options``.
 
         Returns
         -------
         Self
             Validated instance.
+
+        Notes
+        -----
+        Validation errors are normalised and re-raised as :exc:`ValueError` by
+        the internal validation helper.
         """
-        return cls._validate_with_options(
-            obj,
-            ModelValidateOptions(
-                strict=strict,
-                extra=extra,
-                from_attributes=from_attributes,
-                context=context,
-                by_alias=by_alias,
-                by_name=by_name,
-            ),
-        )
+        merged = _compose_options(options, kwargs)
+        return cls._validate_with_options(obj, merged)
 
     @classmethod
     def _validate_with_options(cls, obj: object, options: ModelValidateOptions) -> Self:
