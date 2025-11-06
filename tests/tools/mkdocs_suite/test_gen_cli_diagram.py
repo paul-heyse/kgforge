@@ -169,6 +169,43 @@ def test_collect_operations_surface_loader_error(monkeypatch: pytest.MonkeyPatch
         collect_operations()
 
 
+def test_ensure_cli_index_entry_preserves_existing_content(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
+
+    existing_content = "- [Existing Diagram](./existing.d2)\n"
+    buffers: dict[str, io.StringIO] = {
+        gen_cli_module.DIAGRAM_INDEX_PATH: io.StringIO(existing_content)
+    }
+    open_calls: list[tuple[str, str]] = []
+
+    @contextlib.contextmanager
+    def fake_open(path: str, mode: str = "r", **_: object) -> io.StringIO:
+        open_calls.append((path, mode))
+        buffer = buffers.setdefault(path, io.StringIO())
+        if "w" in mode:
+            buffer = io.StringIO()
+            buffers[path] = buffer
+        elif "a" in mode:
+            buffer.seek(0, io.SEEK_END)
+        else:
+            buffer.seek(0)
+        yield buffer
+
+    monkeypatch.setattr(gen_cli_module.mkdocs_gen_files, "open", fake_open)
+
+    gen_cli_module._ensure_cli_index_entry()
+
+    updated_content = buffers[gen_cli_module.DIAGRAM_INDEX_PATH].getvalue()
+    assert updated_content == existing_content + gen_cli_module.CLI_INDEX_ENTRY
+
+    read_modes = [
+        mode
+        for path, mode in open_calls
+        if path == gen_cli_module.DIAGRAM_INDEX_PATH and "r" in mode
+    ]
+    assert read_modes == ["r", "r"]
 def test_main_skips_diagram_when_dependency_missing(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
