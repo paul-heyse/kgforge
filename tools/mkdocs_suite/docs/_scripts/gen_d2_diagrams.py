@@ -23,7 +23,6 @@ def _load_curated_intro() -> str:
     index with that prose before appending the dynamic folder listing so that
     documentation builds retain the curated onboarding experience.
     """
-
     try:
         content = CURATED_INDEX_PATH.read_text(encoding="utf-8")
     except FileNotFoundError:
