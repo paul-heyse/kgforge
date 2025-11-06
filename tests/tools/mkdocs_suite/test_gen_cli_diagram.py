@@ -210,6 +210,43 @@ def test_ensure_cli_index_entry_preserves_existing_content(
     assert read_modes == ["r"]
 
 
+def test_update_cli_index_entry_preserves_double_newline(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
+
+    original_content = (
+        "# Diagrams\n"
+        "\n"
+        "Introductory text about diagrams.\n"
+        "\n"
+        "- [Existing Diagram](./existing.d2)\n"
+        "\n"
+    )
+    buffers: dict[str, io.StringIO] = {
+        gen_cli_module.DIAGRAM_INDEX_PATH: io.StringIO(original_content)
+    }
+
+    def fake_open(
+        path: str, mode: str = "r", **_: object
+    ) -> contextlib.AbstractContextManager[io.StringIO]:
+        return _capture_write(buffers, path, mode)
+
+    monkeypatch.setattr(gen_cli_module.mkdocs_gen_files, "open", fake_open)
+
+    gen_cli_module._update_cli_index_entry(enabled=True)
+    updated_content = buffers[gen_cli_module.DIAGRAM_INDEX_PATH].getvalue()
+
+    assert "Introductory text about diagrams.\n\n- [Existing Diagram](./existing.d2)\n" in updated_content
+    assert updated_content.endswith("\n\n")
+    assert gen_cli_module.CLI_INDEX_ENTRY.strip() in updated_content
+
+    gen_cli_module._update_cli_index_entry(enabled=False)
+    reverted_content = buffers[gen_cli_module.DIAGRAM_INDEX_PATH].getvalue()
+
+    assert reverted_content == original_content
+
+
 def test_main_skips_diagram_when_dependency_missing(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
