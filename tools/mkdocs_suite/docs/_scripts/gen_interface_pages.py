@@ -17,6 +17,9 @@ from tools._shared.augment_registry import (
     render_problem_details,
 )
 from tools.mkdocs_suite.docs._scripts import load_repo_settings
+from tools.mkdocs_suite.docs._scripts._operation_links import (
+    build_operation_href,
+)
 
 if TYPE_CHECKING:
     from tools._shared.augment_registry import (
@@ -101,13 +104,7 @@ def _module_doc_link(module: object) -> str:
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
-    if not operation_id:
-        return None
-    if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
-        return "../api/openapi-cli.md"
-    if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
-        return "../api/index.md"
-    return None
+    return build_operation_href(spec_path, operation_id)
 
 
 def _parse_handler_module(handler: object) -> str | None:
@@ -366,6 +363,20 @@ def _write_interface_details(
 def render_interface_catalog() -> None:
     registry = _load_registry()
     interfaces = _collect_nav_interfaces()
+    if registry is not None:
+        nav_lookup = {
+            str(record["id"]): record
+            for record in interfaces
+            if isinstance(record.get("id"), str) and record["id"].strip()
+        }
+        for identifier, interface_model in registry.interfaces.items():
+            key = str(identifier)
+            if key in nav_lookup:
+                continue
+            placeholder: dict[str, object] = {"id": key}
+            if interface_model.type:
+                placeholder["type"] = interface_model.type
+            interfaces.append(placeholder)
     interfaces.sort(key=lambda item: (str(item.get("type")), str(item.get("id"))))
 
     with mkdocs_gen_files.open("api/interfaces.md", "w") as handle:
