@@ -17,6 +17,9 @@ from tools._shared.augment_registry import (
     render_problem_details,
 )
 from tools.mkdocs_suite.docs._scripts import load_repo_settings
+from tools.mkdocs_suite.docs._scripts._operation_links import (
+    build_operation_href,
+)
 
 if TYPE_CHECKING:
     from tools._shared.augment_registry import (
@@ -101,13 +104,7 @@ def _module_doc_link(module: object) -> str:
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
-    if not operation_id:
-        return None
-    if isinstance(spec_path, str) and spec_path.endswith("openapi-cli.yaml"):
-        return "../api/openapi-cli.md"
-    if isinstance(spec_path, str) and spec_path.endswith("openapi.yaml"):
-        return "../api/index.md"
-    return None
+    return build_operation_href(spec_path, operation_id)
 
 
 def _parse_handler_module(handler: object) -> str | None:
