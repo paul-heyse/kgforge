@@ -35,6 +35,15 @@ __all__ = ["OperationEntry", "collect_operations", "main", "write_diagram"]
 
 LOGGER = logging.getLogger(__name__)
 
+
+RECOVERABLE_EXCEPTIONS: tuple[type[Exception], ...] = (
+    ImportError,
+    ModuleNotFoundError,
+    AttributeError,
+    TypeError,
+    RuntimeError,
+)
+
 DOCS_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = DOCS_ROOT.parents[2]
 AUGMENT_PATH = REPO_ROOT / "openapi" / "_augment_cli.yaml"
@@ -47,6 +56,12 @@ DEFAULT_INTERFACE_ID = "orchestration-cli"
 DEFAULT_BIN_NAME = "kgf"
 DEFAULT_TITLE = "KGFoundry CLI"
 DEFAULT_VERSION = "0.0.0"
+
+
+def _log_diagram_warning(message: str, exc: Exception) -> None:
+    """Log a warning describing why the CLI diagram cannot be produced."""
+
+    LOGGER.warning(message, exc_info=exc, extra={"status": "warning"})
 
 
 def _escape_d2(value: str) -> str:
@@ -190,12 +205,33 @@ def collect_operations(
     """
     if context is None:
         settings = _default_cli_settings(interface_id)
-        context = load_cli_tooling_context(settings)
+        try:
+            context = load_cli_tooling_context(settings)
+        except CLIConfigError:
+            raise
+        except RECOVERABLE_EXCEPTIONS as exc:
+            _log_diagram_warning(
+                "Skipping CLI diagram generation; unable to load CLI tooling context.",
+                exc,
+            )
+            return []
         interface_id = settings.interface_id
+
+    if context is None:
+        return []
 
     cli_config = cast("CLIConfig", context.cli_config)
     resolved_interface = interface_id or cli_config.interface_id
-    command_candidate = click_cmd or _load_click_command(context, resolved_interface)
+    try:
+        command_candidate = click_cmd or _load_click_command(context, resolved_interface)
+    except CLIConfigError:
+        raise
+    except RECOVERABLE_EXCEPTIONS as exc:
+        _log_diagram_warning(
+            "Skipping CLI diagram generation; unable to resolve CLI entrypoint.",
+            exc,
+        )
+        return []
     operation_context = cli_config.operation_context
 
     return _build_operations(operation_context, cast("Command", command_candidate))
@@ -210,7 +246,7 @@ def _ensure_cli_index_entry() -> None:
     """Ensure the diagrams index links to the CLI diagram."""
     entry_token = CLI_INDEX_ENTRY.strip()
     try:
-        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
             existing_content = handle.read()
     except FileNotFoundError:
         existing_content = ""
@@ -219,7 +255,7 @@ def _ensure_cli_index_entry() -> None:
         newline_prefix = "" if not existing_content or existing_content.endswith("\n") else "\n"
         with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "a") as handle:
             handle.write(f"{newline_prefix}{CLI_INDEX_ENTRY}")
-        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "r") as handle:
             existing_content = handle.read()
 
     if entry_token not in existing_content:
@@ -228,6 +264,7 @@ def _ensure_cli_index_entry() -> None:
 
 
 def main() -> None:
+    operations: list[OperationEntry] | None
     try:
         operations = collect_operations()
     except CLIConfigError as exc:
@@ -236,11 +273,11 @@ def main() -> None:
             extra={"status": "error"},
         )
         LOGGER.debug("CLI diagram problem details: %s", render_problem(exc.problem))
-        return
-    if not operations:
+        operations = None
+    if operations:
+        write_diagram(operations)
+    elif operations == []:
         LOGGER.info("No CLI operations discovered in configuration")
-        return
-    write_diagram(operations)
     _ensure_cli_index_entry()
 
 
