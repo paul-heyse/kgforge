@@ -86,6 +86,269 @@ interfaces:
             source: "kgf e2e"
         problem_details:
           - schema/examples/problem_details/public-api-invalid-config.json
+  download-cli:
+    type: cli
+    module: download
+    owner: "@data-platform"
+    stability: experimental
+    entrypoint: download.cli:app
+    binary: kgf
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - download
+    description: |
+      Downloader command suite that sources external corpora (currently OpenAlex) using the shared
+      CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,
+      diagrams, documentation) remains in sync without bespoke glue.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      harvest:
+        operation_id: cli.download.harvest
+        summary: Harvest OpenAlex works for downstream ingestion.
+        description: |
+          Execute a dry-run compatible harvest of OpenAlex data based on topic and year filters. The
+          command routes metadata through the shared CLI tooling facade so downstream consumers can
+          rely on typed contracts without custom parsing.
+        handler: download.cli:harvest
+        tags:
+          - download
+        env: []
+        code_samples:
+          - lang: bash
+            source: "kgf download harvest 'foundation models' --years '>=2020' --max-works 5000"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+  docstring-builder-cli:
+    type: cli
+    module: tools.docstring_builder
+    owner: "@docs"
+    stability: beta
+    entrypoint: tools.docstring_builder.cli:main
+    binary: docstring-builder
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - docstrings
+    description: |
+      Command suite powering docstring synchronization, validation, policy enforcement, and
+      diagnostics. The CLI integrates with shared tooling metadata so documentation helpers,
+      diagrams, and automation emit consistent Problem Details and logging envelopes.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      generate:
+        operation_id: docstrings.generate
+        summary: Regenerate managed docstrings and DocFacts artifacts.
+        description: |
+          Execute the full docstring builder pipeline, updating managed docstrings in-place and
+          refreshing DocFacts manifests. Intended for presubmit workflows and documentation rebuilds.
+        handler: tools.docstring_builder.cli:_command_generate
+        tags:
+          - docstrings
+          - docstrings-update
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli generate"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      fix:
+        operation_id: docstrings.fix
+        summary: Apply docstring updates while bypassing cache entries.
+        description: |
+          Force-regenerate docstrings, ignoring cache hints so that all managed symbols are
+          re-rendered. Useful after plugin or policy changes when stale cache entries must be
+          invalidated.
+        handler: tools.docstring_builder.cli:_command_fix
+        tags:
+          - docstrings
+          - docstrings-update
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli fix"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      fmt:
+        operation_id: docstrings.fmt
+        summary: Normalize docstring sections without regenerating content.
+        description: |
+          Tidy managed docstrings by rewriting section headers and spacing without triggering the
+          full regeneration pipeline. Leaves content intact while ensuring formatting consistency.
+        handler: tools.docstring_builder.cli:_command_fmt
+        tags:
+          - docstrings
+          - docstrings-update
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli fmt"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      update:
+        operation_id: docstrings.update
+        summary: Legacy alias for the generate pipeline.
+        description: |
+          Backwards compatible alias that invokes the same synchronization flow as the `generate`
+          subcommand. Maintained for existing automation until callers migrate to the new verbs.
+        handler: tools.docstring_builder.cli:_command_update
+        tags:
+          - docstrings
+          - docstrings-update
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli update"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      check:
+        operation_id: docstrings.check
+        summary: Validate docstrings without writing updates.
+        description: |
+          Inspect managed docstrings for drift, policy violations, or missing sections. Emits a
+          structured CLI envelope and non-zero exit status when remediation is required.
+        handler: tools.docstring_builder.cli:_command_check
+        tags:
+          - docstrings
+          - docstrings-validate
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli check"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      diff:
+        operation_id: docstrings.diff
+        summary: Show docstring drift previews without mutating files.
+        description: |
+          Produce unified diffs for managed docstrings highlighting pending changes. Useful when
+          reviewing edits prior to accepting updates or triaging regressions.
+        handler: tools.docstring_builder.cli:_command_diff
+        tags:
+          - docstrings
+          - docstrings-validate
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli diff"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      lint:
+        operation_id: docstrings.lint
+        summary: Alias for check with optional DocFacts skip.
+        description: |
+          Run the validation workflow with optional DocFacts reconciliation disabled for speed.
+          Mirrors the `check` behavior while supporting quick linting loops.
+        handler: tools.docstring_builder.cli:_command_lint
+        tags:
+          - docstrings
+          - docstrings-validate
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli lint --no-docfacts"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      measure:
+        operation_id: docstrings.measure
+        summary: Execute validation and emit observability metrics.
+        description: |
+          Run the validation pipeline and record observability counters, including processed file
+          counts and policy outcomes. Designed for CI environments that publish metrics.
+        handler: tools.docstring_builder.cli:_command_measure
+        tags:
+          - docstrings
+          - docstrings-observability
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli measure"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      list:
+        operation_id: docstrings.list
+        summary: List managed docstring targets detected by the pipeline.
+        description: |
+          Enumerate symbols managed by the docstring builder, including modules and plugin coverage.
+          Helpful when auditing what content is under automation.
+        handler: tools.docstring_builder.cli:_command_list
+        tags:
+          - docstrings
+          - docstrings-observability
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli list"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      harvest:
+        operation_id: docstrings.harvest
+        summary: Gather docstring metadata without writing changes.
+        description: |
+          Harvest symbol metadata and DocFacts inputs without applying edits. Supports workflows
+          that need intermediate data for analysis or experiment pipelines.
+        handler: tools.docstring_builder.cli:_command_harvest
+        tags:
+          - docstrings
+          - docstrings-utilities
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli harvest"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      schema:
+        operation_id: docstrings.schema
+        summary: Export the docstring IR schema to disk.
+        description: |
+          Generate the JSON schema describing the docstring intermediate representation. Intended
+          for tooling integration tests and documentation.
+        handler: tools.docstring_builder.cli:_command_schema
+        tags:
+          - docstrings
+          - docstrings-utilities
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli schema --output docs/_build/docstring-schema.json"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      clear-cache:
+        operation_id: docstrings.clear_cache
+        summary: Remove cached docstring builder artifacts.
+        description: |
+          Delete the docstring builder cache directory, forcing subsequent runs to recompute state
+          from scratch. Useful after structural changes to plugins or configuration.
+        handler: tools.docstring_builder.cli:_command_clear_cache
+        tags:
+          - docstrings
+          - docstrings-utilities
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli clear-cache"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      doctor:
+        operation_id: docstrings.doctor
+        summary: Diagnose configuration, dependencies, and optional stubs.
+        description: |
+          Run health checks covering Python version, configuration files, optional dependencies,
+          and stub drift. Surfaces actionable guidance with structured Problem Details on failure.
+        handler: tools.docstring_builder.cli:_command_doctor
+        tags:
+          - docstrings
+          - docstrings-diagnostics
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m tools.docstring_builder.cli doctor --stubs"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
   search-http:
     type: http
     module: search_api

@@ -23,14 +23,39 @@ import argparse
 import json
 import logging
 import sys
-from collections.abc import Callable
+import time
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache, wraps
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as pkg_version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
+from uuid import uuid4
 
 import yaml
 
-from tools._shared.logging import get_logger
+from tools._shared.cli import (
+    CliEnvelope,
+    CliEnvelopeBuilder,
+    CliErrorStatus,
+    CliFileStatus,
+    CliStatus,
+    render_cli_envelope,
+)
+from tools._shared.cli_tooling import (
+    CLIConfigError,
+    CLIToolingContext,
+    CLIToolSettings,
+    load_cli_tooling_context,
+)
+from tools._shared.logging import LoggerAdapter, get_logger, with_fields
+from tools._shared.problem_details import (
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
+)
+from tools.docstring_builder.builder_types import STATUS_LABELS
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import (
@@ -45,7 +70,6 @@ from tools.docstring_builder.orchestrator import (
     ExitStatus,
     InvalidPathError,
     load_builder_config,
-    render_cli_result,
     render_failure_summary,
     run_docstring_builder,
 )
@@ -59,13 +83,268 @@ from tools.docstring_builder.policy import PolicyConfigurationError, load_policy
 from tools.stubs.drift_check import run as run_stub_drift
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     from tools.docstring_builder.orchestrator import (
         DocstringBuildResult,
     )
 
 LOGGER = get_logger(__name__)
+
+CLI_COMMAND = "docstring-builder"
+CLI_TITLE = "Docstring Builder CLI"
+CLI_INTERFACE_ID = "docstring-builder-cli"
+CLI_ENVELOPE_DIR = REPO_ROOT / "site" / "_build" / "cli"
+
+CLI_OPERATION_IDS: dict[str, str] = {
+    "generate": "docstrings.generate",
+    "fix": "docstrings.fix",
+    "fmt": "docstrings.fmt",
+    "update": "docstrings.update",
+    "check": "docstrings.check",
+    "diff": "docstrings.diff",
+    "lint": "docstrings.lint",
+    "measure": "docstrings.measure",
+    "list": "docstrings.list",
+    "harvest": "docstrings.harvest",
+    "schema": "docstrings.schema",
+    "clear-cache": "docstrings.clear_cache",
+    "clear_cache": "docstrings.clear_cache",
+    "doctor": "docstrings.doctor",
+}
+
+
+def _resolve_cli_version() -> str:
+    try:
+        return pkg_version("kgfoundry")
+    except PackageNotFoundError:
+        return "0.0.0"
+
+
+CLI_SETTINGS = CLIToolSettings(
+    bin_name=CLI_COMMAND,
+    title=CLI_TITLE,
+    version=_resolve_cli_version(),
+    augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
+    registry_path=REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml",
+    interface_id=CLI_INTERFACE_ID,
+)
+
+
+@lru_cache
+def _load_cli_context() -> CLIToolingContext:
+    return load_cli_tooling_context(CLI_SETTINGS)
+
+
+def _operation_id_for_subcommand(subcommand: str | None) -> str | None:
+    if not subcommand:
+        return None
+    key = subcommand.replace("_", "-")
+    return CLI_OPERATION_IDS.get(key)
+
+
+def _wrap_handler(handler: CommandHandler, subcommand: str) -> CommandHandler:
+    @wraps(handler)
+    def _wrapper(args: argparse.Namespace) -> int:
+        if not getattr(args, "invoked_subcommand", None):
+            args.invoked_subcommand = subcommand
+        return handler(args)
+
+    return _wrapper
+
+
+def _status_label_from_exit_code(exit_code: int) -> CliStatus:
+    try:
+        status = STATUS_LABELS[ExitStatus(exit_code)]
+    except ValueError:
+        status = "success" if exit_code == 0 else "error"
+    if status not in {"success", "violation", "config", "error"}:
+        status = "error"
+    return cast("CliStatus", status)
+
+
+def _map_file_status(report: Mapping[str, object]) -> CliFileStatus:
+    if bool(report.get("skipped")):
+        return cast("CliFileStatus", "skipped")
+    status = str(report.get("status", "success"))
+    match status:
+        case "success":
+            mapped = "success"
+        case "violation":
+            mapped = "violation"
+        case "config" | "error":
+            mapped = "error"
+        case _:
+            mapped = "error"
+    return cast("CliFileStatus", mapped)
+
+
+def _apply_pipeline_result(
+    builder: CliEnvelopeBuilder,
+    result: DocstringBuildResult,
+) -> None:
+    for file_report in result.file_reports:
+        path = str(file_report.get("path", "<unknown>"))
+        message = file_report.get("message") or file_report.get("preview")
+        problem_raw = file_report.get("problem")
+        problem: ProblemDetailsDict | None
+        if isinstance(problem_raw, Mapping):
+            problem = cast("ProblemDetailsDict", dict(problem_raw))
+        else:
+            problem = None
+        builder.add_file(
+            path=path,
+            status=_map_file_status(file_report),
+            message=str(message) if message else None,
+            problem=problem,
+        )
+    for error in result.errors:
+        status = str(error.get("status", "error"))
+        if status not in {"error", "violation", "config"}:
+            status = "error"
+        problem_raw = error.get("problem")
+        if isinstance(problem_raw, Mapping):
+            problem = cast("ProblemDetailsDict", dict(problem_raw))
+        else:
+            problem = None
+        builder.add_error(
+            status=cast("CliErrorStatus", status),
+            message=str(error.get("message", "")),
+            file=str(error.get("file", "")) or None,
+            problem=problem,
+        )
+    if result.manifest_path is not None:
+        builder.add_file(
+            path=str(result.manifest_path),
+            status=cast("CliFileStatus", "success"),
+            message="Manifest written",
+        )
+    if result.problem_details is not None:
+        builder.set_problem(cast("ProblemDetailsDict", dict(result.problem_details)))
+
+
+def _resolve_duration(duration: float, result: DocstringBuildResult | None) -> float:
+    if result and result.cli_payload:
+        payload_duration = result.cli_payload.get("durationSeconds")
+        if isinstance(payload_duration, (int, float)):
+            return float(payload_duration)
+    return duration
+
+
+def _apply_additional_annotations(builder: CliEnvelopeBuilder, args: argparse.Namespace) -> None:
+    output_paths = getattr(args, "cli_output_paths", None)
+    if output_paths:
+        for path_obj in output_paths:
+            builder.add_file(
+                path=str(path_obj),
+                status=cast("CliFileStatus", "success"),
+            )
+    summary = getattr(args, "cli_summary", None)
+    if isinstance(summary, Mapping) and summary:
+        builder.add_file(
+            path="<summary>",
+            status=cast("CliFileStatus", "success"),
+            message=json.dumps(summary, sort_keys=True),
+        )
+    doctor_issues = getattr(args, "cli_doctor_issues", None)
+    if isinstance(doctor_issues, Sequence):
+        for issue in doctor_issues:
+            builder.add_error(
+                status=cast("CliErrorStatus", "config"),
+                message=str(issue),
+            )
+    additional_problem = getattr(args, "cli_problem", None)
+    if isinstance(additional_problem, Mapping):
+        builder.set_problem(cast("ProblemDetailsDict", dict(additional_problem)))
+
+
+def _build_cli_envelope_from_args(
+    args: argparse.Namespace,
+    *,
+    subcommand: str,
+    exit_code: int,
+    duration: float,
+) -> CliEnvelope:
+    status = _status_label_from_exit_code(exit_code)
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=status,
+        subcommand=subcommand,
+    )
+    result = cast("DocstringBuildResult | None", getattr(args, "docbuilder_result", None))
+    if result is not None:
+        _apply_pipeline_result(builder, result)
+        duration = _resolve_duration(duration, result)
+    _apply_additional_annotations(builder, args)
+    return builder.finish(duration_seconds=duration)
+
+
+def _build_config_error_envelope(subcommand: str, problem: ProblemDetailsDict) -> CliEnvelope:
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=cast("CliStatus", "config"),
+        subcommand=subcommand,
+    )
+    detail = str(problem.get("detail", "CLI configuration failed."))
+    builder.add_error(
+        status=cast("CliErrorStatus", "config"),
+        message=detail,
+    )
+    builder.set_problem(problem)
+    return builder.finish()
+
+
+def _build_unexpected_failure_envelope(subcommand: str, exc: BaseException) -> CliEnvelope:
+    detail = f"{type(exc).__name__}: {exc}"
+    problem = build_problem_details(
+        ProblemDetailsParams(
+            type="https://kgfoundry.dev/problems/docstrings/unhandled-error",
+            title="Docstring builder command failed",
+            status=500,
+            detail=detail,
+            instance=f"urn:cli:docstrings:{subcommand or 'root'}",
+        )
+    )
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status=cast("CliStatus", "error"),
+        subcommand=subcommand,
+    )
+    builder.add_error(
+        status=cast("CliErrorStatus", "error"),
+        message=detail,
+    )
+    builder.set_problem(problem)
+    return builder.finish()
+
+
+def _emit_envelope(
+    envelope: CliEnvelope,
+    *,
+    subcommand: str,
+    logger: logging.Logger | LoggerAdapter,
+    json_output: bool,
+) -> Path | None:
+    payload = render_cli_envelope(envelope)
+    safe_subcommand = subcommand or "root"
+    output_path = CLI_ENVELOPE_DIR / f"{CLI_COMMAND}-{safe_subcommand.replace('/', '-')}.json"
+    try:
+        CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(payload + "\n", encoding="utf-8")
+        logger.debug(
+            "CLI envelope written",
+            extra={"status": envelope.status, "envelope_path": str(output_path)},
+        )
+    except OSError as exc:  # pragma: no cover - disk write failure
+        logger.warning(
+            "Unable to write CLI envelope",
+            extra={"status": "warning", "error": str(exc)},
+        )
+        output_path = None
+    if json_output:
+        sys.stdout.write(payload)
+        sys.stdout.write("\n")
+    return output_path
+
+
 CommandHandler = Callable[[argparse.Namespace], int]
 
 
@@ -355,14 +634,6 @@ def build_request_from_args(
     return _build_request(args, command=command, subcommand=subcommand)
 
 
-def _emit_json(result: DocstringBuildResult) -> None:
-    payload = render_cli_result(result)
-    if payload is None:
-        return
-    json.dump(payload, sys.stdout, indent=2, sort_keys=True)
-    sys.stdout.write("\n")
-
-
 def _emit_diffs(result: DocstringBuildResult) -> None:
     for _, preview in result.diff_previews:
         sys.stdout.write(preview)
@@ -372,10 +643,13 @@ def _execute_pipeline(args: argparse.Namespace, subcommand: str, command: str) -
     request = _build_request(args, command=command, subcommand=subcommand)
     config_override = getattr(args, "config_path", None)
     result = run_docstring_builder(request, config_override=config_override)
+    args.docbuilder_result = result
+    if result.cli_payload:
+        summary_payload = result.cli_payload.get("summary")
+        if isinstance(summary_payload, dict):
+            args.cli_summary = summary_payload
     if request.diff and not request.json_output:
         _emit_diffs(result)
-    if request.json_output:
-        _emit_json(result)
     render_failure_summary(result)
     return int(result.exit_status)
 
@@ -431,17 +705,25 @@ def _command_list(args: argparse.Namespace) -> int:
     except InvalidPathError:
         LOGGER.exception("Invalid path supplied to docstring builder list")
         return int(ExitStatus.CONFIG)
+    owned_symbols = 0
     for file_path in files:
         result = harvest_file(file_path, config, REPO_ROOT)
         for symbol in result.symbols:
             if symbol.owned:
+                owned_symbols += 1
                 sys.stdout.write(f"{symbol.qname}\n")
+    args.cli_summary = {
+        "files": len(files),
+        "ownedSymbols": owned_symbols,
+    }
     return int(ExitStatus.SUCCESS)
 
 
-def _command_clear_cache(_: argparse.Namespace) -> int:
+def _command_clear_cache(args: argparse.Namespace) -> int:
     BuilderCache(CACHE_PATH).clear()
     LOGGER.info("Cleared docstring builder cache at %s", CACHE_PATH)
+    args.cli_output_paths = (CACHE_PATH,)
+    args.cli_summary = {"cachePath": str(CACHE_PATH)}
     return int(ExitStatus.SUCCESS)
 
 
@@ -458,6 +740,8 @@ def _command_schema(args: argparse.Namespace) -> int:
     write_schema(target)
     rel = target.relative_to(REPO_ROOT)
     LOGGER.info("Schema written to %s", rel)
+    args.cli_output_paths = (target,)
+    args.cli_summary = {"schemaPath": str(rel)}
     return int(ExitStatus.SUCCESS)
 
 
@@ -652,7 +936,8 @@ def _command_doctor(args: argparse.Namespace) -> int:
     ):  # pragma: no cover - defensive doctor safeguard
         LOGGER.exception("Doctor encountered an unexpected error.")
         return int(ExitStatus.ERROR)
-
+    args.cli_doctor_issues = issues
+    args.cli_summary = {"stubDriftExit": drift_status}
     return _finalize_doctor(issues, drift_status)
 
 
@@ -661,6 +946,82 @@ LEGACY_COMMAND_HANDLERS: dict[str, CommandHandler] = {
     "check": _command_check,
     "harvest": _command_harvest,
 }
+
+
+def _invoke_handler(args: argparse.Namespace, handler: CommandHandler) -> int:
+    subcommand = cast(
+        "str", getattr(args, "invoked_subcommand", None) or getattr(args, "subcommand", "")
+    )
+    operation_id = _operation_id_for_subcommand(subcommand)
+    correlation_id = str(uuid4())
+    logger_fields: dict[str, object] = {
+        "command": CLI_COMMAND,
+        "subcommand": subcommand,
+        "correlation_id": correlation_id,
+    }
+    if operation_id:
+        logger_fields["operation_id"] = operation_id
+    operation_logger = with_fields(LOGGER, **logger_fields)
+    operation_logger.info("Starting docstring builder command", extra={"status": "start"})
+
+    try:
+        context = _load_cli_context()
+    except CLIConfigError as exc:
+        operation_logger.exception(
+            "Unable to load CLI tooling context",
+            extra={"status": "config", "detail": exc.problem.get("detail")},
+        )
+        envelope = _build_config_error_envelope(subcommand, exc.problem)
+        _emit_envelope(
+            envelope,
+            subcommand=subcommand,
+            logger=operation_logger,
+            json_output=bool(getattr(args, "json_output", False)),
+        )
+        return int(ExitStatus.CONFIG)
+
+    args.cli_tooling_context = context
+    start = time.monotonic()
+    try:
+        exit_code = handler(args)
+    except SystemExit:  # pragma: no cover - allow argparse to exit
+        raise
+    except BaseException as exc:
+        duration = time.monotonic() - start
+        operation_logger.exception(
+            "Docstring builder command raised an unexpected exception",
+            extra={"status": "error"},
+        )
+        envelope = _build_unexpected_failure_envelope(subcommand, exc)
+        _emit_envelope(
+            envelope,
+            subcommand=subcommand,
+            logger=operation_logger,
+            json_output=bool(getattr(args, "json_output", False)),
+        )
+        return int(ExitStatus.ERROR)
+
+    duration = time.monotonic() - start
+    envelope = _build_cli_envelope_from_args(
+        args,
+        subcommand=subcommand,
+        exit_code=exit_code,
+        duration=duration,
+    )
+    _emit_envelope(
+        envelope,
+        subcommand=subcommand,
+        logger=operation_logger,
+        json_output=bool(getattr(args, "json_output", False)),
+    )
+    operation_logger.info(
+        "Completed docstring builder command",
+        extra={
+            "status": envelope.status,
+            "duration_seconds": envelope.duration_seconds,
+        },
+    )
+    return exit_code
 
 
 def _apply_cli_arguments(parser: argparse.ArgumentParser) -> None:
@@ -728,7 +1089,8 @@ def _register_subcommand(
         _add_path_argument(subparser)
     if configure is not None:
         configure(subparser)
-    subparser.set_defaults(func=handler)
+    wrapped_handler = _wrap_handler(handler, name)
+    subparser.set_defaults(func=wrapped_handler, invoked_subcommand=name)
 
 
 SUBCOMMAND_SPECS: tuple[dict[str, object], ...] = (
@@ -860,7 +1222,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 1
     handler = cast("CommandHandler", args.func)
-    return handler(args)
+    return _invoke_handler(args, handler)
 
 
 if __name__ == "__main__":  # pragma: no cover

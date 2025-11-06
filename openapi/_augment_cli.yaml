@@ -2,10 +2,42 @@ tags:
   - name: orchestration
     x-displayName: Orchestration
     description: Commands that orchestrate indexing, ingestion, and flow execution.
+  - name: docstrings
+    x-displayName: Docstring Builder
+    description: Commands that generate, validate, and maintain managed docstrings.
+  - name: docstrings-update
+    x-displayName: Update
+    description: Synchronize docstrings and DocFacts artifacts with source code.
+  - name: docstrings-validate
+    x-displayName: Validate
+    description: Inspect docstrings for drift or policy violations without writing changes.
+  - name: docstrings-observability
+    x-displayName: Observability
+    description: Emit metrics, listings, and auxiliary reports for docstring maintenance.
+  - name: docstrings-diagnostics
+    x-displayName: Diagnostics
+    description: Diagnose configuration, environment, and stub health for the docstring builder.
+  - name: docstrings-utilities
+    x-displayName: Utilities
+    description: Auxiliary helpers including schema export, cache management, and metadata harvesting.
+  - name: download
+    x-displayName: Download
+    description: Commands that harvest external corpora for downstream processing.
 
 x-tagGroups:
   - name: CLI Suites
     tags: [orchestration]
+  - name: Docstring Builder
+    tags: [docstrings]
+  - name: Docstring Focus Areas
+    tags:
+      - docstrings-update
+      - docstrings-validate
+      - docstrings-observability
+      - docstrings-diagnostics
+      - docstrings-utilities
+  - name: Data Acquisition
+    tags: [download]
 
 operations:
   cli.index_bm25:
@@ -38,4 +70,94 @@ operations:
     x-codeSamples:
       - lang: bash
         source: "kgf e2e"
+  docstrings.generate:
+    tags: [docstrings, docstrings-update]
+    x-handler: "tools.docstring_builder.cli:_command_generate"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli generate"
+  docstrings.fix:
+    tags: [docstrings, docstrings-update]
+    x-handler: "tools.docstring_builder.cli:_command_fix"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli fix"
+  docstrings.fmt:
+    tags: [docstrings, docstrings-update]
+    x-handler: "tools.docstring_builder.cli:_command_fmt"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli fmt"
+  docstrings.update:
+    tags: [docstrings, docstrings-update]
+    x-handler: "tools.docstring_builder.cli:_command_update"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli update"
+  docstrings.check:
+    tags: [docstrings, docstrings-validate]
+    x-handler: "tools.docstring_builder.cli:_command_check"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli check"
+  docstrings.diff:
+    tags: [docstrings, docstrings-validate]
+    x-handler: "tools.docstring_builder.cli:_command_diff"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli diff"
+  docstrings.lint:
+    tags: [docstrings, docstrings-validate]
+    x-handler: "tools.docstring_builder.cli:_command_lint"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli lint --no-docfacts"
+  docstrings.measure:
+    tags: [docstrings, docstrings-observability]
+    x-handler: "tools.docstring_builder.cli:_command_measure"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli measure"
+  docstrings.list:
+    tags: [docstrings, docstrings-observability]
+    x-handler: "tools.docstring_builder.cli:_command_list"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli list"
+  docstrings.harvest:
+    tags: [docstrings, docstrings-utilities]
+    x-handler: "tools.docstring_builder.cli:_command_harvest"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli harvest"
+  docstrings.schema:
+    tags: [docstrings, docstrings-utilities]
+    x-handler: "tools.docstring_builder.cli:_command_schema"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli schema --output docs/_build/docstring-schema.json"
+  docstrings.clear_cache:
+    tags: [docstrings, docstrings-utilities]
+    x-handler: "tools.docstring_builder.cli:_command_clear_cache"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli clear-cache"
+  docstrings.doctor:
+    tags: [docstrings, docstrings-diagnostics]
+    x-handler: "tools.docstring_builder.cli:_command_doctor"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m tools.docstring_builder.cli doctor --stubs"
+  cli.download.harvest:
+    summary: Harvest OpenAlex works for downstream ingestion.
+    description: |
+      Collect OpenAlex publications matching a topic query and year filter. The command produces
+      structured CLI envelopes and metadata that downstream tooling can consume without bespoke glue.
+    tags: [download]
+    x-handler: "download.cli:harvest"
+    x-codeSamples:
+      - lang: bash
+        source: "kgf download harvest 'foundation models' --years '>=2020' --max-works 5000"
+    x-problemDetails:
+      - schema/examples/problem_details/tool-execution-error.json
 

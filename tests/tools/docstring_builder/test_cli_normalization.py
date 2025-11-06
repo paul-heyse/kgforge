@@ -7,28 +7,6 @@ import argparse
 from tools.docstring_builder import cli
 
 
-def _make_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="docbuilder")
-    for option_names, options in cli.CLI_ARGUMENT_DEFINITIONS:
-        parser.add_argument(*option_names, **options)
-    subparsers = parser.add_subparsers(dest="subcommand")
-    for spec in cli.SUBCOMMAND_SPECS:
-        name = str(spec["name"])
-        help_text = str(spec.get("help_text", ""))
-        subparser = subparsers.add_parser(name, help=help_text)
-        if spec.get("include_paths"):
-            subparser.add_argument(
-                "paths",
-                nargs="*",
-                help="Optional Python paths to limit processing",
-            )
-        configure = spec.get("configure")
-        if callable(configure):
-            configure(subparser)
-        subparser.set_defaults(func=spec["handler"])
-    return parser
-
-
 def test_normalize_request_options_blank_inputs() -> None:
     args = argparse.Namespace(
         module="",
@@ -48,7 +26,7 @@ def test_normalize_request_options_blank_inputs() -> None:
 
 
 def test_build_request_from_cli_arguments() -> None:
-    parser = _make_parser()
+    parser = cli.build_parser()
     argv = [
         "--module",
         "kgfoundry",
