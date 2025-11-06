@@ -1,6 +1,6 @@
 {
   "exports": [
-    "canonicalize_text"
+    "HybridChunker"
   ],
   "module_meta": {
     "owner": "@docling",
@@ -11,17 +11,18 @@
     {
       "id": "public-api",
       "symbols": [
-        "canonicalize_text"
+        "HybridChunker"
       ]
     }
   ],
   "symbols": {
-    "canonicalize_text": {
+    "HybridChunker": {
       "owner": "@docling",
       "since": "0.1.0",
       "stability": "beta"
     }
   },
-  "synopsis": "String canonicalisation utilities for docling preprocessing",
-  "title": "docling.canonicalizer"
+  "synopsis": "Hybrid docling_kg pipeline combining layout and text cues",
+  "title": "docling_kg.hybrid"
 }
+

@@ -55,7 +55,7 @@ def canonicalize_text(blocks: list[str]) -> str:
 
         Examples
         --------
-        >>> from docling.canonicalizer import norm
+        >>> from docling_kg.canonicalizer import norm
         >>> result = norm(...)
         >>> result  # doctest: +ELLIPSIS
         """

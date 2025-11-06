@@ -11,7 +11,7 @@ Overview of kgfoundry.
 
 ## Modules
 
-- **`kgfoundry.docling`** — Namespace bridge that exposes the docling package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/docling/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/docling/__init__.py#L1)
+- **`kgfoundry.docling_kg`** — Namespace bridge that exposes the docling_kg package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/docling_kg/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/docling_kg/__init__.py#L1)
 - **`kgfoundry.download`** — Namespace bridge that exposes the download package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/download/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/download/__init__.py#L1)
 - **`kgfoundry.embeddings_dense`** — Namespace bridge that exposes the embeddings_dense package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_dense/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/embeddings_dense/__init__.py#L1)
 - **`kgfoundry.embeddings_sparse`** — Namespace bridge that exposes the embeddings_sparse package under kgfoundry. → [open](vscode://file//home/paul/kgfoundry/src/kgfoundry/embeddings_sparse/__init__.py:1:1) | [view](https://github.com/paul-heyse/kgfoundry/blob/18158918ad31c841b72a8a8cd247c7cb82793385/src/kgfoundry/embeddings_sparse/__init__.py#L1)

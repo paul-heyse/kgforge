@@ -1,10 +1,11 @@
-"""Expose docling pipelines and navigation metadata for documentation ingestion."""
+"""Expose docling_kg pipelines and navigation metadata for documentation ingestion."""
 
 from __future__ import annotations
 
-from docling import canonicalizer, hybrid, vlm
 from kgfoundry_common.navmap_loader import load_nav_metadata
 from kgfoundry_common.navmap_types import NavMap as _NavMap
+
+from . import canonicalizer, hybrid, vlm
 
 NavMap = _NavMap
 
