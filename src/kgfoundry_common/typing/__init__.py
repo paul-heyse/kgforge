@@ -58,6 +58,11 @@ class _Comparable(Protocol):
         other : _Comparable
             Other object to compare.
 
+        Returns
+        -------
+        bool
+            True if self < other.
+
         Raises
         ------
         NotImplementedError
@@ -72,6 +77,11 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self <= other.
 
         Raises
         ------
@@ -88,6 +98,11 @@ class _Comparable(Protocol):
         other : _Comparable
             Other object to compare.
 
+        Returns
+        -------
+        bool
+            True if self > other.
+
         Raises
         ------
         NotImplementedError
@@ -102,6 +117,11 @@ class _Comparable(Protocol):
         ----------
         other : _Comparable
             Other object to compare.
+
+        Returns
+        -------
+        bool
+            True if self >= other.
 
         Raises
         ------

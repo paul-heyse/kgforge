@@ -69,12 +69,12 @@ class _DummyFile(io.StringIO):
     def __enter__(self) -> _DummyFile:  # noqa: PYI034
         return self
 
-    def __exit__(  # pyright: ignore[reportIncompatibleMethodOverride]  # pyrefly: ignore[bad-override]
+    def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
         exc_tb: types.TracebackType | None,
-    ) -> bool:
+    ) -> None:
         """Store written content keyed by the path before closing.
 
         Parameters
@@ -93,7 +93,7 @@ class _DummyFile(io.StringIO):
             be suppressed.
         """
         _CAPTURED_OUTPUTS[self._path] = self.getvalue()
-        return False
+        return None
 
 
 _CAPTURED_OUTPUTS: dict[str, str] = {}

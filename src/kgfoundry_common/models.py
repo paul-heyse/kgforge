@@ -8,7 +8,7 @@ implementation specifics.
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import ClassVar, Literal
 
 from pydantic import ConfigDict, Field
 
@@ -40,7 +40,7 @@ class Doc(BaseModel):
 
     Attributes
     ----------
-    model_config : ConfigDict
+    model_config : ClassVar[ConfigDict]
         Pydantic configuration forbidding unknown fields.
     id : Id
         Unique document identifier.

@@ -35,6 +35,7 @@ from tools._shared.logging import (
 from tools._shared.metrics import ToolRunObservation, observe_tool_run
 from tools._shared.problem_details import (
     ExceptionProblemDetailsParams,
+    JsonValue,
     ProblemDetailsDict,
     ProblemDetailsParams,
     SchemaProblemDetailsParams,
@@ -90,6 +91,7 @@ _PUBLIC_EXPORTS: dict[str, object] = {
     "CliFileStatus": CliFileStatus,
     "CliStatus": CliStatus,
     "ExceptionProblemDetailsParams": ExceptionProblemDetailsParams,
+    "JsonValue": JsonValue,
     "ProblemDetailsDict": ProblemDetailsDict,
     "ProblemDetailsParams": ProblemDetailsParams,
     "SchemaProblemDetailsParams": SchemaProblemDetailsParams,
@@ -153,6 +155,7 @@ __all__: tuple[str, ...] = (
     "CliFileStatus",
     "CliStatus",
     "ExceptionProblemDetailsParams",
+    "JsonValue",
     "ProblemDetailsDict",
     "ProblemDetailsParams",
     "ProcessRunner",

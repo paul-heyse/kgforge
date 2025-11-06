@@ -98,7 +98,7 @@ class _PytestarchModule(Protocol):
         Parameters
         ----------
         *args : object
-            Positional arguments forwarded to pytestarch implementation.
+            Positional arguments forwarded to pytestarch.
         **kwargs : object
             Keyword arguments (unused).
 
@@ -118,7 +118,7 @@ class _PytestarchModule(Protocol):
         Parameters
         ----------
         *args : object
-            Positional arguments forwarded to pytestarch implementation.
+            Positional arguments forwarded to pytestarch.
         **kwargs : object
             Keyword arguments (unused).
 
@@ -177,7 +177,7 @@ def get_layered_architecture_factory() -> typing.Callable[..., LayeredArchitectu
 
     Returns
     -------
-    Callable[..., LayeredArchitectureProtocol]
+    typing.Callable[..., LayeredArchitectureProtocol]
         Factory function for layered architecture.
     """
     cls = get_layered_architecture_cls()
@@ -189,7 +189,7 @@ def get_module_name_filter_factory() -> typing.Callable[..., ModuleNameFilterPro
 
     Returns
     -------
-    Callable[..., ModuleNameFilterProtocol]
+    typing.Callable[..., ModuleNameFilterProtocol]
         Factory function for module name filters.
     """
     cls = get_module_name_filter_cls()
@@ -201,7 +201,7 @@ def get_evaluable_architecture_fn() -> typing.Callable[..., EvaluableArchitectur
 
     Returns
     -------
-    Callable[..., EvaluableArchitectureProtocol]
+    typing.Callable[..., EvaluableArchitectureProtocol]
         Function to create evaluable architecture.
 
     Raises
@@ -224,7 +224,7 @@ def get_evaluable_architecture_for_module_objects_fn() -> typing.Callable[
 
     Returns
     -------
-    Callable[..., EvaluableArchitectureProtocol]
+    typing.Callable[..., EvaluableArchitectureProtocol]
         Function to create evaluable architecture from module objects.
 
     Raises

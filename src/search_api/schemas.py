@@ -9,7 +9,7 @@ implementation specifics.
 from __future__ import annotations
 
 import importlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from pydantic import ConfigDict, Field
 
@@ -46,7 +46,7 @@ class SearchRequest(BaseModel):
 
     Attributes
     ----------
-    model_config : ConfigDict
+    model_config : ClassVar[ConfigDict]
         Pydantic configuration forbidding extra parameters.
     query : str
         Search query string (at least one character).
@@ -90,7 +90,7 @@ class SearchResult(BaseModel):
 
     Attributes
     ----------
-    model_config : ConfigDict
+    model_config : ClassVar[ConfigDict]
         Pydantic configuration forbidding extra fields.
     doc_id : str
         Document identifier.

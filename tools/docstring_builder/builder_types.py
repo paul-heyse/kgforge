@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from pathlib import Path
 
+    from tools._shared.augment_registry import ToolingMetadataModel
     from tools.docstring_builder.config import ConfigSelection
     from tools.docstring_builder.models import (
         CliResult,
@@ -185,6 +186,7 @@ class DocstringBuildResult:
     problem_details: ModelProblemDetails | None
     config_selection: ConfigSelection | None
     diff_previews: list[tuple[Path, str]] = field(default_factory=list)
+    tooling_metadata: ToolingMetadataModel | None = None
 
 
 def build_problem_details(

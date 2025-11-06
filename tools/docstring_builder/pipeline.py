@@ -8,14 +8,19 @@ import json
 import os
 import time
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from operator import itemgetter
-from typing import TYPE_CHECKING, cast
+from pathlib import Path
+from typing import TYPE_CHECKING, Protocol, cast
 
-from tools.docstring_builder.builder_types import (
-    DocstringBuildResult,
+from tools._shared.augment_registry import (
+    AugmentRegistryError,
+    load_tooling_metadata,
+    render_problem_details,
 )
+from tools.docstring_builder.builder_types import DocstringBuildResult
 from tools.docstring_builder.docfacts import DOCFACTS_VERSION
 from tools.docstring_builder.io import dependents_for, hash_file
 from tools.docstring_builder.manifest_builder import ManifestContext, write_manifest
@@ -37,12 +42,12 @@ from tools.docstring_builder.pipeline_types import (
 )
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
+    from tools._shared.augment_registry import ToolingMetadataModel
     from tools.docstring_builder.builder_types import (
         DocstringBuildRequest,
         ExitStatus,
         LoggerLike,
+        StatusCounts,
     )
     from tools.docstring_builder.cache import BuilderCache
     from tools.docstring_builder.config import BuilderConfig, ConfigSelection
@@ -63,13 +68,70 @@ if TYPE_CHECKING:
         PluginReport,
         RunStatus,
         RunSummary,
-        StatusCounts,
     )
-    from tools.docstring_builder.pipeline_types import (
-        ProcessingOptions,
+    from tools.docstring_builder.models import (
+        ProblemDetails as ModelProblemDetails,
     )
+    from tools.docstring_builder.pipeline_types import ProcessingOptions
     from tools.docstring_builder.plugins import PluginManager
     from tools.docstring_builder.policy import PolicyEngine, PolicyReport
+else:  # pragma: no cover - runtime fallbacks for optional typing deps
+    ToolingMetadataModel = object
+    DocstringBuildRequest = object  # type: ignore[assignment]
+    ExitStatus = int
+    LoggerLike = object
+    StatusCounts = dict[str, int]
+    BuilderCache = object
+    BuilderConfig = object
+    ConfigSelection = object
+    DiffManager = object
+    DocFact = object
+    DocfactsCoordinator = object
+    FileProcessor = object
+    IRDocstring = object
+    MetricsRecorder = object
+    CacheSummary = dict[str, object]
+    CliResult = dict[str, object]
+    DocfactsReport = dict[str, object]
+    ErrorReport = dict[str, object]
+    FileReport = dict[str, object]
+    InputHash = dict[str, object]
+    ObservabilityReport = dict[str, object]
+    ModelProblemDetails = dict[str, object]
+    PluginReport = dict[str, object]
+    RunStatus = str
+    RunSummary = dict[str, object]
+    ProcessingOptions = object
+    PluginManager = object
+    PolicyEngine = object
+    PolicyReport = object
+
+CLI_AUGMENT_PATH = REPO_ROOT / "openapi" / "_augment_cli.yaml"
+CLI_REGISTRY_PATH = REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml"
+
+
+class ProblemDetailsBuilder(Protocol):
+    """Callable signature for building Problem Details envelopes."""
+
+    def __call__(
+        self,
+        status: ExitStatus,
+        request: DocstringBuildRequest,
+        detail: str,
+        *,
+        instance: str | None = ...,
+        errors: Sequence[ErrorReport] | None = ...,
+    ) -> ModelProblemDetails:
+        """Return a Problem Details payload for the supplied context."""
+        ...
+
+
+class DocfactsCoordinatorFactory(Protocol):
+    """Callable signature for constructing Docfacts coordinators."""
+
+    def __call__(self, *, check_mode: bool) -> DocfactsCoordinator:
+        """Return a coordinator configured for the requested mode."""
+        ...
 
 
 def _repo_relative_path(path: Path) -> str:
@@ -106,39 +168,6 @@ def _coerce_int(value: object) -> int:
     return 0
 
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping, Sequence
-    from typing import Protocol
-
-    from tools.docstring_builder.models import ProblemDetails as ModelProblemDetails
-
-    class ProblemDetailsBuilder(Protocol):
-        """Callable signature for building Problem Details envelopes."""
-
-        def __call__(
-            self,
-            status: ExitStatus,
-            request: DocstringBuildRequest,
-            detail: str,
-            *,
-            instance: str | None = ...,  # Protocol stub body (required for TYPE_CHECKING)
-            errors: Sequence[ErrorReport] | None = ...,
-        ) -> ModelProblemDetails:
-            """Return a Problem Details payload for the supplied context."""
-            ...  # Protocol stub body (required for TYPE_CHECKING)
-
-    class DocfactsCoordinatorFactory(Protocol):
-        """Callable signature for constructing Docfacts coordinators."""
-
-        def __call__(self, *, check_mode: bool) -> DocfactsCoordinator:
-            """Return a coordinator configured for the requested mode."""
-            ...
-
-else:
-    ProblemDetailsBuilder = Callable
-    DocfactsCoordinatorFactory = Callable
-
-
 def _new_error_envelopes() -> list[ErrorEnvelope]:
     return []
 
@@ -165,6 +194,7 @@ class PipelineState:
     changed_count: int = 0
     cache_hits: int = 0
     cache_misses: int = 0
+    tooling_metadata: ToolingMetadataModel | None = None
     errors: list[ErrorEnvelope] = field(default_factory=_new_error_envelopes)
     file_reports: list[FileReport] = field(default_factory=_new_file_reports)
     all_ir: list[IRDocstring] = field(default_factory=_new_ir_list)
@@ -185,6 +215,21 @@ class CliResultContext:
     input_hashes: Mapping[str, InputHash]
     diff_links: Mapping[str, str]
     summary: Mapping[str, object]
+
+
+@lru_cache(maxsize=1)
+def _load_cli_metadata_cached(
+    augment_path: str,
+    registry_path: str,
+) -> tuple[ToolingMetadataModel | None, AugmentRegistryError | None]:
+    try:
+        metadata = load_tooling_metadata(
+            augment_path=Path(augment_path),
+            registry_path=Path(registry_path),
+        )
+    except AugmentRegistryError as exc:
+        return None, exc
+    return metadata, None
 
 
 @dataclass(slots=True)
@@ -235,6 +280,37 @@ class PipelineRunner:
         """Return the configured pipeline dependencies."""
         return self._cfg
 
+    def _get_cli_tooling_metadata(self) -> ToolingMetadataModel | None:
+        metadata, error = _load_cli_metadata_cached(
+            str(CLI_AUGMENT_PATH),
+            str(CLI_REGISTRY_PATH),
+        )
+        if error is not None:
+            problem = error.problem
+            self._cfg.logger.warning(
+                "CLI tooling metadata unavailable",
+                extra={
+                    "status": "warning",
+                    "detail": problem.get("detail"),
+                    "instance": problem.get("instance"),
+                },
+            )
+            self._cfg.logger.debug(
+                "CLI tooling metadata problem details: %s",
+                render_problem_details(error),
+            )
+        elif metadata is not None:
+            self._cfg.logger.debug(
+                "Loaded CLI tooling metadata",
+                extra={
+                    "status": "ok",
+                    "augment_path": str(metadata.augment.path),
+                    "registry_path": str(metadata.registry.path),
+                    "interface_count": len(metadata.registry.interfaces),
+                },
+            )
+        return metadata
+
     def run(self, files: Iterable[Path]) -> DocstringBuildResult:
         """Execute the pipeline for the provided file set.
 
@@ -248,9 +324,11 @@ class PipelineRunner:
         DocstringBuildResult
             Build result with exit status, metrics, and outputs.
         """
+        tooling_metadata = self._get_cli_tooling_metadata()
         files_list = list(files)
         jobs = self._resolve_jobs(self._cfg.request.jobs)
         state = PipelineState(status_counts=Counter())
+        state.tooling_metadata = tooling_metadata
         start = time.perf_counter()
 
         self._process_files(files_list, jobs, state)
@@ -267,7 +345,13 @@ class PipelineRunner:
             duration_seconds=duration,
         )
 
-        return self._assemble_result(exit_status, duration, state, policy_report, files_list)
+        return self._assemble_result(
+            exit_status,
+            duration,
+            state,
+            policy_report,
+            files_list,
+        )
 
     @staticmethod
     def _resolve_jobs(jobs: int) -> int:
@@ -702,6 +786,7 @@ class PipelineRunner:
             problem_details=problem_details,
             config_selection=self._cfg.selection,
             diff_previews=state.diff_previews,
+            tooling_metadata=state.tooling_metadata,
         )
 
     @staticmethod

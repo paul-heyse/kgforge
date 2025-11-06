@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
-from tools._shared.cli_tooling import CLIToolingContext
 from tools.mkdocs_suite.docs._scripts import gen_cli_diagram as _impl
 
 OperationEntry = _impl.OperationEntry
 
 __all__ = ["OperationEntry", "collect_operations", "write_diagram"]
+
+if TYPE_CHECKING:  # pragma: no cover - typing aid
+    from tools._shared.cli_tooling import CLIToolingContext
 
 
 def collect_operations(
@@ -29,6 +32,11 @@ def collect_operations(
         standard when ``None``.
     click_cmd : object | None, optional
         Pre-resolved click command tree used for traversal.
+
+    Returns
+    -------
+    list[OperationEntry]
+        Materialised list of CLI operation metadata tuples.
     """
     return _impl.collect_operations(context, interface_id=interface_id, click_cmd=click_cmd)
 

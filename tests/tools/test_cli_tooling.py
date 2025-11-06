@@ -54,7 +54,10 @@ def test_load_cli_tooling_context_success(tmp_path: Path) -> None:
     cli_config = context.cli_config
     assert cli_config.bin_name == "kgf"
     assert cli_config.interface_meta is not None
-    assert context.augment.get_operation("cli.run") == {"tags": ["orchestration"]}
+    assert cli_config.interface_meta.entrypoint == "tests.fixtures.cli:app"
+    override = context.augment.operation_override("cli.run")
+    assert override is not None
+    assert override.tags == ("orchestration",)
 
 
 def test_load_cli_tooling_context_missing_augment(tmp_path: Path) -> None:

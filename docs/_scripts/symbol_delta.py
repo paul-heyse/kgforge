@@ -394,6 +394,87 @@ def _build_delta(
     )
 
 
+def load_symbol_rows(path: Path) -> list[SymbolRow]:
+    """Public wrapper for :func:`_load_symbol_rows`.
+
+    Parameters
+    ----------
+    path : Path
+        Path to the JSON file containing symbol rows.
+
+    Returns
+    -------
+    list[SymbolRow]
+        Parsed symbol rows.
+    """
+    return _load_symbol_rows(path)
+
+
+def load_base_snapshot(arg: str) -> tuple[list[SymbolRow], str | None]:
+    """Public wrapper for :func:`_load_base_snapshot`.
+
+    Parameters
+    ----------
+    arg : str
+        Git reference or path to baseline symbols.json snapshot.
+
+    Returns
+    -------
+    tuple[list[SymbolRow], str | None]
+        Tuple of (symbol rows, optional git SHA for the baseline).
+    """
+    return _load_base_snapshot(arg)
+
+
+def git_rev_parse(ref: str) -> str | None:
+    """Public wrapper for :func:`_git_rev_parse`.
+
+    Parameters
+    ----------
+    ref : str
+        Git reference to resolve.
+
+    Returns
+    -------
+    str | None
+        Git SHA of the reference, or None if the reference cannot be resolved.
+    """
+    return _git_rev_parse(ref)
+
+
+def build_delta_payload(
+    *,
+    base_rows: list[SymbolRow],
+    head_rows: list[SymbolRow],
+    base_sha: str | None,
+    head_sha: str | None,
+) -> TypedSymbolDeltaPayload:
+    """Public wrapper for :func:`_build_delta`.
+
+    Parameters
+    ----------
+    base_rows : list[SymbolRow]
+        Symbol rows from the baseline snapshot.
+    head_rows : list[SymbolRow]
+        Symbol rows from the current snapshot.
+    base_sha : str | None
+        Git SHA of the baseline snapshot, if available.
+    head_sha : str | None
+        Git SHA of the current snapshot, if available.
+
+    Returns
+    -------
+    TypedSymbolDeltaPayload
+        Symbol delta payload containing added, removed, and changed symbols.
+    """
+    return _build_delta(
+        base_rows=base_rows,
+        head_rows=head_rows,
+        base_sha=base_sha,
+        head_sha=head_sha,
+    )
+
+
 def write_delta(delta_path: Path, payload: TypedSymbolDeltaPayload) -> bool:
     """Write ``payload`` to ``delta_path`` and return True when a change occurred.
 

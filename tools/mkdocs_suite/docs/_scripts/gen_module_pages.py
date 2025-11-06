@@ -26,9 +26,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Protocol, TypeGuard, cast
 
 import mkdocs_gen_files
-import yaml
 
-from . import load_repo_settings
+from tools._shared.augment_registry import (
+    AugmentRegistryError,
+    load_registry,
+    render_problem_details,
+)
+from tools.mkdocs_suite.docs._scripts import load_repo_settings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -70,9 +74,13 @@ SUITE_ROOT = TOOLS_ROOT / "mkdocs_suite"
 REPO_URL, DEFAULT_BRANCH = load_repo_settings()
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from collections.abc import Callable, Iterator
 
     from kgfoundry_common.navmap_loader import load_nav_metadata as _load_nav_metadata
+    from tools._shared.augment_registry import (
+        RegistryInterfaceModel,
+        RegistryMetadataModel,
+    )
     from tools.navmap.griffe_navmap import (
         DEFAULT_EXTENSIONS as _DEFAULT_EXTENSIONS,
     )
@@ -391,14 +399,14 @@ def _symbol_from_handler(handler: object) -> str | None:
 
 
 def _registry_api_usage(
-    registry: Mapping[str, dict[str, object]],
+    registry: RegistryMetadataModel | None,
 ) -> dict[str, list[OperationLink]]:
     """Derive symbol → operation mappings from the interface registry.
 
     Parameters
     ----------
-    registry : Mapping[str, dict[str, object]]
-        Interface registry mapping identifiers to metadata.
+    registry : RegistryMetadataModel | None
+        Interface registry metadata resolved from the shared facade.
 
     Returns
     -------
@@ -406,18 +414,17 @@ def _registry_api_usage(
         Mapping of symbol paths to `OperationLink` records from registry data.
     """
     mapping: dict[str, list[OperationLink]] = defaultdict(list)
-    for identifier, entry in registry.items():
-        operations = entry.get("operations")
-        if not isinstance(operations, Mapping):
+    if registry is None:
+        return mapping
+    for identifier, entry in registry.interfaces.items():
+        if not entry.operations:
             continue
-        spec_path = entry.get("spec")
+        spec_path = entry.spec
         spec_label, _ = _spec_href(spec_path)
-        for op_meta in operations.values():
-            if not isinstance(op_meta, Mapping):
-                continue
-            handler = _symbol_from_handler(op_meta.get("handler"))
-            operation_id = op_meta.get("operation_id")
-            if not handler or not isinstance(operation_id, str) or not operation_id:
+        for op_meta in entry.operations.values():
+            handler = _symbol_from_handler(op_meta.handler)
+            operation_id = op_meta.operation_id
+            if not handler or not operation_id:
                 continue
             href = _operation_href(spec_path, operation_id)
             mapping[handler].append(OperationLink(operation_id, href, identifier, spec_label))
@@ -457,27 +464,24 @@ def _merge_api_usage(
     }
 
 
-def _load_registry() -> dict[str, dict[str, object]]:
+def _load_registry() -> RegistryMetadataModel | None:
     """Return the interface registry payload keyed by identifier.
 
     Returns
     -------
-    dict[str, dict[str, object]]
-        Mapping of interface identifiers to registry metadata entries. Empty
-        when the registry file is missing or invalid.
+    RegistryMetadataModel | None
+        Typed registry metadata, or ``None`` when the registry file is missing or invalid.
     """
-    if not REGISTRY_PATH.exists():
-        return {}
-    with REGISTRY_PATH.open("r", encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
-    interfaces = payload.get("interfaces") if isinstance(payload, dict) else {}
-    if not isinstance(interfaces, dict):
-        return {}
-    return {
-        str(identifier): value
-        for identifier, value in interfaces.items()
-        if isinstance(value, dict)
-    }
+    try:
+        registry = load_registry(REGISTRY_PATH)
+    except AugmentRegistryError as exc:
+        LOGGER.exception(
+            "Failed to load interface registry",
+            extra={"status": "error", "path": str(REGISTRY_PATH)},
+        )
+        LOGGER.debug("Registry problem details: %s", render_problem_details(exc))
+        return None
+    return registry
 
 
 def _module_exports(module: _GriffeModule) -> set[str]:
@@ -801,29 +805,31 @@ def _interface_entries(nav_meta: Mapping[str, Any]) -> list[Mapping[str, object]
 
 def _merge_interface_metadata(
     entry: Mapping[str, object],
-    registry: Mapping[str, dict[str, object]],
+    registry: RegistryMetadataModel | None,
     default_identifier: str,
-) -> tuple[str, dict[str, object], Mapping[str, object]]:
+) -> tuple[str, dict[str, object], RegistryInterfaceModel | None]:
     """Return identifier, merged metadata, and registry entry for ``entry``.
 
     Parameters
     ----------
     entry : Mapping[str, object]
-        Interface entry from nav metadata.
-    registry : Mapping[str, dict[str, object]]
-        Interface registry mapping identifiers to metadata.
+        Interface entry from navigation metadata.
+    registry : RegistryMetadataModel | None
+        Registry metadata containing interface definitions, if available.
     default_identifier : str
-        Default identifier to use if entry lacks one.
+        Default identifier to use if entry lacks 'id' or 'entrypoint' fields.
 
     Returns
     -------
-    tuple[str, dict[str, object], Mapping[str, object]]
-        Interface identifier, merged metadata dictionary, and registry-sourced
-        metadata mapping.
+    tuple[str, dict[str, object], RegistryInterfaceModel | None]
+        Computed identifier, merged metadata dictionary, and optional registry model.
     """
     identifier = str(entry.get("id") or entry.get("entrypoint") or default_identifier)
-    registry_entry = registry.get(identifier, {})
-    merged: dict[str, object] = {**registry_entry, **entry}
+    registry_entry = registry.interface(identifier) if registry else None
+    registry_payload: dict[str, object] = {}
+    if registry_entry is not None:
+        registry_payload = registry_entry.to_payload()
+    merged: dict[str, object] = {**registry_payload, **dict(entry)}
     return identifier, merged, registry_entry
 
 
@@ -831,18 +837,15 @@ def _write_interface_operations(
     fd: mkdocs_gen_files.files,
     identifier: str,
     merged: Mapping[str, object],
-    registry_entry: Mapping[str, object],
+    registry_entry: RegistryInterfaceModel | None,
 ) -> None:
-    operations = registry_entry.get("operations")
-    if not isinstance(operations, Mapping) or not operations:
+    if registry_entry is None or not registry_entry.operations:
         return
-    spec_path = merged.get("spec") or registry_entry.get("spec")
+    spec_path = merged.get("spec") or registry_entry.spec
     fd.write("- **Operations:**\n")
-    for op_key, op_meta in sorted(operations.items()):
-        if not isinstance(op_meta, Mapping):
-            continue
-        op_id = str(op_meta.get("operation_id") or f"{identifier}.{op_key}")
-        summary = str(op_meta.get("summary") or "")
+    for op_key, op_meta in sorted(registry_entry.operations.items()):
+        op_id = op_meta.operation_id or f"{identifier}.{op_key}"
+        summary = op_meta.summary or ""
         anchor = _operation_href(spec_path, op_id)
         if anchor:
             fd.write(f"  - [`{op_id}`]({anchor})")
@@ -997,7 +1000,7 @@ def _write_interfaces(
     fd: mkdocs_gen_files.files,
     module_path: str,
     nav_meta: Mapping[str, Any],
-    registry: Mapping[str, dict[str, object]],
+    registry: RegistryMetadataModel | None,
 ) -> None:
     rows = _interface_entries(nav_meta)
     if not rows:
@@ -1008,28 +1011,38 @@ def _write_interfaces(
         fd.write(f"### `{identifier}`\n\n")
         fd.write(
             "- **Type:** {type}\n".format(
-                type=merged.get("type") or registry_entry.get("type") or "—"
+                type=merged.get("type") or (registry_entry.type if registry_entry else None) or "—"
             )
         )
         fd.write(
             "- **Owner:** {owner}\n".format(
-                owner=merged.get("owner") or registry_entry.get("owner") or "—"
+                owner=merged.get("owner")
+                or (registry_entry.owner if registry_entry else None)
+                or "—"
             )
         )
         fd.write(
             "- **Stability:** {stability}\n".format(
-                stability=merged.get("stability") or registry_entry.get("stability") or "—"
+                stability=merged.get("stability")
+                or (registry_entry.stability if registry_entry else None)
+                or "—"
             )
         )
-        if description := merged.get("description") or registry_entry.get("description"):
+        description = merged.get("description") or (
+            registry_entry.description if registry_entry else None
+        )
+        if description:
             fd.write(f"- **Description:** {description}\n")
-        spec_label, spec_href = _spec_href(merged.get("spec") or registry_entry.get("spec"))
+        spec_candidate = merged.get("spec") or (registry_entry.spec if registry_entry else None)
+        spec_label, spec_href = _spec_href(spec_candidate)
         if spec_href:
             fd.write(f"- **Spec:** [{spec_label}]({spec_href})\n")
         elif spec_label:
             fd.write(f"- **Spec:** {spec_label}\n")
-        problems = merged.get("problem_details") or registry_entry.get("problem_details")
-        if isinstance(problems, list) and problems:
+        problems = merged.get("problem_details")
+        if not problems and registry_entry is not None:
+            problems = list(registry_entry.problem_details)
+        if isinstance(problems, Sequence) and problems:
             fd.write("- **Problem Details:** " + ", ".join(map(str, problems)) + "\n")
         elif isinstance(problems, str) and problems:
             fd.write(f"- **Problem Details:** {problems}\n")
@@ -1039,73 +1052,91 @@ def _write_interfaces(
 
 def _render_module_page(
     module_path: str,
-    module: _GriffeModule,
     nav_meta: Mapping[str, Any],
     facts: ModuleFacts,
-    registry: Mapping[str, dict[str, object]],
+    registry: RegistryMetadataModel | None,
 ) -> None:
-    """Generate the Markdown page for ``module_path``."""
-    page_path = f"modules/{module_path}.md"
-    with mkdocs_gen_files.open(page_path, "w") as fd:
+    """Generate the Markdown page for ``module_path`` using nav metadata.
+
+    Parameters
+    ----------
+    module_path : str
+        Fully-qualified module import path.
+    nav_meta : Mapping[str, Any]
+        Navigation metadata derived from ``load_nav_metadata``.
+    facts : ModuleFacts
+        Aggregated relationship tables for the documentation run.
+    registry : RegistryMetadataModel | None
+        Typed registry metadata used for interface enrichment.
+    """
+    nav_dict = dict(nav_meta)
+    _write_navmap_json(module_path, nav_dict)
+
+    output_path = f"modules/{module_path.replace('.', '/')}.md"
+    with mkdocs_gen_files.open(output_path, "w") as fd:
         fd.write(f"# {module_path}\n\n")
-        summary = nav_meta.get("synopsis")
-        if not summary:
-            summary = _first_paragraph(module)
-        if summary:
-            fd.write(f"{summary}\n\n")
-        source_link = _code_permalink(facts.source_paths.get(module_path))
-        if source_link:
-            fd.write(f"[:material-source-repository: View source]({source_link})\n\n")
-        mermaid = _mermaid_inheritance(module_path, facts)
-        if mermaid:
-            fd.write("## Inheritance\n\n")
-            fd.write(f"{mermaid}\n\n")
-        d2_diagram = _inline_d2_neighborhood(module_path, facts)
-        if d2_diagram:
-            fd.write("## Dependencies at a Glance\n\n")
-            fd.write(f"{d2_diagram}\n\n")
-            _write_module_diagram_file(module_path, facts)
-            fd.write(
-                f"> See the full diagram: [{module_path}](../diagrams/modules/{module_path}.d2)\n\n"
-            )
-        _write_autorefs_examples(fd, module_path, facts)
-        _write_interfaces(fd, module_path, nav_meta, registry)
-        _write_relationships(fd, module_path, facts)
-        _write_related_operations(fd, module_path, facts)
+
+        synopsis = nav_dict.get("synopsis")
+        if isinstance(synopsis, str) and synopsis.strip():
+            fd.write(synopsis.strip() + "\n\n")
+
+        code_link = _code_permalink(facts.source_paths.get(module_path))
+        if code_link:
+            fd.write(f"[View source on GitHub]({code_link})\n\n")
+
+        exports = nav_dict.get("exports")
+        if isinstance(exports, Sequence) and exports:
+            export_list = ", ".join(f"`{name}`" for name in exports)
+            fd.write(f"*Exports:* {export_list}\n\n")
+
+        sections = nav_dict.get("sections")
+        if isinstance(sections, Sequence) and sections:
+            fd.write("## Sections\n\n")
+            for section in sections:
+                if not isinstance(section, Mapping):
+                    continue
+                title = str(section.get("title") or section.get("id") or "Section")
+                symbols = section.get("symbols")
+                if isinstance(symbols, Sequence) and symbols:
+                    symbol_list = ", ".join(f"`{symbol}`" for symbol in symbols)
+                    fd.write(f"- **{title}:** {symbol_list}\n")
+                else:
+                    fd.write(f"- **{title}**\n")
+            fd.write("\n")
+
+        _write_interfaces(fd, module_path, nav_dict, registry)
         _write_contents(fd, module_path, facts)
-    relative_path = getattr(module, "relative_filepath", None)
-    if isinstance(relative_path, Path):
-        mkdocs_gen_files.set_edit_path(page_path, str(relative_path))
+        _write_related_operations(fd, module_path, facts)
+        _write_relationships(fd, module_path, facts)
+        _write_autorefs_examples(fd, module_path, facts)
+
+        mermaid_block = _mermaid_inheritance(module_path, facts)
+        if mermaid_block:
+            fd.write("## Inheritance\n\n")
+            fd.write(mermaid_block + "\n\n")
+
+        neighborhood_block = _inline_d2_neighborhood(module_path, facts)
+        if neighborhood_block:
+            fd.write("## Neighborhood\n\n")
+            fd.write(neighborhood_block + "\n\n")
+
+    _write_module_diagram_file(module_path, facts)
 
 
-def _write_module_index(modules: Mapping[str, _GriffeModule]) -> None:
-    """Create the landing page listing all discovered modules."""
-    with mkdocs_gen_files.open("modules/index.md", "w") as fd:
-        fd.write("# Modules\n\n")
-        for module_path in sorted(modules):
-            fd.write(f"- [{module_path}](./{module_path}.md)\n")
-
-
-def main() -> None:
-    """Entry point executed by mkdocs-gen-files."""
-    _extensions, extensions_bundle = _discover_extensions(DEFAULT_EXTENSIONS)
-    modules = _collect_modules(extensions_bundle)
-    if not modules:
-        LOGGER.warning("No modules loaded via Griffe; skipping module page generation.")
-        _write_module_index({})
-        return
+def render_module_pages() -> None:
+    """Generate MkDocs pages for every discovered module."""
     registry = _load_registry()
-    api_usage = _merge_api_usage(_load_api_usage(), _registry_api_usage(registry))
+    registry_usage = _registry_api_usage(registry)
+    file_usage = _load_api_usage()
+    api_usage = _merge_api_usage(file_usage, registry_usage)
+
+    _, extensions_bundle = _discover_extensions(DEFAULT_EXTENSIONS)
+    modules = _collect_modules(extensions_bundle)
     facts = _build_relationships(modules, api_usage)
-    manifest: dict[str, Any] = {}
-    for module_path, module in modules.items():
+
+    for module_path, module in sorted(modules.items(), key=lambda item: item[0]):
         nav_meta = _nav_metadata_for_module(module_path, module, facts)
-        manifest[module_path] = nav_meta
-        _write_navmap_json(module_path, nav_meta)
-        _render_module_page(module_path, module, nav_meta, facts, registry)
-    _write_module_index(modules)
-    with mkdocs_gen_files.open("_data/navmaps/manifest.json", "w") as fd:
-        json.dump(manifest, fd, indent=2, sort_keys=True)
+        _render_module_page(module_path, nav_meta, facts, registry)
 
 
-main()
+render_module_pages()

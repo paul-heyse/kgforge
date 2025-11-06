@@ -10,13 +10,12 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import NoReturn, cast
+from typing import TYPE_CHECKING, NoReturn, cast
 
 import mkdocs_gen_files
 
 from tools._shared.cli_tooling import (
     CLIConfigError,
-    CLIToolingContext,
     CLIToolSettings,
     load_cli_tooling_context,
 )
@@ -26,6 +25,11 @@ from tools._shared.problem_details import (
     render_problem,
 )
 from tools.typer_to_openapi_cli import import_object, to_click_command, walk_commands
+
+if TYPE_CHECKING:  # pragma: no cover - typing aid
+    from click.core import Command
+
+    from tools.typer_to_openapi_cli import OperationContext
 
 OperationEntry = tuple[str, str, str | None, str, tuple[str, ...]]
 
@@ -62,19 +66,20 @@ def _default_cli_settings(interface_id: str | None) -> CLIToolSettings:
 
 
 def _load_click_command(
-    context: CLIToolingContext,
+    context: object,
     target_interface: str | None,
 ) -> object:
-    cli_config = cast("CLIConfig", context.cli_config)
-    interface_id = target_interface or cli_config.interface_id
+    cli_config = context.cli_config  # type: ignore[attr-defined]
+    interface_id = target_interface or cli_config.interface_id  # type: ignore[attr-defined]
     if interface_id is None:
         _raise_diagram_error(
             "CLI interface identifier is not configured.",
             instance="urn:cli-diagram:missing-interface",
         )
-    interface_meta = context.registry.get_interface(interface_id)
+    registry = context.registry  # type: ignore[attr-defined]
+    interface_meta = registry.get_interface(interface_id)
     if interface_meta is None:
-        interface_meta = cli_config.interface_meta
+        interface_meta = cli_config.interface_meta  # type: ignore[attr-defined]
     if interface_meta is None:
         _raise_diagram_error(
             f"Interface '{interface_id}' metadata is unavailable.",
@@ -118,7 +123,7 @@ def _write_diagram(
 
 
 def collect_operations(
-    context: CLIToolingContext | None = None,
+    context: object | None = None,
     *,
     interface_id: str | None = None,
     click_cmd: object | None = None,
@@ -127,9 +132,8 @@ def collect_operations(
 
     Parameters
     ----------
-    context : CLIToolingContext | None, optional
-        Pre-loaded tooling context. When ``None``, the default repository
-        configuration is loaded automatically.
+    context : object | None, optional
+        Pre-loaded tooling context. When ``None``, the default repository configuration is loaded automatically.
     interface_id : str | None, optional
         Interface identifier to resolve. Defaults to the repository's CLI
         interface when omitted.
@@ -143,35 +147,21 @@ def collect_operations(
         List of operation tuples containing method, path, operation identifier,
         summary, and canonical tags. The method is always ``POST`` because CLI
         invocations map to action-style HTTP operations in the documentation.
-
-    Raises
-    ------
-    CLIConfigError
-        Raised when tooling metadata cannot be loaded or when the CLI entrypoint
-        cannot be resolved.
     """
     if context is None:
         settings = _default_cli_settings(interface_id)
         context = load_cli_tooling_context(settings)
         interface_id = settings.interface_id
 
-    cli_context = cast("CLIToolingContext", context)
-    cli_config = cast("CLIConfig", cli_context.cli_config)
-    command = click_cmd or _load_click_command(cli_context, interface_id or cli_config.interface_id)
-    operations: list[OperationEntry] = []
-    operation_context = cli_config.operation_context
+    cli_config = context.cli_config  # type: ignore[attr-defined]
+    resolved_interface = interface_id or cli_config.interface_id  # type: ignore[attr-defined]
+    command_candidate = click_cmd or _load_click_command(context, resolved_interface)
+    operation_context = cli_config.operation_context  # type: ignore[attr-defined]
 
-    for tokens, command_obj in walk_commands(command, []):
-        path, operation, tags = operation_context.build_operation(tokens, command_obj)
-        method = "POST"
-        op_id_raw = operation.get("operationId")
-        operation_id = str(op_id_raw).strip() if op_id_raw is not None else None
-        summary = str(operation.get("summary") or "").strip()
-        tag_values = operation.get("tags") or ["cli"]
-        tag_tuple = tuple(dict.fromkeys(str(tag) for tag in tag_values))
-        operations.append((method, path, operation_id, summary, tag_tuple))
-
-    return operations
+    return _build_operations(
+        cast("OperationContext", operation_context),
+        cast("Command", command_candidate),
+    )
 
 
 def write_diagram(operations: Sequence[OperationEntry]) -> None:
@@ -183,7 +173,7 @@ def main() -> None:
     try:
         operations = collect_operations()
     except CLIConfigError as exc:
-        LOGGER.error(
+        LOGGER.exception(
             "Failed to collect CLI operations for diagram generation",
             extra={"status": "error"},
         )
@@ -206,7 +196,7 @@ def _raise_diagram_error(
     *,
     instance: str,
     status: int = 500,
-    extras: Mapping[str, object] | None = None,
+    extras: Mapping[str, str] | None = None,
 ) -> NoReturn:
     problem = build_problem_details(
         ProblemDetailsParams(
@@ -220,3 +210,23 @@ def _raise_diagram_error(
     )
     LOGGER.error(detail, extra={**({} if extras is None else dict(extras)), "status": "error"})
     raise CLIConfigError(problem)
+
+
+def _build_operations(
+    operation_context: OperationContext,
+    command: Command,
+) -> list[OperationEntry]:
+    operations: list[OperationEntry] = []
+    for tokens, command_obj in walk_commands(command, []):
+        path, operation, fallback_tags = operation_context.build_operation(tokens, command_obj)
+        operation_id_raw = str(operation.get("operationId") or "").strip()
+        operation_id = operation_id_raw or None
+        summary = str(operation.get("summary") or "").strip()
+        raw_tags = operation.get("tags")
+        if isinstance(raw_tags, Sequence) and not isinstance(raw_tags, (str, bytes)):
+            tag_candidates = [str(tag) for tag in raw_tags]
+        else:
+            tag_candidates = fallback_tags or ["cli"]
+        tag_tuple = tuple(dict.fromkeys(tag_candidates))
+        operations.append(("POST", path, operation_id, summary, tag_tuple))
+    return operations
