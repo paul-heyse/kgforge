@@ -51,12 +51,7 @@ DEFAULT_VERSION = "0.0.0"
 
 def _escape_d2(value: str) -> str:
     """Escape characters that would break D2 string literals."""
-
-    return (
-        value.replace("\\", "\\\\")
-        .replace('"', '\\"')
-        .replace("\n", "\\n")
-    )
+    return value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
 
 
 def _operation_anchor(operation_id: str | None) -> str:
@@ -144,10 +139,7 @@ def _write_diagram(
         handle.write('direction: right\nCLI: "CLI" {\n')
         unique_tags = sorted({tag for *_, tags in operations for tag in tags})
         handle.write(
-            "\n".join(
-                f'  "{_escape_d2(tag)}": "{_escape_d2(tag)}" {{}}'
-                for tag in unique_tags
-            )
+            "\n".join(f'  "{_escape_d2(tag)}": "{_escape_d2(tag)}" {{}}' for tag in unique_tags)
         )
         if unique_tags:
             handle.write("\n")
@@ -216,7 +208,6 @@ def write_diagram(operations: Sequence[OperationEntry]) -> None:
 
 def _ensure_cli_index_entry() -> None:
     """Ensure the diagrams index links to the CLI diagram."""
-
     entry_token = CLI_INDEX_ENTRY.strip()
     try:
         with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:

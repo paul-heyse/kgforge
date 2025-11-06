@@ -150,13 +150,11 @@ _GriffeError = getattr(_griffe, "GriffeError", Exception)
 
 def _is_package_directory(path: Path) -> bool:
     """Return ``True`` when ``path`` is a Python package directory."""
-
     return path.is_dir() and (path / "__init__.py").is_file()
 
 
 def _prioritize_packages(names: Sequence[str]) -> tuple[str, ...]:
     """Return package names ordered with priority entries at the front."""
-
     prioritized = [name for name in PACKAGE_PRIORITY_ORDER if name in names]
     remainder = [name for name in names if name not in PACKAGE_PRIORITY_ORDER]
     return tuple(prioritized + remainder)
@@ -164,7 +162,6 @@ def _prioritize_packages(names: Sequence[str]) -> tuple[str, ...]:
 
 def _discover_package_roots(src_root: Path) -> tuple[str, ...]:
     """Return first-party package roots discovered from the repository."""
-
     discovered: dict[str, None] = {}
 
     try:
@@ -193,7 +190,6 @@ def _discover_package_roots(src_root: Path) -> tuple[str, ...]:
 @lru_cache(maxsize=1)
 def _get_package_roots() -> tuple[str, ...]:
     """Return cached package roots for module collection."""
-
     return _discover_package_roots(SRC_ROOT)
 
 
@@ -687,7 +683,7 @@ def _nav_metadata_for_module(
     if isinstance(raw_meta, Mapping):
         meta: dict[str, Any] = copy.deepcopy(dict(raw_meta))
     else:
-        meta = copy.deepcopy(cast(dict[str, Any], raw_meta))
+        meta = copy.deepcopy(cast("dict[str, Any]", raw_meta))
     meta["exports"] = exports
 
     symbols_meta = meta.get("symbols")
@@ -761,7 +757,6 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
     """Return a ReDoc anchor for ``operation_id`` based on ``spec_path``."""
-
     return build_operation_href(spec_path, operation_id)
 
 
@@ -963,7 +958,6 @@ def _module_doc_relpath(module_path: str) -> str:
     str
         Relative documentation path using directory separators instead of dots.
     """
-
     return f"{module_path.replace('.', '/')}" + ".md"
 
 

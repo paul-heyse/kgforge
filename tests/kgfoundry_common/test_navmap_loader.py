@@ -1,8 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 
-from kgfoundry_common.navmap_loader import NavMetadataModel, load_nav_metadata
+import pytest
+
+from kgfoundry_common.navmap_loader import NavMetadataModel, clear_navmap_caches, load_nav_metadata
+
+
+@pytest.fixture(autouse=True)
+def _reset_navmap_caches() -> Iterator[None]:
+    clear_navmap_caches()
+    yield
+    clear_navmap_caches()
 
 
 def _symbol_names(sections: Iterable[dict[str, object]] | None) -> set[str]:
@@ -31,5 +40,5 @@ def test_cli_nav_metadata_derives_from_cli_contracts() -> None:
 def test_sidecar_metadata_validates() -> None:
     metadata = load_nav_metadata("registry.helper", ("DuckDBRegistryHelper",))
     assert isinstance(metadata, NavMetadataModel)
-    assert metadata.title == "registry"
+    assert metadata.module_meta.owner == "@registry"
     assert "DuckDBRegistryHelper" in metadata.symbols

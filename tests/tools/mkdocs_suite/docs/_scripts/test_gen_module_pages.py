@@ -13,7 +13,6 @@ _MODULE_CLASS = types.new_class("Module", (), {})
 @pytest.fixture(name="module")
 def fixture_module() -> types.ModuleType:
     """Return the module under test reloaded for isolation."""
-
     module_name = "tools.mkdocs_suite.docs._scripts.gen_module_pages"
     sys.modules.pop(module_name, None)
     return importlib.import_module(module_name)
@@ -21,7 +20,6 @@ def fixture_module() -> types.ModuleType:
 
 def _make_stub_module(name: str, module_path: Path) -> object:
     """Return a lightweight Griffe module stub for ``name``."""
-
     instance = _MODULE_CLASS()
     instance.path = name
     instance.members = {}
@@ -35,7 +33,6 @@ def test_collect_modules_discovers_new_package(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, module: types.ModuleType
 ) -> None:
     """Newly added packages should be collected without manual configuration."""
-
     stub_kgfoundry = types.ModuleType("kgfoundry")
     stub_kgfoundry.__all__ = ("kgfoundry_common",)
     monkeypatch.setitem(sys.modules, "kgfoundry", stub_kgfoundry)

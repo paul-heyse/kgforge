@@ -114,11 +114,8 @@ def test_write_diagram_escapes_special_characters(
             "POST",
             '/cli/run "special"',
             'operation"Id',
-            (
-                'Summary "with" newline\n'
-                'and backslash \\value'
-            ),
-            ('core"ops', 'line\\tag'),
+            ('Summary "with" newline\nand backslash \\value'),
+            ('core"ops', "line\\tag"),
         )
     ]
 

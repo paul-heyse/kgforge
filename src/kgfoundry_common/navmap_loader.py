@@ -7,11 +7,23 @@ import importlib
 import importlib.util
 import json
 import sys
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import suppress
 from functools import cache
 from importlib import import_module
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
+
+from kgfoundry_common.types import JsonValue
+
+if TYPE_CHECKING:
+    from tools import (
+        AugmentMetadataModel,
+        OperationOverrideModel,
+        RegistryInterfaceModel,
+        RegistryOperationModel,
+        ToolingMetadataModel,
+    )
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -205,7 +217,7 @@ class NavModuleMeta(BaseModel):
         return self.model_copy(update={"tags": tags})
 
 
-class NavMetadataModel(BaseModel, Mapping[str, Any]):
+class NavMetadataModel(BaseModel):
     """Typed navigation metadata aligned with historical navmap structure."""
 
     model_config = ConfigDict(frozen=True)
@@ -236,64 +248,31 @@ class NavMetadataModel(BaseModel, Mapping[str, Any]):
             return self
         return self.model_copy(update={"exports": exports})
 
-    def __iter__(self) -> Iterator[str]:
-        """Return an iterator over navigation metadata keys.
+    def __getitem__(self, key: str) -> JsonValue:
+        """Return flattened navigation metadata value for ``key``.
 
         Returns
         -------
-        Iterator[str]
-            Iterator yielding navigation metadata field names.
+        JsonValue
+            Value associated with ``key`` after merging `extras`.
         """
-        return iter(self._as_mapping())
 
-    def __len__(self) -> int:
-        """Return the number of navigation metadata keys.
+        return self._as_flat_dict()[key]
 
-        Returns
-        -------
-        int
-            Count of top-level navigation metadata fields.
-        """
-        return len(self._as_mapping())
+    def __iter__(self) -> Iterator[tuple[str, JsonValue]]:
+        """Yield flattened key-value pairs for dictionary compatibility."""
 
-    def __getitem__(self, key: str) -> object:
-        """Provide dictionary-style access to navigation metadata entries.
+        yield from self._as_flat_dict().items()
 
-        Parameters
-        ----------
-        key : str
-            Navigation metadata key to retrieve.
-
-        Returns
-        -------
-        object
-            Navigation metadata value associated with ``key``.
-        """
-        return self._as_mapping()[key]
-
-    def model_dump(self, *args: object, **kwargs: object) -> dict[str, Any]:  # type: ignore[override]
-        """Return a flattened dictionary representation of the navigation metadata.
-
-        Returns
-        -------
-        dict[str, Any]
-            Dictionary containing canonical navigation metadata fields.
-        """
-        data = super().model_dump(*args, **kwargs)
+    def _as_flat_dict(self) -> dict[str, JsonValue]:
+        data = super().model_dump()
         extras = data.pop("extras", {})
         if isinstance(extras, Mapping):
             data.update(extras)
-        return data
+        return cast("dict[str, JsonValue]", data)
 
-    def _as_mapping(self) -> dict[str, Any]:
-        """Return the navigation metadata as a plain dictionary.
 
-        Returns
-        -------
-        dict[str, Any]
-            Flattened navigation metadata mapping.
-        """
-        return self.model_dump()
+Mapping.register(NavMetadataModel)
 
 
 def _slugify(value: str) -> str:
@@ -330,17 +309,21 @@ def _to_nav_metadata(
     base = _default_nav_payload(package, export_candidates)
     merged = {**base, **raw}
     merged["exports"] = export_candidates
-    symbols = merged.setdefault("symbols", {})
-    if isinstance(symbols, Mapping):
-        for symbol in export_candidates:
-            symbols.setdefault(symbol, {})
+    symbols_value = merged.get("symbols")
+    if isinstance(symbols_value, Mapping):
+        typed_symbols: dict[str, Any] = dict(symbols_value)
+    else:
+        typed_symbols = {}
+    for symbol in export_candidates:
+        typed_symbols.setdefault(symbol, {})
+    merged["symbols"] = typed_symbols
     sections = merged.get("sections")
     if not sections:
         merged["sections"] = base["sections"]
     return NavMetadataModel.model_validate(merged)
 
 
-def _registry_operation_candidates(operation: object, key: str) -> list[str]:
+def _registry_operation_candidates(operation: RegistryOperationModel, key: str) -> list[str]:
     raw_id = operation.operation_id or key
     tokens = [
         key.replace("-", "_"),
@@ -353,19 +336,22 @@ def _augment_operation_candidates(operation_id: str) -> list[str]:
     return [operation_id.rsplit(".", maxsplit=1)[-1].replace("-", "_")]
 
 
-def _load_cli_tooling_metadata() -> object:
+def _load_cli_tooling_metadata() -> ToolingMetadataModel | None:
     try:
         tools_module = import_module("tools")
     except ImportError:  # pragma: no cover - optional dependency
         return None
     load_tooling = getattr(tools_module, "load_tooling_metadata", None)
-    augment_error = getattr(tools_module, "AugmentRegistryError", RuntimeError)
     if load_tooling is None:
         return None
+    load_tooling_callable = cast("Callable[..., ToolingMetadataModel]", load_tooling)
+    augment_error = cast(
+        "type[BaseException]", getattr(tools_module, "AugmentRegistryError", RuntimeError)
+    )
     if not CLI_AUGMENT_PATH.is_file() or not CLI_REGISTRY_PATH.is_file():
         return None
     try:
-        return load_tooling(  # type: ignore[misc]
+        return load_tooling_callable(
             augment_path=CLI_AUGMENT_PATH,
             registry_path=CLI_REGISTRY_PATH,
         )
@@ -374,7 +360,7 @@ def _load_cli_tooling_metadata() -> object:
 
 
 @cache
-def _cached_cli_tooling_metadata() -> object | None:
+def _cached_cli_tooling_metadata() -> ToolingMetadataModel | None:
     return _load_cli_tooling_metadata()
 
 
@@ -385,23 +371,28 @@ def _candidate_modules(package: str) -> list[str]:
 
 def _resolve_interface_for_package(
     package: str,
-) -> tuple[object, object] | None:
+) -> tuple[ToolingMetadataModel, RegistryInterfaceModel] | None:
     metadata = _cached_cli_tooling_metadata()
     if metadata is None:
+        with suppress(AttributeError):  # pragma: no cover - python <3.9 safeguard
+            _cached_cli_tooling_metadata.cache_clear()
+        metadata = _cached_cli_tooling_metadata()
+    if metadata is None:
         return None
+    typed_metadata = metadata
     candidates = set(_candidate_modules(package))
-    for interface in metadata.registry.interfaces.values():
+    for interface in typed_metadata.registry.interfaces.values():
         module = interface.module
         if module and module in candidates:
-            return metadata, interface
+            return typed_metadata, interface
     return None
 
 
 def _operation_overrides_for_interface(
-    augment: object,
-    interface_operations: Sequence[object],
-) -> dict[str, object]:
-    overrides: dict[str, object] = {}
+    augment: AugmentMetadataModel,
+    interface_operations: Sequence[RegistryOperationModel],
+) -> dict[str, OperationOverrideModel]:
+    overrides: dict[str, OperationOverrideModel] = {}
     relevant_ids = {
         (operation.operation_id or "")
         for operation in interface_operations
@@ -415,16 +406,16 @@ def _operation_overrides_for_interface(
 
 
 def _registry_operations_for_interface(
-    interface: object,
-) -> dict[str, object]:
-    operations: dict[str, object] = {}
+    interface: RegistryInterfaceModel,
+) -> dict[str, RegistryOperationModel]:
+    operations: dict[str, RegistryOperationModel] = {}
     for key, operation in interface.operations.items():
         for candidate in _registry_operation_candidates(operation, key):
             operations.setdefault(candidate, operation)
     return operations
 
 
-def _cli_module_meta(interface: object) -> NavModuleMeta:
+def _cli_module_meta(interface: RegistryInterfaceModel) -> NavModuleMeta:
     payload = interface.to_payload()
     known = {
         "id",
@@ -467,8 +458,8 @@ def _first_non_empty_sequence(*candidates: Sequence[str] | None) -> tuple[str, .
 
 
 def _build_symbol_metadata(
-    registry_op: object,
-    override: object,
+    registry_op: RegistryOperationModel | None,
+    override: OperationOverrideModel | None,
 ) -> NavSymbolModel:
     summary = _first_non_empty(
         override.summary if override else None,
@@ -513,8 +504,8 @@ def _build_symbol_metadata(
 
 def _symbols_from_cli(
     exports: Sequence[str],
-    registry_ops: Mapping[str, object],
-    overrides: Mapping[str, object],
+    registry_ops: Mapping[str, RegistryOperationModel],
+    overrides: Mapping[str, OperationOverrideModel],
 ) -> dict[str, NavSymbolModel]:
     symbols: dict[str, NavSymbolModel] = {}
     for symbol in dict.fromkeys(exports):
@@ -537,7 +528,7 @@ def _section_symbols(
 
 
 def _sections_from_cli(
-    augment: object,
+    augment: AugmentMetadataModel,
     symbols: Mapping[str, NavSymbolModel],
 ) -> tuple[NavSectionModel, ...]:
     section_models: list[NavSectionModel] = []
@@ -633,3 +624,14 @@ def load_nav_metadata(package: str, exports: tuple[str, ...]) -> NavMetadataMode
     if cli_metadata is not None:
         return cli_metadata
     return _sidecar_nav_metadata(package, exports)
+
+
+def clear_navmap_caches() -> None:
+    """Clear internal navigation metadata caches.
+
+    Intended for tests and tooling that need to force regeneration after modifying augment or
+    registry metadata sources at runtime.
+    """
+    load_nav_metadata.cache_clear()
+    with suppress(AttributeError):  # pragma: no cover - python <3.9 safeguard
+        _cached_cli_tooling_metadata.cache_clear()

@@ -17,10 +17,9 @@ import pytest
 @pytest.fixture(name="gen_module_pages")
 def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
     """Load ``gen_module_pages`` without executing its expensive side effects."""
-
     mkdocs_stub = types.ModuleType("mkdocs_gen_files")
-    mkdocs_stub.open = lambda *_args, **_kwargs: io.StringIO()  # noqa: B010
-    mkdocs_stub.files = io.StringIO  # noqa: B010
+    mkdocs_stub.open = lambda *_args, **_kwargs: io.StringIO()
+    mkdocs_stub.files = io.StringIO
     monkeypatch.setitem(sys.modules, "mkdocs_gen_files", mkdocs_stub)
 
     tools_stub = types.ModuleType("tools")
@@ -32,9 +31,9 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
     monkeypatch.setitem(sys.modules, "tools._shared", shared_stub)
 
     augment_stub = types.ModuleType("tools._shared.augment_registry")
-    augment_stub.AugmentRegistryError = type("AugmentRegistryError", (Exception,), {})  # noqa: B010
-    augment_stub.load_registry = lambda *_args, **_kwargs: None  # noqa: B010
-    augment_stub.render_problem_details = lambda *_args, **_kwargs: {}  # noqa: B010
+    augment_stub.AugmentRegistryError = type("AugmentRegistryError", (Exception,), {})
+    augment_stub.load_registry = lambda *_args, **_kwargs: None
+    augment_stub.render_problem_details = lambda *_args, **_kwargs: {}
     monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", augment_stub)
 
     mkdocs_suite_stub = types.ModuleType("tools.mkdocs_suite")
@@ -47,37 +46,37 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
 
     scripts_stub = types.ModuleType("tools.mkdocs_suite.docs._scripts")
     scripts_stub.__path__ = []  # type: ignore[attr-defined]
-    scripts_stub.load_repo_settings = lambda *_args, **_kwargs: (None, None)  # noqa: B010
+    scripts_stub.load_repo_settings = lambda *_args, **_kwargs: (None, None)
     monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts", scripts_stub)
 
     msgspec_stub = types.ModuleType("msgspec")
-    msgspec_stub.UNSET = object()  # noqa: B010
+    msgspec_stub.UNSET = object()
 
-    class _Struct:  # noqa: D401 - simple stub matching msgspec.Struct API surface
+    class _Struct:
         """Minimal stand-in for :class:`msgspec.Struct`."""
 
-        def __init_subclass__(cls, **kwargs: object) -> None:  # noqa: D401 - accept msgspec kwargs
+        def __init_subclass__(cls, **kwargs: object) -> None:
             super().__init_subclass__()
 
-    msgspec_stub.Struct = _Struct  # noqa: B010
-    msgspec_stub.structs = types.SimpleNamespace(replace=lambda obj, **_kwargs: obj)  # noqa: B010
-    msgspec_stub.field = lambda *_args, **kwargs: kwargs  # noqa: B010
+    msgspec_stub.Struct = _Struct
+    msgspec_stub.structs = types.SimpleNamespace(replace=lambda obj, **_kwargs: obj)
+    msgspec_stub.field = lambda *_args, **kwargs: kwargs
     msgspec_stub.json = types.SimpleNamespace(
         encode=lambda *_args, **_kwargs: b"", decode=lambda *_args, **_kwargs: None
-    )  # noqa: B010
+    )
     monkeypatch.setitem(sys.modules, "msgspec", msgspec_stub)
 
     problem_details_stub = types.SimpleNamespace(ProblemDetailsDict=dict)
     typing_stub = types.ModuleType("kgfoundry_common.typing")
-    typing_stub.gate_import = lambda *_args, **_kwargs: problem_details_stub  # noqa: B010
+    typing_stub.gate_import = lambda *_args, **_kwargs: problem_details_stub
     kgfoundry_common_stub = types.ModuleType("kgfoundry_common")
     kgfoundry_common_stub.__path__ = []  # type: ignore[attr-defined]
     monkeypatch.setitem(sys.modules, "kgfoundry_common", kgfoundry_common_stub)
     monkeypatch.setitem(sys.modules, "kgfoundry_common.typing", typing_stub)
     errors_stub = types.ModuleType("kgfoundry_common.errors")
-    errors_stub.SchemaValidationError = type("SchemaValidationError", (Exception,), {})  # noqa: B010
+    errors_stub.SchemaValidationError = type("SchemaValidationError", (Exception,), {})
     serialization_stub = types.ModuleType("kgfoundry_common.serialization")
-    serialization_stub.validate_payload = lambda *_args, **_kwargs: None  # noqa: B010
+    serialization_stub.validate_payload = lambda *_args, **_kwargs: None
     monkeypatch.setitem(sys.modules, "kgfoundry_common.errors", errors_stub)
     monkeypatch.setitem(sys.modules, "kgfoundry_common.serialization", serialization_stub)
 
@@ -90,14 +89,14 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
             self.logger = logger or types.SimpleNamespace()
             self.extra = extra or {}
 
-    logging_stub.LoggerAdapter = _LoggerAdapter  # noqa: B010
-    logging_stub.get_logger = lambda *_args, **_kwargs: _LoggerAdapter()  # noqa: B010
+    logging_stub.LoggerAdapter = _LoggerAdapter
+    logging_stub.get_logger = lambda *_args, **_kwargs: _LoggerAdapter()
     monkeypatch.setitem(sys.modules, "kgfoundry_common.logging", logging_stub)
 
     griffe_stub = types.ModuleType("griffe")
-    griffe_stub.load = lambda *_args, **_kwargs: object()  # noqa: B010
-    griffe_stub.load_extensions = lambda *_args, **_kwargs: None  # noqa: B010
-    griffe_stub.GriffeError = Exception  # noqa: B010
+    griffe_stub.load = lambda *_args, **_kwargs: object()
+    griffe_stub.load_extensions = lambda *_args, **_kwargs: None
+    griffe_stub.GriffeError = Exception
     monkeypatch.setitem(sys.modules, "griffe", griffe_stub)
 
     original_spec = importlib.util.spec_from_file_location
@@ -107,17 +106,16 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
             super().__init__(name, "<stub>")
             self._initializer = initializer
 
-        def exec_module(self, module: types.ModuleType) -> None:  # noqa: D401
+        def exec_module(self, module: types.ModuleType) -> None:
             """Populate the stub module without reading from disk."""
-
             self._initializer(module)
 
     def _navmap_initializer(module: types.ModuleType) -> None:
-        module.DEFAULT_EXTENSIONS = []  # noqa: B010
-        module.DEFAULT_SEARCH_PATHS = []  # noqa: B010
+        module.DEFAULT_EXTENSIONS = []
+        module.DEFAULT_SEARCH_PATHS = []
 
     def _nav_loader_initializer(module: types.ModuleType) -> None:
-        module.load_nav_metadata = lambda *_args, **_kwargs: {}  # noqa: B010
+        module.load_nav_metadata = lambda *_args, **_kwargs: {}
 
     def _fake_spec_from_file_location(
         name: str, location: str | Path, *args: object, **kwargs: object
@@ -158,7 +156,6 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
 
 def test_inline_d2_neighborhood_uses_relative_doc_paths(gen_module_pages: types.ModuleType) -> None:
     """D2 neighborhood links should point to relative module documentation paths."""
-
     module_path = "kgfoundry_common.logging"
     ModuleFacts = gen_module_pages.ModuleFacts
     facts = ModuleFacts(
@@ -178,6 +175,8 @@ def test_inline_d2_neighborhood_uses_relative_doc_paths(gen_module_pages: types.
     assert 'link: "./kgfoundry_common/logging.md"' in block
     assert 'link: "./kgfoundry_common/config.md"' in block
     assert 'link: "./kgfoundry_common/app.md"' in block
+
+
 def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     """Install a lightweight ``mkdocs_gen_files`` stub for module imports."""
 
@@ -192,7 +191,6 @@ def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def _install_griffe_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     """Install a stub ``griffe`` module that forces module discovery to degrade."""
-
     stub = types.ModuleType("griffe")
 
     class _StubGriffeError(Exception):
@@ -204,9 +202,9 @@ def _install_griffe_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     def _stub_load_extensions(*_args: object, **_kwargs: object) -> object:
         return object()
 
-    setattr(stub, "GriffeError", _StubGriffeError)
-    setattr(stub, "load", _stub_load)
-    setattr(stub, "load_extensions", _stub_load_extensions)
+    stub.GriffeError = _StubGriffeError
+    stub.load = _stub_load
+    stub.load_extensions = _stub_load_extensions
     monkeypatch.setitem(sys.modules, "griffe", stub)
 
 
@@ -214,12 +212,11 @@ def test_render_module_pages_warns_and_continues_on_invalid_api_usage(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Invalid API usage JSON should be ignored with a warning during builds."""
-
     _install_mkdocs_stub(monkeypatch)
     _install_griffe_stub(monkeypatch)
 
     # Prevent registry lookups from touching the filesystem during import.
-    import tools._shared.augment_registry as augment_registry
+    from tools._shared import augment_registry
 
     monkeypatch.setattr(augment_registry, "load_registry", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(augment_registry, "render_problem_details", lambda _exc: {})
