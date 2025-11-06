@@ -366,6 +366,20 @@ def _write_interface_details(
 def render_interface_catalog() -> None:
     registry = _load_registry()
     interfaces = _collect_nav_interfaces()
+    if registry is not None:
+        nav_lookup = {
+            str(record["id"]): record
+            for record in interfaces
+            if isinstance(record.get("id"), str) and record["id"].strip()
+        }
+        for identifier, interface_model in registry.interfaces.items():
+            key = str(identifier)
+            if key in nav_lookup:
+                continue
+            placeholder: dict[str, object] = {"id": key}
+            if interface_model.type:
+                placeholder["type"] = interface_model.type
+            interfaces.append(placeholder)
     interfaces.sort(key=lambda item: (str(item.get("type")), str(item.get("id"))))
 
     with mkdocs_gen_files.open("api/interfaces.md", "w") as handle:
