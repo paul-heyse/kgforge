@@ -8,6 +8,7 @@ DocstringBuildConfig and cache interfaces.
 from __future__ import annotations
 
 import tempfile
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, cast
@@ -17,7 +18,7 @@ import tools.docstring_builder.orchestrator as orchestrator_module
 from tools.docstring_builder.builder_types import DocstringBuildResult, ExitStatus
 from tools.docstring_builder.cache import DocstringBuilderCache
 from tools.docstring_builder.config import BuilderConfig, ConfigSelection
-from tools.docstring_builder.config_models import DocstringBuildConfig
+from tools.docstring_builder.config_models import CachePolicy, DocstringBuildConfig
 from tools.docstring_builder.orchestrator import run_build, run_docstring_builder, run_legacy
 
 
@@ -79,7 +80,7 @@ def _install_stubbed_pipeline(
     monkeypatch.setattr(
         orchestrator_module,
         "load_builder_config",
-        lambda override=None: (builder_config, config_selection),
+        lambda _override=None: (builder_config, config_selection),
     )
     monkeypatch.setattr(orchestrator_module, "select_files", lambda *_: [Path("src/module.py")])
 
@@ -94,15 +95,14 @@ def _install_stubbed_pipeline(
         config_selection=config_selection,
     )
 
-    def fake_run_pipeline(
-        files: list[Path],
-        request: DocstringBuildRequest,
-        config: BuilderConfig,
-        selection: ConfigSelection | None,
-        *,
-        cache: DocstringBuilderCache,
-        plugins_enabled: bool,
-    ) -> DocstringBuildResult:
+    def fake_run_pipeline(*args: object, **kwargs: object) -> DocstringBuildResult:
+        files = cast("list[Path]", args[0])
+        request = cast("DocstringBuildRequest", args[1])
+        config = cast("BuilderConfig", args[2])
+        selection = cast("ConfigSelection | None", args[3])
+        cache = cast("DocstringBuilderCache", kwargs["cache"])
+        plugins_enabled = cast("bool", kwargs["plugins_enabled"])
+
         capture.files = list(files)
         capture.request = request
         capture.config = config
@@ -141,7 +141,8 @@ class TestRunBuild:
 
         assert actual is expected_result
         assert capture.files == [Path("src/module.py")]
-        assert capture.request is not None and capture.request.command == "update"
+        assert capture.request is not None
+        assert capture.request.command == "update"
         assert capture.plugins_enabled is True
         assert capture.cache is not None
 
@@ -212,7 +213,7 @@ class TestRunBuild:
         monkeypatch.setattr(
             orchestrator_module,
             "load_builder_config",
-            lambda override=None: (builder_config, config_selection),
+            lambda _override=None: (builder_config, config_selection),
         )
         monkeypatch.setattr(
             orchestrator_module,
@@ -231,14 +232,16 @@ class TestRunBuild:
             config_selection=config_selection,
         )
 
-        def slow_run_pipeline(*args: object, **kwargs: object) -> DocstringBuildResult:
-            time.sleep(0.2)
+        timeout_seconds = 1
+
+        def slow_run_pipeline(*_args: object, **_kwargs: object) -> DocstringBuildResult:
+            time.sleep(timeout_seconds + 1)
             return result
 
         monkeypatch.setattr(orchestrator_module, "_run_pipeline", slow_run_pipeline)
 
         cache = RecordingCache(tmp_path / "cache.json")
-        config = DocstringBuildConfig(timeout_seconds=0.05)
+        config = DocstringBuildConfig(timeout_seconds=timeout_seconds)
 
         with pytest.raises(TimeoutError, match="exceeded timeout"):
             run_build(config=config, cache=cache)

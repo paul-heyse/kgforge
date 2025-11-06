@@ -5,8 +5,9 @@ from __future__ import annotations
 import logging
 import shutil
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
+from mkdocs.config.base import Config, ConfigErrors, ConfigWarnings
 from mkdocs.plugins import BasePlugin
 
 LOGGER = logging.getLogger("mkdocs.plugins.optional-d2")
@@ -21,7 +22,7 @@ def _noop(*_args: object, **_kwargs: object) -> None:
     """Return ``None`` regardless of invocation arguments."""
 
 
-class OptionalD2Plugin(BasePlugin[dict[str, Any]]):
+class OptionalD2Plugin(BasePlugin[Config]):
     """Conditionally delegate to the mkdocs-d2 plugin when available."""
 
     if D2Plugin is not None:
@@ -31,31 +32,36 @@ class OptionalD2Plugin(BasePlugin[dict[str, Any]]):
 
     def __init__(self) -> None:
         super().__init__()
-        self._delegate: BasePlugin[dict[str, Any]] | None = None
+        self._delegate: BasePlugin[Config] | None = None
         self._warned = False
 
-    def load_config(self, config: dict[str, Any], **kwargs: object) -> dict[str, Any]:
+    def load_config(
+        self,
+        options: dict[str, Any],
+        config_file_path: str | None = None,
+    ) -> tuple[ConfigErrors, ConfigWarnings]:
         """Prepare the wrapped mkdocs-d2 plugin when prerequisites are met.
 
         Parameters
         ----------
-        config : dict[str, Any]
+        options : dict[str, Any]
             MkDocs plugin configuration dictionary.
-        **kwargs : object
-            Additional keyword arguments forwarded to the base plugin.
+        config_file_path : str | None, optional
+            Path to the originating configuration file when present.
 
         Returns
         -------
-        dict[str, Any]
-            The validated plugin configuration preserved from ``BasePlugin``.
+        tuple[ConfigErrors, ConfigWarnings]
+            Combined validation errors and warnings from this wrapper and the
+            underlying ``mkdocs-d2`` plugin when available.
         """
-        result = super().load_config(config, **kwargs)
+        errors, warnings = super().load_config(options, config_file_path)
         if D2Plugin is None:
             self._warn_once(
                 "mkdocs-d2-plugin is not installed; skipping D2 diagram rendering.",
             )
             self._delegate = None
-            return result
+            return errors, warnings
 
         if shutil.which("d2") is None:
             self._warn_once(
@@ -63,12 +69,14 @@ class OptionalD2Plugin(BasePlugin[dict[str, Any]]):
                 "served but new renders are skipped. Install the D2 CLI to refresh diagrams.",
             )
             self._delegate = None
-            return result
+            return errors, warnings
 
-        delegate: BasePlugin[dict[str, Any]] = D2Plugin()
-        delegate.load_config(config, **kwargs)
+        delegate = cast("BasePlugin[Config]", D2Plugin())
+        delegate_errors, delegate_warnings = delegate.load_config(options, config_file_path)
+        errors.extend(delegate_errors)
+        warnings.extend(delegate_warnings)
         self._delegate = delegate
-        return result
+        return errors, warnings
 
     def _warn_once(self, message: str) -> None:
         """Emit ``message`` at warning level exactly once per build."""

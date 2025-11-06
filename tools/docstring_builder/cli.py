@@ -49,6 +49,7 @@ from tools._shared.problem_details import (
     ProblemDetailsParams,
     build_problem_details,
 )
+from tools.docstring_builder import cli_context
 from tools.docstring_builder.cache import BuilderCache
 from tools.docstring_builder.harvest import harvest_file
 from tools.docstring_builder.io import (

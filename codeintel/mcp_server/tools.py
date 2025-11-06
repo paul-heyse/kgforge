@@ -173,10 +173,10 @@ def list_python_symbols(directory: str) -> list[dict[str, Any]]:
     list[dict[str, Any]]
         Collection of files paired with their discovered symbol metadata.
 
-    Raises
-    ------
-    FileNotFoundError
-        If the directory does not exist (raised by internal directory resolution).
+    Notes
+    -----
+    Raises :exc:`FileNotFoundError` if the directory does not exist (raised by
+    internal directory resolution helper).
     """
     query_text = _load_python_symbols_query()
     langs = load_langs()
@@ -256,12 +256,11 @@ def list_errors(path: str, *, language: str = "python") -> list[dict[str, Any]]:
     list[dict[str, Any]]
         Captures describing error spans and the extracted text.
 
-    Raises
-    ------
-    ValueError
-        If the language is not supported (raised by internal query execution).
-    FileNotFoundError
-        If the file cannot be found (raised by internal path resolution).
+    Notes
+    -----
+    Raises :exc:`ValueError` if the language is not supported, or
+    :exc:`FileNotFoundError` if the file cannot be found (both raised by internal
+    query execution and path resolution helpers).
     """
     captures = run_ts_query(path, language=language, query=ERROR_QUERY).captures
     return [
