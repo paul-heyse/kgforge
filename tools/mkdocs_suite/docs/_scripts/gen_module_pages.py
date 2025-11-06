@@ -99,7 +99,8 @@ else:
         raise RuntimeError(error_message)
     _griffe_navmap = importlib.util.module_from_spec(_griffe_navmap_spec)
     sys.modules[_griffe_navmap_spec.name] = _griffe_navmap
-    _griffe_navmap_spec.loader.exec_module(_griffe_navmap)  # type: ignore[union-attr]
+    loader = cast("importlib.abc.Loader", _griffe_navmap_spec.loader)
+    loader.exec_module(_griffe_navmap)
 
     _nav_loader_path = SRC_ROOT / "kgfoundry_common" / "navmap_loader.py"
     _nav_loader_spec = importlib.util.spec_from_file_location(
@@ -110,7 +111,8 @@ else:
         raise RuntimeError(error_message)
     _nav_loader = importlib.util.module_from_spec(_nav_loader_spec)
     sys.modules[_nav_loader_spec.name] = _nav_loader
-    _nav_loader_spec.loader.exec_module(_nav_loader)  # type: ignore[union-attr]
+    loader = cast("importlib.abc.Loader", _nav_loader_spec.loader)
+    loader.exec_module(_nav_loader)
 
     DEFAULT_EXTENSIONS = list(_griffe_navmap.DEFAULT_EXTENSIONS)
     DEFAULT_SEARCH_PATHS = list(_griffe_navmap.DEFAULT_SEARCH_PATHS)

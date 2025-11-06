@@ -4,7 +4,7 @@ This catalog is generated from `_nav.json` sidecars and the shared interface reg
 
 | Interface | Type | Module | Owner | Stability | Spec | Description | Problem Details |
 | --------- | ---- | ------ | ----- | -------- | ---- | ----------- | ---------------- |
-| orchestration-cli | cli | [orchestration](../modules/orchestration.md) | @orchestration | beta | [CLI Spec](../api/openapi-cli.md) | Primary Typer application for orchestration flows and indexing commands. | — |
+| orchestration-cli | cli | [orchestration](../modules/orchestration.md) | @orchestration | beta | [CLI Spec](../api/openapi-cli.md) | Primary Typer application for orchestration flows and indexing commands. | schema/examples/problem_details/tool-execution-error.json |
 | search-http | http | [search_api](../modules/search_api.md) | @search-api | experimental | [HTTP API](../api/index.md) | FastAPI application exposing search operations via the public HTTP API. | schema/examples/problem_details/search-missing-index.json, schema/examples/problem_details/search-gpu-unavailable.json |
 
 ## orchestration-cli
@@ -13,10 +13,7 @@ This catalog is generated from `_nav.json` sidecars and the shared interface reg
 * **Module:** orchestration
 * **Owner:** @orchestration
 * **Stability:** beta
-* **Description:** Typer-powered orchestration command suite covering indexing flows, API bootstrapping,
-and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
-consumed by the MkDocs suite.
-
+* **Description:** Primary Typer application for orchestration flows and indexing commands.
 
 ### Operations
 
@@ -62,6 +59,5 @@ consumed by the MkDocs suite.
 * **Module:** search_api
 * **Owner:** @search-api
 * **Stability:** experimental
-* **Description:** FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
-
+* **Description:** FastAPI application exposing search operations via the public HTTP API.
 

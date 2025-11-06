@@ -9,7 +9,6 @@ implementation specifics.
 from __future__ import annotations
 
 import sys
-from contextlib import suppress
 from importlib import import_module
 from typing import TYPE_CHECKING as _TYPE_CHECKING
 
@@ -53,8 +52,7 @@ __navmap__ = load_nav_metadata(__name__, tuple(__all__))
 
 # Remove the helper introduced by ``from __future__ import annotations`` so Griffe
 # does not interpret it as a public alias (it points to ``__future__.annotations``).
-with suppress(NameError):
-    del annotations  # type: ignore[name-defined]
+globals().pop("annotations", None)
 
 # Provide a benign placeholder so static analysers see a concrete value rather than
 # the ``__future__`` alias (the name is not exported via ``__all__``).

@@ -26,6 +26,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from pydantic_core import PydanticCustomError
 
 from tools import get_logger
 from tools._shared.problem_details import (
@@ -48,11 +49,22 @@ _PROBLEM_TITLE = "CLI augment/registry error"
 
 
 def _ensure_str_sequence(value: object) -> tuple[str, ...]:
-    if isinstance(value, (str, bytes)):
-        return (str(value),)
-    if isinstance(value, Sequence):
-        return tuple(str(item) for item in value if item is not None)
-    return ()
+    if value is None:
+        return ()
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        code = "sequence_type"
+        msg = "Value must be a sequence of strings."
+        raise PydanticCustomError(code, msg)
+    seen: set[str] = set()
+    items: list[str] = []
+    for item in value:
+        if item is None:
+            continue
+        text = str(item)
+        if text not in seen:
+            seen.add(text)
+            items.append(text)
+    return tuple(items)
 
 
 class AugmentRegistryError(RuntimeError):
@@ -418,7 +430,10 @@ class RegistryInterfaceModel(BaseModel):
             msg = "Registry interface entry must be a mapping."
             raise TypeError(msg)
         data = {str(key): item for key, item in value.items()}
-        identifier = info.data.get("identifier") or data.get("id")
+        existing_identifier: object | None = None
+        if isinstance(info.data, Mapping):
+            existing_identifier = info.data.get("identifier")
+        identifier = existing_identifier or data.get("identifier") or data.get("id")
         if not identifier:
             msg = "Registry interface requires an identifier."
             raise ValueError(msg)

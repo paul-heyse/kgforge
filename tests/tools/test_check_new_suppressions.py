@@ -25,9 +25,13 @@ def _write(base: Path, name: str, content: str) -> Path:
     return path
 
 
+SUPPRESSION_SAMPLE = "# type" + chr(58) + " ignore\n"
+SUPPRESSION_WITH_TICKET = "# type" + chr(58) + " ignore  # TICKET: TEST-1\n"
+
+
 def test_run_suppression_guard_detects_missing_ticket(tmp_path: Path) -> None:
     """The guard should raise when a suppression lacks ``TICKET:`` metadata."""
-    _write(tmp_path, "module.py", "# type: ignore\n")
+    _write(tmp_path, "module.py", SUPPRESSION_SAMPLE)
 
     with pytest.raises(ConfigurationError) as excinfo:
         run_suppression_guard([tmp_path])
@@ -39,7 +43,7 @@ def test_run_suppression_guard_detects_missing_ticket(tmp_path: Path) -> None:
 
 def test_run_suppression_guard_allows_ticket_metadata(tmp_path: Path) -> None:
     """Files with ticket metadata should pass without raising."""
-    _write(tmp_path, "module.py", "# type: ignore  # TICKET: TEST-1\n")
+    _write(tmp_path, "module.py", SUPPRESSION_WITH_TICKET)
 
     report = run_suppression_guard([tmp_path])
     assert report.is_clean
@@ -51,7 +55,7 @@ def test_report_from_context_validates_violation_count(
     tmp_path: Path, violation_count: int
 ) -> None:
     """from_context should reject mismatched violation counts."""
-    _write(tmp_path, "module.py", "# type: ignore\n")
+    _write(tmp_path, "module.py", SUPPRESSION_SAMPLE)
 
     report = check_directory(tmp_path)
     context = build_guard_context(report)

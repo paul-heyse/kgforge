@@ -77,7 +77,13 @@ if TYPE_CHECKING:
     from tools.docstring_builder.policy import PolicyEngine, PolicyReport
 else:  # pragma: no cover - runtime fallbacks for optional typing deps
     ToolingMetadataModel = object
-    DocstringBuildRequest = object  # type: ignore[assignment]
+
+    class _DocstringBuildRequestPlaceholder:  # pragma: no cover - runtime fallback
+        """Runtime placeholder for ``DocstringBuildRequest`` when typing stubs are unavailable."""
+
+        __slots__ = ()
+
+    DocstringBuildRequest = _DocstringBuildRequestPlaceholder
     ExitStatus = int
     LoggerLike = object
     StatusCounts = dict[str, int]

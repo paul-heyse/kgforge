@@ -51,83 +51,19 @@ from kgfoundry_common.navmap_loader import load_nav_metadata
 
 class _Comparable(Protocol):
     def __lt__(self, other: _Comparable, /) -> bool:
-        """Compare less than.
-
-        Parameters
-        ----------
-        other : _Comparable
-            Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self < other.
-
-        Raises
-        ------
-        NotImplementedError
-            This is a protocol stub that must be implemented by concrete classes.
-        """  # noqa: DOC502
+        """Protocol stub for ``self < other``."""
         _protocol_stub("__lt__", self, other)
 
     def __le__(self, other: _Comparable, /) -> bool:
-        """Compare less than or equal.
-
-        Parameters
-        ----------
-        other : _Comparable
-            Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self <= other.
-
-        Raises
-        ------
-        NotImplementedError
-            This is a protocol stub that must be implemented by concrete classes.
-        """  # noqa: DOC502
+        """Protocol stub for ``self <= other``."""
         _protocol_stub("__le__", self, other)
 
     def __gt__(self, other: _Comparable, /) -> bool:
-        """Compare greater than.
-
-        Parameters
-        ----------
-        other : _Comparable
-            Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self > other.
-
-        Raises
-        ------
-        NotImplementedError
-            This is a protocol stub that must be implemented by concrete classes.
-        """  # noqa: DOC502
+        """Protocol stub for ``self > other``."""
         _protocol_stub("__gt__", self, other)
 
     def __ge__(self, other: _Comparable, /) -> bool:
-        """Compare greater than or equal.
-
-        Parameters
-        ----------
-        other : _Comparable
-            Other object to compare.
-
-        Returns
-        -------
-        bool
-            True if self >= other.
-
-        Raises
-        ------
-        NotImplementedError
-            This is a protocol stub that must be implemented by concrete classes.
-        """  # noqa: DOC502
+        """Protocol stub for ``self >= other``."""
         _protocol_stub("__ge__", self, other)
 
 

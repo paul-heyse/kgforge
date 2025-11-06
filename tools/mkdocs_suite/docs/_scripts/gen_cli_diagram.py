@@ -14,11 +14,7 @@ from typing import TYPE_CHECKING, NoReturn, cast
 
 import mkdocs_gen_files
 
-from tools._shared.cli_tooling import (
-    CLIConfigError,
-    CLIToolSettings,
-    load_cli_tooling_context,
-)
+from tools._shared.cli_tooling import CLIConfigError, CLIToolSettings, load_cli_tooling_context
 from tools._shared.problem_details import (
     ProblemDetailsParams,
     build_problem_details,
@@ -29,7 +25,9 @@ from tools.typer_to_openapi_cli import import_object, to_click_command, walk_com
 if TYPE_CHECKING:  # pragma: no cover - typing aid
     from click.core import Command
 
-    from tools.typer_to_openapi_cli import OperationContext
+    from tools._shared.augment_registry import RegistryInterfaceModel
+    from tools._shared.cli_tooling import CLIToolingContext
+    from tools.typer_to_openapi_cli import CLIConfig, OperationContext
 
 OperationEntry = tuple[str, str, str | None, str, tuple[str, ...]]
 
@@ -66,35 +64,64 @@ def _default_cli_settings(interface_id: str | None) -> CLIToolSettings:
 
 
 def _load_click_command(
-    context: object,
+    context: CLIToolingContext,
     target_interface: str | None,
 ) -> object:
-    cli_config = context.cli_config  # type: ignore[attr-defined]
-    interface_id = target_interface or cli_config.interface_id  # type: ignore[attr-defined]
-    if interface_id is None:
+    cli_config = cast("CLIConfig", context.cli_config)
+    interface_id_candidate = target_interface or cli_config.interface_id
+    if interface_id_candidate is None:
         _raise_diagram_error(
             "CLI interface identifier is not configured.",
             instance="urn:cli-diagram:missing-interface",
         )
-    registry = context.registry  # type: ignore[attr-defined]
-    interface_meta = registry.get_interface(interface_id)
-    if interface_meta is None:
-        interface_meta = cli_config.interface_meta  # type: ignore[attr-defined]
-    if interface_meta is None:
-        _raise_diagram_error(
-            f"Interface '{interface_id}' metadata is unavailable.",
-            instance="urn:cli-diagram:missing-metadata",
-            extras={"interface_id": interface_id},
-        )
-    entrypoint = interface_meta.get("entrypoint")
-    if not isinstance(entrypoint, str) or not entrypoint.strip():
+    interface_id = cast("str", interface_id_candidate)
+    resolved_interface = _resolve_interface_metadata(
+        interface_id,
+        registry_interface=context.registry.interface(interface_id),
+        config_interface=cli_config.interface_meta,
+    )
+    entrypoint_str = _require_entrypoint(interface_id, resolved_interface.entrypoint)
+    app_obj = import_object(entrypoint_str)
+    return to_click_command(app_obj)
+
+
+def _resolve_interface_metadata(
+    interface_id: str,
+    *,
+    registry_interface: RegistryInterfaceModel | None,
+    config_interface: RegistryInterfaceModel | None,
+) -> RegistryInterfaceModel:
+    if registry_interface is not None:
+        return registry_interface
+    if config_interface is not None:
+        return config_interface
+    _raise_diagram_error(
+        f"Interface '{interface_id}' metadata is unavailable.",
+        instance="urn:cli-diagram:missing-metadata",
+        extras={"interface_id": interface_id},
+    )
+    message = (
+        "Interface metadata resolution should be unreachable after raising a CLI diagram error."
+    )
+    raise RuntimeError(message)
+
+
+def _require_entrypoint(interface_id: str, entrypoint: str | None) -> str:
+    if entrypoint is None:
         _raise_diagram_error(
             f"Interface '{interface_id}' is missing an 'entrypoint' attribute.",
             instance="urn:cli-diagram:missing-entrypoint",
             extras={"interface_id": interface_id},
         )
-    app_obj = import_object(entrypoint)
-    return to_click_command(app_obj)
+    entrypoint_not_none = cast("str", entrypoint)
+    entrypoint_str = entrypoint_not_none.strip()
+    if not entrypoint_str:
+        _raise_diagram_error(
+            f"Interface '{interface_id}' is missing an 'entrypoint' attribute.",
+            instance="urn:cli-diagram:missing-entrypoint",
+            extras={"interface_id": interface_id},
+        )
+    return entrypoint_str
 
 
 def _write_diagram(
@@ -123,7 +150,7 @@ def _write_diagram(
 
 
 def collect_operations(
-    context: object | None = None,
+    context: CLIToolingContext | None = None,
     *,
     interface_id: str | None = None,
     click_cmd: object | None = None,
@@ -153,15 +180,12 @@ def collect_operations(
         context = load_cli_tooling_context(settings)
         interface_id = settings.interface_id
 
-    cli_config = context.cli_config  # type: ignore[attr-defined]
-    resolved_interface = interface_id or cli_config.interface_id  # type: ignore[attr-defined]
+    cli_config = cast("CLIConfig", context.cli_config)
+    resolved_interface = interface_id or cli_config.interface_id
     command_candidate = click_cmd or _load_click_command(context, resolved_interface)
-    operation_context = cli_config.operation_context  # type: ignore[attr-defined]
+    operation_context = cli_config.operation_context
 
-    return _build_operations(
-        cast("OperationContext", operation_context),
-        cast("Command", command_candidate),
-    )
+    return _build_operations(operation_context, cast("Command", command_candidate))
 
 
 def write_diagram(operations: Sequence[OperationEntry]) -> None:

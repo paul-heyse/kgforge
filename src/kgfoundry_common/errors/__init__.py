@@ -139,19 +139,7 @@ except ImportError:  # pragma: no cover - optional dependency
         error: KgFoundryError,
         request: RequestProtocol | None = None,
     ) -> JSONResponseProtocol:
-        """Raise an informative error when FastAPI dependencies are missing.
-
-        Parameters
-        ----------
-        error : KgFoundryError
-            Error instance (ignored).
-        request : RequestProtocol | None, optional
-            Request instance (ignored).
-
-        Returns
-        -------
-        JSONResponseProtocol
-            Never returns normally; always raises RuntimeError.
+        """Raise ``RuntimeError`` when FastAPI support is unavailable.
 
         Raises
         ------
@@ -168,12 +156,7 @@ except ImportError:  # pragma: no cover - optional dependency
     _problem_details_response = _missing_problem_details_response
 
     def _missing_register_problem_details_handler(app: FastAPIProtocol) -> None:
-        """Raise an informative error when FastAPI dependencies are missing.
-
-        Parameters
-        ----------
-        app : FastAPIProtocol
-            FastAPI app instance (ignored).
+        """Raise ``RuntimeError`` when FastAPI support is unavailable.
 
         Raises
         ------

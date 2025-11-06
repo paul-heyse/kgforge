@@ -52,7 +52,7 @@ class _ArtifactPaths:
 
 
 def build_symbol_index(argv: Sequence[str] | None = None) -> int:
-    """Entry point for symbol index generation.
+    """Entry point for the symbol index build operation.
 
     Parameters
     ----------

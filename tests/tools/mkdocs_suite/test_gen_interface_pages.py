@@ -86,14 +86,8 @@ class _DummyFile(io.StringIO):
         exc_tb : types.TracebackType | None
             Traceback object if an exception occurred, None otherwise.
 
-        Returns
-        -------
-        bool
-            Always returns ``False`` to indicate exceptions should not
-            be suppressed.
         """
         _CAPTURED_OUTPUTS[self._path] = self.getvalue()
-        return None
 
 
 _CAPTURED_OUTPUTS: dict[str, str] = {}
