@@ -1,9 +1,9 @@
 """Shared CLI context loaders for the download command suite.
 
-The download CLI participates in the repository-wide metadata contracts handled by
-``tools._shared.cli_tooling``. This module encapsulates the configuration needed to
-load the typed augment and registry metadata, exposing cached helpers that other
-modules (for example ``download.cli``) can import without duplicating path logic.
+The download CLI participates in repository-wide metadata contracts handled by the public
+``tools`` facade. This module encapsulates the configuration needed to load the typed augment and
+registry metadata, exposing cached helpers that other modules (for example ``download.cli``) can
+import without duplicating path logic.
 """
 
 from __future__ import annotations
@@ -49,7 +49,13 @@ CLI_OPERATION_IDS: dict[str, str] = {
 
 
 def _resolve_cli_version() -> str:
-    """Return the installed kgfoundry package version used for CLI metadata."""
+    """Return the installed kgfoundry package version used for CLI metadata.
+
+    Returns
+    -------
+    str
+        Detected ``kgfoundry`` package version, or ``"0.0.0"`` when unavailable.
+    """
     try:
         return pkg_version("kgfoundry")
     except PackageNotFoundError:  # pragma: no cover - fallback for editable installs
@@ -166,7 +172,21 @@ def get_interface_metadata() -> RegistryInterfaceModel:
 def get_operation_override(
     subcommand: str, *, tokens: Sequence[str] | None = None
 ) -> OperationOverrideModel | None:
-    """Return augment override metadata for ``subcommand`` when available."""
+    """Return augment override metadata for ``subcommand`` when available.
+
+    Parameters
+    ----------
+    subcommand : str
+        CLI subcommand name to resolve.
+    tokens : Sequence[str] | None, optional
+        Optional token sequence used for fallback matching when a direct operation ID
+        mapping does not exist.
+
+    Returns
+    -------
+    OperationOverrideModel | None
+        Augment override model when defined; otherwise ``None``.
+    """
     operation_id = CLI_OPERATION_IDS.get(subcommand)
     if operation_id is None:
         return None

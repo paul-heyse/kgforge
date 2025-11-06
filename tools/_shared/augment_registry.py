@@ -28,7 +28,7 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 
-from tools import get_logger
+from tools._shared.logging import get_logger
 from tools._shared.problem_details import (
     ProblemDetailsParams,
     build_problem_details,

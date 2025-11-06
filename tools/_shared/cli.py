@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
         path: str
         status: CliFileStatus
-        message: str | None = None
+        message: str | UnsetType = UNSET
         problem: ProblemDetailsDict | UnsetType = UNSET
 
     @dataclass(slots=True)
@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 
         status: CliErrorStatus
         message: str
-        file: str | None = None
+        file: str | UnsetType = UNSET
         problem: ProblemDetailsDict | UnsetType = UNSET
 
     @dataclass(slots=True)
@@ -75,7 +75,7 @@ else:
 
         path: str
         status: CliFileStatus
-        message: str | None = None
+        message: str | UnsetType = UNSET
         problem: ProblemDetailsDict | UnsetType = UNSET
 
     class CliErrorEntry(Struct, kw_only=True):
@@ -83,7 +83,7 @@ else:
 
         status: CliErrorStatus
         message: str
-        file: str | None = None
+        file: str | UnsetType = UNSET
         problem: ProblemDetailsDict | UnsetType = UNSET
 
     def _default_generated_at() -> str:
@@ -207,7 +207,7 @@ class CliEnvelopeBuilder:
             CliFileResult(
                 path=path,
                 status=status,
-                message=message,
+                message=(message if message is not None else UNSET),
                 problem=problem if problem is not None else UNSET,
             )
         )
@@ -225,7 +225,7 @@ class CliEnvelopeBuilder:
             CliErrorEntry(
                 status=status,
                 message=message,
-                file=file,
+                file=(file if file is not None else UNSET),
                 problem=problem if problem is not None else UNSET,
             )
         )

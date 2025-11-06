@@ -15,8 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from tools import get_logger
 from tools._shared import augment_registry
+from tools._shared.logging import get_logger
 from tools._shared.problem_details import ProblemDetailsParams, build_problem_details
 
 LOGGER = get_logger(__name__)
