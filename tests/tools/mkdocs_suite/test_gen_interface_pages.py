@@ -146,6 +146,50 @@ def test_render_interface_catalog_links_full_module_path(
     sys.modules.pop(module_name, None)
 
 
+def test_render_interface_catalog_includes_module_source_link(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Detail sections should include module and source links when available."""
+
+    _install_mkdocs_stub(monkeypatch)
+    module_name = MODULE_PATH
+    sys.modules.pop(module_name, None)
+    module = importlib.import_module(module_name)
+    _CAPTURED_OUTPUTS.clear()
+
+    src_pkg = tmp_path / "src" / "pkg"
+    src_pkg.mkdir(parents=True)
+    (src_pkg / "module.py").write_text("# stub", encoding="utf-8")
+    nav_payload = {
+        "interfaces": [
+            {
+                "id": "pkg.interfaces.Service",
+                "type": "service",
+                "module": "pkg.module",
+            }
+        ]
+    }
+    (src_pkg / "_nav.json").write_text(json.dumps(nav_payload), encoding="utf-8")
+
+    monkeypatch.setattr(module, "_load_registry", lambda: None)
+    monkeypatch.setattr(module, "REPO_ROOT", tmp_path)
+    module._resolve_source_path.cache_clear()
+    module.REPO_URL = "https://example.invalid/repo"
+    module.DEFAULT_BRANCH = "main"
+
+    module.render_interface_catalog()
+
+    output = _CAPTURED_OUTPUTS.get("api/interfaces.md")
+    assert output is not None
+    assert "* **Module:** [pkg.module](../modules/pkg/module.md)" in output
+    assert (
+        "* **Source:** [pkg.module](https://example.invalid/repo/blob/main/src/pkg/module.py)"
+        in output
+    )
+
+    sys.modules.pop(module_name, None)
+
+
 def test_write_interface_table_escapes_markdown_control_characters() -> None:
     """User-controlled metadata should be escaped before inserting into tables."""
     handle = io.StringIO()
