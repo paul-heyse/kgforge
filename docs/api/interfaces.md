@@ -127,7 +127,7 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 - [`cli.download.harvest`](../api/openapi-cli.md) — Harvest OpenAlex works for downstream ingestion.
     - Module docs: [download.cli](../modules/download.cli.md)
-    - Source: [download.cli](https://github.com/example/kgfoundry/blob/main/src/download/cli.py)
+    - Source: [download.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli.py)
   - Tags: download
   - Handler: `download.cli:harvest`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
@@ -146,7 +146,7 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 - [`cli.index_bm25`](../api/openapi-cli.md) — Build BM25 index from JSON/Parquet chunks.
     - Module docs: [orchestration.cli](../modules/orchestration.cli.md)
-    - Source: [orchestration.cli](https://github.com/example/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, index_bm25
   - Handler: `orchestration.cli:index_bm25`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
@@ -154,7 +154,7 @@ diagrams, documentation) remains in sync without bespoke glue.
     * (bash) `kgf index-bm25 data/chunks.parquet --backend lucene --index-dir ./_indices/bm25`
 - [`cli.index_faiss`](../api/openapi-cli.md) — Build FAISS index from dense vectors.
     - Module docs: [orchestration.cli](../modules/orchestration.cli.md)
-    - Source: [orchestration.cli](https://github.com/example/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, index_faiss
   - Handler: `orchestration.cli:index_faiss`
   - Env: KGF_FAISS_RESOURCES
@@ -163,7 +163,7 @@ diagrams, documentation) remains in sync without bespoke glue.
     * (bash) `kgf index-faiss artifacts/vectors.json --factory 'OPQ64,IVF8192,PQ64' --metric ip`
 - [`cli.api`](../api/openapi-cli.md) — Launch FastAPI search service.
     - Module docs: [orchestration.cli](../modules/orchestration.cli.md)
-    - Source: [orchestration.cli](https://github.com/example/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, api
   - Handler: `orchestration.cli:api`
   - Env: KGF_SEARCH_CONFIG
@@ -172,7 +172,7 @@ diagrams, documentation) remains in sync without bespoke glue.
     * (bash) `kgf api --port 8080`
 - [`cli.e2e`](../api/openapi-cli.md) — Execute end-to-end orchestration demo.
     - Module docs: [orchestration.cli](../modules/orchestration.cli.md)
-    - Source: [orchestration.cli](https://github.com/example/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, e2e
   - Handler: `orchestration.cli:e2e`
   - Env: KGF_PROFILE
