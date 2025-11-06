@@ -121,6 +121,57 @@ interfaces:
             source: "kgf download harvest 'foundation models' --years '>=2020' --max-works 5000"
         problem_details:
           - schema/examples/problem_details/tool-execution-error.json
+  codeintel-indexer:
+    type: cli
+    module: codeintel.indexer
+    owner: "@code-intel"
+    stability: experimental
+    entrypoint: codeintel.indexer.cli:app
+    binary: kgf-codeintel
+    protocol: openapi-cli
+    spec: openapi/openapi-cli.yaml
+    augment: openapi/_augment_cli.yaml
+    tags:
+      - codeintel
+    description: |
+      Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol
+      extraction through the shared CLI contracts. The interface integrates with the OpenAPI
+      generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.
+    problem_details:
+      - schema/examples/problem_details/tool-execution-error.json
+    operations:
+      query:
+        operation_id: codeintel.indexer.query
+        summary: Execute a Tree-sitter query against a source file.
+        description: |
+          Compile and run a Tree-sitter S-expression query against a source file, returning capture
+          metadata as structured JSON. Ideal for debugging grammar updates or building lightweight
+          developer tooling.
+        handler: codeintel.indexer.cli:query
+        tags:
+          - codeintel
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
+      symbols:
+        operation_id: codeintel.indexer.symbols
+        summary: Enumerate Python symbols across a directory tree.
+        description: |
+          Use the MCP-backed symbol extraction helpers to list Python symbols discovered in a
+          directory tree, emitting results via the standardized CLI envelope for downstream
+          automation.
+        handler: codeintel.indexer.cli:symbols
+        tags:
+          - codeintel
+        env: []
+        code_samples:
+          - lang: bash
+            source: "uv run python -m codeintel.indexer.cli symbols src/"
+        problem_details:
+          - schema/examples/problem_details/tool-execution-error.json
   docstring-builder-cli:
     type: cli
     module: tools.docstring_builder

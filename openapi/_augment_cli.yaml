@@ -23,6 +23,9 @@ tags:
   - name: download
     x-displayName: Download
     description: Commands that harvest external corpora for downstream processing.
+  - name: codeintel
+    x-displayName: Code Intelligence
+    description: Commands that surface Tree-sitter-based code intelligence capabilities.
 
 x-tagGroups:
   - name: CLI Suites
@@ -38,6 +41,8 @@ x-tagGroups:
       - docstrings-utilities
   - name: Data Acquisition
     tags: [download]
+  - name: Developer Tooling
+    tags: [codeintel]
 
 operations:
   cli.index_bm25:
@@ -148,6 +153,32 @@ operations:
     x-codeSamples:
       - lang: bash
         source: "uv run python -m tools.docstring_builder.cli doctor --stubs"
+  codeintel.indexer.query:
+    summary: Execute a Tree-sitter query against a source file.
+    description: |
+      Run a Tree-sitter S-expression query against a single source file and emit capture metadata
+      as structured JSON. The command integrates with the shared CLI tooling facade so downstream
+      documentation, diagrams, and observability pipelines consume consistent envelopes.
+    tags: [codeintel]
+    x-handler: "codeintel.indexer.cli:query"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm"
+    x-problemDetails:
+      - schema/examples/problem_details/tool-execution-error.json
+  codeintel.indexer.symbols:
+    summary: List Python symbols detected across a directory tree.
+    description: |
+      Traverse a directory tree using the MCP-backed code-intel symbol extractor and emit the
+      discovered symbol metadata. Designed for developer tooling and documentation pipelines that
+      rely on the shared CLI envelope contracts.
+    tags: [codeintel]
+    x-handler: "codeintel.indexer.cli:symbols"
+    x-codeSamples:
+      - lang: bash
+        source: "uv run python -m codeintel.indexer.cli symbols src/"
+    x-problemDetails:
+      - schema/examples/problem_details/tool-execution-error.json
   cli.download.harvest:
     summary: Harvest OpenAlex works for downstream ingestion.
     description: |

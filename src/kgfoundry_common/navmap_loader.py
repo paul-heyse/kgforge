@@ -7,14 +7,12 @@ import importlib
 import importlib.util
 import json
 import sys
-from collections.abc import Callable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
-
-from kgfoundry_common.types import JsonValue
 
 if TYPE_CHECKING:
     from tools import (
@@ -26,6 +24,8 @@ if TYPE_CHECKING:
     )
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+JsonValue = str | int | float | bool | dict[str, "JsonValue"] | list["JsonValue"] | None
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLI_AUGMENT_PATH = REPO_ROOT / "openapi" / "_augment_cli.yaml"
@@ -256,23 +256,31 @@ class NavMetadataModel(BaseModel):
         JsonValue
             Value associated with ``key`` after merging `extras`.
         """
+        return self.as_mapping()[key]
 
-        return self._as_flat_dict()[key]
+    def __iter__(self) -> Generator[tuple[str, JsonValue], None, None]:  # noqa: PYI058,UP043
+        """Yield flattened key-value pairs for dictionary compatibility.
 
-    def __iter__(self) -> Iterator[tuple[str, JsonValue]]:
-        """Yield flattened key-value pairs for dictionary compatibility."""
+        Yields
+        ------
+        tuple[str, JsonValue]
+            Key and value pairs for navigation metadata entries.
+        """
+        yield from self.as_mapping().items()
 
-        yield from self._as_flat_dict().items()
+    def as_mapping(self) -> dict[str, JsonValue]:
+        """Return flattened navigation metadata as a standard dictionary.
 
-    def _as_flat_dict(self) -> dict[str, JsonValue]:
+        Returns
+        -------
+        dict[str, JsonValue]
+            Navigation metadata with extras merged into top-level keys.
+        """
         data = super().model_dump()
         extras = data.pop("extras", {})
         if isinstance(extras, Mapping):
             data.update(extras)
         return cast("dict[str, JsonValue]", data)
-
-
-Mapping.register(NavMetadataModel)
 
 
 def _slugify(value: str) -> str:

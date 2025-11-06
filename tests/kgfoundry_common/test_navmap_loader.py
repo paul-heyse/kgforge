@@ -14,16 +14,17 @@ def _reset_navmap_caches() -> Iterator[None]:
     clear_navmap_caches()
 
 
-def _symbol_names(sections: Iterable[dict[str, object]] | None) -> set[str]:
+def _symbol_names(sections: object) -> set[str]:
     names: set[str] = set()
     if sections is None:
         return names
-    for section in sections:
-        symbols = section.get("symbols", []) if isinstance(section, dict) else []
-        if isinstance(symbols, Iterable):
-            for symbol in symbols:
-                if isinstance(symbol, str):
-                    names.add(symbol)
+    if isinstance(sections, Iterable) and not isinstance(sections, (str, bytes)):
+        for section in sections:
+            symbols = section.get("symbols", []) if isinstance(section, dict) else []
+            if isinstance(symbols, Iterable):
+                for symbol in symbols:
+                    if isinstance(symbol, str):
+                        names.add(symbol)
     return names
 
 

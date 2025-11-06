@@ -4,6 +4,10 @@ This catalog is generated from `_nav.json` sidecars and the shared interface reg
 
 | Interface | Type | Module | Owner | Stability | Spec | Description | Problem Details |
 | --------- | ---- | ------ | ----- | -------- | ---- | ----------- | ---------------- |
+| codeintel-indexer | cli | [codeintel.indexer](../modules/codeintel.indexer.md) | @code-intel | experimental | [CLI Spec](../api/openapi-cli.md) | Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol
+extraction through the shared CLI contracts. The interface integrates with the OpenAPI
+generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.
+ | schema/examples/problem_details/tool-execution-error.json |
 | docstring-builder-cli | cli | [tools.docstring_builder](../modules/tools.docstring_builder.md) | @docs | beta | [CLI Spec](../api/openapi-cli.md) | Command suite powering docstring synchronization, validation, policy enforcement, and
 diagnostics. The CLI integrates with shared tooling metadata so documentation helpers,
 diagrams, and automation emit consistent Problem Details and logging envelopes.
@@ -14,6 +18,34 @@ diagrams, documentation) remains in sync without bespoke glue.
  | schema/examples/problem_details/tool-execution-error.json |
 | orchestration-cli | cli | [orchestration](../modules/orchestration.md) | @orchestration | beta | [CLI Spec](../api/openapi-cli.md) | Primary Typer application for orchestration flows and indexing commands. | schema/examples/problem_details/tool-execution-error.json |
 | search-http | http | [search_api](../modules/search_api.md) | @search-api | experimental | [HTTP API](../api/index.md) | FastAPI application exposing search operations via the public HTTP API. | schema/examples/problem_details/search-missing-index.json, schema/examples/problem_details/search-gpu-unavailable.json |
+
+## codeintel-indexer
+
+* **Type:** cli
+* **Module:** codeintel.indexer
+* **Owner:** @code-intel
+* **Stability:** experimental
+* **Description:** Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol
+extraction through the shared CLI contracts. The interface integrates with the OpenAPI
+generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.
+
+
+### Operations
+
+- [`codeintel.indexer.query`](../api/openapi-cli.md#operation/codeintel.indexer.query) — Execute a Tree-sitter query against a source file.
+    - Module docs: [codeintel.indexer.cli](../modules/codeintel.indexer.cli.md)
+  - Tags: codeintel
+  - Handler: `codeintel.indexer.cli:query`
+  - Problem Details: schema/examples/problem_details/tool-execution-error.json
+  - Code Samples:
+    * (bash) `uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm`
+- [`codeintel.indexer.symbols`](../api/openapi-cli.md#operation/codeintel.indexer.symbols) — Enumerate Python symbols across a directory tree.
+    - Module docs: [codeintel.indexer.cli](../modules/codeintel.indexer.cli.md)
+  - Tags: codeintel
+  - Handler: `codeintel.indexer.cli:symbols`
+  - Problem Details: schema/examples/problem_details/tool-execution-error.json
+  - Code Samples:
+    * (bash) `uv run python -m codeintel.indexer.cli symbols src/`
 
 ## docstring-builder-cli
 
