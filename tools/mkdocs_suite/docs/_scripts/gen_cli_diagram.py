@@ -40,6 +40,8 @@ REPO_ROOT = DOCS_ROOT.parents[2]
 AUGMENT_PATH = REPO_ROOT / "openapi" / "_augment_cli.yaml"
 REGISTRY_PATH = REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml"
 REDOC_PAGE = "api/openapi-cli.md"
+DIAGRAM_INDEX_PATH = "diagrams/index.md"
+CLI_INDEX_ENTRY = "- [CLI by Tag](./cli_by_tag.d2)\n"
 
 DEFAULT_INTERFACE_ID = "orchestration-cli"
 DEFAULT_BIN_NAME = "kgf"
@@ -193,6 +195,28 @@ def write_diagram(operations: Sequence[OperationEntry]) -> None:
     _write_diagram(list(operations))
 
 
+def _ensure_cli_index_entry() -> None:
+    """Ensure the diagrams index links to the CLI diagram."""
+
+    entry_token = CLI_INDEX_ENTRY.strip()
+    try:
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+            existing_content = handle.read()
+    except FileNotFoundError:
+        existing_content = ""
+
+    if entry_token not in existing_content:
+        newline_prefix = "" if not existing_content or existing_content.endswith("\n") else "\n"
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH, "a") as handle:
+            handle.write(f"{newline_prefix}{CLI_INDEX_ENTRY}")
+        with mkdocs_gen_files.open(DIAGRAM_INDEX_PATH) as handle:
+            existing_content = handle.read()
+
+    if entry_token not in existing_content:
+        message = "CLI diagram index entry missing after generation."
+        raise RuntimeError(message)
+
+
 def main() -> None:
     try:
         operations = collect_operations()
@@ -207,8 +231,7 @@ def main() -> None:
         LOGGER.info("No CLI operations discovered in configuration")
         return
     write_diagram(operations)
-    with mkdocs_gen_files.open("diagrams/index.md", "a") as handle:
-        handle.write("- [CLI by Tag](./cli_by_tag.d2)\n")
+    _ensure_cli_index_entry()
 
 
 if __name__ == "__main__":  # pragma: no cover - executed by mkdocs
