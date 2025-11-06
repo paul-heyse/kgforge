@@ -27,14 +27,13 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache, wraps
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
 import yaml
 
+from tools import CLIToolingContext
 from tools._shared.cli import (
     CliEnvelope,
     CliEnvelopeBuilder,
@@ -43,12 +42,7 @@ from tools._shared.cli import (
     CliStatus,
     render_cli_envelope,
 )
-from tools._shared.cli_tooling import (
-    CLIConfigError,
-    CLIToolingContext,
-    CLIToolSettings,
-    load_cli_tooling_context,
-)
+from tools._shared.cli_tooling import CLIConfigError
 from tools._shared.logging import LoggerAdapter, get_logger, with_fields
 from tools._shared.problem_details import (
     ProblemDetailsDict,
@@ -88,27 +82,13 @@ if TYPE_CHECKING:
 
 LOGGER = get_logger(__name__)
 
-CLI_COMMAND = "docstring-builder"
-CLI_TITLE = "Docstring Builder CLI"
-CLI_INTERFACE_ID = "docstring-builder-cli"
-CLI_ENVELOPE_DIR = REPO_ROOT / "site" / "_build" / "cli"
-
-CLI_OPERATION_IDS: dict[str, str] = {
-    "generate": "docstrings.generate",
-    "fix": "docstrings.fix",
-    "fmt": "docstrings.fmt",
-    "update": "docstrings.update",
-    "check": "docstrings.check",
-    "diff": "docstrings.diff",
-    "lint": "docstrings.lint",
-    "measure": "docstrings.measure",
-    "list": "docstrings.list",
-    "harvest": "docstrings.harvest",
-    "schema": "docstrings.schema",
-    "clear-cache": "docstrings.clear_cache",
-    "clear_cache": "docstrings.clear_cache",
-    "doctor": "docstrings.doctor",
-}
+CLI_COMMAND = cli_context.CLI_COMMAND
+CLI_TITLE = cli_context.CLI_TITLE
+CLI_INTERFACE_ID = cli_context.CLI_INTERFACE_ID
+CLI_OPERATION_IDS: dict[str, str] = dict(cli_context.CLI_OPERATION_IDS)
+CLI_SETTINGS = cli_context.get_cli_settings()
+CLI_CONFIG = cli_context.get_cli_config()
+CLI_ENVELOPE_DIR = cli_context.REPO_ROOT / "site" / "_build" / "cli"
 
 
 CLI_STATUS_FROM_EXIT: dict[ExitStatus, CliStatus] = {
@@ -119,26 +99,9 @@ CLI_STATUS_FROM_EXIT: dict[ExitStatus, CliStatus] = {
 }
 
 
-def _resolve_cli_version() -> str:
-    try:
-        return pkg_version("kgfoundry")
-    except PackageNotFoundError:
-        return "0.0.0"
-
-
-CLI_SETTINGS = CLIToolSettings(
-    bin_name=CLI_COMMAND,
-    title=CLI_TITLE,
-    version=_resolve_cli_version(),
-    augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
-    registry_path=REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml",
-    interface_id=CLI_INTERFACE_ID,
-)
-
-
 @lru_cache
 def _load_cli_context() -> CLIToolingContext:
-    return load_cli_tooling_context(CLI_SETTINGS)
+    return cli_context.get_cli_context()
 
 
 def _operation_id_for_subcommand(subcommand: str | None) -> str | None:
@@ -330,7 +293,8 @@ def _emit_envelope(
 ) -> Path | None:
     payload = render_cli_envelope(envelope)
     safe_subcommand = subcommand or "root"
-    output_path = CLI_ENVELOPE_DIR / f"{CLI_COMMAND}-{safe_subcommand.replace('/', '-')}.json"
+    filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand.replace('/', '-')}.json"
+    output_path = CLI_ENVELOPE_DIR / filename
     try:
         CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
         output_path.write_text(payload + "\n", encoding="utf-8")
