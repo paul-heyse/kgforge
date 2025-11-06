@@ -86,6 +86,7 @@ class NavmapPlaceholderError(NavmapError):
     """Raised when placeholder expansion fails."""
 
 
+@dataclass(slots=True)
 class AllDictTemplate:
     """Sentinel for ``{name: TEMPLATE for name in __all__}`` structures.
 
@@ -101,10 +102,7 @@ class AllDictTemplate:
         listed in ``__all__`` when the navmap is resolved.
     """
 
-    __slots__ = ("template",)
-
-    def __init__(self, template: NavTree) -> None:
-        self.template = template
+    template: NavTree
 
 
 NavPrimitive = str | int | float | bool | None

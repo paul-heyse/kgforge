@@ -368,6 +368,7 @@ def test_pipeline_runner_records_docfacts_baseline_payload(
 
     assert diff_manager.recorded_docfacts == [docfacts_payload]
     assert result.cli_payload is not None
+    assert result.tooling_metadata is not None
     docfacts_report = result.cli_payload.get("docfacts")
     assert isinstance(docfacts_report, dict)
     path = docfacts_report.get("path")
@@ -428,3 +429,4 @@ def test_pipeline_runner_includes_baseline_in_file_report(
     file_report = result.file_reports[0]
     baseline = file_report.get("baseline")
     assert baseline == "main"
+    assert result.tooling_metadata is not None

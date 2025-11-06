@@ -537,11 +537,11 @@ def index_bm25(
 
     Parameters
     ----------
-    chunks_parquet : Annotated[str, typer.Argument]
+    chunks_parquet : str
         Path to Parquet or JSONL file containing chunks.
-    backend : Annotated[str, typer.Option], optional
+    backend : str, optional
         Backend to use: "lucene" or "pure". Defaults to "lucene".
-    index_dir : Annotated[str, typer.Option], optional
+    index_dir : str, optional
         Output directory for the index. Defaults to "./_indices/bm25".
 
     Notes
@@ -805,15 +805,15 @@ def index_faiss(
 
     Parameters
     ----------
-    dense_vectors : Annotated[str, typer.Argument]
+    dense_vectors : str
         Path to JSON file containing vectors in skeleton format.
         Expected format: list of {"key": "id", "vector": [float, ...]} objects.
-    index_path : Annotated[str, typer.Option], optional
+    index_path : str, optional
         Output path for the index file. Defaults to "./_indices/faiss/shard_000.idx".
-    factory : Annotated[str, typer.Option], optional
+    factory : str, optional
         FAISS factory string (e.g., "Flat", "OPQ64,IVF8192,PQ64").
         Defaults to "Flat" for testing; production uses "OPQ64,IVF8192,PQ64".
-    metric : Annotated[str, typer.Option], optional
+    metric : str, optional
         Metric type: "ip" (inner product) or "l2" (L2 distance).
         Defaults to "ip".
 

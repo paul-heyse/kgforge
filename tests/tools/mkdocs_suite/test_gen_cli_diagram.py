@@ -3,11 +3,16 @@ from __future__ import annotations
 import contextlib
 import importlib
 import io
-from types import SimpleNamespace
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import pytest
 from tools.mkdocs_suite.docs.cli_diagram import collect_operations, write_diagram
+
+cli_tooling = importlib.import_module("tools._shared.cli_tooling")
+AugmentConfig = cli_tooling.AugmentConfig
+CLIToolingContext = cli_tooling.CLIToolingContext
+RegistryContext = cli_tooling.RegistryContext
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -51,11 +56,25 @@ def test_write_diagram_emits_single_node_for_multi_tag_operations(
         def operation_context(self) -> DummyOperationContext:
             return DummyOperationContext()
 
-    class DummyRegistry:
-        def get_interface(self, _interface_id: str) -> dict[str, object]:
-            return {"entrypoint": "tests.fixtures.cli:app"}
-
-    dummy_context = SimpleNamespace(cli_config=DummyCLIConfig(), registry=DummyRegistry())
+    augment_config = AugmentConfig.model_validate(
+        {
+            "path": Path("augment.yaml"),
+            "payload": {"operations": {}},
+        }
+    )
+    registry_context = RegistryContext.model_validate(
+        {
+            "path": Path("registry.yaml"),
+            "interfaces": {
+                "tools-cli": {"entrypoint": "tests.fixtures.cli:app"},
+            },
+        }
+    )
+    dummy_context = CLIToolingContext(
+        augment=augment_config,
+        registry=registry_context,
+        cli_config=DummyCLIConfig(),
+    )
 
     def fake_walk_commands(_command: object, _tokens: list[str]) -> list[tuple[list[str], object]]:
         return [(["run"], object())]

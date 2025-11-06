@@ -16,9 +16,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 import click
+import yaml
 
 from tools._shared.cli_tooling import (
-    AugmentPayload,
     CLIConfigError,
     CLIToolSettings,
     load_cli_tooling_context,
@@ -27,6 +27,12 @@ from tools._shared.problem_details import render_problem
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from tools._shared.augment_registry import (
+        AugmentMetadataModel,
+        OperationOverrideModel,
+        RegistryInterfaceModel,
+    )
 
     type TyperCommandFactory = Callable[[object], click.core.Command]
 else:
@@ -47,6 +53,11 @@ JSONMapping = Mapping[str, object]
 
 def _looks_like_typer(obj: object) -> bool:
     """Return ``True`` when ``obj`` appears to be a Typer application.
+
+    Parameters
+    ----------
+    obj : object
+        Object to test for Typer application characteristics.
 
     Returns
     -------
@@ -126,6 +137,11 @@ def to_click_command(obj: object) -> click.core.Command:
 def snake_to_kebab(value: str) -> str:
     """Convert a snake_case string to kebab-case.
 
+    Parameters
+    ----------
+    value : str
+        Snake-case string to convert.
+
     Returns
     -------
     str
@@ -181,6 +197,15 @@ def param_schema(param: click.Parameter) -> tuple[dict[str, object], bool, str]:
 def build_example(bin_name: str, tokens: Sequence[str], params: Sequence[click.Parameter]) -> str:
     """Construct a CLI usage example string for documentation.
 
+    Parameters
+    ----------
+    bin_name : str
+        Binary/executable name for the CLI command.
+    tokens : Sequence[str]
+        Command tokens representing the command path (e.g., ["sub", "command"]).
+    params : Sequence[click.Parameter]
+        Click parameters to include in the example.
+
     Returns
     -------
     str
@@ -227,14 +252,10 @@ def walk_commands(
     return results
 
 
-def _augment_lookup(augment: AugmentPayload, op_id: str, tokens: Sequence[str]) -> JSONMapping:
-    operations = _coerce_mapping(augment.get("operations"))
-    override = operations.get(op_id)
-    if isinstance(override, Mapping):
-        return _coerce_mapping(override)
-    token_key = " ".join(tokens)
-    fallback = operations.get(token_key)
-    return _coerce_mapping(fallback)
+def _augment_lookup(
+    augment: AugmentMetadataModel, op_id: str, tokens: Sequence[str]
+) -> OperationOverrideModel | None:
+    return augment.operation_override(op_id, tokens=tokens)
 
 
 def _ensure_str_list(value: object) -> list[str]:
@@ -260,62 +281,59 @@ def _coerce_mapping_list(value: object) -> list[dict[str, object]]:
 
 
 def _operation_metadata(
-    interface_meta: JSONMapping | None,
+    interface_meta: RegistryInterfaceModel | None,
     tokens: Sequence[str],
     operation_id: str,
 ) -> dict[str, object]:
-    if not interface_meta:
+    if interface_meta is None:
         return {}
-    operations = _coerce_mapping(interface_meta.get("operations"))
     token_list = list(tokens)
     slug = "-".join(snake_to_kebab(token) for token in token_list)
     candidates = (operation_id, slug, " ".join(token_list))
     for key in candidates:
-        meta = operations.get(key)
-        if isinstance(meta, Mapping):
-            return dict(meta)
+        operation = interface_meta.operations.get(key)
+        if operation is not None:
+            return operation.to_payload(key)
     return {}
 
 
 def _interface_metadata(
-    interface_id: str | None,
-    interface_meta: JSONMapping | None,
+    interface_meta: RegistryInterfaceModel | None,
 ) -> dict[str, object] | None:
-    if not interface_id and not interface_meta:
+    if interface_meta is None:
         return None
-    meta = dict(interface_meta) if interface_meta is not None else {}
-    identifier = meta.get("id", interface_id)
     return {
-        "id": identifier,
-        "module": meta.get("module"),
-        "owner": meta.get("owner"),
-        "stability": meta.get("stability"),
-        "binary": meta.get("binary"),
-        "protocol": meta.get("protocol"),
+        "id": interface_meta.identifier,
+        "module": interface_meta.module,
+        "owner": interface_meta.owner,
+        "stability": interface_meta.stability,
+        "binary": interface_meta.binary,
+        "protocol": interface_meta.protocol,
     }
 
 
 def _initial_document(
     title: str,
     version: str,
-    augment: JSONMapping,
-    interface_id: str | None,
-    interface_meta: JSONMapping | None,
+    augment: AugmentMetadataModel,
+    interface_meta: RegistryInterfaceModel | None,
 ) -> dict[str, object]:
-    tag_entries = [entry for entry in _coerce_mapping_list(augment.get("tags")) if "name" in entry]
+    tag_entries = [
+        entry for entry in _coerce_mapping_list(augment.payload.get("tags")) if "name" in entry
+    ]
     document: dict[str, object] = {
         "openapi": "3.1.0",
         "info": {"title": title, "version": version},
         "tags": tag_entries,
         "paths": {},
     }
-    if interface_id and interface_meta:
-        extension = _interface_metadata(interface_id, interface_meta)
+    if interface_meta:
+        extension = _interface_metadata(interface_meta)
         if extension:
             info_section = document.setdefault("info", {})
             if isinstance(info_section, dict):
                 info_section.setdefault("x-kgf-interface", extension)
-    tag_groups = augment.get("x-tagGroups")
+    tag_groups = augment.payload.get("x-tagGroups")
     if isinstance(tag_groups, Sequence) and not isinstance(tag_groups, (str, bytes)):
         document["x-tagGroups"] = list(tag_groups)
     return document
@@ -339,39 +357,52 @@ def _request_schema_for_command(
     return schema, bool(properties)
 
 
-def _apply_override_to_x_cli(block: dict[str, object], override: JSONMapping) -> None:
-    updates = {
-        key: value
-        for key, value in override.items()
-        if key.startswith("x-") or key in {"env", "handler", "x-codeSamples"}
-    }
-    if updates:
-        block.update(updates)
+def _apply_override_to_x_cli(
+    block: dict[str, object], override: OperationOverrideModel | None
+) -> None:
+    if override is None:
+        return
+    if override.handler:
+        block["x-handler"] = override.handler
+    if override.env:
+        block["x-env"] = list(override.env)
+    if override.code_samples:
+        sample_block = cast("list[object]", block.setdefault("x-codeSamples", []))
+        sample_block.extend(sample.model_dump() for sample in override.code_samples)
+    if override.examples:
+        example_block = cast("list[str]", block.setdefault("examples", []))
+        example_block.extend(override.examples)
+    if override.problem_details:
+        problem_block = cast("list[str]", block.setdefault("x-problemDetails", []))
+        problem_block.extend(override.problem_details)
+    if override.extras:
+        block.update(override.extras)
 
 
 def _collect_problem_details(
     op_meta: JSONMapping,
-    interface_meta: JSONMapping | None,
-    override: JSONMapping,
+    interface_meta: RegistryInterfaceModel | None,
+    override: OperationOverrideModel | None,
 ) -> list[str]:
     details: list[str] = []
     details.extend(_ensure_str_list(op_meta.get("problem_details")))
     if interface_meta:
-        details.extend(_ensure_str_list(interface_meta.get("problem_details")))
-    details.extend(_ensure_str_list(override.get("x-problemDetails")))
+        details.extend(interface_meta.problem_details)
+    if override:
+        details.extend(override.problem_details)
     return details
 
 
 def _select_operation_tags(
-    override: JSONMapping,
+    override: OperationOverrideModel | None,
     op_meta: JSONMapping,
-    interface_meta: JSONMapping | None,
+    interface_meta: RegistryInterfaceModel | None,
     default_tag: str,
 ) -> list[str]:
     for candidate in (
-        _ensure_str_list(override.get("tags")),
+        list(override.tags) if override else [],
         _ensure_str_list(op_meta.get("tags")),
-        _ensure_str_list(interface_meta.get("tags")) if interface_meta else [],
+        list(interface_meta.tags) if interface_meta else [],
     ):
         if candidate:
             return candidate
@@ -436,14 +467,21 @@ class OperationContext:
     """Context bundle shared across OpenAPI operation builders."""
 
     bin_name: str
-    augment: AugmentPayload
+    augment: AugmentMetadataModel
     interface_id: str | None
-    interface_meta: JSONMapping | None
+    interface_meta: RegistryInterfaceModel | None
 
     def build_operation(
         self, tokens: Sequence[str], command: click.core.Command
     ) -> tuple[str, dict[str, object], list[str]]:
         """Build an OpenAPI operation payload for the supplied command.
+
+        Parameters
+        ----------
+        tokens : Sequence[str]
+            Command tokens representing the command path.
+        command : click.core.Command
+            Click command object to convert to an OpenAPI operation.
 
         Returns
         -------
@@ -462,7 +500,7 @@ class OperationContext:
         request_schema, has_properties = _request_schema_for_command(params)
         x_cli_block = _build_x_cli_block(descriptor, params, op_meta, self)
         _apply_override_to_x_cli(x_cli_block, override)
-        operation = {
+        operation: dict[str, object] = {
             "operationId": descriptor.operation_id,
             "tags": list(tags),
             "summary": descriptor.summary(op_meta),
@@ -495,7 +533,7 @@ class OperationContext:
         problem_details = _collect_problem_details(op_meta, self.interface_meta, override)
         if problem_details:
             operation["x-problemDetails"] = problem_details
-        interface_extension = _interface_metadata(self.interface_id, self.interface_meta)
+        interface_extension = _interface_metadata(self.interface_meta)
         if interface_extension:
             operation["x-kgf-interface"] = interface_extension
         return descriptor.path, operation, tags
@@ -508,9 +546,14 @@ class CLIConfig:
     bin_name: str
     title: str
     version: str
-    augment: AugmentPayload
+    augment: AugmentMetadataModel
     interface_id: str | None = None
-    interface_meta: JSONMapping | None = None
+    interface_meta: RegistryInterfaceModel | None = None
+
+    @property
+    def augment_payload(self) -> Mapping[str, object]:
+        """Return raw augment metadata payload as a mapping."""
+        return self.augment.payload
 
     @property
     def operation_context(self) -> OperationContext:
@@ -538,10 +581,7 @@ def _build_x_cli_block(
         "exitCodes": [{"code": 0, "meaning": "success"}],
     }
     if context.interface_meta:
-        block.setdefault(
-            "x-interface",
-            context.interface_meta.get("id", context.interface_id),
-        )
+        block.setdefault("x-interface", context.interface_meta.identifier)
     handler = op_meta.get("handler")
     if isinstance(handler, (str, bytes)):
         block["x-handler"] = handler
@@ -598,7 +638,6 @@ def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, 
         config.title,
         config.version,
         config.augment,
-        config.interface_id,
         config.interface_meta,
     )
     context = config.operation_context
@@ -666,6 +705,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 def main(argv: Sequence[str] | None = None) -> int:
     """Entry point for generating the CLI OpenAPI specification.
 
+    Parameters
+    ----------
+    argv : Sequence[str] | None, optional
+        Command-line arguments, defaults to sys.argv.
+
     Returns
     -------
     int
@@ -687,7 +731,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         tooling_context = load_cli_tooling_context(settings)
     except CLIConfigError as exc:
-        LOGGER.error(
+        LOGGER.exception(
             "Failed to load CLI tooling context",
             extra={"status": "error", "detail": exc.problem.get("detail")},
         )

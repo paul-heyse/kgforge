@@ -12,6 +12,7 @@ import copy
 import json
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, TypedDict, cast
 
@@ -56,6 +57,7 @@ class AllPlaceholder:
     __slots__ = ()
 
 
+@dataclass(slots=True)
 class AllDictTemplate:
     """Sentinel for ``{name: TEMPLATE for name in __all__}`` structures.
 
@@ -71,10 +73,7 @@ class AllDictTemplate:
         listed in ``__all__`` when the navmap is resolved.
     """
 
-    __slots__ = ("template",)
-
-    def __init__(self, template: NavTree) -> None:
-        self.template = template
+    template: NavTree
 
 
 NavPrimitive = str | int | float | bool | None

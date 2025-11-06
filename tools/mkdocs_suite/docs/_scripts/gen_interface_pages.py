@@ -7,11 +7,23 @@ import logging
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import mkdocs_gen_files
-import yaml
 
+from tools._shared.augment_registry import (
+    AugmentRegistryError,
+    load_registry,
+    render_problem_details,
+)
 from tools.mkdocs_suite.docs._scripts import load_repo_settings
+
+if TYPE_CHECKING:
+    from tools._shared.augment_registry import (
+        RegistryInterfaceModel,
+        RegistryMetadataModel,
+        RegistryOperationModel,
+    )
 
 SUITE_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -24,15 +36,17 @@ LOGGER.addHandler(logging.NullHandler())
 REPO_URL, DEFAULT_BRANCH = load_repo_settings()
 
 
-def _load_registry() -> dict[str, dict[str, object]]:
-    if not REGISTRY_PATH.exists():
-        return {}
-    with REGISTRY_PATH.open("r", encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
-    interfaces = payload.get("interfaces", {}) if isinstance(payload, dict) else {}
-    if isinstance(interfaces, dict):
-        return {str(key): value for key, value in interfaces.items() if isinstance(value, dict)}
-    return {}
+def _load_registry() -> RegistryMetadataModel | None:
+    try:
+        registry = load_registry(REGISTRY_PATH)
+    except AugmentRegistryError as exc:
+        LOGGER.exception(
+            "Failed to load interface registry",
+            extra={"status": "error", "path": str(REGISTRY_PATH)},
+        )
+        LOGGER.debug("Registry problem details: %s", render_problem_details(exc))
+        return None
+    return registry
 
 
 def _ensure_str_list(value: object) -> list[str]:
@@ -139,12 +153,31 @@ def _spec_link(record: dict[str, object]) -> str:
     return spec_path
 
 
-def _problem_details(record: dict[str, object]) -> str:
+def _problem_details(
+    record: Mapping[str, object],
+    interface: RegistryInterfaceModel | None = None,
+) -> str:
     details = record.get("problem_details")
     if isinstance(details, list):
         return ", ".join(str(item) for item in details)
     if isinstance(details, str):
         return details
+    if interface is not None and interface.problem_details:
+        return ", ".join(interface.problem_details)
+    return "—"
+
+
+def _problem_summary(
+    record: Mapping[str, object],
+    interface_model: RegistryInterfaceModel | None,
+) -> str:
+    details = record.get("problem_details")
+    if isinstance(details, list):
+        return ", ".join(str(item) for item in details)
+    if isinstance(details, str):
+        return details
+    if interface_model and interface_model.problem_details:
+        return ", ".join(interface_model.problem_details)
     return "—"
 
 
@@ -159,7 +192,7 @@ def _write_catalog_intro(handle: mkdocs_gen_files.files) -> None:
 def _write_interface_table(
     handle: mkdocs_gen_files.files,
     interfaces: list[dict[str, object]],
-    registry: Mapping[str, dict[str, object]],
+    registry: RegistryMetadataModel | None,
 ) -> set[str]:
     """Render the overview table and return the set of discovered interface IDs.
 
@@ -169,8 +202,8 @@ def _write_interface_table(
         File handle for writing markdown content.
     interfaces : list[dict[str, object]]
         List of interface dictionaries from nav metadata.
-    registry : Mapping[str, dict[str, object]]
-        Registry mapping interface IDs to metadata.
+    registry : RegistryMetadataModel | None
+        Typed registry metadata resolved from the shared augment/registry facade.
 
     Returns
     -------
@@ -188,22 +221,31 @@ def _write_interface_table(
     interface_ids: set[str] = set()
     for record in interfaces:
         identifier = str(record.get("id") or record.get("entrypoint") or "—")
-        reg_entry = registry.get(identifier, {})
-        description = record.get("description") or reg_entry.get("description") or "—"
-        spec_cell = _spec_link(record)
-        owner = record.get("owner") or reg_entry.get("owner") or "—"
+        interface_model = registry.interface(identifier) if registry else None
+        description = (
+            record.get("description")
+            or (interface_model.description if interface_model else None)
+            or "—"
+        )
+        spec_candidate = record.get("spec") or (interface_model.spec if interface_model else None)
+        spec_cell = _spec_link({"spec": spec_candidate})
+        owner = record.get("owner") or (interface_model.owner if interface_model else None) or "—"
         module_path = (
-            record.get("module") or reg_entry.get("module") or record.get("_nav_module_path")
+            record.get("module")
+            or (interface_model.module if interface_model else None)
+            or record.get("_nav_module_path")
         )
         row = "| {id} | {type} | {module} | {owner} | {stability} | {spec} | {desc} | {problems} |".format(
             id=identifier,
-            type=record.get("type", "—"),
+            type=record.get("type") or (interface_model.type if interface_model else "—") or "—",
             module=_module_doc_link(module_path),
             owner=owner,
-            stability=record.get("stability", "—"),
+            stability=record.get("stability")
+            or (interface_model.stability if interface_model else None)
+            or "—",
             spec=spec_cell,
             desc=description,
-            problems=_problem_details(record),
+            problems=_problem_details(record, interface_model),
         )
         handle.write(row + "\n")
         if record.get("id"):
@@ -236,76 +278,88 @@ def _write_code_samples(handle: mkdocs_gen_files.files, samples: object) -> None
 
 
 def _operations_block(
-    handle: mkdocs_gen_files.files, operations: object, spec_path: object
+    handle: mkdocs_gen_files.files,
+    operations: Mapping[str, RegistryOperationModel] | None,
+    spec_path: str | None,
 ) -> None:
     """Render operation metadata if the registry entry exposes operations."""
-    if not isinstance(operations, Mapping) or not operations:
+    if not operations:
         return
     handle.write("\n### Operations\n\n")
     for op_key, op_meta in operations.items():
-        if not isinstance(op_meta, Mapping):
-            continue
-        op_id = str(op_meta.get("operation_id") or f"cli.{op_key.replace('-', '_')}")
-        summary = str(op_meta.get("summary") or "")
+        op_id = op_meta.operation_id or f"cli.{op_key.replace('-', '_')}"
+        summary = op_meta.summary or ""
         href = _operation_href(spec_path, op_id)
         if href:
             handle.write(f"- [`{op_id}`]({href}) — {summary}\n")
         else:
             handle.write(f"- `{op_id}` — {summary}\n")
-        module_path = _parse_handler_module(op_meta.get("handler"))
+        module_path = _parse_handler_module(op_meta.handler)
         if module_path:
             handle.write(f"    - Module docs: {_module_doc_link(module_path)}\n")
             code_link = _code_link_for_module(module_path)
             if code_link:
                 handle.write(f"    - Source: [{module_path}]({code_link})\n")
-        _write_optional_list(handle, "Tags", _ensure_str_list(op_meta.get("tags")))
-        _write_optional_line(handle, "Handler", op_meta.get("handler"))
-        _write_optional_list(handle, "Env", _ensure_str_list(op_meta.get("env")))
-        _write_optional_list(
-            handle, "Problem Details", _ensure_str_list(op_meta.get("problem_details"))
-        )
-        _write_code_samples(handle, op_meta.get("code_samples"))
+        _write_optional_list(handle, "Tags", list(op_meta.tags))
+        _write_optional_line(handle, "Handler", op_meta.handler)
+        _write_optional_list(handle, "Env", list(op_meta.env))
+        _write_optional_list(handle, "Problem Details", list(op_meta.problem_details))
+        _write_code_samples(handle, op_meta.extras.get("code_samples"))
 
 
 def _write_interface_details(
     handle: mkdocs_gen_files.files,
     interface_ids: set[str],
     interfaces: list[dict[str, object]],
-    registry: Mapping[str, dict[str, object]],
+    registry: RegistryMetadataModel | None,
 ) -> None:
     """Write detailed sections per interface identifier."""
     lookup = {str(record["id"]): record for record in interfaces if record.get("id")}
     for identifier in sorted(interface_ids):
         nav_meta = lookup.get(identifier, {})
-        reg_entry: Mapping[str, object] = registry.get(identifier, {})
-        if not isinstance(reg_entry, Mapping):
-            reg_entry = {}
+        interface_model = registry.interface(identifier) if registry else None
 
         handle.write(f"## {identifier}\n\n")
         handle.write(
-            "* **Type:** {type}\n".format(type=nav_meta.get("type") or reg_entry.get("type") or "—")
+            "* **Type:** {type}\n".format(
+                type=nav_meta.get("type")
+                or (interface_model.type if interface_model else None)
+                or "—"
+            )
         )
         module_value = (
-            nav_meta.get("module") or reg_entry.get("module") or nav_meta.get("_nav_module_path")
+            nav_meta.get("module")
+            or (interface_model.module if interface_model else None)
+            or nav_meta.get("_nav_module_path")
         )
         handle.write("* **Module:** {module}\n".format(module=module_value or "—"))
         handle.write(
             "* **Owner:** {owner}\n".format(
-                owner=nav_meta.get("owner") or reg_entry.get("owner") or "—"
+                owner=nav_meta.get("owner")
+                or (interface_model.owner if interface_model else None)
+                or "—"
             )
         )
         handle.write(
             "* **Stability:** {stability}\n".format(
-                stability=nav_meta.get("stability") or reg_entry.get("stability") or "—"
+                stability=nav_meta.get("stability")
+                or (interface_model.stability if interface_model else None)
+                or "—"
             )
         )
-        if reg_entry.get("description") and reg_entry.get("description") != nav_meta.get(
-            "description"
-        ):
-            handle.write(f"* **Description:** {reg_entry['description']}\n")
+        description = nav_meta.get("description") or (
+            interface_model.description if interface_model else None
+        )
+        if description:
+            handle.write(f"* **Description:** {description}\n")
 
-        spec_path = reg_entry.get("spec") or nav_meta.get("spec")
-        _operations_block(handle, reg_entry.get("operations"), spec_path)
+        spec_path = (
+            interface_model.spec
+            if interface_model and interface_model.spec
+            else nav_meta.get("spec")
+        )
+        operations = interface_model.operations if interface_model else None
+        _operations_block(handle, operations, spec_path if isinstance(spec_path, str) else None)
         handle.write("\n")
 
 
@@ -317,7 +371,8 @@ def render_interface_catalog() -> None:
     with mkdocs_gen_files.open("api/interfaces.md", "w") as handle:
         _write_catalog_intro(handle)
         interface_ids = _write_interface_table(handle, interfaces, registry)
-        interface_ids.update(str(key) for key in registry)
+        if registry is not None:
+            interface_ids.update(str(key) for key in registry.interfaces)
         handle.write("\n")
         _write_interface_details(handle, interface_ids, interfaces, registry)
 

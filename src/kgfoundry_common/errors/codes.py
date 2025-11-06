@@ -49,6 +49,75 @@ class ErrorCode(StrEnum):
     - 6xx: Knowledge Graph & Ontology
     - 7xx: Serialization & Persistence
 
+    Attributes
+    ----------
+    DOWNLOAD_FAILED : ErrorCode
+        Download operation failed.
+    UNSUPPORTED_MIME : ErrorCode
+        Unsupported MIME type encountered.
+    INVALID_INPUT : ErrorCode
+        Invalid input provided.
+    DOCLING_ERROR : ErrorCode
+        Document processing error via Docling.
+    OCR_TIMEOUT : ErrorCode
+        OCR operation timed out.
+    CHUNKING_ERROR : ErrorCode
+        Document chunking failed.
+    EMBEDDING_ERROR : ErrorCode
+        Embedding generation failed.
+    INDEX_BUILD_ERROR : ErrorCode
+        Index construction failed.
+    SPLADE_OOM : ErrorCode
+        SPLADE encoding out of memory.
+    RETRY_EXHAUSTED : ErrorCode
+        All retry attempts exhausted.
+    SEARCH_INDEX_MISSING : ErrorCode
+        Search index not found.
+    SEARCH_QUERY_INVALID : ErrorCode
+        Invalid search query.
+    SEARCH_TIMEOUT : ErrorCode
+        Search operation timed out.
+    VECTOR_SEARCH_ERROR : ErrorCode
+        Vector search operation failed.
+    AGENT_CATALOG_SEARCH_ERROR : ErrorCode
+        Agent catalog search failed.
+    CATALOG_LOAD_ERROR : ErrorCode
+        Catalog loading failed.
+    SYMBOL_ATTACHMENT_ERROR : ErrorCode
+        Symbol attachment failed.
+    CONFIGURATION_ERROR : ErrorCode
+        Configuration error.
+    RUNTIME_ERROR : ErrorCode
+        Runtime error occurred.
+    RESOURCE_UNAVAILABLE : ErrorCode
+        Required resource unavailable.
+    SESSION_ERROR : ErrorCode
+        Session management error.
+    ONTOLOGY_PARSE_ERROR : ErrorCode
+        Ontology parsing failed.
+    LINKER_CALIBRATION_ERROR : ErrorCode
+        Linker calibration failed.
+    NEO4J_ERROR : ErrorCode
+        Neo4j database error.
+    SERIALIZATION_ERROR : ErrorCode
+        Data serialization failed.
+    DESERIALIZATION_ERROR : ErrorCode
+        Data deserialization failed.
+    SCHEMA_VALIDATION_ERROR : ErrorCode
+        Schema validation failed.
+    REGISTRY_ERROR : ErrorCode
+        Registry operation failed.
+    ARTIFACT_MODEL_ERROR : ErrorCode
+        Artifact model error.
+    ARTIFACT_VALIDATION_ERROR : ErrorCode
+        Artifact validation failed.
+    ARTIFACT_SERIALIZATION_ERROR : ErrorCode
+        Artifact serialization failed.
+    ARTIFACT_DESERIALIZATION_ERROR : ErrorCode
+        Artifact deserialization failed.
+    ARTIFACT_DEPENDENCY_ERROR : ErrorCode
+        Artifact dependency error.
+
     Notes
     -----
     Enum members are instances of ErrorCode and can be used as string values

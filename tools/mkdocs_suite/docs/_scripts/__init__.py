@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 import yaml
 from yaml.nodes import Node, ScalarNode
@@ -52,7 +51,7 @@ def _construct_python_name(loader: yaml.SafeLoader, _suffix: str, node: Node) ->
 yaml.SafeLoader.add_multi_constructor("tag:yaml.org,2002:python/name:", _construct_python_name)
 
 
-def _coerce_repo_url(value: Any) -> str | None:
+def _coerce_repo_url(value: object) -> str | None:
     if isinstance(value, str):
         stripped = value.strip()
         if stripped:
@@ -90,11 +89,7 @@ def load_repo_settings(
     except yaml.YAMLError:  # pragma: no cover - defensive guard
         return None, DEFAULT_BRANCH_FALLBACK
 
-    config: dict[str, Any]
-    if isinstance(payload, dict):
-        config = payload
-    else:
-        config = {}
+    config = payload if isinstance(payload, dict) else {}
 
     repo_url = _coerce_repo_url(config.get("repo_url"))
     edit_uri = config.get("edit_uri")

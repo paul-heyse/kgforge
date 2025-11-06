@@ -1,61 +1,189 @@
-"""Compute symbol deltas with typed configuration.
-
-This module provides a new public API for computing deltas between symbol indices using typed
-configuration objects instead of positional arguments.
-"""
+"""Generate documentation symbol delta artifacts with lifecycle instrumentation."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import argparse
+import json
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING
 
+from tools import ToolExecutionError
+
+from docs._scripts import symbol_delta as legacy_delta
+from docs.toolchain._shared.lifecycle import (
+    DocLifecycle,
+    DocToolContext,
+    DocToolError,
+    DocToolMetadata,
+    DocToolSettings,
+    ProblemDetailsInput,
+    create_doc_tool_context,
+)
+from kgfoundry_common.errors import (
+    DeserializationError,
+    SchemaValidationError,
+    SerializationError,
+)
+
 if TYPE_CHECKING:
-    from docs.toolchain.config import DocsDeltaConfig
+    from docs.toolchain._shared import DocToolContext
+else:  # pragma: no cover - runtime alias for type checking
+    DocToolContext = object
 
 
-SymbolIndex = Mapping[str, Mapping[str, object]]
-SymbolDelta = Mapping[str, object]
-
-
-def compute_delta(
-    *, config: DocsDeltaConfig, baseline: SymbolIndex, current: SymbolIndex
-) -> SymbolDelta:
-    """Compute a delta between symbol indices with typed configuration.
-
-    This is the new public API for computing symbol deltas that accepts a typed
-    configuration object instead of boolean positional arguments.
+def symbol_delta(argv: Sequence[str] | None = None) -> int:
+    """Entry point for symbol delta generation.
 
     Parameters
     ----------
-    config : DocsDeltaConfig
-        Typed configuration controlling delta computation behavior.
-    baseline : SymbolIndex
-        The baseline symbol index to compare against.
-    current : SymbolIndex
-        The current symbol index to compare.
+    argv : Sequence[str] | None, optional
+        Optional command-line arguments overriding ``sys.argv``.
 
     Returns
     -------
-    SymbolDelta
-        Delta dictionary containing added, removed, and changed symbols.
-
-    Raises
-    ------
-    NotImplementedError
-        This function is a placeholder for Phase 3.2 implementation.
-        The return type annotation indicates the intended return value once
-        this function is fully implemented.
-
-    Examples
-    --------
-    >>> from docs.toolchain.config import DocsDeltaConfig
-    >>> config = DocsDeltaConfig(include_removals=True)
-    >>> # delta = compute_delta(config=config, baseline=..., current=...)
-    """  # noqa: DOC202
-    msg = "compute_delta is a placeholder for Phase 3.2 implementation"
-    raise NotImplementedError(msg)
+    int
+        Exit code indicating success (0) or failure.
+    """
+    settings = DocToolSettings.parse_args(
+        argv,
+        metadata=DocToolMetadata(
+            operation="symbol_delta",
+            description="Compute documentation symbol delta artifacts.",
+            problem_type="docs-symbol-delta",
+        ),
+        configure=_configure_parser,
+    )
+    context = create_doc_tool_context(settings)
+    lifecycle = DocLifecycle(context)
+    return lifecycle.run(_run_symbol_delta)
 
 
-__all__ = [
-    "compute_delta",
-]
+@dataclass(slots=True)
+class _DeltaOptions:
+    """CLI options materialised for delta generation."""
+
+    base: str
+    output: Path
+
+    @classmethod
+    def from_context(cls, context: DocToolContext) -> _DeltaOptions:
+        base_raw = context.settings.get_arg("base", "HEAD~1")
+        base = str(base_raw)
+        output_raw = context.settings.get_arg("output")
+        if output_raw is None:
+            output_path = context.settings.docs_build_dir / "symbols.delta.json"
+        else:
+            candidate = Path(str(output_raw))
+            if not candidate.is_absolute():
+                candidate = (context.settings.docs_build_dir / candidate).resolve()
+            output_path = candidate
+        return cls(base=base, output=output_path)
+
+
+def _configure_parser(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--base",
+        default="HEAD~1",
+        help="Git ref or symbols.json path providing the baseline snapshot.",
+    )
+    parser.add_argument(
+        "--output",
+        default=None,
+        help="Destination path for the generated delta (defaults to docs/_build).",
+    )
+
+
+def _run_symbol_delta(context: DocToolContext) -> int:
+    options = _DeltaOptions.from_context(context)
+    symbols_path = context.settings.docs_build_dir / "symbols.json"
+
+    if not symbols_path.exists():
+        detail = f"Missing current snapshot: {symbols_path}"
+        problem = context.problem_details(
+            ProblemDetailsInput(
+                title="Symbol delta computation failed",
+                detail=detail,
+                status=404,
+                instance=context.instance("missing-current"),
+            )
+        )
+        message = "Current symbol snapshot missing"
+        raise DocToolError(
+            message,
+            problem=problem,
+            exit_code=1,
+            status_label="error",
+        )
+
+    try:
+        head_rows = legacy_delta.load_symbol_rows(symbols_path)
+        base_rows, base_sha = legacy_delta.load_base_snapshot(options.base)
+        head_sha = legacy_delta.git_rev_parse("HEAD")
+        payload = legacy_delta.build_delta_payload(
+            base_rows=base_rows,
+            head_rows=head_rows,
+            base_sha=base_sha,
+            head_sha=head_sha,
+        )
+        delta_written = legacy_delta.write_delta(options.output, payload)
+    except DocToolError:
+        raise
+    except ToolExecutionError as exc:  # pragma: no cover - exercised via CLI smoke
+        problem = exc.problem or context.problem_details(
+            ProblemDetailsInput(
+                title="Symbol delta computation failed",
+                detail=str(exc),
+                status=500,
+                instance=context.instance("tool-error"),
+                extensions={"command": list(exc.command)},
+            )
+        )
+        message = "Symbol delta computation failed"
+        raise DocToolError(
+            message,
+            problem=problem,
+            exit_code=exc.returncode or 1,
+            status_label="error",
+        ) from exc
+    except (
+        DeserializationError,
+        SerializationError,
+        SchemaValidationError,
+        OSError,
+        RuntimeError,
+        json.JSONDecodeError,
+    ) as exc:
+        problem = context.problem_details(
+            ProblemDetailsInput(
+                title="Symbol delta computation failed",
+                detail=str(exc),
+                status=500,
+                instance=context.instance("unexpected-error"),
+                extensions={"base": options.base},
+            )
+        )
+        message = "Symbol delta computation failed"
+        raise DocToolError(
+            message,
+            problem=problem,
+            exit_code=1,
+            status_label="error",
+        ) from exc
+
+    context.logger.info(
+        "Symbol delta computation complete",
+        extra={
+            "status": "success",
+            "delta_path": str(options.output),
+            "delta_written": delta_written,
+            "base_ref": options.base,
+            "base_sha": base_sha,
+            "head_sha": head_sha,
+        },
+    )
+    return 0
+
+
+__all__ = ["symbol_delta"]
