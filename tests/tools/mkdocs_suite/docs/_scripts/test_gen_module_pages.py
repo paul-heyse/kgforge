@@ -75,16 +75,19 @@ def test_collect_modules_discovers_new_package(
 
     monkeypatch.setattr(module, "_load", fake_load)
 
-    module._get_package_roots.cache_clear()  # noqa: SLF001
+    get_package_roots = module.get_package_roots
+    get_collect_modules = module.collect_modules
+
+    module.reset_package_roots_cache()
     modules: dict[str, object] | None = None
     try:
-        packages = module._get_package_roots()  # noqa: SLF001
+        packages = get_package_roots()
         assert "new_package" in packages
 
-        module._get_package_roots.cache_clear()  # noqa: SLF001
-        modules = module._collect_modules(extensions_bundle=object())  # noqa: SLF001
+        module.reset_package_roots_cache()
+        modules = get_collect_modules(extensions_bundle=object())
     finally:
-        module._get_package_roots.cache_clear()  # noqa: SLF001
+        module.reset_package_roots_cache()
 
     assert "new_package" in loaded_packages
     assert modules is not None

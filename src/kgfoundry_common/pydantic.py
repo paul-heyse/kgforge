@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Self
+from typing import TYPE_CHECKING, ClassVar, Self, cast
 
 if TYPE_CHECKING:
     # [nav:anchor BaseModel]
@@ -62,6 +62,11 @@ if TYPE_CHECKING:
             **model_dump_kwargs : object
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump`.
 
+            Returns
+            -------
+            dict[str, object]
+                Mapping produced by ``pydantic.BaseModel.model_dump``.
+
             Raises
             ------
             NotImplementedError
@@ -69,6 +74,7 @@ if TYPE_CHECKING:
             """
             del self, model_dump_kwargs
             raise NotImplementedError
+            return cast("dict[str, object]", {})
 
         def model_dump_json(self, **model_dump_json_kwargs: object) -> str:
             """Return the JSON representation produced by Pydantic.
@@ -78,6 +84,11 @@ if TYPE_CHECKING:
             **model_dump_json_kwargs : object
                 Keyword arguments forwarded to :meth:`pydantic.BaseModel.model_dump_json`.
 
+            Returns
+            -------
+            str
+                JSON string produced by ``pydantic.BaseModel.model_dump_json``.
+
             Raises
             ------
             NotImplementedError
@@ -85,6 +96,7 @@ if TYPE_CHECKING:
             """
             del self, model_dump_json_kwargs
             raise NotImplementedError
+            return cast("str", "")
 
 else:
     from pydantic import BaseModel as _PydanticBaseModel

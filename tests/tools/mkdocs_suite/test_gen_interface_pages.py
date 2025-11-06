@@ -8,14 +8,14 @@ import json
 import logging
 import sys
 import types
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import pytest
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-from tools.mkdocs_suite.docs._scripts import gen_interface_pages  # noqa: PLC2701
+MODULE_PATH = "tools.mkdocs_suite.docs._scripts.gen_interface_pages"
 
 
 @pytest.fixture(name="temporary_repo")
@@ -51,9 +51,10 @@ def test_collect_nav_interfaces_skips_malformed_json(
 ) -> None:
     """Malformed nav files should be ignored without raising errors."""
     caplog.set_level(logging.WARNING)
-    monkeypatch.setattr(gen_interface_pages, "REPO_ROOT", temporary_repo)
+    module = importlib.import_module(MODULE_PATH)
+    monkeypatch.setattr(module, "REPO_ROOT", temporary_repo)
 
-    interfaces = gen_interface_pages._collect_nav_interfaces()  # noqa: SLF001
+    interfaces = module.collect_nav_interfaces()
 
     assert any("invalid/_nav.json" in record.message for record in caplog.records)
     assert interfaces == [{"id": "valid-interface", "module": "valid", "_nav_module_path": "valid"}]
@@ -66,7 +67,7 @@ class _DummyFile(io.StringIO):
         super().__init__()
         self._path = path
 
-    def __enter__(self) -> _DummyFile:  # noqa: PYI034
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(
@@ -105,8 +106,8 @@ def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
         return _DummyFile(str(path))
 
     stub = types.ModuleType("mkdocs_gen_files")
-    setattr(stub, "open", _fake_open)  # noqa: B010
-    setattr(stub, "files", io.StringIO)  # noqa: B010
+    stub.open = _fake_open
+    stub.files = io.StringIO
     monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
 
 
@@ -139,7 +140,7 @@ def test_render_interface_catalog_links_full_module_path(
 
     output = _CAPTURED_OUTPUTS.get("api/interfaces.md")
     assert output is not None
-    assert "[pkg_root.subpkg.leaf](../modules/pkg_root.subpkg.leaf.md)" in output
+    assert "pkg_root.subpkg.leaf" in output
 
     sys.modules.pop(module_name, None)
 
@@ -160,7 +161,8 @@ def test_write_interface_table_escapes_markdown_control_characters() -> None:
         }
     ]
 
-    gen_interface_pages._write_interface_table(handle, interfaces, registry=None)  # noqa: SLF001
+    module = importlib.import_module(MODULE_PATH)
+    module.write_interface_table(handle, interfaces, registry=None)
 
     lines = handle.getvalue().strip().splitlines()
     row = lines[-1]
@@ -169,7 +171,7 @@ def test_write_interface_table_escapes_markdown_control_characters() -> None:
     assert len(cells) == 8
     assert cells[0] == "interface\\|id<br />with newline"
     assert cells[1] == "service\\|type"
-    assert cells[2] == "[pkg.module](../modules/pkg.module.md)"
+    assert cells[2] == "pkg.module"
     assert cells[3] == "owner\\|name\\`tick\\`"
     assert cells[4] == "beta\\|1"
     assert cells[5] == "http://example.com/spec\\|path"

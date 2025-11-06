@@ -93,7 +93,7 @@ class _PytestarchModule(Protocol):
         *args: object,
         **kwargs: object,
     ) -> EvaluableArchitectureProtocol:
-        """Get evaluable architecture instance.
+        """Get evaluable architecture instance returned by pytestarch.
 
         Parameters
         ----------
@@ -113,7 +113,7 @@ class _PytestarchModule(Protocol):
         *args: object,
         **kwargs: object,
     ) -> EvaluableArchitectureProtocol:
-        """Get evaluable architecture for module objects.
+        """Get evaluable architecture for module objects via pytestarch.
 
         Parameters
         ----------

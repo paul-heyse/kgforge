@@ -1,0 +1,133 @@
+# registry.duckdb_helpers
+
+Typed DuckDB helper utilities for parameterized queries and logging.
+
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/duckdb_helpers.py)
+
+## Sections
+
+- **Public API**
+
+## Contents
+
+### registry.duckdb_helpers.DuckDBQueryOptions
+
+::: registry.duckdb_helpers.DuckDBQueryOptions
+
+### registry.duckdb_helpers._coerce_options
+
+::: registry.duckdb_helpers._coerce_options
+
+### registry.duckdb_helpers._ensure_parameterized
+
+::: registry.duckdb_helpers._ensure_parameterized
+
+### registry.duckdb_helpers._format_params
+
+::: registry.duckdb_helpers._format_params
+
+### registry.duckdb_helpers._format_sql
+
+::: registry.duckdb_helpers._format_sql
+
+### registry.duckdb_helpers._set_timeout
+
+::: registry.duckdb_helpers._set_timeout
+
+### registry.duckdb_helpers._truncate_value
+
+::: registry.duckdb_helpers._truncate_value
+
+### registry.duckdb_helpers.connect
+
+::: registry.duckdb_helpers.connect
+
+### registry.duckdb_helpers.execute
+
+::: registry.duckdb_helpers.execute
+
+### registry.duckdb_helpers.fetch_all
+
+::: registry.duckdb_helpers.fetch_all
+
+### registry.duckdb_helpers.fetch_one
+
+::: registry.duckdb_helpers.fetch_one
+
+### registry.duckdb_helpers.validate_identifier
+
+::: registry.duckdb_helpers.validate_identifier
+
+## Relationships
+
+**Imports:** `__future__.annotations`, `collections.abc.Iterable`, `collections.abc.Mapping`, `collections.abc.Sequence`, `dataclasses.dataclass`, `dataclasses.replace`, `duckdb`, `duckdb.DuckDBPyConnection`, `kgfoundry_common.errors.RegistryError`, `kgfoundry_common.logging.get_logger`, `kgfoundry_common.logging.with_fields`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.observability.MetricsProvider`, `kgfoundry_common.observability.observe_duration`, `pathlib.Path`, `time`, `typing.Final`, `typing.TYPE_CHECKING`, `typing.cast`
+
+**Imported by:** [registry.duckdb_registry](duckdb_registry.md), [registry.helper](helper.md), [registry.migrate](migrate.md)
+
+## Autorefs Examples
+
+- [registry.duckdb_helpers.DuckDBQueryOptions][]
+- [registry.duckdb_helpers._coerce_options][]
+- [registry.duckdb_helpers._ensure_parameterized][]
+- [registry.duckdb_helpers._format_params][]
+
+## Inheritance
+
+```mermaid
+classDiagram
+    class DuckDBQueryOptions
+```
+
+## Neighborhood
+
+```d2
+direction: right
+"registry.duckdb_helpers": "registry.duckdb_helpers" { link: "./registry/duckdb_helpers.md" }
+"__future__.annotations": "__future__.annotations"
+"registry.duckdb_helpers" -> "__future__.annotations"
+"collections.abc.Iterable": "collections.abc.Iterable"
+"registry.duckdb_helpers" -> "collections.abc.Iterable"
+"collections.abc.Mapping": "collections.abc.Mapping"
+"registry.duckdb_helpers" -> "collections.abc.Mapping"
+"collections.abc.Sequence": "collections.abc.Sequence"
+"registry.duckdb_helpers" -> "collections.abc.Sequence"
+"dataclasses.dataclass": "dataclasses.dataclass"
+"registry.duckdb_helpers" -> "dataclasses.dataclass"
+"dataclasses.replace": "dataclasses.replace"
+"registry.duckdb_helpers" -> "dataclasses.replace"
+"duckdb": "duckdb"
+"registry.duckdb_helpers" -> "duckdb"
+"duckdb.DuckDBPyConnection": "duckdb.DuckDBPyConnection"
+"registry.duckdb_helpers" -> "duckdb.DuckDBPyConnection"
+"kgfoundry_common.errors.RegistryError": "kgfoundry_common.errors.RegistryError"
+"registry.duckdb_helpers" -> "kgfoundry_common.errors.RegistryError"
+"kgfoundry_common.logging.get_logger": "kgfoundry_common.logging.get_logger"
+"registry.duckdb_helpers" -> "kgfoundry_common.logging.get_logger"
+"kgfoundry_common.logging.with_fields": "kgfoundry_common.logging.with_fields"
+"registry.duckdb_helpers" -> "kgfoundry_common.logging.with_fields"
+"kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
+"registry.duckdb_helpers" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
+"kgfoundry_common.observability.MetricsProvider": "kgfoundry_common.observability.MetricsProvider"
+"registry.duckdb_helpers" -> "kgfoundry_common.observability.MetricsProvider"
+"kgfoundry_common.observability.observe_duration": "kgfoundry_common.observability.observe_duration"
+"registry.duckdb_helpers" -> "kgfoundry_common.observability.observe_duration"
+"pathlib.Path": "pathlib.Path"
+"registry.duckdb_helpers" -> "pathlib.Path"
+"time": "time"
+"registry.duckdb_helpers" -> "time"
+"typing.Final": "typing.Final"
+"registry.duckdb_helpers" -> "typing.Final"
+"typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
+"registry.duckdb_helpers" -> "typing.TYPE_CHECKING"
+"typing.cast": "typing.cast"
+"registry.duckdb_helpers" -> "typing.cast"
+"registry.duckdb_registry": "registry.duckdb_registry" { link: "./registry/duckdb_registry.md" }
+"registry.duckdb_registry" -> "registry.duckdb_helpers"
+"registry.helper": "registry.helper" { link: "./registry/helper.md" }
+"registry.helper" -> "registry.duckdb_helpers"
+"registry.migrate": "registry.migrate" { link: "./registry/migrate.md" }
+"registry.migrate" -> "registry.duckdb_helpers"
+"registry.duckdb_helpers_code": "registry.duckdb_helpers code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/duckdb_helpers.py" }
+"registry.duckdb_helpers" -> "registry.duckdb_helpers_code" { style: dashed }
+```
+

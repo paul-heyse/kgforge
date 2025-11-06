@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import posixpath
 from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
 SUITE_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = Path(__file__).resolve().parents[4]
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
+INTERFACES_DOC_PATH = "api/interfaces.md"
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.NullHandler())
@@ -117,15 +119,35 @@ def _collect_nav_interfaces() -> list[dict[str, object]]:
     return records
 
 
+def collect_nav_interfaces() -> list[dict[str, object]]:
+    """Return interface metadata discovered from nav sidecars.
+
+    Returns
+    -------
+    list[dict[str, object]]
+        List of interface dictionaries extracted from nav sidecar files.
+    """
+    return _collect_nav_interfaces()
+
+
 def _module_doc_link(module: object) -> str:
     if not isinstance(module, str) or not module:
         return "—"
     safe_label = _escape_table_text(module)
-    return f"[{safe_label}](../modules/{module}.md)"
+    if _resolve_source_path(module) is None:
+        return safe_label
+    module_doc = posixpath.join("modules", module.replace(".", "/") + ".md")
+    base_dir = posixpath.dirname(INTERFACES_DOC_PATH)
+    href = posixpath.relpath(module_doc, base_dir or ".")
+    return f"[{safe_label}]({href})"
 
 
 def _operation_href(spec_path: object, operation_id: str) -> str | None:
-    return build_operation_href(spec_path, operation_id)
+    href = build_operation_href(spec_path, operation_id)
+    if href is None:
+        return None
+    base_dir = posixpath.dirname(INTERFACES_DOC_PATH) or "."
+    return posixpath.relpath(href, base_dir)
 
 
 def _parse_handler_module(handler: object) -> str | None:
@@ -277,6 +299,31 @@ def _write_interface_table(
         if record.get("id"):
             interface_ids.add(str(record["id"]))
     return interface_ids
+
+
+def write_interface_table(
+    handle: mkdocs_gen_files.files,
+    interfaces: list[dict[str, object]],
+    registry: RegistryMetadataModel | None,
+) -> set[str]:
+    """Public wrapper around the interface table writer for testing support.
+
+    Parameters
+    ----------
+    handle : mkdocs_gen_files.files
+        File handle for writing markdown content.
+    interfaces : list[dict[str, object]]
+        List of interface dictionaries from nav metadata.
+    registry : RegistryMetadataModel | None
+        Typed registry metadata resolved from the shared augment/registry facade.
+
+    Returns
+    -------
+    set[str]
+        Normalized identifiers sourced from nav sidecars that will have detail
+        sections rendered later in the document.
+    """
+    return _write_interface_table(handle, interfaces, registry)
 
 
 def _write_optional_list(handle: mkdocs_gen_files.files, label: str, values: list[str]) -> None:

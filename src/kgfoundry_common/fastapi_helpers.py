@@ -98,9 +98,9 @@ def typed_dependency[**P, T](
 
         Parameters
         ----------
-        *args : P.args
+        args : P.args
             Positional arguments for the dependency.
-        **kwargs : P.kwargs
+        kwargs : P.kwargs
             Keyword arguments for the dependency.
 
         Returns
@@ -111,8 +111,13 @@ def typed_dependency[**P, T](
         Raises
         ------
         Exception
-            Any exception raised by the dependency is propagated after logging.
-        """  # noqa: DOC502
+            Propagates any exception raised by the dependency function.
+
+        Notes
+        -----
+        Exceptions raised by the dependency function propagate after logging
+        and metrics collection complete.
+        """
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -122,13 +127,13 @@ def typed_dependency[**P, T](
                     dependency(*args, **kwargs),
                     timeout_seconds=timeout,
                 )
-            except Exception:  # pragma: no cover - propagated to caller
+            except Exception as error:  # pragma: no cover - propagated to caller
                 duration_ms = (time.perf_counter() - start) * 1000.0
                 log.exception(
                     "dependency.error",
                     extra={"status": "error", "duration_ms": duration_ms},
                 )
-                raise
+                raise error
             duration_ms = (time.perf_counter() - start) * 1000.0
             log.info(
                 "dependency.success",
@@ -169,8 +174,13 @@ def typed_exception_handler[E: Exception](
         Raises
         ------
         Exception
-            Any exception raised by the handler is propagated after logging.
-        """  # noqa: DOC502
+            Propagates any exception raised by the handler function.
+
+        Notes
+        -----
+        Exceptions raised by the handler function propagate after logging and
+        metrics collection complete.
+        """
         correlation_id = get_correlation_id()
         with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
             start = time.perf_counter()
@@ -187,13 +197,13 @@ def typed_exception_handler[E: Exception](
                     handler(request, exc),
                     timeout_seconds=timeout,
                 )
-            except Exception:  # pragma: no cover - FastAPI surfaces this
+            except Exception as error:  # pragma: no cover - FastAPI surfaces this
                 duration_ms = (time.perf_counter() - start) * 1000.0
                 log.exception(
                     "exception_handler.error",
                     extra={"status": "error", "duration_ms": duration_ms},
                 )
-                raise
+                raise error
             duration_ms = (time.perf_counter() - start) * 1000.0
             log.info(
                 "exception_handler.success",
@@ -253,8 +263,14 @@ def typed_middleware(
             Raises
             ------
             Exception
-                Any exception raised by the middleware is propagated after logging.
-            """  # noqa: DOC502
+                Propagates any exception raised by downstream middleware or
+                handlers.
+
+            Notes
+            -----
+            Exceptions raised by downstream middleware or handlers propagate
+            after logging and metrics collection complete.
+            """
             correlation_id = get_correlation_id()
             with with_fields(logger, operation=name, correlation_id=correlation_id) as log:
                 start = time.perf_counter()
@@ -264,13 +280,13 @@ def typed_middleware(
                         self._delegate.dispatch(request, call_next),
                         timeout_seconds=timeout,
                     )
-                except Exception:  # pragma: no cover - propagated to caller
+                except Exception as error:  # pragma: no cover - propagated to caller
                     duration_ms = (time.perf_counter() - start) * 1000.0
                     log.exception(
                         "middleware.error",
                         extra={"status": "error", "duration_ms": duration_ms},
                     )
-                    raise
+                    raise error
 
                 duration_ms = (time.perf_counter() - start) * 1000.0
                 log.info(

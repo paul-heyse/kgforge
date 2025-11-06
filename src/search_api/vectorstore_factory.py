@@ -380,9 +380,14 @@ class FaissVectorstoreFactory:
         Raises
         ------
         Exception
-            Propagates exceptions raised by :meth:`FaissAdapter.save` (for example
-            I/O errors or FAISS errors).
-        """  # noqa: DOC502
+            Propagates any exception raised by :meth:`FaissAdapter.save` (for
+            example I/O errors or FAISS errors).
+
+        Notes
+        -----
+        Exceptions raised by :meth:`FaissAdapter.save` (for example I/O errors
+        or FAISS errors) propagate after logging and metrics collection complete.
+        """
         logger.info(
             "Saving FAISS index",
             extra={
@@ -398,20 +403,20 @@ class FaissVectorstoreFactory:
         operation = "save"
         try:
             adapter.save(index_uri, idmap_uri)
-        except Exception as exc:
+        except Exception as error:
             logger.exception(
                 "Index save failed",
                 extra={
                     "operation": "save_index",
                     "status": "error",
-                    "error_type": type(exc).__name__,
+                    "error_type": type(error).__name__,
                     "stage": _METRIC_STAGE_LABEL,
                     "correlation_id": correlation_id,
                 },
             )
             elapsed = time.monotonic() - start_time
             _observe_metrics(operation, "error", elapsed)
-            raise
+            raise error
 
         elapsed = time.monotonic() - start_time
         logger.info(

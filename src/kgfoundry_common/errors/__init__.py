@@ -148,6 +148,12 @@ except ImportError:  # pragma: no cover - optional dependency
         request : RequestProtocol | None, optional
             Request instance (unused, for signature compatibility).
 
+        Returns
+        -------
+        JSONResponseProtocol
+            This helper never returns; the return type is declared for signature
+            compatibility with the FastAPI-enabled variant.
+
         Raises
         ------
         RuntimeError
@@ -159,6 +165,7 @@ except ImportError:  # pragma: no cover - optional dependency
             "problem details response helpers."
         )
         raise RuntimeError(message)
+        return cast("JSONResponseProtocol", None)  # pragma: no cover
 
     _problem_details_response = _missing_problem_details_response
 

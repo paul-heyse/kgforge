@@ -51,71 +51,71 @@ class ErrorCode(StrEnum):
 
     Attributes
     ----------
-    DOWNLOAD_FAILED : str
+    DOWNLOAD_FAILED
         Download operation failed.
-    UNSUPPORTED_MIME : str
+    UNSUPPORTED_MIME
         Unsupported MIME type encountered.
-    INVALID_INPUT : str
+    INVALID_INPUT
         Invalid input provided.
-    DOCLING_ERROR : str
+    DOCLING_ERROR
         Document processing error via Docling.
-    OCR_TIMEOUT : str
+    OCR_TIMEOUT
         OCR operation timed out.
-    CHUNKING_ERROR : str
+    CHUNKING_ERROR
         Document chunking failed.
-    EMBEDDING_ERROR : str
+    EMBEDDING_ERROR
         Embedding generation failed.
-    INDEX_BUILD_ERROR : str
+    INDEX_BUILD_ERROR
         Index construction failed.
-    SPLADE_OOM : str
+    SPLADE_OOM
         SPLADE encoding out of memory.
-    RETRY_EXHAUSTED : str
+    RETRY_EXHAUSTED
         All retry attempts exhausted.
-    SEARCH_INDEX_MISSING : str
+    SEARCH_INDEX_MISSING
         Search index not found.
-    SEARCH_QUERY_INVALID : str
+    SEARCH_QUERY_INVALID
         Invalid search query.
-    SEARCH_TIMEOUT : str
+    SEARCH_TIMEOUT
         Search operation timed out.
-    VECTOR_SEARCH_ERROR : str
+    VECTOR_SEARCH_ERROR
         Vector search operation failed.
-    AGENT_CATALOG_SEARCH_ERROR : str
+    AGENT_CATALOG_SEARCH_ERROR
         Agent catalog search failed.
-    CATALOG_LOAD_ERROR : str
+    CATALOG_LOAD_ERROR
         Catalog loading failed.
-    SYMBOL_ATTACHMENT_ERROR : str
+    SYMBOL_ATTACHMENT_ERROR
         Symbol attachment failed.
-    CONFIGURATION_ERROR : str
+    CONFIGURATION_ERROR
         Configuration error.
-    RUNTIME_ERROR : str
+    RUNTIME_ERROR
         Runtime error occurred.
-    RESOURCE_UNAVAILABLE : str
+    RESOURCE_UNAVAILABLE
         Required resource unavailable.
-    SESSION_ERROR : str
+    SESSION_ERROR
         Session management error.
-    ONTOLOGY_PARSE_ERROR : str
+    ONTOLOGY_PARSE_ERROR
         Ontology parsing failed.
-    LINKER_CALIBRATION_ERROR : str
+    LINKER_CALIBRATION_ERROR
         Linker calibration failed.
-    NEO4J_ERROR : str
+    NEO4J_ERROR
         Neo4j database error.
-    SERIALIZATION_ERROR : str
+    SERIALIZATION_ERROR
         Data serialization failed.
-    DESERIALIZATION_ERROR : str
+    DESERIALIZATION_ERROR
         Data deserialization failed.
-    SCHEMA_VALIDATION_ERROR : str
+    SCHEMA_VALIDATION_ERROR
         Schema validation failed.
-    REGISTRY_ERROR : str
+    REGISTRY_ERROR
         Registry operation failed.
-    ARTIFACT_MODEL_ERROR : str
+    ARTIFACT_MODEL_ERROR
         Artifact model error.
-    ARTIFACT_VALIDATION_ERROR : str
+    ARTIFACT_VALIDATION_ERROR
         Artifact validation failed.
-    ARTIFACT_SERIALIZATION_ERROR : str
+    ARTIFACT_SERIALIZATION_ERROR
         Artifact serialization failed.
-    ARTIFACT_DESERIALIZATION_ERROR : str
+    ARTIFACT_DESERIALIZATION_ERROR
         Artifact deserialization failed.
-    ARTIFACT_DEPENDENCY_ERROR : str
+    ARTIFACT_DEPENDENCY_ERROR
         Artifact dependency error.
 
     Notes

@@ -216,8 +216,14 @@ def search_service(
     Raises
     ------
     Exception
-        Any exception raised during processing is propagated after logging.
-    """  # noqa: DOC502
+        Propagates any exception raised during result processing after logging
+        and metrics collection complete.
+
+    Notes
+    -----
+    Exceptions raised during processing propagate after logging and metrics
+    collection complete.
+    """
     active_metrics = metrics or MetricsProvider.default()
     start_time = time.time()
 
@@ -247,9 +253,9 @@ def search_service(
                 },
             )
             obs.success()
-        except Exception as exc:
-            log_adapter.exception("Search service failed", exc_info=exc)
+        except Exception as error:
+            log_adapter.exception("Search service failed", exc_info=error)
             obs.error()
-            raise
+            raise error
         else:
             return response

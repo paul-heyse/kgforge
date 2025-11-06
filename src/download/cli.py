@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import time
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Any
 from uuid import uuid4
 
 import typer
@@ -104,27 +104,23 @@ def _harvest_problem(
 
 @download_app.command(help=HARVEST_DESCRIPTION)
 def harvest(
-    topic: Annotated[str, typer.Argument(help="Topic query string to harvest.")],
-    years: Annotated[
-        str,
-        typer.Option(
-            "--years",
-            "-y",
-            help="Year filter expression (e.g., '>=2018').",
-            metavar="EXPR",
-            show_default=True,
-        ),
-    ] = DEFAULT_YEARS,
-    max_works: Annotated[
-        int,
-        typer.Option(
-            "--max-works",
-            "-m",
-            help="Maximum number of works to harvest.",
-            metavar="COUNT",
-            show_default=True,
-        ),
-    ] = DEFAULT_MAX_WORKS,
+    topic: str = typer.Argument(..., help="Topic query string to harvest."),
+    years: str = typer.Option(
+        DEFAULT_YEARS,
+        "--years",
+        "-y",
+        help="Year filter expression (e.g., '>=2018').",
+        metavar="EXPR",
+        show_default=True,
+    ),
+    max_works: int = typer.Option(
+        DEFAULT_MAX_WORKS,
+        "--max-works",
+        "-m",
+        help="Maximum number of works to harvest.",
+        metavar="COUNT",
+        show_default=True,
+    ),
 ) -> None:
     """Harvest documents from OpenAlex using the shared CLI tooling context.
 
@@ -132,9 +128,9 @@ def harvest(
     ----------
     topic : str
         Topic query string to harvest.
-    years : str, optional
+    years : str
         Year filter expression (e.g., '>=2018'). Defaults to ``DEFAULT_YEARS``.
-    max_works : int, optional
+    max_works : int
         Maximum number of works to harvest. Defaults to ``DEFAULT_MAX_WORKS``.
 
     Raises

@@ -456,18 +456,25 @@ def spawn_text_process(
     TextProcess
         Text process instance.
 
+    Raises
+    ------
+    ToolExecutionError
+        Raised when command validation fails or the command list is empty. The
+        concrete exception type is resolved from the shared tooling facade at
+        runtime.
+
     Notes
     -----
-    Raises a tool execution error (type determined dynamically from the tools
-    surface) when command validation fails or the command list is empty.
+    The tool execution error type is loaded dynamically from the shared tooling
+    facade to avoid importing heavy dependencies at module import time.
     """
     tools_surface = _load_tools_surface()
-    tool_execution_error_ctor = cast(
+    ToolExecutionError = cast(  # noqa: N806
         "_ToolExecutionErrorConstructor", tools_surface.ToolExecutionError
     )
     if not command:
         msg = "Command must contain at least one argument"
-        raise tool_execution_error_ctor(msg, command=[])
+        raise ToolExecutionError(msg, command=[])
 
     get_runner = tools_surface.get_process_runner
     runner = get_runner()

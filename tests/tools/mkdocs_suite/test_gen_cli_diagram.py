@@ -199,14 +199,15 @@ def test_ensure_cli_index_entry_preserves_existing_content(
     gen_cli_module.main()
 
     updated_content = buffers[gen_cli_module.DIAGRAM_INDEX_PATH].getvalue()
-    assert updated_content == existing_content + gen_cli_module.CLI_INDEX_ENTRY
+    # When no operations are discovered the existing content should remain unchanged.
+    assert updated_content == existing_content
 
     read_modes = [
         mode
         for path, mode in open_calls
         if path == gen_cli_module.DIAGRAM_INDEX_PATH and "r" in mode
     ]
-    assert read_modes == ["r", "r"]
+    assert read_modes == ["r"]
 
 
 def test_main_skips_diagram_when_dependency_missing(
@@ -236,5 +237,5 @@ def test_main_skips_diagram_when_dependency_missing(
     warning_messages = " ".join(record.getMessage() for record in caplog.records)
     assert "unable to load CLI tooling context" in warning_messages
 
-    index_output = buffers["diagrams/index.md"].getvalue()
-    assert index_output.endswith("- [CLI by Tag](./cli_by_tag.d2)\n")
+    # No diagram should be emitted when dependencies are missing; the index remains untouched.
+    assert "diagrams/index.md" not in buffers
