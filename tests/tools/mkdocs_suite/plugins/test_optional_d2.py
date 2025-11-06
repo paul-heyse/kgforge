@@ -5,24 +5,18 @@ from __future__ import annotations
 import logging
 
 import pytest
-
 from tools.mkdocs_suite.plugins import optional_d2
 
 
 def test_logger_uses_null_handler() -> None:
     """Ensure the optional D2 plugin logger installs a ``NullHandler``."""
-
-    assert any(
-        isinstance(handler, logging.NullHandler)
-        for handler in optional_d2.LOGGER.handlers
-    )
+    assert any(isinstance(handler, logging.NullHandler) for handler in optional_d2.LOGGER.handlers)
 
 
 def test_missing_dependency_warning_requires_handler(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Surface warnings only when a real handler is registered."""
-
     message = "mkdocs-d2-plugin is not installed; skipping D2 diagram rendering."
     monkeypatch.setattr(optional_d2, "D2Plugin", None)
 

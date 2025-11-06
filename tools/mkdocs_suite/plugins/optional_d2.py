@@ -2,21 +2,41 @@
 
 from __future__ import annotations
 
+import importlib
 import logging
 import shutil
 from collections.abc import Callable
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from mkdocs.config.base import Config, ConfigErrors, ConfigWarnings
 from mkdocs.plugins import BasePlugin
 
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from mkdocs.plugins import PlainConfigSchema
+
 LOGGER = logging.getLogger("mkdocs.plugins.optional-d2")
 LOGGER.addHandler(logging.NullHandler())
 
-try:  # pragma: no cover - dependency may be missing in minimal environments
-    from mkdocs_d2_plugin.plugin import D2Plugin
-except ModuleNotFoundError:  # pragma: no cover - surface friendly warning later
-    D2Plugin = None  # type: ignore[assignment]
+
+def _load_d2_plugin() -> type[BasePlugin[Config]] | None:
+    """Return the mkdocs-d2 plugin class when the dependency is installed.
+
+    Returns
+    -------
+    type[BasePlugin[Config]] | None
+        The D2Plugin class if mkdocs-d2-plugin is installed, otherwise None.
+    """
+    try:
+        module = importlib.import_module("mkdocs_d2_plugin.plugin")
+    except ModuleNotFoundError:
+        return None
+    plugin = getattr(module, "D2Plugin", None)
+    if plugin is None:
+        return None
+    return cast("type[BasePlugin[Config]]", plugin)
+
+
+D2_PLUGIN_CLASS = _load_d2_plugin()
 
 
 def _noop(*_args: object, **_kwargs: object) -> None:
@@ -26,10 +46,11 @@ def _noop(*_args: object, **_kwargs: object) -> None:
 class OptionalD2Plugin(BasePlugin[Config]):
     """Conditionally delegate to the mkdocs-d2 plugin when available."""
 
-    if D2Plugin is not None:
-        config_scheme = D2Plugin.config_scheme  # type: ignore[attr-defined]
+    config_scheme: PlainConfigSchema
+    if D2_PLUGIN_CLASS is not None:
+        config_scheme = D2_PLUGIN_CLASS.config_scheme  # type: ignore[attr-defined]
     else:  # pragma: no cover - exercised when the dependency is absent
-        config_scheme: tuple[tuple[str, object], ...] = ()
+        config_scheme = BasePlugin.config_scheme
 
     def __init__(self) -> None:
         super().__init__()
@@ -57,10 +78,10 @@ class OptionalD2Plugin(BasePlugin[Config]):
             underlying ``mkdocs-d2`` plugin when available.
         """
         errors, warnings = super().load_config(options, config_file_path)
-        if D2Plugin is None:
+        if D2_PLUGIN_CLASS is None:
             message = "mkdocs-d2-plugin is not installed; skipping D2 diagram rendering."
             self._warn_once(message)
-            warnings.append(message)
+            warnings.append(("plugins.optional-d2", message))
             self._delegate = None
             return errors, warnings
 
@@ -70,11 +91,11 @@ class OptionalD2Plugin(BasePlugin[Config]):
                 "served but new renders are skipped. Install the D2 CLI to refresh diagrams."
             )
             self._warn_once(message)
-            warnings.append(message)
+            warnings.append(("plugins.optional-d2", message))
             self._delegate = None
             return errors, warnings
 
-        delegate = cast("BasePlugin[Config]", D2Plugin())
+        delegate = D2_PLUGIN_CLASS()
         delegate_errors, delegate_warnings = delegate.load_config(options, config_file_path)
         errors.extend(delegate_errors)
         warnings.extend(delegate_warnings)

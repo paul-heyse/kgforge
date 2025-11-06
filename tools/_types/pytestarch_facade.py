@@ -98,7 +98,8 @@ class _PytestarchModule(Protocol):
         Parameters
         ----------
         *args : object
-            Positional arguments forwarded to pytestarch helpers.
+            Positional arguments forwarded to pytestarch helpers. Specific arguments
+            vary by pytestarch version and usage pattern.
         **kwargs : object
             Keyword arguments forwarded to pytestarch.
 
@@ -118,7 +119,8 @@ class _PytestarchModule(Protocol):
         Parameters
         ----------
         *args : object
-            Positional arguments forwarded to pytestarch helpers.
+            Positional arguments forwarded to pytestarch helpers. Specific arguments
+            vary by pytestarch version and usage pattern.
         **kwargs : object
             Keyword arguments forwarded to pytestarch.
 

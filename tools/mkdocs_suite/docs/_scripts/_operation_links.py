@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from typing import cast
 from urllib.parse import quote
 
 CLI_SPEC_DOC = "api/openapi-cli.md"
@@ -23,9 +24,12 @@ def _normalize_spec_path(spec_path: object) -> str | None:
         Normalized string path when ``spec_path`` can be converted to a file system
         path, otherwise ``None``.
     """
-    try:
+    if isinstance(spec_path, (str, bytes, os.PathLike)):
         resolved = os.fspath(spec_path)
-    except TypeError:
+    elif hasattr(spec_path, "__fspath__"):
+        pathlike = cast("os.PathLike[str] | os.PathLike[bytes]", spec_path)
+        resolved = os.fspath(pathlike)
+    else:
         return None
     if not resolved:
         return None
