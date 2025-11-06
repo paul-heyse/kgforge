@@ -61,21 +61,76 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 
 def _find_available_port(host: str, min_port: int, max_port: int) -> int:
+    """Return the first available TCP port for the given host.
+
+    Parameters
+    ----------
+    host : str
+        Hostname or IP address to bind.
+    min_port : int
+        Lowest port to probe (inclusive).
+    max_port : int
+        Highest port to probe (inclusive).
+
+    Returns
+    -------
+    int
+        The first available port number in the requested range.
+
+    Raises
+    ------
+    ValueError
+        If ``min_port`` exceeds ``max_port``.
+    RuntimeError
+        If host resolution fails or no ports are available in the range.
+    """
     if min_port > max_port:
         msg = f"min_port {min_port} greater than max_port {max_port}"
         raise ValueError(msg)
 
     for port in range(min_port, max_port + 1):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            try:
-                sock.bind((host, port))
-            except OSError:
-                continue
-        return port
+        try:
+            addrinfos = socket.getaddrinfo(
+                host,
+                port,
+                family=socket.AF_UNSPEC,
+                type=socket.SOCK_STREAM,
+            )
+        except socket.gaierror as exc:  # pragma: no cover - invalid host configuration
+            msg = f"Failed to resolve host {host!r}"
+            raise RuntimeError(msg) from exc
+
+        for family, socktype, proto, _canonname, sockaddr in addrinfos:
+            with socket.socket(family, socktype, proto) as sock:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                try:
+                    sock.bind(sockaddr)
+                except OSError:
+                    continue
+            return port
 
     msg = f"No free ports found in range {min_port}-{max_port} for host {host}"
     raise RuntimeError(msg)
+
+
+def find_available_port(host: str, min_port: int, max_port: int) -> int:
+    """Return an available TCP port for ``host`` within ``min_port``-``max_port``.
+
+    Parameters
+    ----------
+    host : str
+        Hostname or IP address to bind.
+    min_port : int
+        Lowest port to probe (inclusive).
+    max_port : int
+        Highest port to probe (inclusive).
+
+    Returns
+    -------
+    int
+        The first available port number in the requested range.
+    """
+    return _find_available_port(host, min_port, max_port)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -93,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
     """
     args = _parse_args(argv or sys.argv[1:])
 
-    port = _find_available_port(args.host, args.min_port, args.max_port)
+    port = find_available_port(args.host, args.min_port, args.max_port)
     dev_addr = f"{args.host}:{port}"
     LOGGER.info("Starting MkDocs dev server", extra={"dev_addr": dev_addr})
 
