@@ -407,10 +407,11 @@ def _write_interface_details(
         )
         module_doc = _module_doc_link(module_value)
         handle.write(f"* **Module:** {module_doc}\n")
-        if isinstance(module_value, str):
-            module_source = _code_link_for_module(module_value)
-            if module_source:
-                handle.write(f"* **Source:** [{module_value}]({module_source})\n")
+        module_source = (
+            _code_link_for_module(module_value) if isinstance(module_value, str) else None
+        )
+        if module_source:
+            handle.write(f"* **Source:** [{module_value}]({module_source})\n")
         handle.write(
             "* **Owner:** {owner}\n".format(
                 owner=nav_meta.get("owner")
