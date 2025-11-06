@@ -19,6 +19,7 @@ import logging
 import posixpath
 import re
 import sys
+from urllib.parse import urlparse
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
@@ -842,6 +843,13 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
         json.dump(nav_meta, fd, indent=2)
 
 
+def _is_absolute_url(candidate: str) -> bool:
+    """Return ``True`` when ``candidate`` is an absolute URL."""
+
+    parsed = urlparse(candidate)
+    return bool(parsed.scheme and parsed.netloc)
+
+
 def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
     """Return a tuple of (label, href) for the provided spec path.
 
@@ -858,6 +866,8 @@ def _spec_href(spec_path: object) -> tuple[str | None, str | None]:
     """
     if not isinstance(spec_path, str) or not spec_path:
         return None, None
+    if _is_absolute_url(spec_path):
+        return spec_path, spec_path
     if spec_path.endswith("openapi-cli.yaml"):
         return "CLI Spec", "api/openapi-cli.md"
     if spec_path.endswith("openapi.yaml"):
@@ -1225,7 +1235,10 @@ def _write_interfaces(
         if spec_href:
             module_doc = _module_doc_path(module_path)
             module_dir = posixpath.dirname(module_doc) or "."
-            resolved_href = posixpath.relpath(spec_href, module_dir)
+            if _is_absolute_url(spec_href):
+                resolved_href = spec_href
+            else:
+                resolved_href = posixpath.relpath(spec_href, module_dir)
             fd.write(f"- **Spec:** [{spec_label}]({resolved_href})\n")
         elif spec_label:
             fd.write(f"- **Spec:** {spec_label}\n")
