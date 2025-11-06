@@ -104,6 +104,46 @@ def test_write_diagram_emits_single_node_for_multi_tag_operations(
     assert '  "admin" -> "POST /cli/run"\n' in d2_output
 
 
+def test_write_diagram_escapes_special_characters(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
+
+    operations = [
+        (
+            "POST",
+            '/cli/run "special"',
+            'operation"Id',
+            (
+                'Summary "with" newline\n'
+                'and backslash \\value'
+            ),
+            ('core"ops', 'line\\tag'),
+        )
+    ]
+
+    buffers: dict[str, io.StringIO] = {}
+
+    def fake_open(
+        path: str, mode: str = "r", **_: object
+    ) -> contextlib.AbstractContextManager[io.StringIO]:
+        return _capture_write(buffers, path, mode)
+
+    monkeypatch.setattr(gen_cli_module.mkdocs_gen_files, "open", fake_open)
+
+    write_diagram(operations)
+
+    output = buffers["diagrams/cli_by_tag.d2"].getvalue()
+
+    assert '  "core\\"ops": "core\\"ops" {}' in output
+    assert '  "line\\\\tag": "line\\\\tag" {}' in output
+    assert (
+        '  "POST /cli/run \\"special\\"": "POST /cli/run \\"special\\"\\n'
+        'Summary \\"with\\" newline\\nand backslash \\\\value"'
+        ' { link: "../api/openapi-cli.md#operation/operation\\"Id" }'
+    ) in output
+
+
 def test_collect_operations_surface_loader_error(monkeypatch: pytest.MonkeyPatch) -> None:
     gen_cli_module = importlib.import_module("tools.mkdocs_suite.docs._scripts.gen_cli_diagram")
 
