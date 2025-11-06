@@ -221,7 +221,8 @@ def record_operation_metrics(
     Notes
     -----
     Any exception raised within the context is propagated after metrics
-    are recorded, allowing normal exception handling to proceed.
+    are recorded, allowing normal exception handling to proceed. The exception
+    type depends on what the operation raises.
 
     Examples
     --------

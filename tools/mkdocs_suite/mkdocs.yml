@@ -1,6 +1,6 @@
 site_name: KgFoundry MkDocs Suite
 site_url: https://docs.kgfoundry.dev/
-repo_url: https://github.com/kgfoundry/kgfoundry
+repo_url: https://github.com/paul-heyse/kgfoundry
 edit_uri: edit/main/
 strict: true
 
@@ -96,8 +96,7 @@ nav:
       - api/index.md
       - CLI Spec: api/openapi-cli.md
       - Interface Catalog: api/interfaces.md
-  - Modules:
-      - modules/index.md
+  - Modules: modules/
   - Diagrams:
       - diagrams/index.md
   - CLI:

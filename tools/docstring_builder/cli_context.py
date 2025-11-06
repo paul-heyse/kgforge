@@ -9,9 +9,6 @@ importing the heavy Typer CLI entry point.
 
 from __future__ import annotations
 
-from functools import lru_cache
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -23,7 +20,18 @@ from tools import (
     RegistryInterfaceModel,
     RegistryMetadataModel,
     ToolingMetadataModel,
-    load_cli_tooling_context,
+)
+from tools.cli_context_registry import (
+    CLIContextDefinition,
+    augment_for,
+    context_for,
+    default_version_resolver,
+    interface_for,
+    operation_override_for,
+    register_cli,
+    registry_for,
+    settings_for,
+    tooling_metadata_for,
 )
 
 if TYPE_CHECKING:
@@ -32,18 +40,6 @@ if TYPE_CHECKING:
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 """Repository root used to resolve augment and registry metadata paths."""
-
-
-CLI_COMMAND = "docstrings"
-"""Logical command name used for envelopes and documentation artifacts."""
-
-
-CLI_TITLE = "Docstring Builder CLI"
-"""Human-readable CLI title sourced from registry metadata."""
-
-
-CLI_INTERFACE_ID = "docstring-builder-cli"
-"""Registry interface identifier for the docstring builder CLI."""
 
 
 CLI_OPERATION_IDS: dict[str, str] = {
@@ -65,23 +61,30 @@ CLI_OPERATION_IDS: dict[str, str] = {
 """Mapping of subcommand names to canonical operation identifiers."""
 
 
-def _resolve_cli_version() -> str:
-    """Return the version string advertised for the CLI metadata.
+_CLI_KEY = "docstrings"
+_CLI_DEFINITION = CLIContextDefinition(
+    command="docstrings",
+    title="Docstring Builder CLI",
+    interface_id="docstring-builder-cli",
+    operation_ids=CLI_OPERATION_IDS,
+    bin_name="docstring-builder",
+    version_resolver=default_version_resolver("kgfoundry-tools", "kgfoundry"),
+)
 
-    Returns
-    -------
-    str
-        Installed package version or ``"0.0.0"`` when unknown.
-    """
-    for distribution in ("kgfoundry-tools", "kgfoundry"):
-        try:
-            return pkg_version(distribution)
-        except PackageNotFoundError:  # pragma: no cover - editable installs fallback
-            continue
-    return "0.0.0"
+register_cli(_CLI_KEY, _CLI_DEFINITION)
+
+CLI_COMMAND = _CLI_DEFINITION.command
+"""Logical command name used for envelopes and documentation artifacts."""
 
 
-@lru_cache(maxsize=1)
+CLI_TITLE = _CLI_DEFINITION.title
+"""Human-readable CLI title sourced from registry metadata."""
+
+
+CLI_INTERFACE_ID = _CLI_DEFINITION.interface_id
+"""Registry interface identifier for the docstring builder CLI."""
+
+
 def get_cli_settings() -> CLIToolSettings:
     """Return canonical CLI settings for the docstring builder suite.
 
@@ -90,17 +93,9 @@ def get_cli_settings() -> CLIToolSettings:
     CLIToolSettings
         Cached settings referencing augment and registry metadata.
     """
-    return CLIToolSettings(
-        bin_name="docstring-builder",
-        title=CLI_TITLE,
-        version=_resolve_cli_version(),
-        augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
-        registry_path=REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml",
-        interface_id=CLI_INTERFACE_ID,
-    )
+    return settings_for(_CLI_KEY)
 
 
-@lru_cache(maxsize=1)
 def get_cli_context() -> CLIToolingContext:
     """Return the lazily loaded CLI tooling context.
 
@@ -109,7 +104,7 @@ def get_cli_context() -> CLIToolingContext:
     CLIToolingContext
         Composite context bundling augment and registry metadata.
     """
-    return load_cli_tooling_context(get_cli_settings())
+    return context_for(_CLI_KEY)
 
 
 def get_cli_config() -> CLIConfig:
@@ -143,8 +138,7 @@ def get_tooling_metadata() -> ToolingMetadataModel:
     ToolingMetadataModel
         Immutable bundle combining augment and registry metadata models.
     """
-    context = get_cli_context()
-    return ToolingMetadataModel(augment=context.augment, registry=context.registry)
+    return tooling_metadata_for(_CLI_KEY)
 
 
 def get_augment_metadata() -> AugmentMetadataModel:
@@ -155,7 +149,7 @@ def get_augment_metadata() -> AugmentMetadataModel:
     AugmentMetadataModel
         Augment metadata scoped to docstring builder commands.
     """
-    return get_cli_context().augment
+    return augment_for(_CLI_KEY)
 
 
 def get_registry_metadata() -> RegistryMetadataModel:
@@ -166,7 +160,7 @@ def get_registry_metadata() -> RegistryMetadataModel:
     RegistryMetadataModel
         Registry metadata containing interface definitions for the CLI.
     """
-    return get_cli_context().registry
+    return registry_for(_CLI_KEY)
 
 
 def get_interface_metadata() -> RegistryInterfaceModel:
@@ -176,17 +170,8 @@ def get_interface_metadata() -> RegistryInterfaceModel:
     -------
     RegistryInterfaceModel
         Registry interface entry associated with the CLI.
-
-    Raises
-    ------
-    KeyError
-        Raised when the registry metadata omits the expected interface.
     """
-    interface = get_registry_metadata().interface(CLI_INTERFACE_ID)
-    if interface is None:  # pragma: no cover - defensive guard for misconfiguration
-        msg = f"Registry metadata missing interface '{CLI_INTERFACE_ID}'."
-        raise KeyError(msg)
-    return interface
+    return interface_for(_CLI_KEY)
 
 
 def get_operation_override(
@@ -206,10 +191,7 @@ def get_operation_override(
     OperationOverrideModel | None
         Override metadata when defined; otherwise ``None``.
     """
-    operation_id = CLI_OPERATION_IDS.get(subcommand)
-    if operation_id is None:
-        return None
-    return get_augment_metadata().operation_override(operation_id, tokens=tokens)
+    return operation_override_for(_CLI_KEY, subcommand=subcommand, tokens=tokens)
 
 
 __all__ = [

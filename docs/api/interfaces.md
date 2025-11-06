@@ -230,7 +230,7 @@ downstream automation, diagrams, and observability pipelines.
   - Handler: `tools.navmap.build_navmap:main`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
   - Code Samples:
-* (bash) `uv run python -m tools.navmap.build_navmap --write tools/mkdocs_suite/site/_build/navmap/navmap.json`
+    * (bash) `uv run python -m tools.navmap.build_navmap --write site/_build/navmap/navmap.json`
 - [`navmap.check`](openapi-cli.md#operation/navmap.check) — Validate navmap declarations and inline metadata.
     - Module docs: tools.navmap.check_navmap
   - Tags: navmap

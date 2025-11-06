@@ -143,6 +143,11 @@ class TestNamespaceRegistry:
             ------
             RuntimeError
                 Always raised with message "Loader failed" to simulate loader failure.
+
+            Notes
+            -----
+            This function never returns normally; it always raises :exc:`RuntimeError`.
+            The return type annotation exists for type checking purposes only.
             """
             raise RuntimeError("Loader failed")
 

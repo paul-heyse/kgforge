@@ -9,9 +9,6 @@ import without duplicating path logic.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from functools import lru_cache
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -23,7 +20,18 @@ from tools import (
     RegistryInterfaceModel,
     RegistryMetadataModel,
     ToolingMetadataModel,
-    load_cli_tooling_context,
+)
+from tools.cli_context_registry import (
+    CLIContextDefinition,
+    augment_for,
+    context_for,
+    default_version_resolver,
+    interface_for,
+    operation_override_for,
+    register_cli,
+    registry_for,
+    settings_for,
+    tooling_metadata_for,
 )
 
 if TYPE_CHECKING:
@@ -33,36 +41,34 @@ if TYPE_CHECKING:
 REPO_ROOT = Path(__file__).resolve().parents[2]
 """Repository root used to resolve augment and registry paths."""
 
-CLI_COMMAND = "download"
-"""Logical command name used for CLI envelopes and logging."""
-
-CLI_TITLE = "KGFoundry Downloader"
-"""Human-readable title for CLI documentation and Typer help text."""
-
-CLI_INTERFACE_ID = "download-cli"
-"""Registry interface identifier backing the download CLI."""
-
 CLI_OPERATION_IDS: dict[str, str] = {
     "harvest": "cli.download.harvest",
 }
 """Mapping of subcommand names to canonical operation identifiers."""
 
 
-def _resolve_cli_version() -> str:
-    """Return the installed kgfoundry package version used for CLI metadata.
+_CLI_KEY = "download"
+_CLI_DEFINITION = CLIContextDefinition(
+    command="download",
+    title="KGFoundry Downloader",
+    interface_id="download-cli",
+    operation_ids=CLI_OPERATION_IDS,
+    bin_name="kgf",
+    version_resolver=default_version_resolver("kgfoundry"),
+)
 
-    Returns
-    -------
-    str
-        Detected ``kgfoundry`` package version, or ``"0.0.0"`` when unavailable.
-    """
-    try:
-        return pkg_version("kgfoundry")
-    except PackageNotFoundError:  # pragma: no cover - fallback for editable installs
-        return "0.0.0"
+register_cli(_CLI_KEY, _CLI_DEFINITION)
+
+CLI_COMMAND = _CLI_DEFINITION.command
+"""Logical command name used for CLI envelopes and logging."""
+
+CLI_TITLE = _CLI_DEFINITION.title
+"""Human-readable title for CLI documentation and Typer help text."""
+
+CLI_INTERFACE_ID = _CLI_DEFINITION.interface_id
+"""Registry interface identifier backing the download CLI."""
 
 
-@lru_cache(maxsize=1)
 def get_cli_settings() -> CLIToolSettings:
     """Return CLI settings describing augment and registry paths.
 
@@ -71,17 +77,9 @@ def get_cli_settings() -> CLIToolSettings:
     CLIToolSettings
         Cached settings referencing the shared augment and registry metadata.
     """
-    return CLIToolSettings(
-        bin_name="kgf",
-        title=CLI_TITLE,
-        version=_resolve_cli_version(),
-        augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
-        registry_path=REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml",
-        interface_id=CLI_INTERFACE_ID,
-    )
+    return settings_for(_CLI_KEY)
 
 
-@lru_cache(maxsize=1)
 def get_cli_context() -> CLIToolingContext:
     """Return the cached CLI tooling context for the download interface.
 
@@ -90,7 +88,7 @@ def get_cli_context() -> CLIToolingContext:
     CLIToolingContext
         Tooling context bundling augment, registry, and CLI configuration models.
     """
-    return load_cli_tooling_context(get_cli_settings())
+    return context_for(_CLI_KEY)
 
 
 def get_cli_config() -> CLIConfig:
@@ -124,7 +122,7 @@ def get_tooling_metadata() -> ToolingMetadataModel:
     ToolingMetadataModel
         Immutable metadata bundle combining augment and registry models.
     """
-    return ToolingMetadataModel(augment=get_augment_metadata(), registry=get_registry_metadata())
+    return tooling_metadata_for(_CLI_KEY)
 
 
 def get_augment_metadata() -> AugmentMetadataModel:
@@ -135,7 +133,7 @@ def get_augment_metadata() -> AugmentMetadataModel:
     AugmentMetadataModel
         Augment metadata describing operations, tag groups, and extras.
     """
-    return get_cli_context().augment
+    return augment_for(_CLI_KEY)
 
 
 def get_registry_metadata() -> RegistryMetadataModel:
@@ -146,7 +144,7 @@ def get_registry_metadata() -> RegistryMetadataModel:
     RegistryMetadataModel
         Registry metadata containing typed interface entries.
     """
-    return get_cli_context().registry
+    return registry_for(_CLI_KEY)
 
 
 def get_interface_metadata() -> RegistryInterfaceModel:
@@ -156,17 +154,8 @@ def get_interface_metadata() -> RegistryInterfaceModel:
     -------
     RegistryInterfaceModel
         Interface metadata defined in the registry for ``CLI_INTERFACE_ID``.
-
-    Raises
-    ------
-    KeyError
-        Raised when the registry metadata does not contain the configured interface.
     """
-    interface = get_registry_metadata().interface(CLI_INTERFACE_ID)
-    if interface is None:  # pragma: no cover - misconfiguration guarded by type checks
-        msg = f"Registry metadata missing interface '{CLI_INTERFACE_ID}'."
-        raise KeyError(msg)
-    return interface
+    return interface_for(_CLI_KEY)
 
 
 def get_operation_override(
@@ -187,10 +176,7 @@ def get_operation_override(
     OperationOverrideModel | None
         Augment override model when defined; otherwise ``None``.
     """
-    operation_id = CLI_OPERATION_IDS.get(subcommand)
-    if operation_id is None:
-        return None
-    return get_augment_metadata().operation_override(operation_id, tokens=tokens)
+    return operation_override_for(_CLI_KEY, subcommand=subcommand, tokens=tokens)
 
 
 __all__ = [

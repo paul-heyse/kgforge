@@ -12,10 +12,6 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 ## Contents
 
-### download.cli_context._resolve_cli_version
-
-::: download.cli_context._resolve_cli_version
-
 ### download.cli_context.get_augment_metadata
 
 ::: download.cli_context.get_augment_metadata
@@ -54,15 +50,15 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `collections.abc.Sequence`, `functools.lru_cache`, `importlib.metadata.PackageNotFoundError`, `importlib.metadata.version`, `pathlib.Path`, `tools.AugmentMetadataModel`, `tools.CLIToolSettings`, `tools.CLIToolingContext`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryMetadataModel`, `tools.ToolingMetadataModel`, `tools.load_cli_tooling_context`, `tools.typer_to_openapi_cli.CLIConfig`, `tools.typer_to_openapi_cli.OperationContext`, `typing.TYPE_CHECKING`, `typing.cast`
+**Imports:** `__future__.annotations`, `collections.abc.Sequence`, `pathlib.Path`, `tools.AugmentMetadataModel`, `tools.CLIToolSettings`, `tools.CLIToolingContext`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryMetadataModel`, `tools.ToolingMetadataModel`, `tools.cli_context_registry.CLIContextDefinition`, `tools.cli_context_registry.augment_for`, `tools.cli_context_registry.context_for`, `tools.cli_context_registry.default_version_resolver`, `tools.cli_context_registry.interface_for`, `tools.cli_context_registry.operation_override_for`, `tools.cli_context_registry.register_cli`, `tools.cli_context_registry.registry_for`, `tools.cli_context_registry.settings_for`, `tools.cli_context_registry.tooling_metadata_for`, `tools.typer_to_openapi_cli.CLIConfig`, `tools.typer_to_openapi_cli.OperationContext`, `typing.TYPE_CHECKING`, `typing.cast`
 
 **Imported by:** [download.cli](./download/cli.md)
 
 ## Autorefs Examples
 
-- [download.cli_context._resolve_cli_version][]
 - [download.cli_context.get_augment_metadata][]
 - [download.cli_context.get_cli_config][]
+- [download.cli_context.get_cli_context][]
 
 ## Neighborhood
 
@@ -73,12 +69,6 @@ direction: right
 "download.cli_context" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
 "download.cli_context" -> "collections.abc.Sequence"
-"functools.lru_cache": "functools.lru_cache"
-"download.cli_context" -> "functools.lru_cache"
-"importlib.metadata.PackageNotFoundError": "importlib.metadata.PackageNotFoundError"
-"download.cli_context" -> "importlib.metadata.PackageNotFoundError"
-"importlib.metadata.version": "importlib.metadata.version"
-"download.cli_context" -> "importlib.metadata.version"
 "pathlib.Path": "pathlib.Path"
 "download.cli_context" -> "pathlib.Path"
 "tools.AugmentMetadataModel": "tools.AugmentMetadataModel"
@@ -95,8 +85,26 @@ direction: right
 "download.cli_context" -> "tools.RegistryMetadataModel"
 "tools.ToolingMetadataModel": "tools.ToolingMetadataModel"
 "download.cli_context" -> "tools.ToolingMetadataModel"
-"tools.load_cli_tooling_context": "tools.load_cli_tooling_context"
-"download.cli_context" -> "tools.load_cli_tooling_context"
+"tools.cli_context_registry.CLIContextDefinition": "tools.cli_context_registry.CLIContextDefinition"
+"download.cli_context" -> "tools.cli_context_registry.CLIContextDefinition"
+"tools.cli_context_registry.augment_for": "tools.cli_context_registry.augment_for"
+"download.cli_context" -> "tools.cli_context_registry.augment_for"
+"tools.cli_context_registry.context_for": "tools.cli_context_registry.context_for"
+"download.cli_context" -> "tools.cli_context_registry.context_for"
+"tools.cli_context_registry.default_version_resolver": "tools.cli_context_registry.default_version_resolver"
+"download.cli_context" -> "tools.cli_context_registry.default_version_resolver"
+"tools.cli_context_registry.interface_for": "tools.cli_context_registry.interface_for"
+"download.cli_context" -> "tools.cli_context_registry.interface_for"
+"tools.cli_context_registry.operation_override_for": "tools.cli_context_registry.operation_override_for"
+"download.cli_context" -> "tools.cli_context_registry.operation_override_for"
+"tools.cli_context_registry.register_cli": "tools.cli_context_registry.register_cli"
+"download.cli_context" -> "tools.cli_context_registry.register_cli"
+"tools.cli_context_registry.registry_for": "tools.cli_context_registry.registry_for"
+"download.cli_context" -> "tools.cli_context_registry.registry_for"
+"tools.cli_context_registry.settings_for": "tools.cli_context_registry.settings_for"
+"download.cli_context" -> "tools.cli_context_registry.settings_for"
+"tools.cli_context_registry.tooling_metadata_for": "tools.cli_context_registry.tooling_metadata_for"
+"download.cli_context" -> "tools.cli_context_registry.tooling_metadata_for"
 "tools.typer_to_openapi_cli.CLIConfig": "tools.typer_to_openapi_cli.CLIConfig"
 "download.cli_context" -> "tools.typer_to_openapi_cli.CLIConfig"
 "tools.typer_to_openapi_cli.OperationContext": "tools.typer_to_openapi_cli.OperationContext"

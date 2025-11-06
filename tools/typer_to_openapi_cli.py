@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, cast
 import click
 import yaml
 
+from tools._shared.augment_registry import RegistryMetadataModel
 from tools._shared.cli_tooling import (
     CLIConfigError,
     CLIToolSettings,
@@ -30,6 +31,7 @@ if TYPE_CHECKING:
         AugmentMetadataModel,
         OperationOverrideModel,
         RegistryInterfaceModel,
+        RegistryOperationModel,
     )
 
 
@@ -616,7 +618,249 @@ def _augment_document_tags(document: dict[str, object], referenced_tags: set[str
             tag_list.append({"name": tag, "description": f"Commands for {tag}."})
 
 
-def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, object]:
+@dataclass(frozen=True)
+class _RegistryOperationEntry:
+    path: str
+    operation_id: str
+    tags: set[str]
+    document: dict[str, object]
+
+
+@dataclass(frozen=True)
+class _OperationDocumentParams:
+    operation_id: str
+    tags: Sequence[str]
+    summary: str
+    description: str
+    cli_extension: Mapping[str, object]
+    problem_details: Sequence[str]
+    interface_extension: Mapping[str, object] | None
+
+
+@dataclass(frozen=True)
+class _InterfaceOperationContext:
+    interface: RegistryInterfaceModel
+    bin_name: str
+    interface_extension: Mapping[str, object] | None
+    augment: AugmentMetadataModel
+
+
+def _existing_operation_ids(paths_section: Mapping[str, object]) -> set[str]:
+    operation_ids: set[str] = set()
+    for entry in paths_section.values():
+        if not isinstance(entry, Mapping):
+            continue
+        for operation in entry.values():
+            if isinstance(operation, Mapping):
+                op_id = operation.get("operationId")
+                if isinstance(op_id, str):
+                    operation_ids.add(op_id)
+    return operation_ids
+
+
+def _operation_tokens(operation_id: str, fallback: str) -> tuple[list[str], list[str]]:
+    tokens = [part.strip() for part in operation_id.split(".") if part.strip()]
+    if tokens and tokens[0] == "cli":
+        tokens = tokens[1:]
+    if not tokens:
+        tokens = [fallback.replace("-", "_")]
+    sanitized = [token.replace("-", "_") for token in tokens]
+    command_tokens = [snake_to_kebab(token) for token in sanitized]
+    return sanitized, command_tokens
+
+
+def _coerce_str_list(value: object) -> list[str]:
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    return []
+
+
+def _build_cli_extension(
+    *,
+    bin_name: str,
+    command_tokens: Sequence[str],
+    metadata: Mapping[str, object],
+) -> dict[str, object]:
+    command_string = " ".join(command_tokens).strip()
+    example_command = f"{bin_name} {command_string}".strip()
+    extension: dict[str, object] = {
+        "bin": bin_name,
+        "command": command_string or bin_name,
+        "examples": [example_command] if example_command else [bin_name],
+        "exitCodes": [{"code": 0, "meaning": "success"}],
+    }
+    handler = metadata.get("handler")
+    if isinstance(handler, (str, bytes)) and handler:
+        extension["x-handler"] = str(handler)
+    env_values = metadata.get("env") or metadata.get("x-env")
+    if isinstance(env_values, Sequence) and not isinstance(env_values, (str, bytes)):
+        extension["x-env"] = [str(value) for value in env_values]
+    code_samples = metadata.get("code_samples") or metadata.get("x-codeSamples")
+    if isinstance(code_samples, Sequence) and not isinstance(code_samples, (str, bytes)):
+        samples = [cast("Mapping[str, object]", item) for item in code_samples]
+        extension["x-codeSamples"] = samples
+    examples = _coerce_str_list(metadata.get("examples"))
+    if examples:
+        example_list = cast("list[str]", extension.setdefault("examples", []))
+        example_list.extend(examples)
+    return extension
+
+
+def _registry_operation_document(params: _OperationDocumentParams) -> dict[str, object]:
+    operation: dict[str, object] = {
+        "operationId": params.operation_id,
+        "tags": list(params.tags),
+        "summary": params.summary,
+        "description": params.description,
+        "x-cli": dict(params.cli_extension),
+        "requestBody": {
+            "required": False,
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "additionalProperties": True,
+                    }
+                }
+            },
+        },
+        "responses": {
+            "200": {
+                "description": "CLI result",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "stdout": {"type": "string"},
+                                "stderr": {"type": "string"},
+                                "exitCode": {"type": "integer"},
+                                "artifacts": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                },
+                            },
+                            "required": ["exitCode"],
+                        }
+                    }
+                },
+            }
+        },
+    }
+    if params.problem_details:
+        operation["x-problemDetails"] = list(params.problem_details)
+    if params.interface_extension:
+        operation["x-kgf-interface"] = params.interface_extension
+    return operation
+
+
+def _build_registry_operation_entry(
+    *,
+    context: _InterfaceOperationContext,
+    op_key: str,
+    operation_model: RegistryOperationModel,
+    existing_operation_ids: set[str],
+) -> _RegistryOperationEntry | None:
+    payload = operation_model.to_payload(op_key)
+    operation_id = str(payload.get("operation_id") or op_key)
+    if not operation_id or operation_id in existing_operation_ids:
+        return None
+
+    sanitized_tokens, command_tokens = _operation_tokens(operation_id, op_key)
+    path = "/cli/" + "/".join(command_tokens)
+
+    override_model = context.augment.operation_override(operation_id, tokens=sanitized_tokens)
+    override_payload = (
+        override_model.to_payload()
+        if override_model is not None
+        else context.augment.get_operation(operation_id)
+    )
+
+    merged_meta: dict[str, object] = {str(k): v for k, v in payload.items()}
+    if isinstance(override_payload, Mapping):
+        merged_meta.update({str(k): v for k, v in override_payload.items()})
+
+    tags = _select_operation_tags(
+        override_model,
+        merged_meta,
+        context.interface,
+        sanitized_tokens[0] if sanitized_tokens else context.interface.identifier,
+    )
+
+    return _RegistryOperationEntry(
+        path=path,
+        operation_id=operation_id,
+        tags=set(tags),
+        document=_registry_operation_document(
+            _OperationDocumentParams(
+                operation_id=operation_id,
+                tags=tags,
+                summary=str(merged_meta.get("summary") or "Run CLI command"),
+                description=str(merged_meta.get("description") or ""),
+                cli_extension=_build_cli_extension(
+                    bin_name=context.bin_name,
+                    command_tokens=command_tokens,
+                    metadata=merged_meta,
+                ),
+                problem_details=_coerce_str_list(
+                    merged_meta.get("problem_details") or merged_meta.get("x-problemDetails")
+                ),
+                interface_extension=context.interface_extension,
+            )
+        ),
+    )
+
+
+def _ensure_registry_operations(
+    document: dict[str, object],
+    config: CLIConfig,
+    registry: RegistryMetadataModel | None,
+    referenced_tags: set[str],
+) -> None:
+    if registry is None:
+        return
+
+    paths_section = document.setdefault("paths", {})
+    if not isinstance(paths_section, dict):
+        return
+
+    existing_operation_ids = _existing_operation_ids(paths_section)
+    augment = config.augment
+
+    for interface in registry.interfaces.values():
+        bin_name = interface.binary or config.bin_name
+        interface_extension = _interface_metadata(interface)
+        context = _InterfaceOperationContext(
+            interface=interface,
+            bin_name=bin_name,
+            interface_extension=interface_extension,
+            augment=augment,
+        )
+
+        for key, op_model in interface.operations.items():
+            entry = _build_registry_operation_entry(
+                context=context,
+                op_key=key,
+                operation_model=op_model,
+                existing_operation_ids=existing_operation_ids,
+            )
+            if entry is None:
+                continue
+
+            path_entry = paths_section.setdefault(entry.path, {})
+            if not isinstance(path_entry, dict) or "post" in path_entry:
+                continue
+
+            path_entry["post"] = entry.document
+            existing_operation_ids.add(entry.operation_id)
+            referenced_tags.update(entry.tags)
+
+
+def make_openapi(
+    click_cmd: click.core.Command,
+    config: CLIConfig,
+    registry: RegistryMetadataModel | None = None,
+) -> dict[str, object]:
     """Produce an OpenAPI 3.1 document representing the CLI.
 
     Parameters
@@ -626,6 +870,8 @@ def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, 
     config : CLIConfig
         Configuration object containing title, version, augment metadata,
         interface settings, and operation context.
+    registry : RegistryMetadataModel | None, optional
+        Optional registry metadata used to enrich operations with CLI facets.
 
     Returns
     -------
@@ -652,6 +898,8 @@ def make_openapi(click_cmd: click.core.Command, config: CLIConfig) -> dict[str, 
         if isinstance(path_entry, dict):
             path_entry["post"] = operation
         referenced_tags.update(tags)
+
+    _ensure_registry_operations(document, config, registry, referenced_tags)
 
     _augment_document_tags(document, referenced_tags)
     return document
@@ -738,7 +986,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
 
     cli_config = cast("CLIConfig", tooling_context.cli_config)
-    spec = make_openapi(click_cmd, cli_config)
+    registry = getattr(tooling_context, "registry", None)
+    spec = make_openapi(click_cmd, cli_config, registry)
     output_path = Path(args.out)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as handle:

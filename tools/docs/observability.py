@@ -261,7 +261,7 @@ def record_operation_metrics(
     Notes
     -----
     Any exception raised during the operation is propagated after recording
-    error status and metrics.
+    error status and metrics. The exception type depends on what the operation raises.
 
     Examples
     --------

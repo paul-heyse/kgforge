@@ -11,9 +11,6 @@ observability tooling all consume the same canonical configuration.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from functools import lru_cache
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -25,7 +22,18 @@ from tools import (
     RegistryInterfaceModel,
     RegistryMetadataModel,
     ToolingMetadataModel,
-    load_cli_tooling_context,
+)
+from tools.cli_context_registry import (
+    CLIContextDefinition,
+    augment_for,
+    context_for,
+    default_version_resolver,
+    interface_for,
+    operation_override_for,
+    register_cli,
+    registry_for,
+    settings_for,
+    tooling_metadata_for,
 )
 
 if TYPE_CHECKING:
@@ -36,18 +44,6 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 """Repository root used to resolve augment and registry metadata paths."""
 
 
-CLI_COMMAND = "codeintel"
-"""Human-friendly command label used for envelopes and logging."""
-
-
-CLI_TITLE = "KGFoundry CodeIntel Indexer"
-"""Title surfaced in Typer help text and OpenAPI metadata."""
-
-
-CLI_INTERFACE_ID = "codeintel-indexer"
-"""Registry interface identifier for the code-intel indexer CLI."""
-
-
 CLI_OPERATION_IDS: dict[str, str] = {
     "query": "cli.codeintel.query",
     "symbols": "cli.codeintel.symbols",
@@ -55,23 +51,30 @@ CLI_OPERATION_IDS: dict[str, str] = {
 """Mapping of subcommand names to canonical augment/registry operation IDs."""
 
 
-def _resolve_cli_version() -> str:
-    """Return the installed package version backing the CLI metadata.
+_CLI_KEY = "codeintel"
+_CLI_DEFINITION = CLIContextDefinition(
+    command="codeintel",
+    title="KGFoundry CodeIntel Indexer",
+    interface_id="codeintel-indexer",
+    operation_ids=CLI_OPERATION_IDS,
+    bin_name="kgf-codeintel",
+    version_resolver=default_version_resolver("kgfoundry-codeintel", "kgfoundry"),
+)
 
-    Returns
-    -------
-    str
-        Detected version string or ``"0.0.0"`` when the package is unavailable.
-    """
-    for distribution in ("kgfoundry-codeintel", "kgfoundry"):
-        try:
-            return pkg_version(distribution)
-        except PackageNotFoundError:  # pragma: no cover - editable installs fallback
-            continue
-    return "0.0.0"
+register_cli(_CLI_KEY, _CLI_DEFINITION)
+
+CLI_COMMAND = _CLI_DEFINITION.command
+"""Human-friendly command label used for envelopes and logging."""
 
 
-@lru_cache(maxsize=1)
+CLI_TITLE = _CLI_DEFINITION.title
+"""Title surfaced in Typer help text and OpenAPI metadata."""
+
+
+CLI_INTERFACE_ID = _CLI_DEFINITION.interface_id
+"""Registry interface identifier for the code-intel indexer CLI."""
+
+
 def get_cli_settings() -> CLIToolSettings:
     """Return CLI settings describing augment and registry metadata inputs.
 
@@ -80,17 +83,9 @@ def get_cli_settings() -> CLIToolSettings:
     CLIToolSettings
         Cached settings referencing augment and registry metadata paths.
     """
-    return CLIToolSettings(
-        bin_name="kgf-codeintel",
-        title=CLI_TITLE,
-        version=_resolve_cli_version(),
-        augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
-        registry_path=REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml",
-        interface_id=CLI_INTERFACE_ID,
-    )
+    return settings_for(_CLI_KEY)
 
 
-@lru_cache(maxsize=1)
 def get_cli_context() -> CLIToolingContext:
     """Return the cached CLI tooling context for the code-intel CLI.
 
@@ -99,7 +94,7 @@ def get_cli_context() -> CLIToolingContext:
     CLIToolingContext
         Composite context bundling augment, registry, and configuration data.
     """
-    return load_cli_tooling_context(get_cli_settings())
+    return context_for(_CLI_KEY)
 
 
 def get_cli_config() -> CLIConfig:
@@ -133,8 +128,7 @@ def get_tooling_metadata() -> ToolingMetadataModel:
     ToolingMetadataModel
         Immutable bundle combining augment and registry metadata.
     """
-    context = get_cli_context()
-    return ToolingMetadataModel(augment=context.augment, registry=context.registry)
+    return tooling_metadata_for(_CLI_KEY)
 
 
 def get_augment_metadata() -> AugmentMetadataModel:
@@ -145,7 +139,7 @@ def get_augment_metadata() -> AugmentMetadataModel:
     AugmentMetadataModel
         Augment metadata model scoped to the code-intel CLI operations.
     """
-    return get_cli_context().augment
+    return augment_for(_CLI_KEY)
 
 
 def get_registry_metadata() -> RegistryMetadataModel:
@@ -156,7 +150,7 @@ def get_registry_metadata() -> RegistryMetadataModel:
     RegistryMetadataModel
         Registry metadata describing the code-intel CLI interface definition.
     """
-    return get_cli_context().registry
+    return registry_for(_CLI_KEY)
 
 
 def get_interface_metadata() -> RegistryInterfaceModel:
@@ -166,17 +160,8 @@ def get_interface_metadata() -> RegistryInterfaceModel:
     -------
     RegistryInterfaceModel
         Interface metadata linked to the code-intel CLI.
-
-    Raises
-    ------
-    KeyError
-        Raised when the registry metadata does not contain the interface.
     """
-    interface = get_registry_metadata().interface(CLI_INTERFACE_ID)
-    if interface is None:  # pragma: no cover - misconfiguration guard
-        msg = f"Registry metadata missing interface '{CLI_INTERFACE_ID}'."
-        raise KeyError(msg)
-    return interface
+    return interface_for(_CLI_KEY)
 
 
 def get_operation_override(
@@ -189,10 +174,7 @@ def get_operation_override(
     OperationOverrideModel | None
         Operation override metadata when present; otherwise ``None``.
     """
-    operation_id = CLI_OPERATION_IDS.get(subcommand)
-    if operation_id is None:
-        return None
-    return get_augment_metadata().operation_override(operation_id, tokens=tokens)
+    return operation_override_for(_CLI_KEY, subcommand=subcommand, tokens=tokens)
 
 
 __all__ = [

@@ -137,7 +137,7 @@ def observe_tool_run(
     Notes
     -----
     Any exception raised during tool execution is propagated after recording
-    error status and metrics.
+    error status and metrics. The exception type depends on what the tool raises.
     """
     settings = get_runtime_settings()
     observation = ToolRunObservation(
