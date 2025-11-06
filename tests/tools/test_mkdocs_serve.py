@@ -7,9 +7,10 @@ import importlib.util
 import socket
 import sys
 import types
-from collections.abc import Iterable
+from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -23,16 +24,18 @@ def _load_serve_module() -> types.ModuleType:
 
 
 def _load_serve_module_with_stubs() -> types.ModuleType:
-    tools_stub = sys.modules.setdefault("tools", types.ModuleType("tools"))
+    tools_stub = cast("Any", sys.modules.setdefault("tools", types.ModuleType("tools")))
     if not hasattr(tools_stub, "__path__"):
-        tools_stub.__path__ = []  # type: ignore[attr-defined]
+        tools_stub.__path__ = []
 
-    shared_stub = sys.modules.setdefault("tools._shared", types.ModuleType("tools._shared"))
+    shared_stub = cast(
+        "Any", sys.modules.setdefault("tools._shared", types.ModuleType("tools._shared"))
+    )
     if not hasattr(shared_stub, "__path__"):
-        shared_stub.__path__ = []  # type: ignore[attr-defined]
+        shared_stub.__path__ = []
 
     if "tools._shared.logging" not in sys.modules:
-        logging_stub = types.ModuleType("tools._shared.logging")
+        logging_stub = cast("Any", types.ModuleType("tools._shared.logging"))
 
         def _get_logger_stub(*_args: object, **_kwargs: object) -> types.SimpleNamespace:
             return types.SimpleNamespace(
@@ -44,7 +47,7 @@ def _load_serve_module_with_stubs() -> types.ModuleType:
         sys.modules["tools._shared.logging"] = logging_stub
 
     if "tools._shared.proc" not in sys.modules:
-        proc_stub = types.ModuleType("tools._shared.proc")
+        proc_stub = cast("Any", types.ModuleType("tools._shared.proc"))
 
         class _ToolExecutionError(Exception):
             def __init__(self, *args: object, **kwargs: object) -> None:
@@ -75,7 +78,7 @@ def _load_serve_module_with_stubs() -> types.ModuleType:
 serve = _load_serve_module()
 
 
-def _iter_candidate_ports(host: str, family: int, start: int, count: int = 50) -> Iterable[int]:
+def _iter_candidate_ports(host: str, family: int, start: int, count: int = 50) -> Iterator[int]:
     for port in range(start, min(start + count, 65535) + 1):
         try:
             addrinfos = socket.getaddrinfo(
@@ -130,7 +133,10 @@ def test_find_available_port_prefers_unbound_port(host: str, family: int) -> Non
 
     try:
         try:
-            free_port = next(_iter_candidate_ports(host, family, busy_port + 1))
+            candidate_ports: Iterator[int] = iter(
+                _iter_candidate_ports(host, family, busy_port + 1)
+            )
+            free_port = next(candidate_ports)
         except StopIteration:
             pytest.skip("Unable to locate a free port for the test host")
 

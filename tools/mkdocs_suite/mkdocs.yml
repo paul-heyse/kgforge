@@ -2,7 +2,7 @@ site_name: KgFoundry MkDocs Suite
 site_url: https://docs.kgfoundry.dev/
 repo_url: https://github.com/kgfoundry/kgfoundry
 edit_uri: edit/main/
-strict: false
+strict: true
 
 theme:
   name: material

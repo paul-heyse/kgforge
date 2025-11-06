@@ -141,6 +141,13 @@ except ImportError:  # pragma: no cover - optional dependency
     ) -> JSONResponseProtocol:
         """Raise ``RuntimeError`` when FastAPI support is unavailable.
 
+        Parameters
+        ----------
+        error : KgFoundryError
+            Error instance (unused, for signature compatibility).
+        request : RequestProtocol | None, optional
+            Request instance (unused, for signature compatibility).
+
         Raises
         ------
         RuntimeError
@@ -157,6 +164,11 @@ except ImportError:  # pragma: no cover - optional dependency
 
     def _missing_register_problem_details_handler(app: FastAPIProtocol) -> None:
         """Raise ``RuntimeError`` when FastAPI support is unavailable.
+
+        Parameters
+        ----------
+        app : FastAPIProtocol
+            FastAPI app instance (unused, for signature compatibility).
 
         Raises
         ------

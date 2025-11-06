@@ -128,6 +128,15 @@ def harvest(
 ) -> None:
     """Harvest documents from OpenAlex using the shared CLI tooling context.
 
+    Parameters
+    ----------
+    topic : str
+        Topic query string to harvest.
+    years : str, optional
+        Year filter expression (e.g., '>=2018'). Defaults to ``DEFAULT_YEARS``.
+    max_works : int, optional
+        Maximum number of works to harvest. Defaults to ``DEFAULT_MAX_WORKS``.
+
     Raises
     ------
     typer.Exit

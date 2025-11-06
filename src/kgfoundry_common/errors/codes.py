@@ -51,71 +51,71 @@ class ErrorCode(StrEnum):
 
     Attributes
     ----------
-    DOWNLOAD_FAILED : ErrorCode
+    DOWNLOAD_FAILED : str
         Download operation failed.
-    UNSUPPORTED_MIME : ErrorCode
+    UNSUPPORTED_MIME : str
         Unsupported MIME type encountered.
-    INVALID_INPUT : ErrorCode
+    INVALID_INPUT : str
         Invalid input provided.
-    DOCLING_ERROR : ErrorCode
+    DOCLING_ERROR : str
         Document processing error via Docling.
-    OCR_TIMEOUT : ErrorCode
+    OCR_TIMEOUT : str
         OCR operation timed out.
-    CHUNKING_ERROR : ErrorCode
+    CHUNKING_ERROR : str
         Document chunking failed.
-    EMBEDDING_ERROR : ErrorCode
+    EMBEDDING_ERROR : str
         Embedding generation failed.
-    INDEX_BUILD_ERROR : ErrorCode
+    INDEX_BUILD_ERROR : str
         Index construction failed.
-    SPLADE_OOM : ErrorCode
+    SPLADE_OOM : str
         SPLADE encoding out of memory.
-    RETRY_EXHAUSTED : ErrorCode
+    RETRY_EXHAUSTED : str
         All retry attempts exhausted.
-    SEARCH_INDEX_MISSING : ErrorCode
+    SEARCH_INDEX_MISSING : str
         Search index not found.
-    SEARCH_QUERY_INVALID : ErrorCode
+    SEARCH_QUERY_INVALID : str
         Invalid search query.
-    SEARCH_TIMEOUT : ErrorCode
+    SEARCH_TIMEOUT : str
         Search operation timed out.
-    VECTOR_SEARCH_ERROR : ErrorCode
+    VECTOR_SEARCH_ERROR : str
         Vector search operation failed.
-    AGENT_CATALOG_SEARCH_ERROR : ErrorCode
+    AGENT_CATALOG_SEARCH_ERROR : str
         Agent catalog search failed.
-    CATALOG_LOAD_ERROR : ErrorCode
+    CATALOG_LOAD_ERROR : str
         Catalog loading failed.
-    SYMBOL_ATTACHMENT_ERROR : ErrorCode
+    SYMBOL_ATTACHMENT_ERROR : str
         Symbol attachment failed.
-    CONFIGURATION_ERROR : ErrorCode
+    CONFIGURATION_ERROR : str
         Configuration error.
-    RUNTIME_ERROR : ErrorCode
+    RUNTIME_ERROR : str
         Runtime error occurred.
-    RESOURCE_UNAVAILABLE : ErrorCode
+    RESOURCE_UNAVAILABLE : str
         Required resource unavailable.
-    SESSION_ERROR : ErrorCode
+    SESSION_ERROR : str
         Session management error.
-    ONTOLOGY_PARSE_ERROR : ErrorCode
+    ONTOLOGY_PARSE_ERROR : str
         Ontology parsing failed.
-    LINKER_CALIBRATION_ERROR : ErrorCode
+    LINKER_CALIBRATION_ERROR : str
         Linker calibration failed.
-    NEO4J_ERROR : ErrorCode
+    NEO4J_ERROR : str
         Neo4j database error.
-    SERIALIZATION_ERROR : ErrorCode
+    SERIALIZATION_ERROR : str
         Data serialization failed.
-    DESERIALIZATION_ERROR : ErrorCode
+    DESERIALIZATION_ERROR : str
         Data deserialization failed.
-    SCHEMA_VALIDATION_ERROR : ErrorCode
+    SCHEMA_VALIDATION_ERROR : str
         Schema validation failed.
-    REGISTRY_ERROR : ErrorCode
+    REGISTRY_ERROR : str
         Registry operation failed.
-    ARTIFACT_MODEL_ERROR : ErrorCode
+    ARTIFACT_MODEL_ERROR : str
         Artifact model error.
-    ARTIFACT_VALIDATION_ERROR : ErrorCode
+    ARTIFACT_VALIDATION_ERROR : str
         Artifact validation failed.
-    ARTIFACT_SERIALIZATION_ERROR : ErrorCode
+    ARTIFACT_SERIALIZATION_ERROR : str
         Artifact serialization failed.
-    ARTIFACT_DESERIALIZATION_ERROR : ErrorCode
+    ARTIFACT_DESERIALIZATION_ERROR : str
         Artifact deserialization failed.
-    ARTIFACT_DEPENDENCY_ERROR : ErrorCode
+    ARTIFACT_DEPENDENCY_ERROR : str
         Artifact dependency error.
 
     Notes

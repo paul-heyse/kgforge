@@ -205,7 +205,7 @@ class AllDictTemplate:
     attribute. When resolving navmaps, this template is replaced with a dictionary
     mapping each exported symbol name to the template value.
 
-    Parameters
+    Attributes
     ----------
     template : NavTree
         Template navmap tree structure that will be applied to each symbol

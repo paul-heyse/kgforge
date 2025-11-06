@@ -98,9 +98,9 @@ class _PytestarchModule(Protocol):
         Parameters
         ----------
         *args : object
-            Positional arguments forwarded to pytestarch.
+            Positional arguments forwarded to pytestarch helpers.
         **kwargs : object
-            Keyword arguments (unused).
+            Keyword arguments forwarded to pytestarch.
 
         Returns
         -------
@@ -118,9 +118,9 @@ class _PytestarchModule(Protocol):
         Parameters
         ----------
         *args : object
-            Positional arguments forwarded to pytestarch.
+            Positional arguments forwarded to pytestarch helpers.
         **kwargs : object
-            Keyword arguments (unused).
+            Keyword arguments forwarded to pytestarch.
 
         Returns
         -------

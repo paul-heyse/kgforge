@@ -210,6 +210,8 @@ def get_operation_override(
     if operation_id is None:
         return None
     return get_augment_metadata().operation_override(operation_id, tokens=tokens)
+
+
 __all__ = [
     "CLI_COMMAND",
     "CLI_INTERFACE_ID",

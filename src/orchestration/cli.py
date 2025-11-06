@@ -439,6 +439,15 @@ def index_bm25(
 ) -> None:
     """Build a BM25 index from chunk metadata and emit a CLI envelope.
 
+    Parameters
+    ----------
+    chunks_parquet : str
+        Path to Parquet/JSONL file with chunks.
+    backend : str, optional
+        Backend to use: 'lucene' or 'pure'. Defaults to 'lucene'.
+    index_dir : str, optional
+        Output index directory. Defaults to './_indices/bm25'.
+
     Raises
     ------
     typer.Exit
@@ -672,6 +681,11 @@ app.command(name="index_faiss")(index_faiss)
 @app.command(name=SUBCOMMAND_API)
 def api(port: Annotated[int, typer.Option(help="Port to bind", show_default=True)] = 8080) -> None:
     """Launch the FastAPI search service using uvicorn.
+
+    Parameters
+    ----------
+    port : int, optional
+        Port to bind the server to. Defaults to 8080.
 
     Raises
     ------

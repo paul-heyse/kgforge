@@ -5,61 +5,86 @@ from __future__ import annotations
 import ast
 import importlib
 import importlib.machinery
+import importlib.util
 import io
 import logging
 import sys
 import types
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any, cast
 
 import griffe
 import pytest
+from tools._shared import augment_registry
 
 
 @pytest.fixture(name="gen_module_pages")
 def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
     monkeypatch: pytest.MonkeyPatch,
 ) -> types.ModuleType:
-    """Load ``gen_module_pages`` without executing its expensive side effects."""
-    mkdocs_stub = types.ModuleType("mkdocs_gen_files")
+    """Load ``gen_module_pages`` without executing its expensive side effects.
+
+    Parameters
+    ----------
+    monkeypatch : pytest.MonkeyPatch
+        Pytest monkeypatch fixture for stubbing module imports.
+
+    Returns
+    -------
+    types.ModuleType
+        The loaded module instance with side effects stubbed out.
+
+    Raises
+    ------
+    RuntimeError
+        Raised when unable to construct module spec for gen_module_pages.
+    """
+
+    def _module_stub(name: str) -> Any:
+        return cast("Any", types.ModuleType(name))
+
+    mkdocs_stub = cast("Any", types.ModuleType("mkdocs_gen_files"))
     mkdocs_stub.open = lambda *_args, **_kwargs: io.StringIO()
     mkdocs_stub.files = io.StringIO
     monkeypatch.setitem(sys.modules, "mkdocs_gen_files", mkdocs_stub)
 
-    tools_stub = types.ModuleType("tools")
-    tools_stub.__path__ = []  # type: ignore[attr-defined]
+    tools_stub = cast("Any", types.ModuleType("tools"))
+    tools_stub.__path__ = []
     monkeypatch.setitem(sys.modules, "tools", tools_stub)
 
-    shared_stub = types.ModuleType("tools._shared")
-    shared_stub.__path__ = []  # type: ignore[attr-defined]
+    shared_stub = cast("Any", types.ModuleType("tools._shared"))
+    shared_stub.__path__ = []
     monkeypatch.setitem(sys.modules, "tools._shared", shared_stub)
 
-    augment_stub = types.ModuleType("tools._shared.augment_registry")
+    augment_stub = cast("Any", types.ModuleType("tools._shared.augment_registry"))
     augment_stub.AugmentRegistryError = type("AugmentRegistryError", (Exception,), {})
     augment_stub.load_registry = lambda *_args, **_kwargs: None
     augment_stub.render_problem_details = lambda *_args, **_kwargs: {}
     monkeypatch.setitem(sys.modules, "tools._shared.augment_registry", augment_stub)
 
-    operation_links_stub = types.ModuleType("tools.mkdocs_suite.docs._scripts._operation_links")
+    operation_links_stub = cast(
+        "Any", types.ModuleType("tools.mkdocs_suite.docs._scripts._operation_links")
+    )
     operation_links_stub.build_operation_href = lambda *_args, **_kwargs: None
     monkeypatch.setitem(
         sys.modules, "tools.mkdocs_suite.docs._scripts._operation_links", operation_links_stub
     )
 
-    mkdocs_suite_stub = types.ModuleType("tools.mkdocs_suite")
-    mkdocs_suite_stub.__path__ = []  # type: ignore[attr-defined]
+    mkdocs_suite_stub = cast("Any", types.ModuleType("tools.mkdocs_suite"))
+    mkdocs_suite_stub.__path__ = []
     monkeypatch.setitem(sys.modules, "tools.mkdocs_suite", mkdocs_suite_stub)
 
-    docs_stub = types.ModuleType("tools.mkdocs_suite.docs")
-    docs_stub.__path__ = []  # type: ignore[attr-defined]
+    docs_stub = cast("Any", types.ModuleType("tools.mkdocs_suite.docs"))
+    docs_stub.__path__ = []
     monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs", docs_stub)
 
-    scripts_stub = types.ModuleType("tools.mkdocs_suite.docs._scripts")
-    scripts_stub.__path__ = []  # type: ignore[attr-defined]
+    scripts_stub = cast("Any", types.ModuleType("tools.mkdocs_suite.docs._scripts"))
+    scripts_stub.__path__ = []
     scripts_stub.load_repo_settings = lambda *_args, **_kwargs: (None, None)
     monkeypatch.setitem(sys.modules, "tools.mkdocs_suite.docs._scripts", scripts_stub)
 
-    msgspec_stub = types.ModuleType("msgspec")
+    msgspec_stub = cast("Any", types.ModuleType("msgspec"))
     msgspec_stub.UNSET = object()
 
     class _Struct:
@@ -77,20 +102,20 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
     monkeypatch.setitem(sys.modules, "msgspec", msgspec_stub)
 
     problem_details_stub = types.SimpleNamespace(ProblemDetailsDict=dict)
-    typing_stub = types.ModuleType("kgfoundry_common.typing")
+    typing_stub = cast("Any", types.ModuleType("kgfoundry_common.typing"))
     typing_stub.gate_import = lambda *_args, **_kwargs: problem_details_stub
-    kgfoundry_common_stub = types.ModuleType("kgfoundry_common")
-    kgfoundry_common_stub.__path__ = []  # type: ignore[attr-defined]
+    kgfoundry_common_stub = cast("Any", types.ModuleType("kgfoundry_common"))
+    kgfoundry_common_stub.__path__ = []
     monkeypatch.setitem(sys.modules, "kgfoundry_common", kgfoundry_common_stub)
     monkeypatch.setitem(sys.modules, "kgfoundry_common.typing", typing_stub)
-    errors_stub = types.ModuleType("kgfoundry_common.errors")
+    errors_stub = cast("Any", types.ModuleType("kgfoundry_common.errors"))
     errors_stub.SchemaValidationError = type("SchemaValidationError", (Exception,), {})
-    serialization_stub = types.ModuleType("kgfoundry_common.serialization")
+    serialization_stub = cast("Any", types.ModuleType("kgfoundry_common.serialization"))
     serialization_stub.validate_payload = lambda *_args, **_kwargs: None
     monkeypatch.setitem(sys.modules, "kgfoundry_common.errors", errors_stub)
     monkeypatch.setitem(sys.modules, "kgfoundry_common.serialization", serialization_stub)
 
-    logging_stub = types.ModuleType("kgfoundry_common.logging")
+    logging_stub = cast("Any", types.ModuleType("kgfoundry_common.logging"))
 
     class _LoggerAdapter:
         def __init__(
@@ -115,20 +140,22 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
             self._initializer(module)
 
     def _navmap_initializer(module: types.ModuleType) -> None:
-        module.DEFAULT_EXTENSIONS = []
-        module.DEFAULT_SEARCH_PATHS = []
+        module_any = cast("Any", module)
+        module_any.DEFAULT_EXTENSIONS = []
+        module_any.DEFAULT_SEARCH_PATHS = []
 
     def _nav_loader_initializer(module: types.ModuleType) -> None:
-        module.load_nav_metadata = lambda *_args, **_kwargs: {}
+        module_any = cast("Any", module)
+        module_any.load_nav_metadata = lambda *_args, **_kwargs: {}
 
         class _NavMetadataModel(dict):
             def as_mapping(self) -> dict[str, object]:
                 return dict(self)
 
-        module.NavMetadataModel = _NavMetadataModel
+        module_any.NavMetadataModel = _NavMetadataModel
 
     def _fake_spec_from_file_location(
-        name: str, location: str | Path, *args: object, **kwargs: object
+        name: str, location: str | Path, *args: Any, **kwargs: Any
     ) -> importlib.machinery.ModuleSpec:
         path_name = Path(location).name
         if path_name == "griffe_navmap.py":
@@ -137,7 +164,11 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
         if path_name == "navmap_loader.py":
             loader = _StubLoader(name, _nav_loader_initializer)
             return importlib.machinery.ModuleSpec(name, loader)
-        return original_spec(name, location, *args, **kwargs)
+        spec = original_spec(name, location, *args, **kwargs)
+        if spec is None or spec.loader is None:
+            message = "Unable to construct module spec"
+            raise RuntimeError(message)
+        return spec
 
     monkeypatch.setattr(importlib.util, "spec_from_file_location", _fake_spec_from_file_location)
 
@@ -151,16 +182,33 @@ def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
     )
     module_code = module_path.read_text(encoding="utf-8")
     module_ast = ast.parse(module_code, filename=str(module_path))
-    if module_ast.body and isinstance(module_ast.body[-1], ast.Expr):
-        call = module_ast.body[-1].value
-        if isinstance(call, ast.Call) and getattr(call.func, "id", None) == "render_module_pages":
-            module_ast.body.pop()
+    if module_ast.body:
+        last_stmt = module_ast.body[-1]
+        if isinstance(last_stmt, ast.Expr) and isinstance(last_stmt.value, ast.Call):
+            call = last_stmt.value
+            if getattr(call.func, "id", None) == "render_module_pages":
+                module_ast.body.pop()
 
     compiled = compile(module_ast, str(module_path), "exec")
-    module = types.ModuleType("gen_module_pages_under_test")
-    module.__file__ = str(module_path)
-    monkeypatch.setitem(sys.modules, module.__name__, module)
-    exec(compiled, module.__dict__)
+
+    class _PatchedLoader(importlib.machinery.SourceFileLoader):
+        def __init__(self, fullname: str, path: str, code_obj: types.CodeType) -> None:
+            super().__init__(fullname, path)
+            self._code_obj = code_obj
+
+        def get_code(self, fullname: str) -> types.CodeType:
+            del fullname
+            return self._code_obj
+
+    module_name = "gen_module_pages_under_test"
+    loader = _PatchedLoader(module_name, str(module_path), compiled)
+    spec = importlib.util.spec_from_file_location(module_name, module_path, loader=loader)
+    if spec is None or spec.loader is None:
+        message = "Unable to construct module spec for gen_module_pages"
+        raise RuntimeError(message)
+    module = importlib.util.module_from_spec(spec)
+    monkeypatch.setitem(sys.modules, module_name, module)
+    spec.loader.exec_module(module)
     return module
 
 
@@ -191,6 +239,7 @@ def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     """Install a lightweight ``mkdocs_gen_files`` stub for module imports."""
 
     def _fake_open(path: object, *_args: object, **_kwargs: object) -> io.StringIO:
+        del path
         return io.StringIO()
 
     stub = types.ModuleType("mkdocs_gen_files")
@@ -214,8 +263,6 @@ def test_render_module_pages_warns_and_continues_on_invalid_api_usage(
     monkeypatch.setattr(griffe, "load_extensions", lambda *_args, **_kwargs: [])
 
     # Prevent registry lookups from touching the filesystem during import.
-    from tools._shared import augment_registry  # noqa: PLC0415
-
     monkeypatch.setattr(augment_registry, "load_registry", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(augment_registry, "render_problem_details", lambda _exc: {})
 

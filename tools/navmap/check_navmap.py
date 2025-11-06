@@ -89,7 +89,7 @@ class AllDictTemplate:
     attribute. When resolving navmaps, this template is replaced with a dictionary
     mapping each exported symbol name to the template value.
 
-    Parameters
+    Attributes
     ----------
     template : NavTree
         Template navmap tree structure that will be applied to each symbol
@@ -835,7 +835,7 @@ def _validate_section_symbols(
         Python file being validated.
     sid : str
         Section identifier (e.g., ``"public-api"``).
-    symbols_value : list[object]
+    symbols_value : Sequence[object]
         Raw symbols array extracted from the navmap structure.
     anchors_inline : dict[str, int]
         Explicit inline anchor markers discovered in the file.
