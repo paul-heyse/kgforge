@@ -47,6 +47,16 @@ DEFAULT_TITLE = "KGFoundry CLI"
 DEFAULT_VERSION = "0.0.0"
 
 
+def _escape_d2(value: str) -> str:
+    """Escape characters that would break D2 string literals."""
+
+    return (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+    )
+
+
 def _operation_anchor(operation_id: str | None) -> str:
     anchor = (operation_id or "").strip()
     return f"../{REDOC_PAGE}#operation/{anchor}"
@@ -131,21 +141,30 @@ def _write_diagram(
     with mkdocs_gen_files.open(diagram_path, "w") as handle:
         handle.write('direction: right\nCLI: "CLI" {\n')
         unique_tags = sorted({tag for *_, tags in operations for tag in tags})
-        handle.write("\n".join(f'  "{tag}": "{tag}" {{}}' for tag in unique_tags))
+        handle.write(
+            "\n".join(
+                f'  "{_escape_d2(tag)}": "{_escape_d2(tag)}" {{}}'
+                for tag in unique_tags
+            )
+        )
         if unique_tags:
             handle.write("\n")
         written_nodes: set[str] = set()
         for method, path, operation_id, summary, tags in operations:
             node_id = f"{method} {path}"
-            label = f"{method} {path}\\n{summary}" if summary else node_id
+            escaped_node_id = _escape_d2(node_id)
+            label_base = f"{node_id}\n{summary}" if summary else node_id
             if node_id not in written_nodes:
+                escaped_label = _escape_d2(label_base)
                 link_attr = (
-                    f' {{ link: "{_operation_anchor(operation_id)}" }}' if operation_id else ""
+                    f' {{ link: "{_escape_d2(_operation_anchor(operation_id))}" }}'
+                    if operation_id
+                    else ""
                 )
-                handle.write(f'  "{node_id}": "{label}"{link_attr}\n')
+                handle.write(f'  "{escaped_node_id}": "{escaped_label}"{link_attr}\n')
                 written_nodes.add(node_id)
             for tag in tags:
-                handle.write(f'  "{tag}" -> "{node_id}"\n')
+                handle.write(f'  "{_escape_d2(tag)}" -> "{escaped_node_id}"\n')
         handle.write("}\n")
 
 
