@@ -1,5 +1,5 @@
 site_name: KgFoundry MkDocs Suite
-site_url: https://example.invalid/docs/
+site_url: https://docs.kgfoundry.dev/
 repo_url: https://github.com/example/kgfoundry
 edit_uri: edit/main/
 strict: false
