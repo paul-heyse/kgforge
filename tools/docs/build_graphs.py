@@ -21,11 +21,13 @@ import warnings
 from collections.abc import Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
-from functools import lru_cache, partial
+from functools import partial
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING, Any, Protocol, cast
+from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
+
+from docs._scripts import cli_context as docs_cli_context
 
 from kgfoundry_common.logging import setup_logging
 from tools import (
@@ -82,16 +84,6 @@ except (ModuleNotFoundError, ImportError):
 
 
 YamlError = _YamlError
-
-
-class _DocsCliContext(Protocol):
-    REPO_ROOT: Path
-
-    def get_cli_definition(self, command: str) -> Mapping[str, object]: ...
-
-    def get_cli_settings(self, command: str) -> object: ...
-
-    def get_cli_config(self, command: str) -> object: ...
 
 
 def _optional_import(name: str) -> ModuleType | None:
@@ -206,12 +198,6 @@ nx: ModuleType | None = _optional_import("networkx")
 yaml = _optional_import("yaml")
 
 
-@lru_cache(maxsize=1)
-def _load_docs_cli_context() -> _DocsCliContext:
-    module = importlib.import_module("docs._scripts.cli_context")
-    return cast("_DocsCliContext", module)
-
-
 def _require_pydot() -> ModuleType:
     """Return the imported :mod:`pydot` module, raising if unavailable.
 
@@ -241,10 +227,9 @@ OUT.mkdir(parents=True, exist_ok=True)
 SUPPORTED_FORMATS: tuple[str, ...] = ("svg", "png")
 
 CLI_COMMAND_NAME = "docs-build-graphs"
-DOCS_CLI_CONTEXT = _load_docs_cli_context()
-CLI_DEFINITION = DOCS_CLI_CONTEXT.get_cli_definition(CLI_COMMAND_NAME)
-CLI_SETTINGS = DOCS_CLI_CONTEXT.get_cli_settings(CLI_COMMAND_NAME)
-CLI_CONFIG = DOCS_CLI_CONTEXT.get_cli_config(CLI_COMMAND_NAME)
+CLI_DEFINITION = docs_cli_context.get_cli_definition(CLI_COMMAND_NAME)
+CLI_SETTINGS = docs_cli_context.get_cli_settings(CLI_COMMAND_NAME)
+CLI_CONFIG = docs_cli_context.get_cli_config(CLI_COMMAND_NAME)
 CLI_OPERATION_IDS = dict(CLI_DEFINITION.operation_ids)
 CLI_INTERFACE_ID = CLI_DEFINITION.interface_id
 CLI_COMMAND = CLI_DEFINITION.command
@@ -252,7 +237,7 @@ CLI_TITLE = CLI_DEFINITION.title
 SUBCOMMAND_BUILD_GRAPHS = "build"
 CLI_OPERATION_ID = CLI_OPERATION_IDS[SUBCOMMAND_BUILD_GRAPHS]
 CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/docs/build-graphs"
-CLI_ENVELOPE_DIR = DOCS_CLI_CONTEXT.REPO_ROOT / "site" / "_build" / "cli"
+CLI_ENVELOPE_DIR = docs_cli_context.REPO_ROOT / "site" / "_build" / "cli"
 
 
 def _prepare_run_inputs(args: argparse.Namespace) -> RunInputs:
