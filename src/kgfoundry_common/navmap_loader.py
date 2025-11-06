@@ -264,7 +264,7 @@ class NavMetadataModel(BaseModel):
         """
         return self.as_mapping()[key]
 
-    def __iter__(self) -> TupleGenerator:
+    def __iter__(self) -> TupleGenerator:  # type: ignore[override]
         """Yield flattened key-value pairs for dictionary compatibility.
 
         Yields
@@ -274,8 +274,9 @@ class NavMetadataModel(BaseModel):
 
         Notes
         -----
-        This method uses ``yield from`` to delegate iteration. The return type
-        ``TupleGenerator`` is Pydantic's type alias for ``Iterator[tuple[str, Any]]``.
+        The return annotation ``TupleGenerator`` is Pydantic's alias for
+        ``Iterator[tuple[str, JsonValue]]``. Iteration delegates to the underlying
+        mapping via ``yield from``.
         """
         items = self.as_mapping().items()
         yield from items

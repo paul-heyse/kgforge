@@ -95,20 +95,15 @@ def _install_stubbed_pipeline(
         config_selection=config_selection,
     )
 
-    def fake_run_pipeline(*args: object, **kwargs: object) -> DocstringBuildResult:
-        files = cast("list[Path]", args[0])
-        request = cast("DocstringBuildRequest", args[1])
-        config = cast("BuilderConfig", args[2])
-        selection = cast("ConfigSelection | None", args[3])
-        cache = cast("DocstringBuilderCache", kwargs["cache"])
-        plugins_enabled = cast("bool", kwargs["plugins_enabled"])
-
-        capture.files = list(files)
-        capture.request = request
-        capture.config = config
-        capture.selection = selection
-        capture.cache = cache
-        capture.plugins_enabled = plugins_enabled
+    def fake_run_pipeline(
+        invocation: orchestrator_module._PipelineInvocation,
+    ) -> DocstringBuildResult:
+        capture.files = list(invocation.files)
+        capture.request = invocation.request
+        capture.config = invocation.config
+        capture.selection = invocation.selection
+        capture.cache = invocation.cache
+        capture.plugins_enabled = invocation.plugins_enabled
         return result
 
     monkeypatch.setattr(orchestrator_module, "_run_pipeline", fake_run_pipeline)
@@ -234,7 +229,9 @@ class TestRunBuild:
 
         timeout_seconds = 1
 
-        def slow_run_pipeline(*_args: object, **_kwargs: object) -> DocstringBuildResult:
+        def slow_run_pipeline(
+            _invocation: orchestrator_module._PipelineInvocation,
+        ) -> DocstringBuildResult:
             time.sleep(timeout_seconds + 1)
             return result
 

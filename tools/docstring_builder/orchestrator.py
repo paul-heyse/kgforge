@@ -47,7 +47,7 @@ import datetime
 import json
 import os
 import warnings
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _FuturesTimeoutError
 from dataclasses import dataclass
@@ -722,32 +722,41 @@ def _build_error_result(
     )
 
 
-def _run_pipeline(
-    files: Iterable[Path],
-    request: DocstringBuildRequest,
-    config: BuilderConfig,
-    selection: ConfigSelection | None,
-    *,
-    cache: DocstringBuilderCache | None = None,
-    plugins_enabled: bool = True,
-) -> DocstringBuildResult:
-    files_list = list(files)
+@dataclass(slots=True)
+class _PipelineInvocation:
+    """Aggregate inputs required to execute the docstring builder pipeline."""
+
+    files: Iterable[Path]
+    request: DocstringBuildRequest
+    config: BuilderConfig
+    selection: ConfigSelection | None
+    cache: DocstringBuilderCache | None = None
+    plugins_enabled: bool = True
+
+
+def _run_pipeline(invocation: _PipelineInvocation) -> DocstringBuildResult:
+    files_list = list(invocation.files)
 
     context_builder_cls = _load_pipeline_context_builder()
-    context_builder = context_builder_cls(request, config, selection, files_list)
+    context_builder = context_builder_cls(
+        invocation.request,
+        invocation.config,
+        invocation.selection,
+        files_list,
+    )
     build_result = context_builder.build()
     if isinstance(build_result, DocstringBuildResult):
         return build_result
     logger, plugin_manager, policy_engine, options = build_result
-    if not plugins_enabled:
+    if not invocation.plugins_enabled:
         plugin_manager = None
 
     dependencies = _build_pipeline_dependencies(
-        config,
+        invocation.config,
         options,
         plugin_manager,
         logger,
-        cache=cache,
+        cache=invocation.cache,
     )
 
     def build_problem_details_wrapper(
@@ -787,9 +796,9 @@ def _run_pipeline(
         )
 
     pipeline_config = PipelineConfig(
-        request=request,
-        config=config,
-        selection=selection,
+        request=invocation.request,
+        config=invocation.config,
+        selection=invocation.selection,
         options=options,
         cache=dependencies.cache,
         file_processor=dependencies.file_processor,
@@ -813,10 +822,10 @@ def _run_pipeline(
     runner = PipelineRunner(pipeline_config)
     result = runner.run(files_list)
 
-    if request.command == "update":
+    if invocation.request.command == "update":
         dependencies.cache.write()
 
-    if not files_list and request.command == "check" and request.diff:
+    if not files_list and invocation.request.command == "check" and invocation.request.diff:
         DOCSTRINGS_DIFF_PATH.unlink(missing_ok=True)
         DOCFACTS_DIFF_PATH.unlink(missing_ok=True)
 
@@ -865,7 +874,13 @@ def run_docstring_builder(
             "Invalid path supplied to docstring builder",
             selection=config_selection,
         )
-    return _run_pipeline(files, request, config, config_selection)
+    invocation = _PipelineInvocation(
+        files=files,
+        request=request,
+        config=config,
+        selection=config_selection,
+    )
+    return _run_pipeline(invocation)
 
 
 def run_build(
@@ -928,14 +943,15 @@ def run_build(
     adapted_cache = _adapt_cache_policy(cache, config.cache_policy)
 
     def _execute() -> DocstringBuildResult:
-        return _run_pipeline(
-            files,
-            request,
-            builder_config,
-            config_selection,
+        invocation = _PipelineInvocation(
+            files=files,
+            request=request,
+            config=builder_config,
+            selection=config_selection,
             cache=adapted_cache,
             plugins_enabled=config.enable_plugins,
         )
+        return _run_pipeline(invocation)
 
     timeout_seconds = float(config.timeout_seconds)
     if timeout_seconds > 0:

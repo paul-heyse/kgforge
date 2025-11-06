@@ -8,7 +8,6 @@ import json
 import logging
 import sys
 import types
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Self, cast
 
 import pytest
@@ -181,13 +180,65 @@ def test_write_interface_table_escapes_markdown_control_characters() -> None:
     assert cells[7] == "issue\\|one, issue\\`two\\`"
 
 
-def test_operation_href_returns_relative_anchor() -> None:
+def test_operation_href_returns_relative_anchor(tmp_path: Path) -> None:
     """Operation links should include encoded anchors relative to the doc path."""
-    module = importlib.import_module(MODULE_PATH)
-    operation_href = cast(
-        "Callable[[object, str], str | None]",
-        getattr(module, "_operation_href"),
-    )
-    href = operation_href("docs/api/openapi-cli.yaml", "cli.operation/with space")
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        _install_mkdocs_stub(monkeypatch)
 
-    assert href == "openapi-cli.md#operation/cli.operation%2Fwith%20space"
+        module = importlib.import_module(MODULE_PATH)
+        monkeypatch.setattr(module, "REPO_ROOT", tmp_path)
+        monkeypatch.setattr(module, "REGISTRY_PATH", tmp_path / "registry.yaml")
+
+        registry_stub = types.SimpleNamespace(
+            interfaces={
+                "pkg.interfaces.Example": types.SimpleNamespace(
+                    type="service",
+                    module="pkg.interfaces",
+                    owner="owner",
+                    stability="stable",
+                    description=None,
+                    spec="docs/api/openapi-cli.yaml",
+                    operations={
+                        "run": types.SimpleNamespace(
+                            operation_id="cli.operation/with space",
+                            summary="Summary",
+                            handler="pkg.module:handler",
+                            tags=[],
+                            env=[],
+                            problem_details=[],
+                            extras={"code_samples": None},
+                        )
+                    },
+                )
+            },
+            interface=lambda _identifier: None,
+        )
+
+        monkeypatch.setattr(module, "load_registry", lambda _path: registry_stub)
+
+        (tmp_path / "src").mkdir()
+        nav_dir = tmp_path / "src" / "pkg" / "interfaces"
+        nav_dir.mkdir(parents=True)
+        (nav_dir / "_nav.json").write_text(
+            json.dumps(
+                {
+                    "interfaces": [
+                        {
+                            "id": "pkg.interfaces.Example",
+                            "type": "service",
+                            "spec": "docs/api/openapi-cli.yaml",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        _CAPTURED_OUTPUTS.clear()
+        module.render_interface_catalog()
+        rendered = "".join(_CAPTURED_OUTPUTS.values())
+    finally:
+        monkeypatch.undo()
+
+    assert "openapi-cli.md#operation/cli.operation%2Fwith%20space" in rendered
