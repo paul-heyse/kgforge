@@ -60,7 +60,6 @@ DEFAULT_VERSION = "0.0.0"
 
 def _log_diagram_warning(message: str, exc: Exception) -> None:
     """Log a warning describing why the CLI diagram cannot be produced."""
-
     LOGGER.warning(message, exc_info=exc, extra={"status": "warning"})
 
 

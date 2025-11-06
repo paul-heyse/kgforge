@@ -12,11 +12,14 @@ import types
 from collections.abc import Callable
 from pathlib import Path
 
+import griffe
 import pytest
 
 
 @pytest.fixture(name="gen_module_pages")
-def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
+def fixture_gen_module_pages(  # noqa: C901, PLR0914, PLR0915
+    monkeypatch: pytest.MonkeyPatch,
+) -> types.ModuleType:
     """Load ``gen_module_pages`` without executing its expensive side effects."""
     mkdocs_stub = types.ModuleType("mkdocs_gen_files")
     mkdocs_stub.open = lambda *_args, **_kwargs: io.StringIO()
@@ -100,19 +103,6 @@ def fixture_gen_module_pages(monkeypatch: pytest.MonkeyPatch) -> types.ModuleTyp
     logging_stub.get_logger = lambda *_args, **_kwargs: _LoggerAdapter()
     monkeypatch.setitem(sys.modules, "kgfoundry_common.logging", logging_stub)
 
-    griffe_stub = types.ModuleType("griffe")
-    griffe_stub.Alias = type("Alias", (), {})
-    griffe_stub.AliasResolutionError = Exception
-    griffe_stub.BuiltinModuleError = Exception
-    griffe_stub.CyclicAliasError = Exception
-    griffe_stub.Docstring = type("Docstring", (), {})
-    griffe_stub.GriffeLoader = type("GriffeLoader", (), {})
-    griffe_stub.Module = type("Module", (), {})
-    griffe_stub.load = lambda *_args, **_kwargs: object()
-    griffe_stub.load_extensions = lambda *_args, **_kwargs: None
-    griffe_stub.GriffeError = Exception
-    monkeypatch.setitem(sys.modules, "griffe", griffe_stub)
-
     original_spec = importlib.util.spec_from_file_location
 
     class _StubLoader(importlib.machinery.SourceFileLoader):
@@ -190,7 +180,7 @@ def test_inline_d2_neighborhood_uses_relative_doc_paths(gen_module_pages: types.
         source_paths={},
     )
 
-    block = gen_module_pages._inline_d2_neighborhood(module_path, facts)
+    block = gen_module_pages._inline_d2_neighborhood(module_path, facts)  # noqa: SLF001
 
     assert 'link: "./kgfoundry_common/logging.md"' in block
     assert 'link: "./kgfoundry_common/config.md"' in block
@@ -209,41 +199,22 @@ def _install_mkdocs_stub(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(sys.modules, "mkdocs_gen_files", stub)
 
 
-def _install_griffe_stub(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Install a stub ``griffe`` module that forces module discovery to degrade."""
-    stub = types.ModuleType("griffe")
-
-    class _StubGriffeError(Exception):
-        """Replacement for :class:`griffe.GriffeError` used during testing."""
-
-    def _stub_load(*_args: object, **_kwargs: object) -> object:
-        raise _StubGriffeError("stub discovery failure")
-
-    def _stub_load_extensions(*_args: object, **_kwargs: object) -> object:
-        return object()
-
-    stub.Alias = type("Alias", (), {})
-    stub.AliasResolutionError = _StubGriffeError
-    stub.BuiltinModuleError = _StubGriffeError
-    stub.CyclicAliasError = _StubGriffeError
-    stub.Docstring = type("Docstring", (), {})
-    stub.GriffeLoader = type("GriffeLoader", (), {})
-    stub.Module = type("Module", (), {})
-    stub.GriffeError = _StubGriffeError
-    stub.load = _stub_load
-    stub.load_extensions = _stub_load_extensions
-    monkeypatch.setitem(sys.modules, "griffe", stub)
-
-
 def test_render_module_pages_warns_and_continues_on_invalid_api_usage(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
     """Invalid API usage JSON should be ignored with a warning during builds."""
     _install_mkdocs_stub(monkeypatch)
-    _install_griffe_stub(monkeypatch)
+
+    message = "stub discovery failure"
+
+    def _raise_loader_error(*_args: object, **_kwargs: object) -> object:
+        raise griffe.GriffeError(message)
+
+    monkeypatch.setattr(griffe, "load", _raise_loader_error)
+    monkeypatch.setattr(griffe, "load_extensions", lambda *_args, **_kwargs: [])
 
     # Prevent registry lookups from touching the filesystem during import.
-    from tools._shared import augment_registry
+    from tools._shared import augment_registry  # noqa: PLC0415
 
     monkeypatch.setattr(augment_registry, "load_registry", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(augment_registry, "render_problem_details", lambda _exc: {})

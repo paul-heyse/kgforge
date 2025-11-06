@@ -1,10 +1,10 @@
-"""Shared CLI context for the navmap tooling command suite.
+"""Shared CLI context helpers for the docstring builder tooling suite.
 
-This module mirrors the shared CLI configuration helpers adopted across other
-CLIs (download, orchestration, codeintel). It exposes cached accessors for the
-canonical :class:`~tools.CLIToolSettings`, :class:`~tools.CLIToolingContext`, and
-typed augment/registry metadata models so the navmap tooling consumes the same
-facade as the rest of the system.
+The canonical CLI metadata (augment + registry) powers downstream tooling
+including OpenAPI generation, CLI diagrams, and automation scripts. This module
+exposes lightweight accessors so external integrations—such as
+``tools/generate_docstrings.py``—can load the same typed metadata without
+importing the heavy Typer CLI entry point.
 """
 
 from __future__ import annotations
@@ -34,32 +34,44 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 """Repository root used to resolve augment and registry metadata paths."""
 
 
-CLI_COMMAND = "navmap"
-"""Command label used for CLI envelopes and structured logging."""
+CLI_COMMAND = "docstrings"
+"""Logical command name used for envelopes and documentation artifacts."""
 
 
-CLI_TITLE = "KGFoundry Navmap Builder"
-"""Human-readable CLI title used by help text and metadata."""
+CLI_TITLE = "Docstring Builder CLI"
+"""Human-readable CLI title sourced from registry metadata."""
 
 
-CLI_INTERFACE_ID = "navmap-cli"
-"""Registry interface identifier for the navmap tooling CLI."""
+CLI_INTERFACE_ID = "docstring-builder-cli"
+"""Registry interface identifier for the docstring builder CLI."""
 
 
 CLI_OPERATION_IDS: dict[str, str] = {
-    "build": "navmap.build",
-    "check": "navmap.check",
+    "generate": "docstrings.generate",
+    "fix": "docstrings.fix",
+    "fmt": "docstrings.fmt",
+    "update": "docstrings.update",
+    "check": "docstrings.check",
+    "diff": "docstrings.diff",
+    "lint": "docstrings.lint",
+    "measure": "docstrings.measure",
+    "list": "docstrings.list",
+    "harvest": "docstrings.harvest",
+    "schema": "docstrings.schema",
+    "clear-cache": "docstrings.clear_cache",
+    "clear_cache": "docstrings.clear_cache",
+    "doctor": "docstrings.doctor",
 }
 """Mapping of subcommand names to canonical operation identifiers."""
 
 
 def _resolve_cli_version() -> str:
-    """Return the installed package version associated with the CLI metadata.
+    """Return the version string advertised for the CLI metadata.
 
     Returns
     -------
     str
-        Detected package version or ``"0.0.0"`` when unavailable.
+        Installed package version or ``"0.0.0"`` when unknown.
     """
     for distribution in ("kgfoundry-tools", "kgfoundry"):
         try:
@@ -71,15 +83,15 @@ def _resolve_cli_version() -> str:
 
 @lru_cache(maxsize=1)
 def get_cli_settings() -> CLIToolSettings:
-    """Return CLI settings describing augment and registry metadata inputs.
+    """Return canonical CLI settings for the docstring builder suite.
 
     Returns
     -------
     CLIToolSettings
-        Cached settings referencing augment and registry metadata paths.
+        Cached settings referencing augment and registry metadata.
     """
     return CLIToolSettings(
-        bin_name="tools-navmap",
+        bin_name="docstring-builder",
         title=CLI_TITLE,
         version=_resolve_cli_version(),
         augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
@@ -90,35 +102,35 @@ def get_cli_settings() -> CLIToolSettings:
 
 @lru_cache(maxsize=1)
 def get_cli_context() -> CLIToolingContext:
-    """Return the cached CLI tooling context for navmap operations.
+    """Return the lazily loaded CLI tooling context.
 
     Returns
     -------
     CLIToolingContext
-        Composite context bundling augment, registry, and CLI configuration.
+        Composite context bundling augment and registry metadata.
     """
     return load_cli_tooling_context(get_cli_settings())
 
 
 def get_cli_config() -> CLIConfig:
-    """Return the typed CLI configuration extracted from the tooling context.
+    """Return the typed CLI configuration consumed by downstream tooling.
 
     Returns
     -------
     CLIConfig
-        Typed configuration consumed by OpenAPI and CLI integrations.
+        Typed configuration generated from augment and registry metadata.
     """
     context = get_cli_context()
     return cast("CLIConfig", context.cli_config)
 
 
 def get_operation_context() -> OperationContext:
-    """Return the shared operation context helper used for metadata lookups.
+    """Return the helper used to construct OpenAPI operation payloads.
 
     Returns
     -------
     OperationContext
-        Helper used to resolve operation metadata and overrides.
+        Helper object for resolving operation metadata and OpenAPI payloads.
     """
     return get_cli_config().operation_context
 
@@ -129,49 +141,49 @@ def get_tooling_metadata() -> ToolingMetadataModel:
     Returns
     -------
     ToolingMetadataModel
-        Immutable bundle combining augment and registry metadata.
+        Immutable bundle combining augment and registry metadata models.
     """
     context = get_cli_context()
     return ToolingMetadataModel(augment=context.augment, registry=context.registry)
 
 
 def get_augment_metadata() -> AugmentMetadataModel:
-    """Return augment metadata describing navmap CLI operation overrides.
+    """Return augment metadata for docstring builder operations.
 
     Returns
     -------
     AugmentMetadataModel
-        Augment metadata scoped to the navmap CLI operations.
+        Augment metadata scoped to docstring builder commands.
     """
     return get_cli_context().augment
 
 
 def get_registry_metadata() -> RegistryMetadataModel:
-    """Return registry metadata backing the navmap CLI interface.
+    """Return registry metadata describing the docstring builder interface.
 
     Returns
     -------
     RegistryMetadataModel
-        Registry metadata describing the navmap CLI interface.
+        Registry metadata containing interface definitions for the CLI.
     """
     return get_cli_context().registry
 
 
 def get_interface_metadata() -> RegistryInterfaceModel:
-    """Return the registry interface metadata for the navmap CLI.
+    """Return the registry interface metadata for the docstring builder CLI.
 
     Returns
     -------
     RegistryInterfaceModel
-        Interface metadata object associated with the navmap CLI.
+        Registry interface entry associated with the CLI.
 
     Raises
     ------
     KeyError
-        Raised when the registry metadata does not contain the interface.
+        Raised when the registry metadata omits the expected interface.
     """
     interface = get_registry_metadata().interface(CLI_INTERFACE_ID)
-    if interface is None:  # pragma: no cover - misconfiguration guard
+    if interface is None:  # pragma: no cover - defensive guard for misconfiguration
         msg = f"Registry metadata missing interface '{CLI_INTERFACE_ID}'."
         raise KeyError(msg)
     return interface
@@ -180,7 +192,14 @@ def get_interface_metadata() -> RegistryInterfaceModel:
 def get_operation_override(
     subcommand: str, *, tokens: tuple[str, ...] | None = None
 ) -> OperationOverrideModel | None:
-    """Return augment override metadata for the given subcommand when present.
+    """Return augment override metadata for ``subcommand`` when available.
+
+    Parameters
+    ----------
+    subcommand : str
+        Subcommand name to resolve.
+    tokens : tuple[str, ...] | None, optional
+        Optional token sequence for nested command structures.
 
     Returns
     -------
@@ -191,8 +210,6 @@ def get_operation_override(
     if operation_id is None:
         return None
     return get_augment_metadata().operation_override(operation_id, tokens=tokens)
-
-
 __all__ = [
     "CLI_COMMAND",
     "CLI_INTERFACE_ID",

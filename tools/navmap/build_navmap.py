@@ -14,21 +14,31 @@ import json
 import os
 import re
 import sys
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from time import monotonic
 from typing import TYPE_CHECKING, cast
+from uuid import uuid4
 
-from tools import ToolExecutionError, get_logger, run_tool, validate_tools_payload
+from tools import (
+    JsonValue,
+    ToolExecutionError,
+    get_logger,
+    run_tool,
+    validate_tools_payload,
+    with_fields,
+)
 from tools._shared.cli import CliEnvelope, CliEnvelopeBuilder, CliErrorStatus, render_cli_envelope
 from tools._shared.logging import LoggerAdapter
-from tools._shared.problem_details import ProblemDetailsParams, build_problem_details
+from tools._shared.problem_details import (
+    ProblemDetailsDict,
+    ProblemDetailsParams,
+    build_problem_details,
+)
 from tools.drift_preview import write_html_diff
 from tools.navmap import cli_context
-from tools.navmap.document_models import (
-    NAVMAP_SCHEMA,
-    navmap_document_from_index,
-)
+from tools.navmap.document_models import NAVMAP_SCHEMA, navmap_document_from_index
 from tools.navmap.models import nav_index_from_dict
 
 if TYPE_CHECKING:
@@ -62,6 +72,18 @@ SUBCOMMAND_BUILD = "build"
 CLI_PROBLEM_TYPE = "https://kgfoundry.dev/problems/navmap/build"
 
 
+def _prepare_extras(values: Mapping[str, object]) -> dict[str, JsonValue]:
+    prepared: dict[str, JsonValue] = {}
+    for key, value in values.items():
+        if isinstance(value, Path):
+            prepared[str(key)] = str(value)
+        elif isinstance(value, (str, int, float, bool)) or value is None:
+            prepared[str(key)] = value
+        else:
+            prepared[str(key)] = str(value)
+    return prepared
+
+
 def _envelope_path(subcommand: str) -> Path:
     safe_subcommand = subcommand or "root"
     filename = f"{CLI_SETTINGS.bin_name}-{CLI_COMMAND}-{safe_subcommand}.json"
@@ -85,7 +107,7 @@ def _build_problem(
     detail: str,
     status: int,
     extras: dict[str, object] | None = None,
-) -> dict[str, object]:
+) -> ProblemDetailsDict:
     return build_problem_details(
         ProblemDetailsParams(
             type=CLI_PROBLEM_TYPE,
@@ -93,22 +115,30 @@ def _build_problem(
             status=status,
             detail=detail,
             instance=f"urn:cli:{CLI_INTERFACE_ID}:{SUBCOMMAND_BUILD}",
-            extensions=_normalize_json_mapping(extras or {}),
+            extensions=_prepare_extras(extras or {}),
         )
     )
 
 
+@dataclass(slots=True)
+class _ExecutionContext:
+    logger: LoggerAdapter
+    start: float
+    extras: dict[str, object]
+
+    def elapsed(self) -> float:
+        return monotonic() - self.start
+
+
 def _record_failure(
+    context: _ExecutionContext,
     *,
-    logger: LoggerAdapter,
     detail: str,
     status: int,
     error_status: CliErrorStatus,
-    extras: dict[str, object],
-    start_time: float,
     exc: BaseException | None = None,
 ) -> int:
-    problem = _build_problem(detail=detail, status=status, extras=extras)
+    problem = _build_problem(detail=detail, status=status, extras=context.extras)
     failure_builder = CliEnvelopeBuilder.create(
         command=CLI_COMMAND,
         status=error_status if error_status in {"config", "violation"} else "error",
@@ -116,16 +146,16 @@ def _record_failure(
     )
     failure_builder.add_error(status=error_status, message=detail, problem=problem)
     failure_builder.set_problem(problem)
-    envelope = failure_builder.finish(duration_seconds=monotonic() - start_time)
-    path = _emit_envelope(envelope, logger=logger, subcommand=SUBCOMMAND_BUILD)
+    envelope = failure_builder.finish(duration_seconds=context.elapsed())
+    path = _emit_envelope(envelope, logger=context.logger, subcommand=SUBCOMMAND_BUILD)
     log_extra = {
         "status": envelope.status,
         "cli_envelope": str(path),
         "duration_seconds": envelope.duration_seconds,
-        **_normalize_json_mapping(extras),
+        **_prepare_extras(context.extras),
     }
-    logger.error("Command failed", extra=log_extra, exc_info=exc)
-    print(detail, file=sys.stderr)
+    context.logger.error("Command failed", extra=log_extra, exc_info=exc)
+    sys.stderr.write(detail + "\n")
     return 2 if error_status in {"config", "violation"} else 1
 
 
@@ -1052,9 +1082,9 @@ def _load_runtime_navmap(
         nav_exports = nav_copy.get("exports")
         if isinstance(nav_exports, list):
             exports = _dedupe_exports([item for item in nav_exports if isinstance(item, str)])
-            nav_copy["exports"] = exports
+            nav_copy["exports"] = cast("ResolvedNavValue", list(exports))
         elif exports:
-            nav_copy["exports"] = exports
+            nav_copy["exports"] = cast("ResolvedNavValue", list(exports))
         return nav_copy, exports
 
     LOGGER.debug("No nav sidecar discovered for module %s", module_name)
@@ -1515,7 +1545,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     int
         Exit code (0 on success).
     """
-    parser = argparse.ArgumentParser(description="Build the navigation index JSON")
+    override = cli_context.get_operation_override(SUBCOMMAND_BUILD)
+    description = (
+        override.description
+        if override and override.description
+        else "Build the navigation index JSON"
+    )
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         "--write",
         type=Path,
@@ -1526,10 +1562,77 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     target = cast("Path | None", args.write)
-    build_index(json_path=target)
-    destination = target or INDEX_PATH
-    LOGGER.info("[navmap] regenerated %s", destination)
-    return 0
+    return _run_build(target)
+
+
+def _run_build(write_path: Path | None) -> int:
+    extras: dict[str, object] = {"output_path": str(write_path or INDEX_PATH)}
+    correlation_id = uuid4().hex
+    logger = with_fields(
+        LOGGER,
+        command=CLI_COMMAND,
+        subcommand=SUBCOMMAND_BUILD,
+        bin_name=CLI_SETTINGS.bin_name,
+        correlation_id=correlation_id,
+        **_prepare_extras(extras),
+    )
+    logger.info("Command started", extra={"status": "start"})
+    context = _ExecutionContext(logger=logger, start=monotonic(), extras=extras)
+    builder = CliEnvelopeBuilder.create(
+        command=CLI_COMMAND,
+        status="success",
+        subcommand=SUBCOMMAND_BUILD,
+    )
+    try:
+        _ = build_index(json_path=write_path)
+        destination = write_path or INDEX_PATH
+        builder.add_file(
+            path=str(destination),
+            status="success",
+            message="Navmap JSON generated",
+        )
+        if NAVMAP_DIFF_PATH.exists():
+            builder.add_file(
+                path=str(NAVMAP_DIFF_PATH),
+                status="success",
+                message="Navmap drift report",
+            )
+        envelope = builder.finish(duration_seconds=context.elapsed())
+    except ToolExecutionError as exc:
+        return _record_failure(
+            context,
+            detail=str(exc),
+            status=500,
+            error_status="error",
+            exc=exc,
+        )
+    except KeyboardInterrupt as exc:  # pragma: no cover - manual interruption
+        return _record_failure(
+            context,
+            detail="Navmap build cancelled by user",
+            status=499,
+            error_status="config",
+            exc=exc,
+        )
+    except (RuntimeError, ValueError, OSError) as exc:  # pragma: no cover - defensive catch
+        return _record_failure(
+            context,
+            detail=str(exc),
+            status=500,
+            error_status="error",
+            exc=exc,
+        )
+    else:
+        _emit_envelope(envelope, logger=logger, subcommand=SUBCOMMAND_BUILD)
+        logger.info(
+            "Command completed",
+            extra={
+                "status": "success",
+                "duration_seconds": envelope.duration_seconds,
+                **_prepare_extras(extras),
+            },
+        )
+        return 0
 
 
 if __name__ == "__main__":

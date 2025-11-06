@@ -146,7 +146,6 @@ def test_render_interface_catalog_links_full_module_path(
 
 def test_write_interface_table_escapes_markdown_control_characters() -> None:
     """User-controlled metadata should be escaped before inserting into tables."""
-
     handle = io.StringIO()
     interfaces = [
         {

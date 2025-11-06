@@ -4,24 +4,29 @@
 from __future__ import annotations
 
 import json
-import logging
 import sys
+import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol, cast, runtime_checkable
+from uuid import uuid4
 
 from tools import (
+    CliEnvelope,
+    CliEnvelopeBuilder,
     ProblemDetailsParams,
     build_problem_details,
     get_logger,
-    observe_tool_run,
+    render_cli_envelope,
     render_problem,
+    with_fields,
 )
+from tools._shared.error_codes import format_error_message
 from tools._shared.proc import ToolExecutionError
 
-from docs._scripts import shared
+from docs._scripts import cli_context, shared
 from docs._scripts.validation import validate_against_schema
 from kgfoundry_common.errors import DeserializationError, SchemaValidationError, SerializationError
 from kgfoundry_common.optional_deps import OptionalDependencyError, safe_import_griffe
@@ -32,6 +37,8 @@ if TYPE_CHECKING:
     from tools import (
         StructuredLoggerAdapter,
     )
+
+    from kgfoundry_common.logging import LoggerAdapter
 
 
 def _resolve_alias_resolution_error() -> type[Exception]:
@@ -70,11 +77,7 @@ SYMBOLS_PATH = DOCS_BUILD / "symbols.json"
 BY_FILE_PATH = DOCS_BUILD / "by_file.json"
 BY_MODULE_PATH = DOCS_BUILD / "by_module.json"
 SYMBOL_INDEX_SCHEMA = SCHEMA_DIR / "symbol-index.schema.json"
-
 BASE_LOGGER = get_logger(__name__)
-SYMBOL_LOG = shared.make_logger("symbol_index", artifact="symbols.json", logger=BASE_LOGGER)
-BY_FILE_LOG = shared.make_logger("symbol_index", artifact="by_file.json", logger=BASE_LOGGER)
-BY_MODULE_LOG = shared.make_logger("symbol_index", artifact="by_module.json", logger=BASE_LOGGER)
 
 JsonPrimitive = str | int | float | bool | None
 JsonValue = JsonPrimitive | list["JsonValue"] | dict[str, "JsonValue"]
@@ -565,7 +568,7 @@ def load_test_map() -> dict[str, JsonValue]:
     try:
         payload = cast("JsonPayload", json.loads(path.read_text(encoding="utf-8")))
     except json.JSONDecodeError as exc:
-        SYMBOL_LOG.warning(
+        BASE_LOGGER.warning(
             "Failed to parse test_map.json",
             extra={"status": "invalid_test_map", "path": str(path), "reason": str(exc)},
         )
@@ -870,118 +873,333 @@ def safe_attr(node: object, attr: str, default: object | None = None) -> object 
     return safe_getattr(node, attr, default)
 
 
-def _emit_problem(problem: ProblemDetailsDict | None, *, default_message: str) -> None:
-    payload = problem or build_problem_details(
+def _coerce_json_value(value: object) -> JsonValue:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, Path):
+        return value.as_posix()
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [_coerce_json_value(item) for item in value]
+    if isinstance(value, Mapping):
+        return {str(key): _coerce_json_value(item) for key, item in value.items()}
+    return str(value)
+
+
+def _normalize_json_mapping(values: Mapping[str, object]) -> dict[str, JsonValue]:
+    payload: dict[str, JsonValue] = {}
+    for key, value in values.items():
+        payload[str(key)] = _coerce_json_value(value)
+    return payload
+
+
+_CLI_DEFINITION = cli_context.get_cli_definition("docs-build-symbol-index")
+_CLI_COMMAND = _CLI_DEFINITION.command
+_CLI_SUBCOMMAND = "build"
+_CLI_OPERATION_ID = _CLI_DEFINITION.operation_ids["build"]
+_CLI_ENVELOPE_DIR = cli_context.REPO_ROOT / "site" / "_build" / "cli"
+_PROBLEM_TYPE = "https://kgfoundry.dev/problems/docs-symbol-index"
+
+
+def _envelope_path(subcommand: str) -> Path:
+    safe = subcommand or "root"
+    return _CLI_ENVELOPE_DIR / f"{_CLI_DEFINITION.command}-{safe}.json"
+
+
+def _write_envelope(envelope: CliEnvelope, *, logger: LoggerAdapter) -> Path:
+    _CLI_ENVELOPE_DIR.mkdir(parents=True, exist_ok=True)
+    path = _envelope_path(_CLI_SUBCOMMAND)
+    rendered = render_cli_envelope(envelope)
+    path.write_text(f"{rendered}\n", encoding="utf-8")
+    logger.debug(
+        "CLI envelope written",
+        extra={"status": envelope.status, "cli_envelope": str(path)},
+    )
+    return path
+
+
+def _build_failure_problem(
+    detail: str,
+    *,
+    status: int,
+    extras: Mapping[str, object] | None = None,
+) -> ProblemDetailsDict:
+    extensions = _normalize_json_mapping(extras) if extras else None
+    return build_problem_details(
         ProblemDetailsParams(
-            type="https://kgfoundry.dev/problems/docs-symbol-index",
+            type=_PROBLEM_TYPE,
             title="Symbol index build failed",
-            status=500,
-            detail=default_message,
-            instance="urn:docs:symbol-index",
+            status=status,
+            detail=detail,
+            instance=f"urn:cli:{_CLI_DEFINITION.command}:{_CLI_SUBCOMMAND}",
+            extensions=extensions,
         )
     )
-    sys.stderr.write(render_problem(payload) + "\n")
+
+
+@dataclass(slots=True)
+class _FailureContext:
+    """Contextual information captured when the CLI fails."""
+
+    duration_seconds: float
+    message: str
+    exit_code: int
+    exc_info: BaseException | None
+
+
+def _handle_tool_error(
+    exc: ToolExecutionError,
+    packages: Sequence[str],
+    *,
+    logger: LoggerAdapter,
+    start_time: float,
+) -> int:
+    duration = time.monotonic() - start_time
+    extras: dict[str, object] = {
+        "packages": list(packages),
+        "command": list(exc.command),
+        "returncode": exc.returncode,
+    }
+    problem = exc.problem or _build_failure_problem(str(exc), status=500, extras=extras)
+    message = format_error_message(
+        "KGF-DOC-SYM-001",
+        "Symbol index build failed",
+        details=str(exc),
+    )
+    context = _FailureContext(
+        duration_seconds=duration,
+        message=message,
+        exit_code=exc.returncode if exc.returncode is not None else 1,
+        exc_info=exc,
+    )
+    failure_builder = CliEnvelopeBuilder.create(
+        command=_CLI_DEFINITION.command,
+        status="error",
+        subcommand=_CLI_SUBCOMMAND,
+    )
+    failure_builder.add_error(status="error", message=context.message, problem=problem)
+    failure_builder.set_problem(problem)
+    for path in (SYMBOLS_PATH, BY_FILE_PATH, BY_MODULE_PATH):
+        failure_builder.add_file(
+            path=str(path),
+            status="error",
+            message="Artifact not updated due to failure",
+            problem=problem,
+        )
+    envelope = failure_builder.finish(duration_seconds=context.duration_seconds)
+    path = _write_envelope(envelope, logger=logger)
+    sys.stderr.write(render_problem(problem) + "\n")
+    logger.error(
+        context.message,
+        extra={
+            "status": "error",
+            "cli_envelope": str(path),
+            "duration_seconds": context.duration_seconds,
+            "exit_code": context.exit_code,
+        },
+        exc_info=context.exc_info,
+    )
+    return context.exit_code
+
+
+def _handle_keyboard_interrupt(
+    exc: BaseException,
+    packages: Sequence[str],
+    *,
+    logger: LoggerAdapter,
+    start_time: float,
+) -> int:
+    duration = time.monotonic() - start_time
+    problem = _build_failure_problem(
+        "Symbol index build cancelled",
+        status=499,
+        extras={"packages": list(packages)},
+    )
+    context = _FailureContext(
+        duration_seconds=duration,
+        message="Symbol index build cancelled",
+        exit_code=130,
+        exc_info=exc,
+    )
+    failure_builder = CliEnvelopeBuilder.create(
+        command=_CLI_DEFINITION.command,
+        status="error",
+        subcommand=_CLI_SUBCOMMAND,
+    )
+    failure_builder.add_error(status="error", message=context.message, problem=problem)
+    failure_builder.set_problem(problem)
+    for path in (SYMBOLS_PATH, BY_FILE_PATH, BY_MODULE_PATH):
+        failure_builder.add_file(
+            path=str(path),
+            status="error",
+            message="Artifact not updated due to failure",
+            problem=problem,
+        )
+    envelope = failure_builder.finish(duration_seconds=context.duration_seconds)
+    path = _write_envelope(envelope, logger=logger)
+    sys.stderr.write(render_problem(problem) + "\n")
+    logger.error(
+        context.message,
+        extra={
+            "status": "error",
+            "cli_envelope": str(path),
+            "duration_seconds": context.duration_seconds,
+            "exit_code": context.exit_code,
+        },
+        exc_info=context.exc_info,
+    )
+    return context.exit_code
+
+
+def _handle_unexpected_error(
+    exc: Exception,
+    packages: Sequence[str],
+    *,
+    logger: LoggerAdapter,
+    start_time: float,
+) -> int:
+    duration = time.monotonic() - start_time
+    problem = _build_failure_problem(
+        str(exc),
+        status=500,
+        extras={"packages": list(packages)},
+    )
+    message = format_error_message(
+        "KGF-DOC-SYM-002",
+        "Symbol index build failed",
+        details=str(exc),
+    )
+    context = _FailureContext(
+        duration_seconds=duration,
+        message=message,
+        exit_code=1,
+        exc_info=exc,
+    )
+    failure_builder = CliEnvelopeBuilder.create(
+        command=_CLI_DEFINITION.command,
+        status="error",
+        subcommand=_CLI_SUBCOMMAND,
+    )
+    failure_builder.add_error(status="error", message=context.message, problem=problem)
+    failure_builder.set_problem(problem)
+    for path in (SYMBOLS_PATH, BY_FILE_PATH, BY_MODULE_PATH):
+        failure_builder.add_file(
+            path=str(path),
+            status="error",
+            message="Artifact not updated due to failure",
+            problem=problem,
+        )
+    envelope = failure_builder.finish(duration_seconds=context.duration_seconds)
+    path = _write_envelope(envelope, logger=logger)
+    sys.stderr.write(render_problem(problem) + "\n")
+    logger.error(
+        context.message,
+        extra={
+            "status": "error",
+            "cli_envelope": str(path),
+            "duration_seconds": context.duration_seconds,
+            "exit_code": context.exit_code,
+        },
+        exc_info=context.exc_info,
+    )
+    return context.exit_code
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Build and validate documentation symbol index artifacts.
-
-    This entry point generates the symbol index by analyzing all packages
-    in the repository. It produces three artifacts: symbols.json (complete
-    symbol metadata), by_file.json (symbols grouped by file), and
-    by_module.json (symbols grouped by module).
-
-    Parameters
-    ----------
-    argv : Sequence[str] | None, optional
-        Command-line arguments (reserved for future use). Currently unused.
-        Defaults to None.
+    """Build documentation symbol index artifacts with CLI envelope output.
 
     Returns
     -------
     int
-        Exit code: 0 on success, 1 on error.
-
-    Examples
-    --------
-    >>> from docs._scripts.build_symbol_index import main
-    >>> exit_code = main()
-    >>> exit_code
-    0
+        Exit code: ``0`` on success, non-zero when failures occur.
     """
-    # argv is reserved for future CLI argument parsing if needed
-    del argv
+    del argv  # reserved for future CLI arguments
 
-    if not logging.getLogger().handlers:
-        logging.basicConfig(level=logging.INFO)
+    correlation_id = uuid4().hex
+    logger = with_fields(
+        get_logger(__name__),
+        correlation_id=correlation_id,
+        command=_CLI_DEFINITION.command,
+        subcommand=_CLI_SUBCOMMAND,
+        operation_id=_CLI_OPERATION_ID,
+    )
+    builder = CliEnvelopeBuilder.create(
+        command=_CLI_DEFINITION.command,
+        status="success",
+        subcommand=_CLI_SUBCOMMAND,
+    )
 
-    packages = list(SETTINGS.packages or ())
-    with observe_tool_run(["docs-symbol-index"], cwd=DOCS_BUILD, timeout=None) as observation:
-        try:
-            artifacts = generate_index(packages, LOADER)
-            rows_payload = artifacts.rows_payload()
-            wrote_symbols = write_artifact(
+    packages = [str(pkg) for pkg in SETTINGS.packages or ()]
+    start = time.monotonic()
+
+    try:
+        artifacts = generate_index(packages, LOADER)
+        artifact_specs: Sequence[tuple[str, Path, object, SchemaValidation | None]] = (
+            (
+                "symbols.json",
                 SYMBOLS_PATH,
-                rows_payload,
-                logger=SYMBOL_LOG,
-                artifact="symbols.json",
-                validation=SchemaValidation(schema=SYMBOL_INDEX_SCHEMA),
-            )
-            wrote_by_file = write_artifact(
+                artifacts.rows_payload(),
+                SchemaValidation(schema=SYMBOL_INDEX_SCHEMA),
+            ),
+            (
+                "by_file.json",
                 BY_FILE_PATH,
                 artifacts.by_file_payload(),
-                logger=BY_FILE_LOG,
-                artifact="by_file.json",
-            )
-            wrote_by_module = write_artifact(
+                None,
+            ),
+            (
+                "by_module.json",
                 BY_MODULE_PATH,
                 artifacts.by_module_payload(),
-                logger=BY_MODULE_LOG,
-                artifact="by_module.json",
+                None,
+            ),
+        )
+        artifact_results: list[tuple[str, Path, bool]] = []
+        for name, path, payload, validation in artifact_specs:
+            artifact_logger = with_fields(logger, artifact=name)
+            wrote = write_artifact(
+                path,
+                payload,
+                logger=artifact_logger,
+                artifact=name,
+                validation=validation,
             )
-        except ToolExecutionError as exc:  # pragma: no cover - exercised in CLI
-            observation.failure("failure", returncode=1)
-            _emit_problem(exc.problem, default_message=str(exc))
-            return 1
-        except KeyboardInterrupt:
-            observation.failure("cancelled", returncode=130)
-            SYMBOL_LOG.info("Symbol index generation cancelled by user")
-            return 130
-        except (
-            DeserializationError,
-            SerializationError,
-            SchemaValidationError,
-            OSError,
-            RuntimeError,
-            json.JSONDecodeError,
-        ) as exc:
-            observation.failure("exception", returncode=1)
-            problem = build_problem_details(
-                ProblemDetailsParams(
-                    type="https://kgfoundry.dev/problems/docs-symbol-index",
-                    title="Symbol index build failed",
-                    status=500,
-                    detail=str(exc),
-                    instance="urn:docs:symbol-index:unexpected-error",
-                    extensions={"packages": list(packages)},
-                )
-            )
-            _emit_problem(problem, default_message=str(exc))
-            return 1
-        else:
-            observation.success(0)
+            artifact_results.append((name, path, wrote))
+    except ToolExecutionError as exc:
+        return _handle_tool_error(exc, packages, logger=logger, start_time=start)
+    except KeyboardInterrupt as exc:
+        return _handle_keyboard_interrupt(exc, packages, logger=logger, start_time=start)
+    except (
+        DeserializationError,
+        SerializationError,
+        SchemaValidationError,
+        OSError,
+        RuntimeError,
+        json.JSONDecodeError,
+    ) as exc:
+        return _handle_unexpected_error(exc, packages, logger=logger, start_time=start)
 
-    SYMBOL_LOG.info(
+    duration = time.monotonic() - start
+    for name, path, wrote in artifact_results:
+        builder.add_file(
+            path=str(path),
+            status="success" if wrote else "skipped",
+            message=f"{name} updated" if wrote else f"{name} unchanged",
+        )
+
+    envelope = builder.finish(duration_seconds=duration)
+    path = _write_envelope(envelope, logger=logger)
+
+    wrote_lookup = {name: wrote for name, _, wrote in artifact_results}
+    logger.info(
         "Symbol index build complete",
         extra={
             "status": "success",
             "symbols_entries": artifacts.symbol_count,
-            "symbols_updated": wrote_symbols,
-            "by_file_updated": wrote_by_file,
-            "by_module_updated": wrote_by_module,
-            "symbols_path": str(SYMBOLS_PATH),
-            "by_file_path": str(BY_FILE_PATH),
-            "by_module_path": str(BY_MODULE_PATH),
+            "symbols_updated": wrote_lookup.get("symbols.json", False),
+            "by_file_updated": wrote_lookup.get("by_file.json", False),
+            "by_module_updated": wrote_lookup.get("by_module.json", False),
+            "cli_envelope": str(path),
+            "duration_seconds": duration,
         },
     )
     return 0
