@@ -4,12 +4,36 @@ from __future__ import annotations
 
 import os
 from collections import defaultdict
+from pathlib import Path
 from typing import Final
 
 import mkdocs_gen_files
 
 GROUP_DEPTH_ENV_VAR: Final = "MKDOCS_D2_GROUP_DEPTH"
 DEFAULT_GROUP_DEPTH: Final = 1
+DOCS_ROOT = Path(__file__).resolve().parents[1]
+CURATED_INDEX_PATH = DOCS_ROOT / "diagrams" / "index.md"
+
+
+def _load_curated_intro() -> str:
+    """Return the curated diagrams landing page introduction.
+
+    The static ``docs/diagrams/index.md`` file contains human-crafted context
+    explaining how the generated diagrams are structured. We seed the generated
+    index with that prose before appending the dynamic folder listing so that
+    documentation builds retain the curated onboarding experience.
+    """
+
+    try:
+        content = CURATED_INDEX_PATH.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return "# Diagrams\n\n"
+
+    if content.endswith("\n\n"):
+        return content
+    if content.endswith("\n"):
+        return f"{content}\n"
+    return f"{content}\n\n"
 
 
 def _resolve_group_depth() -> int:
@@ -64,8 +88,12 @@ def main() -> None:
                 )
             handle.write("}\n")
 
+    curated_intro = _load_curated_intro()
+
     with mkdocs_gen_files.open("diagrams/index.md", "w") as handle:
-        handle.write("# Diagrams\n\n")
+        handle.write(curated_intro)
+        if not curated_intro.endswith("\n\n"):
+            handle.write("\n")
         for folder in sorted(by_folder):
             handle.write(f"- [{folder}](./{folder}.d2)\n")
 

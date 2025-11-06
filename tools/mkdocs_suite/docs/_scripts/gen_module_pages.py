@@ -22,6 +22,7 @@ from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Protocol, TypeGuard, cast
 
@@ -124,22 +125,16 @@ if TYPE_CHECKING:
     load_nav_metadata = _load_nav_metadata
 
 
-PACKAGE_ROOTS: tuple[str, ...] = (
-    "kgfoundry_common",
-    "docling",
-    "download",
-    "embeddings_dense",
-    "embeddings_sparse",
-    "kg_builder",
-    "linking",
-    "observability",
-    "ontology",
-    "orchestration",
-    "registry",
-    "search_api",
-    "search_client",
-    "vectorstore_faiss",
+PACKAGE_DENYLIST = frozenset(
+    {
+        "codeintel",
+        "examples",
+        "kf_common",
+        "kgfoundry",
+        "tests",
+    }
 )
+PACKAGE_PRIORITY_ORDER = ("kgfoundry_common",)
 API_USAGE_FILE = Path(__file__).with_name("api_usage.json")
 REGISTRY_PATH = SUITE_ROOT / "api_registry.yaml"
 
@@ -148,6 +143,55 @@ _griffe = importlib.import_module("griffe")
 _load = cast("Callable[..., object]", _griffe.load)
 _load_extensions = cast("Callable[..., object]", _griffe.load_extensions)
 _GriffeError = getattr(_griffe, "GriffeError", Exception)
+
+
+def _is_package_directory(path: Path) -> bool:
+    """Return ``True`` when ``path`` is a Python package directory."""
+
+    return path.is_dir() and (path / "__init__.py").is_file()
+
+
+def _prioritize_packages(names: Sequence[str]) -> tuple[str, ...]:
+    """Return package names ordered with priority entries at the front."""
+
+    prioritized = [name for name in PACKAGE_PRIORITY_ORDER if name in names]
+    remainder = [name for name in names if name not in PACKAGE_PRIORITY_ORDER]
+    return tuple(prioritized + remainder)
+
+
+def _discover_package_roots(src_root: Path) -> tuple[str, ...]:
+    """Return first-party package roots discovered from the repository."""
+
+    discovered: dict[str, None] = {}
+
+    try:
+        kgfoundry_module = importlib.import_module("kgfoundry")
+    except ModuleNotFoundError:
+        exports: Sequence[str] = ()
+    else:
+        exports = tuple(getattr(kgfoundry_module, "__all__", ()))
+
+    for name in exports:
+        if name in PACKAGE_DENYLIST:
+            continue
+        discovered[name] = None
+
+    for candidate in sorted(src_root.iterdir(), key=lambda path: path.name):
+        name = candidate.name
+        if name in PACKAGE_DENYLIST or name.startswith("_"):
+            continue
+        if not _is_package_directory(candidate):
+            continue
+        discovered.setdefault(name, None)
+
+    return _prioritize_packages(tuple(discovered))
+
+
+@lru_cache(maxsize=1)
+def _get_package_roots() -> tuple[str, ...]:
+    """Return cached package roots for module collection."""
+
+    return _discover_package_roots(SRC_ROOT)
 
 
 class _Docstring(Protocol):
@@ -302,7 +346,7 @@ def _collect_modules(extensions_bundle: object) -> dict[str, _GriffeModule]:
     """
     modules: dict[str, _GriffeModule] = {}
     visited: set[str] = set()
-    for package in PACKAGE_ROOTS:
+    for package in _get_package_roots():
         try:
             with _suppress_griffe_errors():
                 root = _load(
@@ -362,7 +406,21 @@ def _load_api_usage() -> dict[str, list[OperationLink]]:
     """
     if not API_USAGE_FILE.exists():
         return {}
-    raw_mapping = json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    try:
+        raw_mapping = json.loads(API_USAGE_FILE.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        LOGGER.warning(
+            "Skipping API usage map at %s due to invalid JSON: %s",
+            API_USAGE_FILE,
+            exc,
+        )
+        return {}
+    if not isinstance(raw_mapping, Mapping):
+        LOGGER.warning(
+            "Skipping API usage map at %s because the payload is not a mapping",
+            API_USAGE_FILE,
+        )
+        return {}
     usage: dict[str, list[OperationLink]] = defaultdict(list)
     for symbol, operations in raw_mapping.items():
         if not isinstance(symbol, str):
