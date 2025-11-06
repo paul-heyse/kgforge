@@ -905,6 +905,23 @@ def _mermaid_inheritance(module_path: str, facts: ModuleFacts) -> str:
     return "\n".join(lines)
 
 
+def _module_doc_relpath(module_path: str) -> str:
+    """Return the relative documentation path for ``module_path``.
+
+    Parameters
+    ----------
+    module_path : str
+        Dotted module identifier.
+
+    Returns
+    -------
+    str
+        Relative documentation path using directory separators instead of dots.
+    """
+
+    return f"{module_path.replace('.', '/')}" + ".md"
+
+
 def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
     """Return a small inline D2 neighborhood diagram for ``module_path``.
 
@@ -927,13 +944,14 @@ def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
 
     def _link(target: str) -> str | None:
         if target in facts.documented_modules:
-            return f"./{target}.md"
+            relpath = _module_doc_relpath(target)
+            return f"./{relpath}"
         return None
 
     lines = [
         "```d2",
         "direction: right",
-        f'"{module_path}": "{module_path}" {{ link: "./{module_path}.md" }}',
+        f'"{module_path}": "{module_path}" {{ link: "./{_module_doc_relpath(module_path)}" }}',
     ]
     for target in outgoing:
         link = _link(target)
