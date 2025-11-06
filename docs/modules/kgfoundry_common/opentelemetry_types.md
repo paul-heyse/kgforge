@@ -2,6 +2,8 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/opentelemetry_types.py)
+
 ## Sections
 
 - **Public API**
@@ -117,7 +119,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.opentelemetry_types": "kgfoundry_common.opentelemetry_types" { link: "opentelemetry_types.md" }
+"kgfoundry_common.opentelemetry_types": "kgfoundry_common.opentelemetry_types" { link: "./kgfoundry_common/opentelemetry_types.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.opentelemetry_types" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -138,5 +140,7 @@ direction: right
 "kgfoundry_common.opentelemetry_types" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.opentelemetry_types" -> "typing.cast"
+"kgfoundry_common.opentelemetry_types_code": "kgfoundry_common.opentelemetry_types code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/opentelemetry_types.py" }
+"kgfoundry_common.opentelemetry_types" -> "kgfoundry_common.opentelemetry_types_code" { style: dashed }
 ```
 

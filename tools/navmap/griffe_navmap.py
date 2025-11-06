@@ -480,7 +480,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "-o",
         "--output",
-        default="site/_build/navmap/navmap.json",
+        default="tools/mkdocs_suite/site/_build/navmap/navmap.json",
         help="Destination JSON file for the navmap output.",
     )
     parser.add_argument(

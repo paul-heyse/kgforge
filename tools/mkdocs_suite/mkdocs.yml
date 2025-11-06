@@ -20,11 +20,6 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.details
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:mermaid2.fence_mermaid_custom
   - pymdownx.snippets
   - pymdownx.emoji
   - meta
@@ -41,7 +36,7 @@ plugins:
         - docs/_scripts/gen_module_pages.py
         - docs/_scripts/gen_d2_diagrams.py
         - docs/_scripts/gen_cli_diagram.py
-  - !python/name:tools.mkdocs_suite.plugins.optional_d2:OptionalD2Plugin
+  - d2
   - include-markdown
   - macros
   - mermaid2

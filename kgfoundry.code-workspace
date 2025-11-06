@@ -1,7 +1,9 @@
 {
   "folders": [
-    { "name": "kgfoundry", "path": "." },
-    { "name": "Site (Sphinx)", "path": "site" }
+    {
+      "name": "kgfoundry",
+      "path": "."
+    }
   ],
   "settings": {
     "files.eol": "\n",

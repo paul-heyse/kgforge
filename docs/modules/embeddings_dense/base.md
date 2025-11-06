@@ -2,6 +2,8 @@
 
 Protocols describing dense embedding providers
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_dense/base.py)
+
 ## Sections
 
 - **Public API**
@@ -35,7 +37,7 @@ classDiagram
 
 ```d2
 direction: right
-"embeddings_dense.base": "embeddings_dense.base" { link: "base.md" }
+"embeddings_dense.base": "embeddings_dense.base" { link: "./embeddings_dense/base.md" }
 "__future__.annotations": "__future__.annotations"
 "embeddings_dense.base" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -50,5 +52,7 @@ direction: right
 "embeddings_dense.base" -> "typing.Protocol"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "embeddings_dense.base" -> "typing.TYPE_CHECKING"
+"embeddings_dense.base_code": "embeddings_dense.base code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_dense/base.py" }
+"embeddings_dense.base" -> "embeddings_dense.base_code" { style: dashed }
 ```
 

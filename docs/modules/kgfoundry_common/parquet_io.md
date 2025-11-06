@@ -2,6 +2,8 @@
 
 Utilities for writing embedding vectors and chunks to Parquet
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/parquet_io.py)
+
 ## Sections
 
 - **Public API**
@@ -70,7 +72,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.parquet_io": "kgfoundry_common.parquet_io" { link: "parquet_io.md" }
+"kgfoundry_common.parquet_io": "kgfoundry_common.parquet_io" { link: "./kgfoundry_common/parquet_io.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.parquet_io" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -101,5 +103,7 @@ direction: right
 "kgfoundry_common.parquet_io" -> "typing.TYPE_CHECKING"
 "typing.TypedDict": "typing.TypedDict"
 "kgfoundry_common.parquet_io" -> "typing.TypedDict"
+"kgfoundry_common.parquet_io_code": "kgfoundry_common.parquet_io code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/parquet_io.py" }
+"kgfoundry_common.parquet_io" -> "kgfoundry_common.parquet_io_code" { style: dashed }
 ```
 

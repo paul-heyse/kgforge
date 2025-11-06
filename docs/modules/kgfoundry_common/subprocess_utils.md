@@ -2,6 +2,8 @@
 
 Subprocess execution with timeouts, path sanitization, and error handling.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/subprocess_utils.py)
+
 ## Sections
 
 - **Public API**
@@ -158,7 +160,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.subprocess_utils": "kgfoundry_common.subprocess_utils" { link: "subprocess_utils.md" }
+"kgfoundry_common.subprocess_utils": "kgfoundry_common.subprocess_utils" { link: "./kgfoundry_common/subprocess_utils.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.subprocess_utils" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -185,5 +187,7 @@ direction: right
 "kgfoundry_common.subprocess_utils" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.subprocess_utils" -> "typing.cast"
+"kgfoundry_common.subprocess_utils_code": "kgfoundry_common.subprocess_utils code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/subprocess_utils.py" }
+"kgfoundry_common.subprocess_utils" -> "kgfoundry_common.subprocess_utils_code" { style: dashed }
 ```
 

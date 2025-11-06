@@ -2,6 +2,8 @@
 
 Typed NumPy helpers shared across vector search modules.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/numpy_typing.py)
+
 ## Sections
 
 - **Public API**
@@ -34,7 +36,7 @@ Typed NumPy helpers shared across vector search modules.
 
 ```d2
 direction: right
-"kgfoundry_common.numpy_typing": "kgfoundry_common.numpy_typing" { link: "numpy_typing.md" }
+"kgfoundry_common.numpy_typing": "kgfoundry_common.numpy_typing" { link: "./kgfoundry_common/numpy_typing.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.numpy_typing" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -49,5 +51,7 @@ direction: right
 "kgfoundry_common.numpy_typing" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.numpy_typing" -> "typing.cast"
+"kgfoundry_common.numpy_typing_code": "kgfoundry_common.numpy_typing code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/numpy_typing.py" }
+"kgfoundry_common.numpy_typing" -> "kgfoundry_common.numpy_typing_code" { style: dashed }
 ```
 

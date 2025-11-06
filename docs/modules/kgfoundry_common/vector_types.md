@@ -2,6 +2,8 @@
 
 Typed vector contracts and validation helpers for vector ingestion.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/vector_types.py)
+
 ## Sections
 
 - **Public API**
@@ -60,7 +62,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.vector_types": "kgfoundry_common.vector_types" { link: "vector_types.md" }
+"kgfoundry_common.vector_types": "kgfoundry_common.vector_types" { link: "./kgfoundry_common/vector_types.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.vector_types" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -85,5 +87,7 @@ direction: right
 "kgfoundry_common.vector_types" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.vector_types" -> "typing.cast"
+"kgfoundry_common.vector_types_code": "kgfoundry_common.vector_types code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/vector_types.py" }
+"kgfoundry_common.vector_types" -> "kgfoundry_common.vector_types_code" { style: dashed }
 ```
 

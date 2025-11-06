@@ -2,6 +2,8 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/bm25_index.py)
+
 ## Sections
 
 - **Public API**
@@ -32,7 +34,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 **Imports:** `__future__.annotations`, `collections.abc.Iterable`, `dataclasses.dataclass`, `duckdb`, `kgfoundry_common.errors.ConfigurationError`, `kgfoundry_common.errors.DeserializationError`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.problem_details.JsonValue`, `kgfoundry_common.safe_pickle_v2.UnsafeSerializationError`, `kgfoundry_common.safe_pickle_v2.load_unsigned_legacy`, `kgfoundry_common.serialization.deserialize_json`, `kgfoundry_common.serialization.serialize_json`, `math`, `os`, `pathlib.Path`, `re`, `registry.duckdb_helpers.fetch_all`, `registry.duckdb_helpers.fetch_one`, `typing.TYPE_CHECKING`, `typing.cast`
 
-**Imported by:** [search_api](../search_api.md)
+**Imported by:** [search_api](./search_api.md)
 
 ## Autorefs Examples
 
@@ -54,7 +56,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.bm25_index": "search_api.bm25_index" { link: "bm25_index.md" }
+"search_api.bm25_index": "search_api.bm25_index" { link: "./search_api/bm25_index.md" }
 "__future__.annotations": "__future__.annotations"
 "search_api.bm25_index" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -95,7 +97,9 @@ direction: right
 "search_api.bm25_index" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "search_api.bm25_index" -> "typing.cast"
-"search_api": "search_api" { link: "../search_api.md" }
+"search_api": "search_api" { link: "./search_api.md" }
 "search_api" -> "search_api.bm25_index"
+"search_api.bm25_index_code": "search_api.bm25_index code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/bm25_index.py" }
+"search_api.bm25_index" -> "search_api.bm25_index_code" { style: dashed }
 ```
 

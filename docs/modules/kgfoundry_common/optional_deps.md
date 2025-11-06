@@ -2,6 +2,8 @@
 
 Guarded optional dependency imports with Problem Details and observability.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/optional_deps.py)
+
 ## Sections
 
 - **Public API**
@@ -54,7 +56,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.optional_deps": "kgfoundry_common.optional_deps" { link: "optional_deps.md" }
+"kgfoundry_common.optional_deps": "kgfoundry_common.optional_deps" { link: "./kgfoundry_common/optional_deps.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.optional_deps" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -79,5 +81,7 @@ direction: right
 "kgfoundry_common.optional_deps" -> "typing.cast"
 "uuid": "uuid"
 "kgfoundry_common.optional_deps" -> "uuid"
+"kgfoundry_common.optional_deps_code": "kgfoundry_common.optional_deps code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/optional_deps.py" }
+"kgfoundry_common.optional_deps" -> "kgfoundry_common.optional_deps_code" { style: dashed }
 ```
 

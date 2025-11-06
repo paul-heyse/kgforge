@@ -2,6 +2,8 @@
 
 Typed facades for jsonschema usage across the codebase.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/jsonschema_utils.py)
+
 ## Sections
 
 - **Public API**
@@ -54,7 +56,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.jsonschema_utils": "kgfoundry_common.jsonschema_utils" { link: "jsonschema_utils.md" }
+"kgfoundry_common.jsonschema_utils": "kgfoundry_common.jsonschema_utils" { link: "./kgfoundry_common/jsonschema_utils.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.jsonschema_utils" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -79,5 +81,7 @@ direction: right
 "kgfoundry_common.jsonschema_utils" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.jsonschema_utils" -> "typing.cast"
+"kgfoundry_common.jsonschema_utils_code": "kgfoundry_common.jsonschema_utils code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/jsonschema_utils.py" }
+"kgfoundry_common.jsonschema_utils" -> "kgfoundry_common.jsonschema_utils_code" { style: dashed }
 ```
 

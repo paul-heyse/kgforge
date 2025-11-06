@@ -2,6 +2,8 @@
 
 Helper utilities that simplify writing records into the DuckDB registry.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/helper.py)
+
 ## Sections
 
 - **Public API**
@@ -18,7 +20,7 @@ Helper utilities that simplify writing records into the DuckDB registry.
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `collections.abc.Mapping`, `contextlib.closing`, `duckdb.DuckDBPyConnection`, `json`, `kgfoundry_common.models.Doc`, `kgfoundry_common.models.DoctagsAsset`, `kgfoundry_common.navmap_loader.load_nav_metadata`, [registry.duckdb_helpers](duckdb_helpers.md), `registry.duckdb_helpers.DuckDBQueryOptions`, `typing.TYPE_CHECKING`, `uuid`
+**Imports:** `__future__.annotations`, `collections.abc.Mapping`, `contextlib.closing`, `duckdb.DuckDBPyConnection`, `json`, `kgfoundry_common.models.Doc`, `kgfoundry_common.models.DoctagsAsset`, `kgfoundry_common.navmap_loader.load_nav_metadata`, [registry.duckdb_helpers](./registry/duckdb_helpers.md), `registry.duckdb_helpers.DuckDBQueryOptions`, `typing.TYPE_CHECKING`, `uuid`
 
 ## Autorefs Examples
 
@@ -36,7 +38,7 @@ classDiagram
 
 ```d2
 direction: right
-"registry.helper": "registry.helper" { link: "helper.md" }
+"registry.helper": "registry.helper" { link: "./registry/helper.md" }
 "__future__.annotations": "__future__.annotations"
 "registry.helper" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -53,7 +55,7 @@ direction: right
 "registry.helper" -> "kgfoundry_common.models.DoctagsAsset"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "registry.helper" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"registry.duckdb_helpers": "registry.duckdb_helpers" { link: "duckdb_helpers.md" }
+"registry.duckdb_helpers": "registry.duckdb_helpers" { link: "./registry/duckdb_helpers.md" }
 "registry.helper" -> "registry.duckdb_helpers"
 "registry.duckdb_helpers.DuckDBQueryOptions": "registry.duckdb_helpers.DuckDBQueryOptions"
 "registry.helper" -> "registry.duckdb_helpers.DuckDBQueryOptions"
@@ -61,5 +63,7 @@ direction: right
 "registry.helper" -> "typing.TYPE_CHECKING"
 "uuid": "uuid"
 "registry.helper" -> "uuid"
+"registry.helper_code": "registry.helper code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/helper.py" }
+"registry.helper" -> "registry.helper_code" { style: dashed }
 ```
 

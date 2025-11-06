@@ -2,6 +2,8 @@
 
 Structured logging helpers with correlation IDs and observability
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/logging.py)
+
 ## Sections
 
 - **Public API**
@@ -115,7 +117,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.logging": "kgfoundry_common.logging" { link: "logging.md" }
+"kgfoundry_common.logging": "kgfoundry_common.logging" { link: "./kgfoundry_common/logging.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.logging" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -154,5 +156,7 @@ direction: right
 "kgfoundry_common.logging" -> "typing.cast"
 "typing.runtime_checkable": "typing.runtime_checkable"
 "kgfoundry_common.logging" -> "typing.runtime_checkable"
+"kgfoundry_common.logging_code": "kgfoundry_common.logging code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/logging.py" }
+"kgfoundry_common.logging" -> "kgfoundry_common.logging_code" { style: dashed }
 ```
 

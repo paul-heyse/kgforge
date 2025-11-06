@@ -4,6 +4,8 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/flows.py)
+
 ## Sections
 
 - **Public API**
@@ -31,7 +33,7 @@ consumed by the MkDocs suite.
 
 ```d2
 direction: right
-"orchestration.flows": "orchestration.flows" { link: "flows.md" }
+"orchestration.flows": "orchestration.flows" { link: "./orchestration/flows.md" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.flows" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -40,5 +42,7 @@ direction: right
 "orchestration.flows" -> "prefect.flow"
 "prefect.task": "prefect.task"
 "orchestration.flows" -> "prefect.task"
+"orchestration.flows_code": "orchestration.flows code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/flows.py" }
+"orchestration.flows" -> "orchestration.flows_code" { style: dashed }
 ```
 

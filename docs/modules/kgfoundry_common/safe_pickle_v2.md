@@ -2,6 +2,8 @@
 
 Secure pickle serialization with HMAC signing and class allow-list.
 
+[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/safe_pickle_v2.py)
+
 ## Sections
 
 - **Public API**
@@ -104,7 +106,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.safe_pickle_v2": "kgfoundry_common.safe_pickle_v2" { link: "safe_pickle_v2.md" }
+"kgfoundry_common.safe_pickle_v2": "kgfoundry_common.safe_pickle_v2" { link: "./kgfoundry_common/safe_pickle_v2.md" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.safe_pickle_v2" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -129,5 +131,7 @@ direction: right
 "kgfoundry_common.safe_pickle_v2" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.safe_pickle_v2" -> "typing.cast"
+"kgfoundry_common.safe_pickle_v2_code": "kgfoundry_common.safe_pickle_v2 code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/safe_pickle_v2.py" }
+"kgfoundry_common.safe_pickle_v2" -> "kgfoundry_common.safe_pickle_v2_code" { style: dashed }
 ```
 
