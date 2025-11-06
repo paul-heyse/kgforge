@@ -1,0 +1,18 @@
+# openspec/policies/http-retry/non-idempotent-with-key.yaml
+name: non-idempotent-with-key
+description: "Allow POST retries only when Idempotency-Key present"
+methods: [POST]
+require_idempotency_key: true
+retry_on:
+  status: [429, "500-503"]
+  exceptions: [HttpTimeout, HttpConnectionError]
+respect_retry_after: true
+stop:
+  after_attempt: 4
+  after_delay_s: 20
+wait:
+  kind: exponential_jitter
+  initial_s: 0.5
+  max_s: 8.0
+  jitter: 0.3
+metrics_label: nonidemp-key

@@ -488,6 +488,7 @@ docs-build-symbol-index = "docs.toolchain:build_symbol_index"
 docs-validate-artifacts = "docs.toolchain:validate_artifacts"
 docs-symbol-delta = "docs.toolchain:symbol_delta"
 tools-build-navmap = "tools.cli:build_navmap"
+docs-serve-mkdocs = "tools.mkdocs_suite.serve:main"
 
 
 [project.optional-dependencies]

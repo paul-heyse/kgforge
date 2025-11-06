@@ -8,11 +8,6 @@ importing the heavier entry points.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from dataclasses import dataclass
-from functools import cache
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version as pkg_version
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -24,68 +19,63 @@ from tools import (
     RegistryInterfaceModel,
     RegistryMetadataModel,
     ToolingMetadataModel,
-    load_cli_tooling_context,
+)
+from tools.cli_context_registry import (
+    CLIContextDefinition,
+    augment_for,
+    context_for,
+    default_version_resolver,
+    definition_for,
+    interface_for,
+    operation_override_for,
+    register_cli,
+    registry_for,
+    settings_for,
+    tooling_metadata_for,
 )
 
 if TYPE_CHECKING:
     from tools.typer_to_openapi_cli import CLIConfig, OperationContext
 
 
-@dataclass(frozen=True)
-class _CLIDefinition:
-    """Static metadata describing an individual documentation CLI."""
-
-    command: str
-    title: str
-    interface_id: str
-    operation_ids: Mapping[str, str]
-
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 """Repository root used to resolve augment and registry metadata paths."""
 
 
-_CLI_DEFINITIONS: dict[str, _CLIDefinition] = {
-    "docs-validate-artifacts": _CLIDefinition(
+_DOCS_DEFINITIONS: dict[str, CLIContextDefinition] = {
+    "docs-validate-artifacts": CLIContextDefinition(
         command="docs-validate-artifacts",
         title="Documentation Artifact Validator",
         interface_id="docs-validate-cli",
         operation_ids={"validate": "docs.validate_artifacts"},
+        bin_name="docs-validate-artifacts",
+        version_resolver=default_version_resolver("kgfoundry-tools", "kgfoundry"),
     ),
-    "docs-build-symbol-index": _CLIDefinition(
+    "docs-build-symbol-index": CLIContextDefinition(
         command="docs-build-symbol-index",
         title="Documentation Symbol Index Builder",
         interface_id="docs-symbol-index-cli",
         operation_ids={"build": "docs.symbol_index.build"},
+        bin_name="docs-build-symbol-index",
+        version_resolver=default_version_resolver("kgfoundry-tools", "kgfoundry"),
     ),
-    "docs-build-graphs": _CLIDefinition(
+    "docs-build-graphs": CLIContextDefinition(
         command="docs-cli",
         title="Documentation Graph Builder",
         interface_id="docs-validate-cli",
         operation_ids={"build": "docs.build_graphs"},
+        bin_name="docs-cli",
+        version_resolver=default_version_resolver("kgfoundry-tools", "kgfoundry"),
     ),
 }
+
+for _key, _definition in _DOCS_DEFINITIONS.items():
+    register_cli(_key, _definition)
 
 _DEFAULT_COMMAND = "docs-validate-artifacts"
 
 
-def _resolve_cli_version() -> str:
-    """Return the version string advertised by the CLI metadata.
-
-    Returns
-    -------
-    str
-        Detected ``kgfoundry`` tooling version or ``"0.0.0"`` when unavailable.
-    """
-    for distribution in ("kgfoundry-tools", "kgfoundry"):
-        try:
-            return pkg_version(distribution)
-        except PackageNotFoundError:  # pragma: no cover - editable installs fallback
-            continue
-    return "0.0.0"
-
-
-def get_cli_definition(command: str) -> _CLIDefinition:
+def get_cli_definition(command: str) -> CLIContextDefinition:
     """Return the CLI metadata definition for ``command``.
 
     Parameters
@@ -95,32 +85,10 @@ def get_cli_definition(command: str) -> _CLIDefinition:
 
     Returns
     -------
-    _CLIDefinition
+    CLIContextDefinition
         Structured metadata describing the requested CLI command.
-
-    Raises
-    ------
-    KeyError
-        Raised when ``command`` is not registered in ``_CLI_DEFINITIONS``.
     """
-    try:
-        return _CLI_DEFINITIONS[command]
-    except KeyError as exc:  # pragma: no cover - defensive guard
-        message = f"Unknown documentation CLI command: {command}"
-        raise KeyError(message) from exc
-
-
-@cache
-def _settings_for(command: str) -> CLIToolSettings:
-    definition = get_cli_definition(command)
-    return CLIToolSettings(
-        bin_name=definition.command,
-        title=definition.title,
-        version=_resolve_cli_version(),
-        augment_path=REPO_ROOT / "openapi" / "_augment_cli.yaml",
-        registry_path=REPO_ROOT / "tools" / "mkdocs_suite" / "api_registry.yaml",
-        interface_id=definition.interface_id,
-    )
+    return definition_for(command)
 
 
 def get_cli_settings(command: str = _DEFAULT_COMMAND) -> CLIToolSettings:
@@ -136,12 +104,7 @@ def get_cli_settings(command: str = _DEFAULT_COMMAND) -> CLIToolSettings:
     CLIToolSettings
         Materialised CLI settings including augment/registry paths and interface id.
     """
-    return _settings_for(command)
-
-
-@cache
-def _context_for(command: str) -> CLIToolingContext:
-    return load_cli_tooling_context(get_cli_settings(command))
+    return settings_for(command)
 
 
 def get_cli_context(command: str = _DEFAULT_COMMAND) -> CLIToolingContext:
@@ -157,7 +120,7 @@ def get_cli_context(command: str = _DEFAULT_COMMAND) -> CLIToolingContext:
     CLIToolingContext
         Cached context with augment, registry, and typed configuration objects.
     """
-    return _context_for(command)
+    return context_for(command)
 
 
 def get_cli_config(command: str = _DEFAULT_COMMAND) -> CLIConfig:
@@ -206,8 +169,7 @@ def get_tooling_metadata(command: str = _DEFAULT_COMMAND) -> ToolingMetadataMode
     ToolingMetadataModel
         Immutable bundle combining augment and registry metadata models.
     """
-    context = get_cli_context(command)
-    return ToolingMetadataModel(augment=context.augment, registry=context.registry)
+    return tooling_metadata_for(command)
 
 
 def get_augment_metadata(command: str = _DEFAULT_COMMAND) -> AugmentMetadataModel:
@@ -223,7 +185,7 @@ def get_augment_metadata(command: str = _DEFAULT_COMMAND) -> AugmentMetadataMode
     AugmentMetadataModel
         Augment metadata scoped to the selected CLI command.
     """
-    return get_cli_context(command).augment
+    return augment_for(command)
 
 
 def get_registry_metadata(command: str = _DEFAULT_COMMAND) -> RegistryMetadataModel:
@@ -239,7 +201,7 @@ def get_registry_metadata(command: str = _DEFAULT_COMMAND) -> RegistryMetadataMo
     RegistryMetadataModel
         Registry metadata for the selected CLI command.
     """
-    return get_cli_context(command).registry
+    return registry_for(command)
 
 
 def get_interface_metadata(command: str = _DEFAULT_COMMAND) -> RegistryInterfaceModel:
@@ -254,18 +216,8 @@ def get_interface_metadata(command: str = _DEFAULT_COMMAND) -> RegistryInterface
     -------
     RegistryInterfaceModel
         Registry interface entry for the selected CLI command.
-
-    Raises
-    ------
-    KeyError
-        Raised when the registry metadata does not contain the expected interface.
     """
-    interface_id = get_cli_definition(command).interface_id
-    interface = get_registry_metadata(command).interface(interface_id)
-    if interface is None:  # pragma: no cover - defensive guard for misconfiguration
-        msg = f"Registry metadata missing interface '{interface_id}'."
-        raise KeyError(msg)
-    return interface
+    return interface_for(command)
 
 
 def get_operation_override(
@@ -290,10 +242,7 @@ def get_operation_override(
     OperationOverrideModel | None
         Override metadata when defined; otherwise ``None``.
     """
-    operation_id = get_cli_definition(command).operation_ids.get(subcommand)
-    if operation_id is None:
-        return None
-    return get_augment_metadata(command).operation_override(operation_id, tokens=tokens)
+    return operation_override_for(command, subcommand=subcommand, tokens=tokens)
 
 
 CLI_COMMAND = get_cli_definition(_DEFAULT_COMMAND).command

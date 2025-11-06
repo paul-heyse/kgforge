@@ -2,4 +2,8 @@
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from docs import cli_context as _cli_context
+
+cli_context = _cli_context
+
+__all__ = ["cli_context"]

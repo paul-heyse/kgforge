@@ -276,7 +276,8 @@ class NavMetadataModel(BaseModel):
         -----
         The return annotation ``TupleGenerator`` is Pydantic's alias for
         ``Iterator[tuple[str, JsonValue]]``. Iteration delegates to the underlying
-        mapping via ``yield from``.
+        mapping via ``yield from``. This method returns an iterator over key-value
+        pairs, but Ruff flags it as not returning due to the generator pattern.
         """
         items = self.as_mapping().items()
         yield from items

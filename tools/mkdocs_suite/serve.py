@@ -15,14 +15,13 @@ import sys
 from pathlib import Path
 
 from tools._shared.logging import get_logger
-from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 
 DEFAULT_CONFIG = Path("tools/mkdocs_suite/mkdocs.yml")
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_MIN_PORT = 8000
-DEFAULT_MAX_PORT = 8019
+DEFAULT_MAX_PORT = 8020
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -163,33 +162,30 @@ def main(argv: list[str] | None = None) -> int:
     if args.open:
         command.append("--open")
 
-    env = os.environ.copy()
     repo_root = Path(__file__).resolve().parents[2]
     src_path = (repo_root / "src").resolve()
-    existing_pythonpath = env.get("PYTHONPATH")
+    existing_pythonpath = os.environ.get("PYTHONPATH")
     if existing_pythonpath:
-        env["PYTHONPATH"] = os.pathsep.join((str(src_path), existing_pythonpath))
+        os.environ["PYTHONPATH"] = os.pathsep.join((str(src_path), existing_pythonpath))
     else:
-        env["PYTHONPATH"] = str(src_path)
+        os.environ["PYTHONPATH"] = str(src_path)
+
+    message = f"Serving documentation at http://{dev_addr} (Ctrl+C to stop)"
+    print(message, flush=True)
+    LOGGER.info("Launching MkDocs dev server", extra={"dev_addr": dev_addr})
 
     try:
-        result = run_tool(command, env=env, check=False)
+        os.execvp("mkdocs", command)
     except KeyboardInterrupt:  # pragma: no cover - interactive interrupt
         LOGGER.info("MkDocs dev server interrupted", extra={"dev_addr": dev_addr})
         return 130
-    except ToolExecutionError as exc:
+    except OSError as exc:
         LOGGER.exception(
-            "MkDocs dev server failed",
-            extra={
-                "dev_addr": dev_addr,
-                "returncode": exc.returncode,
-                "stdout": exc.stdout,
-                "stderr": exc.stderr,
-            },
+            "Failed to exec MkDocs dev server",
+            extra={"dev_addr": dev_addr, "errno": exc.errno},
         )
-        return exc.returncode if exc.returncode is not None else 1
-
-    return result.returncode
+        print(f"Error launching mkdocs serve: {exc}", file=sys.stderr, flush=True)
+        return 1
 
 
 if __name__ == "__main__":

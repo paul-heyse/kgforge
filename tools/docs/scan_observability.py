@@ -373,8 +373,9 @@ def load_policy() -> ObservabilityPolicy:
     Notes
     -----
     Any exception raised during policy loading that is not a YAML parsing error
-    is propagated after logging. YAML parsing issues are logged and result in
-    the default policy being returned.
+    is propagated after logging. The exception type depends on what the loading
+    operation raises (e.g., OSError for file I/O issues). YAML parsing issues
+    are logged and result in the default policy being returned.
     """
     policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():

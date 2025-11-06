@@ -989,6 +989,11 @@ def run_legacy(
     ------
     NotImplementedError
         Always raised as this function is a placeholder and not yet implemented.
+
+    Notes
+    -----
+    This function never returns normally; it always raises :exc:`NotImplementedError`.
+    The return type annotation exists for type checking purposes only.
     """
     msg = (
         "run_legacy() is deprecated and will be removed in a future release. "

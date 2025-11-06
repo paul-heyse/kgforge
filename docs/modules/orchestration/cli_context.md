@@ -12,10 +12,6 @@ consumed by the MkDocs suite.
 
 ## Contents
 
-### orchestration.cli_context._resolve_cli_version
-
-::: orchestration.cli_context._resolve_cli_version
-
 ### orchestration.cli_context.get_augment_metadata
 
 ::: orchestration.cli_context.get_augment_metadata
@@ -54,15 +50,15 @@ consumed by the MkDocs suite.
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `collections.abc.Sequence`, `functools.lru_cache`, `importlib.metadata.PackageNotFoundError`, `importlib.metadata.version`, `pathlib.Path`, `tools.AugmentMetadataModel`, `tools.CLIToolSettings`, `tools.CLIToolingContext`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryMetadataModel`, `tools.ToolingMetadataModel`, `tools.load_cli_tooling_context`, `tools.typer_to_openapi_cli.CLIConfig`, `tools.typer_to_openapi_cli.OperationContext`, `typing.TYPE_CHECKING`, `typing.cast`
+**Imports:** `__future__.annotations`, `collections.abc.Sequence`, `pathlib.Path`, `tools.AugmentMetadataModel`, `tools.CLIToolSettings`, `tools.CLIToolingContext`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryMetadataModel`, `tools.ToolingMetadataModel`, `tools.cli_context_registry.CLIContextDefinition`, `tools.cli_context_registry.augment_for`, `tools.cli_context_registry.context_for`, `tools.cli_context_registry.default_version_resolver`, `tools.cli_context_registry.interface_for`, `tools.cli_context_registry.operation_override_for`, `tools.cli_context_registry.register_cli`, `tools.cli_context_registry.registry_for`, `tools.cli_context_registry.settings_for`, `tools.cli_context_registry.tooling_metadata_for`, `tools.typer_to_openapi_cli.CLIConfig`, `tools.typer_to_openapi_cli.OperationContext`, `typing.TYPE_CHECKING`, `typing.cast`
 
 **Imported by:** [orchestration.cli](./orchestration/cli.md)
 
 ## Autorefs Examples
 
-- [orchestration.cli_context._resolve_cli_version][]
 - [orchestration.cli_context.get_augment_metadata][]
 - [orchestration.cli_context.get_cli_config][]
+- [orchestration.cli_context.get_cli_context][]
 
 ## Neighborhood
 
@@ -73,12 +69,6 @@ direction: right
 "orchestration.cli_context" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
 "orchestration.cli_context" -> "collections.abc.Sequence"
-"functools.lru_cache": "functools.lru_cache"
-"orchestration.cli_context" -> "functools.lru_cache"
-"importlib.metadata.PackageNotFoundError": "importlib.metadata.PackageNotFoundError"
-"orchestration.cli_context" -> "importlib.metadata.PackageNotFoundError"
-"importlib.metadata.version": "importlib.metadata.version"
-"orchestration.cli_context" -> "importlib.metadata.version"
 "pathlib.Path": "pathlib.Path"
 "orchestration.cli_context" -> "pathlib.Path"
 "tools.AugmentMetadataModel": "tools.AugmentMetadataModel"
@@ -95,8 +85,26 @@ direction: right
 "orchestration.cli_context" -> "tools.RegistryMetadataModel"
 "tools.ToolingMetadataModel": "tools.ToolingMetadataModel"
 "orchestration.cli_context" -> "tools.ToolingMetadataModel"
-"tools.load_cli_tooling_context": "tools.load_cli_tooling_context"
-"orchestration.cli_context" -> "tools.load_cli_tooling_context"
+"tools.cli_context_registry.CLIContextDefinition": "tools.cli_context_registry.CLIContextDefinition"
+"orchestration.cli_context" -> "tools.cli_context_registry.CLIContextDefinition"
+"tools.cli_context_registry.augment_for": "tools.cli_context_registry.augment_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.augment_for"
+"tools.cli_context_registry.context_for": "tools.cli_context_registry.context_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.context_for"
+"tools.cli_context_registry.default_version_resolver": "tools.cli_context_registry.default_version_resolver"
+"orchestration.cli_context" -> "tools.cli_context_registry.default_version_resolver"
+"tools.cli_context_registry.interface_for": "tools.cli_context_registry.interface_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.interface_for"
+"tools.cli_context_registry.operation_override_for": "tools.cli_context_registry.operation_override_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.operation_override_for"
+"tools.cli_context_registry.register_cli": "tools.cli_context_registry.register_cli"
+"orchestration.cli_context" -> "tools.cli_context_registry.register_cli"
+"tools.cli_context_registry.registry_for": "tools.cli_context_registry.registry_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.registry_for"
+"tools.cli_context_registry.settings_for": "tools.cli_context_registry.settings_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.settings_for"
+"tools.cli_context_registry.tooling_metadata_for": "tools.cli_context_registry.tooling_metadata_for"
+"orchestration.cli_context" -> "tools.cli_context_registry.tooling_metadata_for"
 "tools.typer_to_openapi_cli.CLIConfig": "tools.typer_to_openapi_cli.CLIConfig"
 "orchestration.cli_context" -> "tools.typer_to_openapi_cli.CLIConfig"
 "tools.typer_to_openapi_cli.OperationContext": "tools.typer_to_openapi_cli.OperationContext"

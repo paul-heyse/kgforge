@@ -23,10 +23,27 @@ if hasattr(_module, "__path__"):
 
 
 def __getattr__(name: str) -> object:
-    """Forward attribute lookups to the underlying module."""
+    """Return attributes exposed by the docling_kg module.
+
+    Parameters
+    ----------
+    name : str
+        Attribute name to resolve.
+
+    Returns
+    -------
+    object
+        Attribute resolved from the underlying ``docling_kg`` namespace.
+    """
     return namespace_getattr(_module, name)
 
 
 def __dir__() -> list[str]:
-    """Return the combined attribute listing."""
+    """Return the combined attribute listing.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of attribute names provided by ``docling_kg``.
+    """
     return namespace_dir(_module, _EXPORTS)
