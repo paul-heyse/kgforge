@@ -19,7 +19,6 @@ import logging
 import posixpath
 import re
 import sys
-from urllib.parse import urlparse
 from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
@@ -27,6 +26,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Protocol, TypeGuard, cast
+from urllib.parse import urlparse
 
 import mkdocs_gen_files
 
@@ -844,8 +844,13 @@ def _write_navmap_json(module_path: str, nav_meta: dict[str, Any]) -> None:
 
 
 def _is_absolute_url(candidate: str) -> bool:
-    """Return ``True`` when ``candidate`` is an absolute URL."""
+    """Return ``True`` when ``candidate`` is an absolute URL.
 
+    Returns
+    -------
+    bool
+        ``True`` when ``candidate`` includes both scheme and netloc; otherwise ``False``.
+    """
     parsed = urlparse(candidate)
     return bool(parsed.scheme and parsed.netloc)
 

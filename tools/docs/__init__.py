@@ -139,9 +139,11 @@ _MODULE_EXPORTS: dict[str, str] = {
 MODULE_EXPORTS: Final[Mapping[str, str]] = MappingProxyType(_MODULE_EXPORTS)
 
 if TYPE_CHECKING:
-    from docs._scripts import cli_context
+    from types import ModuleType
 
-    from tools.docs import errors, observability
+    cli_context: ModuleType
+    errors: ModuleType
+    observability: ModuleType
 
 __all__: tuple[str, ...] = (
     "build_artifacts",
