@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
-from codeintel.indexer import cli as indexer_cli
 from typer.testing import CliRunner
+
+from codeintel import cli
 
 
 @pytest.fixture(name="runner")
@@ -22,7 +23,7 @@ def _read_envelope(path: Path) -> dict[str, Any]:
 def test_query_emits_success_envelope(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, runner: CliRunner
 ) -> None:
-    monkeypatch.setattr(indexer_cli, "CLI_ENVELOPE_DIR", tmp_path)
+    monkeypatch.setattr(cli, "CLI_ENVELOPE_DIR", tmp_path)
 
     source_file = tmp_path / "example.py"
     source_file.write_text("print('hello world')\n", encoding="utf-8")
@@ -43,13 +44,13 @@ def test_query_emits_success_envelope(
     ) -> list[dict[str, object]]:
         return [{"kind": "identifier", "capture": "ident", "match_id": 0}]
 
-    monkeypatch.setattr(indexer_cli, "load_langs", fake_load_langs)
-    monkeypatch.setattr(indexer_cli, "get_language", fake_get_language)
-    monkeypatch.setattr(indexer_cli, "parse_bytes", fake_parse_bytes)
-    monkeypatch.setattr(indexer_cli, "run_query", fake_run_query)
+    monkeypatch.setattr(cli, "load_langs", fake_load_langs)
+    monkeypatch.setattr(cli, "get_language", fake_get_language)
+    monkeypatch.setattr(cli, "parse_bytes", fake_parse_bytes)
+    monkeypatch.setattr(cli, "run_query", fake_run_query)
 
     result = runner.invoke(
-        indexer_cli.app,
+        cli.app,
         [
             "query",
             str(source_file),
@@ -73,7 +74,7 @@ def test_query_emits_success_envelope(
 def test_query_invalid_language_records_violation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, runner: CliRunner
 ) -> None:
-    monkeypatch.setattr(indexer_cli, "CLI_ENVELOPE_DIR", tmp_path)
+    monkeypatch.setattr(cli, "CLI_ENVELOPE_DIR", tmp_path)
 
     source_file = tmp_path / "example.py"
     source_file.write_text("print('hello world')\n", encoding="utf-8")
@@ -81,7 +82,7 @@ def test_query_invalid_language_records_violation(
     query_file.write_text("(identifier) @ident\n", encoding="utf-8")
 
     result = runner.invoke(
-        indexer_cli.app,
+        cli.app,
         [
             "query",
             str(source_file),

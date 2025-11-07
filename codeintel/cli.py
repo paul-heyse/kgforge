@@ -1,15 +1,22 @@
-"""Code-intel CLI aligned with the shared tooling metadata contracts."""
+"""Unified CodeIntel CLI aligned with the shared tooling metadata contracts.
+
+This CLI provides:
+- Developer tooling: query, symbols (Tree-sitter powered)
+- Operational commands: mcp serve, index build
+"""
 
 from __future__ import annotations
 
 import json
+import os
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Final, NoReturn
+from typing import Annotated, Any, Final, NoReturn, cast
 from uuid import uuid4
 
+import anyio
 import typer
 from tools import (
     CliEnvelope,
@@ -27,7 +34,8 @@ from tools import (
 from tools._shared.logging import LoggerAdapter
 from tree_sitter import Language
 
-from codeintel.indexer import cli_context
+from codeintel import cli_context
+from codeintel.index.store import IndexStore, ensure_schema, index_incremental
 from codeintel.indexer.tscore import (
     LANGUAGE_NAMES,
     get_language,
@@ -36,6 +44,7 @@ from codeintel.indexer.tscore import (
     run_query,
 )
 from codeintel.mcp_server import tools as mcp_tools
+from codeintel.mcp_server.server import amain as mcp_amain
 from kgfoundry_common.errors import ConfigurationError
 
 CLI_COMMAND = cli_context.CLI_COMMAND
@@ -447,6 +456,23 @@ def _execute_query_or_exit(
         )
 
 
+def _infer_repo_root(repo: str | None) -> str:
+    """Resolve repository root path.
+
+    Parameters
+    ----------
+    repo : str | None
+        Repository path, defaults to current directory.
+
+    Returns
+    -------
+    str
+        Absolute path to repository root.
+    """
+    return str(Path(repo or ".").resolve())
+
+
+# Developer tooling commands (Tree-sitter powered)
 @app.command(name="query", help=QUERY_HELP)
 def query(
     path: SourcePathArgument,
@@ -563,5 +589,121 @@ def symbols(dirpath: DirectoryArgument) -> None:
     _finish_success(context)
 
 
-if __name__ == "__main__":  # pragma: no cover - manual execution entrypoint
+# Operational commands (MCP server and index management)
+mcp_group = typer.Typer()
+app.add_typer(mcp_group, name="mcp")
+
+RepoOption = Annotated[
+    str,
+    typer.Option(
+        "--repo",
+        "-r",
+        help="Repository root path.",
+    ),
+]
+
+
+@mcp_group.command("serve")
+def serve(repo: RepoOption = ".") -> None:
+    """Start the CodeIntel MCP server over stdio.
+
+    Parameters
+    ----------
+    repo : str, optional
+        Repository root path, by default ".".
+    """
+    context = _start_command("mcp/serve", repo=repo)
+    repo_root = _infer_repo_root(repo)
+    # Make repo visible to tools in a predictable way:
+    os.environ["KGF_REPO_ROOT"] = repo_root
+
+    try:
+        # Run server inside AnyIO; façade gives you correlation ids + envelopes
+        # Cast to help type checker understand the async function signature
+        anyio.run(cast("Any", mcp_amain))
+        context.builder.add_file(
+            path=str(repo_root),
+            status="success",
+            message=f"MCP server stopped (repo={repo_root})",
+        )
+        _finish_success(context)
+    except (RuntimeError, OSError, ValueError) as exc:
+        _fail_command(
+            context,
+            detail=f"MCP server error: {exc}",
+            status=STATUS_INTERNAL_ERROR,
+            error_status="error",
+            options=_FailureOptions(
+                kind="mcp-server-error",
+                extras={"repo": repo_root},
+                exc=exc,
+            ),
+        )
+
+
+index_group = typer.Typer()
+app.add_typer(index_group, name="index")
+
+FreshOption = Annotated[
+    bool,
+    typer.Option(
+        "--fresh/--incremental",
+        help="Rebuild entire index (fresh) or only changed files (incremental).",
+    ),
+]
+
+
+@index_group.command("build")
+def build_index(repo: RepoOption = ".", *, fresh: FreshOption = False) -> None:
+    """Build or update the persistent symbol index.
+
+    Parameters
+    ----------
+    repo : str, optional
+        Repository root path, by default ".".
+    fresh : bool, optional
+        If True, rebuild entire index; otherwise incremental, by default False.
+    """
+    context = _start_command("index/build", repo=repo, fresh=fresh)
+    repo_path = Path(repo).resolve()
+
+    try:
+        db = repo_path / ".kgf" / "codeintel.db"
+        db.parent.mkdir(parents=True, exist_ok=True)
+        with IndexStore(db) as store:
+            ensure_schema(store)
+            count = index_incremental(store, repo_path, changed_only=not fresh)
+        context.builder.add_file(
+            path=str(db),
+            status="success",
+            message=f"Indexed {count} files from repo={repo_path} into {db}",
+        )
+        _finish_success(context)
+    except FileNotFoundError as exc:
+        _fail_command(
+            context,
+            detail=f"Repository not found: {repo_path}",
+            status=STATUS_NOT_FOUND,
+            error_status="config",
+            options=_FailureOptions(
+                kind="repo-missing",
+                extras={"repo": repo_path},
+                exc=exc,
+            ),
+        )
+    except (RuntimeError, OSError, ValueError) as exc:
+        _fail_command(
+            context,
+            detail=f"Index build error: {exc}",
+            status=STATUS_INTERNAL_ERROR,
+            error_status="error",
+            options=_FailureOptions(
+                kind="index-build-error",
+                extras={"repo": repo_path, "fresh": fresh},
+                exc=exc,
+            ),
+        )
+
+
+if __name__ == "__main__":  # pragma: no cover - script entry point
     app()

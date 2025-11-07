@@ -4,7 +4,7 @@ This catalog is generated from `_nav.json` sidecars and the shared interface reg
 
 | Interface | Type | Module | Owner | Stability | Spec | Description | Problem Details |
 | --------- | ---- | ------ | ----- | -------- | ---- | ----------- | ---------------- |
-| codeintel-indexer | cli | codeintel.indexer | @code-intel | experimental | [CLI Spec](../api/openapi-cli.md) | Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol<br />extraction through the shared CLI contracts. The interface integrates with the OpenAPI<br />generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.<br /> | schema/examples/problem_details/tool-execution-error.json |
+| codeintel-indexer | cli | codeintel | @code-intel | experimental | [CLI Spec](../api/openapi-cli.md) | Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol<br />extraction through the shared CLI contracts. The interface integrates with the OpenAPI<br />generator, MkDocs diagrams, and documentation lifecycles to keep metadata consistent.<br /> | schema/examples/problem_details/tool-execution-error.json |
 | docs-symbol-index-cli | cli | docs.toolchain | @docs | experimental | [CLI Spec](../api/openapi-cli.md) | Documentation tooling CLI that builds the symbol index, by-file, and by-module artifacts used<br />throughout the documentation pipeline. Emits standardized CLI envelopes and Problem Details<br />for CI gating and observability.<br /> | schema/examples/problem_details/tool-execution-error.json |
 | docs-validate-cli | cli | docs.toolchain | @docs | experimental | [CLI Spec](../api/openapi-cli.md) | Documentation tooling CLI that validates generated artifacts (symbol index, delta summaries,<br />and reverse lookups) against their canonical JSON Schemas. Emits standardized CLI envelopes<br />and Problem Details for CI gating and observability pipelines.<br /> | schema/examples/problem_details/tool-execution-error.json |
 | docstring-builder-cli | cli | tools.docstring_builder | @docs | beta | [CLI Spec](../api/openapi-cli.md) | Command suite powering docstring synchronization, validation, policy enforcement, and<br />diagnostics. The CLI integrates with shared tooling metadata so documentation helpers,<br />diagrams, and automation emit consistent Problem Details and logging envelopes.<br /> | schema/examples/problem_details/tool-execution-error.json |
@@ -16,7 +16,7 @@ This catalog is generated from `_nav.json` sidecars and the shared interface reg
 ## codeintel-indexer
 
 * **Type:** cli
-* **Module:** codeintel.indexer
+* **Module:** codeintel
 * **Owner:** @code-intel
 * **Stability:** experimental
 * **Description:** Tree-sitter powered developer tooling that exposes code-intelligence queries and symbol
@@ -27,12 +27,12 @@ generator, MkDocs diagrams, and documentation lifecycles to keep metadata consis
 ### Operations
 
 - [`codeintel.indexer.query`](openapi-cli.md#operation/codeintel.indexer.query) — Execute a Tree-sitter query against a source file.
-    - Module docs: codeintel.indexer.cli
+    - Module docs: codeintel.cli
   - Tags: codeintel
-  - Handler: `codeintel.indexer.cli:query`
+  - Handler: `codeintel.cli:query`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
   - Code Samples:
-    * (bash) `uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm`
+    * (bash) `uv run python -m codeintel.cli query src/example.py --language python --query queries/highlights.scm`
 
 ## docs-symbol-index-cli
 

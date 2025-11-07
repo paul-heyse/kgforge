@@ -198,10 +198,10 @@ operations:
       as structured JSON. The command integrates with the shared CLI tooling facade so downstream
       documentation, diagrams, and observability pipelines consume consistent envelopes.
     tags: [codeintel]
-    x-handler: "codeintel.indexer.cli:query"
+    x-handler: "codeintel.cli:query"
     x-codeSamples:
       - lang: bash
-        source: "uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm"
+        source: "uv run python -m codeintel.cli query src/example.py --language python --query queries/highlights.scm"
     x-problemDetails:
       - schema/examples/problem_details/tool-execution-error.json
   codeintel.indexer.symbols:
@@ -211,10 +211,10 @@ operations:
       discovered symbol metadata. Designed for developer tooling and documentation pipelines that
       rely on the shared CLI envelope contracts.
     tags: [codeintel]
-    x-handler: "codeintel.indexer.cli:symbols"
+    x-handler: "codeintel.cli:symbols"
     x-codeSamples:
       - lang: bash
-        source: "uv run python -m codeintel.indexer.cli symbols src/"
+        source: "uv run python -m codeintel.cli symbols src/"
     x-problemDetails:
       - schema/examples/problem_details/tool-execution-error.json
   navmap.build:

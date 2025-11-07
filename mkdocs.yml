@@ -147,5 +147,11 @@ nav:
       - Vectorstore FAISS:
           - Overview: api/vectorstore_faiss/index.md
           - GPU adapter: api/vectorstore_faiss/gpu/index.md
+      - CodeIntel:
+          - Overview: modules/codeintel/index.md
+          - Quickstart (MCP): modules/codeintel/quickstart_mcp.md
+          - Tools: modules/codeintel/tools.md
+          - Limits: modules/codeintel/limits.md
+          - Config: modules/codeintel/config.md
 not_in_nav: |
   _build/**

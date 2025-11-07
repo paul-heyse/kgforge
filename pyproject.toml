@@ -700,6 +700,9 @@ runtime-evaluated-base-classes = [
 [tool.ruff.lint.per-file-ignores]
 # Blanket suppressions for most test files
 "tests/**" = [
+    "S404",  # subprocess module is safe in tests with fixed arguments
+    "S603",  # subprocess.Popen with list args and shell=False is safe in tests
+    "PLC0415",  # Late imports acceptable in test fixtures for module state setup
     "D100",
     "D101",
     "D102",

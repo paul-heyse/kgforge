@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from tools.typer_to_openapi_cli import CLIConfig, OperationContext
 
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[1]
 """Repository root used to resolve augment and registry metadata paths."""
 
 

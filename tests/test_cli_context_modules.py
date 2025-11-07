@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import pytest
-from codeintel.indexer import cli_context as codeintel_context
 from docs import cli_context as docs_cli_context
 from src.download import cli_context as download_context
 from src.orchestration import cli_context as orchestration_context
 from tools import CLIToolingContext, CLIToolSettings, OperationOverrideModel
 from tools.docstring_builder import cli_context as docstrings_context
 from tools.navmap import cli_context as navmap_context
+
+from codeintel import cli_context as codeintel_context
 
 
 def _assert_settings(module, settings: CLIToolSettings) -> None:
