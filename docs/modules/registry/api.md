@@ -2,7 +2,11 @@
 
 Protocol defining the registry interface
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/api.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/registry/api.py)
+
+## Hierarchy
+
+- **Parent:** [registry](../registry.md)
 
 ## Sections
 
@@ -37,7 +41,7 @@ classDiagram
 
 ```d2
 direction: right
-"registry.api": "registry.api" { link: "./registry/api.md" }
+"registry.api": "registry.api" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/registry/api.py" }
 "__future__.annotations": "__future__.annotations"
 "registry.api" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -52,7 +56,7 @@ direction: right
 "registry.api" -> "typing.Protocol"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "registry.api" -> "typing.TYPE_CHECKING"
-"registry.api_code": "registry.api code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/registry/api.py" }
-"registry.api" -> "registry.api_code" { style: dashed }
+"registry": "registry" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/registry/__init__.py" }
+"registry" -> "registry.api" { style: dashed }
 ```
 

@@ -4,7 +4,11 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli_context.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli_context.py)
+
+## Hierarchy
+
+- **Parent:** [orchestration](../orchestration.md)
 
 ## Sections
 
@@ -52,7 +56,7 @@ consumed by the MkDocs suite.
 
 **Imports:** `__future__.annotations`, `collections.abc.Sequence`, `pathlib.Path`, `tools.AugmentMetadataModel`, `tools.CLIToolSettings`, `tools.CLIToolingContext`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryMetadataModel`, `tools.ToolingMetadataModel`, `tools.cli_context_registry.CLIContextDefinition`, `tools.cli_context_registry.augment_for`, `tools.cli_context_registry.context_for`, `tools.cli_context_registry.default_version_resolver`, `tools.cli_context_registry.interface_for`, `tools.cli_context_registry.operation_override_for`, `tools.cli_context_registry.register_cli`, `tools.cli_context_registry.registry_for`, `tools.cli_context_registry.settings_for`, `tools.cli_context_registry.tooling_metadata_for`, `tools.typer_to_openapi_cli.CLIConfig`, `tools.typer_to_openapi_cli.OperationContext`, `typing.TYPE_CHECKING`, `typing.cast`
 
-**Imported by:** [orchestration.cli](./orchestration/cli.md)
+**Imported by:** [orchestration.cli](cli.md)
 
 ## Autorefs Examples
 
@@ -64,7 +68,7 @@ consumed by the MkDocs suite.
 
 ```d2
 direction: right
-"orchestration.cli_context": "orchestration.cli_context" { link: "./orchestration/cli_context.md" }
+"orchestration.cli_context": "orchestration.cli_context" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli_context.py" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.cli_context" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -113,9 +117,9 @@ direction: right
 "orchestration.cli_context" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "orchestration.cli_context" -> "typing.cast"
-"orchestration.cli": "orchestration.cli" { link: "./orchestration/cli.md" }
+"orchestration.cli": "orchestration.cli" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py" }
 "orchestration.cli" -> "orchestration.cli_context"
-"orchestration.cli_context_code": "orchestration.cli_context code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli_context.py" }
-"orchestration.cli_context" -> "orchestration.cli_context_code" { style: dashed }
+"orchestration": "orchestration" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/__init__.py" }
+"orchestration" -> "orchestration.cli_context" { style: dashed }
 ```
 

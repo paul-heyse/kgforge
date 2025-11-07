@@ -1,0 +1,36 @@
+# Hypercorn configuration for HTTP/2, HTTP/3, and streaming
+
+# Bind addresses (TCP for H1/H2)
+bind = ["0.0.0.0:8000"]
+
+# QUIC for HTTP/3 (if terminating H3 at origin; otherwise NGINX handles it)
+# quic_bind = ["0.0.0.0:8000"]
+
+# TLS certificates (only if terminating TLS at Hypercorn)
+# certfile = "/etc/ssl/certs/codeintel-mcp.crt"
+# keyfile = "/etc/ssl/private/codeintel-mcp.key"
+
+# ALPN protocols
+alpn_protocols = ["h2", "http/1.1"]
+
+# Advertise HTTP/3 (if serving H3)
+# alt_svc_headers = ["h3=\":443\"; ma=86400"]
+
+# Connection and timeout settings
+keep_alive_timeout = 5
+ssl_handshake_timeout = 60
+
+# Server identification
+server_names = ["codeintel-mcp.local"]
+
+# Workers
+workers = 2
+
+# Logging
+accesslog = "-"  # stdout
+errorlog = "-"   # stderr
+loglevel = "info"
+
+# Application
+application = "codeintel_rev.app.main:app"
+

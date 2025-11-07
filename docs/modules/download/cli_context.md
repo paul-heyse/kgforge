@@ -4,7 +4,11 @@ Downloader command suite that sources external corpora (currently OpenAlex) usin
 CLI tooling contracts. Emits structured envelopes and metadata so downstream tooling (OpenAPI,
 diagrams, documentation) remains in sync without bespoke glue.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli_context.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/download/cli_context.py)
+
+## Hierarchy
+
+- **Parent:** [download](../download.md)
 
 ## Sections
 
@@ -52,7 +56,7 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 **Imports:** `__future__.annotations`, `collections.abc.Sequence`, `pathlib.Path`, `tools.AugmentMetadataModel`, `tools.CLIToolSettings`, `tools.CLIToolingContext`, `tools.OperationOverrideModel`, `tools.RegistryInterfaceModel`, `tools.RegistryMetadataModel`, `tools.ToolingMetadataModel`, `tools.cli_context_registry.CLIContextDefinition`, `tools.cli_context_registry.augment_for`, `tools.cli_context_registry.context_for`, `tools.cli_context_registry.default_version_resolver`, `tools.cli_context_registry.interface_for`, `tools.cli_context_registry.operation_override_for`, `tools.cli_context_registry.register_cli`, `tools.cli_context_registry.registry_for`, `tools.cli_context_registry.settings_for`, `tools.cli_context_registry.tooling_metadata_for`, `tools.typer_to_openapi_cli.CLIConfig`, `tools.typer_to_openapi_cli.OperationContext`, `typing.TYPE_CHECKING`, `typing.cast`
 
-**Imported by:** [download.cli](./download/cli.md)
+**Imported by:** [download.cli](cli.md)
 
 ## Autorefs Examples
 
@@ -64,7 +68,7 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 ```d2
 direction: right
-"download.cli_context": "download.cli_context" { link: "./download/cli_context.md" }
+"download.cli_context": "download.cli_context" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/download/cli_context.py" }
 "__future__.annotations": "__future__.annotations"
 "download.cli_context" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -113,9 +117,9 @@ direction: right
 "download.cli_context" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "download.cli_context" -> "typing.cast"
-"download.cli": "download.cli" { link: "./download/cli.md" }
+"download.cli": "download.cli" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/download/cli.py" }
 "download.cli" -> "download.cli_context"
-"download.cli_context_code": "download.cli_context code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli_context.py" }
-"download.cli_context" -> "download.cli_context_code" { style: dashed }
+"download": "download" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/download/__init__.py" }
+"download" -> "download.cli_context" { style: dashed }
 ```
 

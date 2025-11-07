@@ -10,13 +10,15 @@ from pathlib import Path
 import pytest
 
 
-def _start_mcp_server(cwd: str) -> subprocess.Popen[str]:
+def _start_mcp_server(cwd: str, env: dict[str, str] | None = None) -> subprocess.Popen[str]:
     """Start MCP server subprocess for testing.
 
     Parameters
     ----------
     cwd : str
         Working directory for the server process.
+    env : dict[str, str] | None, optional
+        Environment variables to pass to subprocess, by default None (inherits parent env).
 
     Returns
     -------
@@ -28,6 +30,11 @@ def _start_mcp_server(cwd: str) -> subprocess.Popen[str]:
     Uses subprocess.Popen with a list of arguments and shell=False,
     which is safe for test code with fixed arguments.
     """
+    import os
+
+    proc_env = os.environ.copy()
+    if env:
+        proc_env.update(env)
     return subprocess.Popen(
         [sys.executable, "-m", "codeintel.mcp_server.server"],
         stdin=subprocess.PIPE,
@@ -35,14 +42,18 @@ def _start_mcp_server(cwd: str) -> subprocess.Popen[str]:
         stderr=subprocess.PIPE,
         text=True,
         cwd=cwd,
+        env=proc_env,
     )
 
 
-def test_rate_limit(repo_fixture: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_rate_limit(repo_fixture: Path) -> None:
     """Test that rate limiting enforces QPS limits."""
-    monkeypatch.setenv("CODEINTEL_RATE_LIMIT_QPS", "1")
-    monkeypatch.setenv("CODEINTEL_RATE_LIMIT_BURST", "1")
-    proc = _start_mcp_server(str(repo_fixture))
+    env = {
+        "CODEINTEL_RATE_LIMIT_QPS": "1",
+        "CODEINTEL_RATE_LIMIT_BURST": "1",
+        "KGF_REPO_ROOT": str(repo_fixture),
+    }
+    proc = _start_mcp_server(str(repo_fixture), env=env)
     try:
 
         def rpc(id_: int) -> dict[str, object]:
@@ -75,7 +86,11 @@ def test_rate_limit(repo_fixture: Path, monkeypatch: pytest.MonkeyPatch) -> None
 def test_timeout_behavior(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that tool timeouts are enforced."""
     monkeypatch.setenv("CODEINTEL_TOOL_TIMEOUT_S", "0.001")  # Very short timeout
-    # This test would require a slow operation; for now just verify timeout config is read
-    from codeintel.config import LIMITS
+    # Reload config module to pick up new env var
+    import importlib
 
-    assert LIMITS.tool_timeout_s == 0.001
+    import codeintel.config
+
+    importlib.reload(codeintel.config)
+    # This test would require a slow operation; for now just verify timeout config is read
+    assert codeintel.config.LIMITS.tool_timeout_s == 0.001

@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+import importlib.util
+import time
+from collections.abc import Callable
 from pathlib import Path
+from typing import ParamSpec, TypeVar, cast
 
 import pytest
+
+P = ParamSpec("P")
+T = TypeVar("T")
 
 
 @pytest.fixture(scope="session")
@@ -56,3 +63,53 @@ def set_env(repo_fixture: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(tools, "REPO_ROOT", repo_fixture.resolve())
     monkeypatch.setattr(tools, "QUERIES_DIR", repo_fixture.resolve() / "codeintel" / "queries")
+
+
+try:
+    _BENCHMARK_AVAILABLE = importlib.util.find_spec("pytest_benchmark.plugin") is not None
+except ModuleNotFoundError:  # pragma: no cover - optional dep
+    _BENCHMARK_AVAILABLE = False
+
+
+if not _BENCHMARK_AVAILABLE:  # pragma: no cover - optional dep
+
+    class _BenchmarkStub:
+        """Lightweight fallback for pytest-benchmark when the plugin is unavailable."""
+
+        __slots__ = ("_iterations", "stats")
+
+        def __init__(self, iterations: int = 5) -> None:
+            self._iterations = max(iterations, 1)
+            self.stats: dict[str, float] = {
+                "mean": 0.0,
+                "min": 0.0,
+                "max": 0.0,
+                "iterations": 0.0,
+            }
+
+        def __call__(self, func: Callable[P, T], *args: P.args, **kwargs: P.kwargs) -> T:
+            durations: list[float] = []
+            result: T | None = None
+            for _ in range(self._iterations):
+                start = time.perf_counter()
+                result = func(*args, **kwargs)
+                durations.append(time.perf_counter() - start)
+            stats = {
+                "mean": sum(durations) / len(durations),
+                "min": min(durations),
+                "max": max(durations),
+                "iterations": float(len(durations)),
+            }
+            self.stats = stats
+            return cast("T", result)
+
+    @pytest.fixture
+    def benchmark() -> _BenchmarkStub:
+        """Provide a minimal benchmark fixture when pytest-benchmark is absent.
+
+        Returns
+        -------
+        _BenchmarkStub
+            Simple callable capturing timing statistics for the provided function.
+        """
+        return _BenchmarkStub()

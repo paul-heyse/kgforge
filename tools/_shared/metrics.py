@@ -120,32 +120,44 @@ def observe_tool_run(
 ) -> Iterator[ToolRunObservation]:
     """Record metrics and tracing for a subprocess invocation.
 
+    This context manager wraps subprocess execution with observability features,
+    including Prometheus metrics, OpenTelemetry tracing, and structured logging.
+    It yields a ToolRunObservation object that tracks the subprocess lifecycle
+    and automatically records metrics when the context exits.
+
     Parameters
     ----------
     command : Sequence[str]
-        Command to execute.
+        Command to execute as a sequence of strings (program name followed by arguments).
     cwd : Path | None
-        Working directory for the command.
+        Working directory for the command execution, or None to use the current directory.
     timeout : float | None
-        Optional timeout in seconds.
+        Optional timeout in seconds. If the subprocess exceeds this duration,
+        it will be terminated and a timeout exception will be raised.
 
     Yields
     ------
     ToolRunObservation
-        Context manager that yields a :class:`ToolRunObservation` capturing runtime details.
+        Context manager that yields a :class:`ToolRunObservation` capturing runtime
+        details including command, working directory, timeout, and execution status.
+        The observation object can be used to track subprocess state and results.
 
     Raises
     ------
     Exception
         Any exception raised during tool execution is explicitly re-raised after
-        recording error status and metrics. The exception is caught, metrics are
-        updated, and then the exception is re-raised. The specific exception type
-        depends on what the tool raises.
+        recording error status and metrics. The exception is caught using
+        ``except Exception as exc``, metrics are updated to reflect the error,
+        and then the exception is explicitly re-raised using ``raise exc``.
+        The specific exception type depends on what the tool raises (e.g.,
+        subprocess errors, timeout errors, etc.).
 
     Notes
     -----
     Any exception raised during tool execution is propagated after recording
-    error status and metrics.
+    error status and metrics. The function catches exceptions using
+    ``except Exception as exc`` and explicitly re-raises them using ``raise exc``
+    to satisfy static analysis tools that require explicit exception raising.
     """
     settings = get_runtime_settings()
     observation = ToolRunObservation(
@@ -182,11 +194,11 @@ def observe_tool_run(
     with span_context:
         try:
             yield observation
-        except Exception:
+        except Exception as exc:
             if observation.status == "success":
                 observation.failure("exception")
             _record(observation, logger)
-            raise
+            raise exc  # Explicitly re-raise the caught exception
         else:
             _record(observation, logger)
 

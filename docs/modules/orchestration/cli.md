@@ -4,7 +4,11 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py)
+
+## Hierarchy
+
+- **Parent:** [orchestration](../orchestration.md)
 
 ## Sections
 
@@ -146,7 +150,7 @@ consumed by the MkDocs suite.
 
 ## Relationships
 
-**Imports:** `__future__.annotations`, `collections.abc.Callable`, `collections.abc.Iterable`, `collections.abc.Mapping`, `collections.abc.Sequence`, `contextlib`, `dataclasses.dataclass`, `importlib`, `json`, `kgfoundry.embeddings_sparse.bm25.get_bm25`, `kgfoundry_common.errors.ConfigurationError`, `kgfoundry_common.errors.IndexBuildError`, `kgfoundry_common.jsonschema_utils.Draft202012ValidatorProtocol`, `kgfoundry_common.jsonschema_utils.ValidationErrorProtocol`, `kgfoundry_common.jsonschema_utils.create_draft202012_validator`, `kgfoundry_common.schema_helpers.load_schema`, `kgfoundry_common.vector_types.VectorBatch`, `kgfoundry_common.vector_types.VectorValidationError`, `kgfoundry_common.vector_types.coerce_vector_batch`, [orchestration.cli_context](./orchestration/cli_context.md), `orchestration.config.IndexCliConfig`, `orchestration.flows.e2e_flow`, [orchestration.safe_pickle](./orchestration/safe_pickle.md), `pathlib.Path`, `time`, `tools.CliEnvelope`, `tools.CliEnvelopeBuilder`, `tools.CliErrorStatus`, `tools.CliStatus`, `tools.JsonValue`, `tools.ProblemDetailsDict`, `tools.ProblemDetailsParams`, `tools._shared.logging.LoggerAdapter`, `tools.build_problem_details`, `tools.get_logger`, `tools.render_cli_envelope`, `tools.with_fields`, `typer`, `typing.Annotated`, `typing.Protocol`, `typing.TYPE_CHECKING`, `typing.cast`, `uuid.uuid4`
+**Imports:** `__future__.annotations`, `collections.abc.Callable`, `collections.abc.Iterable`, `collections.abc.Mapping`, `collections.abc.Sequence`, `contextlib`, `dataclasses.dataclass`, `importlib`, `json`, `kgfoundry.embeddings_sparse.bm25.get_bm25`, `kgfoundry_common.errors.ConfigurationError`, `kgfoundry_common.errors.IndexBuildError`, `kgfoundry_common.jsonschema_utils.Draft202012ValidatorProtocol`, `kgfoundry_common.jsonschema_utils.ValidationErrorProtocol`, `kgfoundry_common.jsonschema_utils.create_draft202012_validator`, `kgfoundry_common.schema_helpers.load_schema`, `kgfoundry_common.vector_types.VectorBatch`, `kgfoundry_common.vector_types.VectorValidationError`, `kgfoundry_common.vector_types.coerce_vector_batch`, [orchestration.cli_context](cli_context.md), `orchestration.config.IndexCliConfig`, `orchestration.flows.e2e_flow`, [orchestration.safe_pickle](safe_pickle.md), `pathlib.Path`, `time`, `tools.CliEnvelope`, `tools.CliEnvelopeBuilder`, `tools.CliErrorStatus`, `tools.CliStatus`, `tools.JsonValue`, `tools.ProblemDetailsDict`, `tools.ProblemDetailsParams`, `tools._shared.logging.LoggerAdapter`, `tools.build_problem_details`, `tools.get_logger`, `tools.render_cli_envelope`, `tools.with_fields`, `typer`, `typing.Annotated`, `typing.Protocol`, `typing.TYPE_CHECKING`, `typing.cast`, `uuid.uuid4`
 
 ## Autorefs Examples
 
@@ -174,7 +178,7 @@ classDiagram
 
 ```d2
 direction: right
-"orchestration.cli": "orchestration.cli" { link: "./orchestration/cli.md" }
+"orchestration.cli": "orchestration.cli" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.cli" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -213,13 +217,13 @@ direction: right
 "orchestration.cli" -> "kgfoundry_common.vector_types.VectorValidationError"
 "kgfoundry_common.vector_types.coerce_vector_batch": "kgfoundry_common.vector_types.coerce_vector_batch"
 "orchestration.cli" -> "kgfoundry_common.vector_types.coerce_vector_batch"
-"orchestration.cli_context": "orchestration.cli_context" { link: "./orchestration/cli_context.md" }
+"orchestration.cli_context": "orchestration.cli_context" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli_context.py" }
 "orchestration.cli" -> "orchestration.cli_context"
 "orchestration.config.IndexCliConfig": "orchestration.config.IndexCliConfig"
 "orchestration.cli" -> "orchestration.config.IndexCliConfig"
 "orchestration.flows.e2e_flow": "orchestration.flows.e2e_flow"
 "orchestration.cli" -> "orchestration.flows.e2e_flow"
-"orchestration.safe_pickle": "orchestration.safe_pickle" { link: "./orchestration/safe_pickle.md" }
+"orchestration.safe_pickle": "orchestration.safe_pickle" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/safe_pickle.py" }
 "orchestration.cli" -> "orchestration.safe_pickle"
 "pathlib.Path": "pathlib.Path"
 "orchestration.cli" -> "pathlib.Path"
@@ -261,7 +265,7 @@ direction: right
 "orchestration.cli" -> "typing.cast"
 "uuid.uuid4": "uuid.uuid4"
 "orchestration.cli" -> "uuid.uuid4"
-"orchestration.cli_code": "orchestration.cli code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py" }
-"orchestration.cli" -> "orchestration.cli_code" { style: dashed }
+"orchestration": "orchestration" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/__init__.py" }
+"orchestration" -> "orchestration.cli" { style: dashed }
 ```
 

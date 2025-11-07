@@ -2,7 +2,11 @@
 
 Typed configuration management via pydantic_settings
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/config.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/config.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -66,7 +70,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.config": "kgfoundry_common.config" { link: "./kgfoundry_common/config.md" }
+"kgfoundry_common.config": "kgfoundry_common.config" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/config.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.config" -> "__future__.annotations"
 "base64": "base64"
@@ -115,7 +119,7 @@ direction: right
 "kgfoundry_common.config" -> "typing.Unpack"
 "typing.cast": "typing.cast"
 "kgfoundry_common.config" -> "typing.cast"
-"kgfoundry_common.config_code": "kgfoundry_common.config code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/config.py" }
-"kgfoundry_common.config" -> "kgfoundry_common.config_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.config" { style: dashed }
 ```
 

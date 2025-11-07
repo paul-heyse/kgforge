@@ -2,7 +2,11 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/fs.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/fs.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -44,7 +48,7 @@ Shared utilities and data structures used across KgFoundry services and tools.
 
 ```d2
 direction: right
-"kgfoundry_common.fs": "kgfoundry_common.fs" { link: "./kgfoundry_common/fs.md" }
+"kgfoundry_common.fs": "kgfoundry_common.fs" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/fs.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.fs" -> "__future__.annotations"
 "kgfoundry_common.logging.get_logger": "kgfoundry_common.logging.get_logger"
@@ -57,7 +61,7 @@ direction: right
 "kgfoundry_common.fs" -> "tempfile"
 "typing.Literal": "typing.Literal"
 "kgfoundry_common.fs" -> "typing.Literal"
-"kgfoundry_common.fs_code": "kgfoundry_common.fs code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/fs.py" }
-"kgfoundry_common.fs" -> "kgfoundry_common.fs_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.fs" { style: dashed }
 ```
 

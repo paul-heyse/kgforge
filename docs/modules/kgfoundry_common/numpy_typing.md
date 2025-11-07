@@ -2,7 +2,11 @@
 
 Typed NumPy helpers shared across vector search modules.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/numpy_typing.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/numpy_typing.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -36,7 +40,7 @@ Typed NumPy helpers shared across vector search modules.
 
 ```d2
 direction: right
-"kgfoundry_common.numpy_typing": "kgfoundry_common.numpy_typing" { link: "./kgfoundry_common/numpy_typing.md" }
+"kgfoundry_common.numpy_typing": "kgfoundry_common.numpy_typing" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/numpy_typing.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.numpy_typing" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -51,7 +55,7 @@ direction: right
 "kgfoundry_common.numpy_typing" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.numpy_typing" -> "typing.cast"
-"kgfoundry_common.numpy_typing_code": "kgfoundry_common.numpy_typing code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/numpy_typing.py" }
-"kgfoundry_common.numpy_typing" -> "kgfoundry_common.numpy_typing_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.numpy_typing" { style: dashed }
 ```
 

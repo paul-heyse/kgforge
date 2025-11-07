@@ -4,7 +4,11 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/flows.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/flows.py)
+
+## Hierarchy
+
+- **Parent:** [orchestration](../orchestration.md)
 
 ## Sections
 
@@ -33,7 +37,7 @@ consumed by the MkDocs suite.
 
 ```d2
 direction: right
-"orchestration.flows": "orchestration.flows" { link: "./orchestration/flows.md" }
+"orchestration.flows": "orchestration.flows" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/flows.py" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.flows" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -42,7 +46,7 @@ direction: right
 "orchestration.flows" -> "prefect.flow"
 "prefect.task": "prefect.task"
 "orchestration.flows" -> "prefect.task"
-"orchestration.flows_code": "orchestration.flows code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/flows.py" }
-"orchestration.flows" -> "orchestration.flows_code" { style: dashed }
+"orchestration": "orchestration" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/__init__.py" }
+"orchestration" -> "orchestration.flows" { style: dashed }
 ```
 

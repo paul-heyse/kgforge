@@ -2,7 +2,11 @@
 
 Ontology loading and lookup helpers
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/ontology/__init__.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/__init__.py)
+
+## Hierarchy
+
+- **Children:** [ontology.catalog](ontology/catalog.md), [ontology.loader](ontology/loader.md)
 
 ## Sections
 
@@ -16,14 +20,16 @@ Ontology loading and lookup helpers
 
 ```d2
 direction: right
-"ontology": "ontology" { link: "./ontology.md" }
+"ontology": "ontology" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/__init__.py" }
 "__future__.annotations": "__future__.annotations"
 "ontology" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "ontology" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
 "kgfoundry_common.navmap_types.NavMap": "kgfoundry_common.navmap_types.NavMap"
 "ontology" -> "kgfoundry_common.navmap_types.NavMap"
-"ontology_code": "ontology code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/ontology/__init__.py" }
-"ontology" -> "ontology_code" { style: dashed }
+"ontology.catalog": "ontology.catalog" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/catalog.py" }
+"ontology" -> "ontology.catalog" { style: dashed }
+"ontology.loader": "ontology.loader" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/loader.py" }
+"ontology" -> "ontology.loader" { style: dashed }
 ```
 

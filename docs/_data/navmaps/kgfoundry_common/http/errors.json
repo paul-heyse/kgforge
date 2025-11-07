@@ -1,0 +1,11 @@
+{
+  "exports": [],
+  "symbols": {},
+  "sections": [
+    {
+      "id": "public-api",
+      "title": "Public API",
+      "symbols": []
+    }
+  ]
+}

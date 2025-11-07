@@ -2,7 +2,11 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/types.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/types.py)
+
+## Hierarchy
+
+- **Parent:** [search_api](../search_api.md)
 
 ## Sections
 
@@ -100,7 +104,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 **Imports:** `__future__.annotations`, `collections.abc.Callable`, `collections.abc.Mapping`, `collections.abc.Sequence`, `contextlib.suppress`, `dataclasses.dataclass`, `kgfoundry_common.navmap_loader.load_nav_metadata`, `kgfoundry_common.problem_details.JsonValue`, `numpy`, `numpy.typing`, `numpy.typing.NDArray`, `operator.attrgetter`, `typing.Protocol`, `typing.TYPE_CHECKING`, `typing.TypedDict`, `typing.cast`
 
-**Imported by:** [search_api](./search_api.md)
+**Imported by:** [search_api](../search_api.md)
 
 ## Autorefs Examples
 
@@ -144,7 +148,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.types": "search_api.types" { link: "./search_api/types.md" }
+"search_api.types": "search_api.types" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/types.py" }
 "__future__.annotations": "__future__.annotations"
 "search_api.types" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -177,9 +181,8 @@ direction: right
 "search_api.types" -> "typing.TypedDict"
 "typing.cast": "typing.cast"
 "search_api.types" -> "typing.cast"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/__init__.py" }
 "search_api" -> "search_api.types"
-"search_api.types_code": "search_api.types code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/types.py" }
-"search_api.types" -> "search_api.types_code" { style: dashed }
+"search_api" -> "search_api.types" { style: dashed }
 ```
 

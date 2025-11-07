@@ -2,7 +2,11 @@
 
 Helpers for the MockKG in-memory knowledge graph
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kg_builder/mock_kg.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kg_builder/mock_kg.py)
+
+## Hierarchy
+
+- **Parent:** [kg_builder](../kg_builder.md)
 
 ## Sections
 
@@ -33,12 +37,12 @@ classDiagram
 
 ```d2
 direction: right
-"kg_builder.mock_kg": "kg_builder.mock_kg" { link: "./kg_builder/mock_kg.md" }
+"kg_builder.mock_kg": "kg_builder.mock_kg" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kg_builder/mock_kg.py" }
 "__future__.annotations": "__future__.annotations"
 "kg_builder.mock_kg" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "kg_builder.mock_kg" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"kg_builder.mock_kg_code": "kg_builder.mock_kg code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kg_builder/mock_kg.py" }
-"kg_builder.mock_kg" -> "kg_builder.mock_kg_code" { style: dashed }
+"kg_builder": "kg_builder" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kg_builder/__init__.py" }
+"kg_builder" -> "kg_builder.mock_kg" { style: dashed }
 ```
 

@@ -2,7 +2,11 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_loader.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/navmap_loader.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -166,7 +170,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.navmap_loader": "kgfoundry_common.navmap_loader" { link: "./kgfoundry_common/navmap_loader.md" }
+"kgfoundry_common.navmap_loader": "kgfoundry_common.navmap_loader" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/navmap_loader.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.navmap_loader" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -217,7 +221,7 @@ direction: right
 "kgfoundry_common.navmap_loader" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.navmap_loader" -> "typing.cast"
-"kgfoundry_common.navmap_loader_code": "kgfoundry_common.navmap_loader code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/navmap_loader.py" }
-"kgfoundry_common.navmap_loader" -> "kgfoundry_common.navmap_loader_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.navmap_loader" { style: dashed }
 ```
 

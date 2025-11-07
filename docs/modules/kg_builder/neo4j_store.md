@@ -2,7 +2,11 @@
 
 Placeholder interface for a Neo4j-backed store
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kg_builder/neo4j_store.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kg_builder/neo4j_store.py)
+
+## Hierarchy
+
+- **Parent:** [kg_builder](../kg_builder.md)
 
 ## Sections
 
@@ -33,12 +37,12 @@ classDiagram
 
 ```d2
 direction: right
-"kg_builder.neo4j_store": "kg_builder.neo4j_store" { link: "./kg_builder/neo4j_store.md" }
+"kg_builder.neo4j_store": "kg_builder.neo4j_store" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kg_builder/neo4j_store.py" }
 "__future__.annotations": "__future__.annotations"
 "kg_builder.neo4j_store" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "kg_builder.neo4j_store" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"kg_builder.neo4j_store_code": "kg_builder.neo4j_store code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kg_builder/neo4j_store.py" }
-"kg_builder.neo4j_store" -> "kg_builder.neo4j_store_code" { style: dashed }
+"kg_builder": "kg_builder" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kg_builder/__init__.py" }
+"kg_builder" -> "kg_builder.neo4j_store" { style: dashed }
 ```
 

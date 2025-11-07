@@ -2,7 +2,11 @@
 
 Typed runtime configuration with fail-fast validation
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/settings.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/settings.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -76,7 +80,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.settings": "kgfoundry_common.settings" { link: "./kgfoundry_common/settings.md" }
+"kgfoundry_common.settings": "kgfoundry_common.settings" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/settings.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.settings" -> "__future__.annotations"
 "kgfoundry_common.errors.SettingsError": "kgfoundry_common.errors.SettingsError"
@@ -97,7 +101,7 @@ direction: right
 "kgfoundry_common.settings" -> "typing.ClassVar"
 "typing.cast": "typing.cast"
 "kgfoundry_common.settings" -> "typing.cast"
-"kgfoundry_common.settings_code": "kgfoundry_common.settings code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/settings.py" }
-"kgfoundry_common.settings" -> "kgfoundry_common.settings_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.settings" { style: dashed }
 ```
 

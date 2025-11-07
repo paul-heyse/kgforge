@@ -1,0 +1,18 @@
+{
+  "exports": [],
+  "symbols": {},
+  "sections": [
+    {
+      "id": "public-api",
+      "title": "Public API",
+      "symbols": []
+    }
+  ],
+  "relationships": {
+    "imports": [
+      "collections.abc.Callable",
+      "typing.Protocol",
+      "typing.TypeVar"
+    ]
+  }
+}

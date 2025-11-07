@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
+from typing import Any, TypedDict, cast
 
 from codeintel.mcp_server.server import MCPServer
 
@@ -12,24 +14,53 @@ Auto-generated from server schemas. Do not edit manually.
 
 """
 
+LOGGER = logging.getLogger(__name__)
+
+
+class ToolSchema(TypedDict, total=False):
+    """Typed representation of an MCP tool schema."""
+
+    name: str
+    description: str
+    inputSchema: dict[str, Any]
+
 
 def main() -> None:
     """Generate tools.md from MCPServer tool schemas."""
-    server = MCPServer()
-    tools_list = server._tool_schemas()
+    tools_list = cast("list[ToolSchema]", MCPServer.tool_schemas())
     lines = [HEADER]
     for tool in tools_list:
-        name = tool["name"]
-        description = tool.get("description", "")
+        name = tool.get("name")
+        if not isinstance(name, str):
+            LOGGER.warning("Skipping tool entry without a name", extra={"entry": tool})
+            continue
+        description_value = tool.get("description", "")
+        description = description_value if isinstance(description_value, str) else ""
         lines.append(f"## `{name}`\n\n{description}\n")
-        schema = tool["inputSchema"]
+        schema = tool.get("inputSchema") or {}
+        if not isinstance(schema, dict):
+            LOGGER.warning(
+                "Skipping schema for tool because inputSchema is not a mapping",
+                extra={"tool": name},
+            )
+            schema = {}
         props = schema.get("properties", {})
-        req = set(schema.get("required", []))
+        if not isinstance(props, dict):
+            props = {}
+
+        required_raw = schema.get("required", [])
+        req = {str(item) for item in required_raw} if isinstance(required_raw, list) else set()
         if props:
             lines.append("**Parameters**:\n")
             for key, value in props.items():
-                typ = value.get("type", "any")
-                desc = value.get("description", "")
+                if not isinstance(key, str):
+                    continue
+                if isinstance(value, dict):
+                    typ = str(value.get("type", "any"))
+                    desc = str(value.get("description", ""))
+                else:
+                    typ = "any"
+                    desc = str(value)
                 star = " *(required)*" if key in req else ""
                 lines.append(f"- `{key}`: `{typ}`{star} — {desc}")
             lines.append("\n")
@@ -40,7 +71,7 @@ def main() -> None:
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Generated {output_path}")
+    LOGGER.info("Generated CodeIntel MCP docs", extra={"output_path": str(output_path)})
 
 
 if __name__ == "__main__":

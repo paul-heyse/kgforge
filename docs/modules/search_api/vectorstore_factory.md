@@ -2,7 +2,11 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/vectorstore_factory.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/vectorstore_factory.py)
+
+## Hierarchy
+
+- **Parent:** [search_api](../search_api.md)
 
 ## Sections
 
@@ -49,7 +53,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.vectorstore_factory": "search_api.vectorstore_factory" { link: "./search_api/vectorstore_factory.md" }
+"search_api.vectorstore_factory": "search_api.vectorstore_factory" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/vectorstore_factory.py" }
 "__future__.annotations": "__future__.annotations"
 "search_api.vectorstore_factory" -> "__future__.annotations"
 "dataclasses.dataclass": "dataclasses.dataclass"
@@ -78,7 +82,7 @@ direction: right
 "search_api.vectorstore_factory" -> "typing.Final"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "search_api.vectorstore_factory" -> "typing.TYPE_CHECKING"
-"search_api.vectorstore_factory_code": "search_api.vectorstore_factory code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/vectorstore_factory.py" }
-"search_api.vectorstore_factory" -> "search_api.vectorstore_factory_code" { style: dashed }
+"search_api": "search_api" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/__init__.py" }
+"search_api" -> "search_api.vectorstore_factory" { style: dashed }
 ```
 

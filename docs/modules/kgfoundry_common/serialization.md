@@ -2,7 +2,11 @@
 
 Safe serialization helpers with schema validation and checksums.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/serialization.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/serialization.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -64,7 +68,7 @@ Safe serialization helpers with schema validation and checksums.
 
 ```d2
 direction: right
-"kgfoundry_common.serialization": "kgfoundry_common.serialization" { link: "./kgfoundry_common/serialization.md" }
+"kgfoundry_common.serialization": "kgfoundry_common.serialization" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/serialization.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.serialization" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -99,7 +103,7 @@ direction: right
 "kgfoundry_common.serialization" -> "pathlib.Path"
 "typing.cast": "typing.cast"
 "kgfoundry_common.serialization" -> "typing.cast"
-"kgfoundry_common.serialization_code": "kgfoundry_common.serialization code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/serialization.py" }
-"kgfoundry_common.serialization" -> "kgfoundry_common.serialization_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.serialization" { style: dashed }
 ```
 

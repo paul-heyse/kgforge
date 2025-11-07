@@ -787,7 +787,6 @@ def _module_diagram_link(
     module_path: str,
     facts: ModuleFacts,
     *,
-    base_module: str | None = None,
     inline: bool,
 ) -> str | None:
     github_link = _module_github_link(module_path, facts)
@@ -795,9 +794,10 @@ def _module_diagram_link(
         return github_link
 
     if module_path in facts.documented_modules:
-        if inline and base_module is not None:
-            return _relative_module_href(base_module, module_path)
-        return f"../modules/{module_path.replace('.', '/')}.md"
+        doc_path = module_path.replace(".", "/") + ".md"
+        if inline:
+            return f"./{doc_path}"
+        return f"../modules/{doc_path}"
     return None
 
 
@@ -821,7 +821,7 @@ def _module_hierarchy_items(module_path: str, facts: ModuleFacts) -> list[str]:
 
     children = _direct_children(module_path, facts.documented_modules)
     if children:
-        child_links = []
+        child_links: list[str] = []
         for child in children:
             if child in facts.documented_modules:
                 href = _relative_module_href(module_path, child)
@@ -830,6 +830,57 @@ def _module_hierarchy_items(module_path: str, facts: ModuleFacts) -> list[str]:
                 child_links.append(f"`{child}`")
         items.append(f"- **Children:** {', '.join(child_links)}")
     return items
+
+
+def _write_synopsis(fd: mkdocs_gen_files.files, nav_dict: Mapping[str, Any]) -> None:
+    synopsis = nav_dict.get("synopsis")
+    if isinstance(synopsis, str) and synopsis.strip():
+        fd.write(synopsis.strip() + "\n\n")
+
+
+def _write_source_link(
+    fd: mkdocs_gen_files.files,
+    module_path: str,
+    facts: ModuleFacts,
+) -> None:
+    code_link = _code_permalink(facts.source_paths.get(module_path))
+    if code_link:
+        fd.write(f"[View source on GitHub]({code_link})\n\n")
+
+
+def _write_hierarchy_section(
+    fd: mkdocs_gen_files.files,
+    module_path: str,
+    facts: ModuleFacts,
+) -> None:
+    hierarchy_items = _module_hierarchy_items(module_path, facts)
+    if not hierarchy_items:
+        return
+    fd.write("## Hierarchy\n\n")
+    fd.write("\n".join(hierarchy_items) + "\n\n")
+
+
+def _write_exports_block(fd: mkdocs_gen_files.files, exports: object) -> None:
+    if isinstance(exports, Sequence) and exports:
+        export_list = ", ".join(f"`{name}`" for name in exports)
+        fd.write(f"*Exports:* {export_list}\n\n")
+
+
+def _write_sections_overview(fd: mkdocs_gen_files.files, sections: object) -> None:
+    if not isinstance(sections, Sequence) or not sections:
+        return
+    fd.write("## Sections\n\n")
+    for section in sections:
+        if not isinstance(section, Mapping):
+            continue
+        title = str(section.get("title") or section.get("id") or "Section")
+        symbols = section.get("symbols")
+        if isinstance(symbols, Sequence) and symbols:
+            symbol_list = ", ".join(f"`{symbol}`" for symbol in symbols)
+            fd.write(f"- **{title}:** {symbol_list}\n")
+        else:
+            fd.write(f"- **{title}**\n")
+    fd.write("\n")
 
 
 def _format_module_links(
@@ -865,7 +916,16 @@ def _format_module_links(
 
 
 def _load_nav_metadata_mapping(module_path: str, exports: Sequence[str]) -> dict[str, Any]:
-    raw_meta = load_nav_metadata(module_path, tuple(exports))
+    try:
+        raw_meta = load_nav_metadata(module_path, tuple(exports))
+    except (ImportError, SyntaxError) as exc:
+        LOGGER.warning(
+            "Skipping nav metadata for %s due to import failure",
+            module_path,
+            exc_info=exc,
+            extra={"status": "warning", "module_path": module_path},
+        )
+        raw_meta = {}
     if NavMetadataModel is not None and isinstance(raw_meta, NavMetadataModel):
         meta = copy.deepcopy(raw_meta.as_mapping())
     elif isinstance(raw_meta, Mapping):
@@ -1234,7 +1294,7 @@ def _inline_d2_neighborhood(module_path: str, facts: ModuleFacts) -> str:
     def ensure_node(name: str) -> None:
         if name in written_nodes:
             return
-        link = _module_diagram_link(name, facts, base_module=module_path, inline=True)
+        link = _module_diagram_link(name, facts, inline=True)
         lines.append(_diagram_node_statement(name, link))
         written_nodes.add(name)
 
@@ -1419,39 +1479,11 @@ def _render_module_page(
     with mkdocs_gen_files.open(output_path, "w") as fd:
         fd.write(f"# {module_path}\n\n")
 
-        synopsis = nav_dict.get("synopsis")
-        if isinstance(synopsis, str) and synopsis.strip():
-            fd.write(synopsis.strip() + "\n\n")
-
-        code_link = _code_permalink(facts.source_paths.get(module_path))
-        if code_link:
-            fd.write(f"[View source on GitHub]({code_link})\n\n")
-
-        hierarchy_items = _module_hierarchy_items(module_path, facts)
-        if hierarchy_items:
-            fd.write("## Hierarchy\n\n")
-            fd.write("\n".join(hierarchy_items) + "\n\n")
-
-        exports = nav_dict.get("exports")
-        if isinstance(exports, Sequence) and exports:
-            export_list = ", ".join(f"`{name}`" for name in exports)
-            fd.write(f"*Exports:* {export_list}\n\n")
-
-        sections = nav_dict.get("sections")
-        if isinstance(sections, Sequence) and sections:
-            fd.write("## Sections\n\n")
-            for section in sections:
-                if not isinstance(section, Mapping):
-                    continue
-                title = str(section.get("title") or section.get("id") or "Section")
-                symbols = section.get("symbols")
-                if isinstance(symbols, Sequence) and symbols:
-                    symbol_list = ", ".join(f"`{symbol}`" for symbol in symbols)
-                    fd.write(f"- **{title}:** {symbol_list}\n")
-                else:
-                    fd.write(f"- **{title}**\n")
-            fd.write("\n")
-
+        _write_synopsis(fd, nav_dict)
+        _write_source_link(fd, module_path, facts)
+        _write_hierarchy_section(fd, module_path, facts)
+        _write_exports_block(fd, nav_dict.get("exports"))
+        _write_sections_overview(fd, nav_dict.get("sections"))
         _write_interfaces(fd, module_path, nav_dict, registry)
         _write_contents(fd, module_path, facts)
         _write_related_operations(fd, module_path, facts)

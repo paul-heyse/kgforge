@@ -2,7 +2,11 @@
 
 Utility catalogue for lightweight ontology lookups.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/ontology/catalog.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/catalog.py)
+
+## Hierarchy
+
+- **Parent:** [ontology](../ontology.md)
 
 ## Sections
 
@@ -39,7 +43,7 @@ classDiagram
 
 ```d2
 direction: right
-"ontology.catalog": "ontology.catalog" { link: "./ontology/catalog.md" }
+"ontology.catalog": "ontology.catalog" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/catalog.py" }
 "__future__.annotations": "__future__.annotations"
 "ontology.catalog" -> "__future__.annotations"
 "dataclasses.dataclass": "dataclasses.dataclass"
@@ -50,7 +54,7 @@ direction: right
 "ontology.catalog" -> "kgfoundry_common.problem_details.JsonValue"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "ontology.catalog" -> "typing.TYPE_CHECKING"
-"ontology.catalog_code": "ontology.catalog code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/ontology/catalog.py" }
-"ontology.catalog" -> "ontology.catalog_code" { style: dashed }
+"ontology": "ontology" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/ontology/__init__.py" }
+"ontology" -> "ontology.catalog" { style: dashed }
 ```
 

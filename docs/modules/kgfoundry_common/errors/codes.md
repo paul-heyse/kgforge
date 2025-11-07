@@ -2,7 +2,11 @@
 
 Error code registry and type URIs for Problem Details.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common.errors](../errors.md)
 
 ## Sections
 
@@ -42,7 +46,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.errors.codes": "kgfoundry_common.errors.codes" { link: "./kgfoundry_common/errors/codes.md" }
+"kgfoundry_common.errors.codes": "kgfoundry_common.errors.codes" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors.codes" -> "__future__.annotations"
 "enum.StrEnum": "enum.StrEnum"
@@ -51,7 +55,7 @@ direction: right
 "kgfoundry_common.errors.codes" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
 "typing.Final": "typing.Final"
 "kgfoundry_common.errors.codes" -> "typing.Final"
-"kgfoundry_common.errors.codes_code": "kgfoundry_common.errors.codes code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py" }
-"kgfoundry_common.errors.codes" -> "kgfoundry_common.errors.codes_code" { style: dashed }
+"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py" }
+"kgfoundry_common.errors" -> "kgfoundry_common.errors.codes" { style: dashed }
 ```
 

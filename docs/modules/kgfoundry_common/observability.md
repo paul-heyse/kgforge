@@ -2,7 +2,11 @@
 
 Prometheus metrics and OpenTelemetry tracing helpers
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/observability.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/observability.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -78,7 +82,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.observability": "kgfoundry_common.observability" { link: "./kgfoundry_common/observability.md" }
+"kgfoundry_common.observability": "kgfoundry_common.observability" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/observability.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.observability" -> "__future__.annotations"
 "collections.abc.Iterator": "collections.abc.Iterator"
@@ -125,7 +129,7 @@ direction: right
 "kgfoundry_common.observability" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.observability" -> "typing.cast"
-"kgfoundry_common.observability_code": "kgfoundry_common.observability code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/observability.py" }
-"kgfoundry_common.observability" -> "kgfoundry_common.observability_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.observability" { style: dashed }
 ```
 

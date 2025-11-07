@@ -2,7 +2,12 @@
 
 Exception hierarchy and Problem Details support
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
+- **Children:** [kgfoundry_common.errors.codes](errors/codes.md), [kgfoundry_common.errors.exceptions](errors/exceptions.md), [kgfoundry_common.errors.http](errors/http.md)
 
 ## Sections
 
@@ -102,7 +107,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "./kgfoundry_common/errors.md" }
+"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors" -> "__future__.annotations"
 "kgfoundry_common.errors.codes.BASE_TYPE_URI": "kgfoundry_common.errors.codes.BASE_TYPE_URI"
@@ -183,7 +188,13 @@ direction: right
 "kgfoundry_common.errors" -> "typing.Protocol"
 "typing.cast": "typing.cast"
 "kgfoundry_common.errors" -> "typing.cast"
-"kgfoundry_common.errors_code": "kgfoundry_common.errors code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py" }
-"kgfoundry_common.errors" -> "kgfoundry_common.errors_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.errors" { style: dashed }
+"kgfoundry_common.errors.codes": "kgfoundry_common.errors.codes" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/codes.py" }
+"kgfoundry_common.errors" -> "kgfoundry_common.errors.codes" { style: dashed }
+"kgfoundry_common.errors.exceptions": "kgfoundry_common.errors.exceptions" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/exceptions.py" }
+"kgfoundry_common.errors" -> "kgfoundry_common.errors.exceptions" { style: dashed }
+"kgfoundry_common.errors.http": "kgfoundry_common.errors.http" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py" }
+"kgfoundry_common.errors" -> "kgfoundry_common.errors.http" { style: dashed }
 ```
 

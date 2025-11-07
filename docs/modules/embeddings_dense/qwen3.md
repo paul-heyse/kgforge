@@ -2,7 +2,11 @@
 
 Qwen-3 dense embedding adapter
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_dense/qwen3.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/embeddings_dense/qwen3.py)
+
+## Hierarchy
+
+- **Parent:** [embeddings_dense](../embeddings_dense.md)
 
 ## Sections
 
@@ -33,12 +37,12 @@ classDiagram
 
 ```d2
 direction: right
-"embeddings_dense.qwen3": "embeddings_dense.qwen3" { link: "./embeddings_dense/qwen3.md" }
+"embeddings_dense.qwen3": "embeddings_dense.qwen3" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/embeddings_dense/qwen3.py" }
 "__future__.annotations": "__future__.annotations"
 "embeddings_dense.qwen3" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "embeddings_dense.qwen3" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"embeddings_dense.qwen3_code": "embeddings_dense.qwen3 code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_dense/qwen3.py" }
-"embeddings_dense.qwen3" -> "embeddings_dense.qwen3_code" { style: dashed }
+"embeddings_dense": "embeddings_dense" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/embeddings_dense/__init__.py" }
+"embeddings_dense" -> "embeddings_dense.qwen3" { style: dashed }
 ```
 
