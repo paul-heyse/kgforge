@@ -136,7 +136,8 @@ class DuckDBCatalog:
 
         The query uses parameterized SQL to prevent injection and efficiently
         filters by URI. Results are limited to prevent excessive memory usage
-        for large files.
+        for large files. Pass ``limit <= 0`` to disable the limit entirely
+        while still preserving deterministic ordering by chunk ID.
 
         Parameters
         ----------
@@ -145,8 +146,8 @@ class DuckDBCatalog:
             table (typically a relative path from repo root).
         limit : int, optional
             Maximum number of chunks to return. Defaults to 100. Set higher for
-            large files, but be aware of memory usage. Use 0 or very large value
-            for no limit (not recommended for production).
+            large files, but be aware of memory usage. Pass 0 or a negative value
+            to disable the limit (not recommended for production).
 
         Returns
         -------
@@ -166,7 +167,13 @@ class DuckDBCatalog:
             msg = "Connection not open"
             raise RuntimeError(msg)
 
-        relation = self.conn.execute("SELECT * FROM chunks WHERE uri = ? LIMIT ?", [uri, limit])
+        sql = "SELECT * FROM chunks WHERE uri = ? ORDER BY id"
+        params: list[object] = [uri]
+        if limit > 0:
+            sql = "SELECT * FROM chunks WHERE uri = ? ORDER BY id LIMIT ?"
+            params.append(limit)
+
+        relation = self.conn.execute(sql, params)
         rows = relation.fetchall()
         cols = [desc[0] for desc in relation.description]
         return [dict(zip(cols, row, strict=True)) for row in rows]
