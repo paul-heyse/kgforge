@@ -128,6 +128,25 @@ class DuckDBCatalog:
         cols = [desc[0] for desc in relation.description]
         return [dict(zip(cols, row, strict=True)) for row in rows]
 
+    def get_chunk_by_id(self, chunk_id: int) -> dict | None:
+        """Return a single chunk record by ID.
+
+        Parameters
+        ----------
+        chunk_id : int
+            Chunk identifier to retrieve from the catalog.
+
+        Returns
+        -------
+        dict | None
+            Chunk metadata dictionary when the ID exists, otherwise ``None``.
+        """
+
+        results = self.query_by_ids([chunk_id])
+        if not results:
+            return None
+        return results[0]
+
     def query_by_uri(self, uri: str, limit: int = 100) -> list[dict]:
         """Query chunks by file URI/path.
 
