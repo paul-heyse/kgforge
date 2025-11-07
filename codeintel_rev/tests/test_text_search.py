@@ -118,3 +118,37 @@ def test_search_text_falls_back_to_grep(monkeypatch: pytest.MonkeyPatch) -> None
     )
     _expect(condition=captured_commands[1][0] == "grep", message="Fallback should invoke grep")
     _expect(condition=result["matches"], message="Fallback grep should produce matches")
+
+
+def test_search_text_fallback_normalizes_relative_paths(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Relative grep results should be normalized to repo-relative paths."""
+
+    def fake_run_subprocess(
+        cmd: list[str], *, timeout: int | None = None, cwd: Path | None = None
+    ) -> str:
+        _ = timeout, cwd
+        if cmd[0] == "rg":
+            error_message = "rg missing"
+            raise SubprocessError(error_message, returncode=127, stderr=error_message)
+        return "\n".join(
+            [
+                "README.md:1:example",
+                "./README.md:2:example",
+            ]
+        )
+
+    monkeypatch.setattr(text_search, "run_subprocess", fake_run_subprocess)
+
+    result = text_search.search_text("example", max_results=5)
+
+    _expect(condition=len(result["matches"]) == 2, message="Expected two normalized matches")
+    _expect(
+        condition={match["line"] for match in result["matches"]} == {1, 2},
+        message="Expected both relative paths to be preserved",
+    )
+    _expect(
+        condition=all(match["path"] == "README.md" for match in result["matches"]),
+        message="Expected normalized repo-relative paths",
+    )
