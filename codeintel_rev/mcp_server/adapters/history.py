@@ -5,6 +5,7 @@ Provides git blame and commit history via subprocess.
 
 from __future__ import annotations
 
+import string
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -24,6 +25,7 @@ from kgfoundry_common.subprocess_utils import (
 BLAME_TIMEOUT_SECONDS = 30
 LOG_TIMEOUT_SECONDS = 30
 SHORT_SHA_LENGTH = 8
+FULL_SHA_LENGTH = 40
 LOG_LINE_PARTS = 5
 BLAME_HEADER_FIELDS = 3
 
@@ -204,13 +206,15 @@ def _parse_blame_porcelain(stdout: str) -> list[GitBlameEntry]:
     block: list[str] = []
 
     for line in stdout.splitlines():
+        if _is_blame_header(line):
+            if block:
+                entry = _parse_blame_block(block)
+                if entry is not None:
+                    entries.append(entry)
+                block = []
+
         if line.strip():
             block.append(line)
-        elif block:
-            entry = _parse_blame_block(block)
-            if entry is not None:
-                entries.append(entry)
-            block = []
 
     if block:
         entry = _parse_blame_block(block)
@@ -264,6 +268,19 @@ def _parse_blame_block(lines: Sequence[str]) -> GitBlameEntry | None:
         "date": _to_iso_timestamp(timestamp),
         "message": summary,
     }
+
+
+def _is_blame_header(line: str) -> bool:
+    """Return ``True`` when the given line starts a new blame entry."""
+
+    if not line:
+        return False
+
+    sha, *_ = line.split(maxsplit=1)
+    if len(sha) != FULL_SHA_LENGTH:
+        return False
+
+    return all(char in string.hexdigits for char in sha)
 
 
 def _to_iso_timestamp(timestamp: str) -> str:
