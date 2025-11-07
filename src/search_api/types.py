@@ -395,16 +395,28 @@ class VectorSearchResult:
     """
 
     doc_id: str
-    """Document identifier (URN format). Alias: none; name ``doc_id``."""
+    """Document identifier (URN format).
+
+    Alias: none; name ``doc_id``.
+    """
 
     chunk_id: str
-    """Chunk identifier within the document. Alias: none; name ``chunk_id``."""
+    """Chunk identifier within the document.
+
+    Alias: none; name ``chunk_id``.
+    """
 
     score: float
-    """Final relevance score. Alias: none; name ``score``."""
+    """Final relevance score.
+
+    Alias: none; name ``score``.
+    """
 
     vector_score: float
-    """Vector similarity score. Alias: none; name ``vector_score``."""
+    """Vector similarity score.
+
+    Alias: none; name ``vector_score``.
+    """
 
     def __post_init__(self) -> None:
         """Validate result fields.
@@ -538,7 +550,10 @@ class AgentSearchQuery:
     """
 
     query: str
-    """Search query text. Alias: none; name ``query``."""
+    """Search query text.
+
+    Alias: none; name ``query``.
+    """
 
     k: int = 10
     """Maximum number of results to return.

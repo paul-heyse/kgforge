@@ -37,7 +37,10 @@ class SearchResponse(BaseModel):
     """Pydantic configuration forbidding unexpected fields."""
 
     results: list[SearchResult] = Field(default_factory=list)
-    """Ordered search results. Alias: none; name ``results``."""
+    """Ordered search results.
+
+    Alias: none; name ``results``.
+    """
 
 
 # [nav:anchor SearchRequest]
@@ -75,13 +78,25 @@ class SearchRequest(BaseModel):
     """Pydantic configuration forbidding extra parameters."""
 
     query: str = Field(min_length=1)
-    """Search query string (at least one character). Alias: none; name ``query``."""
+    """Search query string (at least one character).
+
+    Alias: none; name ``query``.
+    """
     k: int = 10
-    """Number of results to return. Alias: none; name ``k``."""
+    """Number of results to return.
+
+    Alias: none; name ``k``.
+    """
     filters: dict[str, JsonValue] | None = None
-    """Optional filters keyed by field. Alias: none; name ``filters``."""
+    """Optional filters keyed by field.
+
+    Alias: none; name ``filters``.
+    """
     explain: bool = False
-    """Include explanation metadata flag. Alias: none; name ``explain``."""
+    """Include explanation metadata flag.
+
+    Alias: none; name ``explain``.
+    """
 
 
 # [nav:anchor SearchResult]
@@ -127,18 +142,42 @@ class SearchResult(BaseModel):
     """Pydantic configuration forbidding extra fields."""
 
     doc_id: str
-    """Document identifier. Alias: none; name ``doc_id``."""
+    """Document identifier.
+
+    Alias: none; name ``doc_id``.
+    """
     chunk_id: str
-    """Chunk identifier. Alias: none; name ``chunk_id``."""
+    """Chunk identifier.
+
+    Alias: none; name ``chunk_id``.
+    """
     title: str
-    """Document title. Alias: none; name ``title``."""
+    """Document title.
+
+    Alias: none; name ``title``.
+    """
     section: str
-    """Section label. Alias: none; name ``section``."""
+    """Section label.
+
+    Alias: none; name ``section``.
+    """
     score: float
-    """Relevance score. Alias: none; name ``score``."""
+    """Relevance score.
+
+    Alias: none; name ``score``.
+    """
     signals: dict[str, float] = Field(default_factory=dict)
-    """Signal scores (dense, sparse, kg). Alias: none; name ``signals``."""
+    """Signal scores (dense, sparse, kg).
+
+    Alias: none; name ``signals``.
+    """
     spans: dict[str, int] = Field(default_factory=dict)
-    """Character spans associated with the result. Alias: none; name ``spans``."""
+    """Character spans associated with the result.
+
+    Alias: none; name ``spans``.
+    """
     concepts: list[dict[str, str]] = Field(default_factory=list)
-    """Linked concept metadata. Alias: none; name ``concepts``."""
+    """Linked concept metadata.
+
+    Alias: none; name ``concepts``.
+    """

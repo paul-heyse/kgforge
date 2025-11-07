@@ -1,7 +1,7 @@
 """Retry policy configuration and loading.
 
-This module provides RetryPolicyDoc dataclass and PolicyRegistry for loading
-and managing retry policies from YAML files.
+This module provides RetryPolicyDoc dataclass and PolicyRegistry for loading and managing retry
+policies from YAML files.
 """
 
 from __future__ import annotations

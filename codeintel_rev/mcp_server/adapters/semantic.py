@@ -7,7 +7,8 @@ the FAISS index, then hydrating results from DuckDB.
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
 from pathlib import Path
 from time import perf_counter
 
@@ -19,15 +20,57 @@ from codeintel_rev.io.vllm_client import VLLMClient
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, Finding, MethodInfo
 from codeintel_rev.mcp_server.service_context import ServiceContext, get_service_context
 from kgfoundry_common.errors import EmbeddingError, KgFoundryError, VectorSearchError
-from kgfoundry_common.errors.exceptions import KgFoundryErrorConfig
 from kgfoundry_common.logging import get_logger, with_fields
-from kgfoundry_common.observability import MetricsProvider, observe_duration
+from kgfoundry_common.observability import DurationObservation, MetricsProvider, observe_duration
 from kgfoundry_common.problem_details import ProblemDetails
 
 SNIPPET_PREVIEW_CHARS = 500
 COMPONENT_NAME = "codeintel_mcp"
 LOGGER = get_logger(__name__)
 METRICS = MetricsProvider.default()
+
+
+def _supports_histogram_labels(histogram: object) -> bool:
+    labelnames = getattr(histogram, "_labelnames", None)
+    if labelnames is None:
+        return True
+    try:
+        return len(tuple(labelnames)) > 0
+    except TypeError:
+        return False
+
+
+_METRICS_ENABLED = _supports_histogram_labels(METRICS.operation_duration_seconds)
+
+
+class _NoopObservation:
+    """Fallback observation when Prometheus metrics are unavailable."""
+
+    def mark_error(self) -> None:
+        """No-op error marker."""
+
+    def mark_success(self) -> None:
+        """No-op success marker."""
+
+
+@contextmanager
+def _observe(operation: str) -> Iterator[DurationObservation | _NoopObservation]:
+    """Yield a metrics observation, falling back to a no-op when metrics are disabled.
+
+    Yields
+    ------
+    DurationObservation | _NoopObservation
+        Metrics observation when Prometheus is configured, otherwise a no-op recorder.
+    """
+    if not _METRICS_ENABLED:
+        yield _NoopObservation()
+        return
+    try:
+        with observe_duration(METRICS, operation, component=COMPONENT_NAME) as observation:
+            yield observation
+            return
+    except ValueError:
+        yield _NoopObservation()
 
 
 async def semantic_search(query: str, limit: int = 20) -> AnswerEnvelope:
@@ -50,7 +93,7 @@ async def semantic_search(query: str, limit: int = 20) -> AnswerEnvelope:
 
 def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
     start_time = perf_counter()
-    with observe_duration(METRICS, "semantic_search", component=COMPONENT_NAME) as observation:
+    with _observe("semantic_search") as observation:
         context = get_service_context()
 
         ready, faiss_limits, faiss_error = context.ensure_faiss_ready()
@@ -58,9 +101,7 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             failure_limits = [*faiss_limits, "FAISS index not available"]
             error = VectorSearchError(
                 faiss_error or "Semantic search not available - index not built",
-                config=KgFoundryErrorConfig(
-                    context={"faiss_index": str(context.settings.paths.faiss_index)}
-                ),
+                context={"faiss_index": str(context.settings.paths.faiss_index)},
             )
             observation.mark_error()
             return _error_envelope(error, limits=failure_limits)
@@ -69,7 +110,7 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
         if embedding is None or embed_error is not None:
             error = EmbeddingError(
                 embed_error or "Embedding service unavailable",
-                config=KgFoundryErrorConfig(context={"vllm_url": context.settings.vllm.base_url}),
+                context={"vllm_url": context.settings.vllm.base_url},
             )
             observation.mark_error()
             return _error_envelope(error, limits=["vLLM embedding service error"])
@@ -82,10 +123,8 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
         if search_exc is not None:
             error = VectorSearchError(
                 str(search_exc),
-                config=KgFoundryErrorConfig(
-                    cause=search_exc,
-                    context={"faiss_index": str(context.settings.paths.faiss_index)},
-                ),
+                cause=search_exc,
+                context={"faiss_index": str(context.settings.paths.faiss_index)},
             )
             observation.mark_error()
             return _error_envelope(error, limits=[*faiss_limits, "FAISS search error"])
@@ -95,13 +134,11 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             failure_limits = [*faiss_limits, "DuckDB hydration error"]
             error = VectorSearchError(
                 str(hydrate_exc),
-                config=KgFoundryErrorConfig(
-                    cause=hydrate_exc,
-                    context={
-                        "duckdb_path": str(context.settings.paths.duckdb_path),
-                        "vectors_dir": str(context.settings.paths.vectors_dir),
-                    },
-                ),
+                cause=hydrate_exc,
+                context={
+                    "duckdb_path": str(context.settings.paths.duckdb_path),
+                    "vectors_dir": str(context.settings.paths.vectors_dir),
+                },
             )
             observation.mark_error()
             return _error_envelope(
@@ -111,16 +148,11 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             )
 
         observation.mark_success()
-        extras: dict[str, object] = {}
-        if faiss_limits:
-            extras["limits"] = list(faiss_limits)
-        extras["method"] = _build_method(len(findings), limit, start_time)
-        success_answer = f"Found {len(findings)} semantically similar code chunks for: {query}"
         return _make_envelope(
             findings=findings,
-            answer=success_answer,
+            answer=f"Found {len(findings)} semantically similar code chunks for: {query}",
             confidence=0.85 if findings else 0.0,
-            extras=extras,
+            extras=_success_extras(faiss_limits, len(findings), limit, start_time),
         )
 
 
@@ -333,6 +365,25 @@ def _make_envelope(
         envelope.update(extras)
 
     return envelope
+
+
+def _success_extras(
+    limits: Sequence[str],
+    findings_count: int,
+    limit: int,
+    start_time: float,
+) -> dict[str, object]:
+    """Build a success extras payload with optional limits metadata.
+
+    Returns
+    -------
+    dict[str, object]
+        Extras payload including method metadata and optional limits.
+    """
+    extras: dict[str, object] = {"method": _build_method(findings_count, limit, start_time)}
+    if limits:
+        extras["limits"] = list(limits)
+    return extras
 
 
 __all__ = ["semantic_search"]

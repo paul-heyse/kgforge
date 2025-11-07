@@ -24,9 +24,15 @@ class ConceptMeta(TypedDict):
     """Metadata for knowledge graph concepts used by mock scoring."""
 
     label: str
-    """Human-readable concept label. Alias: none; name ``label``."""
+    """Human-readable concept label.
+
+    Alias: none; name ``label``.
+    """
     keywords: list[str]
-    """Keywords associated with the concept. Alias: none; name ``keywords``."""
+    """Keywords associated with the concept.
+
+    Alias: none; name ``keywords``.
+    """
 
 
 CONCEPTS: Final[dict[str, ConceptMeta]] = {

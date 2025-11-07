@@ -122,23 +122,50 @@ class FaissAdapterSettings:
     """
 
     db_path: str
-    """DuckDB registry or Parquet vector path. Alias: none; name ``db_path``."""
+    """DuckDB registry or Parquet vector path.
+
+    Alias: none; name ``db_path``.
+    """
     index_path: str
-    """Filesystem path for the built index. Alias: none; name ``index_path``."""
+    """Filesystem path for the built index.
+
+    Alias: none; name ``index_path``.
+    """
     factory: str = "Flat"
-    """FAISS factory string (e.g., ``"OPQ64,IVF8192,PQ64"``). Alias: none; name ``factory``."""
+    """FAISS factory string (e.g., ``"OPQ64,IVF8192,PQ64"``).
+
+    Alias: none; name ``factory``.
+    """
     metric: str = "ip"
-    """Similarity metric (``"ip"`` or ``"l2"``). Alias: none; name ``metric``."""
+    """Similarity metric (``"ip"`` or ``"l2"``).
+
+    Alias: none; name ``metric``.
+    """
     nprobe: int = DEFAULT_NPROBE
-    """IVF search parameter ``nprobe``. Alias: none; name ``nprobe``."""
+    """IVF search parameter ``nprobe``.
+
+    Alias: none; name ``nprobe``.
+    """
     use_gpu: bool = True
-    """Enable GPU acceleration flag. Alias: none; name ``use_gpu``."""
+    """Enable GPU acceleration flag.
+
+    Alias: none; name ``use_gpu``.
+    """
     use_cuvs: bool = True
-    """Enable cuVS acceleration flag. Alias: none; name ``use_cuvs``."""
+    """Enable cuVS acceleration flag.
+
+    Alias: none; name ``use_cuvs``.
+    """
     gpu_devices: tuple[int, ...] = field(default_factory=lambda: (0,))
-    """GPU device identifiers. Alias: none; name ``gpu_devices``."""
+    """GPU device identifiers.
+
+    Alias: none; name ``gpu_devices``.
+    """
     timeout_seconds: int = DEFAULT_INDEX_TIMEOUT_SECONDS
-    """Build timeout in seconds. Alias: none; name ``timeout_seconds``."""
+    """Build timeout in seconds.
+
+    Alias: none; name ``timeout_seconds``.
+    """
 
     def __post_init__(self) -> None:
         """Validate settings.

@@ -1,7 +1,7 @@
 """Tenacity-based retry strategy implementation.
 
-This module provides TenacityRetryStrategy which implements the RetryStrategy
-protocol using the tenacity library for retry logic.
+This module provides TenacityRetryStrategy which implements the RetryStrategy protocol using the
+tenacity library for retry logic.
 """
 
 from __future__ import annotations
