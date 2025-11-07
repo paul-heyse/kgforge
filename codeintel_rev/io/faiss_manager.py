@@ -212,7 +212,7 @@ class FAISSManager:
                     co.use_cuvs = True
 
             self.gpu_index = faiss.index_cpu_to_gpu(self.gpu_resources, device, cpu_index, co)
-        except Exception as exc:
+        except (RuntimeError, ValueError, OSError) as exc:
             self.gpu_resources = None
             self.gpu_index = None
             self.gpu_disabled_reason = f"FAISS GPU disabled - using CPU: {exc}"

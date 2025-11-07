@@ -18,7 +18,9 @@ untyped-def-behavior = "check-and-infer-return-type"
 permissive-ignores = false
 replace-imports-with-any = [
 ]
-ignore-missing-imports = []
+ignore-missing-imports = [
+    "codeintel.*",  # Package exists but not yet implemented (draft code)
+]
 ignore-missing-source = false
 ignore-errors-in-generated-code = false
 

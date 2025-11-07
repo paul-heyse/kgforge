@@ -8,7 +8,10 @@ from tools import CLIToolingContext, CLIToolSettings, OperationOverrideModel
 from tools.docstring_builder import cli_context as docstrings_context
 from tools.navmap import cli_context as navmap_context
 
-from codeintel import cli_context as codeintel_context
+try:
+    from codeintel import cli_context as codeintel_context  # type: ignore[reportMissingImports]
+except ImportError:
+    codeintel_context = None  # type: ignore[assignment]
 
 
 def _assert_settings(module, settings: CLIToolSettings) -> None:
@@ -46,6 +49,9 @@ def test_orchestration_cli_context_helpers() -> None:
 
 
 def test_codeintel_cli_context_helpers() -> None:
+    """Test codeintel CLI context helpers (skipped if codeintel package not available)."""
+    if codeintel_context is None:
+        pytest.skip("codeintel package not available")
     settings = codeintel_context.get_cli_settings()
     _assert_settings(codeintel_context, settings)
 

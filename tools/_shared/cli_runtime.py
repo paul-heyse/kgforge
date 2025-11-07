@@ -606,12 +606,6 @@ def cli_run(cfg: CliRunConfig) -> Iterator[tuple[CliContext, EnvelopeBuilder]]:
         and ``cfg.exit_on_error`` evaluates to ``True``. The original exception
         is chained via ``raise SystemExit(1) from exc`` where ``exc`` is the
         caught exception.
-    Exception
-        Any exception raised inside the context is re-raised when
-        ``cfg.exit_on_error`` evaluates to ``False``. The exception is caught,
-        stored in a local variable for logging and envelope generation, and then
-        explicitly re-raised using ``raise exc``. The specific exception type
-        depends on what the wrapped operation raises.
 
     Notes
     -----

@@ -7,6 +7,10 @@ from __future__ import annotations
 
 from fastmcp import FastMCP
 
+from codeintel_rev.mcp_server.adapters import files as files_adapter
+from codeintel_rev.mcp_server.adapters import history as history_adapter
+from codeintel_rev.mcp_server.adapters import semantic as semantic_adapter
+from codeintel_rev.mcp_server.adapters import text_search as text_search_adapter
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, ScopeIn
 
 # Create FastMCP instance
@@ -30,9 +34,7 @@ def set_scope(scope: ScopeIn) -> dict:
     dict
         Effective scope configuration.
     """
-    from codeintel_rev.mcp_server.adapters.files import set_scope as _set_scope
-
-    return _set_scope(scope)
+    return files_adapter.set_scope(scope)
 
 
 @mcp.tool()
@@ -60,9 +62,12 @@ def list_paths(
     dict
         File listing with paths.
     """
-    from codeintel_rev.mcp_server.adapters.files import list_paths as _list_paths
-
-    return _list_paths(path, include_globs, exclude_globs, max_results)
+    return files_adapter.list_paths(
+        path=path,
+        include_globs=include_globs,
+        exclude_globs=exclude_globs,
+        max_results=max_results,
+    )
 
 
 @mcp.tool()
@@ -87,9 +92,7 @@ def open_file(
     dict
         File content and metadata.
     """
-    from codeintel_rev.mcp_server.adapters.files import open_file as _open_file
-
-    return _open_file(path, start_line, end_line)
+    return files_adapter.open_file(path, start_line, end_line)
 
 
 # ==================== Search ====================
@@ -98,6 +101,7 @@ def open_file(
 @mcp.tool()
 def search_text(
     query: str,
+    *,
     regex: bool = False,
     case_sensitive: bool = False,
     paths: list[str] | None = None,
@@ -123,9 +127,13 @@ def search_text(
     dict
         Search matches.
     """
-    from codeintel_rev.mcp_server.adapters.text_search import search_text as _search_text
-
-    return _search_text(query, regex, case_sensitive, paths, max_results)
+    return text_search_adapter.search_text(
+        query,
+        regex=regex,
+        case_sensitive=case_sensitive,
+        paths=paths,
+        max_results=max_results,
+    )
 
 
 @mcp.tool()
@@ -147,9 +155,7 @@ async def semantic_search(
     AnswerEnvelope
         Search results with findings.
     """
-    from codeintel_rev.mcp_server.adapters.semantic import semantic_search as _semantic_search
-
-    return await _semantic_search(query, limit)
+    return await semantic_adapter.semantic_search(query, limit)
 
 
 # ==================== Symbols ====================
@@ -177,8 +183,13 @@ def symbol_search(
     dict
         Symbol matches.
     """
-    # TODO: Implement with SCIP/pyrefly
-    return {"symbols": [], "total": 0}
+    return {
+        "symbols": [],
+        "total": 0,
+        "message": "Symbol search is not yet implemented.",
+        "query": query,
+        "filters": {"kind": kind, "language": language},
+    }
 
 
 @mcp.tool()
@@ -203,8 +214,11 @@ def definition_at(
     dict
         Definition locations.
     """
-    # TODO: Implement with pyrefly/SCIP
-    return {"locations": []}
+    return {
+        "locations": [],
+        "message": "Definition lookup is not yet implemented.",
+        "request": {"path": path, "line": line, "character": character},
+    }
 
 
 @mcp.tool()
@@ -229,8 +243,11 @@ def references_at(
     dict
         Reference locations.
     """
-    # TODO: Implement with pyrefly/SCIP
-    return {"locations": []}
+    return {
+        "locations": [],
+        "message": "Reference lookup is not yet implemented.",
+        "request": {"path": path, "line": line, "character": character},
+    }
 
 
 # ==================== Git History ====================
@@ -258,9 +275,7 @@ def blame_range(
     dict
         Blame entries for each line.
     """
-    from codeintel_rev.mcp_server.adapters.history import blame_range as _blame_range
-
-    return _blame_range(path, start_line, end_line)
+    return history_adapter.blame_range(path, start_line, end_line)
 
 
 @mcp.tool()
@@ -282,9 +297,7 @@ def file_history(
     dict
         Commit history.
     """
-    from codeintel_rev.mcp_server.adapters.history import file_history as _file_history
-
-    return _file_history(path, limit)
+    return history_adapter.file_history(path, limit)
 
 
 # ==================== Resources ====================
@@ -304,8 +317,10 @@ def file_resource(path: str) -> str:
     str
         File content.
     """
-    # TODO: Implement file reading
-    return ""
+    file_result = files_adapter.open_file(path)
+    if "error" in file_result:
+        return f"Error reading file {path}: {file_result['error']}"
+    return file_result.get("content", "")
 
 
 # ==================== Prompts ====================

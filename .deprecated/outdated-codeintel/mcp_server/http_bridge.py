@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
+from codeintel.mcp_server import tools
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-
-from codeintel.mcp_server import tools
 
 app = FastAPI(
     title="KGFoundry Tree-sitter Bridge",

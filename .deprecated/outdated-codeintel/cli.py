@@ -18,6 +18,17 @@ from uuid import uuid4
 
 import anyio
 import typer
+from codeintel.index.store import IndexStore, ensure_schema, index_incremental
+from codeintel.indexer.tscore import (
+    LANGUAGE_NAMES,
+    get_language,
+    load_langs,
+    parse_bytes,
+    run_query,
+)
+from codeintel.mcp_server import tools as mcp_tools
+from codeintel.mcp_server.server import amain as mcp_amain
+from codeintel.observability import INDEX_BUILD_DURATION_SECONDS, update_index_metrics
 from tools import (
     CliEnvelope,
     CliEnvelopeBuilder,
@@ -35,17 +46,6 @@ from tools._shared.logging import LoggerAdapter
 from tree_sitter import Language
 
 from codeintel import cli_context
-from codeintel.index.store import IndexStore, ensure_schema, index_incremental
-from codeintel.indexer.tscore import (
-    LANGUAGE_NAMES,
-    get_language,
-    load_langs,
-    parse_bytes,
-    run_query,
-)
-from codeintel.mcp_server import tools as mcp_tools
-from codeintel.mcp_server.server import amain as mcp_amain
-from codeintel.observability import INDEX_BUILD_DURATION_SECONDS, update_index_metrics
 from kgfoundry_common.errors import ConfigurationError
 
 CLI_COMMAND = cli_context.CLI_COMMAND

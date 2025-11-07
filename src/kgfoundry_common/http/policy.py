@@ -1,15 +1,59 @@
-# src/kgfoundry_common/http/policy.py
+"""Retry policy configuration and loading.
+
+This module provides RetryPolicyDoc dataclass and PolicyRegistry for loading
+and managing retry policies from YAML files.
+"""
+
 from __future__ import annotations
 
 import json
 from dataclasses import dataclass
 from pathlib import Path
 
+import jsonschema
 import yaml
 
 
 @dataclass(frozen=True)
 class RetryPolicyDoc:
+    """Retry policy configuration document.
+
+    Attributes
+    ----------
+    name : str
+        Policy name identifier.
+    description : str | None
+        Human-readable description of the policy.
+    methods : tuple[str, ...]
+        HTTP methods this policy applies to.
+    retry_status : tuple[tuple[int, int] | int, ...]
+        HTTP status codes to retry on (can be ranges like (500, 504) or single codes).
+    retry_exceptions : tuple[str, ...]
+        Exception class names to retry on.
+    give_up_status : tuple[int, ...]
+        HTTP status codes that should not be retried.
+    respect_retry_after : bool
+        Whether to respect Retry-After headers.
+    require_idempotency_key : bool
+        Whether idempotency key is required for non-idempotent methods.
+    stop_after_attempt : int
+        Maximum number of retry attempts.
+    stop_after_delay_s : float | None
+        Maximum total delay in seconds before giving up.
+    wait_kind : str
+        Type of wait strategy (e.g., "exponential").
+    wait_initial_s : float
+        Initial wait time in seconds.
+    wait_max_s : float
+        Maximum wait time between retries in seconds.
+    wait_jitter : float
+        Jitter fraction (0.0 to 1.0).
+    wait_base : float
+        Base multiplier for exponential backoff.
+    metrics_label : str | None
+        Label for metrics tracking.
+    """
+
     name: str
     description: str | None
     methods: tuple[str, ...]
@@ -29,6 +73,18 @@ class RetryPolicyDoc:
 
 
 def _parse_status_entry(x: int | str) -> tuple[int, int] | int:
+    """Parse status code entry from YAML (int or range string).
+
+    Parameters
+    ----------
+    x : int | str
+        Status code (int) or range string like "500-504".
+
+    Returns
+    -------
+    tuple[int, int] | int
+        Status code or range tuple.
+    """
     if isinstance(x, int):
         return x
     lo, hi = x.split("-", 1)
@@ -36,11 +92,30 @@ def _parse_status_entry(x: int | str) -> tuple[int, int] | int:
 
 
 def load_policy(path: Path, schema_path: Path | None = None) -> RetryPolicyDoc:
-    obj = yaml.safe_load(path.read_text())
-    if schema_path and schema_path.exists():
-        import jsonschema
+    """Load retry policy from YAML file.
 
-        jsonschema.validate(obj, json.loads(schema_path.read_text()))
+    Parameters
+    ----------
+    path : Path
+        Path to policy YAML file.
+    schema_path : Path | None, optional
+        Path to JSON schema for validation. Defaults to None.
+
+    Returns
+    -------
+        RetryPolicyDoc
+            Loaded policy document.
+
+    Raises
+    ------
+        FileNotFoundError
+            If policy file does not exist.
+        jsonschema.ValidationError
+            If policy does not match schema.
+    """
+    obj = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if schema_path and schema_path.exists():
+        jsonschema.validate(obj, json.loads(schema_path.read_text(encoding="utf-8")))
     return RetryPolicyDoc(
         name=obj["name"],
         description=obj.get("description"),
@@ -64,10 +139,36 @@ def load_policy(path: Path, schema_path: Path | None = None) -> RetryPolicyDoc:
 
 
 class PolicyRegistry:
-    def __init__(self, root: Path):
+    """Registry for loading retry policies from a directory."""
+
+    def __init__(self, root: Path) -> None:
+        """Initialize policy registry.
+
+        Parameters
+        ----------
+        root : Path
+            Root directory containing policy YAML files.
+        """
         self.root = root
 
     def get(self, name: str) -> RetryPolicyDoc:
+        """Load policy by name.
+
+        Parameters
+        ----------
+        name : str
+            Policy name (without .yaml extension).
+
+        Returns
+        -------
+        RetryPolicyDoc
+            Loaded policy document.
+
+        Raises
+        ------
+        FileNotFoundError
+            If policy file does not exist.
+        """
         p = self.root / f"{name}.yaml"
         if not p.exists():
             raise FileNotFoundError(p)

@@ -5,11 +5,23 @@ Provides git blame and commit history via subprocess.
 
 from __future__ import annotations
 
-import subprocess
+from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 
 from codeintel_rev.config.settings import load_settings
 from codeintel_rev.mcp_server.schemas import GitBlameEntry
+from kgfoundry_common.subprocess_utils import (
+    SubprocessError,
+    SubprocessTimeoutError,
+    run_subprocess,
+)
+
+BLAME_TIMEOUT_SECONDS = 30
+LOG_TIMEOUT_SECONDS = 30
+SHORT_SHA_LENGTH = 8
+LOG_LINE_PARTS = 5
+BLAME_HEADER_FIELDS = 3
 
 
 def blame_range(
@@ -46,83 +58,21 @@ def blame_range(
     if not file_path.exists():
         return {"blame": [], "error": "File not found"}
 
-    # Run git blame with porcelain format
-    cmd = [
-        "git",
-        "blame",
-        "--porcelain",
-        f"-L{start_line},{end_line}",
-        str(file_path.relative_to(repo_root)),
-    ]
+    stdout, error = _invoke_git(
+        [
+            "git",
+            "blame",
+            "--line-porcelain",
+            f"-L{start_line},{end_line}",
+            str(file_path.relative_to(repo_root)),
+        ],
+        repo_root=repo_root,
+        timeout=BLAME_TIMEOUT_SECONDS,
+    )
+    if error is not None or stdout is None:
+        return {"blame": [], "error": error}
 
-    try:
-        result = subprocess.run(
-            cmd,
-            cwd=repo_root,
-            capture_output=True,
-            text=True,
-            timeout=30.0,
-            check=True,
-        )
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError) as e:
-        return {"blame": [], "error": str(e)}
-
-    # Parse porcelain format
-    blame_entries: list[GitBlameEntry] = []
-    current_commit = ""
-    current_author = ""
-    current_date = ""
-    current_message = ""
-    current_line = start_line
-
-    for line in result.stdout.splitlines():
-        if not line.strip():
-            continue
-
-        # Commit SHA line
-        if len(line) > 40 and " " in line and not line.startswith("\t"):
-            parts = line.split()
-            if len(parts) >= 3:
-                current_commit = parts[0]
-                current_line = int(parts[2])
-                continue
-
-        # Author line
-        if line.startswith("author "):
-            current_author = line[7:]
-            continue
-
-        # Date line (timestamp)
-        if line.startswith("author-time "):
-            timestamp = int(line[12:])
-            from datetime import UTC, datetime
-
-            current_date = datetime.fromtimestamp(timestamp, tz=UTC).isoformat()
-            continue
-
-        # Summary line
-        if line.startswith("summary "):
-            current_message = line[8:]
-            continue
-
-        # Content line (starts with tab)
-        if line.startswith("\t") and current_commit:
-            entry: GitBlameEntry = {
-                "line": current_line,
-                "commit": current_commit[:8],  # Short SHA
-                "author": current_author,
-                "date": current_date,
-                "message": current_message,
-            }
-            blame_entries.append(entry)
-
-            # Reset for next entry
-            current_commit = ""
-            current_author = ""
-            current_date = ""
-            current_message = ""
-
-    return {"blame": blame_entries}
+    return {"blame": _parse_blame_porcelain(stdout)}
 
 
 def file_history(
@@ -156,50 +106,38 @@ def file_history(
     if not file_path.exists():
         return {"commits": [], "error": "File not found"}
 
-    # Run git log
-    cmd = [
-        "git",
-        "log",
-        f"-n{limit}",
-        "--format=%H|%an|%ae|%at|%s",
-        "--",
-        str(file_path.relative_to(repo_root)),
-    ]
-
-    try:
-        result = subprocess.run(
-            cmd,
-            cwd=repo_root,
-            capture_output=True,
-            text=True,
-            timeout=30.0,
-            check=True,
-        )
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError) as e:
-        return {"commits": [], "error": str(e)}
+    stdout, error = _invoke_git(
+        [
+            "git",
+            "log",
+            f"-n{limit}",
+            "--format=%H|%an|%ae|%at|%s",
+            "--",
+            str(file_path.relative_to(repo_root)),
+        ],
+        repo_root=repo_root,
+        timeout=LOG_TIMEOUT_SECONDS,
+    )
+    if error is not None or stdout is None:
+        return {"commits": [], "error": error}
 
     # Parse output
     commits = []
-    for line in result.stdout.splitlines():
+    for line in stdout.splitlines():
         if not line.strip():
             continue
 
-        parts = line.split("|", 4)
-        if len(parts) < 5:
+        parts = line.split("|", LOG_LINE_PARTS - 1)
+        if len(parts) < LOG_LINE_PARTS:
             continue
 
-        sha, author_name, author_email, timestamp, message = parts
+        sha, author_name, author_email, timestamp_str, message = parts
 
-        try:
-            from datetime import UTC, datetime
-
-            date = datetime.fromtimestamp(int(timestamp), tz=UTC).isoformat()
-        except ValueError:
-            date = timestamp
+        date = _to_iso_timestamp(timestamp_str)
 
         commits.append(
             {
-                "sha": sha[:8],
+                "sha": sha[:SHORT_SHA_LENGTH],
                 "full_sha": sha,
                 "author": author_name,
                 "email": author_email,
@@ -209,6 +147,110 @@ def file_history(
         )
 
     return {"commits": commits}
+
+
+def _invoke_git(
+    command: list[str],
+    *,
+    repo_root: Path,
+    timeout: int,
+) -> tuple[str | None, str | None]:
+    """Execute a git command and capture stdout or return an error.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        Pair of stdout and error message. Exactly one element will be ``None``.
+    """
+    try:
+        stdout = run_subprocess(command, cwd=repo_root, timeout=timeout)
+    except (SubprocessError, SubprocessTimeoutError, ValueError) as exc:
+        return None, str(exc)
+    else:
+        return stdout, None
+
+
+def _parse_blame_porcelain(stdout: str) -> list[GitBlameEntry]:
+    """Parse porcelain blame output into structured entries.
+
+    Returns
+    -------
+    list[GitBlameEntry]
+        Parsed blame entries ordered by output sequence.
+    """
+    entries: list[GitBlameEntry] = []
+    block: list[str] = []
+
+    for line in stdout.splitlines():
+        if line.strip():
+            block.append(line)
+        elif block:
+            entry = _parse_blame_block(block)
+            if entry is not None:
+                entries.append(entry)
+            block = []
+
+    if block:
+        entry = _parse_blame_block(block)
+        if entry is not None:
+            entries.append(entry)
+
+    return entries
+
+
+def _parse_blame_block(lines: Sequence[str]) -> GitBlameEntry | None:
+    """Parse a single line-porcelain blame block.
+
+    Returns
+    -------
+    GitBlameEntry | None
+        Parsed blame entry when successful, otherwise ``None``.
+    """
+    if not lines:
+        return None
+
+    header_parts = lines[0].split()
+    if len(header_parts) < BLAME_HEADER_FIELDS:
+        return None
+
+    commit = header_parts[0]
+    try:
+        line_number = int(header_parts[2])
+    except ValueError:
+        return None
+
+    author = ""
+    timestamp = ""
+    summary = ""
+    for line in lines[1:]:
+        if line.startswith("author "):
+            author = line[len("author ") :]
+        elif line.startswith("author-time "):
+            timestamp = line[len("author-time ") :]
+        elif line.startswith("summary "):
+            summary = line[len("summary ") :]
+
+    return {
+        "line": line_number,
+        "commit": commit[:SHORT_SHA_LENGTH],
+        "author": author,
+        "date": _to_iso_timestamp(timestamp),
+        "message": summary,
+    }
+
+
+def _to_iso_timestamp(timestamp: str) -> str:
+    """Convert a unix timestamp string to ISO 8601 format.
+
+    Returns
+    -------
+    str
+        ISO 8601 timestamp or the original string if parsing fails.
+    """
+    try:
+        return datetime.fromtimestamp(int(timestamp), tz=UTC).isoformat()
+    except ValueError:
+        return timestamp
 
 
 __all__ = ["blame_range", "file_history"]

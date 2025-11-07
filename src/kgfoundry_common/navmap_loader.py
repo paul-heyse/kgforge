@@ -277,12 +277,7 @@ class NavMetadataModel(BaseModel):
         tuple[str, JsonValue]
             Key and value pairs for navigation metadata entries. Keys include
             standard fields (title, exports, sections, etc.) and any additional
-            fields from the extras dictionary.
-
-        Returns
-        -------
-        TupleGenerator
-            Iterator over key-value pairs. The return annotation ``TupleGenerator``
+            fields from the extras dictionary. The return annotation ``TupleGenerator``
             is Pydantic's type alias for ``Iterator[tuple[str, JsonValue]]``.
             Generator functions return iterator objects when called, so this
             method returns an iterator that yields the flattened key-value pairs.

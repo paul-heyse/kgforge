@@ -1,4 +1,5 @@
 """Quickstart Search Tutorial.
+
 ==========================
 
 Introduce the documentation quickstart that exercises the search API, building

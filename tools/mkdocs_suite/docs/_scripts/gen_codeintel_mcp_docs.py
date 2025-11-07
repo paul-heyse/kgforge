@@ -6,7 +6,11 @@ import logging
 from pathlib import Path
 from typing import Any, TypedDict, cast
 
-from codeintel.mcp_server.server import MCPServer
+try:
+    from codeintel.mcp_server.server import MCPServer  # type: ignore[reportMissingImports]
+except ImportError:
+    # codeintel package not available - this script is for generating docs when it exists
+    MCPServer = None  # type: ignore[assignment, misc]
 
 HEADER = """# CodeIntel MCP Tools
 
@@ -27,6 +31,9 @@ class ToolSchema(TypedDict, total=False):
 
 def main() -> None:
     """Generate tools.md from MCPServer tool schemas."""
+    if MCPServer is None:
+        LOGGER.warning("codeintel package not available, skipping doc generation")
+        return
     tools_list = cast("list[ToolSchema]", MCPServer.tool_schemas())
     lines = [HEADER]
     for tool in tools_list:

@@ -263,21 +263,14 @@ def record_operation_metrics(
     None
         Context manager that yields control to the wrapped operation block.
 
-    Raises
-    ------
-    Exception
-        Any exception raised during the operation is explicitly re-raised after
-        recording error status and metrics. The exception is caught using
-        ``except Exception as exc``, metrics are updated to reflect the error,
-        and then the exception is explicitly re-raised using ``raise exc``.
-        The specific exception type depends on what the wrapped operation raises.
-
     Notes
     -----
-    Any exception raised during the operation is propagated after recording
-    error status and metrics. The function catches exceptions using
-    ``except Exception as exc`` and explicitly re-raises them using ``raise exc``
+    Any exception raised during the operation is explicitly re-raised after
+    recording error status and metrics. The exception is caught using
+    ``except Exception as exc``, metrics are updated to reflect the error,
+    and then the exception is explicitly re-raised using ``raise exc``
     to satisfy static analysis tools that require explicit exception raising.
+    The specific exception type depends on what the wrapped operation raises.
 
     Examples
     --------
