@@ -222,15 +222,18 @@ def record_operation_metrics(
     ------
     Exception
         Any exception raised within the context is explicitly re-raised after
-        metrics are recorded. The exception is caught, metrics are updated,
-        and then the exception is re-raised using a bare ``raise`` statement.
-        The specific exception type depends on what the wrapped operation raises.
+        metrics are recorded. The exception is caught using ``except Exception as exc``,
+        metrics are updated to reflect the error, and then the exception is
+        explicitly re-raised using ``raise exc``. The specific exception type
+        depends on what the wrapped operation raises.
 
     Notes
     -----
     Any exception raised within the context is propagated after metrics
-    are recorded, allowing normal exception handling to proceed. The exception
-    type depends on what the operation raises.
+    are recorded, allowing normal exception handling to proceed. The function
+    catches exceptions using ``except Exception as exc`` and explicitly re-raises
+    them using ``raise exc`` to satisfy static analysis tools that require
+    explicit exception raising.
 
     Examples
     --------
@@ -252,9 +255,9 @@ def record_operation_metrics(
 
     try:
         yield
-    except Exception:
+    except Exception as exc:
         final_status = "error"
-        raise
+        raise exc  # Explicitly re-raise the caught exception
     finally:
         duration = time.monotonic() - start_time
 

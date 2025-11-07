@@ -365,23 +365,33 @@ def _build_policy_from_mapping(data: Mapping[str, object]) -> ObservabilityPolic
 def load_policy() -> ObservabilityPolicy:
     """Load the observability policy from disk, falling back to defaults on failure.
 
+    This function reads the observability policy configuration file from disk,
+    parses it as YAML, and merges it with default settings. If the file doesn't
+    exist or YAML parsing fails, it returns the default policy. Other errors
+    (e.g., I/O errors) are logged and propagated.
+
     Returns
     -------
     ObservabilityPolicy
-        Loaded policy or default policy.
+        Loaded policy merged with defaults, or default policy if file doesn't
+        exist or YAML parsing fails.
 
     Raises
     ------
     Exception
         Any exception raised during policy loading that is not a YAML parsing error
-        is propagated after logging. The exception type depends on what the loading
-        operation raises (e.g., OSError for file I/O issues).
+        is explicitly re-raised after logging. The exception is caught using
+        ``except Exception as exc``, and if it's not a YAML error, it is
+        explicitly re-raised using ``raise exc``. The exception type depends on
+        what the loading operation raises (e.g., OSError for file I/O issues).
 
     Notes
     -----
     Any exception raised during policy loading that is not a YAML parsing error
     is propagated after logging. YAML parsing issues are logged and result in
-    the default policy being returned.
+    the default policy being returned. The function catches exceptions using
+    ``except Exception as exc`` and explicitly re-raises non-YAML errors using
+    ``raise exc`` to satisfy static analysis tools.
     """
     policy = DEFAULT_POLICY
     if yaml is None or not POLICY_PATH.exists():
@@ -407,7 +417,7 @@ def load_policy() -> ObservabilityPolicy:
                 "Failed to parse observability policy YAML: %s", exc
             )
             return policy
-        raise
+        raise exc  # Explicitly re-raise non-YAML exceptions
 
     if overrides_raw is None:
         return policy

@@ -2,7 +2,11 @@
 
 Typed exception hierarchy with Problem Details support.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/exceptions.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/exceptions.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common.errors](../errors.md)
 
 ## Sections
 
@@ -274,7 +278,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.errors.exceptions": "kgfoundry_common.errors.exceptions" { link: "./kgfoundry_common/errors/exceptions.md" }
+"kgfoundry_common.errors.exceptions": "kgfoundry_common.errors.exceptions" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/exceptions.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors.exceptions" -> "__future__.annotations"
 "collections.abc.Mapping": "collections.abc.Mapping"
@@ -301,7 +305,7 @@ direction: right
 "kgfoundry_common.errors.exceptions" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.errors.exceptions" -> "typing.cast"
-"kgfoundry_common.errors.exceptions_code": "kgfoundry_common.errors.exceptions code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/exceptions.py" }
-"kgfoundry_common.errors.exceptions" -> "kgfoundry_common.errors.exceptions_code" { style: dashed }
+"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py" }
+"kgfoundry_common.errors" -> "kgfoundry_common.errors.exceptions" { style: dashed }
 ```
 

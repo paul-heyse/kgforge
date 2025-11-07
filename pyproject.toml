@@ -481,6 +481,12 @@ dependencies = [
     "mkdocs-monorepo-plugin>=1.1.2",
     "mkdocs-typer>=0.0.3",
     "mkdocs-typer2>=0.1.6",
+    "mcp[cli]>=1.20.0",
+    "hypercorn>=0.17.3",
+    "ast-grep-py>=0.39.9",
+    "protobuf>=6.33.0",
+    "fastmcp>=2.10.6",
+    "cyclopts>=5.0.0a1",
 ]
 
 [project.scripts]
@@ -779,7 +785,8 @@ exclude = [
   "build/*", "dist/*", "node_modules/*",
   "docs/_build/*", "site/*",
   "faiss/*",
-  "kgfoundry.egg-info/*", "src/kgfoundry.egg-info/*"
+  "kgfoundry.egg-info/*", "src/kgfoundry.egg-info/*",
+  "src/kgfoundry_common/http*",
 ]
 
 # Decorators that indicate runtime or framework-driven usage.

@@ -2,7 +2,11 @@
 
 Schema and model round-trip validation helpers.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/schema_helpers.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/schema_helpers.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -36,7 +40,7 @@ Schema and model round-trip validation helpers.
 
 ```d2
 direction: right
-"kgfoundry_common.schema_helpers": "kgfoundry_common.schema_helpers" { link: "./kgfoundry_common/schema_helpers.md" }
+"kgfoundry_common.schema_helpers": "kgfoundry_common.schema_helpers" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/schema_helpers.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.schema_helpers" -> "__future__.annotations"
 "json": "json"
@@ -69,7 +73,7 @@ direction: right
 "kgfoundry_common.schema_helpers" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.schema_helpers" -> "typing.cast"
-"kgfoundry_common.schema_helpers_code": "kgfoundry_common.schema_helpers code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/schema_helpers.py" }
-"kgfoundry_common.schema_helpers" -> "kgfoundry_common.schema_helpers_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.schema_helpers" { style: dashed }
 ```
 

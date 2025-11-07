@@ -6,16 +6,18 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
-def _start_mcp_server(cwd: str) -> subprocess.Popen[str]:
+def _start_mcp_server(cwd: str, env: dict[str, str] | None = None) -> subprocess.Popen[str]:
     """Start MCP server subprocess for testing.
 
     Parameters
     ----------
     cwd : str
         Working directory for the server process.
+    env : dict[str, str] | None, optional
+        Environment variables to pass to subprocess, by default None (inherits parent env).
 
     Returns
     -------
@@ -27,6 +29,11 @@ def _start_mcp_server(cwd: str) -> subprocess.Popen[str]:
     Uses subprocess.Popen with a list of arguments and shell=False,
     which is safe for test code with fixed arguments.
     """
+    import os
+
+    proc_env = os.environ.copy()
+    if env:
+        proc_env.update(env)
     return subprocess.Popen(
         [sys.executable, "-m", "codeintel.mcp_server.server"],
         stdin=subprocess.PIPE,
@@ -34,6 +41,7 @@ def _start_mcp_server(cwd: str) -> subprocess.Popen[str]:
         stderr=subprocess.PIPE,
         text=True,
         cwd=cwd,
+        env=proc_env,
     )
 
 
@@ -66,7 +74,7 @@ def test_tools_list(repo_fixture: Path) -> None:
     proc = _start_mcp_server(str(repo_fixture))
     try:
         msg = {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
-        res = _rpc(proc, msg)
+        res = _rpc(proc, cast("dict[str, object]", msg))
         assert "result" in res
         assert "tools" in res["result"]
         assert res["result"]["tools"]  # non-empty
@@ -77,7 +85,13 @@ def test_tools_list(repo_fixture: Path) -> None:
 
 def test_get_outline_call(repo_fixture: Path) -> None:
     """Test tools/call with code.getOutline."""
-    proc = _start_mcp_server(str(repo_fixture))
+    # Set high rate limits for tests to avoid rate limiting
+    env = {
+        "CODEINTEL_RATE_LIMIT_QPS": "1000",
+        "CODEINTEL_RATE_LIMIT_BURST": "1000",
+        "KGF_REPO_ROOT": str(repo_fixture),
+    }
+    proc = _start_mcp_server(str(repo_fixture), env=env)
     try:
         # tools/list (to discover schema) — optional
         _ = _rpc(proc, {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}})
@@ -91,7 +105,7 @@ def test_get_outline_call(repo_fixture: Path) -> None:
                 "arguments": {"path": "pkg/mod.py", "language": "python"},
             },
         }
-        res = _rpc(proc, call)
+        res = _rpc(proc, cast("dict[str, object]", call))
         assert "result" in res
         assert res["result"]["status"] == "ok"
         assert "items" in res["result"]
@@ -103,7 +117,13 @@ def test_get_outline_call(repo_fixture: Path) -> None:
 
 def test_list_files_call(repo_fixture: Path) -> None:
     """Test tools/call with code.listFiles."""
-    proc = _start_mcp_server(str(repo_fixture))
+    # Set high rate limits for tests to avoid rate limiting
+    env = {
+        "CODEINTEL_RATE_LIMIT_QPS": "1000",
+        "CODEINTEL_RATE_LIMIT_BURST": "1000",
+        "KGF_REPO_ROOT": str(repo_fixture),
+    }
+    proc = _start_mcp_server(str(repo_fixture), env=env)
     try:
         call = {
             "jsonrpc": "2.0",
@@ -111,7 +131,7 @@ def test_list_files_call(repo_fixture: Path) -> None:
             "method": "tools/call",
             "params": {"name": "code.listFiles", "arguments": {"limit": 5}},
         }
-        res = _rpc(proc, call)
+        res = _rpc(proc, cast("dict[str, object]", call))
         assert "result" in res
         assert res["result"]["status"] == "ok"
         assert "files" in res["result"]

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "code-search": {
+      "command": "python",
+      "args": ["-m", "mcp_code_server.main", "--stdio"],
+      "env": {
+        "CODE_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}

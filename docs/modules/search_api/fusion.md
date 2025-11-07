@@ -2,7 +2,11 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/fusion.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/fusion.py)
+
+## Hierarchy
+
+- **Parent:** [search_api](../search_api.md)
 
 ## Sections
 
@@ -18,7 +22,7 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 **Imports:** `__future__.annotations`, `kgfoundry_common.navmap_loader.load_nav_metadata`
 
-**Imported by:** [search_api](./search_api.md)
+**Imported by:** [search_api](../search_api.md)
 
 ## Autorefs Examples
 
@@ -28,14 +32,13 @@ FastAPI service exposing search endpoints, aggregation helpers, and Problem Deta
 
 ```d2
 direction: right
-"search_api.fusion": "search_api.fusion" { link: "./search_api/fusion.md" }
+"search_api.fusion": "search_api.fusion" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/fusion.py" }
 "__future__.annotations": "__future__.annotations"
 "search_api.fusion" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "search_api.fusion" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"search_api": "search_api" { link: "./search_api.md" }
+"search_api": "search_api" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/__init__.py" }
 "search_api" -> "search_api.fusion"
-"search_api.fusion_code": "search_api.fusion code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/fusion.py" }
-"search_api.fusion" -> "search_api.fusion_code" { style: dashed }
+"search_api" -> "search_api.fusion" { style: dashed }
 ```
 

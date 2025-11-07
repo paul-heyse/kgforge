@@ -2,7 +2,11 @@
 
 SPLADE sparse embedding helpers
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_sparse/splade.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/embeddings_sparse/splade.py)
+
+## Hierarchy
+
+- **Parent:** [embeddings_sparse](../embeddings_sparse.md)
 
 ## Sections
 
@@ -97,7 +101,7 @@ classDiagram
 
 ```d2
 direction: right
-"embeddings_sparse.splade": "embeddings_sparse.splade" { link: "./embeddings_sparse/splade.md" }
+"embeddings_sparse.splade": "embeddings_sparse.splade" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/embeddings_sparse/splade.py" }
 "__future__.annotations": "__future__.annotations"
 "embeddings_sparse.splade" -> "__future__.annotations"
 "base64": "base64"
@@ -154,7 +158,7 @@ direction: right
 "embeddings_sparse.splade" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "embeddings_sparse.splade" -> "typing.cast"
-"embeddings_sparse.splade_code": "embeddings_sparse.splade code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/embeddings_sparse/splade.py" }
-"embeddings_sparse.splade" -> "embeddings_sparse.splade_code" { style: dashed }
+"embeddings_sparse": "embeddings_sparse" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/embeddings_sparse/__init__.py" }
+"embeddings_sparse" -> "embeddings_sparse.splade" { style: dashed }
 ```
 

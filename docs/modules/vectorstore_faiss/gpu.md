@@ -2,7 +2,11 @@
 
 GPU-aware FAISS index helpers backed by the shared search API facade.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/vectorstore_faiss/gpu.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/vectorstore_faiss/gpu.py)
+
+## Hierarchy
+
+- **Parent:** [vectorstore_faiss](../vectorstore_faiss.md)
 
 ## Sections
 
@@ -33,7 +37,7 @@ classDiagram
 
 ```d2
 direction: right
-"vectorstore_faiss.gpu": "vectorstore_faiss.gpu" { link: "./vectorstore_faiss/gpu.md" }
+"vectorstore_faiss.gpu": "vectorstore_faiss.gpu" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/vectorstore_faiss/gpu.py" }
 "__future__.annotations": "__future__.annotations"
 "vectorstore_faiss.gpu" -> "__future__.annotations"
 "collections.abc.Sequence": "collections.abc.Sequence"
@@ -72,7 +76,7 @@ direction: right
 "vectorstore_faiss.gpu" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "vectorstore_faiss.gpu" -> "typing.cast"
-"vectorstore_faiss.gpu_code": "vectorstore_faiss.gpu code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/vectorstore_faiss/gpu.py" }
-"vectorstore_faiss.gpu" -> "vectorstore_faiss.gpu_code" { style: dashed }
+"vectorstore_faiss": "vectorstore_faiss" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/vectorstore_faiss/__init__.py" }
+"vectorstore_faiss" -> "vectorstore_faiss.gpu" { style: dashed }
 ```
 

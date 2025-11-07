@@ -2,7 +2,11 @@
 
 Typed FastAPI helper utilities with structured logging and timeouts.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/fastapi_helpers.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/fastapi_helpers.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -40,7 +44,7 @@ Typed FastAPI helper utilities with structured logging and timeouts.
 
 ```d2
 direction: right
-"kgfoundry_common.fastapi_helpers": "kgfoundry_common.fastapi_helpers" { link: "./kgfoundry_common/fastapi_helpers.md" }
+"kgfoundry_common.fastapi_helpers": "kgfoundry_common.fastapi_helpers" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/fastapi_helpers.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.fastapi_helpers" -> "__future__.annotations"
 "asyncio": "asyncio"
@@ -79,7 +83,7 @@ direction: right
 "kgfoundry_common.fastapi_helpers" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.fastapi_helpers" -> "typing.cast"
-"kgfoundry_common.fastapi_helpers_code": "kgfoundry_common.fastapi_helpers code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/fastapi_helpers.py" }
-"kgfoundry_common.fastapi_helpers" -> "kgfoundry_common.fastapi_helpers_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.fastapi_helpers" { style: dashed }
 ```
 

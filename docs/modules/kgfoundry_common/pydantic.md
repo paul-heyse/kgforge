@@ -2,7 +2,11 @@
 
 Shared utilities and data structures used across KgFoundry services and tools.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -33,7 +37,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.pydantic": "kgfoundry_common.pydantic" { link: "./kgfoundry_common/pydantic.md" }
+"kgfoundry_common.pydantic": "kgfoundry_common.pydantic" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.pydantic" -> "__future__.annotations"
 "pydantic.BaseModel": "pydantic.BaseModel"
@@ -46,7 +50,7 @@ direction: right
 "kgfoundry_common.pydantic" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.pydantic" -> "typing.cast"
-"kgfoundry_common.pydantic_code": "kgfoundry_common.pydantic code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/pydantic.py" }
-"kgfoundry_common.pydantic" -> "kgfoundry_common.pydantic_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.pydantic" { style: dashed }
 ```
 

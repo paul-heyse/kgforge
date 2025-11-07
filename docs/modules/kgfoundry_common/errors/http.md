@@ -2,7 +2,11 @@
 
 HTTP adapters for Problem Details exception handling.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common.errors](../errors.md)
 
 ## Sections
 
@@ -31,7 +35,7 @@ HTTP adapters for Problem Details exception handling.
 
 ```d2
 direction: right
-"kgfoundry_common.errors.http": "kgfoundry_common.errors.http" { link: "./kgfoundry_common/errors/http.md" }
+"kgfoundry_common.errors.http": "kgfoundry_common.errors.http" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.errors.http" -> "__future__.annotations"
 "asyncio": "asyncio"
@@ -54,7 +58,7 @@ direction: right
 "kgfoundry_common.errors.http" -> "kgfoundry_common.problem_details.ProblemDetails"
 "typing.TYPE_CHECKING": "typing.TYPE_CHECKING"
 "kgfoundry_common.errors.http" -> "typing.TYPE_CHECKING"
-"kgfoundry_common.errors.http_code": "kgfoundry_common.errors.http code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/errors/http.py" }
-"kgfoundry_common.errors.http" -> "kgfoundry_common.errors.http_code" { style: dashed }
+"kgfoundry_common.errors": "kgfoundry_common.errors" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/errors/__init__.py" }
+"kgfoundry_common.errors" -> "kgfoundry_common.errors.http" { style: dashed }
 ```
 

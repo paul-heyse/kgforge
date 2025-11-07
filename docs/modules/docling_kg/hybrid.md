@@ -2,7 +2,11 @@
 
 Hybrid docling_kg pipeline combining layout and text cues
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/docling_kg/hybrid.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/docling_kg/hybrid.py)
+
+## Hierarchy
+
+- **Parent:** [docling_kg](../docling_kg.md)
 
 ## Sections
 
@@ -33,12 +37,12 @@ classDiagram
 
 ```d2
 direction: right
-"docling_kg.hybrid": "docling_kg.hybrid" { link: "./docling_kg/hybrid.md" }
+"docling_kg.hybrid": "docling_kg.hybrid" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/docling_kg/hybrid.py" }
 "__future__.annotations": "__future__.annotations"
 "docling_kg.hybrid" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
 "docling_kg.hybrid" -> "kgfoundry_common.navmap_loader.load_nav_metadata"
-"docling_kg.hybrid_code": "docling_kg.hybrid code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/docling_kg/hybrid.py" }
-"docling_kg.hybrid" -> "docling_kg.hybrid_code" { style: dashed }
+"docling_kg": "docling_kg" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/docling_kg/__init__.py" }
+"docling_kg" -> "docling_kg.hybrid" { style: dashed }
 ```
 

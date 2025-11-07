@@ -265,28 +265,43 @@ class NavMetadataModel(BaseModel):
         return self.as_mapping()[key]
 
     def __iter__(self) -> TupleGenerator:  # type: ignore[override]
-        """Yield flattened key-value pairs for dictionary compatibility.
+        """Iterate over flattened key-value pairs for dictionary compatibility.
+
+        This method enables dictionary-like iteration over navigation metadata,
+        yielding key-value pairs from the flattened representation that includes
+        both standard fields and extras. It delegates to the underlying mapping
+        via ``yield from``, making it compatible with dictionary iteration patterns.
 
         Yields
         ------
         tuple[str, JsonValue]
-            Key and value pairs for navigation metadata entries.
+            Key and value pairs for navigation metadata entries. Keys include
+            standard fields (title, exports, sections, etc.) and any additional
+            fields from the extras dictionary.
 
         Returns
         -------
         TupleGenerator
-            Iterator over key-value pairs. This is Pydantic's type alias for
-            ``Iterator[tuple[str, JsonValue]]``. Generator functions return
-            iterator objects, so this method returns an iterator despite using
-            ``yield from``.
+            Iterator over key-value pairs. The return annotation ``TupleGenerator``
+            is Pydantic's type alias for ``Iterator[tuple[str, JsonValue]]``.
+            Generator functions return iterator objects when called, so this
+            method returns an iterator that yields the flattened key-value pairs.
 
         Notes
         -----
         This method implements the iterator protocol using ``yield from`` to
         delegate to the underlying mapping's items. The return annotation
         ``TupleGenerator`` is Pydantic's type alias for ``Iterator[tuple[str, JsonValue]]``.
-        Generator functions return iterator objects when called, so this function
-        does return a value (an iterator), even though it uses ``yield from``.
+        The function is a generator (uses ``yield from``) and returns an iterator
+        object that can be used in for-loops, dict constructors, and other
+        iteration contexts.
+
+        Examples
+        --------
+        >>> model = NavMetadataModel(...)
+        >>> dict(model)  # Convert to dictionary
+        >>> for key, value in model:  # Iterate like a dictionary
+        ...     print(f"{key}: {value}")
         """
         items = self.as_mapping().items()
         yield from items

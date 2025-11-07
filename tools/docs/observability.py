@@ -242,6 +242,11 @@ def record_operation_metrics(
 ) -> Iterator[None]:
     """Record documentation operation metrics and duration.
 
+    This context manager tracks the execution of documentation operations (catalog,
+    graphs, test_map, schemas, portal, analytics) by recording Prometheus metrics
+    including duration histograms and status counters. It automatically updates
+    the status to "error" if an exception occurs within the context.
+
     Parameters
     ----------
     operation : str
@@ -262,15 +267,17 @@ def record_operation_metrics(
     ------
     Exception
         Any exception raised during the operation is explicitly re-raised after
-        recording error status and metrics. The exception is caught, metrics are
-        updated, and then the exception is re-raised using a bare ``raise``
-        statement. The specific exception type depends on what the wrapped
-        operation raises.
+        recording error status and metrics. The exception is caught using
+        ``except Exception as exc``, metrics are updated to reflect the error,
+        and then the exception is explicitly re-raised using ``raise exc``.
+        The specific exception type depends on what the wrapped operation raises.
 
     Notes
     -----
     Any exception raised during the operation is propagated after recording
-    error status and metrics. The exception type depends on what the operation raises.
+    error status and metrics. The function catches exceptions using
+    ``except Exception as exc`` and explicitly re-raises them using ``raise exc``
+    to satisfy static analysis tools that require explicit exception raising.
 
     Examples
     --------
@@ -300,9 +307,9 @@ def record_operation_metrics(
 
     try:
         yield
-    except Exception:
+    except Exception as exc:
         final_status = "error"
-        raise
+        raise exc  # Explicitly re-raise the caught exception
     finally:
         duration = time.monotonic() - start_time
 

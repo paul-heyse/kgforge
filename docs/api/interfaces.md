@@ -192,7 +192,7 @@ diagrams, and automation emit consistent Problem Details and logging envelopes.
 
 * **Type:** cli
 * **Module:** [download](../modules/download.md)
-* **Source:** [download](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/__init__.py)
+* **Source:** [download](https://github.com/paul-heyse/kgfoundry/blob/main/src/download/__init__.py)
 * **Owner:** @data-platform
 * **Stability:** experimental
 * **Description:** Downloader command suite that sources external corpora (currently OpenAlex) using the shared
@@ -204,7 +204,7 @@ diagrams, documentation) remains in sync without bespoke glue.
 
 - [`cli.download.harvest`](openapi-cli.md#operation/cli.download.harvest) — Harvest OpenAlex works for downstream ingestion.
     - Module docs: [download.cli](../modules/download/cli.md)
-    - Source: [download.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/download/cli.py)
+    - Source: [download.cli](https://github.com/paul-heyse/kgfoundry/blob/main/src/download/cli.py)
   - Tags: download
   - Handler: `download.cli:harvest`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
@@ -243,7 +243,7 @@ downstream automation, diagrams, and observability pipelines.
 
 * **Type:** cli
 * **Module:** [orchestration](../modules/orchestration.md)
-* **Source:** [orchestration](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/__init__.py)
+* **Source:** [orchestration](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/__init__.py)
 * **Owner:** @orchestration
 * **Stability:** beta
 * **Description:** Primary Typer application for orchestration flows and indexing commands.
@@ -252,7 +252,7 @@ downstream automation, diagrams, and observability pipelines.
 
 - [`cli.index_bm25`](openapi-cli.md#operation/cli.index_bm25) — Build BM25 index from JSON/Parquet chunks.
     - Module docs: [orchestration.cli](../modules/orchestration/cli.md)
-    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, index_bm25
   - Handler: `orchestration.cli:index_bm25`
   - Problem Details: schema/examples/problem_details/tool-execution-error.json
@@ -260,7 +260,7 @@ downstream automation, diagrams, and observability pipelines.
     * (bash) `kgf index-bm25 data/chunks.parquet --backend lucene --index-dir ./_indices/bm25`
 - [`cli.index_faiss`](openapi-cli.md#operation/cli.index_faiss) — Build FAISS index from dense vectors.
     - Module docs: [orchestration.cli](../modules/orchestration/cli.md)
-    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, index_faiss
   - Handler: `orchestration.cli:index_faiss`
   - Env: KGF_FAISS_RESOURCES
@@ -269,7 +269,7 @@ downstream automation, diagrams, and observability pipelines.
     * (bash) `kgf index-faiss artifacts/vectors.json --factory 'OPQ64,IVF8192,PQ64' --metric ip`
 - [`cli.api`](openapi-cli.md#operation/cli.api) — Launch FastAPI search service.
     - Module docs: [orchestration.cli](../modules/orchestration/cli.md)
-    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, api
   - Handler: `orchestration.cli:api`
   - Env: KGF_SEARCH_CONFIG
@@ -278,7 +278,7 @@ downstream automation, diagrams, and observability pipelines.
     * (bash) `kgf api --port 8080`
 - [`cli.e2e`](openapi-cli.md#operation/cli.e2e) — Execute end-to-end orchestration demo.
     - Module docs: [orchestration.cli](../modules/orchestration/cli.md)
-    - Source: [orchestration.cli](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/cli.py)
+    - Source: [orchestration.cli](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py)
   - Tags: orchestration, e2e
   - Handler: `orchestration.cli:e2e`
   - Env: KGF_PROFILE
@@ -290,7 +290,7 @@ downstream automation, diagrams, and observability pipelines.
 
 * **Type:** http
 * **Module:** [search_api](../modules/search_api.md)
-* **Source:** [search_api](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/__init__.py)
+* **Source:** [search_api](https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/__init__.py)
 * **Owner:** @search-api
 * **Stability:** experimental
 * **Description:** FastAPI application exposing search operations via the public HTTP API.

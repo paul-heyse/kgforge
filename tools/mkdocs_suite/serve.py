@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 from tools._shared.logging import get_logger
+from tools._shared.proc import ToolExecutionError, run_tool
 
 LOGGER = get_logger(__name__)
 
@@ -151,8 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     dev_addr = f"{args.host}:{port}"
     LOGGER.info("Starting MkDocs dev server", extra={"dev_addr": dev_addr})
 
-    command = [
-        "mkdocs",
+    mkdocs_args = [
         "serve",
         "--config-file",
         str(args.config_file),
@@ -160,32 +160,44 @@ def main(argv: list[str] | None = None) -> int:
         dev_addr,
     ]
     if args.open:
-        command.append("--open")
+        mkdocs_args.append("--open")
 
     repo_root = Path(__file__).resolve().parents[2]
     src_path = (repo_root / "src").resolve()
-    existing_pythonpath = os.environ.get("PYTHONPATH")
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH")
     if existing_pythonpath:
-        os.environ["PYTHONPATH"] = os.pathsep.join((str(src_path), existing_pythonpath))
+        env["PYTHONPATH"] = os.pathsep.join((str(src_path), existing_pythonpath))
     else:
-        os.environ["PYTHONPATH"] = str(src_path)
+        env["PYTHONPATH"] = str(src_path)
 
-    message = f"Serving documentation at http://{dev_addr} (Ctrl+C to stop)"
-    print(message, flush=True)
+    message = f"Serving documentation at http://{dev_addr} (Ctrl+C to stop)\n"
+    sys.stdout.write(message)
+    sys.stdout.flush()
     LOGGER.info("Launching MkDocs dev server", extra={"dev_addr": dev_addr})
 
+    command = ["mkdocs", *mkdocs_args]
+
     try:
-        os.execvp("mkdocs", command)
+        result = run_tool(command, env=env, check=False)
     except KeyboardInterrupt:  # pragma: no cover - interactive interrupt
         LOGGER.info("MkDocs dev server interrupted", extra={"dev_addr": dev_addr})
         return 130
-    except OSError as exc:
+    except ToolExecutionError as exc:
         LOGGER.exception(
-            "Failed to exec MkDocs dev server",
-            extra={"dev_addr": dev_addr, "errno": exc.errno},
+            "Failed to launch MkDocs dev server",
+            extra={
+                "dev_addr": dev_addr,
+                "returncode": exc.returncode,
+                "stderr": exc.stderr,
+            },
         )
-        print(f"Error launching mkdocs serve: {exc}", file=sys.stderr, flush=True)
-        return 1
+        error_detail = exc.stderr or exc.stdout or str(exc)
+        sys.stderr.write(f"Error launching mkdocs serve: {error_detail}\n")
+        sys.stderr.flush()
+        return exc.returncode if exc.returncode is not None else 1
+
+    return result.returncode
 
 
 if __name__ == "__main__":

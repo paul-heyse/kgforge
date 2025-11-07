@@ -2,7 +2,11 @@
 
 Client abstractions for calling the kgfoundry Search API
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_client/__init__.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/search_client/__init__.py)
+
+## Hierarchy
+
+- **Children:** [search_client.client](search_client/client.md)
 
 ## Sections
 
@@ -16,7 +20,7 @@ Client abstractions for calling the kgfoundry Search API
 
 ```d2
 direction: right
-"search_client": "search_client" { link: "./search_client.md" }
+"search_client": "search_client" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_client/__init__.py" }
 "__future__.annotations": "__future__.annotations"
 "search_client" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -25,7 +29,7 @@ direction: right
 "search_client" -> "kgfoundry_common.navmap_types.NavMap"
 "search_client.client.KGFoundryClient": "search_client.client.KGFoundryClient"
 "search_client" -> "search_client.client.KGFoundryClient"
-"search_client_code": "search_client code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_client/__init__.py" }
-"search_client" -> "search_client_code" { style: dashed }
+"search_client.client": "search_client.client" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_client/client.py" }
+"search_client" -> "search_client.client" { style: dashed }
 ```
 

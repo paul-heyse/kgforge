@@ -4,7 +4,7 @@
   "pythonPlatform": "Linux",
   "useLibraryCodeForTypes": true,
   "stubPath": "stubs",
-  "include": ["src"],
+  "include": ["src", "codeintel", "tools", "tests", "docs"],
   "exclude": [
     ".git",
     ".hg",
@@ -18,11 +18,18 @@
     "site/**",
     "faiss/**",
     "src/kgfoundry.egg-info/**",
-    "kgfoundry.egg-info/**"
+    "kgfoundry.egg-info/**",
+    "codeintel/ts_languages/**",
+    "src/kgfoundry_common/http/**",
   ],
   "executionEnvironments": [
     {
       "root": "src",
+      "extraPaths": ["src", "stubs"],
+      "pythonVersion": "3.13"
+    },
+    {
+      "root": "codeintel",
       "extraPaths": ["src", "stubs"],
       "pythonVersion": "3.13"
     }

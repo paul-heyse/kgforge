@@ -41,24 +41,28 @@ def sample_dir(repo_fixture: Path) -> Path:
     return src
 
 
-def test_run_ts_query_identifiers(sample_dir: Path) -> None:
+@pytest.mark.usefixtures("sample_dir")
+def test_run_ts_query_identifiers() -> None:
     query = "(identifier) @id"
     result = tools.run_ts_query("pkg/example.py", language="python", query=query)
     assert any(cap["text"] == "foo" for cap in result.captures)
 
 
-def test_list_python_symbols(_sample_dir: Path) -> None:
+@pytest.mark.usefixtures("sample_dir")
+def test_list_python_symbols() -> None:
     symbols = tools.list_python_symbols("pkg")
     assert symbols, "Expected at least one symbol entry"
     names = {entry["name"] for file in symbols for entry in file["defs"] if entry["name"]}
     assert {"foo", "bar"}.issubset(names)
 
 
-def test_list_calls(_sample_dir: Path) -> None:
+@pytest.mark.usefixtures("sample_dir")
+def test_list_calls() -> None:
     calls = tools.list_calls("pkg", language="python")
     assert any(call["callee"] == "bar" for call in calls)
 
 
-def test_list_errors(_sample_dir: Path) -> None:
+@pytest.mark.usefixtures("sample_dir")
+def test_list_errors() -> None:
     errors = tools.list_errors("pkg/broken.py", language="python")
     assert errors, "Expected syntax errors to be reported"

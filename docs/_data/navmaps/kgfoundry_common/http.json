@@ -1,0 +1,20 @@
+{
+  "exports": [],
+  "symbols": {},
+  "sections": [
+    {
+      "id": "public-api",
+      "title": "Public API",
+      "symbols": []
+    }
+  ],
+  "relationships": {
+    "imports": [
+      "kgfoundry_common.http.client.HttpClient",
+      "kgfoundry_common.http.client.HttpSettings",
+      "kgfoundry_common.http.policy.PolicyRegistry",
+      "kgfoundry_common.http.tenacity_retry.TenacityRetryStrategy",
+      "pathlib.Path"
+    ]
+  }
+}

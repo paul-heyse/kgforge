@@ -2,7 +2,11 @@
 
 FastAPI service exposing search endpoints, aggregation helpers, and Problem Details responses.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/faiss_gpu.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/faiss_gpu.py)
+
+## Hierarchy
+
+- **Parent:** [search_api](../search_api.md)
 
 ## Sections
 
@@ -48,7 +52,7 @@ classDiagram
 
 ```d2
 direction: right
-"search_api.faiss_gpu": "search_api.faiss_gpu" { link: "./search_api/faiss_gpu.md" }
+"search_api.faiss_gpu": "search_api.faiss_gpu" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/faiss_gpu.py" }
 "__future__.annotations": "__future__.annotations"
 "search_api.faiss_gpu" -> "__future__.annotations"
 "collections.abc.Callable": "collections.abc.Callable"
@@ -77,7 +81,7 @@ direction: right
 "search_api.faiss_gpu" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "search_api.faiss_gpu" -> "typing.cast"
-"search_api.faiss_gpu_code": "search_api.faiss_gpu code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/search_api/faiss_gpu.py" }
-"search_api.faiss_gpu" -> "search_api.faiss_gpu_code" { style: dashed }
+"search_api": "search_api" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/search_api/__init__.py" }
+"search_api" -> "search_api.faiss_gpu" { style: dashed }
 ```
 

@@ -2,7 +2,11 @@
 
 Typed models shared across kgfoundry services
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/models.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/models.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -63,7 +67,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.models": "kgfoundry_common.models" { link: "./kgfoundry_common/models.md" }
+"kgfoundry_common.models": "kgfoundry_common.models" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/models.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.models" -> "__future__.annotations"
 "kgfoundry_common.navmap_loader.load_nav_metadata": "kgfoundry_common.navmap_loader.load_nav_metadata"
@@ -78,7 +82,7 @@ direction: right
 "kgfoundry_common.models" -> "typing.ClassVar"
 "typing.Literal": "typing.Literal"
 "kgfoundry_common.models" -> "typing.Literal"
-"kgfoundry_common.models_code": "kgfoundry_common.models code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/models.py" }
-"kgfoundry_common.models" -> "kgfoundry_common.models_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.models" { style: dashed }
 ```
 

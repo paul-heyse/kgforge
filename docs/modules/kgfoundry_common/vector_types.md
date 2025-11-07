@@ -2,7 +2,11 @@
 
 Typed vector contracts and validation helpers for vector ingestion.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/vector_types.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/vector_types.py)
+
+## Hierarchy
+
+- **Parent:** [kgfoundry_common](../kgfoundry_common.md)
 
 ## Sections
 
@@ -62,7 +66,7 @@ classDiagram
 
 ```d2
 direction: right
-"kgfoundry_common.vector_types": "kgfoundry_common.vector_types" { link: "./kgfoundry_common/vector_types.md" }
+"kgfoundry_common.vector_types": "kgfoundry_common.vector_types" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/vector_types.py" }
 "__future__.annotations": "__future__.annotations"
 "kgfoundry_common.vector_types" -> "__future__.annotations"
 "collections.abc.Iterable": "collections.abc.Iterable"
@@ -87,7 +91,7 @@ direction: right
 "kgfoundry_common.vector_types" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "kgfoundry_common.vector_types" -> "typing.cast"
-"kgfoundry_common.vector_types_code": "kgfoundry_common.vector_types code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/kgfoundry_common/vector_types.py" }
-"kgfoundry_common.vector_types" -> "kgfoundry_common.vector_types_code" { style: dashed }
+"kgfoundry_common": "kgfoundry_common" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/kgfoundry_common/__init__.py" }
+"kgfoundry_common" -> "kgfoundry_common.vector_types" { style: dashed }
 ```
 

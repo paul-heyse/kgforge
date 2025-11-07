@@ -4,7 +4,11 @@ Typer-powered orchestration command suite covering indexing flows, API bootstrap
 and end-to-end demonstrations. Each command maps to a generated OpenAPI operation
 consumed by the MkDocs suite.
 
-[View source on GitHub](https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/safe_pickle.py)
+[View source on GitHub](https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/safe_pickle.py)
+
+## Hierarchy
+
+- **Parent:** [orchestration](../orchestration.md)
 
 ## Sections
 
@@ -62,7 +66,7 @@ consumed by the MkDocs suite.
 
 **Imports:** `__future__.annotations`, `importlib.import_module`, `logging`, `typing.BinaryIO`, `typing.Protocol`, `typing.TYPE_CHECKING`, `typing.cast`
 
-**Imported by:** [orchestration.cli](./orchestration/cli.md)
+**Imported by:** [orchestration.cli](cli.md)
 
 ## Autorefs Examples
 
@@ -97,7 +101,7 @@ classDiagram
 
 ```d2
 direction: right
-"orchestration.safe_pickle": "orchestration.safe_pickle" { link: "./orchestration/safe_pickle.md" }
+"orchestration.safe_pickle": "orchestration.safe_pickle" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/safe_pickle.py" }
 "__future__.annotations": "__future__.annotations"
 "orchestration.safe_pickle" -> "__future__.annotations"
 "importlib.import_module": "importlib.import_module"
@@ -112,9 +116,9 @@ direction: right
 "orchestration.safe_pickle" -> "typing.TYPE_CHECKING"
 "typing.cast": "typing.cast"
 "orchestration.safe_pickle" -> "typing.cast"
-"orchestration.cli": "orchestration.cli" { link: "./orchestration/cli.md" }
+"orchestration.cli": "orchestration.cli" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/cli.py" }
 "orchestration.cli" -> "orchestration.safe_pickle"
-"orchestration.safe_pickle_code": "orchestration.safe_pickle code" { link: "https://github.com/kgfoundry/kgfoundry/blob/main/src/orchestration/safe_pickle.py" }
-"orchestration.safe_pickle" -> "orchestration.safe_pickle_code" { style: dashed }
+"orchestration": "orchestration" { link: "https://github.com/paul-heyse/kgfoundry/blob/main/src/orchestration/__init__.py" }
+"orchestration" -> "orchestration.safe_pickle" { style: dashed }
 ```
 

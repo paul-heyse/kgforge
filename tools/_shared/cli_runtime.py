@@ -581,35 +581,45 @@ def _finalize_envelope(
 def cli_run(cfg: CliRunConfig) -> Iterator[tuple[CliContext, EnvelopeBuilder]]:
     """Execute a CLI command inside the standardised façade.
 
+    This context manager provides a standardized execution environment for CLI
+    commands, handling logging, metrics, envelope generation, and error handling.
+    It yields a context object and envelope builder, then finalizes execution
+    metadata and optionally writes an envelope file.
+
     Parameters
     ----------
     cfg : CliRunConfig
-        Immutable configuration describing the intended CLI execution.
+        Immutable configuration describing the intended CLI execution, including
+        route, operation name, error handling behavior, and output formatting.
 
     Yields
     ------
     (CliContext, EnvelopeBuilder)
-        Tuple containing the live :class:`CliContext` and the mutable
-        :class:`EnvelopeBuilder`.
+        Tuple containing the live :class:`CliContext` (providing runtime information
+        and logger) and the mutable :class:`EnvelopeBuilder` (for accumulating
+        execution results and metadata).
 
     Raises
     ------
     SystemExit
         Raised with exit code ``1`` when an exception occurs inside the context
         and ``cfg.exit_on_error`` evaluates to ``True``. The original exception
-        is chained via ``raise SystemExit(1) from error``.
+        is chained via ``raise SystemExit(1) from exc`` where ``exc`` is the
+        caught exception.
     Exception
         Any exception raised inside the context is re-raised when
-        ``cfg.exit_on_error`` evaluates to ``False``. The exception is stored
-        in a local variable during exception handling and then re-raised.
-        The specific exception type depends on what the wrapped operation raises.
+        ``cfg.exit_on_error`` evaluates to ``False``. The exception is caught,
+        stored in a local variable for logging and envelope generation, and then
+        explicitly re-raised using ``raise exc``. The specific exception type
+        depends on what the wrapped operation raises.
 
     Notes
     -----
     When ``cfg.exit_on_error`` is ``False`` any exception raised inside the
-    context propagates unchanged to the caller. The function uses a local variable
-    named ``error`` to store the caught exception for logging and conditional
-    re-raising, but this variable name does not represent an exception type.
+    context propagates unchanged to the caller. The function catches exceptions
+    using ``except Exception as exc``, stores the exception in a local variable
+    for logging and envelope generation, and then explicitly re-raises it using
+    ``raise exc`` (not bare ``raise``) to satisfy static analysis tools.
     """
     metadata = _prepare_execution_metadata(cfg)
     envelope = _build_envelope(
@@ -689,7 +699,7 @@ def cli_run(cfg: CliRunConfig) -> Iterator[tuple[CliContext, EnvelopeBuilder]]:
         return
     if cfg.exit_on_error:
         raise SystemExit(1) from error
-    raise error
+    raise error  # Explicitly re-raise the caught exception (error is Exception | None)
 
 
 __all__ = [
