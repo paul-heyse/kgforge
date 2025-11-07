@@ -149,14 +149,23 @@ def open_file(
     path : str
         File path relative to repo root.
     start_line : int | None
-        Start line (1-indexed, inclusive).
+        Start line (1-indexed, inclusive). Must be positive when provided.
     end_line : int | None
-        End line (1-indexed, inclusive).
+        End line (1-indexed, inclusive). Must be positive when provided.
 
     Returns
     -------
     dict
-        File content and metadata.
+        File content and metadata. When the requested line bounds are invalid,
+        an ``{"error": ...}`` payload describing the constraint violation is
+        returned instead of file content.
+
+    Notes
+    -----
+    ``start_line`` and ``end_line`` are inclusive and 1-indexed. If both bounds
+    are supplied then ``start_line`` must be less than or equal to ``end_line``.
+    Providing a single bound slices from the start or through the end of the
+    file respectively.
 
     Examples
     --------
@@ -185,11 +194,31 @@ def open_file(
     except UnicodeDecodeError:
         return {"error": "Binary file or encoding error", "path": path}
 
-    # Slice lines if requested
+    # Validate and slice lines if requested
+    if start_line is not None and start_line <= 0:
+        return {
+            "error": "start_line must be a positive integer",
+            "path": path,
+        }
+    if end_line is not None and end_line <= 0:
+        return {
+            "error": "end_line must be a positive integer",
+            "path": path,
+        }
+    if (
+        start_line is not None
+        and end_line is not None
+        and start_line > end_line
+    ):
+        return {
+            "error": "start_line must be less than or equal to end_line",
+            "path": path,
+        }
+
     if start_line is not None or end_line is not None:
         lines = content.splitlines(keepends=True)
-        start_idx = (start_line - 1) if start_line else 0
-        end_idx = end_line if end_line else len(lines)
+        start_idx = (start_line - 1) if start_line is not None else 0
+        end_idx = end_line if end_line is not None else len(lines)
         content = "".join(lines[start_idx:end_idx])
 
     return {
