@@ -58,7 +58,8 @@ def search_text(
     if not regex:
         cmd.append("--fixed-strings")
 
-    # Add query
+    # Add query with sentinel to prevent option parsing
+    cmd.append("--")
     cmd.append(query)
 
     # Add paths
@@ -86,6 +87,14 @@ def search_text(
     except FileNotFoundError:
         # Fallback to simple grep if ripgrep not installed
         return _fallback_grep(repo_root, query, case_sensitive, max_results)
+
+    if result.returncode > 1:
+        error_message = result.stderr.strip() or "Search failed"
+        return {
+            "matches": [],
+            "total": 0,
+            "error": error_message,
+        }
 
     # Parse JSON output
     matches: list[Match] = []
@@ -160,6 +169,7 @@ def _fallback_grep(
     if not case_sensitive:
         cmd.append("-i")
 
+    cmd.append("--")
     cmd.extend([query, str(repo_root)])
 
     try:
