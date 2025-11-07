@@ -79,6 +79,45 @@ def test_git_history() -> None:
     )
 
 
+def test_parse_blame_porcelain_multiple_entries() -> None:
+    """The blame parser should return an entry for each porcelain header."""
+
+    porcelain_lines = [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1 1 1",
+        "author Alice Example",
+        "author-mail <alice@example.com>",
+        "author-time 1700000000",
+        "author-tz +0000",
+        "summary First change",
+        "filename sample.py",
+        "\tprint('first line')",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 2 2 1",
+        "author Bob Example",
+        "author-mail <bob@example.com>",
+        "author-time 1700000060",
+        "author-tz +0000",
+        "summary Second change",
+        "filename sample.py",
+        "\tprint('second line')",
+    ]
+
+    entries = history_adapter._parse_blame_porcelain("\n".join(porcelain_lines) + "\n")
+
+    _expect(condition=len(entries) == 2, message="Expected two blame entries to be parsed")
+    _expect(
+        condition=[entry["line"] for entry in entries] == [1, 2],
+        message="Expected blame entries to retain distinct line numbers",
+    )
+    _expect(
+        condition={entry["message"] for entry in entries} == {"First change", "Second change"},
+        message="Expected commit summaries to be captured for each entry",
+    )
+    _expect(
+        condition=len({entry["date"] for entry in entries}) == 2,
+        message="Expected unique ISO timestamps for each blame entry",
+    )
+
+
 def test_scope_operations() -> None:
     """Verify scope configuration round-trips through the adapter."""
     scope_request: ScopeIn = {"repos": ["test"], "languages": ["python"]}
