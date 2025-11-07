@@ -59,6 +59,7 @@ async def test_semantic_search_no_index() -> None:
     _expect(condition="answer" in envelope, message="Expected answer in semantic search envelope")
     findings = envelope.get("findings")
     _expect(condition=isinstance(findings, list), message="Findings should be returned as a list")
+    _expect(condition="problem" in envelope, message="Expected Problem Details on failure")
 
 
 def test_git_history() -> None:
@@ -87,4 +88,24 @@ def test_scope_operations() -> None:
     _expect(
         condition=isinstance(effective_scope, Mapping),
         message="Effective scope should be a mapping",
+    )
+
+
+def test_path_escape_rejected_by_file_adapter() -> None:
+    """Adapters should reject attempts to escape the repository root."""
+    result = files_adapter.open_file("../etc/passwd")
+    _expect(condition="error" in result, message="Expected error for escaped path")
+    _expect(
+        condition="escapes repository root" in result["error"],
+        message="Error should mention repository escape",
+    )
+
+
+def test_path_escape_rejected_by_history_adapter() -> None:
+    """Git adapters should refuse to run commands on escaped paths."""
+    blame = history_adapter.blame_range("../etc/passwd", 1, 2)
+    _expect(condition="error" in blame, message="Expected error for escaped path")
+    _expect(
+        condition="escapes repository root" in blame["error"],
+        message="Error should mention repository escape",
     )

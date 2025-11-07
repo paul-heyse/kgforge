@@ -10,6 +10,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from codeintel_rev.config.settings import load_settings
+from codeintel_rev.io.path_utils import (
+    PathOutsideRepositoryError,
+    resolve_within_repo,
+)
 from codeintel_rev.mcp_server.schemas import GitBlameEntry
 from kgfoundry_common.subprocess_utils import (
     SubprocessError,
@@ -52,10 +56,12 @@ def blame_range(
     True
     """
     settings = load_settings()
-    repo_root = Path(settings.paths.repo_root)
-    file_path = repo_root / path
-
-    if not file_path.exists():
+    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    try:
+        file_path = resolve_within_repo(repo_root, path, allow_nonexistent=False)
+    except PathOutsideRepositoryError as exc:
+        return {"blame": [], "error": str(exc)}
+    except FileNotFoundError:
         return {"blame": [], "error": "File not found"}
 
     stdout, error = _invoke_git(
@@ -100,10 +106,12 @@ def file_history(
     True
     """
     settings = load_settings()
-    repo_root = Path(settings.paths.repo_root)
-    file_path = repo_root / path
-
-    if not file_path.exists():
+    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    try:
+        file_path = resolve_within_repo(repo_root, path, allow_nonexistent=False)
+    except PathOutsideRepositoryError as exc:
+        return {"commits": [], "error": str(exc)}
+    except FileNotFoundError:
         return {"commits": [], "error": "File not found"}
 
     stdout, error = _invoke_git(
@@ -157,6 +165,15 @@ def _invoke_git(
 ) -> tuple[str | None, str | None]:
     """Execute a git command and capture stdout or return an error.
 
+    Parameters
+    ----------
+    command : list[str]
+        Git command and arguments.
+    repo_root : Path
+        Repository root directory.
+    timeout : int
+        Command timeout in seconds.
+
     Returns
     -------
     tuple[str | None, str | None]
@@ -172,6 +189,11 @@ def _invoke_git(
 
 def _parse_blame_porcelain(stdout: str) -> list[GitBlameEntry]:
     """Parse porcelain blame output into structured entries.
+
+    Parameters
+    ----------
+    stdout : str
+        Git blame porcelain format output.
 
     Returns
     -------
@@ -200,6 +222,11 @@ def _parse_blame_porcelain(stdout: str) -> list[GitBlameEntry]:
 
 def _parse_blame_block(lines: Sequence[str]) -> GitBlameEntry | None:
     """Parse a single line-porcelain blame block.
+
+    Parameters
+    ----------
+    lines : Sequence[str]
+        Lines comprising a single blame block.
 
     Returns
     -------
@@ -241,6 +268,11 @@ def _parse_blame_block(lines: Sequence[str]) -> GitBlameEntry | None:
 
 def _to_iso_timestamp(timestamp: str) -> str:
     """Convert a unix timestamp string to ISO 8601 format.
+
+    Parameters
+    ----------
+    timestamp : str
+        Unix timestamp string.
 
     Returns
     -------

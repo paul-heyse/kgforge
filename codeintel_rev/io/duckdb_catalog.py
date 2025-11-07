@@ -31,6 +31,7 @@ class DuckDBCatalog:
         self.db_path = db_path
         self.vectors_dir = vectors_dir
         self.conn: duckdb.DuckDBPyConnection | None = None
+        self._embedding_dim_cache: int | None = None
 
     def open(self) -> None:
         """Open database connection."""
@@ -233,7 +234,8 @@ class DuckDBCatalog:
             raise RuntimeError(msg)
 
         if not ids:
-            return np.array([], dtype=np.float32)
+            dim = self._embedding_dim()
+            return np.empty((0, dim), dtype=np.float32)
 
         relation = self.conn.execute(
             """
@@ -247,12 +249,14 @@ class DuckDBCatalog:
         )
         rows = relation.fetchall()
         if not rows:
-            return np.array([], dtype=np.float32)
+            dim = self._embedding_dim()
+            return np.empty((0, dim), dtype=np.float32)
 
         embeddings = [np.array(row[1], dtype=np.float32) for row in rows]
 
         if not embeddings:
-            return np.array([], dtype=np.float32)
+            dim = self._embedding_dim()
+            return np.empty((0, dim), dtype=np.float32)
 
         return np.vstack(embeddings)
 
@@ -283,6 +287,31 @@ class DuckDBCatalog:
 
         result = self.conn.execute("SELECT COUNT(*) FROM chunks").fetchone()
         return result[0] if result else 0
+
+    def _embedding_dim(self) -> int:
+        """Return the embedding dimension, caching when possible.
+
+        Returns
+        -------
+        int
+            Embedding dimension for the chunks table, or ``0`` when no rows exist.
+
+        Raises
+        ------
+        RuntimeError
+            If the database connection has not been opened.
+        """
+        if self._embedding_dim_cache is not None:
+            return self._embedding_dim_cache
+        if not self.conn:
+            msg = "Connection not open"
+            raise RuntimeError(msg)
+        result = self.conn.execute("SELECT embedding FROM chunks LIMIT 1").fetchone()
+        if result and result[0] is not None:
+            self._embedding_dim_cache = len(result[0])
+        else:
+            self._embedding_dim_cache = 0
+        return self._embedding_dim_cache
 
 
 __all__ = ["DuckDBCatalog"]

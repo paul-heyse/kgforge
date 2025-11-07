@@ -32,6 +32,7 @@ from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.parquet_store import write_chunks_parquet
 from codeintel_rev.io.vllm_client import VLLMClient
+from codeintel_rev.mcp_server.service_context import reset_service_context
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -78,10 +79,16 @@ def main() -> None:
         paths.faiss_index,
         catalog_count,
     )
+    reset_service_context()
 
 
 def _resolve_paths(settings: Settings) -> PipelinePaths:
     """Resolve and normalize key filesystem paths.
+
+    Parameters
+    ----------
+    settings : Settings
+        Application settings containing path configuration.
 
     Returns
     -------
@@ -108,15 +115,20 @@ def _resolve_paths(settings: Settings) -> PipelinePaths:
 def _load_scip_index(paths: PipelinePaths) -> SCIPIndex:
     """Load and parse the SCIP index from disk.
 
-    Raises
-    ------
-    FileNotFoundError
-        If the configured SCIP index file does not exist.
+    Parameters
+    ----------
+    paths : PipelinePaths
+        Pipeline paths configuration containing SCIP index location.
 
     Returns
     -------
     SCIPIndex
         Parsed SCIP index containing all documents and occurrences.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the configured SCIP index file does not exist.
     """
     if not paths.scip_index.exists():
         msg = f"SCIP index not found at {paths.scip_index}"
@@ -129,6 +141,11 @@ def _load_scip_index(paths: PipelinePaths) -> SCIPIndex:
 
 def _group_definitions_by_file(index: SCIPIndex) -> Mapping[str, list[SymbolDef]]:
     """Group symbol definitions by their relative file path.
+
+    Parameters
+    ----------
+    index : SCIPIndex
+        SCIP index containing symbol definitions.
 
     Returns
     -------
@@ -149,6 +166,15 @@ def _chunk_repository(
     budget: int,
 ) -> list[Chunk]:
     """Chunk all files referenced by the SCIP index.
+
+    Parameters
+    ----------
+    paths : PipelinePaths
+        Pipeline paths configuration.
+    definitions_by_file : Mapping[str, Sequence[SymbolDef]]
+        Symbol definitions grouped by file path.
+    budget : int
+        Character budget per chunk.
 
     Returns
     -------
@@ -183,6 +209,13 @@ def _chunk_repository(
 def _embed_chunks(chunks: Sequence[Chunk], config: VLLMConfig) -> np.ndarray:
     """Generate embeddings for the supplied chunks using vLLM.
 
+    Parameters
+    ----------
+    chunks : Sequence[Chunk]
+        Chunks to embed.
+    config : VLLMConfig
+        vLLM client configuration.
+
     Returns
     -------
     np.ndarray
@@ -202,6 +235,17 @@ def _write_parquet(
     vec_dim: int,
 ) -> Path:
     """Persist chunk metadata and embeddings to Parquet.
+
+    Parameters
+    ----------
+    chunks : Sequence[Chunk]
+        Chunks to persist.
+    embeddings : np.ndarray
+        Embedding vectors aligned with chunks.
+    paths : PipelinePaths
+        Pipeline paths configuration.
+    vec_dim : int
+        Embedding vector dimension.
 
     Returns
     -------
@@ -226,6 +270,15 @@ def _build_faiss_index(
     index_config: IndexConfig,
 ) -> None:
     """Train and persist the FAISS index.
+
+    Parameters
+    ----------
+    embeddings : np.ndarray
+        Embedding vectors to index.
+    paths : PipelinePaths
+        Pipeline paths configuration.
+    index_config : IndexConfig
+        FAISS index configuration.
 
     Raises
     ------
@@ -254,6 +307,11 @@ def _build_faiss_index(
 
 def _initialize_duckdb(paths: PipelinePaths) -> int:
     """Create or refresh the DuckDB catalog and return the chunk count.
+
+    Parameters
+    ----------
+    paths : PipelinePaths
+        Pipeline paths configuration.
 
     Returns
     -------

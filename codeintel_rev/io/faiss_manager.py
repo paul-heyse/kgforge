@@ -5,18 +5,29 @@ Manages IVF-PQ index with cuVS acceleration, CPU persistence, and GPU cloning.
 
 from __future__ import annotations
 
+import importlib
 import logging
 from pathlib import Path
 
-import importlib
 import faiss
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-_FAISS_GPU_AVAILABLE = all(
-    hasattr(faiss, attr) for attr in ("StandardGpuResources", "GpuClonerOptions", "index_cpu_to_gpu")
-)
+
+def _has_faiss_gpu_support() -> bool:
+    """Return ``True`` when FAISS exposes GPU bindings, otherwise ``False``.
+
+    Returns
+    -------
+    bool
+        ``True`` when GPU capabilities are available, otherwise ``False``.
+    """
+    required_attrs = ("StandardGpuResources", "GpuClonerOptions", "index_cpu_to_gpu")
+    return all(hasattr(faiss, attr) for attr in required_attrs)
+
+
+_FAISS_GPU_AVAILABLE = _has_faiss_gpu_support()
 
 
 class FAISSManager:

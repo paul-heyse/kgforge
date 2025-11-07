@@ -7,7 +7,7 @@ import importlib
 import importlib.util
 import json
 import sys
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from importlib import import_module
@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     )
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from pydantic.main import TupleGenerator
 
 JsonValue = str | int | float | bool | dict[str, "JsonValue"] | list["JsonValue"] | None
 
@@ -264,7 +263,7 @@ class NavMetadataModel(BaseModel):
         """
         return self.as_mapping()[key]
 
-    def __iter__(self) -> TupleGenerator:  # type: ignore[override]
+    def __iter__(self) -> Iterator[tuple[str, JsonValue]]:  # type: ignore[override]
         """Iterate over flattened key-value pairs for dictionary compatibility.
 
         This method enables dictionary-like iteration over navigation metadata,
@@ -277,19 +276,16 @@ class NavMetadataModel(BaseModel):
         tuple[str, JsonValue]
             Key and value pairs for navigation metadata entries. Keys include
             standard fields (title, exports, sections, etc.) and any additional
-            fields from the extras dictionary. The return annotation ``TupleGenerator``
-            is Pydantic's type alias for ``Iterator[tuple[str, JsonValue]]``.
-            Generator functions return iterator objects when called, so this
-            method returns an iterator that yields the flattened key-value pairs.
+            fields from the extras dictionary. The return type annotation
+            ``Iterator[tuple[str, JsonValue]]`` is compatible with Pydantic's
+            ``TupleGenerator`` type alias.
 
         Notes
         -----
         This method implements the iterator protocol using ``yield from`` to
-        delegate to the underlying mapping's items. The return annotation
-        ``TupleGenerator`` is Pydantic's type alias for ``Iterator[tuple[str, JsonValue]]``.
-        The function is a generator (uses ``yield from``) and returns an iterator
-        object that can be used in for-loops, dict constructors, and other
-        iteration contexts.
+        delegate to the underlying mapping's items. The function is a generator
+        (uses ``yield from``) and returns an iterator object that can be used
+        in for-loops, dict constructors, and other iteration contexts.
 
         Examples
         --------

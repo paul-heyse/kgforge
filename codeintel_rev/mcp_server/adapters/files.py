@@ -6,9 +6,14 @@ Provides file listing, reading, and scope configuration.
 from __future__ import annotations
 
 import fnmatch
+from collections.abc import Sequence
 from pathlib import Path
 
 from codeintel_rev.config.settings import load_settings
+from codeintel_rev.io.path_utils import (
+    PathOutsideRepositoryError,
+    resolve_within_repo,
+)
 from codeintel_rev.mcp_server.schemas import ScopeIn
 
 
@@ -68,15 +73,10 @@ def list_paths(
     True
     """
     settings = load_settings()
-    repo_root = Path(settings.paths.repo_root)
-
-    # Determine search root
-    if path:
-        search_root = repo_root / path
-        if not search_root.exists() or not search_root.is_dir():
-            return {"items": [], "total": 0, "error": "Path not found or not a directory"}
-    else:
-        search_root = repo_root
+    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    search_root, error = _resolve_search_root(repo_root, path)
+    if search_root is None:
+        return {"items": [], "total": 0, "error": error or "Path not found or not a directory"}
 
     # Default excludes
     default_excludes = [
@@ -96,24 +96,34 @@ def list_paths(
     # Walk directory
     items = []
     for file_path in search_root.rglob("*"):
-        if not file_path.is_file():
+        try:
+            resolved = file_path.resolve()
+        except OSError:
             continue
 
-        # Check excludes
-        rel_path = file_path.relative_to(repo_root)
-        if any(fnmatch.fnmatch(str(rel_path), pattern) for pattern in excludes):
+        if not resolved.is_file():
             continue
 
-        # Check includes
-        if not any(fnmatch.fnmatch(str(rel_path), pattern) for pattern in includes):
+        try:
+            relative_path = resolved.relative_to(repo_root)
+        except ValueError:
             continue
 
-        # Add to results
+        relative_str = str(relative_path)
+        if _matches_any(relative_str, excludes):
+            continue
+        if not _matches_any(relative_str, includes):
+            continue
+
+        stat_result = _safe_stat(resolved)
+        if stat_result is None:
+            continue
+
         items.append(
             {
-                "path": str(rel_path),
-                "size": file_path.stat().st_size,
-                "modified": file_path.stat().st_mtime,
+                "path": relative_str,
+                "size": stat_result.st_size,
+                "modified": stat_result.st_mtime,
             }
         )
 
@@ -155,10 +165,16 @@ def open_file(
     True
     """
     settings = load_settings()
-    repo_root = Path(settings.paths.repo_root)
-    file_path = repo_root / path
-
-    if not file_path.exists():
+    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    try:
+        file_path = resolve_within_repo(
+            repo_root,
+            path,
+            allow_nonexistent=False,
+        )
+    except PathOutsideRepositoryError as exc:
+        return {"error": str(exc), "path": path}
+    except FileNotFoundError:
         return {"error": "File not found", "path": path}
 
     if not file_path.is_file():
@@ -185,3 +201,32 @@ def open_file(
 
 
 __all__ = ["list_paths", "open_file", "set_scope"]
+
+
+def _resolve_search_root(repo_root: Path, requested: str | None) -> tuple[Path | None, str | None]:
+    if requested is None:
+        return repo_root, None
+    try:
+        search_root = resolve_within_repo(
+            repo_root,
+            requested,
+            allow_nonexistent=False,
+        )
+    except PathOutsideRepositoryError as exc:
+        return None, str(exc)
+    except FileNotFoundError:
+        return None, "Path not found or not a directory"
+    if not search_root.is_dir():
+        return None, "Path not found or not a directory"
+    return search_root, None
+
+
+def _matches_any(target: str, patterns: Sequence[str]) -> bool:
+    return any(fnmatch.fnmatch(target, pattern) for pattern in patterns)
+
+
+def _safe_stat(path: Path):
+    try:
+        return path.stat()
+    except OSError:
+        return None

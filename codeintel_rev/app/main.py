@@ -285,6 +285,11 @@ async def readyz(request: Request) -> JSONResponse:
 
     Verifies that dependent services are available.
 
+    Parameters
+    ----------
+    request : Request
+        FastAPI request object.
+
     Returns
     -------
     JSONResponse

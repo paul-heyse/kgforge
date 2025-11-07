@@ -39,19 +39,17 @@ class HttpClient:
 
     This client supports per-method retry policies and enforces idempotency
     key requirements for non-idempotent methods when configured.
+
+    Parameters
+    ----------
+    settings : HttpSettings
+        Client configuration settings.
+    retry_strategy : RetryStrategy | None, optional
+        Retry strategy to use. If None, requests will be single-attempt.
+        Defaults to None.
     """
 
     def __init__(self, settings: HttpSettings, retry_strategy: RetryStrategy | None = None) -> None:
-        """Initialize HTTP client.
-
-        Parameters
-        ----------
-        settings : HttpSettings
-            Client configuration settings.
-        retry_strategy : RetryStrategy | None, optional
-            Retry strategy to use. If None, requests will be single-attempt.
-            Defaults to None.
-        """
         self.s = settings
         self.retry_strategy = retry_strategy  # may be None for single-attempt
         # TODO(@http-client): # noqa: TD003 Initialize underlying HTTP client (httpx, requests, etc.)
@@ -132,20 +130,16 @@ class HttpClient:
             strategy = self._policy_strategy_for(method)
 
         def _attempt() -> object:
-            # one attempt, raise well-typed HttpError on failure
+            """Execute a single HTTP request attempt.
+
+            Raises
+            ------
+            NotImplementedError
+                HTTP request implementation is not yet complete.
+            """
             # TODO(@http-client): # noqa: TD003 Implement actual HTTP request
-            # When implemented, use:
-            # from kgfoundry_common.http.errors import HttpRateLimitedError, HttpStatusError
-            # resp = self.b.request(method, url, params=params, headers=headers,
-            #                      json=json_body, data=data,
-            #                      timeout_s=timeout_s or self.s.read_timeout_s)
-            # status = resp.status_code
-            # if 200 <= status < 300:
-            #     return resp
-            # body_excerpt = (lambda t: t[:500] if t else "")(resp.text())
-            # if status == 429:
-            #     raise HttpRateLimitedError(status, body_excerpt, headers=resp.headers)
-            # raise HttpStatusError(status, body_excerpt, headers=resp.headers)
+            # When implemented, use HttpRateLimitedError and HttpStatusError from
+            # kgfoundry_common.http.errors for error handling.
             _ = params, json_body, data, timeout_s  # Placeholder for future use
             msg = "HTTP request not yet implemented"
             raise NotImplementedError(msg)

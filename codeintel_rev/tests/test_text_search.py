@@ -90,6 +90,7 @@ def test_search_text_surfaces_ripgrep_failure(monkeypatch: pytest.MonkeyPatch) -
         condition=result.get("error") == "rg failed",
         message="Expected error message to surface",
     )
+    _expect(condition="problem" in result, message="Expected Problem Details payload")
 
 
 def test_search_text_falls_back_to_grep(monkeypatch: pytest.MonkeyPatch) -> None:

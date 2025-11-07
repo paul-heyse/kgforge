@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import types
-from pathlib import Path
+from collections.abc import Iterator
+from contextlib import contextmanager
 from types import SimpleNamespace
 from typing import Any
 
@@ -71,34 +72,6 @@ class StubVLLMClient:
         return [0.1, 0.2]
 
 
-def _settings(index_path: str, tmp_path: Path) -> Any:
-    """Create test settings.
-
-    Parameters
-    ----------
-    index_path : str
-        Path to FAISS index file.
-    tmp_path : Path
-        Temporary directory for test files.
-
-    Returns
-    -------
-    Any
-        Settings namespace object.
-    """
-    vectors_dir = tmp_path / "vectors"
-    vectors_dir.mkdir(exist_ok=True)
-    return SimpleNamespace(
-        paths=SimpleNamespace(
-            faiss_index=index_path,
-            vectors_dir=str(vectors_dir),
-            duckdb_path=str(tmp_path / "catalog.duckdb"),
-        ),
-        index=SimpleNamespace(vec_dim=2, faiss_nlist=1, use_cuvs=False),
-        vllm=SimpleNamespace(),
-    )
-
-
 class _BaseStubFAISSManager:
     """Base stub FAISS manager for testing."""
 
@@ -158,37 +131,56 @@ class _BaseStubFAISSManager:
         return np.array([[0.9]], dtype=np.float32), np.array([[123]], dtype=np.int64)
 
 
+class StubContext:
+    """Stub service context for semantic adapter tests."""
+
+    def __init__(
+        self,
+        *,
+        faiss_manager: _BaseStubFAISSManager,
+        limits: list[str] | None = None,
+        error: str | None = None,
+    ) -> None:
+        """Initialize stub context."""
+        self.faiss_manager = faiss_manager
+        self.vllm_client = StubVLLMClient(SimpleNamespace())
+        self.settings = SimpleNamespace()
+        self._limits = limits or []
+        self._error = error
+
+    def ensure_faiss_ready(self) -> tuple[bool, list[str], str | None]:
+        """Return readiness tuple.
+
+        Returns
+        -------
+        tuple[bool, list[str], str | None]
+            Tuple of (ready, limits, error).
+        """
+        ready = self._error is None
+        return ready, list(self._limits), self._error
+
+    @contextmanager
+    def open_catalog(self) -> Iterator[StubDuckDBCatalog]:
+        """Yield stub catalog.
+
+        Yields
+        ------
+        StubDuckDBCatalog
+            Stub catalog instance.
+        """
+        yield StubDuckDBCatalog(None, None)
+
+
 @pytest.mark.asyncio
-async def test_semantic_search_gpu_success(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
-    faiss_index_path = tmp_path / "index.faiss"
-    faiss_index_path.write_text("dummy")
-
-    class StubFAISSManager(_BaseStubFAISSManager):
-        """Stub FAISS manager for GPU success test."""
-
-        def __init__(self, index_path: Path, vec_dim: int, nlist: int, *, use_cuvs: bool) -> None:
-            """Initialize stub FAISS manager for GPU success."""
-            super().__init__(should_fail_gpu=False)
-            assert index_path == faiss_index_path
-            assert vec_dim == 2
-            assert nlist == 1
-            assert use_cuvs is False
-
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.FAISSManager",
-        StubFAISSManager,
+async def test_semantic_search_gpu_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    context = StubContext(
+        faiss_manager=_BaseStubFAISSManager(should_fail_gpu=False),
+        limits=[],
+        error=None,
     )
     monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.DuckDBCatalog",
-        StubDuckDBCatalog,
-    )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.VLLMClient",
-        StubVLLMClient,
-    )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.load_settings",
-        lambda: _settings(str(faiss_index_path), tmp_path),
+        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
+        lambda: context,
     )
 
     result = await semantic_search("hello", limit=1)
@@ -203,36 +195,15 @@ async def test_semantic_search_gpu_success(monkeypatch: pytest.MonkeyPatch, tmp_
 
 
 @pytest.mark.asyncio
-async def test_semantic_search_gpu_fallback(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
-    faiss_index_path = tmp_path / "index.faiss"
-    faiss_index_path.write_text("dummy")
-
-    class StubFAISSManager(_BaseStubFAISSManager):
-        """Stub FAISS manager for GPU fallback test."""
-
-        def __init__(self, index_path: Path, vec_dim: int, nlist: int, *, use_cuvs: bool) -> None:
-            """Initialize stub FAISS manager for GPU fallback."""
-            super().__init__(should_fail_gpu=True)
-            assert index_path == faiss_index_path
-            assert vec_dim == 2
-            assert nlist == 1
-            assert use_cuvs is False
-
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.FAISSManager",
-        StubFAISSManager,
+async def test_semantic_search_gpu_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    context = StubContext(
+        faiss_manager=_BaseStubFAISSManager(should_fail_gpu=True),
+        limits=["FAISS GPU disabled - using CPU: simulated failure"],
+        error=None,
     )
     monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.DuckDBCatalog",
-        StubDuckDBCatalog,
-    )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.VLLMClient",
-        StubVLLMClient,
-    )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.load_settings",
-        lambda: _settings(str(faiss_index_path), tmp_path),
+        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
+        lambda: context,
     )
 
     result = await semantic_search("hello", limit=1)
