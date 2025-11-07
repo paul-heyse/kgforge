@@ -1,7 +1,7 @@
 """HTTP client exception classes.
 
-This module defines exception classes for HTTP client errors, including
-status code errors, rate limiting, timeouts, and connection errors.
+This module defines exception classes for HTTP client errors, including status code errors, rate
+limiting, timeouts, and connection errors.
 """
 
 from __future__ import annotations

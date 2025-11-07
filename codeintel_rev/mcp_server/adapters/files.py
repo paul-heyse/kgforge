@@ -6,6 +6,7 @@ Provides file listing, reading, and scope configuration.
 from __future__ import annotations
 
 import fnmatch
+import os
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -71,6 +72,11 @@ def list_paths(
     >>> result = list_paths(path="src", include_globs=["*.py"])
     >>> isinstance(result["items"], list)
     True
+    Notes
+    -----
+    The traversal skips directories that match the default or user supplied
+    exclusion globs (for example ``**/.git/**``) so that large dependency
+    folders are pruned without visiting their contents.
     """
     settings = load_settings()
     repo_root = Path(settings.paths.repo_root).expanduser().resolve()
@@ -80,55 +86,83 @@ def list_paths(
 
     # Default excludes
     default_excludes = [
-        ".git",
-        ".venv",
-        "__pycache__",
-        "node_modules",
-        "*.pyc",
-        "*.pyo",
-        ".pytest_cache",
-        ".ruff_cache",
-        ".mypy_cache",
+        "**/.git",
+        "**/.git/**",
+        "**/.venv",
+        "**/.venv/**",
+        "**/__pycache__",
+        "**/__pycache__/**",
+        "**/node_modules",
+        "**/node_modules/**",
+        "**/.pytest_cache",
+        "**/.pytest_cache/**",
+        "**/.ruff_cache",
+        "**/.ruff_cache/**",
+        "**/.mypy_cache",
+        "**/.mypy_cache/**",
+        "**/*.pyc",
+        "**/*.pyo",
     ]
     excludes = (exclude_globs or []) + default_excludes
-    includes = include_globs or ["*"]
+    includes = include_globs or ["**"]
 
     # Walk directory
     items = []
-    for file_path in search_root.rglob("*"):
+    for current_root, dirnames, filenames in os.walk(search_root):
         try:
-            resolved = file_path.resolve()
+            resolved_root = Path(current_root).resolve()
         except OSError:
             continue
 
-        if not resolved.is_file():
+        if _relative_path_str(resolved_root, repo_root) is None:
             continue
 
-        try:
-            relative_path = resolved.relative_to(repo_root)
-        except ValueError:
-            continue
+        # Prune excluded directories so we do not descend into them.
+        for dir_name in list(dirnames):
+            dir_path = resolved_root / dir_name
+            relative_dir = _relative_path_str(dir_path, repo_root)
+            if relative_dir is None:
+                dirnames.remove(dir_name)
+                continue
+            dir_targets = (
+                relative_dir,
+                f"{relative_dir}/",
+                f"./{relative_dir}",
+                f"./{relative_dir}/",
+            )
+            if any(_matches_any(target, excludes) for target in dir_targets):
+                dirnames.remove(dir_name)
 
-        relative_str = str(relative_path)
-        if _matches_any(relative_str, excludes):
-            continue
-        if not _matches_any(relative_str, includes):
-            continue
+        for file_name in filenames:
+            file_path = resolved_root / file_name
+            relative_file = _relative_path_str(file_path, repo_root)
+            if relative_file is None:
+                continue
+            if _matches_any(relative_file, excludes) or _matches_any(
+                f"./{relative_file}", excludes
+            ):
+                continue
+            if not _matches_any(relative_file, includes):
+                continue
 
-        stat_result = _safe_stat(resolved)
-        if stat_result is None:
-            continue
+            stat_result = _safe_stat(file_path)
+            if stat_result is None:
+                continue
 
-        items.append(
-            {
-                "path": relative_str,
-                "size": stat_result.st_size,
-                "modified": stat_result.st_mtime,
-            }
-        )
+            items.append(
+                {
+                    "path": relative_file,
+                    "size": stat_result.st_size,
+                    "modified": stat_result.st_mtime,
+                }
+            )
 
-        if len(items) >= max_results:
-            break
+            if len(items) >= max_results:
+                return {
+                    "items": items,
+                    "total": len(items),
+                    "truncated": True,
+                }
 
     return {
         "items": items,
@@ -222,7 +256,21 @@ def _resolve_search_root(repo_root: Path, requested: str | None) -> tuple[Path |
 
 
 def _matches_any(target: str, patterns: Sequence[str]) -> bool:
-    return any(fnmatch.fnmatch(target, pattern) for pattern in patterns)
+    normalized = target.replace("\\", "/")
+    return any(fnmatch.fnmatch(normalized, pattern) for pattern in patterns)
+
+
+def _relative_path_str(path: Path, repo_root: Path) -> str | None:
+    try:
+        resolved = path.resolve()
+    except OSError:
+        return None
+    try:
+        relative_path = resolved.relative_to(repo_root)
+    except ValueError:
+        return None
+    relative_str = relative_path.as_posix()
+    return relative_str
 
 
 def _safe_stat(path: Path):

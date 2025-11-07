@@ -89,9 +89,15 @@ class VectorBatch:
     """
 
     ids: tuple[VectorId, ...]
-    """Identifiers for each vector row. Alias: none; name ``ids``."""
+    """Identifiers for each vector row.
+
+    Alias: none; name ``ids``.
+    """
     matrix: VectorMatrix
-    """Two-dimensional ``float32`` matrix. Alias: none; name ``matrix``."""
+    """Two-dimensional ``float32`` matrix.
+
+    Alias: none; name ``matrix``.
+    """
 
     def __post_init__(self) -> None:
         """Normalise matrix representation without enforcing ids invariants."""
