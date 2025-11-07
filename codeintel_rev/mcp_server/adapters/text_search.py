@@ -5,19 +5,30 @@ Fast text search with regex support.
 
 from __future__ import annotations
 
-import subprocess
 import json
+from collections.abc import Sequence
 from pathlib import Path
 
 from codeintel_rev.config.settings import load_settings
 from codeintel_rev.mcp_server.schemas import Match
+from kgfoundry_common.subprocess_utils import (
+    SubprocessError,
+    SubprocessTimeoutError,
+    run_subprocess,
+)
+
+SEARCH_TIMEOUT_SECONDS = 30
+MAX_PREVIEW_CHARS = 200
+GREP_SPLIT_PARTS = 3
+COMMAND_NOT_FOUND_RETURN_CODE = 127
 
 
 def search_text(
     query: str,
+    *,
     regex: bool = False,
     case_sensitive: bool = False,
-    paths: list[str] | None = None,
+    paths: Sequence[str] | None = None,
     max_results: int = 50,
 ) -> dict:
     """Fast text search using ripgrep.
@@ -47,100 +58,58 @@ def search_text(
     True
     """
     settings = load_settings()
-    repo_root = Path(settings.paths.repo_root)
+    repo_root = Path(settings.paths.repo_root).resolve()
 
-    # Build ripgrep command
-    cmd = ["rg", "--json", "--max-count", str(max_results)]
+    cmd = _build_ripgrep_command(
+        query=query,
+        regex=regex,
+        case_sensitive=case_sensitive,
+        paths=paths,
+        max_results=max_results,
+    )
 
-    if not case_sensitive:
-        cmd.append("--ignore-case")
-
-    if not regex:
-        cmd.append("--fixed-strings")
-
-    # Add query with sentinel to prevent option parsing
-    cmd.append("--")
-    cmd.append(query)
-
-    # Add paths
-    if paths:
-        for p in paths:
-            cmd.append(str(repo_root / p))
-    else:
-        cmd.append(str(repo_root))
-
-    # Run ripgrep
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=30.0,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
+        stdout = run_subprocess(cmd, cwd=repo_root, timeout=SEARCH_TIMEOUT_SECONDS)
+    except SubprocessTimeoutError:
         return {
             "matches": [],
             "total": 0,
             "error": "Search timeout",
         }
-    except FileNotFoundError:
-        # Fallback to simple grep if ripgrep not installed
-        return _fallback_grep(repo_root, query, case_sensitive, max_results)
-
-    if result.returncode > 1:
-        error_message = result.stderr.strip() or "Search failed"
+    except SubprocessError as exc:
+        if exc.returncode == 1:
+            stdout = ""
+        elif exc.returncode == COMMAND_NOT_FOUND_RETURN_CODE:
+            return _fallback_grep(
+                repo_root=repo_root,
+                query=query,
+                case_sensitive=case_sensitive,
+                max_results=max_results,
+            )
+        else:
+            error_message = (exc.stderr or "").strip() or str(exc)
+            return {
+                "matches": [],
+                "total": 0,
+                "error": error_message,
+            }
+    except ValueError as exc:
         return {
             "matches": [],
             "total": 0,
-            "error": error_message,
+            "error": str(exc),
         }
 
-    # Parse JSON output
-    matches: list[Match] = []
-    for line in result.stdout.splitlines():
-        if not line.strip():
-            continue
-
-        try:
-            entry = json.loads(line)
-
-            if entry.get("type") != "match":
-                continue
-
-            data = entry.get("data", {})
-            path = data.get("path", {}).get("text", "")
-            line_number = data.get("line_number", 0)
-            lines = data.get("lines", {}).get("text", "")
-            submatches = data.get("submatches", [])
-
-            # Get first submatch for column
-            column = 0
-            if submatches:
-                column = submatches[0].get("start", 0)
-
-            match: Match = {
-                "path": str(Path(path).relative_to(repo_root)),
-                "line": line_number,
-                "column": column,
-                "preview": lines.strip()[:200],
-            }
-            matches.append(match)
-
-        except (json.JSONDecodeError, KeyError, ValueError):
-            continue
-
-        if len(matches) >= max_results:
-            break
-
+    matches, truncated = _parse_ripgrep_output(stdout, repo_root, max_results)
     return {
         "matches": matches,
         "total": len(matches),
-        "truncated": len(matches) >= max_results,
+        "truncated": truncated,
     }
 
 
 def _fallback_grep(
+    *,
     repo_root: Path,
     query: str,
     case_sensitive: bool,
@@ -164,34 +133,38 @@ def _fallback_grep(
     dict
         Search matches.
     """
-    cmd = ["grep", "-r", "-n"]
+    command = ["grep", "-r", "-n"]
 
     if not case_sensitive:
-        cmd.append("-i")
+        command.append("-i")
 
-    cmd.append("--")
-    cmd.extend([query, str(repo_root)])
+    command.extend(["--", query, "."])
 
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=30.0,
-            check=False,
-        )
-    except (subprocess.TimeoutExpired, FileNotFoundError):
+        stdout = run_subprocess(command, cwd=repo_root, timeout=SEARCH_TIMEOUT_SECONDS)
+    except SubprocessTimeoutError:
         return {
             "matches": [],
             "total": 0,
             "error": "Search tool unavailable",
         }
+    except SubprocessError as exc:
+        if exc.returncode == 1:
+            stdout = ""
+        else:
+            error_message = (exc.stderr or "").strip() or str(exc)
+            return {
+                "matches": [],
+                "total": 0,
+                "error": error_message,
+            }
+    except ValueError as exc:
+        return {"matches": [], "total": 0, "error": str(exc)}
 
-    # Parse grep output
     matches: list[Match] = []
-    for line in result.stdout.splitlines()[:max_results]:
-        parts = line.split(":", 2)
-        if len(parts) < 3:
+    for line in stdout.splitlines()[:max_results]:
+        parts = line.split(":", GREP_SPLIT_PARTS - 1)
+        if len(parts) < GREP_SPLIT_PARTS:
             continue
 
         try:
@@ -214,6 +187,98 @@ def _fallback_grep(
         "total": len(matches),
         "truncated": len(matches) >= max_results,
     }
+
+
+def _build_ripgrep_command(
+    *,
+    query: str,
+    regex: bool,
+    case_sensitive: bool,
+    paths: Sequence[str] | None,
+    max_results: int,
+) -> list[str]:
+    """Assemble the ripgrep command arguments.
+
+    Returns
+    -------
+    list[str]
+        Argument vector for ripgrep invocation.
+    """
+    command = ["rg", "--json", "--max-count", str(max_results)]
+
+    if not case_sensitive:
+        command.append("--ignore-case")
+
+    if not regex:
+        command.append("--fixed-strings")
+
+    command.append("--")
+    command.append(query)
+
+    if paths:
+        command.extend(str(Path(path)) for path in paths)
+    else:
+        command.append(".")
+
+    return command
+
+
+def _parse_ripgrep_output(
+    stdout: str,
+    repo_root: Path,
+    max_results: int,
+) -> tuple[list[Match], bool]:
+    """Parse ripgrep JSON output into structured matches.
+
+    Returns
+    -------
+    tuple[list[Match], bool]
+        Parsed match list and whether results were truncated at max_results.
+    """
+    matches: list[Match] = []
+    truncated = False
+
+    for line in stdout.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        try:
+            entry = json.loads(stripped)
+        except json.JSONDecodeError:
+            continue
+
+        if entry.get("type") != "match":
+            continue
+
+        data = entry.get("data", {})
+        path_text = data.get("path", {}).get("text")
+        if not path_text:
+            continue
+
+        try:
+            relative_path = str(Path(path_text).resolve().relative_to(repo_root))
+        except ValueError:
+            relative_path = path_text
+
+        line_number = int(data.get("line_number", 0))
+        lines = data.get("lines", {}).get("text", "")
+        submatches = data.get("submatches", [])
+        column = int(submatches[0].get("start", 0)) if submatches else 0
+
+        match: Match = {
+            "path": relative_path,
+            "line": line_number,
+            "column": column,
+            "preview": lines.strip()[:MAX_PREVIEW_CHARS],
+        }
+        matches.append(match)
+
+        if len(matches) >= max_results:
+            truncated = True
+            break
+
+    return matches, truncated
 
 
 __all__ = ["search_text"]

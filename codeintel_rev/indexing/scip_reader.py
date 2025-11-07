@@ -17,6 +17,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
+RANGE_TUPLE_LENGTH = 4
+
+
 @dataclass(frozen=True)
 class Range:
     """Source code range with line and character positions.
@@ -229,7 +232,7 @@ def parse_scip_json(json_path: Path) -> SCIPIndex:
 
             # Parse range - can be array [sl, sc, el, ec] or object {start, end}
             rng = occ.get("range") or occ.get("enclosingRange")
-            if isinstance(rng, list) and len(rng) == 4:
+            if isinstance(rng, list) and len(rng) == RANGE_TUPLE_LENGTH:
                 range_tuple = tuple(rng)  # type: ignore[arg-type]
             elif isinstance(rng, dict):
                 start = rng.get("start", {})
@@ -248,7 +251,7 @@ def parse_scip_json(json_path: Path) -> SCIPIndex:
                 # Convert role array to bitmask
                 role_val = 0
                 for r in roles:
-                    if r == 1 or r == "DEFINITION":
+                    if r in {1, "DEFINITION"}:
                         role_val |= 1
                 roles = role_val
 

@@ -7,123 +7,174 @@ the FAISS index, then hydrating results from DuckDB.
 from __future__ import annotations
 
 import asyncio
-import time
+from collections.abc import Sequence
 from pathlib import Path
+from time import perf_counter
 
-from codeintel_rev.config.settings import load_settings
+import httpx
+import numpy as np
+
+from codeintel_rev.config.settings import Settings, load_settings
 from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.vllm_client import VLLMClient
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, Finding, MethodInfo
 
+SNIPPET_PREVIEW_CHARS = 500
 
-async def semantic_search(
-    query: str,
-    limit: int = 20,
-) -> AnswerEnvelope:
+
+async def semantic_search(query: str, limit: int = 20) -> AnswerEnvelope:
     """Perform semantic search using embeddings.
-
-    Parameters
-    ----------
-    query : str
-        Natural language or code query.
-    limit : int
-        Maximum number of results to return.
 
     Returns
     -------
     AnswerEnvelope
-        Search results with findings and metadata.
-
-    Examples
-    --------
-    >>> result = await semantic_search("parse JSON configuration")
-    >>> len(result["findings"]) <= 20
-    True
+        Semantic search response payload.
     """
-    settings = load_settings()
-    start_time = time.time()
+    return await asyncio.to_thread(_semantic_search_sync, query, limit)
 
-    # Initialize clients
-    vllm_client = VLLMClient(settings.vllm)
-    faiss_mgr = FAISSManager(
-        index_path=Path(settings.paths.faiss_index),
-        vec_dim=settings.index.vec_dim,
-        nlist=settings.index.faiss_nlist,
-        use_cuvs=settings.index.use_cuvs,
+
+def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
+    start_time = perf_counter()
+    settings = load_settings()
+    index_path = Path(settings.paths.faiss_index)
+
+    if not index_path.exists():
+        return _make_envelope(
+            findings=[],
+            answer="Semantic search not available - index not built",
+            confidence=0.0,
+            limits=["FAISS index not found. Run indexing first."],
+        )
+
+    embedding, embed_error = _embed_query(VLLMClient(settings.vllm), query)
+    if embedding is None or embed_error is not None:
+        return _make_envelope(
+            findings=[],
+            answer=embed_error or "Embedding service unavailable",
+            confidence=0.0,
+            limits=["vLLM embedding service error"],
+        )
+
+    result_ids, result_scores, search_limits, search_error = _run_faiss_search(
+        FAISSManager(
+            index_path=index_path,
+            vec_dim=settings.index.vec_dim,
+            nlist=settings.index.faiss_nlist,
+            use_cuvs=settings.index.use_cuvs,
+        ),
+        embedding,
+        limit,
+    )
+    if search_error is not None:
+        failure_limits = [*search_limits, "FAISS search error"]
+        return _make_envelope(
+            findings=[],
+            answer=search_error,
+            confidence=0.0,
+            limits=failure_limits,
+        )
+
+    findings, hydrate_error = _hydrate_findings(settings, result_ids, result_scores)
+    if hydrate_error is not None:
+        failure_limits = [*search_limits, "DuckDB hydration error"]
+        return _make_envelope(
+            findings=findings,
+            answer=f"Database query failed: {hydrate_error}",
+            confidence=0.5,
+            limits=failure_limits,
+            method=_build_method(len(findings), limit, start_time),
+        )
+
+    success_answer = f"Found {len(findings)} semantically similar code chunks for: {query}"
+    return _make_envelope(
+        findings=findings,
+        answer=success_answer,
+        confidence=0.85 if findings else 0.0,
+        limits=list(search_limits) or None,
+        method=_build_method(len(findings), limit, start_time),
     )
 
-    # Check if index exists
-    if not Path(settings.paths.faiss_index).exists():
-        return {
-            "answer": "Semantic search not available - index not built",
-            "query_kind": "semantic",
-            "findings": [],
-            "limits": ["FAISS index not found. Run indexing first."],
-            "confidence": 0.0,
-        }
 
-    # Embed query
+def _embed_query(client: VLLMClient, query: str) -> tuple[np.ndarray | None, str | None]:
+    """Embed query text and return a normalized vector and error message.
+
+    Returns
+    -------
+    tuple[np.ndarray | None, str | None]
+        Pair of (query_vector, error_message). Exactly one element will be ``None``.
+    """
     try:
-        query_embedding = await asyncio.to_thread(
-            vllm_client.embed_single,
-            query,
-        )
-    except Exception as e:
-        return {
-            "answer": f"Embedding service unavailable: {e}",
-            "query_kind": "semantic",
-            "findings": [],
-            "limits": ["vLLM embedding service error"],
-            "confidence": 0.0,
-        }
+        vector = client.embed_single(query)
+    except (RuntimeError, ValueError, httpx.HTTPError) as exc:
+        return None, f"Embedding service unavailable: {exc}"
 
-    # Load FAISS index and search
+    array = np.array(vector, dtype=np.float32).reshape(1, -1)
+    return array, None
+
+
+def _run_faiss_search(
+    faiss_mgr: FAISSManager,
+    query_vector: np.ndarray,
+    limit: int,
+) -> tuple[list[int], list[float], list[str], str | None]:
+    """Execute FAISS search and return result identifiers and scores.
+
+    Returns
+    -------
+    tuple[list[int], list[float], list[str], str | None]
+        Result IDs, scores, accumulated limit notices, and optional error message.
+    """
     limits: list[str] = []
-
     try:
         faiss_mgr.load_cpu_index()
+    except FileNotFoundError as exc:
+        return [], [], limits, f"FAISS index not found: {exc}"
+    except RuntimeError as exc:
+        return [], [], limits, f"FAISS index load failed: {exc}"
+
+    try:
         gpu_enabled = faiss_mgr.clone_to_gpu()
-        if not gpu_enabled and faiss_mgr.gpu_disabled_reason:
-            limits.append(faiss_mgr.gpu_disabled_reason)
+    except RuntimeError as exc:
+        limits.append(str(exc))
+        gpu_enabled = False
 
-        # Search
-        import numpy as np
+    if not gpu_enabled and faiss_mgr.gpu_disabled_reason:
+        limits.append(faiss_mgr.gpu_disabled_reason)
 
-        query_vec = np.array(query_embedding, dtype=np.float32).reshape(1, -1)
-        distances, ids = faiss_mgr.search(query_vec, k=limit)
+    try:
+        distances, ids = faiss_mgr.search(query_vector, k=limit)
+    except RuntimeError as exc:
+        return [], [], limits, f"FAISS search failed: {exc}"
 
-        # Flatten results (single query)
-        result_ids = ids[0].tolist()
-        result_scores = distances[0].tolist()
+    return ids[0].tolist(), distances[0].tolist(), limits, None
 
-    except Exception as e:
-        return {
-            "answer": f"FAISS search failed: {e}",
-            "query_kind": "semantic",
-            "findings": [],
-            "limits": ["FAISS search error"],
-            "confidence": 0.0,
-        }
 
-    # Hydrate from DuckDB
+def _hydrate_findings(
+    settings: Settings,
+    chunk_ids: Sequence[int],
+    scores: Sequence[float],
+) -> tuple[list[Finding], str | None]:
+    """Hydrate FAISS search results from DuckDB.
+
+    Returns
+    -------
+    tuple[list[Finding], str | None]
+        Findings constructed from the catalog and optional error message.
+    """
     findings: list[Finding] = []
     try:
         with DuckDBCatalog(
             Path(settings.paths.duckdb_path),
             Path(settings.paths.vectors_dir),
         ) as catalog:
-            for chunk_id, score in zip(result_ids, result_scores, strict=True):
-                # Skip invalid IDs
+            for chunk_id, score in zip(chunk_ids, scores, strict=True):
                 if chunk_id < 0:
                     continue
-
-                # Fetch chunk metadata
                 chunk = catalog.get_chunk_by_id(int(chunk_id))
                 if not chunk:
                     continue
 
-                # Create finding
                 finding: Finding = {
                     "type": "usage",
                     "title": f"{Path(chunk['uri']).name} (score: {score:.3f})",
@@ -134,41 +185,59 @@ async def semantic_search(
                         "end_line": chunk["end_line"],
                         "end_column": 0,
                     },
-                    "snippet": chunk["preview"][:500],
+                    "snippet": chunk["preview"][:SNIPPET_PREVIEW_CHARS],
                     "score": float(score),
                     "why": f"Semantic similarity: {score:.3f}",
                 }
                 findings.append(finding)
+    except (RuntimeError, OSError) as exc:
+        return findings, str(exc)
 
-    except Exception as e:
-        return {
-            "answer": f"Database query failed: {e}",
-            "query_kind": "semantic",
-            "findings": findings,  # Return what we got
-            "limits": ["DuckDB hydration error"],
-            "confidence": 0.5,
-        }
+    return findings, None
 
-    # Build response
-    elapsed_ms = int((time.time() - start_time) * 1000)
 
-    method: MethodInfo = {
+def _build_method(findings_count: int, limit: int, start_time: float) -> MethodInfo:
+    """Build method metadata for the response.
+
+    Returns
+    -------
+    MethodInfo
+        Retrieval metadata describing semantic search coverage.
+    """
+    elapsed_ms = int((perf_counter() - start_time) * 1000)
+    return {
         "retrieval": ["semantic", "faiss"],
-        "coverage": f"{len(findings)}/{limit} results in {elapsed_ms}ms",
+        "coverage": f"{findings_count}/{limit} results in {elapsed_ms}ms",
     }
 
-    answer = f"Found {len(findings)} semantically similar code chunks for: {query}"
 
+def _make_envelope(
+    *,
+    findings: Sequence[Finding],
+    answer: str,
+    confidence: float,
+    limits: Sequence[str] | None,
+    method: MethodInfo | None = None,
+) -> AnswerEnvelope:
+    """Construct an AnswerEnvelope with optional metadata.
+
+    Returns
+    -------
+    AnswerEnvelope
+        Response payload ready for MCP clients.
+    """
     envelope: AnswerEnvelope = {
         "answer": answer,
         "query_kind": "semantic",
-        "method": method,
-        "findings": findings,
-        "confidence": 0.85 if findings else 0.0,
+        "findings": list(findings),
+        "confidence": confidence,
     }
 
     if limits:
-        envelope["limits"] = limits
+        envelope["limits"] = list(limits)
+
+    if method is not None:
+        envelope["method"] = method
 
     return envelope
 

@@ -8,7 +8,6 @@ from codeintel_rev.indexing.scip_reader import Range, SymbolDef
 
 def test_chunk_with_mid_line_bounds_uses_correct_line_indices() -> None:
     """Chunk boundaries inside lines should map to the containing lines."""
-
     text = "alpha = 1\nvalue = compute()\nthird line!\n"
     definitions = [
         SymbolDef(

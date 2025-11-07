@@ -158,7 +158,8 @@ def extract_embeddings(table: pa.Table) -> np.ndarray:
         raise TypeError(msg)
 
     fixed_array = cast("pa.FixedSizeListArray", dense_array)
-    vec_dim = fixed_array.type.list_size
+    # Convert list_size (which is a _Size type) to int for numpy.reshape
+    vec_dim: int = fixed_array.type.list_size  # type: ignore[assignment]
     flat_values = fixed_array.values.to_numpy(zero_copy_only=False)
     return flat_values.reshape(-1, vec_dim)
 

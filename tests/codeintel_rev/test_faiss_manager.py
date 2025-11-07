@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import faiss
 import pytest
-
 from codeintel_rev.io.faiss_manager import FAISSManager
 
 
@@ -15,7 +15,8 @@ class _SentinelGpuIndex:
 @pytest.fixture
 def faiss_manager(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> FAISSManager:
     manager = FAISSManager(index_path=tmp_path / "index.faiss", use_cuvs=False)
-    manager.cpu_index = object()  # CPU index presence is validated by identity only
+    # CPU index presence is validated by identity only in tests
+    manager.cpu_index = cast("faiss.Index", object())  # type: ignore[assignment]
 
     class DummyGpuClonerOptions:
         def __init__(self) -> None:
@@ -33,7 +34,6 @@ def faiss_manager(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> FAISSManag
 
 def test_clone_to_gpu_success(monkeypatch: pytest.MonkeyPatch, faiss_manager: FAISSManager) -> None:
     """GPU cloning succeeds when FAISS GPU helpers work."""
-
     gpu_resources = object()
     gpu_index = _SentinelGpuIndex()
 
@@ -64,7 +64,8 @@ def test_clone_to_gpu_falls_back(
     """GPU cloning failure is logged and returns False without raising."""
 
     def failing_resources() -> None:
-        raise RuntimeError("CUDA unavailable")
+        msg = "CUDA unavailable"
+        raise RuntimeError(msg)
 
     monkeypatch.setattr(faiss, "StandardGpuResources", failing_resources, raising=False)
 

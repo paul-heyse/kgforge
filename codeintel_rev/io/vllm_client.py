@@ -168,12 +168,26 @@ class VLLMClient:
 
         # Sort by index and extract vectors
         sorted_data = sorted(result.data, key=lambda d: d.index)
-        vectors = np.array([d.embedding for d in sorted_data], dtype=np.float32)
-
-        return vectors
+        return np.array([d.embedding for d in sorted_data], dtype=np.float32)
 
     def embed_single(self, text: str) -> np.ndarray:
-        """Embed a single string and return its vector."""
+        """Embed a single string and return its vector.
+
+        Parameters
+        ----------
+        text : str
+            Text to embed.
+
+        Returns
+        -------
+        np.ndarray
+            One-dimensional embedding vector for the supplied text.
+
+        Raises
+        ------
+        RuntimeError
+            If the embedding service returns an empty response.
+        """
         vectors = self.embed_batch([text])
         if vectors.size == 0:
             msg = "vLLM returned no vectors for single embed request"

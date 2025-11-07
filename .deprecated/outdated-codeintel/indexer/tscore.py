@@ -11,11 +11,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, cast
 
 import tree_sitter as ts
-from tools import get_logger
-from tree_sitter import Language, Parser
-
 from codeintel.errors import LanguageNotSupportedError, ManifestError, QuerySyntaxError
 from codeintel.observability import record_parse
+from tools import get_logger
+from tree_sitter import Language, Parser
 
 if TYPE_CHECKING:
     from tree_sitter import Tree

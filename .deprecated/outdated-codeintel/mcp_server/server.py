@@ -10,14 +10,13 @@ from typing import Any, ClassVar, cast
 
 import anyio
 from anyio import to_thread
-from pydantic import BaseModel, Field, field_validator
-from tools import ProblemDetailsParams, build_problem_details, get_logger
-
 from codeintel.config import LIMITS
 from codeintel.index.store import IndexStore, find_references, search_symbols
 from codeintel.mcp_server import tools
 from codeintel.mcp_server.ratelimit import TokenBucket
 from codeintel.mcp_server.tools import QueryResult
+from pydantic import BaseModel, Field, field_validator
+from tools import ProblemDetailsParams, build_problem_details, get_logger
 
 _logger = get_logger(__name__)
 

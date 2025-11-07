@@ -1,29 +1,71 @@
-# src/kgfoundry_common/http/errors.py
-class HttpError(Exception): ...
+"""HTTP client exception classes.
+
+This module defines exception classes for HTTP client errors, including
+status code errors, rate limiting, timeouts, and connection errors.
+"""
+
+from __future__ import annotations
+
+
+class HttpError(Exception):
+    """Base exception for all HTTP client errors."""
 
 
 class HttpStatusError(HttpError):
+    """Exception raised for HTTP error status codes.
+
+    Attributes
+    ----------
+    status : int
+        HTTP status code.
+    headers : dict[str, str]
+        Response headers.
+    """
+
     def __init__(
         self, status: int, body_excerpt: str | None = None, headers: dict[str, str] | None = None
-    ):
+    ) -> None:
+        """Initialize HTTP status error.
+
+        Parameters
+        ----------
+        status : int
+            HTTP status code.
+        body_excerpt : str | None, optional
+            Excerpt from response body. Defaults to None.
+        headers : dict[str, str] | None, optional
+            Response headers. Defaults to None.
+        """
         super().__init__(f"HTTP {status}: {body_excerpt or ''}")
         self.status = status
         self.headers = headers or {}
 
 
-class HttpRateLimited(HttpStatusError): ...
+class HttpRateLimitedError(HttpStatusError):
+    """Exception raised when rate limited (HTTP 429)."""
 
 
-class HttpTimeout(HttpError): ...
+class HttpTimeoutError(HttpError):
+    """Exception raised when request times out."""
 
 
-class HttpConnectionError(HttpError): ...
+class HttpConnectionError(HttpError):
+    """Exception raised when connection fails."""
 
 
-class HttpTlsError(HttpError): ...
+class HttpTlsError(HttpError):
+    """Exception raised when TLS/SSL error occurs."""
 
 
-class HttpTooManyRedirects(HttpError): ...
+class HttpTooManyRedirectsError(HttpError):
+    """Exception raised when too many redirects occur."""
 
 
-class HttpRequestError(HttpError): ...
+class HttpRequestError(HttpError):
+    """Exception raised for general request errors."""
+
+
+# Backward compatibility aliases
+HttpRateLimited = HttpRateLimitedError
+HttpTimeout = HttpTimeoutError
+HttpTooManyRedirects = HttpTooManyRedirectsError

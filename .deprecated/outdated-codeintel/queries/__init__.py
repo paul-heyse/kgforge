@@ -26,10 +26,9 @@ from functools import cache
 from pathlib import Path
 from typing import Final
 
-from tools import get_logger
-
 from codeintel.errors import QuerySyntaxError
 from codeintel.indexer.tscore import get_language, load_langs
+from tools import get_logger
 
 _logger = get_logger(__name__)
 

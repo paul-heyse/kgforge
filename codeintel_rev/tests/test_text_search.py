@@ -1,14 +1,22 @@
-"""Unit tests for text search adapter."""
+"""Unit tests for the text search adapter."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-import subprocess
 
 import pytest
 
 from codeintel_rev.mcp_server.adapters import text_search
+from kgfoundry_common.subprocess_utils import SubprocessError
+
+RG_FAILURE_CODE = 2
+EXPECTED_SUBPROCESS_INVOCATIONS = 2
+
+
+def _expect(*, condition: bool, message: str) -> None:
+    if not condition:
+        pytest.fail(message)
 
 
 def _build_match_line(path: Path) -> str:
@@ -26,22 +34,19 @@ def _build_match_line(path: Path) -> str:
 
 
 def test_search_text_flag_prefixed_query(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Queries starting with a dash should be passed after `--`."""
-
-    captured_args: list[list[str]] = []
+    """Queries beginning with a dash should be passed after the `--` sentinel."""
+    captured_commands: list[list[str]] = []
     repo_root = Path.cwd()
     target_path = repo_root / "pyproject.toml"
 
-    def fake_run(args: list[str], **_: object) -> subprocess.CompletedProcess[str]:
-        captured_args.append(list(args))
-        return subprocess.CompletedProcess(
-            args,
-            0,
-            stdout=_build_match_line(target_path),
-            stderr="",
-        )
+    def fake_run_subprocess(
+        cmd: list[str], *, timeout: int | None = None, cwd: Path | None = None
+    ) -> str:
+        captured_commands.append(list(cmd))
+        _ = timeout, cwd
+        return _build_match_line(target_path)
 
-    monkeypatch.setattr(text_search.subprocess, "run", fake_run)
+    monkeypatch.setattr(text_search, "run_subprocess", fake_run_subprocess)
 
     result = text_search.search_text(
         "-def",
@@ -51,54 +56,64 @@ def test_search_text_flag_prefixed_query(monkeypatch: pytest.MonkeyPatch) -> Non
         max_results=1,
     )
 
-    assert captured_args, "The ripgrep process was not invoked"
-    args = captured_args[0]
-    sentinel_index = args.index("--")
-    assert args[sentinel_index + 1] == "-def"
-    assert result["matches"]
-    assert result["matches"][0]["path"].endswith("pyproject.toml")
+    _expect(condition=bool(captured_commands), message="Expected ripgrep to be invoked")
+    arguments = captured_commands[0]
+    sentinel_index = arguments.index("--")
+    _expect(
+        condition=arguments[sentinel_index + 1] == "-def",
+        message="Query should appear immediately after the sentinel",
+    )
+    _expect(condition=result["matches"], message="Expected at least one match")
+    _expect(
+        condition=result["matches"][0]["path"].endswith("pyproject.toml"),
+        message="Match path should end with the queried file",
+    )
 
 
-def test_search_text_returns_error_on_ripgrep_failure(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Ripgrep failures (return code > 1) should surface an error."""
+def test_search_text_surfaces_ripgrep_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Return-code > 1 from ripgrep should surface an error message."""
 
-    def fake_run(args: list[str], **_: object) -> subprocess.CompletedProcess[str]:
-        return subprocess.CompletedProcess(args, 2, stdout="", stderr="rg failed")
+    def fake_run_subprocess(
+        cmd: list[str], *, timeout: int | None = None, cwd: Path | None = None
+    ) -> str:
+        _ = cmd, timeout, cwd
+        error_message = "rg failed"
+        raise SubprocessError(error_message, returncode=RG_FAILURE_CODE, stderr=error_message)
 
-    monkeypatch.setattr(text_search.subprocess, "run", fake_run)
+    monkeypatch.setattr(text_search, "run_subprocess", fake_run_subprocess)
 
     result = text_search.search_text("pattern")
 
-    assert result["matches"] == []
-    assert result["total"] == 0
-    assert result["error"] == "rg failed"
+    _expect(condition=result["matches"] == [], message="Expected no matches on failure")
+    _expect(condition=result["total"] == 0, message="Expected total to be zero on failure")
+    _expect(
+        condition=result.get("error") == "rg failed",
+        message="Expected error message to surface",
+    )
 
 
-def test_fallback_grep_flag_prefixed_query(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The grep fallback should also place the query after `--`."""
+def test_search_text_falls_back_to_grep(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Missing ripgrep binary should trigger the grep fallback."""
+    captured_commands: list[list[str]] = []
 
-    captured_args: list[list[str]] = []
-    repo_root = Path.cwd()
-    target_path = repo_root / "pyproject.toml"
+    def fake_run_subprocess(
+        cmd: list[str], *, timeout: int | None = None, cwd: Path | None = None
+    ) -> str:
+        _ = timeout, cwd
+        captured_commands.append(list(cmd))
+        if cmd[0] == "rg":
+            error_message = "rg missing"
+            raise SubprocessError(error_message, returncode=127, stderr=error_message)
+        repo_root = Path.cwd()
+        return f"{repo_root}/README.md:1:example"
 
-    def fake_run(args: list[str], **_: object) -> subprocess.CompletedProcess[str]:
-        captured_args.append(list(args))
-        return subprocess.CompletedProcess(
-            args,
-            0,
-            stdout=f"{target_path}:1:example",
-            stderr="",
-        )
+    monkeypatch.setattr(text_search, "run_subprocess", fake_run_subprocess)
 
-    monkeypatch.setattr(text_search.subprocess, "run", fake_run)
+    result = text_search.search_text("example", max_results=1)
 
-    result = text_search._fallback_grep(repo_root, "-def", case_sensitive=False, max_results=1)
-
-    assert captured_args, "The grep process was not invoked"
-    args = captured_args[0]
-    sentinel_index = args.index("--")
-    assert args[sentinel_index + 1] == "-def"
-    assert result["matches"]
-    assert result["matches"][0]["path"].endswith("pyproject.toml")
+    _expect(
+        condition=len(captured_commands) == EXPECTED_SUBPROCESS_INVOCATIONS,
+        message="Expected two subprocess invocations",
+    )
+    _expect(condition=captured_commands[1][0] == "grep", message="Fallback should invoke grep")
+    _expect(condition=result["matches"], message="Fallback grep should produce matches")

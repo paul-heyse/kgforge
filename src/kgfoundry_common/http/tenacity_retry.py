@@ -1,31 +1,86 @@
-# src/kgfoundry_common/http/tenacity_retry.py
+"""Tenacity-based retry strategy implementation.
+
+This module provides TenacityRetryStrategy which implements the RetryStrategy
+protocol using the tenacity library for retry logic.
+"""
+
 from __future__ import annotations
 
+import random
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from tenacity import Retrying, retry_if_exception, stop_after_attempt, stop_after_delay, wait_base
+from tenacity import (
+    Retrying,
+    retry_if_exception,
+    stop_after_attempt,
+    stop_after_delay,
+)
+from tenacity.wait import wait_base
 
-from .errors import HttpStatusError
-from .policy import RetryPolicyDoc
-from .types import RetryStrategy
+from kgfoundry_common.http.errors import HttpStatusError
+from kgfoundry_common.http.policy import RetryPolicyDoc
+from kgfoundry_common.http.types import RetryStrategy
+
+_RANDOM_SEED: int | None = None
+
+
+def _set_random_seed(seed: int | None) -> None:
+    """Set random seed for testing.
+
+    Parameters
+    ----------
+    seed : int | None
+        Random seed value, or None to use system random.
+    """
+    global _RANDOM_SEED  # noqa: PLW0603
+    _RANDOM_SEED = seed
 
 
 @dataclass
 class WaitRetryAfterOrJitter(wait_base):
+    """Wait strategy that respects Retry-After headers or uses exponential backoff with jitter.
+
+    Attributes
+    ----------
+    initial : float
+        Initial wait time in seconds.
+    max_s : float
+        Maximum wait time in seconds.
+    jitter : float
+        Jitter fraction (0.0 to 1.0).
+    base : float
+        Base multiplier for exponential backoff.
+    respect_retry_after : bool
+        Whether to respect Retry-After headers.
+    """
+
     initial: float
     max_s: float
     jitter: float  # 0..1 fraction
     base: float
     respect_retry_after: bool
 
-    def __call__(self, retry_state) -> float:
+    def __call__(self, retry_state: object) -> float:
+        """Calculate wait time for retry.
+
+        Parameters
+        ----------
+        retry_state : object
+            Tenacity retry state object.
+
+        Returns
+        -------
+        float
+            Wait time in seconds.
+        """
         # attempt starts at 1
-        attempt = retry_state.attempt_number
+        attempt = getattr(retry_state, "attempt_number", 1)
         # If last exception had Retry-After, prefer it:
         sleep = None
         if self.respect_retry_after:
-            exc = retry_state.outcome.exception() if retry_state.outcome else None
+            outcome = getattr(retry_state, "outcome", None)
+            exc = outcome.exception() if outcome else None
             if isinstance(exc, HttpStatusError):
                 ra = _parse_retry_after(exc.headers.get("Retry-After"))
                 if ra is not None:
@@ -33,28 +88,65 @@ class WaitRetryAfterOrJitter(wait_base):
         if sleep is None:
             # Exponential backoff with jitter
             base = min(self.max_s, self.initial * (self.base ** (attempt - 1)))
-            jitter = base * self.jitter
-            sleep = max(0.0, base - jitter + _rand() * (2 * jitter))
+            jitter_amount = base * self.jitter
+            sleep = max(0.0, base - jitter_amount + _rand() * (2 * jitter_amount))
         return sleep
 
 
 def _parse_retry_after(s: str | None) -> float | None:
+    """Parse Retry-After header value.
+
+    Parameters
+    ----------
+    s : str | None
+        Retry-After header value.
+
+    Returns
+    -------
+    float | None
+        Seconds to wait, or None if invalid.
+    """
     if not s:
         return None
     try:
         return float(s)
-    except Exception:
+    except (ValueError, TypeError):
         return None
 
 
 def _rand() -> float:
-    # separate for test seeding
-    import random
+    """Generate random float for jitter calculation.
 
-    return random.random()
+    Returns
+    -------
+    float
+        Random float between 0.0 and 1.0.
+
+    Notes
+    -----
+    This uses standard random for jitter, not cryptographic randomness.
+    """
+    if _RANDOM_SEED is not None:
+        rng = random.Random(_RANDOM_SEED)  # noqa: S311
+        return rng.random()
+    return random.random()  # noqa: S311
 
 
 def _status_in_sets(status: int, sets: tuple[tuple[int, int] | int, ...]) -> bool:
+    """Check if status code matches any in the sets.
+
+    Parameters
+    ----------
+    status : int
+        HTTP status code.
+    sets : tuple[tuple[int, int] | int, ...]
+        Status codes or ranges to check.
+
+    Returns
+    -------
+    bool
+        True if status matches any entry in sets.
+    """
     for x in sets:
         if isinstance(x, int) and status == x:
             return True
@@ -64,6 +156,20 @@ def _status_in_sets(status: int, sets: tuple[tuple[int, int] | int, ...]) -> boo
 
 
 def _should_retry_exception(method: str, policy: RetryPolicyDoc) -> Callable[[BaseException], bool]:
+    """Create predicate function for retry decision based on exception.
+
+    Parameters
+    ----------
+    method : str
+        HTTP method name.
+    policy : RetryPolicyDoc
+        Retry policy configuration.
+
+    Returns
+    -------
+    Callable[[BaseException], bool]
+        Predicate function that returns True if exception should be retried.
+    """
     allowed_methods = set(policy.methods)
     retry_exc_names = set(policy.retry_exceptions)
     give_up = set(policy.give_up_status)
@@ -90,16 +196,42 @@ def _should_retry_exception(method: str, policy: RetryPolicyDoc) -> Callable[[Ba
     return _pred
 
 
-class TenacityRetryStrategy(RetryStrategy):
-    def __init__(self, policy: RetryPolicyDoc):
+class TenacityRetryStrategy(RetryStrategy[object]):
+    """Retry strategy implementation using tenacity library."""
+
+    def __init__(self, policy: RetryPolicyDoc) -> None:
+        """Initialize retry strategy with policy.
+
+        Parameters
+        ----------
+        policy : RetryPolicyDoc
+            Retry policy configuration.
+        """
         self.policy = policy
 
-    def run(self, fn: Callable[[], object]):
+    def run(self, fn: Callable[[], object]) -> object:
+        """Execute function with retry logic.
+
+        Parameters
+        ----------
+        fn : Callable[[], object]
+            Function to execute with retries.
+
+        Returns
+        -------
+        object
+            Result of function execution.
+
+        Raises
+        ------
+        Exception
+            Final exception if all retries are exhausted.
+        """  # noqa: DOC502
         retry = retry_if_exception(_should_retry_exception(method="*UNKNOWN*", policy=self.policy))
         # note: we'll substitute actual method per-request (see client below)
         stopper = stop_after_attempt(self.policy.stop_after_attempt)
         if self.policy.stop_after_delay_s:
-            stopper = stopper | stop_after_delay(self.policy.stop_after_delay_s)
+            stopper |= stop_after_delay(self.policy.stop_after_delay_s)
         waiter = WaitRetryAfterOrJitter(
             initial=self.policy.wait_initial_s,
             max_s=self.policy.wait_max_s,
@@ -111,12 +243,24 @@ class TenacityRetryStrategy(RetryStrategy):
         r = Retrying(retry=retry, stop=stopper, wait=waiter, reraise=True)
         return r(fn)
 
-    def for_method(self, method: str) -> TenacityRetryStrategy:
+    def for_method(self, method: str) -> RetryStrategy[object]:
+        """Create method-specific retry strategy.
+
+        Parameters
+        ----------
+        method : str
+            HTTP method name.
+
+        Returns
+        -------
+        RetryStrategy[object]
+            New retry strategy instance for the method.
+        """
         # clone with method-specific predicate
         pred = retry_if_exception(_should_retry_exception(method=method, policy=self.policy))
         stopper = stop_after_attempt(self.policy.stop_after_attempt)
         if self.policy.stop_after_delay_s:
-            stopper = stopper | stop_after_delay(self.policy.stop_after_delay_s)
+            stopper |= stop_after_delay(self.policy.stop_after_delay_s)
         waiter = WaitRetryAfterOrJitter(
             initial=self.policy.wait_initial_s,
             max_s=self.policy.wait_max_s,
@@ -127,8 +271,8 @@ class TenacityRetryStrategy(RetryStrategy):
         r = Retrying(retry=pred, stop=stopper, wait=waiter, reraise=True)
 
         # Wrap as a tiny strategy that uses this Retrying instance:
-        class _MethodStrategy(RetryStrategy):
-            def run(self, fn):
+        class _MethodStrategy(RetryStrategy[object]):
+            def run(self, fn: Callable[[], object]) -> object:  # noqa: PLR6301
                 return r(fn)
 
         return _MethodStrategy()

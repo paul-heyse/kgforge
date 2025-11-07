@@ -142,22 +142,15 @@ def observe_tool_run(
         details including command, working directory, timeout, and execution status.
         The observation object can be used to track subprocess state and results.
 
-    Raises
-    ------
-    Exception
-        Any exception raised during tool execution is explicitly re-raised after
-        recording error status and metrics. The exception is caught using
-        ``except Exception as exc``, metrics are updated to reflect the error,
-        and then the exception is explicitly re-raised using ``raise exc``.
-        The specific exception type depends on what the tool raises (e.g.,
-        subprocess errors, timeout errors, etc.).
-
     Notes
     -----
-    Any exception raised during tool execution is propagated after recording
-    error status and metrics. The function catches exceptions using
-    ``except Exception as exc`` and explicitly re-raises them using ``raise exc``
+    Any exception raised during tool execution is explicitly re-raised after
+    recording error status and metrics. The exception is caught using
+    ``except Exception as exc``, metrics are updated to reflect the error,
+    and then the exception is explicitly re-raised using ``raise exc``
     to satisfy static analysis tools that require explicit exception raising.
+    The specific exception type depends on what the tool raises (e.g.,
+    subprocess errors, timeout errors, etc.).
     """
     settings = get_runtime_settings()
     observation = ToolRunObservation(

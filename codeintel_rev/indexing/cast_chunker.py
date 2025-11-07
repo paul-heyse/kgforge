@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from bisect import bisect_right
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -94,8 +94,20 @@ def line_starts(text: str) -> list[int]:
 
 
 def _line_index_from_byte(starts: Sequence[int], byte_offset: int) -> int:
-    """Return the zero-based line index containing ``byte_offset``."""
+    """Return the zero-based line index containing ``byte_offset``.
 
+    Parameters
+    ----------
+    starts : Sequence[int]
+        Offsets for the beginning of each line.
+    byte_offset : int
+        Absolute byte offset within the text.
+
+    Returns
+    -------
+    int
+        Zero-based line index best matching the offset.
+    """
     index = bisect_right(starts, byte_offset) - 1
     if index < 0:
         return 0
@@ -127,13 +139,123 @@ def range_to_bytes(text: str, starts: list[int], rng: Range) -> tuple[int, int]:
     else:
         start = n
 
-    # End position
-    if rng.end_line < len(starts):
-        end = min(starts[rng.end_line] + rng.end_character, n)
-    else:
-        end = n
+    end_candidate = starts[rng.end_line] + rng.end_character if rng.end_line < len(starts) else n
+    end = min(end_candidate, n)
 
-    return start, min(end, n)
+    return start, end
+
+
+@dataclass(slots=True)
+class _ChunkAccumulator:
+    """Accumulate SCIP symbol ranges into budgeted chunks."""
+
+    uri: str
+    text: str
+    starts: Sequence[int]
+    budget: int
+    chunks: list[Chunk] = field(default_factory=list)
+    _current_start: int | None = None
+    _current_end: int | None = None
+    _current_symbols: list[str] = field(default_factory=list)
+
+    def add_symbol(self, symbol: SymbolDef, start: int, end: int) -> None:
+        """Incorporate a symbol range into the current chunk set."""
+        if self._current_start is None or self._current_end is None:
+            self._start_chunk(start, end, symbol.symbol)
+            return
+
+        merged_end = max(self._current_end, end)
+        if merged_end - self._current_start <= self.budget:
+            self._current_end = merged_end
+            self._current_symbols.append(symbol.symbol)
+            return
+
+        self._flush_current()
+        if end - start > self.budget:
+            self._split_large_symbol(symbol, start, end)
+            self._reset()
+            return
+
+        self._start_chunk(start, end, symbol.symbol)
+
+    def finalize(self) -> list[Chunk]:
+        """Flush any pending chunk and return accumulated results.
+
+        Returns
+        -------
+        list[Chunk]
+            All generated chunks in source order.
+        """
+        self._flush_current()
+        return self.chunks
+
+    def _start_chunk(self, start: int, end: int, symbol: str) -> None:
+        self._current_start = start
+        self._current_end = end
+        self._current_symbols = [symbol]
+
+    def _flush_current(self) -> None:
+        if self._current_start is None or self._current_end is None:
+            return
+        self._append_chunk(
+            self._current_start,
+            self._current_end,
+            tuple(self._current_symbols),
+        )
+        self._reset()
+
+    def _append_chunk(
+        self,
+        start: int,
+        end: int,
+        symbols: tuple[str, ...],
+    ) -> None:
+        if end <= start:
+            return
+        start_line = _line_index_from_byte(self.starts, start)
+        end_line = _line_index_from_byte(self.starts, max(end - 1, 0))
+        self.chunks.append(
+            Chunk(
+                uri=self.uri,
+                start_byte=start,
+                end_byte=end,
+                start_line=start_line,
+                end_line=end_line,
+                text=self.text[start:end],
+                symbols=symbols,
+            )
+        )
+
+    def _split_large_symbol(
+        self,
+        symbol: SymbolDef,
+        start: int,
+        end: int,
+    ) -> None:
+        """Split an oversized symbol range on blank-line boundaries."""
+        position = start
+        while position < end:
+            tentative_end = min(position + self.budget, end)
+            search_start = position + self.budget // 2
+            search_end = min(tentative_end, end)
+            newline_idx = self.text.rfind("\n\n", search_start, search_end)
+            if newline_idx != -1 and newline_idx > position:
+                tentative_end = newline_idx + 1
+            if tentative_end <= position:
+                tentative_end = min(position + self.budget, end)
+                if tentative_end <= position:
+                    tentative_end = end
+            self._append_chunk(
+                position,
+                tentative_end,
+                (symbol.symbol,),
+            )
+            position = tentative_end
+
+    def _reset(self) -> None:
+        self._current_start = None
+        self._current_end = None
+        self._current_symbols = []
 
 
 def chunk_file(
@@ -168,103 +290,22 @@ def chunk_file(
 
     uri = str(path)
     starts = line_starts(text)
-    n = len(text)
+    accumulator = _ChunkAccumulator(
+        uri=uri,
+        text=text,
+        starts=starts,
+        budget=budget,
+    )
 
-    # Convert ranges to bytes, sort by start
-    symbols_with_bytes: list[tuple[SymbolDef, int, int]] = []
-    for sym_def in definitions:
-        start, end = range_to_bytes(text, starts, sym_def.range)
-        symbols_with_bytes.append((sym_def, start, end))
-
-    symbols_with_bytes.sort(key=lambda x: x[1])
-
-    chunks: list[Chunk] = []
-    cur_start: int | None = None
-    cur_end: int | None = None
-    cur_syms: list[str] = []
+    symbols_with_bytes = sorted(
+        ((sym_def, *range_to_bytes(text, starts, sym_def.range)) for sym_def in definitions),
+        key=lambda item: item[1],
+    )
 
     for sym_def, start, end in symbols_with_bytes:
-        piece_len = end - start
+        accumulator.add_symbol(sym_def, start, end)
 
-        if cur_start is None:
-            # Start first chunk
-            cur_start, cur_end, cur_syms = start, end, [sym_def.symbol]
-            continue
-
-        # Try to merge
-        if cur_end is not None and (max(cur_end, end) - cur_start) <= budget:
-            cur_end = max(cur_end, end)
-            cur_syms.append(sym_def.symbol)
-        else:
-            # Flush current chunk
-            if cur_start is not None and cur_end is not None:
-                chunk_text = text[cur_start:cur_end]
-                # Find line numbers for chunk
-                sl = _line_index_from_byte(starts, cur_start)
-                el = _line_index_from_byte(starts, max(cur_end - 1, 0))
-                chunks.append(
-                    Chunk(
-                        uri=uri,
-                        start_byte=cur_start,
-                        end_byte=cur_end,
-                        start_line=sl,
-                        end_line=el,
-                        text=chunk_text,
-                        symbols=tuple(cur_syms),
-                    )
-                )
-
-            # Handle large symbol
-            if piece_len > budget:
-                # Split on blank lines
-                pos = start
-                while pos < end:
-                    chunk_end = min(pos + budget, end)
-                    # Find nearest blank line boundary
-                    search_start = pos + budget // 2
-                    search_end = min(chunk_end, end)
-                    nl_idx = text.rfind("\n\n", search_start, search_end)
-                    if nl_idx != -1 and nl_idx > pos:
-                        chunk_end = nl_idx + 1
-
-                    chunk_text = text[pos:chunk_end]
-                    sl = _line_index_from_byte(starts, pos)
-                    el = _line_index_from_byte(starts, max(chunk_end - 1, 0))
-                    chunks.append(
-                        Chunk(
-                            uri=uri,
-                            start_byte=pos,
-                            end_byte=chunk_end,
-                            start_line=sl,
-                            end_line=el,
-                            text=chunk_text,
-                            symbols=(sym_def.symbol,),
-                        )
-                    )
-                    pos = chunk_end
-
-                cur_start, cur_end, cur_syms = None, None, []
-            else:
-                cur_start, cur_end, cur_syms = start, end, [sym_def.symbol]
-
-    # Flush remaining
-    if cur_start is not None and cur_end is not None:
-        chunk_text = text[cur_start:cur_end]
-        sl = _line_index_from_byte(starts, cur_start)
-        el = _line_index_from_byte(starts, max(cur_end - 1, 0))
-        chunks.append(
-            Chunk(
-                uri=uri,
-                start_byte=cur_start,
-                end_byte=cur_end,
-                start_line=sl,
-                end_line=el,
-                text=chunk_text,
-                symbols=tuple(cur_syms),
-            )
-        )
-
-    return chunks
+    return accumulator.finalize()
 
 
 __all__ = [

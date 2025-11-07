@@ -57,7 +57,9 @@ __all__ = [
     "tool_missing_problem_details",
     "tool_timeout_problem_details",
 ]
-__all__.sort()
+# Sort for consistent export order (pyright doesn't understand list.sort() on __all__)
+_sorted_exports = sorted(__all__)
+__all__ = _sorted_exports  # type: ignore[assignment]
 
 # Type aliases for JSON values (RFC 7159 compatible)
 JsonPrimitive = str | int | float | bool | None

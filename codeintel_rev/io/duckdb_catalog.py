@@ -141,7 +141,6 @@ class DuckDBCatalog:
         dict | None
             Chunk metadata dictionary when the ID exists, otherwise ``None``.
         """
-
         results = self.query_by_ids([chunk_id])
         if not results:
             return None

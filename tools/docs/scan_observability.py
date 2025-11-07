@@ -376,20 +376,11 @@ def load_policy() -> ObservabilityPolicy:
         Loaded policy merged with defaults, or default policy if file doesn't
         exist or YAML parsing fails.
 
-    Raises
-    ------
-    Exception
-        Any exception raised during policy loading that is not a YAML parsing error
-        is explicitly re-raised after logging. The exception is caught using
-        ``except Exception as exc``, and if it's not a YAML error, it is
-        explicitly re-raised using ``raise exc``. The exception type depends on
-        what the loading operation raises (e.g., OSError for file I/O issues).
-
     Notes
     -----
     Any exception raised during policy loading that is not a YAML parsing error
-    is propagated after logging. YAML parsing issues are logged and result in
-    the default policy being returned. The function catches exceptions using
+    is explicitly re-raised after logging. YAML parsing issues are logged and
+    result in the default policy being returned. The exception is caught using
     ``except Exception as exc`` and explicitly re-raises non-YAML errors using
     ``raise exc`` to satisfy static analysis tools.
     """
