@@ -18,12 +18,8 @@ from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.vllm_client import VLLMClient
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, Finding, MethodInfo
 from codeintel_rev.mcp_server.service_context import ServiceContext, get_service_context
-from kgfoundry_common.errors import (
-    EmbeddingError,
-    KgFoundryError,
-    KgFoundryErrorConfig,
-    VectorSearchError,
-)
+from kgfoundry_common.errors import EmbeddingError, KgFoundryError, VectorSearchError
+from kgfoundry_common.errors.exceptions import KgFoundryErrorConfig
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.problem_details import ProblemDetails
