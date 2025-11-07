@@ -12,7 +12,8 @@ from typing import Any
 
 from codeintel_rev.config.settings import load_settings
 from codeintel_rev.mcp_server.schemas import Match
-from kgfoundry_common.errors import KgFoundryError, KgFoundryErrorConfig, VectorSearchError
+from kgfoundry_common.errors import KgFoundryError, VectorSearchError
+from kgfoundry_common.errors.exceptions import KgFoundryErrorConfig
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.subprocess_utils import (
