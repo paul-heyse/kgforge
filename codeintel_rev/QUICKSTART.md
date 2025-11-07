@@ -71,6 +71,11 @@ python codeintel_rev/bin/index_all.py
 hypercorn --config codeintel_rev/app/hypercorn.toml codeintel_rev.app.main:app
 ```
 
+> ℹ️ **open_file line ranges** — ``start_line`` and ``end_line`` are inclusive,
+> 1-indexed bounds. Provide positive integers, and ensure ``start_line`` is less
+> than or equal to ``end_line`` when both are set. Invalid requests return an
+> error payload instead of content.
+
 ## 🎯 Architecture Highlights
 
 ```
