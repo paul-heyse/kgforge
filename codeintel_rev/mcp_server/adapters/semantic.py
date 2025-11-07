@@ -57,9 +57,23 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
     with observe_duration(METRICS, "semantic_search", component=COMPONENT_NAME) as observation:
         context = get_service_context()
 
+        requested_limit = limit
+        max_results = max(1, context.settings.limits.max_results)
+        effective_limit = max(1, min(requested_limit, max_results))
+        truncation_messages: list[str] = []
+        if requested_limit <= 0:
+            truncation_messages.append(
+                f"Requested limit {requested_limit} is not positive; using minimum of 1."
+            )
+        if requested_limit > max_results:
+            truncation_messages.append(
+                f"Requested limit {requested_limit} exceeds max_results {max_results}; truncating to {max_results}."
+            )
+
         ready, faiss_limits, faiss_error = context.ensure_faiss_ready()
+        limits_metadata = [*faiss_limits, *truncation_messages]
         if not ready:
-            failure_limits = [*faiss_limits, "FAISS index not available"]
+            failure_limits = [*limits_metadata, "FAISS index not available"]
             error = VectorSearchError(
                 faiss_error or "Semantic search not available - index not built",
                 config=KgFoundryErrorConfig(
@@ -76,12 +90,15 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
                 config=KgFoundryErrorConfig(context={"vllm_url": context.settings.vllm.base_url}),
             )
             observation.mark_error()
-            return _error_envelope(error, limits=["vLLM embedding service error"])
+            return _error_envelope(
+                error,
+                limits=[*limits_metadata, "vLLM embedding service error"],
+            )
 
         result_ids, result_scores, search_exc = _run_faiss_search(
             context.faiss_manager,
             embedding,
-            limit,
+            effective_limit,
         )
         if search_exc is not None:
             error = VectorSearchError(
@@ -92,11 +109,14 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
                 ),
             )
             observation.mark_error()
-            return _error_envelope(error, limits=[*faiss_limits, "FAISS search error"])
+            return _error_envelope(
+                error,
+                limits=[*limits_metadata, "FAISS search error"],
+            )
 
         findings, hydrate_exc = _hydrate_findings(context, result_ids, result_scores)
         if hydrate_exc is not None:
-            failure_limits = [*faiss_limits, "DuckDB hydration error"]
+            failure_limits = [*limits_metadata, "DuckDB hydration error"]
             error = VectorSearchError(
                 str(hydrate_exc),
                 config=KgFoundryErrorConfig(
@@ -111,14 +131,24 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             return _error_envelope(
                 error,
                 limits=failure_limits,
-                method=_build_method(len(findings), limit, start_time),
+                method=_build_method(
+                    len(findings),
+                    requested_limit,
+                    effective_limit,
+                    start_time,
+                ),
             )
 
         observation.mark_success()
         extras: dict[str, object] = {}
-        if faiss_limits:
-            extras["limits"] = list(faiss_limits)
-        extras["method"] = _build_method(len(findings), limit, start_time)
+        if limits_metadata:
+            extras["limits"] = limits_metadata
+        extras["method"] = _build_method(
+            len(findings),
+            requested_limit,
+            effective_limit,
+            start_time,
+        )
         success_answer = f"Found {len(findings)} semantically similar code chunks for: {query}"
         return _make_envelope(
             findings=findings,
@@ -276,15 +306,22 @@ def _error_envelope(
     )
 
 
-def _build_method(findings_count: int, limit: int, start_time: float) -> MethodInfo:
+def _build_method(
+    findings_count: int,
+    requested_limit: int,
+    effective_limit: int,
+    start_time: float,
+) -> MethodInfo:
     """Build method metadata for the response.
 
     Parameters
     ----------
     findings_count : int
         Number of findings returned.
-    limit : int
+    requested_limit : int
         Requested result limit.
+    effective_limit : int
+        Effective limit applied after clamping.
     start_time : float
         Search start time (monotonic clock).
 
@@ -294,9 +331,12 @@ def _build_method(findings_count: int, limit: int, start_time: float) -> MethodI
         Retrieval metadata describing semantic search coverage.
     """
     elapsed_ms = int((perf_counter() - start_time) * 1000)
+    coverage = f"{findings_count}/{effective_limit} results in {elapsed_ms}ms"
+    if requested_limit != effective_limit:
+        coverage = f"{coverage} (requested {requested_limit})"
     return {
         "retrieval": ["semantic", "faiss"],
-        "coverage": f"{findings_count}/{limit} results in {elapsed_ms}ms",
+        "coverage": coverage,
     }
 
 
