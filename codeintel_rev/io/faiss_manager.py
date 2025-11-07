@@ -45,6 +45,7 @@ class FAISSManager:
         self.cpu_index: faiss.Index | None = None
         self.gpu_index: faiss.Index | None = None
         self.gpu_resources: faiss.StandardGpuResources | None = None
+        self.gpu_disabled_reason: str | None = None
 
     def build_index(self, vectors: np.ndarray) -> None:
         """Build and train IVF-PQ index.
@@ -152,7 +153,7 @@ class FAISSManager:
 
         self.cpu_index = faiss.read_index(str(self.index_path))
 
-    def clone_to_gpu(self, device: int = 0) -> None:
+    def clone_to_gpu(self, device: int = 0) -> bool:
         """Clone CPU index to GPU for accelerated search.
 
         Creates a GPU-resident copy of the CPU index for faster search operations.
@@ -172,12 +173,17 @@ class FAISSManager:
             CUDA device ID to use (default: 0). Use device 0 for single-GPU systems.
             For multi-GPU, specify the device ID (0, 1, 2, etc.).
 
+        Returns
+        -------
+        bool
+            ``True`` when GPU acceleration is available. ``False`` when GPU
+            initialization fails and the manager falls back to the CPU index.
+
         Raises
         ------
         RuntimeError
             If the CPU index has not been loaded yet. Call load_cpu_index() or
-            build_index() first. Also raised if GPU operations fail (e.g., CUDA
-            not available, out of GPU memory).
+            build_index() first.
         """
         try:
             cpu_index = self._require_cpu_index()
@@ -185,24 +191,39 @@ class FAISSManager:
             msg = "Cannot clone index to GPU before building or loading it."
             raise RuntimeError(msg) from exc
 
-        # Initialize GPU resources
-        self.gpu_resources = faiss.StandardGpuResources()
+        self.gpu_disabled_reason = None
 
-        # Configure cloner options
-        co = faiss.GpuClonerOptions()
-        co.useFloat16 = False
+        try:
+            # Initialize GPU resources
+            self.gpu_resources = faiss.StandardGpuResources()
 
-        # Try with cuVS if enabled
-        co.use_cuvs = False
-        if self.use_cuvs:
-            try:
-                self._try_load_cuvs()
-            except (ImportError, RuntimeError, AttributeError) as exc:
-                logger.warning("cuVS acceleration unavailable: %s", exc)
-            else:
-                co.use_cuvs = True
+            # Configure cloner options
+            co = faiss.GpuClonerOptions()
+            co.useFloat16 = False
 
-        self.gpu_index = faiss.index_cpu_to_gpu(self.gpu_resources, device, cpu_index, co)
+            # Try with cuVS if enabled
+            co.use_cuvs = False
+            if self.use_cuvs:
+                try:
+                    self._try_load_cuvs()
+                except (ImportError, RuntimeError, AttributeError) as exc:
+                    logger.warning("cuVS acceleration unavailable: %s", exc)
+                else:
+                    co.use_cuvs = True
+
+            self.gpu_index = faiss.index_cpu_to_gpu(self.gpu_resources, device, cpu_index, co)
+        except Exception as exc:
+            self.gpu_resources = None
+            self.gpu_index = None
+            self.gpu_disabled_reason = f"FAISS GPU disabled - using CPU: {exc}"
+            logger.warning(
+                "FAISS GPU initialization failed; continuing with CPU index: %s",
+                exc,
+                exc_info=True,
+            )
+            return False
+
+        return True
 
     def search(
         self, query: np.ndarray, k: int = 50, nprobe: int = 128

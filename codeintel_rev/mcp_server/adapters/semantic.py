@@ -79,9 +79,13 @@ async def semantic_search(
         }
 
     # Load FAISS index and search
+    limits: list[str] = []
+
     try:
         faiss_mgr.load_cpu_index()
-        faiss_mgr.clone_to_gpu()
+        gpu_enabled = faiss_mgr.clone_to_gpu()
+        if not gpu_enabled and faiss_mgr.gpu_disabled_reason:
+            limits.append(faiss_mgr.gpu_disabled_reason)
 
         # Search
         import numpy as np
@@ -155,13 +159,18 @@ async def semantic_search(
 
     answer = f"Found {len(findings)} semantically similar code chunks for: {query}"
 
-    return {
+    envelope: AnswerEnvelope = {
         "answer": answer,
         "query_kind": "semantic",
         "method": method,
         "findings": findings,
         "confidence": 0.85 if findings else 0.0,
     }
+
+    if limits:
+        envelope["limits"] = limits
+
+    return envelope
 
 
 __all__ = ["semantic_search"]
