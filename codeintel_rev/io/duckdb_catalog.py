@@ -71,10 +71,27 @@ class DuckDBCatalog:
             msg = "Connection not open"
             raise RuntimeError(msg)
 
-        # Create chunks view
         parquet_pattern = str(self.vectors_dir / "**/*.parquet")
-        relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
-        relation.create_view("chunks", replace=True)
+        if any(self.vectors_dir.rglob("*.parquet")):
+            relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
+            relation.create_view("chunks", replace=True)
+            return
+
+        self.conn.execute(
+            """
+            CREATE OR REPLACE VIEW chunks AS
+            SELECT
+                CAST(NULL AS BIGINT) AS id,
+                CAST(NULL AS VARCHAR) AS uri,
+                CAST(NULL AS INTEGER) AS start_line,
+                CAST(NULL AS INTEGER) AS end_line,
+                CAST(NULL AS BIGINT) AS start_byte,
+                CAST(NULL AS BIGINT) AS end_byte,
+                CAST(NULL AS VARCHAR) AS preview,
+                CAST(NULL AS FLOAT[]) AS embedding
+            WHERE 1 = 0
+            """
+        )
 
     def query_by_ids(self, ids: Sequence[int]) -> list[dict]:
         """Query chunks by their unique IDs.

@@ -33,12 +33,10 @@ class RecordingFAISSManager:
 
     def load_cpu_index(self) -> None:
         """Record CPU index load attempts."""
-
         self.load_calls += 1
 
     def clone_to_gpu(self) -> bool:
         """Record GPU clone attempts and report disabled GPU."""
-
         self.clone_calls += 1
         return False
 
@@ -54,12 +52,10 @@ class RecordingDuckDBCatalog:
 
     def open(self) -> None:  # pragma: no cover - trivial shim
         """Record catalog opening."""
-
         self.open_called = True
 
     def close(self) -> None:  # pragma: no cover - trivial shim
         """Record catalog closing."""
-
         self.closed = True
 
 
@@ -72,7 +68,6 @@ class DummyVLLMClient:
 
 def test_service_context_resolves_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Relative configuration paths resolve against ``REPO_ROOT``."""
-
     repo_root = tmp_path / "repo"
     repo_root.mkdir()
     faiss_rel = "indexes/code.ivfpq.faiss"

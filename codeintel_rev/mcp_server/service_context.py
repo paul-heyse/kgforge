@@ -30,7 +30,6 @@ def resolve_configured_path(settings: Settings, path_value: str) -> Path:
     Path
         Absolute path pointing to the configured location.
     """
-
     repo_root = Path(settings.paths.repo_root).expanduser().resolve()
     candidate = Path(path_value).expanduser()
     if candidate.is_absolute():
