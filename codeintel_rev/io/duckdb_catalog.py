@@ -73,10 +73,8 @@ class DuckDBCatalog:
 
         # Create chunks view
         parquet_pattern = str(self.vectors_dir / "**/*.parquet")
-        self.conn.execute(
-            "CREATE OR REPLACE VIEW chunks AS SELECT * FROM read_parquet(?)",
-            [parquet_pattern],
-        )
+        relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
+        relation.create_view("chunks", replace=True)
 
     def query_by_ids(self, ids: Sequence[int]) -> list[dict]:
         """Query chunks by their unique IDs.

@@ -274,10 +274,8 @@ def test_get_embeddings_by_ids_returns_correct_shapes(
             msg = "Connection not open"
             raise RuntimeError(msg)
         parquet_pattern = str(self.vectors_dir / "**/*.parquet")
-        self.conn.execute(
-            "CREATE OR REPLACE VIEW chunks AS SELECT * FROM read_parquet(?)",
-            [parquet_pattern],
-        )
+        relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
+        relation.create_view("chunks", replace=True)
 
     monkeypatch.setattr(DuckDBCatalog, "_ensure_views", _ensure_views_for_test, raising=False)
 

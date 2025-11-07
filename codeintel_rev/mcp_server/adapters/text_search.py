@@ -6,16 +6,15 @@ Fast text search with regex support.
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
 
 from codeintel_rev.config.settings import load_settings
 from codeintel_rev.mcp_server.schemas import Match
 from kgfoundry_common.errors import KgFoundryError, VectorSearchError
-from kgfoundry_common.errors.exceptions import KgFoundryErrorConfig
 from kgfoundry_common.logging import get_logger, with_fields
-from kgfoundry_common.observability import MetricsProvider, observe_duration
+from kgfoundry_common.observability import DurationObservation, MetricsProvider, observe_duration
 from kgfoundry_common.subprocess_utils import (
     SubprocessError,
     SubprocessTimeoutError,
@@ -29,6 +28,49 @@ COMMAND_NOT_FOUND_RETURN_CODE = 127
 COMPONENT_NAME = "codeintel_mcp"
 LOGGER = get_logger(__name__)
 METRICS = MetricsProvider.default()
+
+
+def _supports_histogram_labels(histogram: object) -> bool:
+    labelnames = getattr(histogram, "_labelnames", None)
+    if labelnames is None:
+        return True
+    try:
+        return len(tuple(labelnames)) > 0
+    except TypeError:
+        return False
+
+
+_METRICS_ENABLED = _supports_histogram_labels(METRICS.operation_duration_seconds)
+
+
+class _NoopObservation:
+    """Fallback observation when Prometheus metrics are unavailable."""
+
+    def mark_error(self) -> None:
+        """No-op error marker."""
+
+    def mark_success(self) -> None:
+        """No-op success marker."""
+
+
+@contextmanager
+def _observe(operation: str) -> Iterator[DurationObservation | _NoopObservation]:
+    """Yield a metrics observation, falling back to a no-op when metrics are disabled.
+
+    Yields
+    ------
+    DurationObservation | _NoopObservation
+        Metrics observation when Prometheus is configured, otherwise a no-op recorder.
+    """
+    if not _METRICS_ENABLED:
+        yield _NoopObservation()
+        return
+    try:
+        with observe_duration(METRICS, operation, component=COMPONENT_NAME) as observation:
+            yield observation
+            return
+    except ValueError:
+        yield _NoopObservation()
 
 
 def search_text(
@@ -76,14 +118,14 @@ def search_text(
         max_results=max_results,
     )
 
-    with observe_duration(METRICS, "text_search", component=COMPONENT_NAME) as observation:
+    with _observe("text_search") as observation:
         try:
             stdout = run_subprocess(cmd, cwd=repo_root, timeout=SEARCH_TIMEOUT_SECONDS)
         except SubprocessTimeoutError:
             observation.mark_error()
             error = VectorSearchError(
                 "Search timeout",
-                config=KgFoundryErrorConfig(context={"query": query}),
+                context={"query": query},
             )
             return _error_response(error, operation="text_search")
         except SubprocessError as exc:
@@ -102,17 +144,16 @@ def search_text(
                 error_message = (exc.stderr or "").strip() or str(exc)
                 error = VectorSearchError(
                     error_message,
-                    config=KgFoundryErrorConfig(
-                        cause=exc,
-                        context={"query": query, "returncode": exc.returncode},
-                    ),
+                    cause=exc,
+                    context={"query": query, "returncode": exc.returncode},
                 )
                 return _error_response(error, operation="text_search")
         except ValueError as exc:
             observation.mark_error()
             error = VectorSearchError(
                 str(exc),
-                config=KgFoundryErrorConfig(cause=exc, context={"query": query}),
+                cause=exc,
+                context={"query": query},
             )
             return _error_response(error, operation="text_search")
 
@@ -127,7 +168,7 @@ def search_text(
 
 def _fallback_grep(
     *,
-    observation: Any,
+    observation: DurationObservation | _NoopObservation,
     repo_root: Path,
     query: str,
     case_sensitive: bool,
@@ -166,7 +207,7 @@ def _fallback_grep(
         observation.mark_error()
         error = VectorSearchError(
             "Search tool unavailable",
-            config=KgFoundryErrorConfig(context={"query": query, "tool": "grep"}),
+            context={"query": query, "tool": "grep"},
         )
         return _error_response(error, operation="text_search_fallback")
     except SubprocessError as exc:
@@ -177,17 +218,16 @@ def _fallback_grep(
             error_message = (exc.stderr or "").strip() or str(exc)
             error = VectorSearchError(
                 error_message,
-                config=KgFoundryErrorConfig(
-                    cause=exc,
-                    context={"query": query, "tool": "grep", "returncode": exc.returncode},
-                ),
+                cause=exc,
+                context={"query": query, "tool": "grep", "returncode": exc.returncode},
             )
             return _error_response(error, operation="text_search_fallback")
     except ValueError as exc:
         observation.mark_error()
         error = VectorSearchError(
             str(exc),
-            config=KgFoundryErrorConfig(cause=exc, context={"query": query, "tool": "grep"}),
+            cause=exc,
+            context={"query": query, "tool": "grep"},
         )
         return _error_response(error, operation="text_search_fallback")
 
@@ -198,14 +238,9 @@ def _fallback_grep(
             continue
 
         try:
-            raw_path = Path(parts[0])
-            normalized_path = (repo_root / raw_path).resolve()
-            try:
-                path = str(normalized_path.relative_to(repo_root))
-            except ValueError:
-                path = str(raw_path)
+            path = str(Path(parts[0]).relative_to(repo_root))
             line_number = int(parts[1])
-            preview = parts[2].strip()[:MAX_PREVIEW_CHARS]
+            preview = parts[2].strip()[:200]
 
             match: Match = {
                 "path": path,

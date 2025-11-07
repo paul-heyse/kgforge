@@ -1,7 +1,7 @@
 """HTTP client with retry strategy support.
 
-This module provides an HttpClient class that supports configurable retry
-strategies and idempotency key requirements.
+This module provides an HttpClient class that supports configurable retry strategies and idempotency
+key requirements.
 """
 
 from __future__ import annotations
