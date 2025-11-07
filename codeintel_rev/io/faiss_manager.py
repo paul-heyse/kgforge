@@ -5,14 +5,18 @@ Manages IVF-PQ index with cuVS acceleration, CPU persistence, and GPU cloning.
 
 from __future__ import annotations
 
-import importlib
 import logging
 from pathlib import Path
 
+import importlib
 import faiss
 import numpy as np
 
 logger = logging.getLogger(__name__)
+
+_FAISS_GPU_AVAILABLE = all(
+    hasattr(faiss, attr) for attr in ("StandardGpuResources", "GpuClonerOptions", "index_cpu_to_gpu")
+)
 
 
 class FAISSManager:
@@ -193,6 +197,11 @@ class FAISSManager:
 
         self.gpu_disabled_reason = None
 
+        if not _FAISS_GPU_AVAILABLE:
+            self.gpu_disabled_reason = "FAISS GPU symbols unavailable - running in CPU mode"
+            logger.info("Skipping GPU clone; %s", self.gpu_disabled_reason)
+            return False
+
         try:
             # Initialize GPU resources
             self.gpu_resources = faiss.StandardGpuResources()
@@ -212,7 +221,7 @@ class FAISSManager:
                     co.use_cuvs = True
 
             self.gpu_index = faiss.index_cpu_to_gpu(self.gpu_resources, device, cpu_index, co)
-        except (RuntimeError, ValueError, OSError) as exc:
+        except (RuntimeError, ValueError, OSError, AttributeError) as exc:
             self.gpu_resources = None
             self.gpu_index = None
             self.gpu_disabled_reason = f"FAISS GPU disabled - using CPU: {exc}"
