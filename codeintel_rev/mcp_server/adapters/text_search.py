@@ -6,6 +6,7 @@ Fast text search with regex support.
 from __future__ import annotations
 
 import subprocess
+import json
 from pathlib import Path
 
 from codeintel_rev.config.settings import load_settings
@@ -93,8 +94,6 @@ def search_text(
             continue
 
         try:
-            import json
-
             entry = json.loads(line)
 
             if entry.get("type") != "match":

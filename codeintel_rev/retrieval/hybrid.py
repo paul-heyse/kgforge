@@ -122,7 +122,7 @@ def create_hit_list(
     """
     return [
         SearchHit(doc_id=doc_id, score=score, rank=rank, source=source)
-        for rank, (doc_id, score) in enumerate(zip(doc_ids, scores))
+        for rank, (doc_id, score) in enumerate(zip(doc_ids, scores, strict=True))
     ]
 
 

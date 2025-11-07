@@ -5,13 +5,14 @@ Manages IVF-PQ index with cuVS acceleration, CPU persistence, and GPU cloning.
 
 from __future__ import annotations
 
+import importlib
+import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
 
+import faiss
 import numpy as np
 
-if TYPE_CHECKING:
-    import faiss
+logger = logging.getLogger(__name__)
 
 
 class FAISSManager:
@@ -34,6 +35,7 @@ class FAISSManager:
         index_path: Path,
         vec_dim: int = 2560,
         nlist: int = 8192,
+        *,
         use_cuvs: bool = True,
     ) -> None:
         self.index_path = index_path
@@ -52,17 +54,7 @@ class FAISSManager:
         vectors : np.ndarray
             Training vectors of shape (n, vec_dim).
 
-        Raises
-        ------
-        ImportError
-            If FAISS not available.
         """
-        try:
-            import faiss
-        except ImportError as e:
-            msg = "FAISS not installed"
-            raise ImportError(msg) from e
-
         # Normalize for cosine similarity via inner product
         faiss.normalize_L2(vectors)
 
@@ -100,26 +92,19 @@ class FAISSManager:
         ------
         RuntimeError
             If the index has not been built yet. Call build_index() first.
-        ImportError
-            If the FAISS library is not installed or cannot be imported. Install
-            with `uv add faiss` or `uv add faiss-cpu` for CPU-only version.
         """
-        if self.cpu_index is None:
-            msg = "Index not built"
-            raise RuntimeError(msg)
-
         try:
-            import faiss
-        except ImportError as e:
-            msg = "FAISS not installed"
-            raise ImportError(msg) from e
+            cpu_index = self._require_cpu_index()
+        except RuntimeError as exc:
+            msg = "Cannot add vectors: FAISS index has not been built or loaded."
+            raise RuntimeError(msg) from exc
 
         # Normalize vectors
         vectors_norm = vectors.copy()
         faiss.normalize_L2(vectors_norm)
 
         # Add with IDs
-        self.cpu_index.add_with_ids(vectors_norm, ids.astype(np.int64))
+        cpu_index.add_with_ids(vectors_norm, ids.astype(np.int64))
 
     def save_cpu_index(self) -> None:
         """Save CPU index to disk for persistence.
@@ -135,22 +120,15 @@ class FAISSManager:
         ------
         RuntimeError
             If the index has not been built yet. Call build_index() first.
-        ImportError
-            If the FAISS library is not installed or cannot be imported. Install
-            with `uv add faiss` or `uv add faiss-cpu` for CPU-only version.
         """
-        if self.cpu_index is None:
-            msg = "Index not built"
-            raise RuntimeError(msg)
-
         try:
-            import faiss
-        except ImportError as e:
-            msg = "FAISS not installed"
-            raise ImportError(msg) from e
+            cpu_index = self._require_cpu_index()
+        except RuntimeError as exc:
+            msg = "Cannot save index: FAISS index has not been built or loaded."
+            raise RuntimeError(msg) from exc
 
         self.index_path.parent.mkdir(parents=True, exist_ok=True)
-        faiss.write_index(self.cpu_index, str(self.index_path))
+        faiss.write_index(cpu_index, str(self.index_path))
 
     def load_cpu_index(self) -> None:
         """Load CPU index from disk.
@@ -167,19 +145,10 @@ class FAISSManager:
         FileNotFoundError
             If the index file does not exist at index_path. Ensure the index was
             saved with save_cpu_index() or that the path is correct.
-        ImportError
-            If the FAISS library is not installed or cannot be imported. Install
-            with `uv add faiss` or `uv add faiss-cpu` for CPU-only version.
         """
         if not self.index_path.exists():
             msg = f"Index not found: {self.index_path}"
             raise FileNotFoundError(msg)
-
-        try:
-            import faiss
-        except ImportError as e:
-            msg = "FAISS not installed"
-            raise ImportError(msg) from e
 
         self.cpu_index = faiss.read_index(str(self.index_path))
 
@@ -209,19 +178,12 @@ class FAISSManager:
             If the CPU index has not been loaded yet. Call load_cpu_index() or
             build_index() first. Also raised if GPU operations fail (e.g., CUDA
             not available, out of GPU memory).
-        ImportError
-            If the FAISS library is not installed or cannot be imported. Install
-            with `uv add faiss` (GPU version) or ensure CUDA is properly configured.
         """
-        if self.cpu_index is None:
-            msg = "CPU index not loaded"
-            raise RuntimeError(msg)
-
         try:
-            import faiss
-        except ImportError as e:
-            msg = "FAISS not installed"
-            raise ImportError(msg) from e
+            cpu_index = self._require_cpu_index()
+        except RuntimeError as exc:
+            msg = "Cannot clone index to GPU before building or loading it."
+            raise RuntimeError(msg) from exc
 
         # Initialize GPU resources
         self.gpu_resources = faiss.StandardGpuResources()
@@ -231,23 +193,16 @@ class FAISSManager:
         co.useFloat16 = False
 
         # Try with cuVS if enabled
+        co.use_cuvs = False
         if self.use_cuvs:
             try:
-                from pylibcuvs import load_library
-
-                load_library()
+                self._try_load_cuvs()
+            except (ImportError, RuntimeError, AttributeError) as exc:
+                logger.warning("cuVS acceleration unavailable: %s", exc)
+            else:
                 co.use_cuvs = True
-                self.gpu_index = faiss.index_cpu_to_gpu(
-                    self.gpu_resources, device, self.cpu_index, co
-                )
-                return
-            except (ImportError, RuntimeError, AttributeError):
-                # Fall back to standard GPU
-                pass
 
-        # Standard GPU clone
-        co.use_cuvs = False
-        self.gpu_index = faiss.index_cpu_to_gpu(self.gpu_resources, device, self.cpu_index, co)
+        self.gpu_index = faiss.index_cpu_to_gpu(self.gpu_resources, device, cpu_index, co)
 
     def search(
         self, query: np.ndarray, k: int = 50, nprobe: int = 128
@@ -292,26 +247,15 @@ class FAISSManager:
             If no index is available (neither CPU nor GPU index loaded). Call
             load_cpu_index() or build_index() first. Also raised if search fails
             (e.g., dimension mismatch, invalid nprobe value).
-        ImportError
-            If the FAISS library is not installed or cannot be imported. Install
-            with `uv add faiss` or `uv add faiss-cpu` for CPU-only version.
         """
-        if self.gpu_index is None and self.cpu_index is None:
-            msg = "No index available"
-            raise RuntimeError(msg)
-
         try:
-            import faiss
-        except ImportError as e:
-            msg = "FAISS not installed"
-            raise ImportError(msg) from e
-
-        # Use GPU if available, otherwise CPU
-        index = self.gpu_index if self.gpu_index is not None else self.cpu_index
+            index = self._active_index()
+        except RuntimeError as exc:
+            msg = "Cannot search: no FAISS index is available."
+            raise RuntimeError(msg) from exc
 
         # Set nprobe
-        if hasattr(index, "nprobe"):
-            index.nprobe = nprobe
+        index.nprobe = nprobe
 
         # Reshape query if needed
         if query.ndim == 1:
@@ -322,9 +266,74 @@ class FAISSManager:
         faiss.normalize_L2(query_norm)
 
         # Search
-        distances, ids = index.search(query_norm, k)
+        return index.search(query_norm, k)
 
-        return distances, ids
+    @staticmethod
+    def _try_load_cuvs() -> None:
+        """Load cuVS acceleration library if available.
+
+        Raises
+        ------
+        ImportError
+            If the optional pylibcuvs package is not installed.
+        RuntimeError
+            If the cuVS shared library cannot be loaded.
+        """
+        try:
+            pylibcuvs = importlib.import_module("pylibcuvs")
+        except ImportError as exc:  # pragma: no cover - optional dependency
+            msg = "pylibcuvs is required for cuVS acceleration"
+            raise ImportError(msg) from exc
+
+        try:
+            load_library = pylibcuvs.load_library
+        except AttributeError as exc:  # pragma: no cover - unexpected signature
+            msg = "pylibcuvs does not expose load_library()"
+            raise RuntimeError(msg) from exc
+
+        try:
+            load_library()
+        except OSError as exc:  # pragma: no cover - shared object load failures
+            msg = "Failed to load cuVS shared libraries"
+            raise RuntimeError(msg) from exc
+
+    def _require_cpu_index(self) -> faiss.Index:
+        """Return the CPU index if initialized.
+
+        Returns
+        -------
+        faiss.Index
+            Initialized CPU FAISS index.
+
+        Raises
+        ------
+        RuntimeError
+            If the index has not been built or loaded yet.
+        """
+        if self.cpu_index is None:
+            msg = "Index not built"
+            raise RuntimeError(msg)
+        return self.cpu_index
+
+    def _active_index(self) -> faiss.Index:
+        """Return the best available search index.
+
+        Returns
+        -------
+        faiss.Index
+            GPU-backed index when available, otherwise the CPU index.
+
+        Raises
+        ------
+        RuntimeError
+            If neither CPU nor GPU indexes are available.
+        """
+        if self.gpu_index is not None:
+            return self.gpu_index
+        if self.cpu_index is not None:
+            return self.cpu_index
+        msg = "No index available"
+        raise RuntimeError(msg)
 
 
 __all__ = ["FAISSManager"]

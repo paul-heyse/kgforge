@@ -172,6 +172,14 @@ class VLLMClient:
 
         return vectors
 
+    def embed_single(self, text: str) -> np.ndarray:
+        """Embed a single string and return its vector."""
+        vectors = self.embed_batch([text])
+        if vectors.size == 0:
+            msg = "vLLM returned no vectors for single embed request"
+            raise RuntimeError(msg)
+        return vectors[0]
+
     def embed_chunks(
         self,
         texts: Sequence[str],
