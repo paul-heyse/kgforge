@@ -197,9 +197,14 @@ def _fallback_grep(
             continue
 
         try:
-            path = str(Path(parts[0]).relative_to(repo_root))
+            raw_path = Path(parts[0])
+            normalized_path = (repo_root / raw_path).resolve()
+            try:
+                path = str(normalized_path.relative_to(repo_root))
+            except ValueError:
+                path = str(raw_path)
             line_number = int(parts[1])
-            preview = parts[2].strip()[:200]
+            preview = parts[2].strip()[:MAX_PREVIEW_CHARS]
 
             match: Match = {
                 "path": path,
