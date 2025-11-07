@@ -8,9 +8,13 @@ from __future__ import annotations
 import json
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from codeintel_rev.config.settings import load_settings
 from codeintel_rev.mcp_server.schemas import Match
+from kgfoundry_common.errors import KgFoundryError, KgFoundryErrorConfig, VectorSearchError
+from kgfoundry_common.logging import get_logger, with_fields
+from kgfoundry_common.observability import MetricsProvider, observe_duration
 from kgfoundry_common.subprocess_utils import (
     SubprocessError,
     SubprocessTimeoutError,
@@ -21,6 +25,9 @@ SEARCH_TIMEOUT_SECONDS = 30
 MAX_PREVIEW_CHARS = 200
 GREP_SPLIT_PARTS = 3
 COMMAND_NOT_FOUND_RETURN_CODE = 127
+COMPONENT_NAME = "codeintel_mcp"
+LOGGER = get_logger(__name__)
+METRICS = MetricsProvider.default()
 
 
 def search_text(
@@ -41,7 +48,7 @@ def search_text(
         Treat query as regex pattern.
     case_sensitive : bool
         Case-sensitive search.
-    paths : list[str] | None
+    paths : Sequence[str] | None
         Paths to search in (relative to repo root).
     max_results : int
         Maximum number of results.
@@ -68,48 +75,58 @@ def search_text(
         max_results=max_results,
     )
 
-    try:
-        stdout = run_subprocess(cmd, cwd=repo_root, timeout=SEARCH_TIMEOUT_SECONDS)
-    except SubprocessTimeoutError:
-        return {
-            "matches": [],
-            "total": 0,
-            "error": "Search timeout",
-        }
-    except SubprocessError as exc:
-        if exc.returncode == 1:
-            stdout = ""
-        elif exc.returncode == COMMAND_NOT_FOUND_RETURN_CODE:
-            return _fallback_grep(
-                repo_root=repo_root,
-                query=query,
-                case_sensitive=case_sensitive,
-                max_results=max_results,
+    with observe_duration(METRICS, "text_search", component=COMPONENT_NAME) as observation:
+        try:
+            stdout = run_subprocess(cmd, cwd=repo_root, timeout=SEARCH_TIMEOUT_SECONDS)
+        except SubprocessTimeoutError:
+            observation.mark_error()
+            error = VectorSearchError(
+                "Search timeout",
+                config=KgFoundryErrorConfig(context={"query": query}),
             )
-        else:
-            error_message = (exc.stderr or "").strip() or str(exc)
-            return {
-                "matches": [],
-                "total": 0,
-                "error": error_message,
-            }
-    except ValueError as exc:
-        return {
-            "matches": [],
-            "total": 0,
-            "error": str(exc),
-        }
+            return _error_response(error, operation="text_search")
+        except SubprocessError as exc:
+            if exc.returncode == 1:
+                stdout = ""
+            elif exc.returncode == COMMAND_NOT_FOUND_RETURN_CODE:
+                return _fallback_grep(
+                    observation=observation,
+                    repo_root=repo_root,
+                    query=query,
+                    case_sensitive=case_sensitive,
+                    max_results=max_results,
+                )
+            else:
+                observation.mark_error()
+                error_message = (exc.stderr or "").strip() or str(exc)
+                error = VectorSearchError(
+                    error_message,
+                    config=KgFoundryErrorConfig(
+                        cause=exc,
+                        context={"query": query, "returncode": exc.returncode},
+                    ),
+                )
+                return _error_response(error, operation="text_search")
+        except ValueError as exc:
+            observation.mark_error()
+            error = VectorSearchError(
+                str(exc),
+                config=KgFoundryErrorConfig(cause=exc, context={"query": query}),
+            )
+            return _error_response(error, operation="text_search")
 
-    matches, truncated = _parse_ripgrep_output(stdout, repo_root, max_results)
-    return {
-        "matches": matches,
-        "total": len(matches),
-        "truncated": truncated,
-    }
+        matches, truncated = _parse_ripgrep_output(stdout, repo_root, max_results)
+        observation.mark_success()
+        return {
+            "matches": matches,
+            "total": len(matches),
+            "truncated": truncated,
+        }
 
 
 def _fallback_grep(
     *,
+    observation: Any,
     repo_root: Path,
     query: str,
     case_sensitive: bool,
@@ -119,6 +136,8 @@ def _fallback_grep(
 
     Parameters
     ----------
+    observation : Any
+        Metrics observation context used to record success or failure.
     repo_root : Path
         Repository root directory.
     query : str
@@ -131,7 +150,7 @@ def _fallback_grep(
     Returns
     -------
     dict
-        Search matches.
+        Search results or error payload when fallback execution fails.
     """
     command = ["grep", "-r", "-n"]
 
@@ -143,23 +162,33 @@ def _fallback_grep(
     try:
         stdout = run_subprocess(command, cwd=repo_root, timeout=SEARCH_TIMEOUT_SECONDS)
     except SubprocessTimeoutError:
-        return {
-            "matches": [],
-            "total": 0,
-            "error": "Search tool unavailable",
-        }
+        observation.mark_error()
+        error = VectorSearchError(
+            "Search tool unavailable",
+            config=KgFoundryErrorConfig(context={"query": query, "tool": "grep"}),
+        )
+        return _error_response(error, operation="text_search_fallback")
     except SubprocessError as exc:
         if exc.returncode == 1:
             stdout = ""
         else:
+            observation.mark_error()
             error_message = (exc.stderr or "").strip() or str(exc)
-            return {
-                "matches": [],
-                "total": 0,
-                "error": error_message,
-            }
+            error = VectorSearchError(
+                error_message,
+                config=KgFoundryErrorConfig(
+                    cause=exc,
+                    context={"query": query, "tool": "grep", "returncode": exc.returncode},
+                ),
+            )
+            return _error_response(error, operation="text_search_fallback")
     except ValueError as exc:
-        return {"matches": [], "total": 0, "error": str(exc)}
+        observation.mark_error()
+        error = VectorSearchError(
+            str(exc),
+            config=KgFoundryErrorConfig(cause=exc, context={"query": query, "tool": "grep"}),
+        )
+        return _error_response(error, operation="text_search_fallback")
 
     matches: list[Match] = []
     for line in stdout.splitlines()[:max_results]:
@@ -182,10 +211,43 @@ def _fallback_grep(
         except (ValueError, IndexError):
             continue
 
+    observation.mark_success()
     return {
         "matches": matches,
         "total": len(matches),
         "truncated": len(matches) >= max_results,
+    }
+
+
+def _error_response(error: KgFoundryError, *, operation: str) -> dict:
+    """Return standardized error payload with Problem Details.
+
+    Parameters
+    ----------
+    error : KgFoundryError
+        Error to convert to response.
+    operation : str
+        Operation name for logging.
+
+    Returns
+    -------
+    dict
+        Error response dictionary with matches, total, error, and problem fields.
+    """
+    problem = error.to_problem_details(instance=operation)
+    with with_fields(
+        LOGGER,
+        component=COMPONENT_NAME,
+        operation=operation,
+        error_code=error.code.value,
+    ) as adapter:
+        adapter.log(error.log_level, error.message, extra={"context": error.context})
+
+    return {
+        "matches": [],
+        "total": 0,
+        "error": error.message,
+        "problem": problem,
     }
 
 
@@ -198,6 +260,19 @@ def _build_ripgrep_command(
     max_results: int,
 ) -> list[str]:
     """Assemble the ripgrep command arguments.
+
+    Parameters
+    ----------
+    query : str
+        Search query string.
+    regex : bool
+        Whether query is a regex pattern.
+    case_sensitive : bool
+        Whether search is case-sensitive.
+    paths : Sequence[str] | None
+        Paths to search in (relative to repo root).
+    max_results : int
+        Maximum number of results to return.
 
     Returns
     -------
@@ -229,6 +304,15 @@ def _parse_ripgrep_output(
     max_results: int,
 ) -> tuple[list[Match], bool]:
     """Parse ripgrep JSON output into structured matches.
+
+    Parameters
+    ----------
+    stdout : str
+        Ripgrep JSON output.
+    repo_root : Path
+        Repository root directory.
+    max_results : int
+        Maximum number of results to parse.
 
     Returns
     -------

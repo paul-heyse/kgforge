@@ -33,9 +33,10 @@ class RetryStrategy(Protocol[T]):
         T
             The result of fn if execution succeeds.
 
-        Raises
-        ------
-        Exception
-            The final exception if all retries are exhausted.
+        Notes
+        -----
+        Implementations should re-raise the final exception if all retries
+        are exhausted. The specific exception type depends on what the
+        wrapped function raises.
         """
         ...

@@ -103,15 +103,14 @@ def load_policy(path: Path, schema_path: Path | None = None) -> RetryPolicyDoc:
 
     Returns
     -------
-        RetryPolicyDoc
-            Loaded policy document.
+    RetryPolicyDoc
+        Loaded policy document.
 
-    Raises
-    ------
-        FileNotFoundError
-            If policy file does not exist.
-        jsonschema.ValidationError
-            If policy does not match schema.
+    Notes
+    -----
+    This function may propagate the following exceptions from dependencies:
+    - ``FileNotFoundError``: If policy file does not exist (from ``path.read_text()``)
+    - ``jsonschema.ValidationError``: If policy does not match schema (from ``jsonschema.validate()``)
     """
     obj = yaml.safe_load(path.read_text(encoding="utf-8"))
     if schema_path and schema_path.exists():
@@ -139,16 +138,15 @@ def load_policy(path: Path, schema_path: Path | None = None) -> RetryPolicyDoc:
 
 
 class PolicyRegistry:
-    """Registry for loading retry policies from a directory."""
+    """Registry for loading retry policies from a directory.
+
+    Parameters
+    ----------
+    root : Path
+        Root directory containing policy YAML files.
+    """
 
     def __init__(self, root: Path) -> None:
-        """Initialize policy registry.
-
-        Parameters
-        ----------
-        root : Path
-            Root directory containing policy YAML files.
-        """
         self.root = root
 
     def get(self, name: str) -> RetryPolicyDoc:

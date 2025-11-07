@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from typing import Literal, NotRequired, TypedDict
 
+from kgfoundry_common.problem_details import ProblemDetailsDict
+
 
 class ScopeIn(TypedDict, total=False):
     """Query scope parameters for filtering search results.
@@ -264,6 +266,9 @@ class AnswerEnvelope(TypedDict, total=False):
         Suggested follow-up queries or actions. Provides guidance on how to
         refine the search or explore related topics (e.g., "Try searching for
         'data validation'", "See callers of this function").
+    problem : ProblemDetailsDict
+        RFC 9457 Problem Details payload describing the failure when the request
+        could not be fulfilled successfully.
     """
 
     answer: str
@@ -281,6 +286,7 @@ class AnswerEnvelope(TypedDict, total=False):
     confidence: float
     limits: list[str]
     next_steps: list[str]
+    problem: ProblemDetailsDict
 
 
 class SymbolInfo(TypedDict):

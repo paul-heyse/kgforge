@@ -197,16 +197,15 @@ def _should_retry_exception(method: str, policy: RetryPolicyDoc) -> Callable[[Ba
 
 
 class TenacityRetryStrategy(RetryStrategy[object]):
-    """Retry strategy implementation using tenacity library."""
+    """Retry strategy implementation using tenacity library.
+
+    Parameters
+    ----------
+    policy : RetryPolicyDoc
+        Retry policy configuration.
+    """
 
     def __init__(self, policy: RetryPolicyDoc) -> None:
-        """Initialize retry strategy with policy.
-
-        Parameters
-        ----------
-        policy : RetryPolicyDoc
-            Retry policy configuration.
-        """
         self.policy = policy
 
     def run(self, fn: Callable[[], object]) -> object:

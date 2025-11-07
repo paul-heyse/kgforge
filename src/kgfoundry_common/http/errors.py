@@ -14,28 +14,25 @@ class HttpError(Exception):
 class HttpStatusError(HttpError):
     """Exception raised for HTTP error status codes.
 
-    Attributes
+    Parameters
     ----------
     status : int
         HTTP status code.
-    headers : dict[str, str]
-        Response headers.
+    body_excerpt : str | None, optional
+        Excerpt from response body. Defaults to None.
+    headers : dict[str, str] | None, optional
+        Response headers. Defaults to None.
+
+    Notes
+    -----
+    After initialization, this exception has instance attributes:
+    - ``status``: The HTTP status code (int)
+    - ``headers``: The response headers (dict[str, str], defaults to empty dict)
     """
 
     def __init__(
         self, status: int, body_excerpt: str | None = None, headers: dict[str, str] | None = None
     ) -> None:
-        """Initialize HTTP status error.
-
-        Parameters
-        ----------
-        status : int
-            HTTP status code.
-        body_excerpt : str | None, optional
-            Excerpt from response body. Defaults to None.
-        headers : dict[str, str] | None, optional
-            Response headers. Defaults to None.
-        """
         super().__init__(f"HTTP {status}: {body_excerpt or ''}")
         self.status = status
         self.headers = headers or {}
