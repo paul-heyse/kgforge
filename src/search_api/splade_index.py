@@ -61,13 +61,25 @@ class SpladeDoc:
     """Document fixture for SPLADE index backed by sparse retrieval data."""
 
     chunk_id: str
-    """Chunk identifier. Alias: none; name ``chunk_id``."""
+    """Chunk identifier.
+
+    Alias: none; name ``chunk_id``.
+    """
     doc_id: str
-    """Document identifier. Alias: none; name ``doc_id``."""
+    """Document identifier.
+
+    Alias: none; name ``doc_id``.
+    """
     section: str
-    """Section label within the document. Alias: none; name ``section``."""
+    """Section label within the document.
+
+    Alias: none; name ``section``.
+    """
     text: str
-    """Chunk text content. Alias: none; name ``text``."""
+    """Chunk text content.
+
+    Alias: none; name ``text``.
+    """
 
 
 # [nav:anchor SpladeIndex]

@@ -29,9 +29,9 @@ T = TypeVar("T")
 class NamespaceRegistry:
     """Typed registry for lazy-loading module symbols.
 
-    This registry encapsulates symbol metadata (name, loader callable) and
-    provides typed methods to register and resolve symbols without relying
-    on Any types. Loaders are cached to avoid repeated module imports.
+    This registry encapsulates symbol metadata (name, loader callable) and provides typed methods to
+    register and resolve symbols without relying on Any types. Loaders are cached to avoid repeated
+    module imports.
     """
 
     _registry: dict[str, Callable[[], object]] = field(default_factory=dict, init=False)

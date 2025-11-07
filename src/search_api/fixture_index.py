@@ -69,21 +69,35 @@ def tokenize(text: str) -> list[str]:
 class FixtureDoc:
     """Document fixture for test and tutorial use.
 
-    Represents a document chunk loaded from the fixture index. Inline
-    attribute docstrings note alias usage for clarity and mkdocstrings
-    compatibility.
+    Represents a document chunk loaded from the fixture index. Inline attribute docstrings note
+    alias usage for clarity and mkdocstrings compatibility.
     """
 
     chunk_id: str
-    """Unique chunk identifier. Alias: none; name ``chunk_id``."""
+    """Unique chunk identifier.
+
+    Alias: none; name ``chunk_id``.
+    """
     doc_id: str
-    """Parent document identifier. Alias: none; name ``doc_id``."""
+    """Parent document identifier.
+
+    Alias: none; name ``doc_id``.
+    """
     title: str
-    """Document title. Alias: none; name ``title``."""
+    """Document title.
+
+    Alias: none; name ``title``.
+    """
     section: str
-    """Optional section heading. Alias: none; name ``section``."""
+    """Optional section heading.
+
+    Alias: none; name ``section``.
+    """
     text: str
-    """Chunk text content. Alias: none; name ``text``."""
+    """Chunk text content.
+
+    Alias: none; name ``text``.
+    """
 
 
 # [nav:anchor FixtureIndex]

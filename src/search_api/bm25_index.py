@@ -188,17 +188,35 @@ class BM25Doc:
     """
 
     chunk_id: str
-    """Unique identifier for the chunk. Alias: none; name ``chunk_id``."""
+    """Unique identifier for the chunk.
+
+    Alias: none; name ``chunk_id``.
+    """
     doc_id: str
-    """Parent document identifier. Alias: none; name ``doc_id``."""
+    """Parent document identifier.
+
+    Alias: none; name ``doc_id``.
+    """
     title: str
-    """Document title used for term weighting. Alias: none; name ``title``."""
+    """Document title used for term weighting.
+
+    Alias: none; name ``title``.
+    """
     section: str
-    """Section label where the chunk appears. Alias: none; name ``section``."""
+    """Section label where the chunk appears.
+
+    Alias: none; name ``section``.
+    """
     tf: dict[str, float]
-    """Term frequency mapping per token. Alias: none; name ``tf``."""
+    """Term frequency mapping per token.
+
+    Alias: none; name ``tf``.
+    """
     dl: float
-    """BM25 document length (sum of term frequencies). Alias: none; name ``dl``."""
+    """BM25 document length (sum of term frequencies).
+
+    Alias: none; name ``dl``.
+    """
 
 
 # [nav:anchor BM25Index]
