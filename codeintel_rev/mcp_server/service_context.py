@@ -15,6 +15,29 @@ from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.vllm_client import VLLMClient
 
 
+def resolve_configured_path(settings: Settings, path_value: str) -> Path:
+    """Return an absolute path for ``path_value`` using ``settings.paths.repo_root``.
+
+    Parameters
+    ----------
+    settings : Settings
+        Loaded application settings containing the repository root.
+    path_value : str
+        Configured path value that may be relative to the repository root.
+
+    Returns
+    -------
+    Path
+        Absolute path pointing to the configured location.
+    """
+
+    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    candidate = Path(path_value).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (repo_root / candidate).resolve()
+
+
 @dataclass(slots=True)
 class ServiceContext:
     """Container for long-lived service clients."""
@@ -37,7 +60,7 @@ class ServiceContext:
             None on success or an error message on failure.
         """
         limits: list[str] = []
-        index_path = Path(self.settings.paths.faiss_index)
+        index_path = resolve_configured_path(self.settings, self.settings.paths.faiss_index)
         if not index_path.exists():
             return False, limits, f"FAISS index not found at {index_path}"
 
@@ -91,8 +114,8 @@ class ServiceContext:
             Catalog instance for querying chunk metadata.
         """
         catalog = DuckDBCatalog(
-            Path(self.settings.paths.duckdb_path),
-            Path(self.settings.paths.vectors_dir),
+            resolve_configured_path(self.settings, self.settings.paths.duckdb_path),
+            resolve_configured_path(self.settings, self.settings.paths.vectors_dir),
         )
         try:
             catalog.open()
@@ -112,7 +135,7 @@ def get_service_context() -> ServiceContext:
     """
     settings = load_settings()
     faiss_manager = FAISSManager(
-        index_path=Path(settings.paths.faiss_index),
+        index_path=resolve_configured_path(settings, settings.paths.faiss_index),
         vec_dim=settings.index.vec_dim,
         nlist=settings.index.faiss_nlist,
         use_cuvs=settings.index.use_cuvs,
