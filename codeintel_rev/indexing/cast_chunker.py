@@ -7,6 +7,8 @@ the character budget, splitting large symbols on blank lines.
 
 from __future__ import annotations
 
+from bisect import bisect_right
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -89,6 +91,15 @@ def line_starts(text: str) -> list[int]:
         if ch == "\n":
             starts.append(i + 1)
     return starts
+
+
+def _line_index_from_byte(starts: Sequence[int], byte_offset: int) -> int:
+    """Return the zero-based line index containing ``byte_offset``."""
+
+    index = bisect_right(starts, byte_offset) - 1
+    if index < 0:
+        return 0
+    return min(index, len(starts) - 1)
 
 
 def range_to_bytes(text: str, starts: list[int], rng: Range) -> tuple[int, int]:
@@ -189,14 +200,8 @@ def chunk_file(
             if cur_start is not None and cur_end is not None:
                 chunk_text = text[cur_start:cur_end]
                 # Find line numbers for chunk
-                sl = next(
-                    (i for i, ls in enumerate(starts) if ls >= cur_start),
-                    len(starts) - 1,
-                )
-                el = next(
-                    (i for i, ls in enumerate(starts) if ls >= cur_end),
-                    len(starts) - 1,
-                )
+                sl = _line_index_from_byte(starts, cur_start)
+                el = _line_index_from_byte(starts, max(cur_end - 1, 0))
                 chunks.append(
                     Chunk(
                         uri=uri,
@@ -223,11 +228,8 @@ def chunk_file(
                         chunk_end = nl_idx + 1
 
                     chunk_text = text[pos:chunk_end]
-                    sl = next((i for i, ls in enumerate(starts) if ls >= pos), len(starts) - 1)
-                    el = next(
-                        (i for i, ls in enumerate(starts) if ls >= chunk_end),
-                        len(starts) - 1,
-                    )
+                    sl = _line_index_from_byte(starts, pos)
+                    el = _line_index_from_byte(starts, max(chunk_end - 1, 0))
                     chunks.append(
                         Chunk(
                             uri=uri,
@@ -248,8 +250,8 @@ def chunk_file(
     # Flush remaining
     if cur_start is not None and cur_end is not None:
         chunk_text = text[cur_start:cur_end]
-        sl = next((i for i, ls in enumerate(starts) if ls >= cur_start), len(starts) - 1)
-        el = next((i for i, ls in enumerate(starts) if ls >= cur_end), len(starts) - 1)
+        sl = _line_index_from_byte(starts, cur_start)
+        el = _line_index_from_byte(starts, max(cur_end - 1, 0))
         chunks.append(
             Chunk(
                 uri=uri,
