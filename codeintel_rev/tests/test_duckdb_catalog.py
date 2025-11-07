@@ -31,8 +31,16 @@ def _write_chunk_parquet(parquet_path: Path) -> None:
             """
             CREATE TABLE chunks AS
             SELECT * FROM (VALUES
-                (1, 'src/example.py', 'Example preview', 10, 20)
-            ) AS t(id, uri, preview, start_line, end_line)
+                (
+                    1,
+                    'src/example.py',
+                    10,
+                    20,
+                    0,
+                    42,
+                    'Example preview'
+                )
+            ) AS t(id, uri, start_line, end_line, start_byte, end_byte, preview)
             """
         )
         conn.execute(
@@ -53,9 +61,6 @@ def _write_chunk_parquet_with_embedding(parquet_path: Path, vec_dim: int) -> Non
     vec_dim : int
         Embedding dimension.
 
-    Returns
-    -------
-    None
     """
     values = ", ".join(f"{0.1 * (i + 1):.1f}" for i in range(vec_dim))
     conn = duckdb.connect()
@@ -219,27 +224,33 @@ class StubContext:
         yield self.catalog
 
 
-def test_get_chunk_by_id_returns_single_record(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_open_creates_empty_view(tmp_path: Path) -> None:
+    """Ensure the catalog initialises when no vectors are present."""
+    vectors_dir = tmp_path / "vectors"
+    vectors_dir.mkdir()
+    catalog_path = tmp_path / "catalog.duckdb"
+
+    catalog = DuckDBCatalog(catalog_path, vectors_dir)
+    catalog.open()
+    try:
+        _expect(
+            condition=catalog.count_chunks() == 0,
+            message="Expected zero chunks for empty catalog",
+        )
+        _expect(
+            condition=catalog.query_by_ids([]) == [],
+            message="Empty query should return empty results",
+        )
+    finally:
+        catalog.close()
+
+
+def test_get_chunk_by_id_returns_single_record(tmp_path: Path) -> None:
     """Ensure DuckDBCatalog returns hydrated chunk metadata."""
     vectors_dir = tmp_path / "vectors"
     vectors_dir.mkdir()
     parquet_path = vectors_dir / "chunks.parquet"
     _write_chunk_parquet(parquet_path)
-
-    def _ensure_views_for_test(self: DuckDBCatalog) -> None:
-        if not self.conn:
-            msg = "Connection not open"
-            raise RuntimeError(msg)
-
-        parquet_pattern = str(self.vectors_dir / "**/*.parquet")
-        safe_pattern = parquet_pattern.replace("'", "''")
-        self.conn.execute(
-            f"CREATE OR REPLACE VIEW chunks AS SELECT * FROM read_parquet('{safe_pattern}')"  # noqa: S608
-        )
-
-    monkeypatch.setattr(DuckDBCatalog, "_ensure_views", _ensure_views_for_test, raising=False)
 
     catalog_path = tmp_path / "catalog.duckdb"
     with DuckDBCatalog(catalog_path, vectors_dir) as catalog:
@@ -254,30 +265,24 @@ def test_get_chunk_by_id_returns_single_record(
                 condition=chunk["preview"] == "Example preview",
                 message="Unexpected preview text",
             )
+        records = catalog.query_by_ids([1])
+        _expect(condition=len(records) == 1, message="Expected one record from query_by_ids")
+        _expect(
+            condition=records[0]["uri"] == "src/example.py",
+            message="Unexpected URI from query_by_ids",
+        )
         _expect(
             condition=catalog.get_chunk_by_id(9999) is None,
             message="Expected None for missing chunk",
         )
 
 
-def test_get_embeddings_by_ids_returns_correct_shapes(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_get_embeddings_by_ids_returns_correct_shapes(tmp_path: Path) -> None:
     """Ensure embedding queries return matrices with consistent shape."""
     vectors_dir = tmp_path / "vectors"
     vectors_dir.mkdir()
     parquet_path = vectors_dir / "chunks.parquet"
     _write_chunk_parquet_with_embedding(parquet_path, vec_dim=3)
-
-    def _ensure_views_for_test(self: DuckDBCatalog) -> None:
-        if not self.conn:
-            msg = "Connection not open"
-            raise RuntimeError(msg)
-        parquet_pattern = str(self.vectors_dir / "**/*.parquet")
-        relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
-        relation.create_view("chunks", replace=True)
-
-    monkeypatch.setattr(DuckDBCatalog, "_ensure_views", _ensure_views_for_test, raising=False)
 
     catalog_path = tmp_path / "catalog.duckdb"
     with DuckDBCatalog(catalog_path, vectors_dir) as catalog:
