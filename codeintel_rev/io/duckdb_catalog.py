@@ -7,7 +7,7 @@ chunk retrieval and joins.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import duckdb
 import numpy as np
@@ -43,8 +43,14 @@ class DuckDBCatalog:
             self.conn.close()
             self.conn = None
 
-    def __enter__(self) -> DuckDBCatalog:
-        """Enter context manager."""
+    def __enter__(self) -> Self:
+        """Enter context manager.
+
+        Returns
+        -------
+        Self
+            The catalog instance with an active DuckDB connection.
+        """
         self.open()
         return self
 
@@ -53,15 +59,22 @@ class DuckDBCatalog:
         self.close()
 
     def _ensure_views(self) -> None:
-        """Create views over Parquet directories."""
+        """Create views over Parquet directories.
+
+        Raises
+        ------
+        RuntimeError
+            If the database connection has not been opened.
+        """
         if not self.conn:
             msg = "Connection not open"
             raise RuntimeError(msg)
 
         # Create chunks view
-        parquet_pattern = f"{self.vectors_dir}/**/*.parquet"
+        parquet_pattern = str(self.vectors_dir / "**/*.parquet")
         self.conn.execute(
-            f"CREATE OR REPLACE VIEW chunks AS SELECT * FROM read_parquet('{parquet_pattern}')"
+            "CREATE OR REPLACE VIEW chunks AS SELECT * FROM read_parquet(?)",
+            [parquet_pattern],
         )
 
     def query_by_ids(self, ids: Sequence[int]) -> list[dict]:
@@ -101,12 +114,19 @@ class DuckDBCatalog:
         if not ids:
             return []
 
-        id_list = ",".join(str(i) for i in ids)
-        result = self.conn.execute(f"SELECT * FROM chunks WHERE id IN ({id_list})").fetchall()
-
-        # Convert to dicts
-        cols = [desc[0] for desc in self.conn.description]
-        return [dict(zip(cols, row)) for row in result]
+        relation = self.conn.execute(
+            """
+            SELECT c.*
+            FROM chunks AS c
+            JOIN UNNEST(?) WITH ORDINALITY AS ids(id, position)
+                ON c.id = ids.id
+            ORDER BY ids.position
+            """,
+            [list(ids)],
+        )
+        rows = relation.fetchall()
+        cols = [desc[0] for desc in relation.description]
+        return [dict(zip(cols, row, strict=True)) for row in rows]
 
     def query_by_uri(self, uri: str, limit: int = 100) -> list[dict]:
         """Query chunks by file URI/path.
@@ -146,12 +166,10 @@ class DuckDBCatalog:
             msg = "Connection not open"
             raise RuntimeError(msg)
 
-        result = self.conn.execute(
-            "SELECT * FROM chunks WHERE uri = ? LIMIT ?", [uri, limit]
-        ).fetchall()
-
-        cols = [desc[0] for desc in self.conn.description]
-        return [dict(zip(cols, row)) for row in result]
+        relation = self.conn.execute("SELECT * FROM chunks WHERE uri = ? LIMIT ?", [uri, limit])
+        rows = relation.fetchall()
+        cols = [desc[0] for desc in relation.description]
+        return [dict(zip(cols, row, strict=True)) for row in rows]
 
     def get_embeddings_by_ids(self, ids: Sequence[int]) -> np.ndarray:
         """Extract embedding vectors for given chunk IDs.
@@ -192,14 +210,21 @@ class DuckDBCatalog:
         if not ids:
             return np.array([], dtype=np.float32)
 
-        id_list = ",".join(str(i) for i in ids)
-        result = self.conn.execute(
-            f"SELECT id, embedding FROM chunks WHERE id IN ({id_list}) ORDER BY id"
-        ).fetchall()
+        relation = self.conn.execute(
+            """
+            SELECT c.id, c.embedding, ids.position
+            FROM chunks AS c
+            JOIN UNNEST(?) WITH ORDINALITY AS ids(id, position)
+                ON c.id = ids.id
+            ORDER BY ids.position
+            """,
+            [list(ids)],
+        )
+        rows = relation.fetchall()
+        if not rows:
+            return np.array([], dtype=np.float32)
 
-        # Extract embeddings in order
-        id_to_emb = {row[0]: np.array(row[1], dtype=np.float32) for row in result}
-        embeddings = [id_to_emb[i] for i in ids if i in id_to_emb]
+        embeddings = [np.array(row[1], dtype=np.float32) for row in rows]
 
         if not embeddings:
             return np.array([], dtype=np.float32)

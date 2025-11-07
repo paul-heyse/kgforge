@@ -7,7 +7,7 @@ for efficient vector storage and querying via DuckDB.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pyarrow as pa
@@ -113,7 +113,7 @@ def write_chunks_parquet(
         table,
         output_path,
         compression="snappy",
-        use_dictionary=["uri"],
+        use_dictionary=True,
     )
 
 
@@ -145,11 +145,21 @@ def extract_embeddings(table: pa.Table) -> np.ndarray:
     -------
     np.ndarray
         Embeddings array of shape (num_rows, vec_dim).
+
+    Raises
+    ------
+    TypeError
+        If the embedding column is not stored as a FixedSizeListArray.
     """
-    embedding_col = table["embedding"]
-    # Convert FixedSizeList to numpy array
-    flat_values = embedding_col.flatten().to_numpy()
-    vec_dim = embedding_col.type.list_size
+    chunked = table.column("embedding")
+    dense_array = chunked.combine_chunks()
+    if not isinstance(dense_array, pa.FixedSizeListArray):
+        msg = "Embedding column is not a FixedSizeListArray"
+        raise TypeError(msg)
+
+    fixed_array = cast("pa.FixedSizeListArray", dense_array)
+    vec_dim = fixed_array.type.list_size
+    flat_values = fixed_array.values.to_numpy(zero_copy_only=False)
     return flat_values.reshape(-1, vec_dim)
 
 

@@ -346,7 +346,7 @@ def load_settings() -> Settings:
         bm25_k1=float(os.environ.get("BM25_K1", "0.9")),
         bm25_b=float(os.environ.get("BM25_B", "0.4")),
         rrf_k=int(os.environ.get("RRF_K", "60")),
-        use_cuvs=os.environ.get("USE_CUVS", "1").lower() in ("1", "true", "yes"),
+        use_cuvs=os.environ.get("USE_CUVS", "1").lower() in {"1", "true", "yes"},
     )
 
     limits = ServerLimits(
