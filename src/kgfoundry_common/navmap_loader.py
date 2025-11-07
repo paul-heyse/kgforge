@@ -272,12 +272,21 @@ class NavMetadataModel(BaseModel):
         tuple[str, JsonValue]
             Key and value pairs for navigation metadata entries.
 
+        Returns
+        -------
+        TupleGenerator
+            Iterator over key-value pairs. This is Pydantic's type alias for
+            ``Iterator[tuple[str, JsonValue]]``. Generator functions return
+            iterator objects, so this method returns an iterator despite using
+            ``yield from``.
+
         Notes
         -----
-        The return annotation ``TupleGenerator`` is Pydantic's alias for
-        ``Iterator[tuple[str, JsonValue]]``. Iteration delegates to the underlying
-        mapping via ``yield from``. This method returns an iterator over key-value
-        pairs, but Ruff flags it as not returning due to the generator pattern.
+        This method implements the iterator protocol using ``yield from`` to
+        delegate to the underlying mapping's items. The return annotation
+        ``TupleGenerator`` is Pydantic's type alias for ``Iterator[tuple[str, JsonValue]]``.
+        Generator functions return iterator objects when called, so this function
+        does return a value (an iterator), even though it uses ``yield from``.
         """
         items = self.as_mapping().items()
         yield from items

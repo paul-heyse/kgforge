@@ -595,15 +595,21 @@ def cli_run(cfg: CliRunConfig) -> Iterator[tuple[CliContext, EnvelopeBuilder]]:
     Raises
     ------
     SystemExit
-        Raised with exit code ``1`` when an exception occurs and
-        ``cfg.exit_on_error`` evaluates to ``True``.
+        Raised with exit code ``1`` when an exception occurs inside the context
+        and ``cfg.exit_on_error`` evaluates to ``True``. The original exception
+        is chained via ``raise SystemExit(1) from error``.
+    Exception
+        Any exception raised inside the context is re-raised when
+        ``cfg.exit_on_error`` evaluates to ``False``. The exception is stored
+        in a local variable during exception handling and then re-raised.
+        The specific exception type depends on what the wrapped operation raises.
 
     Notes
     -----
     When ``cfg.exit_on_error`` is ``False`` any exception raised inside the
-    context propagates unchanged to the caller. The variable ``error`` in the
-    function body is used for tracking purposes and does not represent an
-    exception type.
+    context propagates unchanged to the caller. The function uses a local variable
+    named ``error`` to store the caught exception for logging and conditional
+    re-raising, but this variable name does not represent an exception type.
     """
     metadata = _prepare_execution_metadata(cfg)
     envelope = _build_envelope(

@@ -158,6 +158,16 @@ repos:
         entry: bash tools/hooks/run_readme_generator.sh
         language: system
         pass_filenames: false
+      - id: forbid-direct-tree-sitter-imports
+        name: Forbid direct tree-sitter imports outside indexer/tscore.py
+        entry: bash -c "! grep -RIn --include='*.py' -E 'from tree_sitter|import tree_sitter' codeintel | grep -v 'indexer/tscore.py' || (echo 'Use tscore.py for all Tree-sitter imports' && exit 1)"
+        language: system
+        files: ^codeintel/.*\.py$
+      - id: forbid-unsafe-open
+        name: Forbid raw open() in mcp_server (use tools._resolve_path)
+        entry: bash -c "! grep -RIn --include='*.py' -E '\\bopen\\(' codeintel/mcp_server || (echo 'Use sandboxed helpers from tools.py' && exit 1)"
+        language: system
+        files: ^codeintel/mcp_server/.*\.py$
       - id: docstring-builder-diff
         name: "docstring-builder (diff, optional)"
         entry: >-

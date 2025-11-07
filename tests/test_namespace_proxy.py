@@ -7,7 +7,7 @@ handling without relying on Any types.
 from __future__ import annotations
 
 from types import ModuleType
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, NoReturn, cast
 
 import pytest
 
@@ -136,7 +136,7 @@ class TestNamespaceRegistry:
         """Test that exceptions in loaders propagate correctly."""
         registry = NamespaceRegistry()
 
-        def failing_loader() -> object:
+        def failing_loader() -> NoReturn:
             """Raise ``RuntimeError`` to simulate a failing loader.
 
             Raises
@@ -147,7 +147,8 @@ class TestNamespaceRegistry:
             Notes
             -----
             This function never returns normally; it always raises :exc:`RuntimeError`.
-            The return type annotation exists for type checking purposes only.
+            The return type annotation ``NoReturn`` indicates that this function never
+            returns a value.
             """
             raise RuntimeError("Loader failed")
 

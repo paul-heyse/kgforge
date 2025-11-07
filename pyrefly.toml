@@ -1,4 +1,4 @@
-project-includes = ["src", "tests", "tools"]
+project-includes = ["src", "tests", "tools", "codeintel"]
 project-excludes = [
     "**/tests/fixtures*",
     "**/build/",
@@ -7,6 +7,7 @@ project-excludes = [
     "**/.venv/**",
     "**/__pycache__/**",
     "codeintel/ts_languages/**",
+    "src/kgfoundry_common/http/**",
 ]
 search-path = ["src", "stubs", "."]
 python-version = "3.13.9"

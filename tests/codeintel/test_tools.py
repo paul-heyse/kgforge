@@ -10,9 +10,21 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def sample_dir(tmp_path: Path) -> Path:
-    src = tmp_path / "pkg"
-    src.mkdir()
+def sample_dir(repo_fixture: Path) -> Path:
+    """Create sample directory within repository fixture.
+
+    Parameters
+    ----------
+    repo_fixture : Path
+        Repository fixture path.
+
+    Returns
+    -------
+    Path
+        Path to the created sample directory.
+    """
+    src = repo_fixture / "pkg"
+    src.mkdir(exist_ok=True)
     (src / "example.py").write_text(
         """
         def foo(x: int) -> int:
@@ -30,24 +42,23 @@ def sample_dir(tmp_path: Path) -> Path:
 
 
 def test_run_ts_query_identifiers(sample_dir: Path) -> None:
-    file_path = sample_dir / "example.py"
     query = "(identifier) @id"
-    result = tools.run_ts_query(str(file_path), language="python", query=query)
+    result = tools.run_ts_query("pkg/example.py", language="python", query=query)
     assert any(cap["text"] == "foo" for cap in result.captures)
 
 
-def test_list_python_symbols(sample_dir: Path) -> None:
-    symbols = tools.list_python_symbols(str(sample_dir))
+def test_list_python_symbols(_sample_dir: Path) -> None:
+    symbols = tools.list_python_symbols("pkg")
     assert symbols, "Expected at least one symbol entry"
     names = {entry["name"] for file in symbols for entry in file["defs"] if entry["name"]}
     assert {"foo", "bar"}.issubset(names)
 
 
-def test_list_calls(sample_dir: Path) -> None:
-    calls = tools.list_calls(str(sample_dir), language="python")
+def test_list_calls(_sample_dir: Path) -> None:
+    calls = tools.list_calls("pkg", language="python")
     assert any(call["callee"] == "bar" for call in calls)
 
 
-def test_list_errors(sample_dir: Path) -> None:
-    errors = tools.list_errors(str(sample_dir / "broken.py"), language="python")
+def test_list_errors(_sample_dir: Path) -> None:
+    errors = tools.list_errors("pkg/broken.py", language="python")
     assert errors, "Expected syntax errors to be reported"

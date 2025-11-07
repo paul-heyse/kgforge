@@ -40,6 +40,7 @@ from tools._shared.cli import (
     render_cli_envelope,
     validate_cli_envelope,
 )
+from tools._shared.cli_integration import cli_operation
 from tools._shared.cli_runtime import (
     CliContext,
     CliRunConfig,
@@ -137,6 +138,7 @@ _PUBLIC_EXPORTS: dict[str, object] = {
     "StructuredLoggerAdapter": cast("object", StructuredLoggerAdapter),
     "CliContext": CliContext,
     "CliRunConfig": CliRunConfig,
+    "cli_operation": cli_operation,
     "CliRunStatus": CliRunStatus,
     "EnvelopeBuilder": EnvelopeBuilder,
     "ProcessRunner": ProcessRunner,
@@ -246,6 +248,7 @@ __all__: tuple[str, ...] = (
     "build_problem_details",
     "build_schema_problem_details",
     "build_tool_problem_details",
+    "cli_operation",
     "cli_run",
     "codemods",
     "docs",

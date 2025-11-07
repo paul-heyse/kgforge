@@ -52,7 +52,7 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _FuturesTimeoutError
 from dataclasses import dataclass
 from importlib import import_module
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import TYPE_CHECKING, NoReturn, Protocol, cast
 
 from tools._shared.logging import get_logger, with_fields
 from tools._shared.proc import ToolExecutionError, run_tool
@@ -969,7 +969,7 @@ def run_build(
 def run_legacy(
     *args: object,
     **kwargs: object,
-) -> DocstringBuildResult:
+) -> NoReturn:
     """Deprecate legacy API for docstring builder in favor of typed config.
 
     .. deprecated::
@@ -993,7 +993,8 @@ def run_legacy(
     Notes
     -----
     This function never returns normally; it always raises :exc:`NotImplementedError`.
-    The return type annotation exists for type checking purposes only.
+    The return type annotation ``NoReturn`` indicates that this function never
+    returns a value.
     """
     msg = (
         "run_legacy() is deprecated and will be removed in a future release. "

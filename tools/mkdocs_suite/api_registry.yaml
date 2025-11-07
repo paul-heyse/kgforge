@@ -123,10 +123,10 @@ interfaces:
           - schema/examples/problem_details/tool-execution-error.json
   codeintel-indexer:
     type: cli
-    module: codeintel.indexer
+    module: codeintel
     owner: "@code-intel"
     stability: experimental
-    entrypoint: codeintel.indexer.cli:app
+    entrypoint: codeintel.cli:app
     binary: kgf-codeintel
     protocol: openapi-cli
     spec: openapi/openapi-cli.yaml
@@ -147,13 +147,13 @@ interfaces:
           Compile and run a Tree-sitter S-expression query against a source file, returning capture
           metadata as structured JSON. Ideal for debugging grammar updates or building lightweight
           developer tooling.
-        handler: codeintel.indexer.cli:query
+        handler: codeintel.cli:query
         tags:
           - codeintel
         env: []
         code_samples:
           - lang: bash
-            source: "uv run python -m codeintel.indexer.cli query src/example.py --language python --query queries/highlights.scm"
+            source: "uv run python -m codeintel.cli query src/example.py --language python --query queries/highlights.scm"
         problem_details:
           - schema/examples/problem_details/tool-execution-error.json
   navmap-cli:

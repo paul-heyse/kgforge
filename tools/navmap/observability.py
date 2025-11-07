@@ -218,6 +218,14 @@ def record_operation_metrics(
     None
         Context manager that yields control to the wrapped navmap operation block.
 
+    Raises
+    ------
+    Exception
+        Any exception raised within the context is explicitly re-raised after
+        metrics are recorded. The exception is caught, metrics are updated,
+        and then the exception is re-raised using a bare ``raise`` statement.
+        The specific exception type depends on what the wrapped operation raises.
+
     Notes
     -----
     Any exception raised within the context is propagated after metrics
