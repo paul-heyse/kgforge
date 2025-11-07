@@ -8,7 +8,41 @@ from typing import Any
 
 import numpy as np
 import pytest
+import kgfoundry_common.errors as errors_pkg
+from kgfoundry_common.errors.exceptions import KgFoundryErrorConfig as _ErrorConfig
+
+if not hasattr(errors_pkg, "KgFoundryErrorConfig"):
+    errors_pkg.KgFoundryErrorConfig = _ErrorConfig
+
 from codeintel_rev.mcp_server.adapters.semantic import semantic_search
+
+
+@pytest.fixture(autouse=True)
+def _stub_metrics(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Provide a minimal metrics stub for semantic adapter tests."""
+
+    class _Histogram:
+        def labels(self, **_: object) -> _Histogram:
+            return self
+
+        def observe(self, _: object) -> None:
+            return None
+
+    class _Counter:
+        def labels(self, **_: object) -> _Counter:
+            return self
+
+        def inc(self, _: object | None = None) -> None:
+            return None
+
+    class _Metrics:
+        operation_duration_seconds = _Histogram()
+        runs_total = _Counter()
+
+    monkeypatch.setattr(
+        "codeintel_rev.mcp_server.adapters.semantic.METRICS",
+        _Metrics(),
+    )
 
 
 class StubDuckDBCatalog:
@@ -17,6 +51,7 @@ class StubDuckDBCatalog:
     def __init__(self, _db_path: Any, _vectors_dir: Any) -> None:
         """Initialize stub catalog."""
         self._chunk = {
+            "id": 123,
             "uri": "src/module.py",
             "start_line": 0,
             "end_line": 0,
@@ -60,6 +95,11 @@ class StubDuckDBCatalog:
     def get_chunk_by_id(self, chunk_id: int) -> dict[str, Any] | None:
         return self._chunk if chunk_id == 123 else None
 
+    def query_by_ids(self, chunk_ids: list[int]) -> list[dict[str, Any]]:
+        if 123 in chunk_ids:
+            return [dict(self._chunk)]
+        return []
+
 
 class StubVLLMClient:
     """Stub vLLM client for testing."""
@@ -86,6 +126,7 @@ class _BaseStubFAISSManager:
         self.should_fail_gpu = should_fail_gpu
         self.gpu_disabled_reason: str | None = None
         self.clone_invocations = 0
+        self.last_k: int | None = None
 
     def load_cpu_index(self) -> None:
         """Load CPU index (no-op for testing)."""
@@ -126,7 +167,8 @@ class _BaseStubFAISSManager:
             Tuple of (distances, ids) arrays.
         """
         assert query.shape == (1, 2)
-        assert k == 1
+        assert k >= 1
+        self.last_k = k
         assert nprobe == 128
         return np.array([[0.9]], dtype=np.float32), np.array([[123]], dtype=np.int64)
 
@@ -140,11 +182,20 @@ class StubContext:
         faiss_manager: _BaseStubFAISSManager,
         limits: list[str] | None = None,
         error: str | None = None,
+        max_results: int = 5,
     ) -> None:
         """Initialize stub context."""
         self.faiss_manager = faiss_manager
         self.vllm_client = StubVLLMClient(SimpleNamespace())
-        self.settings = SimpleNamespace()
+        self.settings = SimpleNamespace(
+            limits=SimpleNamespace(max_results=max_results),
+            paths=SimpleNamespace(
+                faiss_index="/tmp/index.faiss",
+                duckdb_path="/tmp/catalog.duckdb",
+                vectors_dir="/tmp/vectors",
+            ),
+            vllm=SimpleNamespace(base_url="http://localhost"),
+        )
         self._limits = limits or []
         self._error = error
 
@@ -216,3 +267,63 @@ async def test_semantic_search_gpu_fallback(monkeypatch: pytest.MonkeyPatch) -> 
     location = findings[0].get("location")
     assert location is not None
     assert location.get("uri") == "src/module.py"
+
+
+@pytest.mark.asyncio
+async def test_semantic_search_limit_truncates_to_max_results(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    faiss_manager = _BaseStubFAISSManager(should_fail_gpu=False)
+    context = StubContext(
+        faiss_manager=faiss_manager,
+        limits=[],
+        error=None,
+        max_results=3,
+    )
+    monkeypatch.setattr(
+        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
+        lambda: context,
+    )
+
+    result = await semantic_search("hello", limit=10)
+
+    assert faiss_manager.last_k == 3
+    limits = result.get("limits")
+    assert limits is not None
+    assert any("exceeds max_results" in message for message in limits)
+    method = result.get("method")
+    assert method is not None
+    coverage = method.get("coverage")
+    assert coverage is not None
+    assert "/3 results" in coverage
+    assert "requested 10" in coverage
+
+
+@pytest.mark.asyncio
+async def test_semantic_search_limit_enforces_minimum(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    faiss_manager = _BaseStubFAISSManager(should_fail_gpu=False)
+    context = StubContext(
+        faiss_manager=faiss_manager,
+        limits=[],
+        error=None,
+        max_results=5,
+    )
+    monkeypatch.setattr(
+        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
+        lambda: context,
+    )
+
+    result = await semantic_search("hello", limit=0)
+
+    assert faiss_manager.last_k == 1
+    limits = result.get("limits")
+    assert limits is not None
+    assert any("not positive" in message for message in limits)
+    method = result.get("method")
+    assert method is not None
+    coverage = method.get("coverage")
+    assert coverage is not None
+    assert "/1 results" in coverage
+    assert "requested 0" in coverage
