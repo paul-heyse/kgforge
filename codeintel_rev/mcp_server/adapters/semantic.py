@@ -16,9 +16,11 @@ from typing import TYPE_CHECKING, cast
 import httpx
 import numpy as np
 
+from codeintel_rev.app.middleware import get_session_id
 from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.vllm_client import VLLMClient
-from codeintel_rev.mcp_server.schemas import AnswerEnvelope, Finding, MethodInfo
+from codeintel_rev.mcp_server.schemas import AnswerEnvelope, Finding, MethodInfo, ScopeIn
+from codeintel_rev.mcp_server.scope_utils import get_effective_scope
 from kgfoundry_common.errors import EmbeddingError, KgFoundryError, VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import DurationObservation, MetricsProvider, observe_duration
@@ -81,6 +83,10 @@ async def semantic_search(
 ) -> AnswerEnvelope:
     """Perform semantic search using embeddings.
 
+    Applies session scope filters during DuckDB hydration (if scope has path/language
+    constraints). FAISS search is performed without scope constraints (FAISS has no
+    built-in filtering), then results are filtered via DuckDB catalog queries.
+
     Parameters
     ----------
     context : ApplicationContext
@@ -93,7 +99,33 @@ async def semantic_search(
     Returns
     -------
     AnswerEnvelope
-        Semantic search response payload.
+        Semantic search response payload with findings and applied scope.
+
+    Examples
+    --------
+    Basic usage:
+
+    >>> result = await semantic_search(context, "data processing")
+    >>> isinstance(result["findings"], list)
+    True
+
+    With session scope:
+
+    >>> set_scope(context, {"languages": ["python"], "include_globs": ["src/**"]})
+    >>> result = await semantic_search(context, "data processing")
+    >>> # Returns only Python chunks from src/ directory
+    >>> result["scope"]["languages"]
+    ['python']
+
+    Notes
+    -----
+    Scope Integration:
+    - Session scope is retrieved from registry using session ID (set by middleware).
+    - FAISS search is performed without scope constraints (FAISS has no built-in filtering).
+    - Chunk IDs from FAISS are filtered via DuckDB catalog using scope's `include_globs`,
+      `exclude_globs`, and `languages` (see `query_by_filters` method).
+    - Applied scope is included in response envelope (`scope` field) for transparency.
+    - If no scope is set, searches all indexed chunks without filtering.
     """
     return await asyncio.to_thread(_semantic_search_sync, context, query, limit)
 
@@ -101,6 +133,21 @@ async def semantic_search(
 def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -> AnswerEnvelope:  # noqa: PLR0914 - pre-existing complexity, refactoring doesn't increase it
     start_time = perf_counter()
     with _observe("semantic_search") as observation:
+        # Retrieve session scope for filtering (applied during DuckDB hydration)
+        session_id = get_session_id()
+        scope = get_effective_scope(context, session_id)
+
+        LOGGER.debug(
+            "Semantic search with scope",
+            extra={
+                "session_id": session_id,
+                "query": query,
+                "has_scope": scope is not None,
+                "scope_languages": scope.get("languages") if scope else None,  # type: ignore[typeddict-item]
+                "scope_include_globs": scope.get("include_globs") if scope else None,  # type: ignore[typeddict-item]
+            },
+        )
+
         requested_limit = limit
         max_results = max(1, context.settings.limits.max_results)
         effective_limit = max(1, min(requested_limit, max_results))
@@ -137,10 +184,17 @@ def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -
                 limits=[*limits_metadata, "vLLM embedding service error"],
             )
 
+        # Over-fetch from FAISS to compensate for scope filtering
+        # Request 2x limit to ensure we have enough results after filtering
+        faiss_k = (
+            effective_limit * 2
+            if scope and (scope.get("include_globs") or scope.get("languages"))
+            else effective_limit
+        )
         result_ids, result_scores, search_exc = _run_faiss_search(
             context.faiss_manager,
             embedding,
-            effective_limit,
+            faiss_k,
         )
         if search_exc is not None:
             error = VectorSearchError(
@@ -154,7 +208,13 @@ def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -
                 limits=[*limits_metadata, "FAISS search error"],
             )
 
-        findings, hydrate_exc = _hydrate_findings(context, result_ids, result_scores)
+        # Hydrate findings with scope filtering if scope has filters
+        findings, hydrate_exc = _hydrate_findings(
+            context,
+            result_ids,
+            result_scores,
+            scope=scope,
+        )
         if hydrate_exc is not None:
             failure_limits = [*limits_metadata, "DuckDB hydration error"]
             error = VectorSearchError(
@@ -178,13 +238,37 @@ def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -
             )
 
         observation.mark_success()
+
+        # Log warning if scope filtering reduced results significantly
+        if (
+            scope
+            and (scope.get("include_globs") or scope.get("languages"))
+            and len(findings) < effective_limit
+        ):
+            LOGGER.warning(
+                "Scope filtering reduced results below requested limit",
+                extra={
+                    "requested_limit": effective_limit,
+                    "actual_count": len(findings),
+                    "faiss_results": len(result_ids),
+                    "has_include_globs": bool(scope.get("include_globs")),
+                    "has_exclude_globs": bool(scope.get("exclude_globs")),
+                    "has_languages": bool(scope.get("languages")),
+                },
+            )
+
+        extras = _success_extras(
+            limits_metadata, len(findings), requested_limit, effective_limit, start_time
+        )
+        # Include applied scope in response envelope
+        if scope:
+            extras["scope"] = scope
+
         return _make_envelope(
             findings=findings,
             answer=f"Found {len(findings)} semantically similar code chunks for: {query}",
             confidence=0.85 if findings else 0.0,
-            extras=_success_extras(
-                limits_metadata, len(findings), requested_limit, effective_limit, start_time
-            ),
+            extras=extras,
         )
 
 
@@ -237,8 +321,14 @@ def _hydrate_findings(
     context: ApplicationContext,
     chunk_ids: Sequence[int],
     scores: Sequence[float],
+    *,
+    scope: ScopeIn | None = None,
 ) -> tuple[list[Finding], Exception | None]:
     """Hydrate FAISS search results from DuckDB.
+
+    Applies scope filters (path globs, languages) during chunk hydration if scope
+    is provided. FAISS search is performed without scope constraints, then results
+    are filtered via DuckDB catalog queries.
 
     Parameters
     ----------
@@ -248,11 +338,25 @@ def _hydrate_findings(
         Chunk identifiers from FAISS search.
     scores : Sequence[float]
         Similarity scores aligned with chunk_ids.
+    scope : dict | None, optional
+        Session scope with optional `include_globs`, `exclude_globs`, and `languages`
+        fields. If provided and contains filters, uses `query_by_filters` instead of
+        `query_by_ids`. Defaults to None.
 
     Returns
     -------
     tuple[list[Finding], Exception | None]
         Findings constructed from the catalog and optional hydration exception.
+
+    Notes
+    -----
+    Scope Filtering:
+    - If scope has `include_globs` or `languages`, uses `catalog.query_by_filters()`
+      to filter chunks by path patterns and file extensions.
+    - If scope is None or has no filters, uses `catalog.query_by_ids()` for
+      unfiltered retrieval (backward compatible).
+    - Filtering happens during DuckDB hydration (post-FAISS), so FAISS search
+      may return more IDs than needed to compensate for filtering.
     """
     findings: list[Finding] = []
     try:
@@ -261,7 +365,26 @@ def _hydrate_findings(
             if not valid_ids:
                 return [], None
 
-            records = catalog.query_by_ids(valid_ids)
+            # Apply scope filters if scope has path/language constraints
+            if scope and (scope.get("include_globs") or scope.get("languages")):
+                records = catalog.query_by_filters(
+                    valid_ids,
+                    include_globs=scope.get("include_globs"),  # type: ignore[typeddict-item]
+                    exclude_globs=scope.get("exclude_globs"),  # type: ignore[typeddict-item]
+                    languages=scope.get("languages"),  # type: ignore[typeddict-item]
+                )
+                LOGGER.debug(
+                    "Applied scope filters during DuckDB hydration",
+                    extra={
+                        "chunk_ids_count": len(valid_ids),
+                        "filtered_count": len(records),
+                        "has_include_globs": bool(scope.get("include_globs")),
+                        "has_exclude_globs": bool(scope.get("exclude_globs")),
+                        "has_languages": bool(scope.get("languages")),
+                    },
+                )
+            else:
+                records = catalog.query_by_ids(valid_ids)
             chunk_by_id = {int(record["id"]): record for record in records if "id" in record}
 
             for chunk_id, score in zip(chunk_ids, scores, strict=True):

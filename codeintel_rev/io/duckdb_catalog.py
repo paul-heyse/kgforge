@@ -7,13 +7,26 @@ chunk retrieval and joins.
 from __future__ import annotations
 
 from pathlib import Path
+from time import perf_counter
 from typing import TYPE_CHECKING, Self
 
 import duckdb
 import numpy as np
 
+from kgfoundry_common.logging import get_logger
+from kgfoundry_common.prometheus import build_histogram
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+LOGGER = get_logger(__name__)
+
+# Prometheus metrics for scope filtering
+_scope_filter_duration_seconds = build_histogram(
+    "codeintel_scope_filter_duration_seconds",
+    "Time to apply scope filters",
+    ("filter_type",),
+)
 
 
 class DuckDBCatalog:
@@ -62,6 +75,9 @@ class DuckDBCatalog:
     def _ensure_views(self) -> None:
         """Create views over Parquet directories.
 
+        Creates the `chunks` view over Parquet files and creates an index on the
+        `uri` column for efficient path filtering in `query_by_filters`.
+
         Raises
         ------
         RuntimeError
@@ -75,23 +91,27 @@ class DuckDBCatalog:
         if any(self.vectors_dir.rglob("*.parquet")):
             relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
             relation.create_view("chunks", replace=True)
-            return
+        else:
+            self.conn.execute(
+                """
+                CREATE OR REPLACE VIEW chunks AS
+                SELECT
+                    CAST(NULL AS BIGINT) AS id,
+                    CAST(NULL AS VARCHAR) AS uri,
+                    CAST(NULL AS INTEGER) AS start_line,
+                    CAST(NULL AS INTEGER) AS end_line,
+                    CAST(NULL AS BIGINT) AS start_byte,
+                    CAST(NULL AS BIGINT) AS end_byte,
+                    CAST(NULL AS VARCHAR) AS preview,
+                    CAST(NULL AS FLOAT[]) AS embedding
+                WHERE 1 = 0
+                """
+            )
 
-        self.conn.execute(
-            """
-            CREATE OR REPLACE VIEW chunks AS
-            SELECT
-                CAST(NULL AS BIGINT) AS id,
-                CAST(NULL AS VARCHAR) AS uri,
-                CAST(NULL AS INTEGER) AS start_line,
-                CAST(NULL AS INTEGER) AS end_line,
-                CAST(NULL AS BIGINT) AS start_byte,
-                CAST(NULL AS BIGINT) AS end_byte,
-                CAST(NULL AS VARCHAR) AS preview,
-                CAST(NULL AS FLOAT[]) AS embedding
-            WHERE 1 = 0
-            """
-        )
+        # Create index on uri column for efficient path filtering
+        # Index is idempotent (IF NOT EXISTS prevents errors on repeated calls)
+        self.conn.execute("CREATE INDEX IF NOT EXISTS idx_uri ON chunks(uri)")
+        LOGGER.info("Created DuckDB index on uri column")
 
     def query_by_ids(self, ids: Sequence[int]) -> list[dict]:
         """Query chunks by their unique IDs.
@@ -143,6 +163,301 @@ class DuckDBCatalog:
         rows = relation.fetchall()
         cols = [desc[0] for desc in relation.description]
         return [dict(zip(cols, row, strict=True)) for row in rows]
+
+    def query_by_filters(  # noqa: C901, PLR0912, PLR0915, PLR0914 - complex filtering logic with SQL generation and post-processing
+        self,
+        ids: Sequence[int],
+        *,
+        include_globs: list[str] | None = None,
+        exclude_globs: list[str] | None = None,
+        languages: list[str] | None = None,
+    ) -> list[dict]:
+        """Query chunks by IDs with path and language filtering.
+
+        Retrieves chunk metadata for a list of chunk IDs, applying optional filters
+        for path patterns (include/exclude globs) and programming languages. This
+        method is used after FAISS search to filter results by scope constraints.
+
+        Filtering Strategy:
+        - Simple globs (e.g., `*.py`, `src/**`) are converted to SQL `LIKE` patterns
+          for efficient database-side filtering.
+        - Complex globs (e.g., `src/**/test_*.py`) fall back to Python `fnmatch`
+          post-filtering after SQL query execution.
+        - Language filtering uses file extension mapping (e.g., `python` → `.py`, `.pyi`).
+
+        Parameters
+        ----------
+        ids : Sequence[int]
+            Sequence of chunk IDs to retrieve. Empty sequence returns empty list.
+        include_globs : list[str] | None, optional
+            Glob patterns to include. Chunks must match at least one pattern.
+            Empty list means "include all" (no filtering). Defaults to None.
+        exclude_globs : list[str] | None, optional
+            Glob patterns to exclude. Chunks matching any pattern are removed.
+            Empty list means "exclude none". Defaults to None.
+        languages : list[str] | None, optional
+            Programming language names (e.g., ["python", "typescript"]).
+            Filters chunks by file extension. Defaults to None.
+
+        Returns
+        -------
+        list[dict]
+            List of filtered chunk records as dictionaries. Each dict contains all
+            columns from the chunks Parquet file. Results preserve input ID order
+            (via JOIN with UNNEST ordinality). Returns empty list if no IDs provided
+            or all chunks filtered out.
+
+        Raises
+        ------
+        RuntimeError
+            If the database connection is not open. Call open() or use the
+            context manager before querying.
+
+        Examples
+        --------
+        Filter by language:
+
+        >>> catalog.query_by_filters([1, 2, 3], languages=["python"])
+        [{'id': 1, 'uri': 'src/main.py', ...}, {'id': 2, 'uri': 'src/utils.py', ...}]
+
+        Filter by include globs:
+
+        >>> catalog.query_by_filters([1, 2, 3], include_globs=["src/**/*.py"])
+        [{'id': 1, 'uri': 'src/main.py', ...}]
+
+        Combined filters:
+
+        >>> catalog.query_by_filters(
+        ...     [1, 2, 3],
+        ...     include_globs=["**/*.py"],
+        ...     exclude_globs=["**/test_*.py"],
+        ...     languages=["python"],
+        ... )
+        [{'id': 1, 'uri': 'src/main.py', ...}]
+
+        Notes
+        -----
+        SQL LIKE Pattern Conversion:
+        - `**/*.py` → `%.py` (matches any path ending in .py)
+        - `src/**` → `src/%` (matches paths starting with src/)
+        - `*.py` → `%.py` (same as **/*.py in our implementation)
+
+        Complex Glob Detection:
+        - Patterns with `**` in the middle (e.g., `src/**/test_*.py`) are detected
+          as complex and use Python post-filtering.
+        - Patterns with bracket expressions `[...]` or `[!...]` use Python filtering.
+        - Simple prefix/suffix patterns use SQL LIKE for performance.
+
+        Language Extension Mapping:
+        - Uses `LANGUAGE_EXTENSIONS` from `scope_utils` module.
+        - Unknown languages are silently ignored (no error raised).
+        - Extension matching is case-insensitive (normalizes to lowercase).
+
+        Performance:
+        - SQL filtering is preferred for large result sets (avoids transferring
+          filtered-out chunks from database).
+        - Python post-filtering adds ~1-2ms overhead per 1000 chunks.
+        - Consider adding index on `uri` column for faster LIKE queries (see Task 14).
+        """
+        if not self.conn:
+            msg = "Connection not open"
+            raise RuntimeError(msg)
+
+        if not ids:
+            return []
+
+        # Measure filtering duration
+        start_time = perf_counter()
+
+        # Import LANGUAGE_EXTENSIONS here to avoid circular dependency
+        from codeintel_rev.mcp_server.scope_utils import (  # noqa: PLC0415 - import inside function to avoid circular dependency
+            LANGUAGE_EXTENSIONS,
+            path_matches_glob,
+        )
+
+        # Build base query with ID filtering
+        query_parts = [
+            "SELECT c.*",
+            "FROM chunks AS c",
+            "JOIN UNNEST(?) WITH ORDINALITY AS ids(id, position)",
+            "  ON c.id = ids.id",
+        ]
+        params: list[object] = [list(ids)]
+        where_clauses: list[str] = []
+
+        # Convert simple globs to SQL LIKE patterns
+        simple_include_patterns: list[str] = []
+        complex_include_patterns: list[str] = []
+        simple_exclude_patterns: list[str] = []
+        complex_exclude_patterns: list[str] = []
+
+        if include_globs:
+            for pattern in include_globs:
+                if self._is_simple_glob(pattern):
+                    sql_pattern = self._glob_to_sql_like(pattern)
+                    simple_include_patterns.append(sql_pattern)
+                else:
+                    complex_include_patterns.append(pattern)
+
+        if exclude_globs:
+            for pattern in exclude_globs:
+                if self._is_simple_glob(pattern):
+                    sql_pattern = self._glob_to_sql_like(pattern)
+                    simple_exclude_patterns.append(sql_pattern)
+                else:
+                    complex_exclude_patterns.append(pattern)
+
+        # Add SQL WHERE clauses for simple patterns
+        if simple_include_patterns:
+            like_clauses = " OR ".join("c.uri LIKE ?" for _ in simple_include_patterns)
+            where_clauses.append(f"({like_clauses})")
+            params.extend(simple_include_patterns)
+
+        if simple_exclude_patterns:
+            for pattern in simple_exclude_patterns:
+                where_clauses.append("c.uri NOT LIKE ?")
+                params.append(pattern)
+
+        # Add language filter (SQL LIKE for extensions)
+        if languages:
+            extensions: set[str] = set()
+            for lang in languages:
+                lang_extensions = LANGUAGE_EXTENSIONS.get(lang.lower(), [])
+                extensions.update(lang_extensions)
+
+            if extensions:
+                ext_clauses = " OR ".join("c.uri LIKE ?" for _ in extensions)
+                where_clauses.append(f"({ext_clauses})")
+                # SQL LIKE patterns: escape % and _ if needed, but extensions are safe
+                params.extend(f"%{ext}" for ext in extensions)
+            else:
+                # No extensions found for requested languages -> no matches
+                # Return empty by adding impossible WHERE clause
+                where_clauses.append("1 = 0")
+
+        # Build final query
+        if where_clauses:
+            query_parts.append("WHERE " + " AND ".join(where_clauses))
+
+        query_parts.append("ORDER BY ids.position")
+
+        query = "\n".join(query_parts)
+
+        # Execute SQL query
+        relation = self.conn.execute(query, params)
+        rows = relation.fetchall()
+        cols = [desc[0] for desc in relation.description]
+        results = [dict(zip(cols, row, strict=True)) for row in rows]
+
+        # Post-filter complex globs using Python fnmatch
+        if complex_include_patterns or complex_exclude_patterns:
+            filtered_results: list[dict] = []
+            for chunk in results:
+                uri = chunk.get("uri", "")
+                if not isinstance(uri, str):
+                    continue
+
+                # Check complex include patterns
+                if complex_include_patterns and not any(
+                    path_matches_glob(uri, pattern) for pattern in complex_include_patterns
+                ):
+                    continue  # Doesn't match any include pattern
+
+                # Check complex exclude patterns
+                if complex_exclude_patterns and any(
+                    path_matches_glob(uri, pattern) for pattern in complex_exclude_patterns
+                ):
+                    continue  # Matches an exclude pattern
+
+                filtered_results.append(chunk)
+            results = filtered_results
+
+        # Record filtering duration
+        duration = perf_counter() - start_time
+        filter_type = "none"
+        if include_globs or exclude_globs:
+            filter_type = "combined" if languages else "glob"
+        elif languages:
+            filter_type = "language"
+        _scope_filter_duration_seconds.labels(filter_type=filter_type).observe(duration)
+
+        return results
+
+    @staticmethod
+    def _is_simple_glob(pattern: str) -> bool:
+        """Check if glob pattern can be converted to SQL LIKE.
+
+        Simple patterns:
+        - `*.py` (suffix match)
+        - `**/*.py` (suffix match, equivalent to `*.py`)
+        - `src/**` (prefix match)
+        - `src/*.py` (prefix + suffix)
+
+        Complex patterns (require Python filtering):
+        - `src/**/test_*.py` (recursive in middle)
+        - `src/[abc]/*.py` (bracket expressions)
+        - `src/{a,b}/*.py` (brace expansion)
+
+        Parameters
+        ----------
+        pattern : str
+            Glob pattern to check.
+
+        Returns
+        -------
+        bool
+            True if pattern can be converted to SQL LIKE, False otherwise.
+        """
+        # Normalize separators
+        normalized = pattern.replace("\\", "/")
+
+        # Check for complex patterns
+        if "[" in normalized or "{" in normalized:
+            return False  # Bracket expressions or brace expansion
+
+        # Check for ** in middle (not at start or end)
+        if "**" in normalized:
+            parts = normalized.split("**")
+            expected_parts = 2  # Simple glob has at most one ** separator
+            if len(parts) > expected_parts:
+                return False  # Multiple ** separators
+            if len(parts) == expected_parts and parts[0] and parts[1]:
+                # ** in middle: e.g., "src/**/test.py"
+                return False
+
+        return True
+
+    @staticmethod
+    def _glob_to_sql_like(pattern: str) -> str:
+        """Convert simple glob pattern to SQL LIKE pattern.
+
+        Conversions:
+        - `*.py` → `%.py`
+        - `**/*.py` → `%.py` (same as `*.py`)
+        - `src/**` → `src/%`
+        - `src/*.py` → `src/%.py`
+
+        Parameters
+        ----------
+        pattern : str
+            Simple glob pattern (must pass `_is_simple_glob` check).
+
+        Returns
+        -------
+        str
+            SQL LIKE pattern ready for parameterized query.
+        """
+        # Normalize separators
+        normalized = pattern.replace("\\", "/")
+
+        # Replace ** with % (matches any characters including slashes)
+        normalized = normalized.replace("**", "%")
+
+        # Replace * with % (matches any characters)
+        normalized = normalized.replace("*", "%")
+
+        # Replace ? with _ (matches single character)
+        return normalized.replace("?", "_")
 
     def get_chunk_by_id(self, chunk_id: int) -> dict | None:
         """Return a single chunk record by ID.

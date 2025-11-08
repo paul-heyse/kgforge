@@ -11,7 +11,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from codeintel_rev.app.middleware import get_session_id
 from codeintel_rev.mcp_server.schemas import Match
+from codeintel_rev.mcp_server.scope_utils import get_effective_scope
 from kgfoundry_common.errors import KgFoundryError, VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import DurationObservation, MetricsProvider, observe_duration
@@ -87,6 +89,9 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
 ) -> dict:
     """Fast text search using ripgrep.
 
+    Applies session scope path filters if set via `set_scope`. Explicit `paths`
+    parameter overrides session scope.
+
     Parameters
     ----------
     context : ApplicationContext
@@ -98,7 +103,7 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
     case_sensitive : bool
         Case-sensitive search.
     paths : Sequence[str] | None
-        Paths to search in (relative to repo root).
+        Paths to search in (relative to repo root). Overrides session scope if provided.
     max_results : int
         Maximum number of results.
 
@@ -109,17 +114,62 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
 
     Examples
     --------
+    Basic usage:
+
     >>> result = search_text(context, "def main", regex=False)
     >>> isinstance(result["matches"], list)
     True
+
+    With session scope:
+
+    >>> set_scope(context, {"include_globs": ["src/**/*.py"]})
+    >>> result = search_text(context, "def main")
+    >>> # Searches only Python files in src/ directory
+
+    Explicit paths override scope:
+
+    >>> set_scope(context, {"include_globs": ["src/**"]})
+    >>> result = search_text(context, "def main", paths=["tests/"])
+    >>> # Searches tests/ directory (explicit override), not src/
+
+    Notes
+    -----
+    Scope Integration:
+    - Session scope is retrieved from registry using session ID (set by middleware).
+    - If explicit `paths` parameter is provided, it overrides scope's `include_globs`.
+    - If no explicit `paths` and scope has `include_globs`, scope paths are used.
+    - If neither explicit paths nor scope paths, searches entire repository (ripgrep default).
     """
     repo_root = context.paths.repo_root
+
+    # Retrieve session scope and merge with explicit paths parameter
+    session_id = get_session_id()
+    scope = get_effective_scope(context, session_id)
+
+    # Determine effective paths: explicit paths override scope
+    if paths:
+        effective_paths = list(paths)  # Explicit paths override scope
+    elif scope and scope.get("include_globs"):
+        effective_paths = scope.get("include_globs") or None  # type: ignore[assignment]
+    else:
+        effective_paths = None  # Search all (ripgrep default)
+
+    LOGGER.debug(
+        "Searching text with scope filters",
+        extra={
+            "session_id": session_id,
+            "query": query,
+            "explicit_paths": list(paths) if paths else None,
+            "scope_paths": scope.get("include_globs") if scope else None,  # type: ignore[typeddict-item]
+            "effective_paths": effective_paths,
+        },
+    )
 
     cmd = _build_ripgrep_command(
         query=query,
         regex=regex,
         case_sensitive=case_sensitive,
-        paths=paths,
+        paths=effective_paths,
         max_results=max_results,
     )
 
