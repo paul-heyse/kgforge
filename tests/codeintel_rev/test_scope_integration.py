@@ -138,6 +138,21 @@ def mock_context(test_repo: Path) -> Mock:
     return context
 
 
+@pytest.fixture(autouse=True)
+def disable_scope_metrics(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace scope histogram with a stub for deterministic tests."""
+
+    from codeintel_rev.mcp_server import scope_utils
+
+    class _HistogramStub:
+        def labels(self, **_: object) -> "_HistogramStub":
+            return self
+
+        def observe(self, _: float) -> None:
+            return None
+
+    monkeypatch.setattr(scope_utils, "_scope_filter_duration_seconds", _HistogramStub())
+
 @pytest.fixture
 def session_id() -> str:
     """Generate a test session ID.
@@ -441,6 +456,99 @@ class TestSetScopeToSemanticSearch:
         if findings:
             uris = [f.get("uri", "") for f in findings]
             assert all(isinstance(uri, str) and uri.startswith("src/") for uri in uris if uri)
+
+    def test_set_scope_then_semantic_search_exclude_globs(
+        self, mock_context: Mock, session_id: str
+    ) -> None:
+        """Test that setting scope with exclude_globs filters semantic_search results."""
+        session_id_var.set(session_id)
+
+        scope: ScopeIn = {"exclude_globs": ["tests/**"]}
+        files_adapter.set_scope(mock_context, scope)
+
+        search_call: dict[str, int] = {}
+
+        def fake_search(query: np.ndarray, k: int = 0) -> tuple[np.ndarray, np.ndarray]:
+            search_call["k"] = k
+            return (
+                np.array([[0.9, 0.8]], dtype=np.float32),
+                np.array([[1, 2]], dtype=np.int64),
+            )
+
+        mock_context.faiss_manager.search = Mock(side_effect=fake_search)
+        mock_context.vllm_client.embed_single = Mock(
+            return_value=np.array([0.1] * 2560, dtype=np.float32)
+        )
+
+        test_chunks = [
+            {
+                "id": 1,
+                "uri": "src/main.py",
+                "start_line": 1,
+                "end_line": 10,
+                "preview": "def main()",
+            },
+            {
+                "id": 2,
+                "uri": "tests/test_main.py",
+                "start_line": 1,
+                "end_line": 5,
+                "preview": "def test_main()",
+            },
+        ]
+
+        def mock_query_by_filters(
+            ids,
+            *,
+            include_globs=None,
+            exclude_globs=None,
+            languages=None,  # noqa: ARG001
+        ) -> list[dict]:
+            assert exclude_globs == ["tests/**"]
+            import fnmatch
+
+            filtered: list[dict] = []
+            for chunk in test_chunks:
+                if chunk["id"] not in ids:
+                    continue
+                if exclude_globs and any(
+                    fnmatch.fnmatch(chunk["uri"], pattern)
+                    for pattern in exclude_globs
+                ):
+                    continue
+                filtered.append(chunk)
+            return filtered
+
+        catalog_mock = Mock()
+        catalog_mock.query_by_filters = Mock(side_effect=mock_query_by_filters)
+        catalog_mock.query_by_ids = Mock(side_effect=AssertionError("query_by_ids should not be used"))
+
+        from contextlib import contextmanager
+
+        @contextmanager
+        def test_open_catalog() -> Generator[Mock]:
+            yield catalog_mock
+
+        mock_context.open_catalog = test_open_catalog
+
+        result = asyncio.run(semantic_adapter.semantic_search(mock_context, "query", 2))
+
+        assert search_call.get("k") == 4
+        catalog_mock.query_by_filters.assert_called_once()
+        call_kwargs = catalog_mock.query_by_filters.call_args.kwargs
+        assert call_kwargs.get("exclude_globs") == ["tests/**"]
+
+        findings = result.get("findings", [])
+        assert len(findings) == 1
+        first_location = findings[0].get("location") if isinstance(findings[0], dict) else None
+        assert isinstance(first_location, dict)
+        assert first_location.get("uri") == "src/main.py"
+
+        method = result.get("method")
+        assert method is not None
+        coverage = method.get("coverage") if isinstance(method, dict) else None
+        assert isinstance(coverage, str)
+        assert coverage.startswith("1/2 results")
 
 
 class TestParameterOverride:
