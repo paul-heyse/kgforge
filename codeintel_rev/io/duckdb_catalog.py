@@ -6,6 +6,7 @@ chunk retrieval and joins.
 
 from __future__ import annotations
 
+from contextlib import suppress
 from pathlib import Path
 from time import perf_counter
 from typing import TYPE_CHECKING, Self
@@ -380,8 +381,6 @@ class DuckDBCatalog:
         elif languages:
             filter_type = "language"
         # Record metric (may fail in test environments without Prometheus registry)
-        from contextlib import suppress
-
         with suppress(ValueError):
             _scope_filter_duration_seconds.labels(filter_type=filter_type).observe(duration)
 
