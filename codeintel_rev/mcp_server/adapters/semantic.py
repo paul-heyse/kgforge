@@ -186,11 +186,12 @@ def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -
 
         # Over-fetch from FAISS to compensate for scope filtering
         # Request 2x limit to ensure we have enough results after filtering
-        faiss_k = (
-            effective_limit * 2
-            if scope and (scope.get("include_globs") or scope.get("languages"))
-            else effective_limit
-        )
+        has_include_globs = bool(scope and scope.get("include_globs"))
+        has_exclude_globs = bool(scope and scope.get("exclude_globs"))
+        has_languages = bool(scope and scope.get("languages"))
+        has_scope_filters = has_include_globs or has_exclude_globs or has_languages
+
+        faiss_k = effective_limit * 2 if has_scope_filters else effective_limit
         result_ids, result_scores, search_exc = _run_faiss_search(
             context.faiss_manager,
             embedding,
@@ -240,20 +241,16 @@ def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -
         observation.mark_success()
 
         # Log warning if scope filtering reduced results significantly
-        if (
-            scope
-            and (scope.get("include_globs") or scope.get("languages"))
-            and len(findings) < effective_limit
-        ):
+        if scope and has_scope_filters and len(findings) < effective_limit:
             LOGGER.warning(
                 "Scope filtering reduced results below requested limit",
                 extra={
                     "requested_limit": effective_limit,
                     "actual_count": len(findings),
                     "faiss_results": len(result_ids),
-                    "has_include_globs": bool(scope.get("include_globs")),
-                    "has_exclude_globs": bool(scope.get("exclude_globs")),
-                    "has_languages": bool(scope.get("languages")),
+                    "has_include_globs": has_include_globs,
+                    "has_exclude_globs": has_exclude_globs,
+                    "has_languages": has_languages,
                 },
             )
 
@@ -351,8 +348,9 @@ def _hydrate_findings(
     Notes
     -----
     Scope Filtering:
-    - If scope has `include_globs` or `languages`, uses `catalog.query_by_filters()`
-      to filter chunks by path patterns and file extensions.
+    - If scope has `include_globs`, `exclude_globs`, or `languages`, uses
+      `catalog.query_by_filters()` to filter chunks by path patterns and file
+      extensions.
     - If scope is None or has no filters, uses `catalog.query_by_ids()` for
       unfiltered retrieval (backward compatible).
     - Filtering happens during DuckDB hydration (post-FAISS), so FAISS search
@@ -365,22 +363,32 @@ def _hydrate_findings(
             if not valid_ids:
                 return [], None
 
+            include_globs = (
+                cast("list[str] | None", scope.get("include_globs")) if scope else None
+            )
+            exclude_globs = (
+                cast("list[str] | None", scope.get("exclude_globs")) if scope else None
+            )
+            languages = cast("list[str] | None", scope.get("languages")) if scope else None
+
+            has_filters = bool(include_globs or exclude_globs or languages)
+
             # Apply scope filters if scope has path/language constraints
-            if scope and (scope.get("include_globs") or scope.get("languages")):
+            if has_filters:
                 records = catalog.query_by_filters(
                     valid_ids,
-                    include_globs=scope.get("include_globs"),  # type: ignore[typeddict-item]
-                    exclude_globs=scope.get("exclude_globs"),  # type: ignore[typeddict-item]
-                    languages=scope.get("languages"),  # type: ignore[typeddict-item]
+                    include_globs=include_globs,
+                    exclude_globs=exclude_globs,
+                    languages=languages,
                 )
                 LOGGER.debug(
                     "Applied scope filters during DuckDB hydration",
                     extra={
                         "chunk_ids_count": len(valid_ids),
                         "filtered_count": len(records),
-                        "has_include_globs": bool(scope.get("include_globs")),
-                        "has_exclude_globs": bool(scope.get("exclude_globs")),
-                        "has_languages": bool(scope.get("languages")),
+                        "has_include_globs": bool(include_globs),
+                        "has_exclude_globs": bool(exclude_globs),
+                        "has_languages": bool(languages),
                     },
                 )
             else:
