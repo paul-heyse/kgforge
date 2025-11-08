@@ -6,8 +6,9 @@ Provides health/readiness endpoints, CORS, and streaming support.
 from __future__ import annotations
 
 import asyncio
+import os
 from collections.abc import AsyncIterator, Awaitable, Callable
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +16,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.responses import Response
 
 from codeintel_rev.app.config_context import ApplicationContext
+from codeintel_rev.app.middleware import SessionScopeMiddleware
 from codeintel_rev.app.readiness import ReadinessProbe
 from codeintel_rev.mcp_server.server import app_context
 from codeintel_rev.mcp_server.server import asgi_app as mcp_asgi
@@ -56,7 +58,7 @@ def _preload_faiss_index(context: ApplicationContext) -> bool:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0915  # Complex initialization sequence required
     """Application lifespan manager with explicit configuration initialization.
 
     This function runs during FastAPI startup and shutdown, managing the
@@ -65,12 +67,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     Startup sequence:
     1. Load configuration from environment (fail fast if invalid)
     2. Initialize long-lived clients (vLLM, FAISS manager)
-    3. Run readiness checks (verify indexes exist, vLLM reachable)
-    4. Optionally pre-load FAISS index (controlled by FAISS_PRELOAD env var)
+    3. Initialize scope registry for session-scoped query constraints
+    4. Run readiness checks (verify indexes exist, vLLM reachable)
+    5. Optionally pre-load FAISS index (controlled by FAISS_PRELOAD env var)
+    6. Start background pruning task for expired sessions
 
     Shutdown sequence:
-    1. Clear readiness state
-    2. Explicitly close any open resources
+    1. Cancel background pruning task
+    2. Clear readiness state
+    3. Explicitly close any open resources
 
     Yields
     ------
@@ -102,6 +107,49 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             if not preload_success:
                 LOGGER.warning("FAISS index pre-load failed; will lazy-load on first search")
 
+        # Phase 4: Start background pruning task for expired sessions
+        max_age_seconds = int(os.environ.get("SESSION_MAX_AGE_SECONDS", "3600"))
+        pruning_interval_seconds = int(os.environ.get("SESSION_PRUNING_INTERVAL_SECONDS", "600"))
+        pruning_task: asyncio.Task[None] | None = None
+
+        async def prune_sessions_periodically() -> None:
+            """Background task to prune expired sessions periodically.
+
+            Runs in a loop, sleeping for the configured interval, then pruning
+            expired sessions from the scope registry. This prevents memory leaks
+            from abandoned sessions.
+
+            Raises
+            ------
+            asyncio.CancelledError
+                When the task is cancelled during application shutdown.
+            """
+            while True:
+                try:
+                    await asyncio.sleep(pruning_interval_seconds)
+                    pruned = await asyncio.to_thread(
+                        context.scope_registry.prune_expired, max_age_seconds
+                    )
+                    if pruned > 0:
+                        LOGGER.info(
+                            "Pruned expired sessions",
+                            extra={"pruned_count": pruned, "max_age_seconds": max_age_seconds},
+                        )
+                except asyncio.CancelledError:
+                    LOGGER.debug("Session pruning task cancelled")
+                    raise
+                except Exception:
+                    LOGGER.exception("Error in session pruning task")
+
+        pruning_task = asyncio.create_task(prune_sessions_periodically())
+        LOGGER.info(
+            "Started background session pruning task",
+            extra={
+                "max_age_seconds": max_age_seconds,
+                "pruning_interval_seconds": pruning_interval_seconds,
+            },
+        )
+
         LOGGER.info("Application initialization complete")
 
     except ConfigurationError as exc:
@@ -119,6 +167,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
     finally:
         LOGGER.info("Starting application shutdown")
+        # Cancel background pruning task
+        if pruning_task is not None:
+            pruning_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await pruning_task
         await readiness.shutdown()
         LOGGER.info("Application shutdown complete")
 
@@ -128,6 +181,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Session scope middleware (must be registered early, before other middleware)
+app.add_middleware(SessionScopeMiddleware)
 
 # CORS middleware for browser clients
 app.add_middleware(

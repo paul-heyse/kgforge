@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, Self, cast
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
     from codeintel_rev.app.config_context import ApplicationContext
 
 from codeintel_rev.mcp_server.adapters.semantic import semantic_search
+from codeintel_rev.mcp_server.schemas import ScopeIn
 
 
 @pytest.fixture(autouse=True)
@@ -47,15 +49,33 @@ def _stub_metrics(monkeypatch: pytest.MonkeyPatch) -> None:
 class StubDuckDBCatalog:
     """Stub DuckDB catalog for testing."""
 
-    def __init__(self, _db_path: Any, _vectors_dir: Any) -> None:
-        """Initialize stub catalog."""
-        self._chunk = {
-            "id": 123,
-            "uri": "src/module.py",
-            "start_line": 0,
-            "end_line": 0,
-            "preview": "print('hello world')",
-        }
+    def __init__(
+        self, _db_path: Any, _vectors_dir: Any, *, chunks: list[dict[str, Any]] | None = None
+    ) -> None:
+        """Initialize stub catalog.
+
+        Parameters
+        ----------
+        _db_path : Any
+            Database path (unused in stub).
+        _vectors_dir : Any
+            Vectors directory (unused in stub).
+        chunks : list[dict[str, Any]] | None, optional
+            List of chunks to return. If None, uses default chunk.
+        """
+        if chunks is None:
+            self._chunks = [
+                {
+                    "id": 123,
+                    "uri": "src/module.py",
+                    "start_line": 0,
+                    "end_line": 0,
+                    "preview": "print('hello world')",
+                }
+            ]
+        else:
+            self._chunks = chunks
+        self._chunk = self._chunks[0] if self._chunks else {}
 
     def __enter__(self) -> Self:
         """Enter context manager.
@@ -95,9 +115,87 @@ class StubDuckDBCatalog:
         return self._chunk if chunk_id == 123 else None
 
     def query_by_ids(self, chunk_ids: list[int]) -> list[dict[str, Any]]:
-        if 123 in chunk_ids:
-            return [dict(self._chunk)]
-        return []
+        """Query chunks by IDs.
+
+        Parameters
+        ----------
+        chunk_ids : list[int]
+            List of chunk IDs to query.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            List of chunks matching the IDs.
+        """
+        return [dict(chunk) for chunk in self._chunks if chunk.get("id") in chunk_ids]
+
+    def query_by_filters(
+        self,
+        chunk_ids: list[int],
+        *,
+        include_globs: list[str] | None = None,
+        exclude_globs: list[str] | None = None,
+        languages: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query chunks by IDs with filters.
+
+        Parameters
+        ----------
+        chunk_ids : list[int]
+            List of chunk IDs to query.
+        include_globs : list[str] | None, optional
+            Glob patterns to include. Defaults to None.
+        exclude_globs : list[str] | None, optional
+            Glob patterns to exclude. Defaults to None.
+        languages : list[str] | None, optional
+            Languages to filter by. Defaults to None.
+
+        Returns
+        -------
+        list[dict[str, Any]]
+            Filtered list of chunks.
+        """
+        import fnmatch
+
+        filtered = [dict(chunk) for chunk in self._chunks if chunk.get("id") in chunk_ids]
+
+        # Apply language filter
+        if languages:
+            extensions = []
+            language_exts = {
+                "python": [".py", ".pyi"],
+                "typescript": [".ts", ".tsx"],
+                "javascript": [".js", ".jsx"],
+            }
+            for lang in languages:
+                extensions.extend(language_exts.get(lang.lower(), []))
+            if extensions:
+                filtered = [
+                    chunk
+                    for chunk in filtered
+                    if isinstance(chunk.get("uri"), str)
+                    and any(chunk["uri"].endswith(ext) for ext in extensions)
+                ]
+
+        # Apply include globs
+        if include_globs:
+            filtered = [
+                chunk
+                for chunk in filtered
+                if isinstance(chunk.get("uri"), str)
+                and any(fnmatch.fnmatch(chunk["uri"], pattern) for pattern in include_globs)
+            ]
+
+        # Apply exclude globs
+        if exclude_globs:
+            filtered = [
+                chunk
+                for chunk in filtered
+                if isinstance(chunk.get("uri"), str)
+                and not any(fnmatch.fnmatch(chunk["uri"], pattern) for pattern in exclude_globs)
+            ]
+
+        return filtered
 
 
 class StubVLLMClient:
@@ -106,26 +204,41 @@ class StubVLLMClient:
     def __init__(self, _config: Any) -> None:
         """Initialize stub vLLM client."""
 
-    def embed_single(self, query: str) -> list[float]:
+    def embed_single(self, query: str) -> np.ndarray:
+        """Return mock embedding vector.
+
+        Parameters
+        ----------
+        query : str
+            Query text.
+
+        Returns
+        -------
+        np.ndarray
+            Mock embedding vector (2560 dimensions).
+        """
         assert query
-        return [0.1, 0.2]
+        return np.array([0.1] * 2560, dtype=np.float32)
 
 
 class _BaseStubFAISSManager:
     """Base stub FAISS manager for testing."""
 
-    def __init__(self, *, should_fail_gpu: bool) -> None:
+    def __init__(self, *, should_fail_gpu: bool, search_ids: list[int] | None = None) -> None:
         """Initialize stub FAISS manager.
 
         Parameters
         ----------
         should_fail_gpu : bool
             Whether GPU cloning should fail.
+        search_ids : list[int] | None, optional
+            List of chunk IDs to return from search. If None, returns [123].
         """
         self.should_fail_gpu = should_fail_gpu
         self.gpu_disabled_reason: str | None = None
         self.clone_invocations = 0
         self.last_k: int | None = None
+        self._search_ids = search_ids or [123]
 
     def load_cpu_index(self) -> None:
         """Load CPU index (no-op for testing)."""
@@ -165,11 +278,16 @@ class _BaseStubFAISSManager:
         tuple[np.ndarray, np.ndarray]
             Tuple of (distances, ids) arrays.
         """
-        assert query.shape == (1, 2)
+        assert query.shape[0] == 1  # Batch size 1
         assert k >= 1
         self.last_k = k
         assert nprobe == 128
-        return np.array([[0.9]], dtype=np.float32), np.array([[123]], dtype=np.int64)
+        # Return k results (or fewer if k > available chunks)
+        # Use stored search_ids or default to [123]
+        result_ids = self._search_ids[:k]
+        ids = np.array([result_ids], dtype=np.int64)
+        distances = np.array([[0.9] * len(result_ids)], dtype=np.float32)
+        return distances, ids
 
 
 class StubContext:
@@ -182,8 +300,23 @@ class StubContext:
         limits: list[str] | None = None,
         error: str | None = None,
         max_results: int = 5,
+        catalog_chunks: list[dict[str, Any]] | None = None,
     ) -> None:
-        """Initialize stub context."""
+        """Initialize stub context.
+
+        Parameters
+        ----------
+        faiss_manager : _BaseStubFAISSManager
+            FAISS manager stub.
+        limits : list[str] | None, optional
+            Limits metadata. Defaults to None.
+        error : str | None, optional
+            Error message. Defaults to None.
+        max_results : int, optional
+            Maximum results setting. Defaults to 5.
+        catalog_chunks : list[dict[str, Any]] | None, optional
+            Chunks to return from catalog. Defaults to None.
+        """
         self.faiss_manager = faiss_manager
         self.vllm_client = StubVLLMClient(SimpleNamespace())
         self.settings = SimpleNamespace(
@@ -201,6 +334,7 @@ class StubContext:
         )
         self._limits = limits or []
         self._error = error
+        self._catalog_chunks = catalog_chunks
 
     def ensure_faiss_ready(self) -> tuple[bool, list[str], str | None]:
         """Return readiness tuple.
@@ -222,7 +356,7 @@ class StubContext:
         StubDuckDBCatalog
             Stub catalog instance.
         """
-        yield StubDuckDBCatalog(None, None)
+        yield StubDuckDBCatalog(None, None, chunks=self._catalog_chunks)
 
 
 @pytest.mark.asyncio
@@ -233,9 +367,17 @@ async def test_semantic_search_gpu_success() -> None:
         error=None,
     )
 
-    # Cast StubContext to ApplicationContext for type checking
-    # StubContext implements the necessary interface for testing
-    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=1)
+    # Mock session ID and scope (no scope for this test)
+    with (
+        patch(
+            "codeintel_rev.mcp_server.adapters.semantic.get_session_id",
+            return_value="test-session-123",
+        ),
+        patch("codeintel_rev.mcp_server.adapters.semantic.get_effective_scope", return_value=None),
+    ):
+        # Cast StubContext to ApplicationContext for type checking
+        # StubContext implements the necessary interface for testing
+        result = await semantic_search(cast("ApplicationContext", context), "hello", limit=1)
 
     assert "limits" not in result
     findings = result.get("findings")
@@ -254,7 +396,15 @@ async def test_semantic_search_gpu_fallback() -> None:
         error=None,
     )
 
-    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=1)
+    # Mock session ID and scope (no scope for this test)
+    with (
+        patch(
+            "codeintel_rev.mcp_server.adapters.semantic.get_session_id",
+            return_value="test-session-123",
+        ),
+        patch("codeintel_rev.mcp_server.adapters.semantic.get_effective_scope", return_value=None),
+    ):
+        result = await semantic_search(cast("ApplicationContext", context), "hello", limit=1)
 
     limits = result.get("limits")
     assert limits == ["FAISS GPU disabled - using CPU: simulated failure"]
@@ -276,7 +426,15 @@ async def test_semantic_search_limit_truncates_to_max_results() -> None:
         max_results=3,
     )
 
-    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=10)
+    # Mock session ID and scope (no scope for this test)
+    with (
+        patch(
+            "codeintel_rev.mcp_server.adapters.semantic.get_session_id",
+            return_value="test-session-123",
+        ),
+        patch("codeintel_rev.mcp_server.adapters.semantic.get_effective_scope", return_value=None),
+    ):
+        result = await semantic_search(cast("ApplicationContext", context), "hello", limit=10)
 
     assert faiss_manager.last_k == 3
     limits = result.get("limits")
@@ -300,7 +458,15 @@ async def test_semantic_search_limit_enforces_minimum() -> None:
         max_results=5,
     )
 
-    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=0)
+    # Mock session ID and scope (no scope for this test)
+    with (
+        patch(
+            "codeintel_rev.mcp_server.adapters.semantic.get_session_id",
+            return_value="test-session-123",
+        ),
+        patch("codeintel_rev.mcp_server.adapters.semantic.get_effective_scope", return_value=None),
+    ):
+        result = await semantic_search(cast("ApplicationContext", context), "hello", limit=0)
 
     assert faiss_manager.last_k == 1
     limits = result.get("limits")
@@ -312,3 +478,130 @@ async def test_semantic_search_limit_enforces_minimum() -> None:
     assert coverage is not None
     assert "/1 results" in coverage
     assert "requested 0" in coverage
+
+
+@pytest.mark.asyncio
+async def test_semantic_search_with_scope_filters() -> None:
+    """Test semantic search applies scope filters (language filter).
+
+    Verifies that when session scope has language filters, only chunks
+    matching those languages are returned.
+    """
+    # Create catalog with mixed file types
+    catalog_chunks = [
+        {
+            "id": 123,
+            "uri": "src/main.py",
+            "start_line": 0,
+            "end_line": 10,
+            "preview": "def main():\n    pass",
+        },
+        {
+            "id": 456,
+            "uri": "src/app.ts",
+            "start_line": 0,
+            "end_line": 10,
+            "preview": "function app() {\n    return null;\n}",
+        },
+        {
+            "id": 789,
+            "uri": "src/utils.py",
+            "start_line": 0,
+            "end_line": 5,
+            "preview": "def helper():\n    pass",
+        },
+    ]
+
+    # FAISS returns all three chunk IDs
+    faiss_manager = _BaseStubFAISSManager(should_fail_gpu=False, search_ids=[123, 456, 789])
+
+    context = StubContext(
+        faiss_manager=faiss_manager,
+        limits=[],
+        error=None,
+        catalog_chunks=catalog_chunks,
+    )
+
+    # Mock session scope with Python language filter
+    scope: ScopeIn = {"languages": ["python"]}
+
+    with (
+        patch(
+            "codeintel_rev.mcp_server.adapters.semantic.get_session_id",
+            return_value="test-session-123",
+        ),
+        patch("codeintel_rev.mcp_server.adapters.semantic.get_effective_scope", return_value=scope),
+    ):
+        result = await semantic_search(cast("ApplicationContext", context), "function", limit=10)
+
+    findings = result.get("findings")
+    assert findings is not None
+    assert len(findings) == 2  # Only Python files
+
+    # Verify all results are Python files
+    uris = [finding.get("location", {}).get("uri", "") for finding in findings]
+    assert all(uri.endswith(".py") for uri in uris)
+    assert "src/main.py" in uris
+    assert "src/utils.py" in uris
+    assert "src/app.ts" not in uris
+
+    # Verify scope is included in response
+    assert result.get("scope") == scope
+
+
+@pytest.mark.asyncio
+async def test_semantic_search_no_scope() -> None:
+    """Test semantic search without scope filters returns all files.
+
+    Verifies that when no session scope is set, all chunks are returned
+    (no filtering applied).
+    """
+    # Create catalog with mixed file types
+    catalog_chunks = [
+        {
+            "id": 123,
+            "uri": "src/main.py",
+            "start_line": 0,
+            "end_line": 10,
+            "preview": "def main():\n    pass",
+        },
+        {
+            "id": 456,
+            "uri": "src/app.ts",
+            "start_line": 0,
+            "end_line": 10,
+            "preview": "function app() {\n    return null;\n}",
+        },
+    ]
+
+    # FAISS returns both chunk IDs
+    faiss_manager = _BaseStubFAISSManager(should_fail_gpu=False, search_ids=[123, 456])
+
+    context = StubContext(
+        faiss_manager=faiss_manager,
+        limits=[],
+        error=None,
+        catalog_chunks=catalog_chunks,
+    )
+
+    # Mock no session scope
+    with (
+        patch(
+            "codeintel_rev.mcp_server.adapters.semantic.get_session_id",
+            return_value="test-session-123",
+        ),
+        patch("codeintel_rev.mcp_server.adapters.semantic.get_effective_scope", return_value=None),
+    ):
+        result = await semantic_search(cast("ApplicationContext", context), "function", limit=10)
+
+    findings = result.get("findings")
+    assert findings is not None
+    assert len(findings) == 2  # All files returned
+
+    # Verify both file types are present
+    uris = [finding.get("location", {}).get("uri", "") for finding in findings]
+    assert "src/main.py" in uris
+    assert "src/app.ts" in uris
+
+    # Verify query_by_ids was called (not query_by_filters)
+    # This is verified by the fact that all chunks are returned

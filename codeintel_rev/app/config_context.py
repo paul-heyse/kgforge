@@ -51,6 +51,9 @@ from pathlib import Path
 from threading import Lock
 from typing import TYPE_CHECKING
 
+# Import ScopeRegistry at runtime (not TYPE_CHECKING) to avoid circular dependency
+# scope_registry imports schemas, but config_context only needs ScopeRegistry type
+from codeintel_rev.app.scope_registry import ScopeRegistry
 from codeintel_rev.config.settings import Settings, load_settings
 from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 from codeintel_rev.io.faiss_manager import FAISSManager
@@ -224,6 +227,10 @@ class ApplicationContext:
     faiss_manager : FAISSManager
         FAISS index manager that handles CPU and GPU indexes. GPU resources are
         lazily initialized on first search or optionally pre-loaded at startup.
+    scope_registry : ScopeRegistry
+        Thread-safe registry for storing per-session query scopes. Sessions are
+        identified by UUID and expire after 1 hour of inactivity. Used by adapters
+        to apply scope filters (path globs, languages) to search operations.
     _faiss_lock : Lock
         Thread lock for coordinating FAISS index loading (internal use only).
     _faiss_loaded : bool
@@ -269,6 +276,7 @@ class ApplicationContext:
     paths: ResolvedPaths
     vllm_client: VLLMClient
     faiss_manager: FAISSManager
+    scope_registry: ScopeRegistry
     _faiss_lock: Lock = field(default_factory=Lock, init=False)
     _faiss_loaded: bool = field(default=False, init=False)
     _faiss_gpu_attempted: bool = field(default=False, init=False)
@@ -329,6 +337,9 @@ class ApplicationContext:
             use_cuvs=settings.index.use_cuvs,
         )
 
+        # Initialize scope registry for session-scoped query constraints
+        scope_registry = ScopeRegistry()
+
         LOGGER.info(
             "Application context created",
             extra={
@@ -343,6 +354,7 @@ class ApplicationContext:
             paths=paths,
             vllm_client=vllm_client,
             faiss_manager=faiss_manager,
+            scope_registry=scope_registry,
         )
 
     def ensure_faiss_ready(self) -> tuple[bool, list[str], str | None]:

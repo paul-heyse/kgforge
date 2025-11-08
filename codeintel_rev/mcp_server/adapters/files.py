@@ -11,45 +11,74 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from codeintel_rev.app.middleware import get_session_id
 from codeintel_rev.io.path_utils import (
     PathOutsideRepositoryError,
     resolve_within_repo,
 )
 from codeintel_rev.mcp_server.schemas import ScopeIn
+from codeintel_rev.mcp_server.scope_utils import (
+    apply_language_filter,
+    get_effective_scope,
+    merge_scope_filters,
+)
+from kgfoundry_common.logging import get_logger
 
 if TYPE_CHECKING:
     from codeintel_rev.app.config_context import ApplicationContext
 
+LOGGER = get_logger(__name__)
 
-def set_scope(context: ApplicationContext, scope: ScopeIn) -> dict:  # noqa: ARG001 - reserved for future multi-repo support
+
+def set_scope(context: ApplicationContext, scope: ScopeIn) -> dict:
     """Set query scope for subsequent operations.
+
+    Stores scope in the session-scoped registry keyed by session ID. Subsequent
+    queries within the same session automatically apply these constraints.
 
     Parameters
     ----------
     context : ApplicationContext
-        Application context (currently unused, reserved for future multi-repo support).
+        Application context containing scope registry.
     scope : ScopeIn
         Scope configuration with repos, branches, paths, languages.
 
     Returns
     -------
     dict
-        Effective scope configuration.
+        Confirmation with effective scope and session ID.
 
     Examples
     --------
-    >>> result = set_scope(context, {"repos": ["myrepo"], "languages": ["python"]})
+    >>> result = set_scope(context, {"languages": ["python"], "include_globs": ["src/**"]})
     >>> result["status"]
     'ok'
+    >>> result["session_id"]  # UUID format
+    'abc123...'
+    >>> result["effective_scope"]["languages"]
+    ['python']
+
+    Notes
+    -----
+    The session ID is extracted from the request context (set by middleware).
+    If no session ID is available, this function will raise RuntimeError.
     """
-    # Future enhancement: Store scope in context for multi-repo support
+    session_id = get_session_id()
+    context.scope_registry.set_scope(session_id, scope)
+
+    LOGGER.info(
+        "Set scope for session",
+        extra={"session_id": session_id, "scope": scope},
+    )
+
     return {
         "effective_scope": scope,
+        "session_id": session_id,
         "status": "ok",
     }
 
 
-def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory traversal logic
+def list_paths(  # noqa: C901, PLR0912, PLR0914 - pre-existing complexity from directory traversal logic + scope integration
     context: ApplicationContext,
     path: str | None = None,
     include_globs: list[str] | None = None,
@@ -58,6 +87,9 @@ def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory 
 ) -> dict:
     """List files in repository.
 
+    Applies session scope filters (include_globs, exclude_globs, languages) if
+    set via `set_scope`. Explicit parameters override session scope.
+
     Parameters
     ----------
     context : ApplicationContext
@@ -65,9 +97,9 @@ def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory 
     path : str | None
         Starting path relative to repo root (None = root).
     include_globs : list[str] | None
-        Glob patterns to include (e.g., ["*.py"]).
+        Glob patterns to include (e.g., ["*.py"]). Overrides session scope if provided.
     exclude_globs : list[str] | None
-        Glob patterns to exclude (e.g., ["__pycache__", "*.pyc"]).
+        Glob patterns to exclude (e.g., ["__pycache__", "*.pyc"]). Overrides session scope if provided.
     max_results : int
         Maximum number of files to return.
 
@@ -78,12 +110,33 @@ def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory 
 
     Examples
     --------
+    Basic usage:
+
     >>> result = list_paths(context, path="src", include_globs=["*.py"])
     >>> isinstance(result["items"], list)
     True
 
+    With session scope:
+
+    >>> set_scope(context, {"languages": ["python"], "include_globs": ["src/**"]})
+    >>> result = list_paths(context, path=None)
+    >>> # Returns only Python files in src/ directory
+
+    Explicit parameters override scope:
+
+    >>> set_scope(context, {"languages": ["python"]})
+    >>> result = list_paths(context, include_globs=["**/*.ts"])
+    >>> # Returns TypeScript files (explicit override), not Python
+
     Notes
     -----
+    Scope Integration:
+    - Session scope is retrieved from registry using session ID (set by middleware).
+    - Scope's `include_globs` and `exclude_globs` are merged with explicit parameters.
+    - Explicit parameters take precedence over scope (explicit wins).
+    - Scope's `languages` filter is applied after directory traversal (post-filtering).
+    - If no scope is set, behaves as before (no filtering beyond explicit params).
+
     The traversal skips directories that match the default or user supplied
     exclusion globs (for example ``**/.git/**``) so that large dependency
     folders are pruned without visiting their contents.
@@ -92,6 +145,14 @@ def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory 
     search_root, error = _resolve_search_root(repo_root, path)
     if search_root is None:
         return {"items": [], "total": 0, "error": error or "Path not found or not a directory"}
+
+    # Retrieve session scope and merge with explicit parameters
+    session_id = get_session_id()
+    scope = get_effective_scope(context, session_id)
+    merged = merge_scope_filters(
+        scope,
+        {"include_globs": include_globs, "exclude_globs": exclude_globs},
+    )
 
     # Default excludes
     default_excludes = [
@@ -112,8 +173,8 @@ def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory 
         "**/*.pyc",
         "**/*.pyo",
     ]
-    excludes = (exclude_globs or []) + default_excludes
-    includes = include_globs or ["**"]
+    excludes = (merged.get("exclude_globs") or []) + default_excludes
+    includes = merged.get("include_globs") or ["**"]
 
     # Walk directory
     items = []
@@ -167,11 +228,32 @@ def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory 
             )
 
             if len(items) >= max_results:
-                return {
-                    "items": items,
-                    "total": len(items),
-                    "truncated": True,
-                }
+                break
+
+    # Apply language filter if scope has languages
+    if scope:
+        languages = scope.get("languages")
+        if languages:
+            filtered_paths = apply_language_filter([item["path"] for item in items], languages)
+            items = [item for item in items if item["path"] in filtered_paths]
+
+    if len(items) >= max_results:
+        return {
+            "items": items[:max_results],
+            "total": len(items),
+            "truncated": True,
+        }
+
+    LOGGER.debug(
+        "Listed paths with scope filters",
+        extra={
+            "session_id": session_id,
+            "path": path,
+            "item_count": len(items),
+            "applied_scope": scope is not None,
+            "languages": scope.get("languages") if scope else None,
+        },
+    )
 
     return {
         "items": items,

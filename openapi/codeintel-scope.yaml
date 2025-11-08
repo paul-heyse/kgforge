@@ -1,0 +1,628 @@
+openapi: 3.1.0
+info:
+  title: CodeIntel Scope Management API
+  version: 1.0.0
+  description: |
+    API specification for session-scoped scope management in CodeIntel MCP server.
+    
+    Scope management allows clients to set query constraints (path patterns, languages,
+    repositories) that persist across multiple requests within a session. Instead of
+    passing scope parameters with every query, clients call `set_scope` once and
+    subsequent queries automatically apply those constraints.
+    
+    **Key Concepts**:
+    - **Session**: A logical grouping of requests identified by a session ID (UUID)
+    - **Scope**: Query constraints (path globs, languages, repositories) stored per session
+    - **Session ID**: Extracted from `X-Session-ID` header or auto-generated if absent
+    - **Precedence**: Explicit adapter parameters override session scope
+    
+    **Example Flow**:
+    1. Client sends `set_scope` request with scope constraints
+    2. Server stores scope keyed by session ID
+    3. Subsequent queries (semantic_search, search_text, list_paths) automatically apply scope
+    4. Explicit parameters in queries override session scope when both are present
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://codeintel.example.com
+    description: Production server
+
+paths:
+  /mcp/tools/set_scope:
+    post:
+      summary: Set query scope for current session
+      description: |
+        Stores query constraints (path patterns, languages, repositories) for the current
+        session. Subsequent queries within the same session automatically apply these
+        constraints unless overridden by explicit parameters.
+        
+        **Session ID Management**:
+        - If `X-Session-ID` header is present, uses that value
+        - If header is absent, generates UUID v4 and returns it in response
+        - Session ID persists across multiple requests within the same session
+        
+        **Scope Fields**:
+        - `include_globs`: Path patterns to include (e.g., `["**/*.py", "src/**"]`)
+        - `exclude_globs`: Path patterns to exclude (e.g., `["**/test_*.py"]`)
+        - `languages`: Programming languages to filter (e.g., `["python", "typescript"]`)
+        - `repos`: Repository names (reserved for Phase 3 multi-repo support)
+        - `branches`: Branch names (reserved for Phase 4 branch filtering)
+        - `commit`: Commit SHA (reserved for Phase 4 commit filtering)
+        
+        **Precedence Rules**:
+        - Explicit parameters in query tools override session scope
+        - Example: If scope has `include_globs=["**/*.py"]` but `list_paths` is called
+          with `include_globs=["**/*.ts"]`, only TypeScript files are returned
+        
+        **Session Expiration**:
+        - Sessions expire after 1 hour of inactivity (configurable via `SESSION_MAX_AGE_SECONDS`)
+        - Expired sessions are pruned by background task (runs every 10 minutes)
+        - Accessing a session updates its last-accessed timestamp (LRU behavior)
+      operationId: setScope
+      tags:
+        - Scope Management
+      parameters:
+        - $ref: '#/components/parameters/X-Session-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScopeIn'
+            examples:
+              python_only:
+                summary: Python files only
+                value:
+                  languages: ["python"]
+              src_directory:
+                summary: Source directory with exclusions
+                value:
+                  include_globs: ["src/**"]
+                  exclude_globs: ["**/test_*.py", "**/__pycache__/**"]
+              combined_filters:
+                summary: Combined filters
+                value:
+                  languages: ["python", "typescript"]
+                  include_globs: ["src/**"]
+                  exclude_globs: ["**/test_*.py"]
+      responses:
+        '200':
+          description: Scope set successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetScopeResponse'
+              examples:
+                success:
+                  summary: Successful scope setting
+                  value:
+                    effective_scope:
+                      languages: ["python"]
+                      include_globs: ["src/**"]
+                    session_id: "a3f8b2c1-4d5e-6789-abcd-ef0123456789"
+                    status: "ok"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /mcp/tools/list_paths:
+    post:
+      summary: List files with scope filtering
+      description: |
+        Lists files in the repository, applying session scope filters if set.
+        
+        **Scope Integration**:
+        - Merges session scope's `include_globs`, `exclude_globs`, and `languages` with
+          explicit parameters
+        - Explicit parameters override session scope (precedence rule)
+        - Language filtering applied post-traversal (filters paths by extension)
+        
+        **Example**:
+        - Session scope: `{"languages": ["python"]}`
+        - Call: `list_paths(path="src")`
+        - Result: Only Python files in `src/` directory
+      operationId: listPaths
+      tags:
+        - File Operations
+      parameters:
+        - $ref: '#/components/parameters/X-Session-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  nullable: true
+                  description: Starting path relative to repo root (null = root)
+                  example: "src"
+                include_globs:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  description: |
+                    Path patterns to include. Overrides session scope's include_globs
+                    if provided.
+                  example: ["**/*.py"]
+                exclude_globs:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  description: |
+                    Path patterns to exclude. Overrides session scope's exclude_globs
+                    if provided.
+                  example: ["**/test_*.py"]
+                max_results:
+                  type: integer
+                  default: 1000
+                  description: Maximum number of files to return
+                  example: 100
+      responses:
+        '200':
+          description: File listing with scope filters applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                        type:
+                          type: string
+                          enum: [file, directory]
+                  total:
+                    type: integer
+                  truncated:
+                    type: boolean
+
+  /mcp/tools/search_text:
+    post:
+      summary: Text search with scope path filtering
+      description: |
+        Performs fast text search using ripgrep, applying session scope path filters.
+        
+        **Scope Integration**:
+        - If explicit `paths` parameter provided, uses those paths (overrides scope)
+        - Otherwise, uses session scope's `include_globs` as search paths
+        - Scope paths passed directly to ripgrep command (no post-filtering)
+        
+        **Example**:
+        - Session scope: `{"include_globs": ["src/**"]}`
+        - Call: `search_text(query="def main")`
+        - Result: Searches only files in `src/` directory
+      operationId: searchText
+      tags:
+        - Search Operations
+      parameters:
+        - $ref: '#/components/parameters/X-Session-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: Search query text
+                  example: "def main"
+                regex:
+                  type: boolean
+                  default: false
+                  description: Treat query as regex pattern
+                case_sensitive:
+                  type: boolean
+                  default: false
+                  description: Case-sensitive matching
+                paths:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  description: |
+                    Explicit paths to search. Overrides session scope's include_globs
+                    if provided.
+                  example: ["src/"]
+                max_results:
+                  type: integer
+                  default: 50
+                  description: Maximum number of matches to return
+      responses:
+        '200':
+          description: Search results with scope filters applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matches:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Match'
+                  total:
+                    type: integer
+                  truncated:
+                    type: boolean
+
+  /mcp/tools/semantic_search:
+    post:
+      summary: Semantic code search with scope filtering
+      description: |
+        Performs semantic code search using FAISS embeddings, applying session scope
+        filters during DuckDB chunk hydration.
+        
+        **Scope Integration**:
+        - FAISS search performed without scope constraints (FAISS has no built-in filtering)
+        - Chunk IDs from FAISS filtered via `DuckDBCatalog.query_by_filters` using
+          scope's `include_globs`, `exclude_globs`, and `languages`
+        - Response envelope includes `scope` field showing applied scope
+        - If filtering reduces results below requested `limit`, all matching results
+          are returned (no error)
+        
+        **Filtering Strategy**:
+        - Simple globs (e.g., `*.py`, `src/**`) converted to SQL `LIKE` patterns
+        - Complex globs (e.g., `src/**/test_*.py`) fall back to Python `fnmatch`
+        - Language filtering uses extension mapping (e.g., `python` → `[".py", ".pyi"]`)
+        
+        **Example**:
+        - Session scope: `{"languages": ["python"]}`
+        - Call: `semantic_search(query="data processing", limit=20)`
+        - Result: Only Python files matching query, with `scope` field in response
+      operationId: semanticSearch
+      tags:
+        - Search Operations
+      parameters:
+        - $ref: '#/components/parameters/X-Session-ID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: Search query text
+                  example: "data processing"
+                limit:
+                  type: integer
+                  default: 20
+                  description: Maximum number of results to return
+                  minimum: 1
+                  maximum: 100
+      responses:
+        '200':
+          description: Semantic search results with scope filters applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerEnvelope'
+              examples:
+                with_scope:
+                  summary: Results with scope applied
+                  value:
+                    findings:
+                      - path: "src/process.py"
+                        line: 42
+                        column: 0
+                        preview: "def process_data(data): ..."
+                        score: 0.95
+                    scope:
+                      languages: ["python"]
+                    method:
+                      retrieval: ["semantic"]
+                      coverage: "Searched 150 chunks"
+
+components:
+  schemas:
+    ScopeIn:
+      type: object
+      description: |
+        Query scope parameters for filtering search results. All fields are optional.
+        Unspecified fields don't filter results (search everything).
+      properties:
+        repos:
+          type: array
+          items:
+            type: string
+          description: |
+            Repository names to include in search. Currently ignored (single-repo mode).
+            Reserved for Phase 3 multi-repository support.
+          example: ["github.com/owner/repo"]
+        branches:
+          type: array
+          items:
+            type: string
+          description: |
+            Branch names to search. Currently ignored.
+            Reserved for Phase 4 branch filtering support.
+          example: ["main", "develop"]
+        commit:
+          type: string
+          description: |
+            Specific commit SHA to search. Currently ignored.
+            Reserved for Phase 4 commit filtering support.
+          example: "a1b2c3d4e5f6..."
+        include_globs:
+          type: array
+          items:
+            type: string
+          description: |
+            File path glob patterns to include (e.g., `["**/*.py", "src/**"]`).
+            Only files matching these patterns are searched. Empty list or omitted
+            means all files.
+            
+            **Glob Pattern Syntax**:
+            - `*` matches any characters (including `/`)
+            - `?` matches any single character
+            - `[seq]` matches any character in seq
+            - `[!seq]` matches any character not in seq
+            - `**` matches zero or more directories
+            
+            **Examples**:
+            - `["**/*.py"]` - All Python files
+            - `["src/**"]` - All files in src/ directory
+            - `["src/**/*.py"]` - Python files in src/ directory
+          example: ["**/*.py", "src/**"]
+        exclude_globs:
+          type: array
+          items:
+            type: string
+          description: |
+            File path glob patterns to exclude (e.g., `["**/test_*.py", "**/__pycache__/**"]`).
+            Files matching these patterns are excluded from search. Empty list or omitted
+            means no exclusions.
+          example: ["**/test_*.py", "**/__pycache__/**"]
+        languages:
+          type: array
+          items:
+            type: string
+            enum:
+              - python
+              - typescript
+              - javascript
+              - rust
+              - go
+              - java
+              - kotlin
+              - scala
+              - cpp
+              - c
+              - csharp
+              - ruby
+              - php
+              - swift
+              - objectivec
+              - bash
+              - powershell
+              - yaml
+              - json
+              - toml
+              - xml
+              - html
+              - css
+              - markdown
+              - sql
+              - r
+              - perl
+              - lua
+              - haskell
+              - elixir
+              - erlang
+              - clojure
+              - dart
+              - vue
+              - svelte
+          description: |
+            Programming languages to include (e.g., `["python", "typescript"]`).
+            Only files of these languages are searched. Empty list or omitted means
+            all languages.
+            
+            Language names are case-insensitive. Files are matched by extension
+            (e.g., `python` matches `.py`, `.pyi`, `.pyw`).
+          example: ["python", "typescript"]
+      additionalProperties: false
+      example:
+        languages: ["python"]
+        include_globs: ["src/**"]
+        exclude_globs: ["**/test_*.py"]
+
+    SetScopeResponse:
+      type: object
+      required:
+        - effective_scope
+        - session_id
+        - status
+      properties:
+        effective_scope:
+          $ref: '#/components/schemas/ScopeIn'
+          description: Scope that was stored (echoed back for confirmation)
+        session_id:
+          type: string
+          format: uuid
+          description: |
+            Session identifier. Use this value in `X-Session-ID` header for
+            subsequent requests to maintain scope across requests.
+          example: "a3f8b2c1-4d5e-6789-abcd-ef0123456789"
+        status:
+          type: string
+          enum: ["ok"]
+          description: Always "ok" (errors raise exceptions)
+          example: "ok"
+      example:
+        effective_scope:
+          languages: ["python"]
+          include_globs: ["src/**"]
+        session_id: "a3f8b2c1-4d5e-6789-abcd-ef0123456789"
+        status: "ok"
+
+    AnswerEnvelope:
+      type: object
+      description: |
+        Response envelope for semantic search results. Includes findings, applied scope,
+        and metadata about the search method.
+      properties:
+        findings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Match'
+          description: Search results (matches)
+        scope:
+          $ref: '#/components/schemas/ScopeIn'
+          description: |
+            Effective scope applied to the query. Shows which scope filters were
+            active during search. Empty object `{}` means no scope was applied.
+        method:
+          type: object
+          properties:
+            retrieval:
+              type: array
+              items:
+                type: string
+              example: ["semantic"]
+            coverage:
+              type: string
+              description: Description of search coverage
+              example: "Searched 150 chunks"
+          description: Metadata about search method and coverage
+      additionalProperties: true
+      example:
+        findings:
+          - path: "src/process.py"
+            line: 42
+            column: 0
+            preview: "def process_data(data): ..."
+            score: 0.95
+        scope:
+          languages: ["python"]
+        method:
+          retrieval: ["semantic"]
+          coverage: "Searched 150 chunks"
+
+    Match:
+      type: object
+      required:
+        - path
+        - line
+        - column
+        - preview
+      properties:
+        path:
+          type: string
+          description: File path where match was found
+          example: "src/process.py"
+        line:
+          type: integer
+          description: Line number (1-indexed)
+          example: 42
+        column:
+          type: integer
+          description: Column position (0-indexed)
+          example: 0
+        preview:
+          type: string
+          description: Code snippet preview
+          example: "def process_data(data): ..."
+        score:
+          type: number
+          format: float
+          description: Relevance score (0.0 to 1.0, higher is better)
+          example: 0.95
+
+    ErrorResponse:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          format: uri
+          description: Error type URI (RFC 9457 Problem Details)
+          example: "https://kgfoundry.dev/problems/scope-error"
+        title:
+          type: string
+          description: Error title
+          example: "Scope operation failed"
+        status:
+          type: integer
+          description: HTTP status code
+          example: 500
+        detail:
+          type: string
+          description: Detailed error message
+          example: "Session ID not initialized in request context"
+        instance:
+          type: string
+          format: uri
+          description: Error instance URI
+          example: "urn:codeintel:set_scope:session-error"
+        context:
+          type: object
+          description: Additional error context
+          additionalProperties: true
+
+  parameters:
+    X-Session-ID:
+      name: X-Session-ID
+      in: header
+      required: false
+      description: |
+        Session identifier for maintaining scope across multiple requests.
+        
+        **Behavior**:
+        - If provided, uses this value as session ID
+        - If absent, server generates UUID v4 and returns it in response body
+        - Use the returned `session_id` from `set_scope` response in subsequent requests
+        
+        **Example**:
+        1. Call `set_scope` without header → receive `session_id` in response
+        2. Include `X-Session-ID: {session_id}` in subsequent requests
+        3. Scope persists across requests with same session ID
+        
+        **Session Expiration**:
+        - Sessions expire after 1 hour of inactivity
+        - Expired sessions are pruned automatically
+        - Re-set scope if session expires
+      schema:
+        type: string
+        format: uuid
+        pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+      example: "a3f8b2c1-4d5e-6789-abcd-ef0123456789"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Optional bearer token authentication (if enabled)
+
+security: []
+
+tags:
+  - name: Scope Management
+    description: Operations for managing query scope within sessions
+  - name: File Operations
+    description: File listing and navigation operations
+  - name: Search Operations
+    description: Text and semantic search operations
+

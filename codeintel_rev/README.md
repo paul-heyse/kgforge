@@ -212,13 +212,13 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for:
 The server exposes the following tools via FastMCP:
 
 ### Scope & Navigation
-- `set_scope(scope)` - Set query scope
-- `list_paths(path, globs, max)` - List files
+- `set_scope(scope)` - Set query scope for current session (persists across requests)
+- `list_paths(path, globs, max)` - List files (applies session scope filters)
 - `open_file(path, start_line, end_line)` - Read file content
 
 ### Search
-- `search_text(query, regex, paths)` - Fast text search
-- `semantic_search(query, limit)` - Semantic code search (FAISS)
+- `search_text(query, regex, paths)` - Fast text search (applies session scope path filters)
+- `semantic_search(query, limit)` - Semantic code search (applies session scope language/path filters)
 
 ### Symbols
 - `symbol_search(query, kind, language)` - Find symbols
@@ -234,6 +234,176 @@ The server exposes the following tools via FastMCP:
 
 ### Prompts
 - `prompt_code_review(area)` - Code review template
+
+## Scope Management
+
+Scope management allows you to set query constraints (path patterns, languages, repositories) that persist across multiple requests within a session. Instead of passing scope parameters with every query, you call `set_scope` once and subsequent queries automatically apply those constraints.
+
+### What is Scope?
+
+Scope is a set of query constraints that filter search results. It includes:
+- **Path patterns** (`include_globs`, `exclude_globs`): Filter files by path (e.g., `["**/*.py"]`, `["src/**"]`)
+- **Languages** (`languages`): Filter files by programming language (e.g., `["python", "typescript"]`)
+- **Repositories** (`repos`): Filter by repository (reserved for Phase 3 multi-repo support)
+- **Branches** (`branches`): Filter by Git branch (reserved for Phase 4)
+- **Commit** (`commit`): Filter by specific commit SHA (reserved for Phase 4)
+
+### Supported Scope Fields
+
+```python
+{
+    "include_globs": ["**/*.py", "src/**"],      # Files to include
+    "exclude_globs": ["**/test_*.py"],          # Files to exclude
+    "languages": ["python", "typescript"],      # Programming languages
+    "repos": [],                                 # Reserved (Phase 3)
+    "branches": [],                              # Reserved (Phase 4)
+    "commit": ""                                 # Reserved (Phase 4)
+}
+```
+
+### Usage Examples
+
+**Set scope to search only Python files:**
+
+```python
+# Set scope for current session
+result = mcp.call_tool("set_scope", {
+    "languages": ["python"]
+})
+session_id = result["session_id"]  # Save for subsequent requests
+
+# Subsequent searches respect scope
+results = mcp.call_tool("semantic_search", {"query": "data processing"})
+# Only Python files in results
+
+results = mcp.call_tool("search_text", {"query": "def main"})
+# Only searches Python files
+```
+
+**Set scope with path patterns:**
+
+```python
+# Limit to src/ directory
+mcp.call_tool("set_scope", {
+    "include_globs": ["src/**"],
+    "exclude_globs": ["**/test_*.py"]
+})
+
+# All searches now limited to src/ (excluding test files)
+results = mcp.call_tool("list_paths", {})
+# Only files in src/ directory (no test files)
+```
+
+**Override scope with explicit parameters:**
+
+```python
+# Set scope to Python files
+mcp.call_tool("set_scope", {"languages": ["python"]})
+
+# Override scope for one query (explicit parameters win)
+results = mcp.call_tool("list_paths", {
+    "include_globs": ["**/*.ts"]
+})
+# Returns TypeScript files only (scope ignored)
+
+# Next query still uses Python scope
+results = mcp.call_tool("semantic_search", {"query": "function"})
+# Only Python files (scope still active)
+```
+
+**Combine multiple filters:**
+
+```python
+# Python files in src/ directory, excluding tests
+mcp.call_tool("set_scope", {
+    "languages": ["python"],
+    "include_globs": ["src/**"],
+    "exclude_globs": ["**/test_*.py", "**/__pycache__/**"]
+})
+```
+
+## Session Management
+
+Scope is stored per-session, allowing multiple clients to use different scopes concurrently without interference.
+
+### Session IDs
+
+Each session is identified by a unique session ID (UUID format). Sessions can be managed in two ways:
+
+**1. Auto-generated (default):**
+- If you don't provide a session ID, the server generates one automatically
+- The session ID is returned in the `set_scope` response
+- Use this session ID in subsequent requests via the `X-Session-ID` header
+
+**2. Client-provided:**
+- Send `X-Session-ID` header with your requests
+- Use a consistent session ID across multiple requests
+- Useful for maintaining scope across client restarts
+
+### Using Session IDs
+
+**With HTTP client:**
+
+```python
+import httpx
+
+# First request: set scope (auto-generated session ID)
+response = httpx.post(
+    "http://localhost:8000/mcp/tools/set_scope",
+    headers={"Content-Type": "application/json"},
+    json={"languages": ["python"]}
+)
+session_id = response.json()["session_id"]
+
+# Subsequent requests: include session ID header
+response = httpx.post(
+    "http://localhost:8000/mcp/tools/semantic_search",
+    headers={
+        "Content-Type": "application/json",
+        "X-Session-ID": session_id  # Include session ID
+    },
+    json={"query": "data processing"}
+)
+```
+
+**With MCP client:**
+
+```python
+# MCP clients typically handle session management automatically
+# Check your MCP client documentation for session ID handling
+```
+
+### Session Expiration
+
+Sessions expire after **1 hour of inactivity** (configurable via `SESSION_MAX_AGE_SECONDS` environment variable). When a session expires:
+- Scope is cleared automatically
+- Subsequent requests without a session ID get a new session
+- Expired sessions are pruned by a background task (runs every 10 minutes)
+
+**To prevent expiration:**
+- Make requests within the session regularly
+- Use explicit parameters instead of scope if you need long-lived constraints
+- Re-set scope periodically if needed
+
+## Multi-Repository Support (Future)
+
+**Current Status**: Single-repository mode only.
+
+The `repos` field in `ScopeIn` is **reserved for Phase 3** multi-repository support. Currently:
+- Only one repository is indexed per server instance
+- The `repos` field is ignored (all queries search the single repository)
+- Other scope fields (globs, languages) work as documented
+
+**Future (Phase 3):**
+- Multiple repositories can be indexed in a single server instance
+- `repos` field will select which repositories to query
+- Cross-repository queries will be supported
+- Each repository will have its own FAISS index and DuckDB catalog
+
+**Migration Path:**
+- Current code is forward-compatible with multi-repo architecture
+- No changes needed when Phase 3 is released
+- Simply start using the `repos` field when available
 
 ## Development
 
@@ -340,6 +510,65 @@ export DUCKDB_THREADS=8
 ```
 
 ## Troubleshooting
+
+### Scope not applied
+
+**Symptoms**: Queries return results outside the set scope.
+
+**Causes and Solutions**:
+
+1. **Session ID mismatch**: Ensure you're using the same session ID across requests.
+   ```python
+   # ❌ Wrong: Different session IDs
+   session1 = mcp.call_tool("set_scope", {...})["session_id"]
+   # ... later, new request without session ID header
+   results = mcp.call_tool("semantic_search", {...})  # New session, no scope
+   
+   # ✅ Correct: Use same session ID
+   session_id = mcp.call_tool("set_scope", {...})["session_id"]
+   # Include X-Session-ID header in subsequent requests
+   ```
+
+2. **Session expired**: Sessions expire after 1 hour of inactivity.
+   ```python
+   # Re-set scope if session expired
+   mcp.call_tool("set_scope", {...})
+   ```
+
+3. **Explicit parameters override scope**: Explicit parameters always take precedence.
+   ```python
+   # Scope: Python files only
+   mcp.call_tool("set_scope", {"languages": ["python"]})
+   
+   # This query ignores scope (explicit override)
+   results = mcp.call_tool("list_paths", {"include_globs": ["**/*.ts"]})
+   # Returns TypeScript files, not Python
+   ```
+
+### Unexpected results
+
+**Symptoms**: Results don't match expected scope constraints.
+
+**Causes and Solutions**:
+
+1. **Verify scope was set**: Check `set_scope` response includes your scope.
+   ```python
+   result = mcp.call_tool("set_scope", {"languages": ["python"]})
+   assert result["effective_scope"]["languages"] == ["python"]
+   ```
+
+2. **Check explicit parameter precedence**: Explicit parameters override scope.
+   ```python
+   # If you pass include_globs explicitly, it overrides scope's include_globs
+   # Remove explicit parameters to use scope defaults
+   ```
+
+3. **Verify glob patterns**: Ensure glob patterns match your file structure.
+   ```python
+   # Test glob patterns with list_paths first
+   results = mcp.call_tool("list_paths", {"include_globs": ["**/*.py"]})
+   # Verify expected files are returned before setting scope
+   ```
 
 ### FAISS GPU fails
 
