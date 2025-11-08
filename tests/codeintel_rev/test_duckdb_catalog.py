@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+ALL_CHUNK_IDS = list(range(1, 12))
+
 import duckdb
 import pytest
 from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
@@ -61,7 +63,8 @@ def test_catalog(tmp_path: Path) -> DuckDBCatalog:
             (7::BIGINT, 'docs/README.md'::VARCHAR, 1::INTEGER, 50::INTEGER, 0::BIGINT, 500::BIGINT, '# Documentation'::VARCHAR, [1.3, 1.4]::FLOAT[]),
             (8::BIGINT, 'src/nested/deep/file.py'::VARCHAR, 1::INTEGER, 5::INTEGER, 0::BIGINT, 50::BIGINT, 'deep code'::VARCHAR, [1.5, 1.6]::FLOAT[]),
             (9::BIGINT, 'lib/legacy.py'::VARCHAR, 1::INTEGER, 10::INTEGER, 0::BIGINT, 100::BIGINT, 'old code'::VARCHAR, [1.7, 1.8]::FLOAT[]),
-            (10::BIGINT, 'src/config.json'::VARCHAR, 1::INTEGER, 5::INTEGER, 0::BIGINT, 50::BIGINT, '{"key": "value"}'::VARCHAR, [1.9, 2.0]::FLOAT[])
+            (10::BIGINT, 'src/config.json'::VARCHAR, 1::INTEGER, 5::INTEGER, 0::BIGINT, 50::BIGINT, '{"key": "value"}'::VARCHAR, [1.9, 2.0]::FLOAT[]),
+            (11::BIGINT, 'main.py'::VARCHAR, 1::INTEGER, 20::INTEGER, 0::BIGINT, 200::BIGINT, 'def entry():'::VARCHAR, [2.1, 2.2]::FLOAT[])
         AS t(id, uri, start_line, end_line, start_byte, end_byte, preview, embedding)
         """
     )
@@ -78,7 +81,7 @@ class TestQueryByFiltersIncludeGlobs:
     def test_include_glob_python_files(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by Python file pattern."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["**/*.py"],
         )
 
@@ -90,13 +93,14 @@ class TestQueryByFiltersIncludeGlobs:
             "tests/test_utils.py",
             "src/nested/deep/file.py",
             "lib/legacy.py",
+            "main.py",
         }
-        assert len(results) == 6
+        assert len(results) == 7
 
     def test_include_glob_src_prefix(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by src/ prefix pattern."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["src/**"],
         )
 
@@ -114,7 +118,7 @@ class TestQueryByFiltersIncludeGlobs:
     def test_include_glob_simple_suffix(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by simple suffix pattern."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["*.ts"],
         )
 
@@ -125,7 +129,7 @@ class TestQueryByFiltersIncludeGlobs:
     def test_include_glob_multiple_patterns(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by multiple include patterns (OR logic)."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["**/*.py", "**/*.tsx"],
         )
 
@@ -133,7 +137,8 @@ class TestQueryByFiltersIncludeGlobs:
         assert "src/main.py" in uris
         assert "src/components/Button.tsx" in uris
         assert "src/app.ts" not in uris  # .ts not .tsx
-        assert len(results) == 7  # 6 Python + 1 TSX
+        assert "main.py" in uris
+        assert len(results) == 8  # 7 Python + 1 TSX
 
     def test_include_glob_empty_list(self, test_catalog: DuckDBCatalog) -> None:
         """Test that empty include globs means include all."""
@@ -153,7 +158,7 @@ class TestQueryByFiltersExcludeGlobs:
     def test_exclude_glob_test_files(self, test_catalog: DuckDBCatalog) -> None:
         """Test excluding test files."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             exclude_globs=["**/test_*.py"],
         )
 
@@ -161,12 +166,13 @@ class TestQueryByFiltersExcludeGlobs:
         assert "tests/test_main.py" not in uris
         assert "tests/test_utils.py" not in uris
         assert "src/main.py" in uris
-        assert len(results) == 8
+        assert "main.py" in uris
+        assert len(results) == 9
 
     def test_exclude_glob_multiple_patterns(self, test_catalog: DuckDBCatalog) -> None:
         """Test excluding multiple patterns."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             exclude_globs=["**/test_*.py", "**/*.md"],
         )
 
@@ -174,7 +180,7 @@ class TestQueryByFiltersExcludeGlobs:
         assert "tests/test_main.py" not in uris
         assert "tests/test_utils.py" not in uris
         assert "docs/README.md" not in uris
-        assert len(results) == 7
+        assert len(results) == 8
 
     def test_exclude_glob_empty_list(self, test_catalog: DuckDBCatalog) -> None:
         """Test that empty exclude globs means exclude none."""
@@ -192,7 +198,7 @@ class TestQueryByFiltersLanguageFilter:
     def test_language_filter_python(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by Python language."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             languages=["python"],
         )
 
@@ -204,13 +210,14 @@ class TestQueryByFiltersLanguageFilter:
             "tests/test_utils.py",
             "src/nested/deep/file.py",
             "lib/legacy.py",
+            "main.py",
         }
-        assert len(results) == 6
+        assert len(results) == 7
 
     def test_language_filter_typescript(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by TypeScript language."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             languages=["typescript"],
         )
 
@@ -221,7 +228,7 @@ class TestQueryByFiltersLanguageFilter:
     def test_language_filter_multiple(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by multiple languages."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             languages=["python", "typescript"],
         )
 
@@ -230,7 +237,8 @@ class TestQueryByFiltersLanguageFilter:
         assert "src/app.ts" in uris
         assert "src/components/Button.tsx" in uris
         assert "docs/README.md" not in uris
-        assert len(results) == 8  # 6 Python + 2 TypeScript
+        assert "main.py" in uris
+        assert len(results) == 9  # 7 Python + 2 TypeScript
 
     def test_language_filter_unknown_language(self, test_catalog: DuckDBCatalog) -> None:
         """Test filtering by unknown language returns empty."""
@@ -261,7 +269,7 @@ class TestQueryByFiltersCombined:
     def test_include_and_exclude(self, test_catalog: DuckDBCatalog) -> None:
         """Test combining include and exclude globs."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["**/*.py"],
             exclude_globs=["**/test_*.py"],
         )
@@ -272,14 +280,15 @@ class TestQueryByFiltersCombined:
             "src/utils.py",
             "src/nested/deep/file.py",
             "lib/legacy.py",
+            "main.py",
         }
         assert "tests/test_main.py" not in uris
-        assert len(results) == 4
+        assert len(results) == 5
 
     def test_include_and_language(self, test_catalog: DuckDBCatalog) -> None:
         """Test combining include globs and language filter."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["src/**"],
             languages=["python"],
         )
@@ -297,7 +306,7 @@ class TestQueryByFiltersCombined:
     def test_exclude_and_language(self, test_catalog: DuckDBCatalog) -> None:
         """Test combining exclude globs and language filter."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             exclude_globs=["**/test_*.py"],
             languages=["python"],
         )
@@ -308,14 +317,15 @@ class TestQueryByFiltersCombined:
             "src/utils.py",
             "src/nested/deep/file.py",
             "lib/legacy.py",
+            "main.py",
         }
         assert "tests/test_main.py" not in uris
-        assert len(results) == 4
+        assert len(results) == 5
 
     def test_all_filters_combined(self, test_catalog: DuckDBCatalog) -> None:
         """Test combining all three filter types."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["src/**"],
             exclude_globs=["**/test_*.py"],
             languages=["python"],
@@ -336,7 +346,7 @@ class TestQueryByFiltersComplexGlobs:
     def test_complex_glob_recursive_middle(self, test_catalog: DuckDBCatalog) -> None:
         """Test complex glob with ** in middle (requires Python filtering)."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["src/**/file.py"],
         )
 
@@ -349,7 +359,7 @@ class TestQueryByFiltersComplexGlobs:
         # Note: fnmatch doesn't support bracket expressions the same way as bash,
         # but we test that complex patterns trigger Python filtering
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=["src/[mn]*.py"],
         )
 
@@ -441,7 +451,7 @@ class TestQueryByFiltersParametrized:
     @pytest.mark.parametrize(
         ("include_glob", "expected_count"),
         [
-            ("**/*.py", 6),
+            ("**/*.py", 7),
             ("src/**", 6),
             ("tests/**", 2),
             ("**/*.ts", 1),
@@ -458,7 +468,7 @@ class TestQueryByFiltersParametrized:
     ) -> None:
         """Test various include glob patterns."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             include_globs=[include_glob],
         )
 
@@ -467,7 +477,7 @@ class TestQueryByFiltersParametrized:
     @pytest.mark.parametrize(
         ("language", "expected_count"),
         [
-            ("python", 6),
+            ("python", 7),
             ("typescript", 2),
             ("javascript", 0),  # No .js files in test data
             ("rust", 0),  # No .rs files in test data
@@ -481,7 +491,7 @@ class TestQueryByFiltersParametrized:
     ) -> None:
         """Test various language filters."""
         results = test_catalog.query_by_filters(
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            ALL_CHUNK_IDS,
             languages=[language],
         )
 

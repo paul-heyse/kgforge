@@ -26,7 +26,7 @@ LOGGER = get_logger(__name__)
 _scope_filter_duration_seconds = build_histogram(
     "codeintel_scope_filter_duration_seconds",
     "Time to apply scope filters",
-    ("filter_type",),
+    labelnames=("filter_type",),
 )
 
 
@@ -453,6 +453,9 @@ class DuckDBCatalog:
         # Normalize separators
         normalized = pattern.replace("\\", "/")
 
+        starts_with_recursive = normalized.startswith("**/")
+        recursive_remainder = normalized[len("**/") :] if starts_with_recursive else ""
+
         # Replace ** with % (matches any characters including slashes)
         normalized = normalized.replace("**", "%")
 
@@ -460,7 +463,17 @@ class DuckDBCatalog:
         normalized = normalized.replace("*", "%")
 
         # Replace ? with _ (matches single character)
-        return normalized.replace("?", "_")
+        normalized = normalized.replace("?", "_")
+
+        if (
+            starts_with_recursive
+            and recursive_remainder.startswith("*")
+            and normalized.startswith("%/")
+        ):
+            normalized = normalized.replace("/%", "%", 1)
+            normalized = "%" + normalized.lstrip("%")
+
+        return normalized
 
     def get_chunk_by_id(self, chunk_id: int) -> dict | None:
         """Return a single chunk record by ID.
