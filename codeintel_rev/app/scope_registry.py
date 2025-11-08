@@ -50,6 +50,7 @@ codeintel_rev.mcp_server.scope_utils : Scope merging and filtering utilities
 from __future__ import annotations
 
 import time
+from copy import deepcopy
 from threading import RLock
 from typing import TYPE_CHECKING, cast
 
@@ -163,15 +164,16 @@ class ScopeRegistry:
 
         Notes
         -----
-        The method stores a reference to the scope dict. Callers should not
-        mutate the scope after passing it to set_scope. For safety, consider
-        passing a copy: `registry.set_scope(session_id, dict(scope))`.
+        The method stores a deep copy of the scope dict, preventing subsequent
+        caller mutations from affecting the cached value. Callers may safely
+        reuse or modify the original scope object after calling ``set_scope``.
         """
         timestamp = time.monotonic()
         is_new_session = False
         with self._lock:
             is_new_session = session_id not in self._scopes
-            self._scopes[session_id] = (scope, timestamp)
+            immutable_scope = cast("ScopeIn", deepcopy(scope))
+            self._scopes[session_id] = (immutable_scope, timestamp)
             session_count = len(self._scopes)
 
         # Update metrics
@@ -183,7 +185,7 @@ class ScopeRegistry:
             "Set scope for session",
             extra={
                 "session_id": session_id,
-                "scope_fields": list(scope.keys()),
+                "scope_fields": list(immutable_scope.keys()),
                 "timestamp": timestamp,
             },
         )
@@ -236,7 +238,7 @@ class ScopeRegistry:
 
             # Return copy to prevent caller mutation
             # Cast is safe because scope is ScopeIn from _scopes dict
-            scope_copy = cast("ScopeIn", dict(scope))
+            scope_copy = cast("ScopeIn", deepcopy(scope))
 
             # Update metrics
             _scope_operations_total.labels(operation="get").inc()
