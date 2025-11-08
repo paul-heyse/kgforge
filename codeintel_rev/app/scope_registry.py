@@ -173,10 +173,10 @@ class ScopeRegistry:
             is_new_session = session_id not in self._scopes
             self._scopes[session_id] = (scope, timestamp)
             session_count = len(self._scopes)
+            if is_new_session:
+                # Update metrics while holding the lock to reflect the current registry state
+                _active_sessions_gauge.set(session_count)
 
-        # Update metrics
-        if is_new_session:
-            _active_sessions_gauge.set(session_count)
         _scope_operations_total.labels(operation="set").inc()
 
         LOGGER.info(
@@ -353,10 +353,11 @@ class ScopeRegistry:
                 pruned_count += 1
 
             session_count = len(self._scopes)
+            if pruned_count > 0:
+                # Update metrics while holding the lock to reflect the current registry state
+                _active_sessions_gauge.set(session_count)
 
-        # Update metrics
         if pruned_count > 0:
-            _active_sessions_gauge.set(session_count)
             _scope_operations_total.labels(operation="prune").inc(pruned_count)
             LOGGER.info(
                 "Pruned expired sessions",
