@@ -392,7 +392,7 @@ def _load_cli_tooling_metadata() -> ToolingMetadataModel | None:
             augment_path=CLI_AUGMENT_PATH,
             registry_path=CLI_REGISTRY_PATH,
         )
-    except (augment_error, FileNotFoundError, json.JSONDecodeError, OSError, ValueError):  # type: ignore[arg-type]
+    except (augment_error, FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
         return None
 
 

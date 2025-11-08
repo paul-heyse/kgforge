@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
 import types
+from pathlib import Path
 
 import pytest
 
@@ -12,7 +12,7 @@ if "msgspec" not in sys.modules:
     msgspec_stub = types.ModuleType("msgspec")
 
     class _Struct:  # pragma: no cover - helper for test environment
-        def __init__(self, **kwargs):
+        def __init__(self, **kwargs) -> None:
             for key, value in kwargs.items():
                 setattr(self, key, value)
 
@@ -161,7 +161,6 @@ def test_list_paths_excludes_common_directories_by_default(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Default excludes should omit VCS, virtualenv, and dependency folders."""
-
     repo_root = tmp_path / "repo"
     repo_root.mkdir()
 

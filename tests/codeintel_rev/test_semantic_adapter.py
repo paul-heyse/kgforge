@@ -3,16 +3,15 @@ from __future__ import annotations
 import types
 from collections.abc import Iterator
 from contextlib import contextmanager
+from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import TYPE_CHECKING, Any, Self, cast
 
 import numpy as np
 import pytest
-import kgfoundry_common.errors as errors_pkg
-from kgfoundry_common.errors.exceptions import KgFoundryErrorConfig as _ErrorConfig
 
-if not hasattr(errors_pkg, "KgFoundryErrorConfig"):
-    errors_pkg.KgFoundryErrorConfig = _ErrorConfig
+if TYPE_CHECKING:
+    from codeintel_rev.app.config_context import ApplicationContext
 
 from codeintel_rev.mcp_server.adapters.semantic import semantic_search
 
@@ -58,7 +57,7 @@ class StubDuckDBCatalog:
             "preview": "print('hello world')",
         }
 
-    def __enter__(self) -> StubDuckDBCatalog:  # noqa: PYI034
+    def __enter__(self) -> Self:
         """Enter context manager.
 
         Returns
@@ -174,7 +173,7 @@ class _BaseStubFAISSManager:
 
 
 class StubContext:
-    """Stub service context for semantic adapter tests."""
+    """Stub ApplicationContext for semantic adapter tests."""
 
     def __init__(
         self,
@@ -189,12 +188,16 @@ class StubContext:
         self.vllm_client = StubVLLMClient(SimpleNamespace())
         self.settings = SimpleNamespace(
             limits=SimpleNamespace(max_results=max_results),
-            paths=SimpleNamespace(
-                faiss_index="/tmp/index.faiss",
-                duckdb_path="/tmp/catalog.duckdb",
-                vectors_dir="/tmp/vectors",
-            ),
             vllm=SimpleNamespace(base_url="http://localhost"),
+        )
+        # Use tempfile for secure temporary paths in tests
+        import tempfile
+
+        temp_dir = Path(tempfile.gettempdir())
+        self.paths = SimpleNamespace(
+            faiss_index=temp_dir / "index.faiss",
+            duckdb_path=temp_dir / "catalog.duckdb",
+            vectors_dir=temp_dir / "vectors",
         )
         self._limits = limits or []
         self._error = error
@@ -223,18 +226,16 @@ class StubContext:
 
 
 @pytest.mark.asyncio
-async def test_semantic_search_gpu_success(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_semantic_search_gpu_success() -> None:
     context = StubContext(
         faiss_manager=_BaseStubFAISSManager(should_fail_gpu=False),
         limits=[],
         error=None,
     )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
-        lambda: context,
-    )
 
-    result = await semantic_search("hello", limit=1)
+    # Cast StubContext to ApplicationContext for type checking
+    # StubContext implements the necessary interface for testing
+    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=1)
 
     assert "limits" not in result
     findings = result.get("findings")
@@ -246,18 +247,14 @@ async def test_semantic_search_gpu_success(monkeypatch: pytest.MonkeyPatch) -> N
 
 
 @pytest.mark.asyncio
-async def test_semantic_search_gpu_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_semantic_search_gpu_fallback() -> None:
     context = StubContext(
         faiss_manager=_BaseStubFAISSManager(should_fail_gpu=True),
         limits=["FAISS GPU disabled - using CPU: simulated failure"],
         error=None,
     )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
-        lambda: context,
-    )
 
-    result = await semantic_search("hello", limit=1)
+    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=1)
 
     limits = result.get("limits")
     assert limits == ["FAISS GPU disabled - using CPU: simulated failure"]
@@ -270,9 +267,7 @@ async def test_semantic_search_gpu_fallback(monkeypatch: pytest.MonkeyPatch) -> 
 
 
 @pytest.mark.asyncio
-async def test_semantic_search_limit_truncates_to_max_results(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_semantic_search_limit_truncates_to_max_results() -> None:
     faiss_manager = _BaseStubFAISSManager(should_fail_gpu=False)
     context = StubContext(
         faiss_manager=faiss_manager,
@@ -280,12 +275,8 @@ async def test_semantic_search_limit_truncates_to_max_results(
         error=None,
         max_results=3,
     )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
-        lambda: context,
-    )
 
-    result = await semantic_search("hello", limit=10)
+    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=10)
 
     assert faiss_manager.last_k == 3
     limits = result.get("limits")
@@ -300,9 +291,7 @@ async def test_semantic_search_limit_truncates_to_max_results(
 
 
 @pytest.mark.asyncio
-async def test_semantic_search_limit_enforces_minimum(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+async def test_semantic_search_limit_enforces_minimum() -> None:
     faiss_manager = _BaseStubFAISSManager(should_fail_gpu=False)
     context = StubContext(
         faiss_manager=faiss_manager,
@@ -310,12 +299,8 @@ async def test_semantic_search_limit_enforces_minimum(
         error=None,
         max_results=5,
     )
-    monkeypatch.setattr(
-        "codeintel_rev.mcp_server.adapters.semantic.get_service_context",
-        lambda: context,
-    )
 
-    result = await semantic_search("hello", limit=0)
+    result = await semantic_search(cast("ApplicationContext", context), "hello", limit=0)
 
     assert faiss_manager.last_k == 1
     limits = result.get("limits")

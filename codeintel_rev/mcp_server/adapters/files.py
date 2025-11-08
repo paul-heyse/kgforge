@@ -9,20 +9,25 @@ import fnmatch
 import os
 from collections.abc import Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from codeintel_rev.config.settings import load_settings
 from codeintel_rev.io.path_utils import (
     PathOutsideRepositoryError,
     resolve_within_repo,
 )
 from codeintel_rev.mcp_server.schemas import ScopeIn
 
+if TYPE_CHECKING:
+    from codeintel_rev.app.config_context import ApplicationContext
 
-def set_scope(scope: ScopeIn) -> dict:
+
+def set_scope(context: ApplicationContext, scope: ScopeIn) -> dict:  # noqa: ARG001 - reserved for future multi-repo support
     """Set query scope for subsequent operations.
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context (currently unused, reserved for future multi-repo support).
     scope : ScopeIn
         Scope configuration with repos, branches, paths, languages.
 
@@ -33,17 +38,19 @@ def set_scope(scope: ScopeIn) -> dict:
 
     Examples
     --------
-    >>> result = set_scope({"repos": ["myrepo"], "languages": ["python"]})
+    >>> result = set_scope(context, {"repos": ["myrepo"], "languages": ["python"]})
     >>> result["status"]
     'ok'
     """
+    # Future enhancement: Store scope in context for multi-repo support
     return {
         "effective_scope": scope,
         "status": "ok",
     }
 
 
-def list_paths(
+def list_paths(  # noqa: C901, PLR0912 - pre-existing complexity from directory traversal logic
+    context: ApplicationContext,
     path: str | None = None,
     include_globs: list[str] | None = None,
     exclude_globs: list[str] | None = None,
@@ -53,6 +60,8 @@ def list_paths(
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context containing repo root and settings.
     path : str | None
         Starting path relative to repo root (None = root).
     include_globs : list[str] | None
@@ -69,17 +78,17 @@ def list_paths(
 
     Examples
     --------
-    >>> result = list_paths(path="src", include_globs=["*.py"])
+    >>> result = list_paths(context, path="src", include_globs=["*.py"])
     >>> isinstance(result["items"], list)
     True
+
     Notes
     -----
     The traversal skips directories that match the default or user supplied
     exclusion globs (for example ``**/.git/**``) so that large dependency
     folders are pruned without visiting their contents.
     """
-    settings = load_settings()
-    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    repo_root = context.paths.repo_root
     search_root, error = _resolve_search_root(repo_root, path)
     if search_root is None:
         return {"items": [], "total": 0, "error": error or "Path not found or not a directory"}
@@ -171,7 +180,8 @@ def list_paths(
     }
 
 
-def open_file(
+def open_file(  # noqa: PLR0911 - pre-existing complexity from line validation logic
+    context: ApplicationContext,
     path: str,
     start_line: int | None = None,
     end_line: int | None = None,
@@ -180,6 +190,8 @@ def open_file(
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context containing repo root and settings.
     path : str
         File path relative to repo root.
     start_line : int | None
@@ -203,12 +215,11 @@ def open_file(
 
     Examples
     --------
-    >>> result = open_file("README.md", start_line=1, end_line=10)
+    >>> result = open_file(context, "README.md", start_line=1, end_line=10)
     >>> "content" in result
     True
     """
-    settings = load_settings()
-    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    repo_root = context.paths.repo_root
     try:
         file_path = resolve_within_repo(
             repo_root,
@@ -239,11 +250,7 @@ def open_file(
             "error": "end_line must be a positive integer",
             "path": path,
         }
-    if (
-        start_line is not None
-        and end_line is not None
-        and start_line > end_line
-    ):
+    if start_line is not None and end_line is not None and start_line > end_line:
         return {
             "error": "start_line must be less than or equal to end_line",
             "path": path,
@@ -298,11 +305,10 @@ def _relative_path_str(path: Path, repo_root: Path) -> str | None:
         relative_path = resolved.relative_to(repo_root)
     except ValueError:
         return None
-    relative_str = relative_path.as_posix()
-    return relative_str
+    return relative_path.as_posix()
 
 
-def _safe_stat(path: Path):
+def _safe_stat(path: Path) -> os.stat_result | None:
     try:
         return path.stat()
     except OSError:

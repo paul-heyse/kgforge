@@ -408,7 +408,7 @@ def load_policy() -> ObservabilityPolicy:
                 "Failed to parse observability policy YAML: %s", exc
             )
             return policy
-        raise exc  # Explicitly re-raise non-YAML exceptions
+        raise  # Explicitly re-raise non-YAML exceptions
 
     if overrides_raw is None:
         return policy

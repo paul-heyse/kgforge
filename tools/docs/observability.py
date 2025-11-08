@@ -300,9 +300,9 @@ def record_operation_metrics(
 
     try:
         yield
-    except Exception as exc:
+    except Exception:
         final_status = "error"
-        raise exc  # Explicitly re-raise the caught exception
+        raise  # Explicitly re-raise the caught exception
     finally:
         duration = time.monotonic() - start_time
 

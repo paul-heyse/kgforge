@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import Any, TypedDict, cast
 
 try:
-    from codeintel.mcp_server.server import MCPServer  # type: ignore[reportMissingImports]
+    from codeintel.mcp_server.server import MCPServer
 except ImportError:
     # codeintel package not available - this script is for generating docs when it exists
-    MCPServer = None  # type: ignore[assignment, misc]
+    MCPServer = None
 
 HEADER = """# CodeIntel MCP Tools
 

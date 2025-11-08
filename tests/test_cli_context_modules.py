@@ -9,9 +9,9 @@ from tools.docstring_builder import cli_context as docstrings_context
 from tools.navmap import cli_context as navmap_context
 
 try:
-    from codeintel import cli_context as codeintel_context  # type: ignore[reportMissingImports]
+    from codeintel import cli_context as codeintel_context
 except ImportError:
-    codeintel_context = None  # type: ignore[assignment]
+    codeintel_context = None
 
 
 def _assert_settings(module, settings: CLIToolSettings) -> None:

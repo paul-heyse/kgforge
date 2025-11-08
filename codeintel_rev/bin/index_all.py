@@ -32,7 +32,6 @@ from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.parquet_store import write_chunks_parquet
 from codeintel_rev.io.vllm_client import VLLMClient
-from codeintel_rev.mcp_server.service_context import reset_service_context
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -79,7 +78,6 @@ def main() -> None:
         paths.faiss_index,
         catalog_count,
     )
-    reset_service_context()
 
 
 def _resolve_paths(settings: Settings) -> PipelinePaths:

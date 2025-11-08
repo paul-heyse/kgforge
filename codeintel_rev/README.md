@@ -128,12 +128,18 @@ This will:
 ```bash
 cd codeintel-rev
 
+# Set required environment variables
+export REPO_ROOT=/home/paul/kgfoundry
+export FAISS_PRELOAD=0  # Lazy loading for development
+
 # Option A: Direct with Hypercorn
 hypercorn --config app/hypercorn.toml codeintel_rev.app.main:app
 
 # Option B: Development mode
 uvicorn codeintel_rev.app.main:app --reload --port 8000
 ```
+
+**Note**: The application will fail to start if `REPO_ROOT` is invalid or required resources are missing. This is intentional fail-fast behavior to catch configuration errors early.
 
 ### 6. Configure NGINX (Production)
 
@@ -169,46 +175,37 @@ mcp dev codeintel_rev/mcp_server/server.py
 
 ## Configuration
 
-All configuration is via environment variables:
+All configuration is via environment variables. Configuration is loaded **once at startup** and shared across all requests via explicit dependency injection.
 
-### Core Settings
+**See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for comprehensive configuration documentation.**
 
+### Quick Configuration
+
+**Required**:
 ```bash
-export REPO_ROOT=/path/to/repo
-export DATA_DIR=data
-export VECTORS_DIR=data/vectors
+export REPO_ROOT=/path/to/repo  # Must exist
+```
+
+**Optional** (with defaults):
+```bash
+export FAISS_PRELOAD=0          # 0 = lazy loading (dev), 1 = eager loading (prod)
+export VLLM_URL=http://127.0.0.1:8001/v1
 export FAISS_INDEX=data/faiss/code.ivfpq.faiss
 export DUCKDB_PATH=data/catalog.duckdb
-export SCIP_INDEX=index.scip.json
 ```
 
-### vLLM Settings
+### Configuration Lifecycle
 
-```bash
-export VLLM_URL=http://127.0.0.1:8001/v1
-export VLLM_MODEL=nomic-ai/nomic-embed-code
-export VLLM_BATCH_SIZE=64
-export VLLM_TIMEOUT_S=120.0
-```
+- **Startup**: Configuration loaded once, paths validated, clients initialized
+- **Fail-Fast**: Invalid configuration prevents application startup
+- **Runtime**: Configuration is immutable (changes require restart)
+- **Readiness**: `/readyz` endpoint validates all resources are available
 
-### Index Settings
-
-```bash
-export VEC_DIM=2560              # Nomic embed dimension
-export CHUNK_BUDGET=2200         # cAST chunk size
-export FAISS_NLIST=8192          # IVF centroids
-export FAISS_NPROBE=128          # Search probes
-export USE_CUVS=1                # Enable cuVS acceleration
-```
-
-### Server Limits
-
-```bash
-export MAX_RESULTS=1000
-export QUERY_TIMEOUT_S=30.0
-export RATE_LIMIT_QPS=10.0
-export RATE_LIMIT_BURST=20
-```
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for:
+- Complete environment variable reference
+- Development vs production best practices
+- Kubernetes deployment guide
+- Troubleshooting common configuration errors
 
 ## MCP Tools
 

@@ -21,7 +21,7 @@ from tools._shared.paths import Paths
 from tools._shared.problems import ProblemDetails, problem_from_exc
 
 try:  # pragma: no cover - optional dependency
-    import jsonschema  # type: ignore[import]
+    import jsonschema
 except ImportError:  # pragma: no cover - optional dependency
     jsonschema = None
 
@@ -501,7 +501,7 @@ def _validate_envelope(
     try:
         schema = json.loads(schema_path.read_text())
         jsonschema.validate(payload, schema)
-    except (json.JSONDecodeError, jsonschema.ValidationError, OSError) as exc:  # type: ignore[attr-defined]
+    except (json.JSONDecodeError, jsonschema.ValidationError, OSError) as exc:
         logger.warning("cli_envelope_validation_failed", extra={"error": str(exc)})
 
 
