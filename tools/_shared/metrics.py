@@ -187,11 +187,11 @@ def observe_tool_run(
     with span_context:
         try:
             yield observation
-        except Exception as exc:
+        except Exception:
             if observation.status == "success":
                 observation.failure("exception")
             _record(observation, logger)
-            raise exc  # Explicitly re-raise the caught exception
+            raise  # Explicitly re-raise the caught exception
         else:
             _record(observation, logger)
 

@@ -9,8 +9,8 @@ import string
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from codeintel_rev.config.settings import load_settings
 from codeintel_rev.io.path_utils import (
     PathOutsideRepositoryError,
     resolve_within_repo,
@@ -22,6 +22,9 @@ from kgfoundry_common.subprocess_utils import (
     run_subprocess,
 )
 
+if TYPE_CHECKING:
+    from codeintel_rev.app.config_context import ApplicationContext
+
 BLAME_TIMEOUT_SECONDS = 30
 LOG_TIMEOUT_SECONDS = 30
 SHORT_SHA_LENGTH = 8
@@ -31,6 +34,7 @@ BLAME_HEADER_FIELDS = 3
 
 
 def blame_range(
+    context: ApplicationContext,
     path: str,
     start_line: int,
     end_line: int,
@@ -39,6 +43,8 @@ def blame_range(
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context containing repo root and settings.
     path : str
         File path relative to repo root.
     start_line : int
@@ -53,12 +59,11 @@ def blame_range(
 
     Examples
     --------
-    >>> result = blame_range("README.md", 1, 10)
+    >>> result = blame_range(context, "README.md", 1, 10)
     >>> isinstance(result["blame"], list)
     True
     """
-    settings = load_settings()
-    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    repo_root = context.paths.repo_root
     try:
         file_path = resolve_within_repo(repo_root, path, allow_nonexistent=False)
     except PathOutsideRepositoryError as exc:
@@ -84,6 +89,7 @@ def blame_range(
 
 
 def file_history(
+    context: ApplicationContext,
     path: str,
     limit: int = 50,
 ) -> dict:
@@ -91,6 +97,8 @@ def file_history(
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context containing repo root and settings.
     path : str
         File path relative to repo root.
     limit : int
@@ -103,12 +111,11 @@ def file_history(
 
     Examples
     --------
-    >>> result = file_history("README.md", limit=10)
+    >>> result = file_history(context, "README.md", limit=10)
     >>> isinstance(result["commits"], list)
     True
     """
-    settings = load_settings()
-    repo_root = Path(settings.paths.repo_root).expanduser().resolve()
+    repo_root = context.paths.repo_root
     try:
         file_path = resolve_within_repo(repo_root, path, allow_nonexistent=False)
     except PathOutsideRepositoryError as exc:
@@ -206,12 +213,11 @@ def _parse_blame_porcelain(stdout: str) -> list[GitBlameEntry]:
     block: list[str] = []
 
     for line in stdout.splitlines():
-        if _is_blame_header(line):
-            if block:
-                entry = _parse_blame_block(block)
-                if entry is not None:
-                    entries.append(entry)
-                block = []
+        if _is_blame_header(line) and block:
+            entry = _parse_blame_block(block)
+            if entry is not None:
+                entries.append(entry)
+            block = []
 
         if line.strip():
             block.append(line)
@@ -271,8 +277,13 @@ def _parse_blame_block(lines: Sequence[str]) -> GitBlameEntry | None:
 
 
 def _is_blame_header(line: str) -> bool:
-    """Return ``True`` when the given line starts a new blame entry."""
+    """Return ``True`` when the given line starts a new blame entry.
 
+    Returns
+    -------
+    bool
+        True if line is a valid blame header, False otherwise.
+    """
     if not line:
         return False
 

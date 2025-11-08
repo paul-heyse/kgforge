@@ -81,7 +81,6 @@ def test_git_history() -> None:
 
 def test_parse_blame_porcelain_multiple_entries() -> None:
     """The blame parser should return an entry for each porcelain header."""
-
     porcelain_lines = [
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1 1 1",
         "author Alice Example",

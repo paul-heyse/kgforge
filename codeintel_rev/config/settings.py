@@ -155,6 +155,12 @@ class IndexConfig(msgspec.Struct, frozen=True):
         cuVS provides optimized GPU kernels that can be 2-3x faster than standard
         FAISS GPU. Requires libcuvs-cu13 package. Defaults to True. Set to False
         if cuVS is unavailable or causes issues.
+    faiss_preload : bool
+        Pre-load FAISS index during application startup (eager loading). When True,
+        the FAISS index is loaded immediately at startup, eliminating first-request
+        latency. When False (default), the index is loaded lazily on first semantic
+        search request. Set to True in production for consistent response times;
+        keep False in development for faster startup iteration.
     """
 
     vec_dim: int = 2560
@@ -165,6 +171,7 @@ class IndexConfig(msgspec.Struct, frozen=True):
     bm25_b: float = 0.4
     rrf_k: int = 60
     use_cuvs: bool = True
+    faiss_preload: bool = False
 
 
 class ServerLimits(msgspec.Struct, frozen=True):
@@ -309,6 +316,9 @@ def load_settings() -> Settings:
         RRF fusion K parameter (default: 60).
     USE_CUVS : str, optional
         Enable cuVS acceleration: "1", "true", or "yes" (default: "1").
+    FAISS_PRELOAD : str, optional
+        Pre-load FAISS index at startup: "1", "true", or "yes" (default: "0").
+        When enabled, startup takes 2-10 seconds longer but first request is faster.
     MAX_RESULTS : int, optional
         Maximum results per query (default: 1000).
     QUERY_TIMEOUT_S : float, optional
@@ -347,6 +357,7 @@ def load_settings() -> Settings:
         bm25_b=float(os.environ.get("BM25_B", "0.4")),
         rrf_k=int(os.environ.get("RRF_K", "60")),
         use_cuvs=os.environ.get("USE_CUVS", "1").lower() in {"1", "true", "yes"},
+        faiss_preload=os.environ.get("FAISS_PRELOAD", "0").lower() in {"1", "true", "yes"},
     )
 
     limits = ServerLimits(

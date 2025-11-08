@@ -9,8 +9,8 @@ import json
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from codeintel_rev.config.settings import load_settings
 from codeintel_rev.mcp_server.schemas import Match
 from kgfoundry_common.errors import KgFoundryError, VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
@@ -20,6 +20,9 @@ from kgfoundry_common.subprocess_utils import (
     SubprocessTimeoutError,
     run_subprocess,
 )
+
+if TYPE_CHECKING:
+    from codeintel_rev.app.config_context import ApplicationContext
 
 SEARCH_TIMEOUT_SECONDS = 30
 MAX_PREVIEW_CHARS = 200
@@ -73,7 +76,8 @@ def _observe(operation: str) -> Iterator[DurationObservation | _NoopObservation]
         yield _NoopObservation()
 
 
-def search_text(
+def search_text(  # noqa: PLR0913 - context parameter required for dependency injection
+    context: ApplicationContext,
     query: str,
     *,
     regex: bool = False,
@@ -85,6 +89,8 @@ def search_text(
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context containing repo root and settings.
     query : str
         Search query (literal or regex).
     regex : bool
@@ -103,12 +109,11 @@ def search_text(
 
     Examples
     --------
-    >>> result = search_text("def main", regex=False)
+    >>> result = search_text(context, "def main", regex=False)
     >>> isinstance(result["matches"], list)
     True
     """
-    settings = load_settings()
-    repo_root = Path(settings.paths.repo_root).resolve()
+    repo_root = context.paths.repo_root
 
     cmd = _build_ripgrep_command(
         query=query,

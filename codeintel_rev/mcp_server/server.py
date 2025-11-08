@@ -5,8 +5,11 @@ Implements full MCP tool catalog for code intelligence.
 
 from __future__ import annotations
 
+import contextvars
+
 from fastmcp import FastMCP
 
+from codeintel_rev.app.config_context import ApplicationContext
 from codeintel_rev.mcp_server.adapters import files as files_adapter
 from codeintel_rev.mcp_server.adapters import history as history_adapter
 from codeintel_rev.mcp_server.adapters import semantic as semantic_adapter
@@ -15,6 +18,37 @@ from codeintel_rev.mcp_server.schemas import AnswerEnvelope, ScopeIn
 
 # Create FastMCP instance
 mcp = FastMCP("CodeIntel MCP")
+
+# Context variable for storing ApplicationContext per request
+# This is set by middleware in main.py and accessed by tool handlers
+# Made public for testing purposes (tests need to mock this)
+app_context: contextvars.ContextVar[ApplicationContext | None] = contextvars.ContextVar(
+    "app_context", default=None
+)
+
+
+def get_context() -> ApplicationContext:
+    """Extract ApplicationContext from context variable.
+
+    The context is set by middleware in main.py for each request.
+    This allows tool handlers to access ApplicationContext without
+    requiring Request injection (which FastMCP doesn't support).
+
+    Returns
+    -------
+    ApplicationContext
+        Application context for the current request.
+
+    Raises
+    ------
+    RuntimeError
+        If context is not initialized (should never happen after startup).
+    """
+    context = app_context.get()
+    if context is None:
+        msg = "ApplicationContext not initialized in request context"
+        raise RuntimeError(msg)
+    return context
 
 
 # ==================== Scope & Navigation ====================
@@ -34,7 +68,8 @@ def set_scope(scope: ScopeIn) -> dict:
     dict
         Effective scope configuration.
     """
-    return files_adapter.set_scope(scope)
+    context = get_context()
+    return files_adapter.set_scope(context, scope)
 
 
 @mcp.tool()
@@ -62,7 +97,9 @@ def list_paths(
     dict
         File listing with paths.
     """
+    context = get_context()
     return files_adapter.list_paths(
+        context,
         path=path,
         include_globs=include_globs,
         exclude_globs=exclude_globs,
@@ -92,7 +129,8 @@ def open_file(
     dict
         File content and metadata.
     """
-    return files_adapter.open_file(path, start_line, end_line)
+    context = get_context()
+    return files_adapter.open_file(context, path, start_line, end_line)
 
 
 # ==================== Search ====================
@@ -127,7 +165,9 @@ def search_text(
     dict
         Search matches.
     """
+    context = get_context()
     return text_search_adapter.search_text(
+        context,
         query,
         regex=regex,
         case_sensitive=case_sensitive,
@@ -155,7 +195,8 @@ async def semantic_search(
     AnswerEnvelope
         Search results with findings.
     """
-    return await semantic_adapter.semantic_search(query, limit)
+    context = get_context()
+    return await semantic_adapter.semantic_search(context, query, limit)
 
 
 # ==================== Symbols ====================
@@ -275,7 +316,8 @@ def blame_range(
     dict
         Blame entries for each line.
     """
-    return history_adapter.blame_range(path, start_line, end_line)
+    context = get_context()
+    return history_adapter.blame_range(context, path, start_line, end_line)
 
 
 @mcp.tool()
@@ -297,7 +339,8 @@ def file_history(
     dict
         Commit history.
     """
-    return history_adapter.file_history(path, limit)
+    context = get_context()
+    return history_adapter.file_history(context, path, limit)
 
 
 # ==================== Resources ====================
@@ -317,7 +360,8 @@ def file_resource(path: str) -> str:
     str
         File content.
     """
-    file_result = files_adapter.open_file(path)
+    context = get_context()
+    file_result = files_adapter.open_file(context, path)
     if "error" in file_result:
         return f"Error reading file {path}: {file_result['error']}"
     return file_result.get("content", "")

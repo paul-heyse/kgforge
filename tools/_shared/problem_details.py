@@ -37,7 +37,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-__all__ = [
+__all__: tuple[str, ...] = (
     "ExceptionProblemDetailsParams",
     "JsonPrimitive",
     "JsonValue",
@@ -56,10 +56,9 @@ __all__ = [
     "tool_failure_problem_details",
     "tool_missing_problem_details",
     "tool_timeout_problem_details",
-]
+)
 # Sort for consistent export order (pyright doesn't understand list.sort() on __all__)
-_sorted_exports = sorted(__all__)
-__all__ = _sorted_exports  # type: ignore[assignment]
+__all__ = tuple(sorted(__all__))
 
 # Type aliases for JSON values (RFC 7159 compatible)
 JsonPrimitive = str | int | float | bool | None

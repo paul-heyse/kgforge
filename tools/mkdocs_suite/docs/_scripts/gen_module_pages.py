@@ -48,7 +48,7 @@ class _NavProtocol(Protocol):
 if hasattr(mkdocs_gen_files, "Nav"):
 
     def _make_nav() -> _NavProtocol:
-        instance = mkdocs_gen_files.Nav()  # type: ignore[attr-defined, call-arg]
+        instance = mkdocs_gen_files.Nav()
         return cast("_NavProtocol", instance)
 
 else:  # pragma: no cover - fallback for older mkdocs-gen-files versions
@@ -56,7 +56,7 @@ else:  # pragma: no cover - fallback for older mkdocs-gen-files versions
     class _FallbackNav(dict[str | tuple[str, ...], str]):
         """Fallback navigation helper when mkdocs-gen-files lacks ``Nav``."""
 
-        def __setitem__(self, keys: str | Sequence[str], item: str) -> None:  # type: ignore[override]
+        def __setitem__(self, keys: str | Sequence[str], item: str) -> None:
             if isinstance(keys, tuple):
                 normalized: str | tuple[str, ...] = keys
             elif isinstance(keys, Sequence) and not isinstance(keys, (str, bytes)):

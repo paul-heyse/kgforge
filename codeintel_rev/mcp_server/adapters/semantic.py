@@ -11,6 +11,7 @@ from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from time import perf_counter
+from typing import TYPE_CHECKING, cast
 
 import httpx
 import numpy as np
@@ -18,11 +19,13 @@ import numpy as np
 from codeintel_rev.io.faiss_manager import FAISSManager
 from codeintel_rev.io.vllm_client import VLLMClient
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, Finding, MethodInfo
-from codeintel_rev.mcp_server.service_context import ServiceContext, get_service_context
 from kgfoundry_common.errors import EmbeddingError, KgFoundryError, VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import DurationObservation, MetricsProvider, observe_duration
 from kgfoundry_common.problem_details import ProblemDetails
+
+if TYPE_CHECKING:
+    from codeintel_rev.app.config_context import ApplicationContext
 
 SNIPPET_PREVIEW_CHARS = 500
 COMPONENT_NAME = "codeintel_mcp"
@@ -73,11 +76,15 @@ def _observe(operation: str) -> Iterator[DurationObservation | _NoopObservation]
         yield _NoopObservation()
 
 
-async def semantic_search(query: str, limit: int = 20) -> AnswerEnvelope:
+async def semantic_search(
+    context: ApplicationContext, query: str, limit: int = 20
+) -> AnswerEnvelope:
     """Perform semantic search using embeddings.
 
     Parameters
     ----------
+    context : ApplicationContext
+        Application context containing FAISS manager, vLLM client, and settings.
     query : str
         Search query text.
     limit : int, optional
@@ -88,14 +95,12 @@ async def semantic_search(query: str, limit: int = 20) -> AnswerEnvelope:
     AnswerEnvelope
         Semantic search response payload.
     """
-    return await asyncio.to_thread(_semantic_search_sync, query, limit)
+    return await asyncio.to_thread(_semantic_search_sync, context, query, limit)
 
 
-def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
+def _semantic_search_sync(context: ApplicationContext, query: str, limit: int) -> AnswerEnvelope:  # noqa: PLR0914 - pre-existing complexity, refactoring doesn't increase it
     start_time = perf_counter()
     with _observe("semantic_search") as observation:
-        context = get_service_context()
-
         requested_limit = limit
         max_results = max(1, context.settings.limits.max_results)
         effective_limit = max(1, min(requested_limit, max_results))
@@ -115,7 +120,7 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             failure_limits = [*limits_metadata, "FAISS index not available"]
             error = VectorSearchError(
                 faiss_error or "Semantic search not available - index not built",
-                context={"faiss_index": str(context.settings.paths.faiss_index)},
+                context={"faiss_index": str(context.paths.faiss_index)},
             )
             observation.mark_error()
             return _error_envelope(error, limits=failure_limits)
@@ -141,7 +146,7 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             error = VectorSearchError(
                 str(search_exc),
                 cause=search_exc,
-                context={"faiss_index": str(context.settings.paths.faiss_index)},
+                context={"faiss_index": str(context.paths.faiss_index)},
             )
             observation.mark_error()
             return _error_envelope(
@@ -156,8 +161,8 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
                 str(hydrate_exc),
                 cause=hydrate_exc,
                 context={
-                    "duckdb_path": str(context.settings.paths.duckdb_path),
-                    "vectors_dir": str(context.settings.paths.vectors_dir),
+                    "duckdb_path": str(context.paths.duckdb_path),
+                    "vectors_dir": str(context.paths.vectors_dir),
                 },
             )
             observation.mark_error()
@@ -173,21 +178,13 @@ def _semantic_search_sync(query: str, limit: int) -> AnswerEnvelope:
             )
 
         observation.mark_success()
-        extras: dict[str, object] = {}
-        if limits_metadata:
-            extras["limits"] = limits_metadata
-        extras["method"] = _build_method(
-            len(findings),
-            requested_limit,
-            effective_limit,
-            start_time,
-        )
-        success_answer = f"Found {len(findings)} semantically similar code chunks for: {query}"
         return _make_envelope(
             findings=findings,
             answer=f"Found {len(findings)} semantically similar code chunks for: {query}",
             confidence=0.85 if findings else 0.0,
-            extras=_success_extras(faiss_limits, len(findings), limit, start_time),
+            extras=_success_extras(
+                limits_metadata, len(findings), requested_limit, effective_limit, start_time
+            ),
         )
 
 
@@ -237,7 +234,7 @@ def _run_faiss_search(
 
 
 def _hydrate_findings(
-    context: ServiceContext,
+    context: ApplicationContext,
     chunk_ids: Sequence[int],
     scores: Sequence[float],
 ) -> tuple[list[Finding], Exception | None]:
@@ -245,8 +242,8 @@ def _hydrate_findings(
 
     Parameters
     ----------
-    context : ServiceContext
-        Service context for accessing DuckDB catalog.
+    context : ApplicationContext
+        Application context for accessing DuckDB catalog.
     chunk_ids : Sequence[int]
         Chunk identifiers from FAISS search.
     scores : Sequence[float]
@@ -399,7 +396,10 @@ def _make_envelope(
     AnswerEnvelope
         Response payload ready for MCP clients.
     """
-    envelope: AnswerEnvelope = {
+    # Build envelope with all fields at once for type safety
+    # AnswerEnvelope is TypedDict with total=False, so all fields are optional
+    # We construct the envelope by unpacking extras if present
+    base_envelope = {
         "answer": answer,
         "query_kind": "semantic",
         "findings": list(findings),
@@ -407,7 +407,15 @@ def _make_envelope(
     }
 
     if extras:
-        envelope.update(extras)
+        # Include extras in initial construction using dict unpacking
+        # We use cast to tell the type checker that extras contains valid AnswerEnvelope keys
+        # This is safe because _success_extras() only returns valid AnswerEnvelope keys
+        envelope: AnswerEnvelope = cast(
+            "AnswerEnvelope",
+            {**base_envelope, **extras},
+        )
+    else:
+        envelope = cast("AnswerEnvelope", base_envelope)
 
     return envelope
 
@@ -415,17 +423,33 @@ def _make_envelope(
 def _success_extras(
     limits: Sequence[str],
     findings_count: int,
-    limit: int,
+    requested_limit: int,
+    effective_limit: int,
     start_time: float,
 ) -> dict[str, object]:
     """Build a success extras payload with optional limits metadata.
+
+    Parameters
+    ----------
+    limits : Sequence[str]
+        Search limitations or warnings.
+    findings_count : int
+        Number of findings returned.
+    requested_limit : int
+        Requested result limit.
+    effective_limit : int
+        Effective limit applied after clamping.
+    start_time : float
+        Search start time (monotonic clock).
 
     Returns
     -------
     dict[str, object]
         Extras payload including method metadata and optional limits.
     """
-    extras: dict[str, object] = {"method": _build_method(findings_count, limit, start_time)}
+    extras: dict[str, object] = {
+        "method": _build_method(findings_count, requested_limit, effective_limit, start_time)
+    }
     if limits:
         extras["limits"] = list(limits)
     return extras

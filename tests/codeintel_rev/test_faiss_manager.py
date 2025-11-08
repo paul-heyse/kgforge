@@ -16,7 +16,7 @@ class _SentinelGpuIndex:
 def faiss_manager(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> FAISSManager:
     manager = FAISSManager(index_path=tmp_path / "index.faiss", use_cuvs=False)
     # CPU index presence is validated by identity only in tests
-    manager.cpu_index = cast("faiss.Index", object())  # type: ignore[assignment]
+    manager.cpu_index = cast("faiss.Index", object())
 
     class DummyGpuClonerOptions:
         def __init__(self) -> None:
