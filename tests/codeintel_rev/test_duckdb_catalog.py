@@ -496,3 +496,9 @@ class TestQueryByFiltersParametrized:
         )
 
         assert len(results) == expected_count
+
+
+def test_glob_to_sql_like_escapes_literals() -> None:
+    """Ensure glob conversion escapes literal percent and underscore characters."""
+    assert DuckDBCatalog._glob_to_sql_like("config%file.py") == "config\\%file.py"
+    assert DuckDBCatalog._glob_to_sql_like("config_file.py") == "config\\_file.py"

@@ -25,13 +25,14 @@ from codeintel_rev.mcp_server.adapters import semantic as semantic_adapter
 from codeintel_rev.mcp_server.adapters import text_search as text_search_adapter
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, ScopeIn
 
+pytestmark = pytest.mark.asyncio
+
 
 class TestScopeRegistryImmutability:
     """Regression tests for ScopeRegistry immutability guarantees."""
 
     def test_set_scope_guards_against_external_mutation(self) -> None:
         """Mutating the original scope after set_scope should not affect storage."""
-
         registry = ScopeRegistry()
         session_id = "session-mutation"
         scope: ScopeIn = {
@@ -47,12 +48,12 @@ class TestScopeRegistryImmutability:
 
         stored_scope = registry.get_scope(session_id)
         assert stored_scope is not None
-        assert stored_scope["include_globs"] == ["src/**"]
-        assert stored_scope["languages"] == ["python"]
+        assert isinstance(stored_scope, dict)
+        assert stored_scope.get("include_globs") == ["src/**"]
+        assert stored_scope.get("languages") == ["python"]
 
     def test_get_scope_returns_independent_copy(self) -> None:
         """Mutating a retrieved scope should not mutate the registry's cache."""
-
         registry = ScopeRegistry()
         session_id = "session-independent"
         scope: ScopeIn = {
@@ -64,13 +65,15 @@ class TestScopeRegistryImmutability:
 
         retrieved_scope = registry.get_scope(session_id)
         assert retrieved_scope is not None
-        retrieved_scope["include_globs"].append("**/*.ts")
-        retrieved_scope["languages"].append("typescript")
+        assert isinstance(retrieved_scope, dict)
+        retrieved_scope["include_globs"].append("**/*.ts")  # type: ignore[index]
+        retrieved_scope["languages"].append("typescript")  # type: ignore[index]
 
         fresh_scope = registry.get_scope(session_id)
         assert fresh_scope is not None
-        assert fresh_scope["include_globs"] == ["src/**"]
-        assert fresh_scope["languages"] == ["python"]
+        assert isinstance(fresh_scope, dict)
+        assert fresh_scope.get("include_globs") == ["src/**"]
+        assert fresh_scope.get("languages") == ["python"]
 
 
 @pytest.fixture
@@ -188,17 +191,17 @@ def mock_context(test_repo: Path) -> Mock:
 @pytest.fixture(autouse=True)
 def disable_scope_metrics(monkeypatch: pytest.MonkeyPatch) -> None:
     """Replace scope histogram with a stub for deterministic tests."""
-
     from codeintel_rev.mcp_server import scope_utils
 
     class _HistogramStub:
-        def labels(self, **_: object) -> "_HistogramStub":
+        def labels(self, **_: object) -> _HistogramStub:
             return self
 
         def observe(self, _: float) -> None:
             return None
 
     monkeypatch.setattr(scope_utils, "_scope_filter_duration_seconds", _HistogramStub())
+
 
 @pytest.fixture
 def session_id() -> str:
@@ -217,7 +220,7 @@ def session_id() -> str:
 class TestSetScopeToListPaths:
     """Test scope application in list_paths adapter."""
 
-    def test_set_scope_then_list_paths_python_only(
+    async def test_set_scope_then_list_paths_python_only(
         self, mock_context: Mock, session_id: str
     ) -> None:
         """Test that setting scope with Python globs filters list_paths results."""
@@ -230,8 +233,8 @@ class TestSetScopeToListPaths:
         assert result["status"] == "ok"
         assert result["session_id"] == session_id
 
-        # Call list_paths
-        paths_result = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        # Call list_paths (async)
+        paths_result = await files_adapter.list_paths(mock_context, path=None, max_results=100)
 
         # Verify only Python files returned
         items = paths_result["items"]
@@ -240,7 +243,7 @@ class TestSetScopeToListPaths:
         assert not any(item["path"].endswith(".ts") for item in items)
         assert not any(item["path"].endswith(".tsx") for item in items)
 
-    def test_set_scope_then_list_paths_src_prefix(
+    async def test_set_scope_then_list_paths_src_prefix(
         self, mock_context: Mock, session_id: str
     ) -> None:
         """Test that setting scope with src/ prefix filters list_paths results."""
@@ -249,14 +252,14 @@ class TestSetScopeToListPaths:
         scope: ScopeIn = {"include_globs": ["src/**"]}
         files_adapter.set_scope(mock_context, scope)
 
-        paths_result = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        paths_result = await files_adapter.list_paths(mock_context, path=None, max_results=100)
 
         items = paths_result["items"]
         assert len(items) > 0
         assert all(item["path"].startswith("src/") for item in items)
         assert not any(item["path"].startswith("tests/") for item in items)
 
-    def test_set_scope_then_list_paths_language_filter(
+    async def test_set_scope_then_list_paths_language_filter(
         self, mock_context: Mock, session_id: str
     ) -> None:
         """Test that setting scope with languages filters list_paths results."""
@@ -265,7 +268,7 @@ class TestSetScopeToListPaths:
         scope: ScopeIn = {"languages": ["python"]}
         files_adapter.set_scope(mock_context, scope)
 
-        paths_result = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        paths_result = await files_adapter.list_paths(mock_context, path=None, max_results=100)
 
         items = paths_result["items"]
         assert len(items) > 0
@@ -556,11 +559,12 @@ class TestSetScopeToSemanticSearch:
 
             filtered: list[dict] = []
             for chunk in test_chunks:
-                if chunk["id"] not in ids:
+                chunk_id = chunk.get("id")
+                chunk_uri = chunk.get("uri", "")
+                if chunk_id not in ids:
                     continue
                 if exclude_globs and any(
-                    fnmatch.fnmatch(chunk["uri"], pattern)
-                    for pattern in exclude_globs
+                    fnmatch.fnmatch(chunk_uri, pattern) for pattern in exclude_globs
                 ):
                     continue
                 filtered.append(chunk)
@@ -568,7 +572,9 @@ class TestSetScopeToSemanticSearch:
 
         catalog_mock = Mock()
         catalog_mock.query_by_filters = Mock(side_effect=mock_query_by_filters)
-        catalog_mock.query_by_ids = Mock(side_effect=AssertionError("query_by_ids should not be used"))
+        catalog_mock.query_by_ids = Mock(
+            side_effect=AssertionError("query_by_ids should not be used")
+        )
 
         from contextlib import contextmanager
 
@@ -601,7 +607,9 @@ class TestSetScopeToSemanticSearch:
 class TestParameterOverride:
     """Test that explicit parameters override session scope."""
 
-    def test_list_paths_explicit_overrides_scope(self, mock_context: Mock, session_id: str) -> None:
+    async def test_list_paths_explicit_overrides_scope(
+        self, mock_context: Mock, session_id: str
+    ) -> None:
         """Test that explicit include_globs override scope."""
         session_id_var.set(session_id)
 
@@ -610,7 +618,7 @@ class TestParameterOverride:
         files_adapter.set_scope(mock_context, scope)
 
         # Call with explicit TypeScript globs (should override)
-        result = files_adapter.list_paths(
+        result = await files_adapter.list_paths(
             mock_context, path=None, include_globs=["**/*.ts"], max_results=100
         )
 
@@ -649,7 +657,7 @@ class TestParameterOverride:
 class TestMultiSessionIsolation:
     """Test that concurrent sessions maintain isolated scopes."""
 
-    def test_concurrent_sessions_different_scopes(self, mock_context: Mock) -> None:
+    async def test_concurrent_sessions_different_scopes(self, mock_context: Mock) -> None:
         """Test that two sessions with different scopes get different results."""
         session_a = "session-a-123"
         session_b = "session-b-456"
@@ -666,11 +674,11 @@ class TestMultiSessionIsolation:
 
         # Call list_paths from session A
         session_id_var.set(session_a)
-        result_a = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        result_a = await files_adapter.list_paths(mock_context, path=None, max_results=100)
 
         # Call list_paths from session B
         session_id_var.set(session_b)
-        result_b = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        result_b = await files_adapter.list_paths(mock_context, path=None, max_results=100)
 
         # Verify results are different
         items_a = result_a["items"]
@@ -770,19 +778,19 @@ class TestMultiSessionIsolation:
 
         # Session A should have Python files
         if findings_a:
-            uris_a = [f.get("uri", "") for f in findings_a]
+            uris_a = [str(f.get("uri", "")) for f in findings_a]
             assert all(uri.endswith(".py") for uri in uris_a if uri)
 
         # Session B should have TypeScript files
         if findings_b:
-            uris_b = [f.get("uri", "") for f in findings_b]
+            uris_b = [str(f.get("uri", "")) for f in findings_b]
             assert all(uri.endswith(".ts") for uri in uris_b if uri)
 
 
 class TestScopeExpiration:
     """Test scope expiration and pruning."""
 
-    def test_scope_expiration_after_prune(self, mock_context: Mock, session_id: str) -> None:
+    async def test_scope_expiration_after_prune(self, mock_context: Mock, session_id: str) -> None:
         """Test that expired scopes are removed after pruning."""
         session_id_var.set(session_id)
 
@@ -806,7 +814,7 @@ class TestScopeExpiration:
         assert retrieved_scope_after is None
 
         # Verify list_paths no longer applies scope (searches all files)
-        result = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        result = await files_adapter.list_paths(mock_context, path=None, max_results=100)
         items = result["items"]
         # Should include non-Python files (scope no longer applied)
         assert len(items) > 0
@@ -815,12 +823,14 @@ class TestScopeExpiration:
 class TestNoScopeDefaultBehavior:
     """Test default behavior when no scope is set."""
 
-    def test_list_paths_no_scope_searches_all(self, mock_context: Mock, session_id: str) -> None:
+    async def test_list_paths_no_scope_searches_all(
+        self, mock_context: Mock, session_id: str
+    ) -> None:
         """Test that list_paths searches all files when no scope is set."""
         session_id_var.set(session_id)
 
         # Don't call set_scope
-        result = files_adapter.list_paths(mock_context, path=None, max_results=100)
+        result = await files_adapter.list_paths(mock_context, path=None, max_results=100)
 
         items = result["items"]
         # Should include files of all types

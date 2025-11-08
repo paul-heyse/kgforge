@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import duckdb
+import numpy as np
 from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 
 
@@ -48,3 +49,26 @@ def test_query_by_uri_supports_unlimited_results(tmp_path) -> None:
     assert [row["id"] for row in limited] == [1]
     assert [row["id"] for row in unlimited_zero] == [1, 2]
     assert unlimited_zero == unlimited_negative
+
+
+def test_get_embeddings_by_ids_skips_null_embeddings(tmp_path: Path) -> None:
+    vectors_dir = tmp_path / "vectors"
+    vectors_dir.mkdir()
+
+    catalog_path = tmp_path / "catalog.duckdb"
+    catalog = DuckDBCatalog(catalog_path, vectors_dir)
+    catalog.conn = duckdb.connect(database=":memory:")
+    catalog.conn.execute(
+        """
+        CREATE OR REPLACE VIEW chunks AS
+        SELECT * FROM (
+            SELECT 1::BIGINT AS id, [0.1, 0.2]::FLOAT[] AS embedding
+            UNION ALL
+            SELECT 2::BIGINT AS id, NULL::FLOAT[] AS embedding
+        )
+        """
+    )
+
+    results = catalog.get_embeddings_by_ids([1, 2])
+    assert results.shape == (1, 2)
+    assert np.allclose(results[0], [0.1, 0.2])

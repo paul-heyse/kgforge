@@ -6,11 +6,17 @@ This script orchestrates the full indexing pipeline:
 2. Chunk files using cAST (SCIP-based)
 3. Embed chunks with vLLM
 4. Write to Parquet with embeddings
-5. Build FAISS index
+5. Build FAISS index with adaptive type selection
+
+The FAISS index type is automatically selected based on corpus size:
+- Small (<5K vectors): Flat index (exact search, fast training)
+- Medium (5K-50K vectors): IVFFlat (balanced training/recall)
+- Large (>50K vectors): IVF-PQ (memory efficient, fast search)
 """
 
 from __future__ import annotations
 
+import argparse
 import logging
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
@@ -52,7 +58,22 @@ class PipelinePaths:
 
 
 def main() -> None:
-    """Run the end-to-end indexing pipeline."""
+    """Run the end-to-end indexing pipeline.
+
+    Supports both full rebuild (default) and incremental update modes.
+    Use --incremental to add new chunks to an existing index instead of rebuilding.
+    """
+    parser = argparse.ArgumentParser(
+        description="Index repository: SCIP → chunk → embed → Parquet → FAISS",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--incremental",
+        action="store_true",
+        help="Add new chunks to existing index instead of rebuilding (fast incremental updates)",
+    )
+    args = parser.parse_args()
+
     settings = load_settings()
     paths = _resolve_paths(settings)
 
@@ -66,12 +87,28 @@ def main() -> None:
         return
 
     embeddings = _embed_chunks(chunks, settings.vllm)
-    parquet_path = _write_parquet(chunks, embeddings, paths, settings.index.vec_dim)
-    _build_faiss_index(embeddings, paths, settings.index)
-    catalog_count = _initialize_duckdb(paths)
+    parquet_path = _write_parquet(
+        chunks,
+        embeddings,
+        paths,
+        settings.index.vec_dim,
+        settings.index.preview_max_chars,
+    )
 
+    if args.incremental:
+        _update_faiss_index_incremental(chunks, embeddings, paths, settings.index)
+    else:
+        _build_faiss_index(embeddings, paths, settings.index)
+
+    catalog_count = _initialize_duckdb(
+        paths,
+        materialize=settings.index.duckdb_materialize,
+    )
+
+    mode_str = "incremental" if args.incremental else "full rebuild"
     logger.info(
-        "Indexing pipeline complete; chunks=%s embeddings=%s parquet=%s faiss_index=%s duckdb_rows=%s",
+        "Indexing pipeline complete (%s); chunks=%s embeddings=%s parquet=%s faiss_index=%s duckdb_rows=%s",
+        mode_str,
         len(chunks),
         len(embeddings),
         parquet_path,
@@ -231,6 +268,7 @@ def _write_parquet(
     embeddings: np.ndarray,
     paths: PipelinePaths,
     vec_dim: int,
+    preview_max_chars: int,
 ) -> Path:
     """Persist chunk metadata and embeddings to Parquet.
 
@@ -244,6 +282,8 @@ def _write_parquet(
         Pipeline paths configuration.
     vec_dim : int
         Embedding vector dimension.
+    preview_max_chars : int
+        Maximum number of characters to persist in chunk previews.
 
     Returns
     -------
@@ -257,6 +297,7 @@ def _write_parquet(
         embeddings=embeddings,
         start_id=0,
         vec_dim=vec_dim,
+        preview_max_chars=preview_max_chars,
     )
     logger.info("Wrote Parquet dataset to %s", output_path)
     return output_path
@@ -267,7 +308,11 @@ def _build_faiss_index(
     paths: PipelinePaths,
     index_config: IndexConfig,
 ) -> None:
-    """Train and persist the FAISS index.
+    """Train and persist the FAISS index with adaptive type selection.
+
+    The index type is automatically selected based on corpus size for optimal
+    performance. Small corpora use flat indexes (fast training), medium corpora
+    use IVFFlat (balanced), and large corpora use IVF-PQ (memory efficient).
 
     Parameters
     ----------
@@ -287,15 +332,29 @@ def _build_faiss_index(
         msg = "No embeddings available to build FAISS index"
         raise RuntimeError(msg)
 
+    n_vectors = len(embeddings)
+    logger.info("Building FAISS index for %s vectors (adaptive type selection)", n_vectors)
+
     faiss_mgr = FAISSManager(
         index_path=paths.faiss_index,
         vec_dim=index_config.vec_dim,
         nlist=index_config.faiss_nlist,
         use_cuvs=index_config.use_cuvs,
     )
+
+    # Log memory estimate before building
+    mem_est = faiss_mgr.estimate_memory_usage(n_vectors)
+    logger.info(
+        "Estimated memory usage: CPU=%.2f GB, GPU=%.2f GB, Total=%.2f GB",
+        mem_est["cpu_index_bytes"] / 1e9,
+        mem_est["gpu_index_bytes"] / 1e9,
+        mem_est["total_bytes"] / 1e9,
+    )
+
     train_limit = min(len(embeddings), TRAINING_LIMIT)
     training_vectors = embeddings[:train_limit]
     faiss_mgr.build_index(training_vectors)
+    # Index type and memory estimate are logged by FAISSManager.build_index()
 
     ids = np.arange(len(embeddings), dtype=np.int64)
     faiss_mgr.add_vectors(embeddings, ids)
@@ -303,7 +362,119 @@ def _build_faiss_index(
     logger.info("Persisted FAISS index to %s", paths.faiss_index)
 
 
-def _initialize_duckdb(paths: PipelinePaths) -> int:
+def _update_faiss_index_incremental(
+    chunks: Sequence[Chunk],
+    embeddings: np.ndarray,
+    paths: PipelinePaths,
+    index_config: IndexConfig,
+) -> None:
+    """Update FAISS index incrementally by adding new chunks to secondary index.
+
+    Loads existing primary index and identifies new chunks that aren't already
+    indexed. Adds new chunks to the secondary flat index for fast incremental
+    updates without rebuilding the primary index.
+
+    Parameters
+    ----------
+    chunks : Sequence[Chunk]
+        All chunks from the current indexing run.
+    embeddings : np.ndarray
+        Embedding vectors aligned with chunks.
+    paths : PipelinePaths
+        Pipeline paths configuration.
+    index_config : IndexConfig
+        FAISS index configuration.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the primary index does not exist. Use full rebuild mode first.
+    RuntimeError
+        If embeddings are empty or index loading fails.
+    """
+    if embeddings.size == 0:
+        msg = "No embeddings available for incremental update"
+        raise RuntimeError(msg)
+
+    logger.info("Incremental indexing mode: adding new chunks to existing index")
+
+    faiss_mgr = FAISSManager(
+        index_path=paths.faiss_index,
+        vec_dim=index_config.vec_dim,
+        nlist=index_config.faiss_nlist,
+        use_cuvs=index_config.use_cuvs,
+    )
+
+    # Load existing primary index
+    try:
+        faiss_mgr.load_cpu_index()
+        logger.info("Loaded existing primary index from %s", paths.faiss_index)
+    except FileNotFoundError as exc:
+        msg = (
+            f"Primary index not found at {paths.faiss_index}. "
+            "Run without --incremental flag first to create the initial index."
+        )
+        raise FileNotFoundError(msg) from exc
+
+    # Try to load existing secondary index (if any)
+    try:
+        faiss_mgr.load_secondary_index()
+        logger.info(
+            "Loaded existing secondary index with %s vectors", len(faiss_mgr.incremental_ids)
+        )
+    except FileNotFoundError:
+        logger.info("No existing secondary index found; will create new one")
+
+    # Identify new chunks (not already in primary or secondary index)
+    # For simplicity, we'll use chunk indices as IDs (matching the full rebuild logic)
+    chunk_ids = np.arange(len(chunks), dtype=np.int64)
+    existing_ids = set(faiss_mgr.incremental_ids)
+
+    # Get IDs from primary index if possible
+    if faiss_mgr.cpu_index is not None:
+        try:
+            primary_n = faiss_mgr.cpu_index.ntotal  # type: ignore[attr-defined]
+            if hasattr(faiss_mgr.cpu_index, "id_map"):
+                primary_ids = {
+                    faiss_mgr.cpu_index.id_map.at(i)  # type: ignore[attr-defined]
+                    for i in range(primary_n)
+                }
+                existing_ids.update(primary_ids)
+        except (AttributeError, RuntimeError) as exc:
+            logger.warning("Could not extract IDs from primary index: %s", exc)
+
+    # Filter to new chunks only
+    new_mask = np.array([chunk_id not in existing_ids for chunk_id in chunk_ids])
+    new_indices = np.where(new_mask)[0]
+
+    if len(new_indices) == 0:
+        logger.info("All %s chunks already indexed; no incremental update needed", len(chunks))
+        return
+
+    new_chunks = [chunks[i] for i in new_indices]
+    new_embeddings = embeddings[new_indices]
+    new_ids = chunk_ids[new_indices]
+
+    logger.info(
+        "Adding %s new chunks to secondary index (%s already indexed)",
+        len(new_chunks),
+        len(chunks) - len(new_chunks),
+    )
+
+    # Add to secondary index
+    faiss_mgr.update_index(new_embeddings, new_ids)
+
+    # Save both indexes
+    faiss_mgr.save_cpu_index()  # Save primary (unchanged, but ensures consistency)
+    faiss_mgr.save_secondary_index()  # Save secondary with new chunks
+
+    logger.info(
+        "Incremental update complete: %s new vectors added to secondary index",
+        len(new_ids),
+    )
+
+
+def _initialize_duckdb(paths: PipelinePaths, *, materialize: bool) -> int:
     """Create or refresh the DuckDB catalog and return the chunk count.
 
     Parameters
@@ -316,9 +487,18 @@ def _initialize_duckdb(paths: PipelinePaths) -> int:
     int
         Number of chunk records registered in the catalog.
     """
-    with DuckDBCatalog(paths.duckdb_path, paths.vectors_dir) as catalog:
+    with DuckDBCatalog(
+        paths.duckdb_path,
+        paths.vectors_dir,
+        materialize=materialize,
+    ) as catalog:
         count = catalog.count_chunks()
-    logger.info("DuckDB catalog initialized at %s (rows=%s)", paths.duckdb_path, count)
+    logger.info(
+        "DuckDB catalog initialized at %s (rows=%s, materialize=%s)",
+        paths.duckdb_path,
+        count,
+        materialize,
+    )
     return count
 
 

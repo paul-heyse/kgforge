@@ -127,6 +127,12 @@ fi
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"   # linux|darwin|...
 REPO_NAME="$(basename "$(pwd)")"
 
+# ------------- Check for git binary -------------
+if ! command -v git &> /dev/null; then
+  err "Error: git binary not found. Please install git."
+  exit 1
+fi
+
 # ------------- Ensure uv is installed -------------
 ensure_uv() {
   local current_version=""

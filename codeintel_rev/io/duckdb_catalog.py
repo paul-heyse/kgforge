@@ -29,6 +29,19 @@ _scope_filter_duration_seconds = build_histogram(
     labelnames=("filter_type",),
 )
 
+_EMPTY_CHUNKS_SELECT = """
+SELECT
+    CAST(NULL AS BIGINT) AS id,
+    CAST(NULL AS VARCHAR) AS uri,
+    CAST(NULL AS INTEGER) AS start_line,
+    CAST(NULL AS INTEGER) AS end_line,
+    CAST(NULL AS BIGINT) AS start_byte,
+    CAST(NULL AS BIGINT) AS end_byte,
+    CAST(NULL AS VARCHAR) AS preview,
+    CAST(NULL AS FLOAT[]) AS embedding
+WHERE 1 = 0
+"""
+
 
 class DuckDBCatalog:
     """DuckDB catalog for querying chunks.
@@ -39,11 +52,17 @@ class DuckDBCatalog:
         DuckDB database path.
     vectors_dir : Path
         Directory containing Parquet files.
+    materialize : bool, optional
+        When ``True``, chunk metadata is materialized into a persisted DuckDB
+        table (``chunks_materialized``) with a secondary index on ``uri``. When
+        ``False`` (default), the catalog exposes Parquet files through a view for
+        zero-copy queries.
     """
 
-    def __init__(self, db_path: Path, vectors_dir: Path) -> None:
+    def __init__(self, db_path: Path, vectors_dir: Path, *, materialize: bool = False) -> None:
         self.db_path = db_path
         self.vectors_dir = vectors_dir
+        self.materialize = materialize
         self.conn: duckdb.DuckDBPyConnection | None = None
         self._embedding_dim_cache: int | None = None
 
@@ -89,30 +108,48 @@ class DuckDBCatalog:
             raise RuntimeError(msg)
 
         parquet_pattern = str(self.vectors_dir / "**/*.parquet")
-        if any(self.vectors_dir.rglob("*.parquet")):
-            relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
-            relation.create_view("chunks", replace=True)
-        else:
-            self.conn.execute(
-                """
-                CREATE OR REPLACE VIEW chunks AS
-                SELECT
-                    CAST(NULL AS BIGINT) AS id,
-                    CAST(NULL AS VARCHAR) AS uri,
-                    CAST(NULL AS INTEGER) AS start_line,
-                    CAST(NULL AS INTEGER) AS end_line,
-                    CAST(NULL AS BIGINT) AS start_byte,
-                    CAST(NULL AS BIGINT) AS end_byte,
-                    CAST(NULL AS VARCHAR) AS preview,
-                    CAST(NULL AS FLOAT[]) AS embedding
-                WHERE 1 = 0
-                """
-            )
+        parquet_exists = any(self.vectors_dir.rglob("*.parquet"))
 
-        # Create index on uri column for efficient path filtering
-        # Index is idempotent (IF NOT EXISTS prevents errors on repeated calls)
-        self.conn.execute("CREATE INDEX IF NOT EXISTS idx_uri ON chunks(uri)")
-        LOGGER.info("Created DuckDB index on uri column")
+        if self.materialize:
+            if parquet_exists:
+                self.conn.execute(
+                    """
+                    CREATE OR REPLACE TABLE chunks_materialized AS
+                    SELECT * FROM read_parquet(?)
+                    """,
+                    [parquet_pattern],
+                )
+            else:
+                self.conn.execute(
+                    f"CREATE OR REPLACE TABLE chunks_materialized AS {_EMPTY_CHUNKS_SELECT}"
+                )
+
+            self.conn.execute("CREATE OR REPLACE VIEW chunks AS SELECT * FROM chunks_materialized")
+            self.conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_chunks_materialized_uri ON chunks_materialized(uri)"
+            )
+            LOGGER.info(
+                "Materialized DuckDB chunks table",
+                extra={
+                    "materialized": True,
+                    "parquet_found": parquet_exists,
+                    "db_path": str(self.db_path),
+                },
+            )
+        else:
+            if parquet_exists:
+                relation = self.conn.sql("SELECT * FROM read_parquet(?)", params=[parquet_pattern])
+                relation.create_view("chunks", replace=True)
+            else:
+                self.conn.execute(f"CREATE OR REPLACE VIEW chunks AS {_EMPTY_CHUNKS_SELECT}")
+            LOGGER.debug(
+                "Configured DuckDB chunks view",
+                extra={
+                    "materialized": False,
+                    "parquet_found": parquet_exists,
+                    "db_path": str(self.db_path),
+                },
+            )
 
     def query_by_ids(self, ids: Sequence[int]) -> list[dict]:
         """Query chunks by their unique IDs.
@@ -310,13 +347,13 @@ class DuckDBCatalog:
 
         # Add SQL WHERE clauses for simple patterns
         if simple_include_patterns:
-            like_clauses = " OR ".join("c.uri LIKE ?" for _ in simple_include_patterns)
+            like_clauses = " OR ".join("c.uri LIKE ? ESCAPE '\\'" for _ in simple_include_patterns)
             where_clauses.append(f"({like_clauses})")
             params.extend(simple_include_patterns)
 
         if simple_exclude_patterns:
             for pattern in simple_exclude_patterns:
-                where_clauses.append("c.uri NOT LIKE ?")
+                where_clauses.append("c.uri NOT LIKE ? ESCAPE '\\'")
                 params.append(pattern)
 
         # Add language filter (SQL LIKE for extensions)
@@ -327,10 +364,9 @@ class DuckDBCatalog:
                 extensions.update(lang_extensions)
 
             if extensions:
-                ext_clauses = " OR ".join("c.uri LIKE ?" for _ in extensions)
+                ext_clauses = " OR ".join("c.uri LIKE ? ESCAPE '\\'" for _ in extensions)
                 where_clauses.append(f"({ext_clauses})")
-                # SQL LIKE patterns: escape % and _ if needed, but extensions are safe
-                params.extend(f"%{ext}" for ext in extensions)
+                params.extend(f"%{DuckDBCatalog._escape_like_wildcards(ext)}" for ext in extensions)
             else:
                 # No extensions found for requested languages -> no matches
                 # Return empty by adding impossible WHERE clause
@@ -456,24 +492,42 @@ class DuckDBCatalog:
         starts_with_recursive = normalized.startswith("**/")
         recursive_remainder = normalized[len("**/") :] if starts_with_recursive else ""
 
+        escaped = DuckDBCatalog._escape_like_wildcards(normalized)
+
         # Replace ** with % (matches any characters including slashes)
-        normalized = normalized.replace("**", "%")
+        escaped = escaped.replace("**", "%")
 
         # Replace * with % (matches any characters)
-        normalized = normalized.replace("*", "%")
+        escaped = escaped.replace("*", "%")
 
         # Replace ? with _ (matches single character)
-        normalized = normalized.replace("?", "_")
+        escaped = escaped.replace("?", "_")
 
         if (
             starts_with_recursive
             and recursive_remainder.startswith("*")
-            and normalized.startswith("%/")
+            and escaped.startswith("%/")
         ):
-            normalized = normalized.replace("/%", "%", 1)
-            normalized = "%" + normalized.lstrip("%")
+            escaped = escaped.replace("/%", "%", 1)
+            escaped = "%" + escaped.lstrip("%")
 
-        return normalized
+        return escaped
+
+    @staticmethod
+    def _escape_like_wildcards(pattern: str) -> str:
+        """Escape literal SQL LIKE wildcards using backslash.
+
+        Parameters
+        ----------
+        pattern : str
+            Pattern string to escape.
+
+        Returns
+        -------
+        str
+            Escaped pattern string.
+        """
+        return pattern.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
     def get_chunk_by_id(self, chunk_id: int) -> dict | None:
         """Return a single chunk record by ID.
@@ -594,14 +648,20 @@ class DuckDBCatalog:
             [list(ids)],
         )
         rows = relation.fetchall()
+        dim = self._embedding_dim()
         if not rows:
-            dim = self._embedding_dim()
             return np.empty((0, dim), dtype=np.float32)
 
-        embeddings = [np.array(row[1], dtype=np.float32) for row in rows]
+        embeddings: list[np.ndarray] = []
+        for _, embedding, _ in rows:
+            if embedding is None:
+                continue
+            array = np.asarray(embedding, dtype=np.float32)
+            if array.ndim != 1:
+                continue
+            embeddings.append(array)
 
         if not embeddings:
-            dim = self._embedding_dim()
             return np.empty((0, dim), dtype=np.float32)
 
         return np.vstack(embeddings)

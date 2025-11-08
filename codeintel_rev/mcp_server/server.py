@@ -73,13 +73,13 @@ def set_scope(scope: ScopeIn) -> dict:
 
 
 @mcp.tool()
-def list_paths(
+async def list_paths(
     path: str | None = None,
     include_globs: list[str] | None = None,
     exclude_globs: list[str] | None = None,
     max_results: int = 1000,
 ) -> dict:
-    """List files in scope.
+    """List files in scope (async).
 
     Parameters
     ----------
@@ -98,7 +98,7 @@ def list_paths(
         File listing with paths.
     """
     context = get_context()
-    return files_adapter.list_paths(
+    return await files_adapter.list_paths(
         context,
         path=path,
         include_globs=include_globs,
@@ -295,12 +295,12 @@ def references_at(
 
 
 @mcp.tool()
-def blame_range(
+async def blame_range(
     path: str,
     start_line: int,
     end_line: int,
 ) -> dict:
-    """Git blame for line range.
+    """Git blame for line range (async).
 
     Parameters
     ----------
@@ -317,15 +317,15 @@ def blame_range(
         Blame entries for each line.
     """
     context = get_context()
-    return history_adapter.blame_range(context, path, start_line, end_line)
+    return await history_adapter.blame_range(context, path, start_line, end_line)
 
 
 @mcp.tool()
-def file_history(
+async def file_history(
     path: str,
     limit: int = 50,
 ) -> dict:
-    """Get file commit history.
+    """Get file commit history (async).
 
     Parameters
     ----------
@@ -340,7 +340,7 @@ def file_history(
         Commit history.
     """
     context = get_context()
-    return history_adapter.file_history(context, path, limit)
+    return await history_adapter.file_history(context, path, limit)
 
 
 # ==================== Resources ====================

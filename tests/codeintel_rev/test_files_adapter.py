@@ -13,6 +13,8 @@ import pytest
 from codeintel_rev.mcp_server.adapters.files import list_paths
 from codeintel_rev.mcp_server.schemas import ScopeIn
 
+pytestmark = pytest.mark.asyncio
+
 
 @pytest.fixture
 def mock_context(tmp_path: Path) -> Mock:
@@ -56,7 +58,7 @@ def mock_context(tmp_path: Path) -> Mock:
     return context
 
 
-def test_list_paths_with_scope_globs(mock_context: Mock) -> None:
+async def test_list_paths_with_scope_globs(mock_context: Mock) -> None:
     """Test that list_paths applies scope glob filters.
 
     Verifies that when session scope has include_globs, only files
@@ -72,7 +74,7 @@ def test_list_paths_with_scope_globs(mock_context: Mock) -> None:
         ),
         patch("codeintel_rev.mcp_server.adapters.files.get_effective_scope", return_value=scope),
     ):
-        result = list_paths(mock_context, path=None, max_results=100)
+        result = await list_paths(mock_context, path=None, max_results=100)
 
         # Verify only Python files are returned
         assert "items" in result
@@ -88,7 +90,7 @@ def test_list_paths_with_scope_globs(mock_context: Mock) -> None:
         assert not any(path.endswith(".md") for path in paths_list if path)
 
 
-def test_list_paths_with_scope_language(mock_context: Mock) -> None:
+async def test_list_paths_with_scope_language(mock_context: Mock) -> None:
     """Test that list_paths applies scope language filters.
 
     Verifies that when session scope has languages, only files
@@ -104,7 +106,7 @@ def test_list_paths_with_scope_language(mock_context: Mock) -> None:
         ),
         patch("codeintel_rev.mcp_server.adapters.files.get_effective_scope", return_value=scope),
     ):
-        result = list_paths(mock_context, path=None, max_results=100)
+        result = await list_paths(mock_context, path=None, max_results=100)
 
         # Verify only Python files are returned
         assert "items" in result

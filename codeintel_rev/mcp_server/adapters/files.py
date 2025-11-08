@@ -5,6 +5,7 @@ Provides file listing, reading, and scope configuration.
 
 from __future__ import annotations
 
+import asyncio
 import fnmatch
 import os
 from collections.abc import Sequence
@@ -78,17 +79,21 @@ def set_scope(context: ApplicationContext, scope: ScopeIn) -> dict:
     }
 
 
-def list_paths(  # noqa: C901, PLR0912, PLR0914 - pre-existing complexity from directory traversal logic + scope integration
+async def list_paths(
     context: ApplicationContext,
     path: str | None = None,
     include_globs: list[str] | None = None,
     exclude_globs: list[str] | None = None,
     max_results: int = 1000,
 ) -> dict:
-    """List files in repository.
+    """List files in repository (async with threadpool offload).
 
     Applies session scope filters (include_globs, exclude_globs, languages) if
     set via `set_scope`. Explicit parameters override session scope.
+
+    This function runs the blocking directory traversal in a threadpool via
+    `asyncio.to_thread` to prevent blocking the event loop. This enables
+    concurrent file listing operations without thread exhaustion.
 
     Parameters
     ----------
@@ -130,6 +135,11 @@ def list_paths(  # noqa: C901, PLR0912, PLR0914 - pre-existing complexity from d
 
     Notes
     -----
+    Async Pattern:
+    - The blocking directory traversal runs in a threadpool via `asyncio.to_thread`.
+    - This prevents blocking the event loop and enables concurrent operations.
+    - The sync implementation (`_list_paths_sync`) contains the actual logic.
+
     Scope Integration:
     - Session scope is retrieved from registry using session ID (set by middleware).
     - Scope's `include_globs` and `exclude_globs` are merged with explicit parameters.
@@ -140,6 +150,51 @@ def list_paths(  # noqa: C901, PLR0912, PLR0914 - pre-existing complexity from d
     The traversal skips directories that match the default or user supplied
     exclusion globs (for example ``**/.git/**``) so that large dependency
     folders are pruned without visiting their contents.
+    """
+    LOGGER.debug(
+        "Listing paths (async)",
+        extra={"path": path, "max_results": max_results},
+    )
+    return await asyncio.to_thread(
+        _list_paths_sync,
+        context,
+        path,
+        include_globs,
+        exclude_globs,
+        max_results,
+    )
+
+
+def _list_paths_sync(  # noqa: C901, PLR0912, PLR0914 - pre-existing complexity from directory traversal logic + scope integration
+    context: ApplicationContext,
+    path: str | None = None,
+    include_globs: list[str] | None = None,
+    exclude_globs: list[str] | None = None,
+    max_results: int = 1000,
+) -> dict:
+    """List files in repository (synchronous implementation).
+
+    Synchronous implementation of list_paths that performs the actual directory
+    traversal. This function runs in a threadpool when called from the async
+    `list_paths` wrapper.
+
+    Parameters
+    ----------
+    context : ApplicationContext
+        Application context containing repo root and settings.
+    path : str | None
+        Starting path relative to repo root (None = root).
+    include_globs : list[str] | None
+        Glob patterns to include (e.g., ["*.py"]). Overrides session scope if provided.
+    exclude_globs : list[str] | None
+        Glob patterns to exclude (e.g., ["__pycache__", "*.pyc"]). Overrides session scope if provided.
+    max_results : int
+        Maximum number of files to return.
+
+    Returns
+    -------
+    dict
+        File listing with paths and metadata.
     """
     repo_root = context.paths.repo_root
     search_root, error = _resolve_search_root(repo_root, path)

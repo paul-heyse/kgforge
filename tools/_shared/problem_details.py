@@ -58,7 +58,7 @@ __all__: tuple[str, ...] = (
     "tool_timeout_problem_details",
 )
 # Sort for consistent export order (pyright doesn't understand list.sort() on __all__)
-__all__ = tuple(sorted(__all__))
+__all__ = tuple(sorted(__all__))  # type: ignore[reportUnsupportedDunderAll]
 
 # Type aliases for JSON values (RFC 7159 compatible)
 JsonPrimitive = str | int | float | bool | None

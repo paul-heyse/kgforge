@@ -26,6 +26,8 @@ def get_chunks_schema(vec_dim: int) -> pa.Schema:
     ----------
     vec_dim : int
         Embedding dimension.
+    preview_max_chars : int
+        Maximum number of characters to persist in the preview column.
 
     Returns
     -------
@@ -52,6 +54,7 @@ def write_chunks_parquet(
     embeddings: np.ndarray,
     start_id: int = 0,
     vec_dim: int = 2560,
+    preview_max_chars: int = 240,
 ) -> None:
     """Write chunks and embeddings to Parquet.
 
@@ -84,7 +87,7 @@ def write_chunks_parquet(
     end_lines = [c.end_line for c in chunks]
     start_bytes = [c.start_byte for c in chunks]
     end_bytes = [c.end_byte for c in chunks]
-    previews = [c.text[:240] for c in chunks]
+    previews = [c.text[:preview_max_chars] for c in chunks]
 
     # Convert embeddings to FixedSizeList
     embeddings_flat = embeddings.astype(np.float32).ravel()

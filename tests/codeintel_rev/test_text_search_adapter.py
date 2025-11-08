@@ -14,7 +14,6 @@ from codeintel_rev.mcp_server.schemas import ScopeIn
 @pytest.fixture
 def mock_context(tmp_path: Path) -> Mock:
     """Create a mock ApplicationContext for testing."""
-
     from codeintel_rev.app.config_context import ResolvedPaths
 
     context = Mock()
@@ -57,7 +56,6 @@ def _build_match(path: Path) -> str:
 
 def test_search_text_scope_include_and_exclude(mock_context: Mock) -> None:
     """Scope include/exclude globs are forwarded as ripgrep ``--iglob`` options."""
-
     repo_root = mock_context.paths.repo_root
     scope: ScopeIn = {
         "include_globs": ["src/**/*.py"],
@@ -90,7 +88,6 @@ def test_search_text_scope_include_and_exclude(mock_context: Mock) -> None:
 
 def test_search_text_explicit_paths_override_scope(mock_context: Mock) -> None:
     """Explicit paths suppress scope include globs while keeping excludes."""
-
     repo_root = mock_context.paths.repo_root
     scope: ScopeIn = {
         "include_globs": ["src/**"],
@@ -121,7 +118,6 @@ def test_search_text_explicit_paths_override_scope(mock_context: Mock) -> None:
 
 def test_search_text_explicit_globs_override_scope(mock_context: Mock) -> None:
     """Explicit include/exclude globs override scope-provided filters."""
-
     repo_root = mock_context.paths.repo_root
     scope: ScopeIn = {
         "include_globs": ["src/**"],

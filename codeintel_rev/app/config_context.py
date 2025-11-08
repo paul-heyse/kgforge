@@ -57,6 +57,7 @@ from codeintel_rev.app.scope_registry import ScopeRegistry
 from codeintel_rev.config.settings import Settings, load_settings
 from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 from codeintel_rev.io.faiss_manager import FAISSManager
+from codeintel_rev.io.git_client import AsyncGitClient, GitClient
 from codeintel_rev.io.vllm_client import VLLMClient
 from kgfoundry_common.errors import ConfigurationError
 from kgfoundry_common.logging import get_logger
@@ -231,6 +232,13 @@ class ApplicationContext:
         Thread-safe registry for storing per-session query scopes. Sessions are
         identified by UUID and expire after 1 hour of inactivity. Used by adapters
         to apply scope filters (path globs, languages) to search operations.
+    git_client : GitClient
+        Typed Git operations client using GitPython. Provides structured APIs for
+        blame and history operations without subprocess overhead. Lazy-initializes
+        Git repository on first access.
+    async_git_client : AsyncGitClient
+        Async wrapper around git_client for non-blocking Git operations. Runs
+        synchronous GitPython operations in threadpool via asyncio.to_thread.
     _faiss_lock : Lock
         Thread lock for coordinating FAISS index loading (internal use only).
     _faiss_loaded : bool
@@ -277,6 +285,8 @@ class ApplicationContext:
     vllm_client: VLLMClient
     faiss_manager: FAISSManager
     scope_registry: ScopeRegistry
+    git_client: GitClient
+    async_git_client: AsyncGitClient
     _faiss_lock: Lock = field(default_factory=Lock, init=False)
     _faiss_loaded: bool = field(default=False, init=False)
     _faiss_gpu_attempted: bool = field(default=False, init=False)
@@ -340,6 +350,14 @@ class ApplicationContext:
         # Initialize scope registry for session-scoped query constraints
         scope_registry = ScopeRegistry()
 
+        # Initialize Git clients for blame and history operations
+        git_client = GitClient(repo_path=paths.repo_root)
+        async_git_client = AsyncGitClient(git_client)
+        LOGGER.debug(
+            "Initialized Git clients",
+            extra={"repo_path": str(paths.repo_root)},
+        )
+
         LOGGER.info(
             "Application context created",
             extra={
@@ -355,6 +373,8 @@ class ApplicationContext:
             vllm_client=vllm_client,
             faiss_manager=faiss_manager,
             scope_registry=scope_registry,
+            git_client=git_client,
+            async_git_client=async_git_client,
         )
 
     def ensure_faiss_ready(self) -> tuple[bool, list[str], str | None]:
@@ -463,7 +483,11 @@ class ApplicationContext:
         --------
         codeintel_rev.io.duckdb_catalog.DuckDBCatalog : Catalog implementation
         """
-        catalog = DuckDBCatalog(self.paths.duckdb_path, self.paths.vectors_dir)
+        catalog = DuckDBCatalog(
+            self.paths.duckdb_path,
+            self.paths.vectors_dir,
+            materialize=self.settings.index.duckdb_materialize,
+        )
         try:
             catalog.open()
             yield catalog

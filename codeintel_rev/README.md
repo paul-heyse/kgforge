@@ -60,7 +60,7 @@ Production-grade MCP server for AI-assisted code review with SCIP indexing, sema
 
 ```bash
 # Core dependencies (already in environment via bootstrap.sh)
-uv add msgspec httpx numpy pyarrow duckdb fastapi starlette fastmcp
+uv add msgspec httpx numpy pyarrow duckdb fastapi starlette fastmcp gitpython
 
 # GPU stack (optional dependencies)
 uv add --group gpu faiss vllm torch libcuvs-cu13
@@ -68,6 +68,8 @@ uv add --group gpu faiss vllm torch libcuvs-cu13
 # SCIP indexer
 npm install -g @sourcegraph/scip-python
 ```
+
+**Note**: GitPython (>=3.1.43) is required for Git operations. The `git` binary must be available on your system (checked by `scripts/bootstrap.sh`).
 
 ## Quick Start
 
@@ -478,18 +480,116 @@ Uncomment the `auth_request` directives in `config/nginx/codeintel-mcp.conf`.
 
 ## Performance Tuning
 
-### FAISS
+### Adaptive FAISS Indexing
 
+The FAISS index type is **automatically selected** based on corpus size for optimal performance:
+
+- **Small corpus (<5K vectors)**: Flat index (`IndexFlatIP`)
+  - Fast training (no training required)
+  - Exact search
+  - Best for small codebases or development
+
+- **Medium corpus (5K-50K vectors)**: IVFFlat (`IndexIVFFlat`)
+  - Balanced training time and recall
+  - Dynamic `nlist` calculation: `min(√N, N//39)` with minimum 100
+  - Good for medium-sized codebases
+
+- **Large corpus (>50K vectors)**: IVF-PQ (`IndexIVFPQ`)
+  - Memory-efficient with Product Quantization
+  - Dynamic `nlist` calculation: `max(√N, 1024)`
+  - Best for large codebases (100K+ chunks)
+
+**Memory Estimation**:
+```python
+from codeintel_rev.io.faiss_manager import FAISSManager
+
+manager = FAISSManager(index_path=Path("index.faiss"), vec_dim=2560)
+estimates = manager.estimate_memory_usage(n_vectors=100_000)
+print(f"CPU: {estimates['cpu_index_bytes']/1e9:.2f} GB")
+print(f"GPU: {estimates['gpu_index_bytes']/1e9:.2f} GB")
+print(f"Total: {estimates['total_bytes']/1e9:.2f} GB")
+```
+
+**Manual Override** (if needed):
 ```bash
-# Adjust IVF parameters
+# Force specific nlist (used as fallback for large corpora)
 export FAISS_NLIST=16384  # More centroids = better recall, slower training
 export FAISS_NPROBE=256   # More probes = better recall, slower search
 
-# Enable cuVS (requires custom FAISS wheel)
+# Enable cuVS acceleration (requires custom FAISS wheel)
 export USE_CUVS=1
 ```
 
-### vLLM
+### Incremental Index Updates
+
+For large codebases, use **incremental indexing** to add new chunks without rebuilding the entire index:
+
+```bash
+# Initial indexing (full rebuild)
+python bin/index_all.py
+
+# Later: add new chunks incrementally (fast - seconds instead of hours)
+python bin/index_all.py --incremental
+```
+
+**How it works**:
+- New chunks are added to a **secondary flat index** (no training required)
+- Search automatically queries both primary and secondary indexes
+- Results are merged by similarity score
+- Periodically merge secondary into primary for optimal performance
+
+**Merge secondary index** (periodic maintenance):
+```python
+from codeintel_rev.io.faiss_manager import FAISSManager
+
+manager = FAISSManager(index_path=Path("index.faiss"), vec_dim=2560)
+manager.load_cpu_index()
+manager.load_secondary_index()  # If exists
+manager.merge_indexes()  # Rebuilds primary with all vectors
+manager.save_cpu_index()
+```
+
+**When to merge**:
+- After accumulating significant new chunks (e.g., 10K+ in secondary)
+- Before major deployments (ensures optimal search performance)
+- During low-traffic periods (merge is expensive but faster than full rebuild)
+
+### HTTP Connection Pooling
+
+The vLLM client uses **persistent HTTP connections** to reduce overhead:
+
+- Connections are reused across multiple embedding requests
+- Automatic connection pooling (configurable limits)
+- Connections are closed during application shutdown (via `lifespan`)
+
+**Connection Limits**:
+```bash
+# Adjust connection pool size (default: auto-detected)
+export VLLM_MAX_CONNECTIONS=10
+export VLLM_MAX_KEEPALIVE_CONNECTIONS=5
+```
+
+**Note**: The `VLLMClient.close()` method is called automatically during application shutdown. Manual cleanup is only needed if creating clients outside the application lifecycle.
+
+### Async Operations
+
+All I/O operations are **asynchronous** to enable high concurrency:
+
+- **Git operations**: Blame and history use `AsyncGitClient` (threadpool offload)
+- **File operations**: Directory traversal uses `asyncio.to_thread`
+- **Search operations**: FAISS search is CPU-bound but non-blocking
+
+**Concurrency Benefits**:
+- Multiple requests can be processed concurrently
+- No thread exhaustion (operations offloaded to threadpool)
+- Better resource utilization under load
+
+**Concurrency Limits**:
+- Default threadpool size: `min(32, (os.cpu_count() or 1) + 4)`
+- Adjust via `asyncio.set_event_loop_policy()` if needed
+- Monitor thread usage via application metrics
+
+### vLLM Embedding Service
 
 ```bash
 # Increase batch size for throughput
@@ -499,7 +599,7 @@ export VLLM_BATCH_SIZE=128
 vllm serve ... --tensor-parallel-size 2
 ```
 
-### DuckDB
+### DuckDB Catalog
 
 ```bash
 # Increase memory limit
@@ -570,11 +670,65 @@ export DUCKDB_THREADS=8
    # Verify expected files are returned before setting scope
    ```
 
+### High Memory Usage
+
+**Symptoms**: Application uses excessive memory, especially during indexing.
+
+**Solutions**:
+1. **Use incremental indexing** instead of full rebuilds:
+   ```bash
+   python bin/index_all.py --incremental  # Fast, low memory
+   ```
+
+2. **Adjust FAISS parameters** for smaller indexes:
+   ```bash
+   export FAISS_NLIST=4096  # Fewer centroids = less memory
+   ```
+
+3. **Check memory estimates** before indexing:
+   ```python
+   from codeintel_rev.io.faiss_manager import FAISSManager
+   estimates = FAISSManager(...).estimate_memory_usage(n_vectors)
+   ```
+
+4. **Periodically merge secondary index** to consolidate memory usage
+
+### Slow Indexing
+
+**Symptoms**: Full index rebuild takes hours.
+
+**Solutions**:
+1. **Use incremental mode** for adding new chunks:
+   ```bash
+   python bin/index_all.py --incremental  # Seconds instead of hours
+   ```
+
+2. **Verify adaptive indexing** is working (check logs for index type selection)
+
+3. **Reduce training limit** for very large corpora (if acceptable):
+   ```python
+   # In index_all.py, reduce TRAINING_LIMIT
+   TRAINING_LIMIT = 5_000  # Smaller = faster training, potentially lower recall
+   ```
+
+### Thread Exhaustion
+
+**Symptoms**: Requests hang or timeout under load.
+
+**Solutions**:
+- **Async operations are already enabled** - all I/O uses `asyncio.to_thread`
+- Check threadpool size: `asyncio.get_event_loop()._default_executor._max_workers`
+- Monitor concurrent request count via application metrics
+- Consider horizontal scaling if single instance is saturated
+
 ### FAISS GPU fails
 
 ```bash
 # Check CUDA availability
 python -c "import torch; print(torch.cuda.is_available())"
+
+# Run GPU diagnostics
+python -m codeintel_rev.mcp_server.tools.gpu_doctor --require-gpu
 
 # Fallback to CPU-only FAISS
 export USE_CUVS=0

@@ -46,6 +46,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import git
+import git.exc
 
 from kgfoundry_common.logging import get_logger
 
@@ -123,8 +124,6 @@ class GitClient:
         git.exc.InvalidGitRepositoryError
             If repo_path is not a valid Git repository or .git cannot be found
             in parent directories.
-        git.exc.NoSuchPathError
-            If repo_path does not exist on filesystem.
 
         Examples
         --------
@@ -138,12 +137,12 @@ class GitClient:
                 self._repo = git.Repo(self.repo_path, search_parent_directories=True)
                 LOGGER.debug(
                     "Initialized Git repository",
-                    extra={"repo_path": str(self.repo_path), "git_dir": str(self._repo.git_dir)}
+                    extra={"repo_path": str(self.repo_path), "git_dir": str(self._repo.git_dir)},
                 )
-            except git.exc.InvalidGitRepositoryError as exc:
+            except git.exc.InvalidGitRepositoryError:
                 LOGGER.exception(
                     "Invalid Git repository",
-                    extra={"repo_path": str(self.repo_path), "error": str(exc)}
+                    extra={"repo_path": str(self.repo_path)},
                 )
                 raise
         return self._repo
@@ -152,7 +151,7 @@ class GitClient:
         self,
         path: str,
         start_line: int,
-        end_line: int
+        end_line: int,
     ) -> list[GitBlameEntry]:
         """Get Git blame for line range.
 
@@ -227,35 +226,48 @@ class GitClient:
             blame_iter = self.repo.blame_incremental(
                 rev="HEAD",
                 file=path,
-                L=f"{start_line},{end_line}"  # Git line range format
+                L=f"{start_line},{end_line}",  # Git line range format
             )
         except git.exc.GitCommandError as exc:
             # Check if error is "does not exist" (file not found)
-            if "does not exist" in str(exc).lower() or "bad file" in str(exc).lower():
+            error_msg = str(exc)
+            if "does not exist" in error_msg.lower() or "bad file" in error_msg.lower():
+                file_not_found_msg = f"File not found: {path}"
                 LOGGER.warning(
                     "File not found for blame",
-                    extra={"path": path, "error": str(exc)}
+                    extra={"path": path, "error": error_msg},
                 )
-                msg = f"File not found: {path}"
-                raise FileNotFoundError(msg) from exc
+                raise FileNotFoundError(file_not_found_msg) from exc
             # Other Git errors (permission denied, etc.)
             LOGGER.exception(
                 "Git blame failed",
-                extra={"path": path, "error": str(exc)}
+                extra={"path": path},
             )
             raise
 
         entries: list[GitBlameEntry] = []
-        for commit, line_nums in blame_iter:
+        # blame_incremental returns iterator of (commit, line_numbers) tuples
+        # line_numbers is a list of line numbers (1-indexed)
+        # Tuple may have more than 2 elements, so we index instead of unpacking
+        tuple_min_length = 2
+        for blame_tuple in blame_iter:  # type: ignore[assignment]
+            # Handle tuple format: (commit, lines, ...)
+            if len(blame_tuple) >= tuple_min_length:
+                commit = blame_tuple[0]
+                line_nums = blame_tuple[1]
+            else:
+                # Fallback: try to unpack directly
+                commit, line_nums = blame_tuple  # type: ignore[assignment]
+
             for line_num in line_nums:
                 # Filter to requested range (GitPython may return extra lines)
                 if start_line <= line_num <= end_line:
                     entry: GitBlameEntry = {
                         "line": line_num,
-                        "commit": commit.hexsha[:8],  # Short SHA (8 chars)
-                        "author": commit.author.name,  # Unicode-safe
-                        "date": commit.authored_datetime.isoformat(),  # ISO 8601
-                        "message": commit.summary,  # First line of commit message
+                        "commit": commit.hexsha[:8],  # type: ignore[attr-defined]  # Short SHA (8 chars)
+                        "author": commit.author.name,  # type: ignore[attr-defined]  # Unicode-safe
+                        "date": commit.authored_datetime.isoformat(),  # type: ignore[attr-defined]  # ISO 8601
+                        "message": commit.summary,  # type: ignore[attr-defined]  # First line of commit message
                     }
                     entries.append(entry)
 
@@ -265,8 +277,8 @@ class GitClient:
                 "path": path,
                 "start_line": start_line,
                 "end_line": end_line,
-                "entries_count": len(entries)
-            }
+                "entries_count": len(entries),
+            },
         )
 
         return entries
@@ -274,7 +286,7 @@ class GitClient:
     def file_history(
         self,
         path: str,
-        limit: int = 50
+        limit: int = 50,
     ) -> list[dict]:
         """Get commit history for file.
 
@@ -345,39 +357,40 @@ class GitClient:
             commits_iter = self.repo.iter_commits(
                 rev="HEAD",
                 paths=path,
-                max_count=limit
+                max_count=limit,
             )
         except git.exc.GitCommandError as exc:
             # Check if error is "does not exist" (file not found)
-            if "does not exist" in str(exc).lower() or "bad file" in str(exc).lower():
+            error_msg = str(exc)
+            if "does not exist" in error_msg.lower() or "bad file" in error_msg.lower():
+                file_not_found_msg = f"File not found: {path}"
                 LOGGER.warning(
                     "File not found for history",
-                    extra={"path": path, "error": str(exc)}
+                    extra={"path": path, "error": error_msg},
                 )
-                msg = f"File not found: {path}"
-                raise FileNotFoundError(msg) from exc
+                raise FileNotFoundError(file_not_found_msg) from exc
             # Other Git errors
             LOGGER.exception(
                 "Git log failed",
-                extra={"path": path, "error": str(exc)}
+                extra={"path": path},
             )
             raise
 
         commits: list[dict] = []
-        for commit in commits_iter:
+        for commit in commits_iter:  # type: ignore[assignment]
             commit_dict = {
-                "sha": commit.hexsha[:8],  # Short SHA
-                "full_sha": commit.hexsha,  # Full SHA (40 chars)
-                "author": commit.author.name,  # Unicode-safe
-                "email": commit.author.email,
-                "date": commit.authored_datetime.isoformat(),  # ISO 8601 with timezone
-                "message": commit.summary,  # First line only
+                "sha": commit.hexsha[:8],  # type: ignore[attr-defined]  # Short SHA
+                "full_sha": commit.hexsha,  # type: ignore[attr-defined]  # Full SHA (40 chars)
+                "author": commit.author.name,  # type: ignore[attr-defined]  # Unicode-safe
+                "email": commit.author.email,  # type: ignore[attr-defined]
+                "date": commit.authored_datetime.isoformat(),  # type: ignore[attr-defined]  # ISO 8601 with timezone
+                "message": commit.summary,  # type: ignore[attr-defined]  # First line only
             }
             commits.append(commit_dict)
 
         LOGGER.debug(
             "Git history completed",
-            extra={"path": path, "limit": limit, "commits_count": len(commits)}
+            extra={"path": path, "limit": limit, "commits_count": len(commits)},
         )
 
         return commits
@@ -386,50 +399,54 @@ class GitClient:
 class AsyncGitClient:
     """Async wrapper around GitClient using asyncio.to_thread.
 
-    Provides async versions of GitClient methods by running them in a threadpool.
-    This prevents event loop blocking when Git operations are called from async
-    code (e.g., FastAPI request handlers).
+    Provides async versions of GitClient methods by running synchronous
+    GitPython operations in a threadpool. This prevents blocking the event
+    loop while allowing concurrent Git operations.
 
-    GitPython is synchronous (uses subprocess internally), so running it in a
-    threadpool is the recommended approach for async compatibility without
-    rewriting GitPython internals.
+    GitPython is synchronous internally (it calls subprocess), so we use
+    asyncio.to_thread to offload operations to a threadpool. This enables
+    concurrent Git operations without thread exhaustion.
 
-    Parameters
+    Attributes
     ----------
-    git_client : GitClient
-        Synchronous GitClient instance to wrap.
+    _sync_client : GitClient
+        Synchronous GitClient instance wrapped by this async client.
 
     Examples
     --------
-    Create async client:
+    Create async client and get blame:
 
     >>> from pathlib import Path
     >>> sync_client = GitClient(repo_path=Path("."))
     >>> async_client = AsyncGitClient(sync_client)
+    >>> blame = await async_client.blame_range("src/main.py", 1, 10)
+    >>> blame[0]["author"]
+    'John Doe'
 
-    Use in async context:
+    Get commit history:
 
-    >>> async def get_blame():
-    ...     entries = await async_client.blame_range("README.md", 1, 10)
-    ...     return entries
+    >>> history = await async_client.file_history("README.md", limit=5)
+    >>> len(history)
+    5
 
     Notes
     -----
-    The asyncio.to_thread function runs the sync operation in a separate thread
-    from the threadpool. This allows the event loop to handle other requests
-    while waiting for Git operations.
+    The async methods run the synchronous GitClient methods in a threadpool
+    via asyncio.to_thread. This is safe because GitPython operations are
+    thread-safe (each operation uses its own subprocess).
 
-    For applications with heavy Git usage, consider increasing the threadpool
-    size via asyncio ThreadPoolExecutor settings.
+    For best performance, use AsyncGitClient when you need to perform multiple
+    Git operations concurrently (e.g., blaming multiple files in parallel).
     """
 
     def __init__(self, git_client: GitClient) -> None:
-        """Initialize async wrapper with sync client.
+        """Initialize async wrapper.
 
         Parameters
         ----------
         git_client : GitClient
-            Synchronous GitClient to wrap with async interface.
+            Synchronous GitClient instance to wrap. The same instance can be
+            shared across multiple AsyncGitClient instances safely.
         """
         self._sync_client = git_client
 
@@ -437,72 +454,74 @@ class AsyncGitClient:
         self,
         path: str,
         start_line: int,
-        end_line: int
+        end_line: int,
     ) -> list[GitBlameEntry]:
-        """Async version of blame_range (runs in threadpool).
+        """Async version of GitClient.blame_range.
 
-        See GitClient.blame_range for detailed documentation.
+        Runs synchronous blame_range in threadpool to avoid blocking event loop.
+        Exceptions are propagated from the sync client (see GitClient.blame_range).
 
         Parameters
         ----------
         path : str
             File path relative to repository root.
         start_line : int
-            Start line number (1-indexed).
+            Start line number (1-indexed, inclusive).
         end_line : int
-            End line number (1-indexed).
+            End line number (1-indexed, inclusive).
 
         Returns
         -------
         list[GitBlameEntry]
-            Blame entries for line range.
+            List of blame entries for the line range.
 
-        Raises
-        ------
-        FileNotFoundError
-            If file not found.
-        git.exc.GitCommandError
-            If Git operation fails.
+        Examples
+        --------
+        >>> async_client = AsyncGitClient(GitClient(repo_path=Path(".")))
+        >>> blame = await async_client.blame_range("README.md", 1, 10)
+        >>> len(blame)
+        10
         """
         return await asyncio.to_thread(
             self._sync_client.blame_range,
             path,
             start_line,
-            end_line
+            end_line,
         )
 
     async def file_history(
         self,
         path: str,
-        limit: int = 50
+        limit: int = 50,
     ) -> list[dict]:
-        """Async version of file_history (runs in threadpool).
+        """Async version of GitClient.file_history.
 
-        See GitClient.file_history for detailed documentation.
+        Runs synchronous file_history in threadpool to avoid blocking event loop.
+        Exceptions are propagated from the sync client (see GitClient.file_history).
 
         Parameters
         ----------
         path : str
             File path relative to repository root.
-        limit : int
-            Maximum number of commits to return.
+        limit : int, optional
+            Maximum number of commits to return (default: 50).
 
         Returns
         -------
         list[dict]
-            Commit history entries.
+            List of commit dictionaries ordered by date (newest first).
 
-        Raises
-        ------
-        FileNotFoundError
-            If file not found.
-        git.exc.GitCommandError
-            If Git operation fails.
+        Examples
+        --------
+        >>> async_client = AsyncGitClient(GitClient(repo_path=Path(".")))
+        >>> history = await async_client.file_history("README.md", limit=5)
+        >>> len(history)
+        5
         """
         return await asyncio.to_thread(
             self._sync_client.file_history,
             path,
-            limit
+            limit,
         )
 
 

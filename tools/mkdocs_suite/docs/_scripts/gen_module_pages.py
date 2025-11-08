@@ -48,7 +48,7 @@ class _NavProtocol(Protocol):
 if hasattr(mkdocs_gen_files, "Nav"):
 
     def _make_nav() -> _NavProtocol:
-        instance = mkdocs_gen_files.Nav()
+        instance = mkdocs_gen_files.Nav()  # type: ignore[reportPrivateImportUsage]
         return cast("_NavProtocol", instance)
 
 else:  # pragma: no cover - fallback for older mkdocs-gen-files versions

@@ -529,9 +529,125 @@ class _SimpleSpanProcessor:
         """Allow graceful shutdown calls (noop)."""
 
 
+def _torch_smoke() -> tuple[bool, str]:
+    """Perform PyTorch CUDA smoke test.
+
+    Returns
+    -------
+    tuple[bool, str]
+        (success, message)
+    """
+    try:
+        import torch
+    except (ImportError, ModuleNotFoundError) as exc:
+        return False, f"torch import failed: {exc}"
+
+    if not torch.cuda.is_available():
+        return False, "torch.cuda.is_available() is False"
+
+    try:
+        dev = torch.device("cuda:0")
+        # Init CUDA context and do a tiny GEMM
+        torch.cuda.init()
+        a = torch.randn(256, 256, device=dev)
+        b = torch.randn(256, 256, device=dev)
+        c = a @ b  # triggers cuBLAS
+        c.sum().item()  # materialize
+        torch.cuda.synchronize()
+    except (RuntimeError, OSError) as exc:
+        return False, f"torch CUDA smoke failed: {exc}"
+    else:
+        name = torch.cuda.get_device_name(0)
+        cap = ".".join(map(str, torch.cuda.get_device_capability(0)))
+        total = torch.cuda.get_device_properties(0).total_memory
+        msg = f"PyTorch CUDA OK: {name}, CC {cap}, total_mem={total/1e9:.2f} GB"
+        return True, msg
+
+
+def _faiss_smoke() -> tuple[bool, str]:
+    """Perform FAISS GPU smoke test.
+
+    Returns
+    -------
+    tuple[bool, str]
+        (success, message)
+    """
+    try:
+        import faiss
+        import numpy as np
+    except (ImportError, ModuleNotFoundError) as exc:
+        return False, f"faiss import failed: {exc}"
+
+    # If this is a CPU-only wheel, gracefully skip
+    if not hasattr(faiss, "StandardGpuResources"):
+        return False, "faiss built without GPU bindings (StandardGpuResources missing)"
+
+    try:
+        ngpu = faiss.get_num_gpus() if hasattr(faiss, "get_num_gpus") else 0  # type: ignore[attr-defined]
+        if ngpu <= 0:
+            return False, "faiss.get_num_gpus() returned 0"
+
+        res = faiss.StandardGpuResources()
+        d = 64
+        idx = faiss.GpuIndexFlatIP(res, d)  # type: ignore[attr-defined]
+        rs = np.random.RandomState(0)
+        xb = rs.randn(128, d).astype("float32")
+        xq = rs.randn(4, d).astype("float32")
+        # normalize for cosine-as-IP; no-op if you use L2 in your config
+        xb /= np.linalg.norm(xb, axis=1, keepdims=True) + 1e-12
+        xq /= np.linalg.norm(xq, axis=1, keepdims=True) + 1e-12
+        idx.add(xb)
+        _distances, indices = idx.search(xq, 5)
+        assert indices.shape == (4, 5)
+    except (RuntimeError, OSError, AttributeError) as exc:
+        return False, f"FAISS GPU smoke failed: {exc}"
+    else:
+        msg = f"FAISS GPU OK: {ngpu} GPU(s) visible; GpuIndexFlatIP warm-up search ran"
+        return True, msg
+
+
+@fixture(scope="session", autouse=True)
+def gpu_warmup_session() -> None:
+    """Tiny GPU warm-up & early-fail. Set REQUIRE_GPU=1 to make missing GPU a hard error.
+
+    Runs once at session start, before any tests. Performs minimal GPU operations
+    to initialize CUDA contexts, cuBLAS, and FAISS GPU resources.
+
+    If REQUIRE_GPU=1 is set, missing or unusable GPU will cause pytest to fail
+    immediately with a clear message. Otherwise, warnings are issued but tests
+    continue (allowing CPU-only test runs).
+    """
+    import warnings
+
+    require_gpu = os.getenv("REQUIRE_GPU", "0") == "1"
+
+    torch_ok, torch_msg = _torch_smoke()
+    faiss_ok, faiss_msg = _faiss_smoke()
+
+    # Print helpful diagnostics into pytest output
+    print(f"[gpu-warmup] torch: {torch_msg}")
+    print(f"[gpu-warmup] faiss: {faiss_msg}")
+
+    if require_gpu:
+        problems = []
+        if not torch_ok:
+            problems.append(f"PyTorch GPU not usable: {torch_msg}")
+        if not faiss_ok:
+            problems.append(f"FAISS GPU not usable: {faiss_msg}")
+        if problems:
+            pytest.fail(" | ".join(problems))
+    else:
+        # No hard requirement: warn so you can still run CPU-only tests locally.
+        if not torch_ok:
+            warnings.warn(f"[gpu-warmup] {torch_msg}", stacklevel=2)
+        if not faiss_ok:
+            warnings.warn(f"[gpu-warmup] {faiss_msg}", stacklevel=2)
+
+
 __all__ = [
     "HAS_GPU_STACK",
     "caplog_records",
+    "gpu_warmup_session",
     "load_problem_details_example",
     "metrics_asserter",
     "otel_span_exporter",

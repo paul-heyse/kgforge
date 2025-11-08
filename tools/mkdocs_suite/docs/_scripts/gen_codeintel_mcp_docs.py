@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, TypedDict, cast
 
 try:
-    from codeintel.mcp_server.server import MCPServer
+    from codeintel.mcp_server.server import MCPServer  # type: ignore[reportMissingImports]
 except ImportError:
     # codeintel package not available - this script is for generating docs when it exists
     MCPServer = None

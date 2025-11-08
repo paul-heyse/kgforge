@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import threading
-import pytest
+from typing import Self
 
+import pytest
 from codeintel_rev.app.scope_registry import ScopeRegistry
 
 
@@ -34,8 +35,8 @@ class GateableRLock:
         self._release_notifier = notifier
         self._release_gate = gate
 
-    def acquire(self, *args: object, **kwargs: object) -> bool:
-        return self._lock.acquire(*args, **kwargs)
+    def acquire(self, blocking: bool = True, timeout: float = -1.0) -> bool:
+        return self._lock.acquire(blocking=blocking, timeout=timeout)
 
     def release(self) -> None:
         self._lock.release()
@@ -46,9 +47,10 @@ class GateableRLock:
         if notifier is not None:
             notifier.set()
         if gate is not None and not gate.wait(timeout=1.0):
-            raise AssertionError("release gate was not opened in time")
+            msg = "release gate was not opened in time"
+            raise AssertionError(msg)
 
-    def __enter__(self) -> GateableRLock:
+    def __enter__(self) -> Self:
         self.acquire()
         return self
 
@@ -60,7 +62,6 @@ class GateableRLock:
 @pytest.mark.timeout(5)
 def test_gauge_stays_consistent_during_overlapping_operations(monkeypatch: pytest.MonkeyPatch) -> None:
     """Gauge reflects cleared state when set/clear overlap."""
-
     gauge = GaugeProbe()
     monkeypatch.setattr(
         "codeintel_rev.app.scope_registry._active_sessions_gauge",

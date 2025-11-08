@@ -9,7 +9,7 @@ from tools.docstring_builder import cli_context as docstrings_context
 from tools.navmap import cli_context as navmap_context
 
 try:
-    from codeintel import cli_context as codeintel_context
+    from codeintel import cli_context as codeintel_context  # type: ignore[reportAttributeAccessIssue]
 except ImportError:
     codeintel_context = None
 

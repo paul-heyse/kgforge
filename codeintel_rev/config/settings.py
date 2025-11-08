@@ -161,6 +161,14 @@ class IndexConfig(msgspec.Struct, frozen=True):
         latency. When False (default), the index is loaded lazily on first semantic
         search request. Set to True in production for consistent response times;
         keep False in development for faster startup iteration.
+    duckdb_materialize : bool
+        Persist chunk metadata into a DuckDB table (``chunks_materialized``) to
+        enable secondary indexes. When ``False`` (default), the catalog exposes
+        Parquet files via a view for zero-copy reads. Enable this for very large
+        catalogs when SQL filtering requires indexes. Defaults to ``False``.
+    preview_max_chars : int
+        Maximum number of characters to persist in the Parquet ``preview`` column.
+        This controls indexing-time truncation. Defaults to 240 characters.
     """
 
     vec_dim: int = 2560
@@ -172,6 +180,8 @@ class IndexConfig(msgspec.Struct, frozen=True):
     rrf_k: int = 60
     use_cuvs: bool = True
     faiss_preload: bool = False
+    duckdb_materialize: bool = False
+    preview_max_chars: int = 240
 
 
 class ServerLimits(msgspec.Struct, frozen=True):
@@ -358,6 +368,9 @@ def load_settings() -> Settings:
         rrf_k=int(os.environ.get("RRF_K", "60")),
         use_cuvs=os.environ.get("USE_CUVS", "1").lower() in {"1", "true", "yes"},
         faiss_preload=os.environ.get("FAISS_PRELOAD", "0").lower() in {"1", "true", "yes"},
+        duckdb_materialize=os.environ.get("DUCKDB_MATERIALIZE", "0").lower()
+        in {"1", "true", "yes"},
+        preview_max_chars=int(os.environ.get("PREVIEW_MAX_CHARS", "240")),
     )
 
     limits = ServerLimits(

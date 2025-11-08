@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.responses import Response
 
 from codeintel_rev.app.config_context import ApplicationContext
+from codeintel_rev.app.gpu_warmup import warmup_gpu
 from codeintel_rev.app.middleware import SessionScopeMiddleware
 from codeintel_rev.app.readiness import ReadinessProbe
 from codeintel_rev.mcp_server.server import app_context
@@ -66,11 +67,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0915 
 
     Startup sequence:
     1. Load configuration from environment (fail fast if invalid)
-    2. Initialize long-lived clients (vLLM, FAISS manager)
-    3. Initialize scope registry for session-scoped query constraints
-    4. Run readiness checks (verify indexes exist, vLLM reachable)
-    5. Optionally pre-load FAISS index (controlled by FAISS_PRELOAD env var)
-    6. Start background pruning task for expired sessions
+    2. Perform GPU warmup sequence (verify CUDA/torch/FAISS GPU availability)
+    3. Initialize long-lived clients (vLLM, FAISS manager)
+    4. Initialize scope registry for session-scoped query constraints
+    5. Run readiness checks (verify indexes exist, vLLM reachable)
+    6. Optionally pre-load FAISS index (controlled by FAISS_PRELOAD env var)
+    7. Start background pruning task for expired sessions
 
     Shutdown sequence:
     1. Cancel background pruning task
@@ -95,19 +97,30 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0915 
         context = ApplicationContext.create()
         app.state.context = context
 
-        # Phase 2: Initialize readiness probe
+        # Phase 2: GPU warmup sequence
+        gpu_status = warmup_gpu()
+        if gpu_status["overall_status"] == "ready":
+            LOGGER.info("GPU warmup successful - GPU acceleration available")
+        elif gpu_status["overall_status"] == "degraded":
+            LOGGER.warning(
+                "GPU warmup partial - some GPU features unavailable: %s", gpu_status["details"]
+            )
+        else:
+            LOGGER.info("GPU warmup indicates GPU unavailable - continuing with CPU-only mode")
+
+        # Phase 3: Initialize readiness probe
         readiness = ReadinessProbe(context)
         await readiness.initialize()
         app.state.readiness = readiness
 
-        # Phase 3: Optional FAISS preloading (controlled by env var)
+        # Phase 4: Optional FAISS preloading (controlled by env var)
         if context.settings.index.faiss_preload:
             LOGGER.info("Pre-loading FAISS index during startup")
             preload_success = await asyncio.to_thread(_preload_faiss_index, context)
             if not preload_success:
                 LOGGER.warning("FAISS index pre-load failed; will lazy-load on first search")
 
-        # Phase 4: Start background pruning task for expired sessions
+        # Phase 5: Start background pruning task for expired sessions
         max_age_seconds = int(os.environ.get("SESSION_MAX_AGE_SECONDS", "3600"))
         pruning_interval_seconds = int(os.environ.get("SESSION_PRUNING_INTERVAL_SECONDS", "600"))
         pruning_task: asyncio.Task[None] | None = None
@@ -172,6 +185,11 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: C901, PLR0915 
             pruning_task.cancel()
             with suppress(asyncio.CancelledError):
                 await pruning_task
+        # Shutdown: close VLLMClient HTTP connections to prevent resource leaks
+        # The persistent HTTP client must be explicitly closed to release
+        # network connections and avoid connection pool exhaustion
+        context.vllm_client.close()
+        LOGGER.debug("VLLMClient HTTP connections closed during shutdown")
         await readiness.shutdown()
         LOGGER.info("Application shutdown complete")
 
