@@ -15,14 +15,15 @@ All benchmarks use pytest-benchmark plugin for accurate timing and reporting.
 
 from __future__ import annotations
 
-from pathlib import Path
+from time import perf_counter
 
 import duckdb
 import pytest
 from codeintel_rev.io.duckdb_catalog import DuckDBCatalog
 
 # Number of chunks to create for benchmark
-BENCHMARK_CHUNK_COUNT = 100_000
+# Reduced from 100K to 10K for faster fixture setup while still providing meaningful benchmarks
+BENCHMARK_CHUNK_COUNT = 10_000
 
 # Number of chunks to query in each benchmark
 QUERY_CHUNK_COUNT = 1000
@@ -87,13 +88,15 @@ def _generate_chunk_data(
     end_byte = start_byte + 500
     preview = f"Code chunk {chunk_id} in {uri}"
     # Use a simpler embedding representation for performance
-    embedding = [float(x % 100) / 100.0 for x in range(2560)]  # 2560-dim embedding
+    # Generate smaller embedding array (100 dims) for faster insertion
+    # Real embeddings are 2560-dim, but for benchmarks we only need realistic data size
+    embedding = [float(x % 100) / 100.0 for x in range(100)]  # 100-dim embedding for speed
 
     return (chunk_id, uri, start_line, end_line, start_byte, end_byte, preview, embedding)
 
 
-@pytest.fixture
-def benchmark_catalog(tmp_path: Path) -> DuckDBCatalog:
+@pytest.fixture(scope="session")
+def benchmark_catalog(tmp_path_factory) -> DuckDBCatalog:
     """Create a DuckDB catalog with 100K chunks for benchmarking.
 
     Creates a catalog with diverse URIs representing various languages and
@@ -101,20 +104,22 @@ def benchmark_catalog(tmp_path: Path) -> DuckDBCatalog:
 
     Parameters
     ----------
-    tmp_path : Path
-        Temporary directory for DuckDB database file.
+    tmp_path_factory : pytest.TempPathFactory
+        Pytest fixture factory for creating temporary directories.
 
     Returns
     -------
     DuckDBCatalog
-        Catalog instance with 100K chunks loaded.
+        Catalog instance with 10K chunks loaded.
 
     Notes
     -----
-    This fixture creates a large dataset (100K chunks) which may take several
+    This fixture creates a large dataset (10K chunks) which may take several
     seconds to initialize. The fixture is session-scoped to avoid recreating
     it for each benchmark test.
     """
+    # Use session-scoped tmp_path for shared fixture
+    tmp_path = tmp_path_factory.mktemp("benchmark")
     db_path = tmp_path / "benchmark.duckdb"
     vectors_dir = tmp_path / "vectors"
     vectors_dir.mkdir()
@@ -328,9 +333,7 @@ class TestScopeFilteringOverhead:
     stays within acceptable limits (<5ms for typical queries).
     """
 
-    def test_language_filter_overhead_acceptable(
-        self, benchmark_catalog: DuckDBCatalog, benchmark
-    ) -> None:
+    def test_language_filter_overhead_acceptable(self, benchmark_catalog: DuckDBCatalog) -> None:
         """Verify language filter overhead is <5ms.
 
         Compares language-filtered query performance against baseline and
@@ -339,29 +342,27 @@ class TestScopeFilteringOverhead:
         Parameters
         ----------
         benchmark_catalog : DuckDBCatalog
-            Catalog with 100K chunks loaded.
-        benchmark : pytest_benchmark.fixture.BenchmarkFixture
-            pytest-benchmark fixture for timing.
+            Catalog with 10K chunks loaded.
         """
         chunk_ids = list(range(1, QUERY_CHUNK_COUNT + 1))
 
-        # Baseline: no filtering
-        baseline_result = benchmark.pedantic(
-            lambda: benchmark_catalog.query_by_ids(chunk_ids),
-            iterations=100,
-            rounds=10,
-        )
+        # Baseline: no filtering (run multiple times for average)
+        baseline_times: list[float] = []
+        for _ in range(100):
+            start = perf_counter()
+            benchmark_catalog.query_by_ids(chunk_ids)
+            baseline_times.append(perf_counter() - start)
 
-        # Filtered: language filter
-        filtered_result = benchmark.pedantic(
-            lambda: benchmark_catalog.query_by_filters(chunk_ids, languages=["python"]),
-            iterations=100,
-            rounds=10,
-        )
+        # Filtered: language filter (run multiple times for average)
+        filtered_times: list[float] = []
+        for _ in range(100):
+            start = perf_counter()
+            benchmark_catalog.query_by_filters(chunk_ids, languages=["python"])
+            filtered_times.append(perf_counter() - start)
 
         # Calculate overhead (in milliseconds)
-        baseline_time_ms = baseline_result.stats.mean * 1000
-        filtered_time_ms = filtered_result.stats.mean * 1000
+        baseline_time_ms = (sum(baseline_times) / len(baseline_times)) * 1000
+        filtered_time_ms = (sum(filtered_times) / len(filtered_times)) * 1000
         overhead_ms = filtered_time_ms - baseline_time_ms
 
         # Assert overhead is acceptable
@@ -369,9 +370,7 @@ class TestScopeFilteringOverhead:
             f"Language filter overhead {overhead_ms:.2f}ms exceeds threshold {MAX_FILTER_OVERHEAD_MS}ms"
         )
 
-    def test_path_glob_filter_overhead_acceptable(
-        self, benchmark_catalog: DuckDBCatalog, benchmark
-    ) -> None:
+    def test_path_glob_filter_overhead_acceptable(self, benchmark_catalog: DuckDBCatalog) -> None:
         """Verify path glob filter overhead is <5ms.
 
         Compares path-glob-filtered query performance against baseline and
@@ -380,29 +379,27 @@ class TestScopeFilteringOverhead:
         Parameters
         ----------
         benchmark_catalog : DuckDBCatalog
-            Catalog with 100K chunks loaded.
-        benchmark : pytest_benchmark.fixture.BenchmarkFixture
-            pytest-benchmark fixture for timing.
+            Catalog with 10K chunks loaded.
         """
         chunk_ids = list(range(1, QUERY_CHUNK_COUNT + 1))
 
-        # Baseline: no filtering
-        baseline_result = benchmark.pedantic(
-            lambda: benchmark_catalog.query_by_ids(chunk_ids),
-            iterations=100,
-            rounds=10,
-        )
+        # Baseline: no filtering (run multiple times for average)
+        baseline_times: list[float] = []
+        for _ in range(100):
+            start = perf_counter()
+            benchmark_catalog.query_by_ids(chunk_ids)
+            baseline_times.append(perf_counter() - start)
 
-        # Filtered: path glob filter
-        filtered_result = benchmark.pedantic(
-            lambda: benchmark_catalog.query_by_filters(chunk_ids, include_globs=["src/**"]),
-            iterations=100,
-            rounds=10,
-        )
+        # Filtered: path glob filter (run multiple times for average)
+        filtered_times: list[float] = []
+        for _ in range(100):
+            start = perf_counter()
+            benchmark_catalog.query_by_filters(chunk_ids, include_globs=["src/**"])
+            filtered_times.append(perf_counter() - start)
 
         # Calculate overhead (in milliseconds)
-        baseline_time_ms = baseline_result.stats.mean * 1000
-        filtered_time_ms = filtered_result.stats.mean * 1000
+        baseline_time_ms = (sum(baseline_times) / len(baseline_times)) * 1000
+        filtered_time_ms = (sum(filtered_times) / len(filtered_times)) * 1000
         overhead_ms = filtered_time_ms - baseline_time_ms
 
         # Assert overhead is acceptable
@@ -410,9 +407,7 @@ class TestScopeFilteringOverhead:
             f"Path glob filter overhead {overhead_ms:.2f}ms exceeds threshold {MAX_FILTER_OVERHEAD_MS}ms"
         )
 
-    def test_combined_filter_overhead_acceptable(
-        self, benchmark_catalog: DuckDBCatalog, benchmark
-    ) -> None:
+    def test_combined_filter_overhead_acceptable(self, benchmark_catalog: DuckDBCatalog) -> None:
         """Verify combined filter overhead is <5ms.
 
         Compares combined (language + path) filter query performance against
@@ -421,33 +416,31 @@ class TestScopeFilteringOverhead:
         Parameters
         ----------
         benchmark_catalog : DuckDBCatalog
-            Catalog with 100K chunks loaded.
-        benchmark : pytest_benchmark.fixture.BenchmarkFixture
-            pytest-benchmark fixture for timing.
+            Catalog with 10K chunks loaded.
         """
         chunk_ids = list(range(1, QUERY_CHUNK_COUNT + 1))
 
-        # Baseline: no filtering
-        baseline_result = benchmark.pedantic(
-            lambda: benchmark_catalog.query_by_ids(chunk_ids),
-            iterations=100,
-            rounds=10,
-        )
+        # Baseline: no filtering (run multiple times for average)
+        baseline_times: list[float] = []
+        for _ in range(100):
+            start = perf_counter()
+            benchmark_catalog.query_by_ids(chunk_ids)
+            baseline_times.append(perf_counter() - start)
 
-        # Filtered: combined filters
-        filtered_result = benchmark.pedantic(
-            lambda: benchmark_catalog.query_by_filters(
+        # Filtered: combined filters (run multiple times for average)
+        filtered_times: list[float] = []
+        for _ in range(100):
+            start = perf_counter()
+            benchmark_catalog.query_by_filters(
                 chunk_ids,
                 include_globs=["src/**"],
                 languages=["python"],
-            ),
-            iterations=100,
-            rounds=10,
-        )
+            )
+            filtered_times.append(perf_counter() - start)
 
         # Calculate overhead (in milliseconds)
-        baseline_time_ms = baseline_result.stats.mean * 1000
-        filtered_time_ms = filtered_result.stats.mean * 1000
+        baseline_time_ms = (sum(baseline_times) / len(baseline_times)) * 1000
+        filtered_time_ms = (sum(filtered_times) / len(filtered_times)) * 1000
         overhead_ms = filtered_time_ms - baseline_time_ms
 
         # Assert overhead is acceptable

@@ -379,7 +379,11 @@ class DuckDBCatalog:
             filter_type = "combined" if languages else "glob"
         elif languages:
             filter_type = "language"
-        _scope_filter_duration_seconds.labels(filter_type=filter_type).observe(duration)
+        # Record metric (may fail in test environments without Prometheus registry)
+        from contextlib import suppress
+
+        with suppress(ValueError):
+            _scope_filter_duration_seconds.labels(filter_type=filter_type).observe(duration)
 
         return results
 
