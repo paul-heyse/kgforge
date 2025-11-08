@@ -313,8 +313,15 @@ EOF
 ensure_uv
 ensure_python "${PY_VER_DEFAULT}"
 sync_env
-ok "Editable install complete"
 activate_project_env
+if [ -d .wheelhouse ]; then
+  ok ".wheelhouse directory already present"
+else
+  # uv pip install honors [tool.uv.pip]::find-links=.wheelhouse; ensure it exists so
+  # the editable install doesn't fail on fresh clones where the directory is absent.
+  mkdir -p .wheelhouse
+  ok "Created .wheelhouse directory for uv find-links"
+fi
 info "Installing project package in editable mode…"
 uv pip install -e .
 ok "Editable install complete"
