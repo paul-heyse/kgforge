@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 from codeintel_rev.app.middleware import get_session_id
 from codeintel_rev.mcp_server.schemas import Match
-from codeintel_rev.mcp_server.scope_utils import get_effective_scope
+from codeintel_rev.mcp_server.scope_utils import get_effective_scope, merge_scope_filters
 from kgfoundry_common.errors import KgFoundryError, VectorSearchError
 from kgfoundry_common.logging import get_logger, with_fields
 from kgfoundry_common.observability import DurationObservation, MetricsProvider, observe_duration
@@ -85,12 +85,19 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
     regex: bool = False,
     case_sensitive: bool = False,
     paths: Sequence[str] | None = None,
+    include_globs: Sequence[str] | None = None,
+    exclude_globs: Sequence[str] | None = None,
     max_results: int = 50,
 ) -> dict:
     """Fast text search using ripgrep.
 
-    Applies session scope path filters if set via `set_scope`. Explicit `paths`
-    parameter overrides session scope.
+    Applies session scope path filters if set via `set_scope`. Explicit
+    parameters override session scope following this precedence:
+
+    1. `paths` limit the search roots and suppress scope-provided
+       ``include_globs`` unless explicit ``include_globs`` are supplied.
+    2. Explicit ``include_globs``/``exclude_globs`` override scope values.
+    3. Remaining scope filters are forwarded to ripgrep via ``--iglob`` options.
 
     Parameters
     ----------
@@ -103,7 +110,11 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
     case_sensitive : bool
         Case-sensitive search.
     paths : Sequence[str] | None
-        Paths to search in (relative to repo root). Overrides session scope if provided.
+        Paths to search in (relative to repo root). Overrides scope include globs when provided.
+    include_globs : Sequence[str] | None
+        Glob patterns to include. Overrides scope include globs when provided.
+    exclude_globs : Sequence[str] | None
+        Glob patterns to exclude. Overrides scope exclude globs when provided.
     max_results : int
         Maximum number of results.
 
@@ -136,23 +147,31 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
     -----
     Scope Integration:
     - Session scope is retrieved from registry using session ID (set by middleware).
-    - If explicit `paths` parameter is provided, it overrides scope's `include_globs`.
-    - If no explicit `paths` and scope has `include_globs`, scope paths are used.
-    - If neither explicit paths nor scope paths, searches entire repository (ripgrep default).
+    - Explicit `paths` suppress scope `include_globs` unless explicit `include_globs` are supplied.
+    - Explicit `include_globs`/`exclude_globs` override scope-provided globs.
+    - Remaining scope filters are forwarded to ripgrep via ``--iglob``/``--iglob !`` options.
     """
     repo_root = context.paths.repo_root
 
-    # Retrieve session scope and merge with explicit paths parameter
+    # Retrieve session scope and merge with explicit filters
     session_id = get_session_id()
     scope = get_effective_scope(context, session_id)
 
-    # Determine effective paths: explicit paths override scope
-    if paths:
-        effective_paths = list(paths)  # Explicit paths override scope
-    elif scope and scope.get("include_globs"):
-        effective_paths = scope.get("include_globs") or None  # type: ignore[assignment]
+    merged_filters = merge_scope_filters(
+        scope,
+        {
+            "include_globs": list(include_globs) if include_globs is not None else include_globs,
+            "exclude_globs": list(exclude_globs) if exclude_globs is not None else exclude_globs,
+        },
+    )
+
+    effective_paths = list(paths) if paths else None
+    # Explicit paths suppress scope-provided include globs unless explicitly overridden
+    if effective_paths and include_globs is None:
+        effective_include_globs: Sequence[str] | None = None
     else:
-        effective_paths = None  # Search all (ripgrep default)
+        effective_include_globs = merged_filters.get("include_globs")
+    effective_exclude_globs = merged_filters.get("exclude_globs")
 
     LOGGER.debug(
         "Searching text with scope filters",
@@ -160,8 +179,13 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
             "session_id": session_id,
             "query": query,
             "explicit_paths": list(paths) if paths else None,
-            "scope_paths": scope.get("include_globs") if scope else None,  # type: ignore[typeddict-item]
+            "explicit_include_globs": list(include_globs) if include_globs is not None else None,
+            "explicit_exclude_globs": list(exclude_globs) if exclude_globs is not None else None,
+            "scope_include_globs": scope.get("include_globs") if scope else None,  # type: ignore[typeddict-item]
+            "scope_exclude_globs": scope.get("exclude_globs") if scope else None,  # type: ignore[typeddict-item]
             "effective_paths": effective_paths,
+            "effective_include_globs": effective_include_globs,
+            "effective_exclude_globs": effective_exclude_globs,
         },
     )
 
@@ -170,6 +194,8 @@ def search_text(  # noqa: PLR0913 - context parameter required for dependency in
         regex=regex,
         case_sensitive=case_sensitive,
         paths=effective_paths,
+        include_globs=effective_include_globs,
+        exclude_globs=effective_exclude_globs,
         max_results=max_results,
     )
 
@@ -352,6 +378,8 @@ def _build_ripgrep_command(
     query: str,
     regex: bool,
     case_sensitive: bool,
+    include_globs: Sequence[str] | None,
+    exclude_globs: Sequence[str] | None,
     paths: Sequence[str] | None,
     max_results: int,
 ) -> list[str]:
@@ -365,6 +393,10 @@ def _build_ripgrep_command(
         Whether query is a regex pattern.
     case_sensitive : bool
         Whether search is case-sensitive.
+    include_globs : Sequence[str] | None
+        Glob patterns forwarded via ``--iglob``.
+    exclude_globs : Sequence[str] | None
+        Glob patterns forwarded via ``--iglob !pattern``.
     paths : Sequence[str] | None
         Paths to search in (relative to repo root).
     max_results : int
@@ -382,6 +414,14 @@ def _build_ripgrep_command(
 
     if not regex:
         command.append("--fixed-strings")
+
+    if include_globs:
+        for pattern in include_globs:
+            command.extend(["--iglob", pattern])
+
+    if exclude_globs:
+        for pattern in exclude_globs:
+            command.extend(["--iglob", f"!{pattern}"])
 
     command.append("--")
     command.append(query)
