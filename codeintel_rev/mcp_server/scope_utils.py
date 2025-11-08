@@ -418,7 +418,7 @@ def apply_language_filter(
 def path_matches_glob(path: str, pattern: str) -> bool:
     """Test if path matches glob pattern.
 
-    Wrapper around fnmatch.fnmatch with path normalization for cross-platform
+    Wrapper around fnmatch.fnmatchcase with path normalization for cross-platform
     compatibility. Handles both simple patterns (*.py) and recursive patterns
     (**/*.py).
 
@@ -470,9 +470,10 @@ def path_matches_glob(path: str, pattern: str) -> bool:
     normalized_path = path.replace("\\", "/")
     normalized_pattern = pattern.replace("\\", "/")
 
-    # fnmatch.fnmatch is case-sensitive on Unix, case-insensitive on Windows
-    # For consistency, we use case-sensitive matching on all platforms
-    return fnmatch.fnmatch(normalized_path, normalized_pattern)
+    # fnmatch.fnmatchcase provides consistent case-sensitive matching on all
+    # platforms, ensuring behavior matches the documented contract regardless of
+    # the underlying filesystem defaults (e.g., Windows being case-insensitive).
+    return fnmatch.fnmatchcase(normalized_path, normalized_pattern)
 
 
 __all__ = [

@@ -206,6 +206,15 @@ class TestApplyPathFilters:
         # Assert
         assert result == ["src/main.py", "src/utils.py"]
 
+    def test_case_sensitive_markdown_matching(self) -> None:
+        """Ensure markdown glob excludes uppercase filenames when expected."""
+        paths = ["README.MD", "docs/guide.md"]
+        include_globs = ["**/*.md"]
+
+        result = apply_path_filters(paths, include_globs, [])
+
+        assert result == ["docs/guide.md"]
+
     @pytest.mark.parametrize(
         ("paths", "include_globs", "exclude_globs", "expected"),
         [
