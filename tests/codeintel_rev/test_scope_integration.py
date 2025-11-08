@@ -26,6 +26,53 @@ from codeintel_rev.mcp_server.adapters import text_search as text_search_adapter
 from codeintel_rev.mcp_server.schemas import AnswerEnvelope, ScopeIn
 
 
+class TestScopeRegistryImmutability:
+    """Regression tests for ScopeRegistry immutability guarantees."""
+
+    def test_set_scope_guards_against_external_mutation(self) -> None:
+        """Mutating the original scope after set_scope should not affect storage."""
+
+        registry = ScopeRegistry()
+        session_id = "session-mutation"
+        scope: ScopeIn = {
+            "include_globs": ["src/**"],
+            "languages": ["python"],
+        }
+
+        registry.set_scope(session_id, scope)
+
+        # Mutate the original scope after caching.
+        scope["include_globs"].append("tests/**")
+        scope["languages"][0] = "typescript"
+
+        stored_scope = registry.get_scope(session_id)
+        assert stored_scope is not None
+        assert stored_scope["include_globs"] == ["src/**"]
+        assert stored_scope["languages"] == ["python"]
+
+    def test_get_scope_returns_independent_copy(self) -> None:
+        """Mutating a retrieved scope should not mutate the registry's cache."""
+
+        registry = ScopeRegistry()
+        session_id = "session-independent"
+        scope: ScopeIn = {
+            "include_globs": ["src/**"],
+            "languages": ["python"],
+        }
+
+        registry.set_scope(session_id, scope)
+
+        retrieved_scope = registry.get_scope(session_id)
+        assert retrieved_scope is not None
+        retrieved_scope["include_globs"].append("**/*.ts")
+        retrieved_scope["languages"].append("typescript")
+
+        fresh_scope = registry.get_scope(session_id)
+        assert fresh_scope is not None
+        assert fresh_scope["include_globs"] == ["src/**"]
+        assert fresh_scope["languages"] == ["python"]
+
+
 @pytest.fixture
 def test_repo(tmp_path: Path) -> Path:
     """Create a test repository with various file types.
