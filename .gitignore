@@ -49,3 +49,4 @@ npm-debug.log*
 !.vscode/settings.json
 !.vscode/tasks.json
 .idea/
+faiss-1.12.0-py3-none-any.whl
