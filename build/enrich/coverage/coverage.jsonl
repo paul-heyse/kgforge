@@ -1,0 +1,650 @@
+{
+  "path": "risk_hotspots.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "typing.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "doc_health.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "graph_builder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "module_utils.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "config_indexer.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "overlay_manager.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli_enrich.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "typedness.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "coverage_ingest.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "errors.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "uses_builder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "export_resolver.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "_lazy_imports.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "diagnostics/report_cli.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "diagnostics/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "ops/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/scope_registry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/middleware.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/gpu_warmup.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/config_context.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/main.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/scope_store.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/capabilities.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/readiness.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "bin/eval_offline.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "bin/eval_coverage.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "bin/index_all.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "bin/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "config/settings.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "config/utils.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "config/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "indexing/scip_reader.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "indexing/xtr_build.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "indexing/index_lifecycle.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "indexing/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "indexing/cast_chunker.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "metrics/registry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "metrics/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/tree_sitter_bridge.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/scip_reader.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/output_writers.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/tagging.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/type_integration.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/libcst_bridge.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/stubs_overlay.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/runtime_observer.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/metrics.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/otel.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/timeline.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/rrf.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/path_utils.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/coderank_embedder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/vllm_engine.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/symbol_catalog.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/splade_manager.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/vllm_client.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/parquet_store.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/duckdb_manager.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/xtr_manager.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/hybrid_search.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/warp_engine.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/faiss_manager.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/faiss_dual_index.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/duckdb_catalog.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/bm25_manager.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/git_client.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "io/rerank_coderankllm.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "plugins/registry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "plugins/builtins.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "plugins/channels.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "plugins/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "rerank/xtr.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "rerank/base.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "rerank/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/types.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/telemetry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/gating.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/hybrid.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/rm3_heuristics.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/boosters.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "runtime/request_context.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "runtime/factory_adjustment.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "runtime/cells.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "runtime/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/telemetry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/service_context.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/schemas.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/server_semantic.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/server_symbols.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/error_handling.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/scope_utils.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/server.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cache/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "evaluation/offline_recall.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "evaluation/scip_coverage.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "evaluation/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "evaluation/hybrid_pool.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/xtr.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/indexctl.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/splade.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/bm25.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/build_indexes.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/common/observability.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/common/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/tools/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/tools/gpu_doctor.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/retrieval/xtr_cli.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/retrieval/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/adapters/semantic.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/adapters/files.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/adapters/semantic_pro.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/adapters/text_search.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/adapters/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/adapters/history.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/fusion/weighted_rrf.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "retrieval/fusion/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "patches/Supporting Documentation/BM25+SPLADEv3-patchfiles/tools_recall_harness.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/routers/index_admin.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "app/routers/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "ops/runtime/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "ops/runtime/xtr_open.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}

@@ -1,0 +1,910 @@
+{
+  "path": "risk_hotspots.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Hotspot scoring utilities."
+}
+{
+  "path": "typing.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Typing façade for codeintel_rev heavy optional dependencies."
+}
+{
+  "path": "doc_health.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Docstring summarization helpers."
+}
+{
+  "path": "graph_builder.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Import graph builder utilities."
+}
+{
+  "path": "module_utils.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for converting between module paths and dotted names."
+}
+{
+  "path": "config_indexer.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Config awareness helpers (YAML/TOML/JSON/Markdown)."
+}
+{
+  "path": "overlay_manager.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Targeted overlay manager for opt-in stub generation."
+}
+{
+  "path": "cli_enrich.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "CLI entrypoint for repo enrichment and targeted overlay generation."
+}
+{
+  "path": "typedness.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Typedness utilities that build on Pyrefly/Pyright summaries."
+}
+{
+  "path": "coverage_ingest.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Coverage ingestion utilities (Cobertura-style XML)."
+}
+{
+  "path": "errors.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "CodeIntel-specific exception hierarchy with Problem Details support."
+}
+{
+  "path": "uses_builder.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "SCIP-based symbol use graph helpers."
+}
+{
+  "path": "__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "CodeIntel MCP package exposing server, indexing, and retrieval APIs."
+}
+{
+  "path": "export_resolver.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Resolve exports and re-exports for module records."
+}
+{
+  "path": "_lazy_imports.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for lazily importing heavy optional dependencies."
+}
+{
+  "path": "diagnostics/report_cli.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "CLI for rendering session timelines as Markdown diagnostics."
+}
+{
+  "path": "diagnostics/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Diagnostics helpers for CodeIntel."
+}
+{
+  "path": "ops/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Operations and maintenance scripts."
+}
+{
+  "path": "app/scope_registry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Session-scoped scope registry for CodeIntel MCP (legacy helper)."
+}
+{
+  "path": "app/middleware.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Session management middleware for CodeIntel MCP."
+}
+{
+  "path": "app/gpu_warmup.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "GPU warmup and initialization sequence."
+}
+{
+  "path": "app/config_context.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Application-level configuration context manager."
+}
+{
+  "path": "app/main.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "FastAPI application with MCP server mount."
+}
+{
+  "path": "app/scope_store.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Scope store utilities for session state management."
+}
+{
+  "path": "app/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "FastAPI application wiring for the CodeIntel MCP server."
+}
+{
+  "path": "app/capabilities.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Capability snapshot helpers for conditional tool registration and /capz."
+}
+{
+  "path": "app/readiness.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Application readiness checks for Kubernetes health probes."
+}
+{
+  "path": "bin/eval_offline.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Command-line entry point for offline FAISS recall evaluation."
+}
+{
+  "path": "bin/eval_coverage.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Command-line entry point for SCIP function coverage evaluation."
+}
+{
+  "path": "bin/index_all.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "One-shot indexing: SCIP → chunk → embed → Parquet → FAISS."
+}
+{
+  "path": "bin/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "CLI entry points for CodeIntel MCP indexing pipelines."
+}
+{
+  "path": "config/settings.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Configuration settings using msgspec for fast, validated config."
+}
+{
+  "path": "config/utils.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for working with msgspec-based settings structs."
+}
+{
+  "path": "config/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Configuration loading and environment settings for CodeIntel MCP."
+}
+{
+  "path": "indexing/scip_reader.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "SCIP index reader for extracting symbol definitions and ranges."
+}
+{
+  "path": "indexing/xtr_build.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Utilities for building and verifying XTR token indexes."
+}
+{
+  "path": "indexing/index_lifecycle.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Index lifecycle management for FAISS/DuckDB/SCIP artifacts."
+}
+{
+  "path": "indexing/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Indexing utilities (SCIP parsing, lifecycle helpers, chunking)."
+}
+{
+  "path": "indexing/cast_chunker.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "cAST chunking using SCIP symbol ranges."
+}
+{
+  "path": "metrics/registry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Central Prometheus metric registry for FAISS/hybrid retrieval."
+}
+{
+  "path": "metrics/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Metric registry package."
+}
+{
+  "path": "enrich/tree_sitter_bridge.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Tree-sitter outline helpers used for enrichment artifacts."
+}
+{
+  "path": "enrich/scip_reader.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Lightweight helpers for loading and querying SCIP JSON indices."
+}
+{
+  "path": "enrich/output_writers.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Serialization helpers for enrichment artifacts (JSON/JSONL/Markdown)."
+}
+{
+  "path": "enrich/tagging.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Rule-based tagging helpers for enrichment outputs."
+}
+{
+  "path": "enrich/type_integration.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for collecting Pyright/Pyrefly error summaries."
+}
+{
+  "path": "enrich/libcst_bridge.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "LibCST-powered index utilities (imports, defs, exports, docstrings)."
+}
+{
+  "path": "enrich/stubs_overlay.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Targeted overlay generation with opt-in activation."
+}
+{
+  "path": "enrich/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Utilities for building repo-enrichment artifacts (LibCST, SCIP, tagging, overlays)."
+}
+{
+  "path": "observability/runtime_observer.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "RuntimeCell observer that writes lifecycle events to the active timeline."
+}
+{
+  "path": "observability/metrics.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Prometheus metrics for hybrid retrieval."
+}
+{
+  "path": "observability/otel.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Optional OpenTelemetry bootstrap helpers."
+}
+{
+  "path": "observability/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Observability helpers (telemetry + lightweight timelines)."
+}
+{
+  "path": "observability/timeline.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Lightweight per-session timeline recording utilities."
+}
+{
+  "path": "io/rrf.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Reciprocal Rank Fusion utilities (legacy compatibility wrappers)."
+}
+{
+  "path": "io/path_utils.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Path safety utilities for repository-scoped operations."
+}
+{
+  "path": "io/coderank_embedder.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Pooled wrapper around the CodeRank embedding SentenceTransformer."
+}
+{
+  "path": "io/vllm_engine.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "In-process vLLM embedding engine for Stage-0 retrieval."
+}
+{
+  "path": "io/symbol_catalog.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "DuckDB symbol catalog writer."
+}
+{
+  "path": "io/splade_manager.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "SPLADE artifact management, encoding, and Lucene impact index builders."
+}
+{
+  "path": "io/vllm_client.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "vLLM embedding client using msgspec for fast serialization."
+}
+{
+  "path": "io/parquet_store.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Parquet storage for chunks and vectors using Arrow."
+}
+{
+  "path": "io/duckdb_manager.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Thread-safe DuckDB connection manager."
+}
+{
+  "path": "io/xtr_manager.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Token-level XTR index manager with late-interaction scoring utilities."
+}
+{
+  "path": "io/hybrid_search.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Hybrid retrieval utilities combining FAISS, BM25, and SPLADE."
+}
+{
+  "path": "io/warp_engine.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Adapter for the optional WARP/XTR late interaction executor."
+}
+{
+  "path": "io/faiss_manager.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "FAISS manager for GPU-accelerated vector search."
+}
+{
+  "path": "io/faiss_dual_index.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "FAISS dual-index utilities and metadata helpers."
+}
+{
+  "path": "io/duckdb_catalog.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "DuckDB catalog for querying Parquet chunks."
+}
+{
+  "path": "io/bm25_manager.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "BM25 indexing workflow helpers."
+}
+{
+  "path": "io/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Storage and external service adapters for CodeIntel MCP."
+}
+{
+  "path": "io/git_client.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Typed Git operations wrapper using GitPython."
+}
+{
+  "path": "io/rerank_coderankllm.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Listwise reranking using the CodeRankLLM checkpoint."
+}
+{
+  "path": "plugins/registry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Entry-point driven registry for retrieval channels."
+}
+{
+  "path": "plugins/builtins.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Built-in retrieval channel implementations (BM25, SPLADE)."
+}
+{
+  "path": "plugins/channels.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Channel plugin contracts for hybrid retrieval."
+}
+{
+  "path": "plugins/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Plugin surfaces for pluggable retrieval channels."
+}
+{
+  "path": "rerank/xtr.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "XTR-backed reranker implementation."
+}
+{
+  "path": "rerank/base.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Shared reranker interfaces and request/response types."
+}
+{
+  "path": "rerank/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Late-interaction reranker interfaces."
+}
+{
+  "path": "retrieval/types.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Shared retrieval dataclasses for multi-stage pipelines."
+}
+{
+  "path": "retrieval/telemetry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Stage-level telemetry helpers used by multi-stage retrieval pipelines."
+}
+{
+  "path": "retrieval/gating.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Adaptive gating helpers for multi-stage retrieval pipelines."
+}
+{
+  "path": "retrieval/hybrid.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Hybrid retrieval with RRF fusion."
+}
+{
+  "path": "retrieval/rm3_heuristics.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Heuristics for toggling RM3 pseudo-relevance feedback per query."
+}
+{
+  "path": "retrieval/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Hybrid retrieval algorithms for the CodeIntel MCP stack."
+}
+{
+  "path": "retrieval/boosters.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Score boosters applied after fusion."
+}
+{
+  "path": "runtime/request_context.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Shared request-scoped context variables for runtime components."
+}
+{
+  "path": "runtime/factory_adjustment.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Factory adjustment hooks for RuntimeCell initialization."
+}
+{
+  "path": "runtime/cells.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Thread-safe runtime cell primitive for mutable subsystems."
+}
+{
+  "path": "runtime/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Runtime helpers for mutable, closeable state."
+}
+{
+  "path": "mcp_server/telemetry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Telemetry helpers for MCP tools."
+}
+{
+  "path": "mcp_server/service_context.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Cached application context for MCP tool adapters."
+}
+{
+  "path": "mcp_server/schemas.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "MCP server schemas using TypedDict for FastMCP compatibility."
+}
+{
+  "path": "mcp_server/server_semantic.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Semantic MCP tool registrations (pure move from server.py)."
+}
+{
+  "path": "mcp_server/server_symbols.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Symbol MCP tool registrations (pure move from server.py)."
+}
+{
+  "path": "mcp_server/error_handling.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Centralized error handling for CodeIntel MCP server."
+}
+{
+  "path": "mcp_server/scope_utils.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Scope filtering and merging utilities for CodeIntel MCP."
+}
+{
+  "path": "mcp_server/server.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "FastMCP server with QueryScope tools."
+}
+{
+  "path": "mcp_server/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "MCP server implementation and tool adapters for CodeIntel."
+}
+{
+  "path": "cache/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Interfaces for caching results within the CodeIntel MCP stack."
+}
+{
+  "path": "evaluation/offline_recall.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Offline recall evaluator leveraging FAISS + DuckDB catalogs."
+}
+{
+  "path": "evaluation/scip_coverage.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "SCIP symbol coverage evaluator."
+}
+{
+  "path": "evaluation/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Evaluation helpers package."
+}
+{
+  "path": "evaluation/hybrid_pool.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Feature-normalized hybrid pooling utilities."
+}
+{
+  "path": "cli/xtr.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Backward-compatible entrypoint for the XTR Typer CLI."
+}
+{
+  "path": "cli/indexctl.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Typer CLI for managing index lifecycle operations."
+}
+{
+  "path": "cli/splade.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Command-line interface for SPLADE artifact management."
+}
+{
+  "path": "cli/bm25.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Command-line interface for BM25 corpus preparation and index builds."
+}
+{
+  "path": "cli/build_indexes.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "CLI helpers for building Lucene indexes and flipping lifecycle pointers."
+}
+{
+  "path": "cli/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Entry point aggregating CodeIntel CLI subcommands."
+}
+{
+  "path": "mcp_server/common/observability.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Unified observability helpers for CodeIntel MCP adapters."
+}
+{
+  "path": "mcp_server/common/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Common utilities and shared code for MCP server adapters."
+}
+{
+  "path": "mcp_server/tools/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Public tool exports for the CodeIntel MCP server."
+}
+{
+  "path": "mcp_server/tools/gpu_doctor.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "GPU diagnostics script for PyTorch and FAISS."
+}
+{
+  "path": "mcp_server/retrieval/xtr_cli.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Typer CLI for building, verifying, and probing XTR artifacts."
+}
+{
+  "path": "mcp_server/retrieval/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Retrieval utilities exposed via MCP tooling."
+}
+{
+  "path": "mcp_server/adapters/semantic.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Semantic search adapter using FAISS GPU and DuckDB."
+}
+{
+  "path": "mcp_server/adapters/files.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": true,
+  "doc_summary": "File and scope management adapter."
+}
+{
+  "path": "mcp_server/adapters/semantic_pro.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Two-stage semantic search (CodeRank → optional WARP → optional reranker)."
+}
+{
+  "path": "mcp_server/adapters/text_search.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Text search adapter using ripgrep."
+}
+{
+  "path": "mcp_server/adapters/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "MCP tool adapters."
+}
+{
+  "path": "mcp_server/adapters/history.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Git history adapter for blame and log operations."
+}
+{
+  "path": "retrieval/fusion/weighted_rrf.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Weighted reciprocal rank fusion utilities."
+}
+{
+  "path": "retrieval/fusion/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Fusion helpers for multi-channel retrieval."
+}
+{
+  "path": "patches/Supporting Documentation/BM25+SPLADEv3-patchfiles/tools_recall_harness.py",
+  "doc_has_summary": false,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": null
+}
+{
+  "path": "app/routers/index_admin.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Admin endpoints for staging, publishing, and rolling back index versions."
+}
+{
+  "path": "app/routers/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "FastAPI router modules for CodeIntel administrative endpoints."
+}
+{
+  "path": "ops/runtime/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Runtime health and validation utilities."
+}
+{
+  "path": "ops/runtime/xtr_open.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": true,
+  "doc_summary": "Fail-fast probe for XTR artifacts."
+}
