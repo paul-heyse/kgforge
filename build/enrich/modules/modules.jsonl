@@ -171,11 +171,22 @@
       "level": 0
     },
     {
+      "module": "os",
+      "names": [
+        "PathLike"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "typing",
       "names": [
         "TYPE_CHECKING",
         "Any",
-        "Protocol"
+        "Mapping",
+        "Protocol",
+        "Sequence"
       ],
       "aliases": {},
       "is_star": false,
@@ -230,92 +241,102 @@
     {
       "kind": "variable",
       "name": "NDArrayF32",
-      "lineno": 24
-    },
-    {
-      "kind": "variable",
-      "name": "NDArrayI64",
       "lineno": 25
     },
     {
       "kind": "variable",
-      "name": "NDArrayAny",
+      "name": "NDArrayI64",
       "lineno": 26
     },
     {
       "kind": "variable",
+      "name": "NDArrayAny",
+      "lineno": 27
+    },
+    {
+      "kind": "variable",
       "name": "HEAVY_DEPS",
-      "lineno": 40
+      "lineno": 42
     },
     {
       "kind": "function",
       "name": "gate_import",
-      "lineno": 44
+      "lineno": 46
     },
     {
       "kind": "class",
       "name": "TorchDeviceProperties",
-      "lineno": 87
+      "lineno": 89
     },
     {
       "kind": "class",
       "name": "TorchCudaAPI",
-      "lineno": 93
+      "lineno": 95
     },
     {
       "kind": "class",
       "name": "TorchTensor",
-      "lineno": 113
+      "lineno": 115
     },
     {
       "kind": "class",
       "name": "TorchModule",
-      "lineno": 126
+      "lineno": 128
     },
     {
       "kind": "class",
       "name": "FaissStandardGpuResources",
-      "lineno": 144
+      "lineno": 146
     },
     {
       "kind": "class",
       "name": "FaissGpuClonerOptions",
-      "lineno": 149
+      "lineno": 150
     },
     {
       "kind": "class",
       "name": "FaissIndex",
-      "lineno": 157
+      "lineno": 158
     },
     {
       "kind": "class",
       "name": "FaissGpuIndexFlatIP",
-      "lineno": 163
+      "lineno": 164
     },
     {
       "kind": "class",
       "name": "FaissModule",
-      "lineno": 175
+      "lineno": 176
     },
     {
       "kind": "class",
       "name": "NumpyRandomState",
-      "lineno": 208
+      "lineno": 211
     },
     {
       "kind": "class",
       "name": "NumpyRandomNamespace",
-      "lineno": 214
+      "lineno": 217
     },
     {
       "kind": "class",
       "name": "NumpyLinalgNamespace",
-      "lineno": 220
+      "lineno": 223
     },
     {
       "kind": "class",
       "name": "NumpyModule",
-      "lineno": 226
+      "lineno": 229
+    },
+    {
+      "kind": "class",
+      "name": "PolarsDataFrame",
+      "lineno": 236
+    },
+    {
+      "kind": "class",
+      "name": "PolarsModule",
+      "lineno": 242
     }
   ],
   "exports": [
@@ -325,6 +346,7 @@
     "NDArrayF32",
     "NDArrayI64",
     "NumpyModule",
+    "PolarsModule",
     "TorchModule",
     "gate_import"
   ],
@@ -335,6 +357,7 @@
     "NDArrayF32",
     "NDArrayI64",
     "NumpyModule",
+    "PolarsModule",
     "TorchModule",
     "gate_import"
   ],
@@ -379,7 +402,7 @@
       "name": "gate_import",
       "kind": "function",
       "public": true,
-      "lineno": 44,
+      "lineno": 46,
       "doc_summary": "Resolve ``module_name`` lazily using the heavy dependency policy.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -389,7 +412,7 @@
       "name": "TorchDeviceProperties",
       "kind": "class",
       "public": true,
-      "lineno": 87,
+      "lineno": 89,
       "doc_summary": "Subset of torch.cuda device properties accessed by diagnostics.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -399,7 +422,7 @@
       "name": "TorchCudaAPI",
       "kind": "class",
       "public": true,
-      "lineno": 93,
+      "lineno": 95,
       "doc_summary": "Minimal CUDA API surface used throughout the codebase.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -409,7 +432,7 @@
       "name": "TorchTensor",
       "kind": "class",
       "public": true,
-      "lineno": 113,
+      "lineno": 115,
       "doc_summary": "Tensor operations invoked inside diagnostics.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -419,7 +442,7 @@
       "name": "TorchModule",
       "kind": "class",
       "public": true,
-      "lineno": 126,
+      "lineno": 128,
       "doc_summary": "Subset of torch's module-level API we rely on.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -429,7 +452,7 @@
       "name": "FaissStandardGpuResources",
       "kind": "class",
       "public": true,
-      "lineno": 144,
+      "lineno": 146,
       "doc_summary": "GPU resource handle for FAISS.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -439,7 +462,7 @@
       "name": "FaissGpuClonerOptions",
       "kind": "class",
       "public": true,
-      "lineno": 149,
+      "lineno": 150,
       "doc_summary": "Options controlling FAISS GPU cloning behavior.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -449,7 +472,7 @@
       "name": "FaissIndex",
       "kind": "class",
       "public": true,
-      "lineno": 157,
+      "lineno": 158,
       "doc_summary": "Minimal FAISS index surface used in diagnostics.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -459,7 +482,7 @@
       "name": "FaissGpuIndexFlatIP",
       "kind": "class",
       "public": true,
-      "lineno": 163,
+      "lineno": 164,
       "doc_summary": "GPU FAISS index used for smoke testing.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -469,7 +492,7 @@
       "name": "FaissModule",
       "kind": "class",
       "public": true,
-      "lineno": 175,
+      "lineno": 176,
       "doc_summary": "Subset of the FAISS module accessed via gate_import.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -479,7 +502,7 @@
       "name": "NumpyRandomState",
       "kind": "class",
       "public": true,
-      "lineno": 208,
+      "lineno": 211,
       "doc_summary": "Random state wrapper for numpy.random.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -489,7 +512,7 @@
       "name": "NumpyRandomNamespace",
       "kind": "class",
       "public": true,
-      "lineno": 214,
+      "lineno": 217,
       "doc_summary": "Namespace for numpy.random helpers.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -499,7 +522,7 @@
       "name": "NumpyLinalgNamespace",
       "kind": "class",
       "public": true,
-      "lineno": 220,
+      "lineno": 223,
       "doc_summary": "Namespace for numpy.linalg helpers.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -509,8 +532,28 @@
       "name": "NumpyModule",
       "kind": "class",
       "public": true,
-      "lineno": 226,
+      "lineno": 229,
       "doc_summary": "Enough of numpy's surface for lazy imports.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "PolarsDataFrame",
+      "kind": "class",
+      "public": true,
+      "lineno": 236,
+      "doc_summary": "Subset of polars.DataFrame used for Parquet exports.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "PolarsModule",
+      "kind": "class",
+      "public": true,
+      "lineno": 242,
+      "doc_summary": "Minimal polars API used within optional export helpers.",
       "doc_has_summary": true,
       "doc_param_parity": null,
       "doc_examples_present": false
@@ -522,7 +565,7 @@
   },
   "untyped_defs": 0,
   "side_effects": {
-    "filesystem": false,
+    "filesystem": true,
     "network": false,
     "subprocess": false,
     "database": false
@@ -531,18 +574,18 @@
   "complexity": {
     "branches": 1,
     "cyclomatic": 2,
-    "loc": 231
+    "loc": 246
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 71,
+  "fan_in": 72,
   "fan_out": 0,
   "cycle_group": 0,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.587
+  "hotspot_score": 2.592
 }
 {
   "path": "doc_health.py",
@@ -688,20 +731,10 @@
     {
       "module": "typing",
       "names": [
-        "Any"
+        "Any",
+        "cast"
       ],
       "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": null,
-      "names": [
-        "polars"
-      ],
-      "aliases": {
-        "polars": "pl"
-      },
       "is_star": false,
       "level": 0
     },
@@ -715,33 +748,43 @@
       "aliases": {},
       "is_star": false,
       "level": 0
+    },
+    {
+      "module": "codeintel_rev.typing",
+      "names": [
+        "PolarsModule",
+        "gate_import"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
     }
   ],
   "defs": [
     {
-      "kind": "variable",
-      "name": "pl",
-      "lineno": 13
-    },
-    {
       "kind": "class",
       "name": "ImportGraph",
-      "lineno": 23
+      "lineno": 19
     },
     {
       "kind": "function",
       "name": "build_import_graph",
-      "lineno": 32
+      "lineno": 28
     },
     {
       "kind": "function",
       "name": "write_import_graph",
-      "lineno": 87
+      "lineno": 83
     },
     {
       "kind": "function",
       "name": "_tarjan_scc",
-      "lineno": 107
+      "lineno": 100
+    },
+    {
+      "kind": "function",
+      "name": "_write_parquet",
+      "lineno": 135
     }
   ],
   "exports": [],
@@ -766,7 +809,7 @@
       "name": "ImportGraph",
       "kind": "class",
       "public": true,
-      "lineno": 23,
+      "lineno": 19,
       "doc_summary": "Graph representation of intra-repo imports.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -776,7 +819,7 @@
       "name": "build_import_graph",
       "kind": "function",
       "public": true,
-      "lineno": 32,
+      "lineno": 28,
       "doc_summary": "Build an import graph across repo modules.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -786,7 +829,7 @@
       "name": "write_import_graph",
       "kind": "function",
       "public": true,
-      "lineno": 87,
+      "lineno": 83,
       "doc_summary": "Write import edges to Parquet (or JSONL fallback).",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -796,10 +839,20 @@
       "name": "_tarjan_scc",
       "kind": "function",
       "public": false,
-      "lineno": 107,
+      "lineno": 100,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_write_parquet",
+      "kind": "function",
+      "public": false,
+      "lineno": 135,
+      "doc_summary": "Persist records to Parquet via polars when available.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
       "doc_examples_present": false
     }
   ],
@@ -818,7 +871,7 @@
   "complexity": {
     "branches": 25,
     "cyclomatic": 26,
-    "loc": 142
+    "loc": 143
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -961,7 +1014,7 @@
   "complexity": {
     "branches": 18,
     "cyclomatic": 19,
-    "loc": 121
+    "loc": 123
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -1321,9 +1374,9 @@
       "kind": "function",
       "public": false,
       "lineno": 130,
-      "doc_summary": null,
-      "doc_has_summary": false,
-      "doc_param_parity": null,
+      "doc_summary": "Return a best-effort integer conversion.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
       "doc_examples_present": false
     }
   ],
@@ -1340,9 +1393,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 13,
-    "cyclomatic": 14,
-    "loc": 135
+    "branches": 17,
+    "cyclomatic": 18,
+    "loc": 152
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -1359,7 +1412,7 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.636
+  "hotspot_score": 1.707
 }
 {
   "path": "cli_enrich.py",
@@ -1861,137 +1914,137 @@
     {
       "kind": "function",
       "name": "_traits_from_row",
-      "lineno": 787
+      "lineno": 796
     },
     {
       "kind": "function",
       "name": "_build_coverage_rows",
-      "lineno": 839
+      "lineno": 857
     },
     {
       "kind": "function",
       "name": "_build_hotspot_rows",
-      "lineno": 850
+      "lineno": 868
     },
     {
       "kind": "function",
       "name": "_write_exports_outputs",
-      "lineno": 864
+      "lineno": 882
     },
     {
       "kind": "function",
       "name": "_write_graph_outputs",
-      "lineno": 871
+      "lineno": 889
     },
     {
       "kind": "function",
       "name": "_write_uses_output",
-      "lineno": 876
-    },
-    {
-      "kind": "function",
-      "name": "_write_typedness_output",
-      "lineno": 880
-    },
-    {
-      "kind": "function",
-      "name": "_write_doc_output",
       "lineno": 894
     },
     {
       "kind": "function",
-      "name": "_write_coverage_output",
-      "lineno": 908
+      "name": "_write_typedness_output",
+      "lineno": 898
     },
     {
       "kind": "function",
-      "name": "_write_config_output",
+      "name": "_write_doc_output",
       "lineno": 912
     },
     {
       "kind": "function",
+      "name": "_write_coverage_output",
+      "lineno": 926
+    },
+    {
+      "kind": "function",
+      "name": "_write_config_output",
+      "lineno": 930
+    },
+    {
+      "kind": "function",
       "name": "_write_hotspot_output",
-      "lineno": 916
+      "lineno": 934
     },
     {
       "kind": "function",
       "name": "_write_modules_json",
-      "lineno": 920
+      "lineno": 938
     },
     {
       "kind": "function",
       "name": "_write_markdown_modules",
-      "lineno": 924
+      "lineno": 942
     },
     {
       "kind": "function",
       "name": "_write_repo_map",
-      "lineno": 935
+      "lineno": 953
     },
     {
       "kind": "function",
       "name": "_write_symbol_graph",
-      "lineno": 950
+      "lineno": 968
     },
     {
       "kind": "function",
       "name": "_write_tabular_records",
-      "lineno": 957
+      "lineno": 975
     },
     {
       "kind": "function",
       "name": "_normalize_type_signal_map",
-      "lineno": 964
+      "lineno": 982
     },
     {
       "kind": "function",
       "name": "_normalize_metric_map",
-      "lineno": 980
-    },
-    {
-      "kind": "function",
-      "name": "_normalize_path_key",
       "lineno": 998
     },
     {
       "kind": "function",
+      "name": "_normalize_path_key",
+      "lineno": 1016
+    },
+    {
+      "kind": "function",
       "name": "_group_configs_by_dir",
-      "lineno": 1002
+      "lineno": 1020
     },
     {
       "kind": "function",
       "name": "_config_refs_for_row",
-      "lineno": 1013
+      "lineno": 1031
     },
     {
       "kind": "function",
       "name": "_ancestor_dirs",
-      "lineno": 1029
+      "lineno": 1047
     },
     {
       "kind": "function",
       "name": "_dir_key_from_path",
-      "lineno": 1044
+      "lineno": 1062
     },
     {
       "kind": "function",
       "name": "_should_mark_overlay",
-      "lineno": 1051
+      "lineno": 1069
     },
     {
       "kind": "function",
       "name": "_ensure_package_overlays",
-      "lineno": 1081
+      "lineno": 1099
     },
     {
       "kind": "function",
       "name": "_normalized_rel_path",
-      "lineno": 1165
+      "lineno": 1183
     },
     {
       "kind": "function",
       "name": "_write_tag_index",
-      "lineno": 1169
+      "lineno": 1187
     }
   ],
   "exports": [],
@@ -2302,26 +2355,26 @@
       "kind": "function",
       "public": false,
       "lineno": 775,
-      "doc_summary": null,
-      "doc_has_summary": false,
-      "doc_param_parity": null,
+      "doc_summary": "Apply tagging rules to module rows and update their tags in-place.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
       "doc_examples_present": false
     },
     {
       "name": "_traits_from_row",
       "kind": "function",
       "public": false,
-      "lineno": 787,
-      "doc_summary": null,
-      "doc_has_summary": false,
-      "doc_param_parity": null,
+      "lineno": 796,
+      "doc_summary": "Extract ModuleTraits from a module metadata row.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
       "doc_examples_present": false
     },
     {
       "name": "_build_coverage_rows",
       "kind": "function",
       "public": false,
-      "lineno": 839,
+      "lineno": 857,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2331,7 +2384,7 @@
       "name": "_build_hotspot_rows",
       "kind": "function",
       "public": false,
-      "lineno": 850,
+      "lineno": 868,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2341,7 +2394,7 @@
       "name": "_write_exports_outputs",
       "kind": "function",
       "public": false,
-      "lineno": 864,
+      "lineno": 882,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2351,7 +2404,7 @@
       "name": "_write_graph_outputs",
       "kind": "function",
       "public": false,
-      "lineno": 871,
+      "lineno": 889,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2361,7 +2414,7 @@
       "name": "_write_uses_output",
       "kind": "function",
       "public": false,
-      "lineno": 876,
+      "lineno": 894,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2371,7 +2424,7 @@
       "name": "_write_typedness_output",
       "kind": "function",
       "public": false,
-      "lineno": 880,
+      "lineno": 898,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2381,7 +2434,7 @@
       "name": "_write_doc_output",
       "kind": "function",
       "public": false,
-      "lineno": 894,
+      "lineno": 912,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2391,7 +2444,7 @@
       "name": "_write_coverage_output",
       "kind": "function",
       "public": false,
-      "lineno": 908,
+      "lineno": 926,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2401,7 +2454,7 @@
       "name": "_write_config_output",
       "kind": "function",
       "public": false,
-      "lineno": 912,
+      "lineno": 930,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2411,7 +2464,7 @@
       "name": "_write_hotspot_output",
       "kind": "function",
       "public": false,
-      "lineno": 916,
+      "lineno": 934,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2421,7 +2474,7 @@
       "name": "_write_modules_json",
       "kind": "function",
       "public": false,
-      "lineno": 920,
+      "lineno": 938,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2431,7 +2484,7 @@
       "name": "_write_markdown_modules",
       "kind": "function",
       "public": false,
-      "lineno": 924,
+      "lineno": 942,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2441,7 +2494,7 @@
       "name": "_write_repo_map",
       "kind": "function",
       "public": false,
-      "lineno": 935,
+      "lineno": 953,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2451,7 +2504,7 @@
       "name": "_write_symbol_graph",
       "kind": "function",
       "public": false,
-      "lineno": 950,
+      "lineno": 968,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2461,7 +2514,7 @@
       "name": "_write_tabular_records",
       "kind": "function",
       "public": false,
-      "lineno": 957,
+      "lineno": 975,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2471,7 +2524,7 @@
       "name": "_normalize_type_signal_map",
       "kind": "function",
       "public": false,
-      "lineno": 964,
+      "lineno": 982,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2481,7 +2534,7 @@
       "name": "_normalize_metric_map",
       "kind": "function",
       "public": false,
-      "lineno": 980,
+      "lineno": 998,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2491,7 +2544,7 @@
       "name": "_normalize_path_key",
       "kind": "function",
       "public": false,
-      "lineno": 998,
+      "lineno": 1016,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2501,7 +2554,7 @@
       "name": "_group_configs_by_dir",
       "kind": "function",
       "public": false,
-      "lineno": 1002,
+      "lineno": 1020,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2511,7 +2564,7 @@
       "name": "_config_refs_for_row",
       "kind": "function",
       "public": false,
-      "lineno": 1013,
+      "lineno": 1031,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2521,7 +2574,7 @@
       "name": "_ancestor_dirs",
       "kind": "function",
       "public": false,
-      "lineno": 1029,
+      "lineno": 1047,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2531,7 +2584,7 @@
       "name": "_dir_key_from_path",
       "kind": "function",
       "public": false,
-      "lineno": 1044,
+      "lineno": 1062,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2541,7 +2594,7 @@
       "name": "_should_mark_overlay",
       "kind": "function",
       "public": false,
-      "lineno": 1051,
+      "lineno": 1069,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2551,7 +2604,7 @@
       "name": "_ensure_package_overlays",
       "kind": "function",
       "public": false,
-      "lineno": 1081,
+      "lineno": 1099,
       "doc_summary": "Ensure package ``__init__`` overlays exist for ancestors of ``rel_path``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -2561,7 +2614,7 @@
       "name": "_normalized_rel_path",
       "kind": "function",
       "public": false,
-      "lineno": 1165,
+      "lineno": 1183,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2571,7 +2624,7 @@
       "name": "_write_tag_index",
       "kind": "function",
       "public": false,
-      "lineno": 1169,
+      "lineno": 1187,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -2593,7 +2646,7 @@
   "complexity": {
     "branches": 123,
     "cyclomatic": 124,
-    "loc": 1182
+    "loc": 1200
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -2773,7 +2826,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 14,
+  "cycle_group": 9,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/type_integration.py"
@@ -2904,7 +2957,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 9,
+  "cycle_group": 12,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.543
@@ -3248,13 +3301,11 @@
       "level": 0
     },
     {
-      "module": null,
+      "module": "typing",
       "names": [
-        "polars"
+        "cast"
       ],
-      "aliases": {
-        "polars": "pl"
-      },
+      "aliases": {},
       "is_star": false,
       "level": 0
     },
@@ -3266,33 +3317,43 @@
       "aliases": {},
       "is_star": false,
       "level": 0
+    },
+    {
+      "module": "codeintel_rev.typing",
+      "names": [
+        "PolarsModule",
+        "gate_import"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
     }
   ],
   "defs": [
     {
-      "kind": "variable",
-      "name": "pl",
-      "lineno": 12
-    },
-    {
       "kind": "class",
       "name": "UseGraph",
-      "lineno": 18
+      "lineno": 15
     },
     {
       "kind": "function",
       "name": "build_use_graph",
-      "lineno": 26
+      "lineno": 23
     },
     {
       "kind": "function",
       "name": "write_use_graph",
-      "lineno": 62
+      "lineno": 59
     },
     {
       "kind": "function",
       "name": "_is_definition",
-      "lineno": 89
+      "lineno": 85
+    },
+    {
+      "kind": "function",
+      "name": "_write_parquet",
+      "lineno": 91
     }
   ],
   "exports": [],
@@ -3317,7 +3378,7 @@
       "name": "UseGraph",
       "kind": "class",
       "public": true,
-      "lineno": 18,
+      "lineno": 15,
       "doc_summary": "Definition-to-use relationships summarised by file.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -3327,7 +3388,7 @@
       "name": "build_use_graph",
       "kind": "function",
       "public": true,
-      "lineno": 26,
+      "lineno": 23,
       "doc_summary": "Build a use graph from SCIP occurrences.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -3337,7 +3398,7 @@
       "name": "write_use_graph",
       "kind": "function",
       "public": true,
-      "lineno": 62,
+      "lineno": 59,
       "doc_summary": "Persist use graph edges to Parquet (or JSONL fallback).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -3347,10 +3408,20 @@
       "name": "_is_definition",
       "kind": "function",
       "public": false,
-      "lineno": 89,
+      "lineno": 85,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_write_parquet",
+      "kind": "function",
+      "public": false,
+      "lineno": 91,
+      "doc_summary": "Write records via polars when available.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
       "doc_examples_present": false
     }
   ],
@@ -3369,24 +3440,26 @@
   "complexity": {
     "branches": 15,
     "cyclomatic": 16,
-    "loc": 95
+    "loc": 100
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 1,
-  "fan_out": 1,
-  "cycle_group": 16,
+  "fan_out": 2,
+  "cycle_group": 15,
   "imports_internal": [
-    "enrich/scip_reader.py"
+    "enrich/scip_reader.py",
+    "typing.py"
   ],
   "imports_intra_repo": [
-    "enrich/scip_reader.py"
+    "enrich/scip_reader.py",
+    "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.836
+  "hotspot_score": 1.951
 }
 {
   "path": "__init__.py",
@@ -3599,7 +3672,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 15,
+  "cycle_group": 17,
   "imports_internal": [
     "module_utils.py",
     "typing.py"
@@ -4458,8 +4531,7 @@
     {
       "module": "typing",
       "names": [
-        "TYPE_CHECKING",
-        "cast"
+        "TYPE_CHECKING"
       ],
       "aliases": {},
       "is_star": false,
@@ -5251,6 +5323,7 @@
       "names": [
         "TYPE_CHECKING",
         "Any",
+        "Protocol",
         "TypeVar",
         "cast"
       ],
@@ -5363,12 +5436,12 @@
       "level": 0
     },
     {
-      "module": "codeintel_rev.observability",
+      "module": null,
       "names": [
-        "metrics"
+        "codeintel_rev.observability.metrics"
       ],
       "aliases": {
-        "metrics": "retrieval_metrics"
+        "codeintel_rev.observability.metrics": "_retrieval_metrics"
       },
       "is_star": false,
       "level": 0
@@ -5476,89 +5549,114 @@
       "lineno": 93
     },
     {
+      "kind": "class",
+      "name": "_RetrievalMetrics",
+      "lineno": 97
+    },
+    {
+      "kind": "variable",
+      "name": "retrieval_metrics",
+      "lineno": 101
+    },
+    {
       "kind": "function",
       "name": "_infer_index_root",
-      "lineno": 99
+      "lineno": 106
     },
     {
       "kind": "function",
       "name": "_build_factory_adjuster",
-      "lineno": 129
+      "lineno": 136
+    },
+    {
+      "kind": "function",
+      "name": "_build_faiss_manager",
+      "lineno": 169
+    },
+    {
+      "kind": "function",
+      "name": "_build_scope_store",
+      "lineno": 212
+    },
+    {
+      "kind": "function",
+      "name": "_build_git_clients",
+      "lineno": 238
     },
     {
       "kind": "function",
       "name": "_assign_frozen",
-      "lineno": 165
+      "lineno": 263
     },
     {
       "kind": "function",
       "name": "_faiss_module",
-      "lineno": 170
-    },
-    {
-      "kind": "function",
-      "name": "_import_faiss_manager_cls",
-      "lineno": 186
-    },
-    {
-      "kind": "function",
-      "name": "_import_faiss_runtime_opts_cls",
-      "lineno": 198
-    },
-    {
-      "kind": "function",
-      "name": "_faiss_runtime_options_from_index",
-      "lineno": 210
-    },
-    {
-      "kind": "function",
-      "name": "_import_hybrid_engine_cls",
-      "lineno": 251
-    },
-    {
-      "kind": "function",
-      "name": "_import_xtr_index_cls",
       "lineno": 268
     },
     {
       "kind": "function",
+      "name": "_import_faiss_manager_cls",
+      "lineno": 284
+    },
+    {
+      "kind": "function",
+      "name": "_import_faiss_runtime_opts_cls",
+      "lineno": 296
+    },
+    {
+      "kind": "function",
+      "name": "_faiss_runtime_options_from_index",
+      "lineno": 308
+    },
+    {
+      "kind": "function",
+      "name": "_import_hybrid_engine_cls",
+      "lineno": 349
+    },
+    {
+      "kind": "function",
+      "name": "_import_xtr_index_cls",
+      "lineno": 366
+    },
+    {
+      "kind": "function",
       "name": "_require_dependency",
-      "lineno": 285
+      "lineno": 383
     },
     {
       "kind": "function",
       "name": "_ensure_path_exists",
-      "lineno": 344
+      "lineno": 442
     },
     {
       "kind": "class",
       "name": "ResolvedPaths",
-      "lineno": 404
+      "lineno": 502
     },
     {
       "kind": "function",
       "name": "resolve_application_paths",
-      "lineno": 460
+      "lineno": 558
     },
     {
       "kind": "variable",
       "name": "T",
-      "lineno": 573
+      "lineno": 671
     },
     {
       "kind": "class",
       "name": "_FaissRuntimeState",
-      "lineno": 576
+      "lineno": 674
     },
     {
       "kind": "class",
       "name": "_ContextRuntimeState",
-      "lineno": 588
+      "lineno": 686
     },
     {
       "kind": "class",
       "name": "ApplicationContext",
-      "lineno": 628
+      "lineno": 726
     }
   ],
   "exports": [
@@ -5846,10 +5944,20 @@
   },
   "doc_items": [
     {
+      "name": "_RetrievalMetrics",
+      "kind": "class",
+      "public": false,
+      "lineno": 97,
+      "doc_summary": null,
+      "doc_has_summary": false,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
       "name": "_infer_index_root",
       "kind": "function",
       "public": false,
-      "lineno": 99,
+      "lineno": 106,
       "doc_summary": "Return the directory that stores versioned index assets.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5859,8 +5967,38 @@
       "name": "_build_factory_adjuster",
       "kind": "function",
       "public": false,
-      "lineno": 129,
+      "lineno": 136,
       "doc_summary": "Return a DefaultFactoryAdjuster derived from settings.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_build_faiss_manager",
+      "kind": "function",
+      "public": false,
+      "lineno": 169,
+      "doc_summary": "Construct and log the FAISS manager for the main index.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_build_scope_store",
+      "kind": "function",
+      "public": false,
+      "lineno": 212,
+      "doc_summary": "Return the session scope store backed by redis.asyncio.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_build_git_clients",
+      "kind": "function",
+      "public": false,
+      "lineno": 238,
+      "doc_summary": "Initialize Git clients for blame and history operations.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -5869,7 +6007,7 @@
       "name": "_assign_frozen",
       "kind": "function",
       "public": false,
-      "lineno": 165,
+      "lineno": 263,
       "doc_summary": "Assign attribute on a frozen dataclass instance.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -5879,7 +6017,7 @@
       "name": "_faiss_module",
       "kind": "function",
       "public": false,
-      "lineno": 170,
+      "lineno": 268,
       "doc_summary": "Return the cached FAISS manager module.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5889,7 +6027,7 @@
       "name": "_import_faiss_manager_cls",
       "kind": "function",
       "public": false,
-      "lineno": 186,
+      "lineno": 284,
       "doc_summary": "Import ``FAISSManager`` lazily to keep module import costs low.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5899,7 +6037,7 @@
       "name": "_import_faiss_runtime_opts_cls",
       "kind": "function",
       "public": false,
-      "lineno": 198,
+      "lineno": 296,
       "doc_summary": "Return the FAISS runtime options dataclass.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5909,7 +6047,7 @@
       "name": "_faiss_runtime_options_from_index",
       "kind": "function",
       "public": false,
-      "lineno": 210,
+      "lineno": 308,
       "doc_summary": "Materialize FAISS runtime options from the structured index config.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5919,7 +6057,7 @@
       "name": "_import_hybrid_engine_cls",
       "kind": "function",
       "public": false,
-      "lineno": 251,
+      "lineno": 349,
       "doc_summary": "Import ``HybridSearchEngine`` lazily for runtime cell initialization.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5929,7 +6067,7 @@
       "name": "_import_xtr_index_cls",
       "kind": "function",
       "public": false,
-      "lineno": 268,
+      "lineno": 366,
       "doc_summary": "Import ``XTRIndex`` lazily to avoid eager heavy dependencies.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5939,7 +6077,7 @@
       "name": "_require_dependency",
       "kind": "function",
       "public": false,
-      "lineno": 285,
+      "lineno": 383,
       "doc_summary": "Ensure a heavy dependency is available, raising RuntimeUnavailableError.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5949,7 +6087,7 @@
       "name": "_ensure_path_exists",
       "kind": "function",
       "public": false,
-      "lineno": 344,
+      "lineno": 442,
       "doc_summary": "Validate that a filesystem path exists for a given runtime.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5959,7 +6097,7 @@
       "name": "ResolvedPaths",
       "kind": "class",
       "public": true,
-      "lineno": 404,
+      "lineno": 502,
       "doc_summary": "Canonicalized filesystem paths for runtime operations.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -5969,7 +6107,7 @@
       "name": "resolve_application_paths",
       "kind": "function",
       "public": true,
-      "lineno": 460,
+      "lineno": 558,
       "doc_summary": "Resolve all configured paths to absolute paths.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -5979,7 +6117,7 @@
       "name": "_FaissRuntimeState",
       "kind": "class",
       "public": false,
-      "lineno": 576,
+      "lineno": 674,
       "doc_summary": "Runtime bookkeeping for FAISS initialization.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -5989,7 +6127,7 @@
       "name": "_ContextRuntimeState",
       "kind": "class",
       "public": false,
-      "lineno": 588,
+      "lineno": 686,
       "doc_summary": "Mutable runtime state backing the frozen ApplicationContext.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -5999,7 +6137,7 @@
       "name": "ApplicationContext",
       "kind": "class",
       "public": true,
-      "lineno": 628,
+      "lineno": 726,
       "doc_summary": "Application-wide context holding all configuration and long-lived clients.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -6021,7 +6159,7 @@
   "complexity": {
     "branches": 62,
     "cyclomatic": 63,
-    "loc": 1447
+    "loc": 1503
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -6046,7 +6184,7 @@
     "io/hybrid_search.py",
     "io/vllm_client.py",
     "io/xtr_manager.py",
-    "observability/__init__.py",
+    "observability/metrics.py",
     "runtime/__init__.py",
     "runtime/factory_adjustment.py",
     "typing.py"
@@ -6065,7 +6203,7 @@
     "io/hybrid_search.py",
     "io/vllm_client.py",
     "io/xtr_manager.py",
-    "observability/__init__.py",
+    "observability/metrics.py",
     "runtime/__init__.py",
     "runtime/factory_adjustment.py",
     "typing.py"
@@ -7209,9 +7347,9 @@
     "app/hypercorn.toml"
   ],
   "overlay_needed": false,
-  "fan_in": 1,
+  "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 33,
+  "cycle_group": 38,
   "imports_internal": [
     "mcp_server/schemas.py",
     "typing.py"
@@ -7222,7 +7360,7 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.243
+  "hotspot_score": 2.332
 }
 {
   "path": "app/__init__.py",
@@ -8003,7 +8141,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 58,
+  "cycle_group": 53,
   "imports_internal": [
     "_lazy_imports.py",
     "app/config_context.py",
@@ -9170,8 +9308,7 @@
     {
       "module": "typing",
       "names": [
-        "Literal",
-        "cast"
+        "Literal"
       ],
       "aliases": {},
       "is_star": false,
@@ -10225,7 +10362,7 @@
   "overlay_needed": false,
   "fan_in": 21,
   "fan_out": 2,
-  "cycle_group": 35,
+  "cycle_group": 34,
   "imports_internal": [
     "io/duckdb_manager.py",
     "typing.py"
@@ -10976,7 +11113,7 @@
     {
       "kind": "function",
       "name": "main",
-      "lineno": 333
+      "lineno": 329
     }
   ],
   "exports": [],
@@ -11114,7 +11251,7 @@
       "name": "main",
       "kind": "function",
       "public": true,
-      "lineno": 333,
+      "lineno": 329,
       "doc_summary": "Entry point allowing ``python -m codeintel_rev.indexing.xtr_build``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -11136,7 +11273,7 @@
   "complexity": {
     "branches": 18,
     "cyclomatic": 19,
-    "loc": 349
+    "loc": 345
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -11516,7 +11653,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 2,
-  "cycle_group": 51,
+  "cycle_group": 35,
   "imports_internal": [
     "errors.py",
     "typing.py"
@@ -12792,7 +12929,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 11,
+  "cycle_group": 16,
   "imports_internal": [
     "typing.py"
   ],
@@ -13053,7 +13190,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 12,
+  "cycle_group": 13,
   "imports_internal": [
     "typing.py"
   ],
@@ -13495,7 +13632,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 10,
+  "cycle_group": 11,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.293
@@ -13721,7 +13858,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 8,
+  "cycle_group": 10,
   "imports_internal": [
     "typing.py"
   ],
@@ -14028,7 +14165,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 13,
+  "cycle_group": 8,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.789
@@ -14202,17 +14339,17 @@
     {
       "kind": "class",
       "name": "_IndexVisitor",
-      "lineno": 255
+      "lineno": 259
     },
     {
       "kind": "function",
       "name": "index_module",
-      "lineno": 541
+      "lineno": 545
     },
     {
       "kind": "function",
       "name": "_lineno",
-      "lineno": 588
+      "lineno": 592
     }
   ],
   "exports": [],
@@ -14419,7 +14556,7 @@
       "name": "_IndexVisitor",
       "kind": "class",
       "public": false,
-      "lineno": 255,
+      "lineno": 259,
       "doc_summary": "Collect module metadata via a single LibCST traversal.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -14429,7 +14566,7 @@
       "name": "index_module",
       "kind": "function",
       "public": true,
-      "lineno": 541,
+      "lineno": 545,
       "doc_summary": "Return parsed module metadata, falling back to a stub on parse failure.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -14439,7 +14576,7 @@
       "name": "_lineno",
       "kind": "function",
       "public": false,
-      "lineno": 588,
+      "lineno": 592,
       "doc_summary": "Return the starting line number for ``node`` when metadata is available.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -14461,7 +14598,7 @@
   "complexity": {
     "branches": 128,
     "cyclomatic": 129,
-    "loc": 609
+    "loc": 613
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -14941,7 +15078,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 17,
+  "cycle_group": 14,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/output_writers.py",
@@ -15415,12 +15552,12 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 0,
+  "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 77,
+  "cycle_group": 37,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.084
+  "hotspot_score": 1.524
 }
 {
   "path": "observability/otel.py",
@@ -15856,7 +15993,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 27,
+  "cycle_group": 28,
   "imports_internal": [
     "typing.py"
   ],
@@ -15950,12 +16087,12 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 2,
+  "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 36,
+  "cycle_group": 77,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.194
+  "hotspot_score": 0.755
 }
 {
   "path": "observability/timeline.py",
@@ -16506,7 +16643,7 @@
   "overlay_needed": false,
   "fan_in": 11,
   "fan_out": 2,
-  "cycle_group": 28,
+  "cycle_group": 29,
   "imports_internal": [
     "observability/otel.py",
     "typing.py"
@@ -16841,7 +16978,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 0,
-  "cycle_group": 54,
+  "cycle_group": 56,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.801
@@ -17484,7 +17621,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 4,
-  "cycle_group": 40,
+  "cycle_group": 45,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -17694,7 +17831,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 48,
+  "cycle_group": 43,
   "imports_internal": [
     "io/duckdb_manager.py"
   ],
@@ -19334,7 +19471,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 6,
-  "cycle_group": 41,
+  "cycle_group": 46,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -19992,7 +20129,7 @@
   "overlay_needed": false,
   "fan_in": 9,
   "fan_out": 2,
-  "cycle_group": 34,
+  "cycle_group": 33,
   "imports_internal": [
     "_lazy_imports.py",
     "typing.py"
@@ -20394,7 +20531,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 4,
-  "cycle_group": 50,
+  "cycle_group": 42,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -20494,12 +20631,12 @@
       "level": 0
     },
     {
-      "module": "codeintel_rev.observability",
+      "module": null,
       "names": [
-        "metrics"
+        "codeintel_rev.observability.metrics"
       ],
       "aliases": {
-        "metrics": "retrieval_metrics"
+        "codeintel_rev.observability.metrics": "retrieval_metrics"
       },
       "is_star": false,
       "level": 0
@@ -21255,7 +21392,7 @@
     "config/settings.py",
     "evaluation/hybrid_pool.py",
     "io/duckdb_manager.py",
-    "observability/__init__.py",
+    "observability/metrics.py",
     "observability/timeline.py",
     "plugins/channels.py",
     "plugins/registry.py",
@@ -21271,7 +21408,7 @@
     "config/settings.py",
     "evaluation/hybrid_pool.py",
     "io/duckdb_manager.py",
-    "observability/__init__.py",
+    "observability/metrics.py",
     "observability/timeline.py",
     "plugins/channels.py",
     "plugins/registry.py",
@@ -21368,32 +21505,32 @@
     {
       "kind": "class",
       "name": "WarpExecutorProtocol",
-      "lineno": 18
+      "lineno": 19
     },
     {
       "kind": "variable",
       "name": "WarpExecutorFactory",
-      "lineno": 32
+      "lineno": 33
     },
     {
       "kind": "class",
       "name": "WarpUnavailableError",
-      "lineno": 35
+      "lineno": 36
     },
     {
       "kind": "class",
       "name": "WarpEngine",
-      "lineno": 39
+      "lineno": 40
     },
     {
       "kind": "function",
       "name": "_safe_int",
-      "lineno": 166
+      "lineno": 167
     },
     {
       "kind": "function",
       "name": "_safe_float",
-      "lineno": 190
+      "lineno": 191
     }
   ],
   "exports": [],
@@ -21476,7 +21613,7 @@
       "name": "WarpExecutorProtocol",
       "kind": "class",
       "public": true,
-      "lineno": 18,
+      "lineno": 19,
       "doc_summary": "Protocol describing the WARP executor search surface.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -21486,7 +21623,7 @@
       "name": "WarpUnavailableError",
       "kind": "class",
       "public": true,
-      "lineno": 35,
+      "lineno": 36,
       "doc_summary": "Raised when the WARP executor or index artifacts are missing.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -21496,7 +21633,7 @@
       "name": "WarpEngine",
       "kind": "class",
       "public": true,
-      "lineno": 39,
+      "lineno": 40,
       "doc_summary": "Encapsulates interactions with the optional ``xtr-warp`` executor.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -21506,7 +21643,7 @@
       "name": "_safe_int",
       "kind": "function",
       "public": false,
-      "lineno": 166,
+      "lineno": 167,
       "doc_summary": "Convert an object to int safely, falling back to the provided default.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -21516,7 +21653,7 @@
       "name": "_safe_float",
       "kind": "function",
       "public": false,
-      "lineno": 190,
+      "lineno": 191,
       "doc_summary": "Convert an object to float safely, falling back to the provided default.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -21538,7 +21675,7 @@
   "complexity": {
     "branches": 15,
     "cyclomatic": 16,
-    "loc": 212
+    "loc": 213
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -22568,7 +22705,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 5,
-  "cycle_group": 47,
+  "cycle_group": 44,
   "imports_internal": [
     "_lazy_imports.py",
     "metrics/registry.py",
@@ -24613,7 +24750,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 49,
+  "cycle_group": 36,
   "imports_internal": [
     "mcp_server/schemas.py",
     "observability/timeline.py",
@@ -26285,7 +26422,7 @@
   "overlay_needed": false,
   "fan_in": 9,
   "fan_out": 0,
-  "cycle_group": 42,
+  "cycle_group": 47,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.883
@@ -26966,7 +27103,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 46,
+  "cycle_group": 48,
   "imports_internal": [
     "retrieval/types.py"
   ],
@@ -27315,7 +27452,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 44,
+  "cycle_group": 50,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.645
@@ -27435,7 +27572,8 @@
       "module": "typing",
       "names": [
         "TYPE_CHECKING",
-        "Any"
+        "Any",
+        "cast"
       ],
       "aliases": {},
       "is_star": false,
@@ -27759,7 +27897,7 @@
   "complexity": {
     "branches": 28,
     "cyclomatic": 29,
-    "loc": 206
+    "loc": 205
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -27767,7 +27905,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 43,
+  "cycle_group": 49,
   "imports_internal": [
     "io/duckdb_manager.py",
     "retrieval/types.py",
@@ -27882,7 +28020,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 29,
+  "cycle_group": 27,
   "imports_internal": [
     "typing.py"
   ],
@@ -28119,7 +28257,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 37,
+  "cycle_group": 39,
   "imports_internal": [
     "typing.py"
   ],
@@ -28612,7 +28750,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 5,
-  "cycle_group": 38,
+  "cycle_group": 40,
   "imports_internal": [
     "errors.py",
     "observability/timeline.py",
@@ -28739,7 +28877,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 39,
+  "cycle_group": 41,
   "imports_internal": [
     "runtime/cells.py",
     "runtime/factory_adjustment.py"
@@ -28881,7 +29019,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 56,
+  "cycle_group": 54,
   "imports_internal": [
     "app/middleware.py",
     "observability/timeline.py"
@@ -29496,7 +29634,7 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 12,
+  "fan_in": 11,
   "fan_out": 1,
   "cycle_group": 25,
   "imports_internal": [
@@ -29507,7 +29645,7 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.81
+  "hotspot_score": 1.78
 }
 {
   "path": "mcp_server/server_semantic.py",
@@ -30227,7 +30365,7 @@
   "complexity": {
     "branches": 17,
     "cyclomatic": 18,
-    "loc": 688
+    "loc": 687
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -30235,7 +30373,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 3,
-  "cycle_group": 55,
+  "cycle_group": 57,
   "imports_internal": [
     "errors.py",
     "io/path_utils.py",
@@ -30948,7 +31086,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 6,
-  "cycle_group": 57,
+  "cycle_group": 58,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -30975,10 +31113,24 @@
   "doc_has_summary": true,
   "doc_param_parity": true,
   "doc_examples_present": false,
-  "imports": [],
+  "imports": [
+    {
+      "module": null,
+      "names": [
+        "service_context"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 1
+    }
+  ],
   "defs": [],
-  "exports": [],
-  "exports_declared": [],
+  "exports": [
+    "service_context"
+  ],
+  "exports_declared": [
+    "service_context"
+  ],
   "outline_nodes": [],
   "scip_symbols": [
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server`/__init__:"
@@ -30986,7 +31138,8 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "low-coverage"
+    "low-coverage",
+    "public-api"
   ],
   "type_errors": 0,
   "type_error_count": 0,
@@ -31012,7 +31165,7 @@
   "complexity": {
     "branches": 0,
     "cyclomatic": 1,
-    "loc": 2
+    "loc": 6
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -32126,7 +32279,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 45,
+  "cycle_group": 51,
   "imports_internal": [
     "metrics/registry.py"
   ],
@@ -33766,7 +33919,7 @@
       "level": 0
     },
     {
-      "module": "codeintel_rev.cli",
+      "module": null,
       "names": [
         "bm25",
         "indexctl",
@@ -33775,7 +33928,7 @@
       ],
       "aliases": {},
       "is_star": false,
-      "level": 0
+      "level": 1
     }
   ],
   "defs": [
@@ -38485,7 +38638,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 53,
+  "cycle_group": 55,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.194
@@ -39016,6 +39169,15 @@
       "level": 0
     },
     {
+      "module": "collections.abc",
+      "names": [
+        "Mapping"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "pathlib",
       "names": [
         "Path"
@@ -39066,6 +39228,15 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.app.scope_store",
+      "names": [
+        "ScopeIn"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.errors",
       "names": [
         "RuntimeLifecycleError"
@@ -39078,15 +39249,6 @@
       "module": "codeintel_rev.indexing.index_lifecycle",
       "names": [
         "IndexAssets"
-      ],
-      "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": "codeintel_rev.mcp_server.schemas",
-      "names": [
-        "ScopeIn"
       ],
       "aliases": {},
       "is_star": false,
@@ -39115,77 +39277,77 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 19
+      "lineno": 20
     },
     {
       "kind": "variable",
       "name": "router",
-      "lineno": 20
+      "lineno": 21
     },
     {
       "kind": "function",
       "name": "_require_admin",
-      "lineno": 25
+      "lineno": 26
     },
     {
       "kind": "function",
       "name": "_context",
-      "lineno": 31
+      "lineno": 32
     },
     {
       "kind": "function",
       "name": "_persist_session_tuning",
-      "lineno": 38
+      "lineno": 39
     },
     {
       "kind": "function",
       "name": "status_endpoint",
-      "lineno": 52
+      "lineno": 55
     },
     {
       "kind": "class",
       "name": "PublishBody",
-      "lineno": 104
+      "lineno": 107
     },
     {
       "kind": "class",
       "name": "TuningBody",
-      "lineno": 159
+      "lineno": 162
     },
     {
       "kind": "class",
       "name": "FaissRuntimeTuningBody",
-      "lineno": 208
+      "lineno": 211
     },
     {
       "kind": "function",
       "name": "publish_endpoint",
-      "lineno": 260
+      "lineno": 263
     },
     {
       "kind": "function",
       "name": "rollback_endpoint",
-      "lineno": 347
+      "lineno": 350
     },
     {
       "kind": "function",
       "name": "tuning_endpoint",
-      "lineno": 400
+      "lineno": 403
     },
     {
       "kind": "function",
       "name": "faiss_runtime_status",
-      "lineno": 456
+      "lineno": 459
     },
     {
       "kind": "function",
       "name": "faiss_runtime_tuning_endpoint",
-      "lineno": 494
+      "lineno": 497
     },
     {
       "kind": "function",
       "name": "faiss_runtime_reset_endpoint",
-      "lineno": 573
+      "lineno": 576
     }
   ],
   "exports": [
@@ -39322,7 +39484,7 @@
       "name": "_require_admin",
       "kind": "function",
       "public": false,
-      "lineno": 25,
+      "lineno": 26,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -39332,7 +39494,7 @@
       "name": "_context",
       "kind": "function",
       "public": false,
-      "lineno": 31,
+      "lineno": 32,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -39342,7 +39504,7 @@
       "name": "_persist_session_tuning",
       "kind": "function",
       "public": false,
-      "lineno": 38,
+      "lineno": 39,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -39352,7 +39514,7 @@
       "name": "status_endpoint",
       "kind": "function",
       "public": true,
-      "lineno": 52,
+      "lineno": 55,
       "doc_summary": "Return the current index version and health.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39362,7 +39524,7 @@
       "name": "PublishBody",
       "kind": "class",
       "public": true,
-      "lineno": 104,
+      "lineno": 107,
       "doc_summary": "Request body schema for index publication endpoint.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39372,7 +39534,7 @@
       "name": "TuningBody",
       "kind": "class",
       "public": true,
-      "lineno": 159,
+      "lineno": 162,
       "doc_summary": "Request body schema for runtime tuning endpoint.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39382,7 +39544,7 @@
       "name": "FaissRuntimeTuningBody",
       "kind": "class",
       "public": true,
-      "lineno": 208,
+      "lineno": 211,
       "doc_summary": "Request body schema for FAISS runtime tuning endpoint.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39392,7 +39554,7 @@
       "name": "publish_endpoint",
       "kind": "function",
       "public": true,
-      "lineno": 260,
+      "lineno": 263,
       "doc_summary": "Stage and publish a new index version, then reload runtimes.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39402,7 +39564,7 @@
       "name": "rollback_endpoint",
       "kind": "function",
       "public": true,
-      "lineno": 347,
+      "lineno": 350,
       "doc_summary": "Flip ``CURRENT`` to a previously published version.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39412,7 +39574,7 @@
       "name": "tuning_endpoint",
       "kind": "function",
       "public": true,
-      "lineno": 400,
+      "lineno": 403,
       "doc_summary": "Update runtime tuning knobs (nprobe, fusion weights, etc.).",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39422,7 +39584,7 @@
       "name": "faiss_runtime_status",
       "kind": "function",
       "public": true,
-      "lineno": 456,
+      "lineno": 459,
       "doc_summary": "Return the active FAISS runtime tuning profile.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39432,7 +39594,7 @@
       "name": "faiss_runtime_tuning_endpoint",
       "kind": "function",
       "public": true,
-      "lineno": 494,
+      "lineno": 497,
       "doc_summary": "Apply FAISS runtime tuning overrides or persist them for a specific session.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39442,7 +39604,7 @@
       "name": "faiss_runtime_reset_endpoint",
       "kind": "function",
       "public": true,
-      "lineno": 573,
+      "lineno": 576,
       "doc_summary": "Reset FAISS runtime tuning overrides globally or for a session.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -39464,7 +39626,7 @@
   "complexity": {
     "branches": 16,
     "cyclomatic": 17,
-    "loc": 623
+    "loc": 626
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -39477,17 +39639,17 @@
   "cycle_group": 120,
   "imports_internal": [
     "app/config_context.py",
+    "app/scope_store.py",
     "errors.py",
     "indexing/index_lifecycle.py",
-    "mcp_server/schemas.py",
     "runtime/factory_adjustment.py",
     "typing.py"
   ],
   "imports_intra_repo": [
     "app/config_context.py",
+    "app/scope_store.py",
     "errors.py",
     "indexing/index_lifecycle.py",
-    "mcp_server/schemas.py",
     "runtime/factory_adjustment.py",
     "typing.py"
   ],
