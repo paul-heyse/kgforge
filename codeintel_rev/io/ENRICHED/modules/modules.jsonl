@@ -15,7 +15,8 @@
       "module": "typing",
       "names": [
         "TYPE_CHECKING",
-        "Any"
+        "Any",
+        "Protocol"
       ],
       "aliases": {},
       "is_star": false,
@@ -68,16 +69,104 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "NDArrayF32",
+      "lineno": 24
+    },
+    {
+      "kind": "variable",
+      "name": "NDArrayI64",
+      "lineno": 25
+    },
+    {
+      "kind": "variable",
+      "name": "NDArrayAny",
+      "lineno": 26
+    },
+    {
+      "kind": "variable",
+      "name": "HEAVY_DEPS",
+      "lineno": 40
+    },
+    {
       "kind": "function",
       "name": "gate_import",
-      "lineno": 41
+      "lineno": 44
+    },
+    {
+      "kind": "class",
+      "name": "TorchDeviceProperties",
+      "lineno": 87
+    },
+    {
+      "kind": "class",
+      "name": "TorchCudaAPI",
+      "lineno": 93
+    },
+    {
+      "kind": "class",
+      "name": "TorchTensor",
+      "lineno": 113
+    },
+    {
+      "kind": "class",
+      "name": "TorchModule",
+      "lineno": 126
+    },
+    {
+      "kind": "class",
+      "name": "FaissStandardGpuResources",
+      "lineno": 144
+    },
+    {
+      "kind": "class",
+      "name": "FaissGpuClonerOptions",
+      "lineno": 149
+    },
+    {
+      "kind": "class",
+      "name": "FaissIndex",
+      "lineno": 157
+    },
+    {
+      "kind": "class",
+      "name": "FaissGpuIndexFlatIP",
+      "lineno": 163
+    },
+    {
+      "kind": "class",
+      "name": "FaissModule",
+      "lineno": 175
+    },
+    {
+      "kind": "class",
+      "name": "NumpyRandomState",
+      "lineno": 208
+    },
+    {
+      "kind": "class",
+      "name": "NumpyRandomNamespace",
+      "lineno": 214
+    },
+    {
+      "kind": "class",
+      "name": "NumpyLinalgNamespace",
+      "lineno": 220
+    },
+    {
+      "kind": "class",
+      "name": "NumpyModule",
+      "lineno": 226
     }
   ],
   "exports": [
+    "FaissModule",
     "HEAVY_DEPS",
     "NDArrayAny",
     "NDArrayF32",
     "NDArrayI64",
+    "NumpyModule",
+    "TorchModule",
     "gate_import"
   ],
   "outline_nodes": [],
@@ -105,14 +194,16 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 66,
+  "fan_out": 0,
+  "cycle_group": 0
 }
 {
   "path": "cli_enrich.py",
-  "docstring": "CLI entrypoint for repo enrichment and overlay generation.",
+  "docstring": "CLI entrypoint for repo enrichment and targeted overlay generation.",
   "imports": [
     {
       "module": "__future__",
@@ -128,7 +219,7 @@
       "names": [
         "Iterable",
         "Mapping",
-        "Sequence"
+        "MutableMapping"
       ],
       "aliases": {},
       "is_star": false,
@@ -184,7 +275,6 @@
     {
       "module": "codeintel_rev.enrich.libcst_bridge",
       "names": [
-        "ImportEntry",
         "index_module"
       ],
       "aliases": {},
@@ -213,8 +303,20 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.enrich.stitch",
+      "names": [
+        "stitch_records"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.enrich.stubs_overlay",
       "names": [
+        "OverlayPolicy",
+        "activate_overlays",
+        "deactivate_all",
         "generate_overlay_for_file"
       ],
       "aliases": {},
@@ -266,54 +368,194 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "yaml_module",
+      "lineno": 31
+    },
+    {
+      "kind": "variable",
+      "name": "EXPORT_HUB_THRESHOLD",
+      "lineno": 33
+    },
+    {
+      "kind": "variable",
+      "name": "ROOT",
+      "lineno": 35
+    },
+    {
+      "kind": "variable",
+      "name": "SCIP",
+      "lineno": 36
+    },
+    {
+      "kind": "variable",
+      "name": "OUT",
+      "lineno": 37
+    },
+    {
+      "kind": "variable",
+      "name": "PYREFLY",
+      "lineno": 42
+    },
+    {
+      "kind": "variable",
+      "name": "TAGS",
+      "lineno": 47
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_MIN_ERRORS",
+      "lineno": 49
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_MAX_OVERLAYS",
+      "lineno": 50
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_INCLUDE_PUBLIC_DEFS",
+      "lineno": 51
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_INJECT_GETATTR_ANY",
+      "lineno": 52
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_DRY_RUN",
+      "lineno": 53
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_ACTIVATE",
+      "lineno": 54
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_DEACTIVATE",
+      "lineno": 55
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_USE_TYPE_ERROR_OVERLAYS",
+      "lineno": 56
+    },
+    {
+      "kind": "variable",
+      "name": "STUBS",
+      "lineno": 58
+    },
+    {
+      "kind": "variable",
+      "name": "OVERLAYS_ROOT",
+      "lineno": 63
+    },
+    {
+      "kind": "variable",
+      "name": "MIN_ERRORS",
+      "lineno": 68
+    },
+    {
+      "kind": "variable",
+      "name": "MAX_OVERLAYS",
+      "lineno": 73
+    },
+    {
+      "kind": "variable",
+      "name": "INCLUDE_PUBLIC_DEFS",
+      "lineno": 78
+    },
+    {
+      "kind": "variable",
+      "name": "INJECT_GETATTR_ANY",
+      "lineno": 83
+    },
+    {
+      "kind": "variable",
+      "name": "DRY_RUN",
+      "lineno": 88
+    },
+    {
+      "kind": "variable",
+      "name": "ACTIVATE",
+      "lineno": 93
+    },
+    {
+      "kind": "variable",
+      "name": "DEACTIVATE",
+      "lineno": 98
+    },
+    {
+      "kind": "variable",
+      "name": "TYPE_ERROR_OVERLAYS",
+      "lineno": 103
+    },
+    {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 109
+    },
+    {
       "kind": "class",
       "name": "ModuleRecord",
-      "lineno": 50
+      "lineno": 113
     },
     {
       "kind": "class",
       "name": "ScipContext",
-      "lineno": 67
+      "lineno": 130
     },
     {
       "kind": "class",
       "name": "TypeSignals",
-      "lineno": 75
+      "lineno": 138
     },
     {
       "kind": "function",
       "name": "_iter_files",
-      "lineno": 82
+      "lineno": 145
     },
     {
       "kind": "function",
-      "name": "_collect_imported_modules",
-      "lineno": 125
+      "name": "scan",
+      "lineno": 153
     },
     {
       "kind": "function",
-      "name": "_max_type_errors",
-      "lineno": 170
-    },
-    {
-      "kind": "function",
-      "name": "_outline_nodes",
-      "lineno": 219
+      "name": "overlays",
+      "lineno": 208
     },
     {
       "kind": "function",
       "name": "_build_module_row",
-      "lineno": 272
+      "lineno": 321
+    },
+    {
+      "kind": "function",
+      "name": "_ensure_package_overlays",
+      "lineno": 394
+    },
+    {
+      "kind": "function",
+      "name": "_max_type_errors",
+      "lineno": 478
+    },
+    {
+      "kind": "function",
+      "name": "_normalized_rel_path",
+      "lineno": 487
     },
     {
       "kind": "function",
       "name": "_write_tag_index",
-      "lineno": 391
+      "lineno": 491
     },
     {
       "kind": "function",
-      "name": "main",
-      "lineno": 406
+      "name": "_register_type_count",
+      "lineno": 502
     }
   ],
   "exports": [],
@@ -417,10 +659,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 9,
+  "cycle_group": 9
 }
 {
   "path": "errors.py",
@@ -453,11 +697,6 @@
       "lineno": 40
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 80
-    },
-    {
       "kind": "class",
       "name": "FileReadError",
       "lineno": 95
@@ -468,19 +707,9 @@
       "lineno": 142
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 192
-    },
-    {
       "kind": "class",
       "name": "PathNotFoundError",
       "lineno": 214
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 217
     },
     {
       "kind": "class",
@@ -488,19 +717,9 @@
       "lineno": 233
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 236
-    },
-    {
       "kind": "class",
       "name": "GitOperationError",
       "lineno": 255
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 312
     },
     {
       "kind": "class",
@@ -508,19 +727,9 @@
       "lineno": 334
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 337
-    },
-    {
       "kind": "class",
       "name": "RuntimeUnavailableError",
       "lineno": 353
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 356
     }
   ],
   "exports": [
@@ -627,10 +836,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 11,
+  "fan_out": 0,
+  "cycle_group": 28
 }
 {
   "path": "__init__.py",
@@ -645,7 +856,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 96
 }
 {
   "path": "_lazy_imports.py",
@@ -693,26 +907,6 @@
       "kind": "class",
       "name": "LazyModule",
       "lineno": 11
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 16
-    },
-    {
-      "kind": "function",
-      "name": "module",
-      "lineno": 21
-    },
-    {
-      "kind": "function",
-      "name": "__getattr__",
-      "lineno": 34
-    },
-    {
-      "kind": "function",
-      "name": "__setattr__",
-      "lineno": 37
     }
   ],
   "exports": [],
@@ -739,10 +933,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 15,
+  "fan_out": 1,
+  "cycle_group": 10
 }
 {
   "path": "diagnostics/report_cli.py",
@@ -815,6 +1010,21 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "GLYPHS",
+      "lineno": 12
+    },
+    {
+      "kind": "variable",
+      "name": "STAGE_EVENT_MAP",
+      "lineno": 13
+    },
+    {
+      "kind": "variable",
+      "name": "HASH_PREVIEW_LEN",
+      "lineno": 19
+    },
+    {
       "kind": "function",
       "name": "_load_events",
       "lineno": 22
@@ -828,11 +1038,6 @@
       "kind": "function",
       "name": "_select_run_events",
       "lineno": 46
-    },
-    {
-      "kind": "function",
-      "name": "_last_ts",
-      "lineno": 51
     },
     {
       "kind": "function",
@@ -1028,10 +1233,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 1,
+  "cycle_group": 11
 }
 {
   "path": "diagnostics/__init__.py",
@@ -1056,7 +1262,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 97
 }
 {
   "path": "ops/__init__.py",
@@ -1081,7 +1290,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 98
 }
 {
   "path": "app/scope_registry.py",
@@ -1164,39 +1376,14 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 66
+    },
+    {
       "kind": "class",
       "name": "ScopeRegistry",
       "lineno": 81
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 133
-    },
-    {
-      "kind": "function",
-      "name": "set_scope",
-      "lineno": 140
-    },
-    {
-      "kind": "function",
-      "name": "get_scope",
-      "lineno": 188
-    },
-    {
-      "kind": "function",
-      "name": "clear_scope",
-      "lineno": 250
-    },
-    {
-      "kind": "function",
-      "name": "prune_expired",
-      "lineno": 293
-    },
-    {
-      "kind": "function",
-      "name": "get_session_count",
-      "lineno": 375
     }
   ],
   "exports": [
@@ -1265,10 +1452,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 2,
+  "cycle_group": 13
 }
 {
   "path": "app/middleware.py",
@@ -1380,6 +1569,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 70
+    },
+    {
       "kind": "function",
       "name": "get_session_id",
       "lineno": 73
@@ -1393,16 +1587,6 @@
       "kind": "class",
       "name": "SessionScopeMiddleware",
       "lineno": 136
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 191
-    },
-    {
-      "kind": "function",
-      "name": "dispatch",
-      "lineno": 195
     }
   ],
   "exports": [
@@ -1444,10 +1628,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 6,
+  "fan_out": 3,
+  "cycle_group": 17
 }
 {
   "path": "app/gpu_warmup.py",
@@ -1474,10 +1660,17 @@
     {
       "module": "typing",
       "names": [
-        "TYPE_CHECKING",
-        "Any",
         "SupportsInt",
         "cast"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev._lazy_imports",
+      "names": [
+        "LazyModule"
       ],
       "aliases": {},
       "is_star": false,
@@ -1496,6 +1689,9 @@
     {
       "module": "codeintel_rev.typing",
       "names": [
+        "FaissModule",
+        "NumpyModule",
+        "TorchModule",
         "gate_import"
       ],
       "aliases": {},
@@ -1510,55 +1706,43 @@
       "aliases": {},
       "is_star": false,
       "level": 0
-    },
-    {
-      "module": null,
-      "names": [
-        "faiss"
-      ],
-      "aliases": {
-        "faiss": "_faiss"
-      },
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": null,
-      "names": [
-        "torch"
-      ],
-      "aliases": {
-        "torch": "_torch"
-      },
-      "is_star": false,
-      "level": 0
     }
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 17
+    },
+    {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 25
+    },
+    {
       "kind": "function",
       "name": "_check_cuda_availability",
-      "lineno": 32
+      "lineno": 28
     },
     {
       "kind": "function",
       "name": "_check_faiss_gpu_support",
-      "lineno": 68
+      "lineno": 64
     },
     {
       "kind": "function",
       "name": "_test_torch_gpu_operations",
-      "lineno": 101
+      "lineno": 97
     },
     {
       "kind": "function",
       "name": "_test_faiss_gpu_resources",
-      "lineno": 127
+      "lineno": 123
     },
     {
       "kind": "function",
       "name": "warmup_gpu",
-      "lineno": 159
+      "lineno": 155
     }
   ],
   "exports": [
@@ -1609,10 +1793,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 3,
+  "cycle_group": 19
 }
 {
   "path": "app/config_context.py",
@@ -1878,17 +2064,6 @@
       "level": 0
     },
     {
-      "module": null,
-      "names": [
-        "asyncio"
-      ],
-      "aliases": {
-        "asyncio": "_redis_asyncio"
-      },
-      "is_star": false,
-      "level": 0
-    },
-    {
       "module": "codeintel_rev.app.scope_store",
       "names": [
         "SupportsAsyncRedis"
@@ -1918,214 +2093,104 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "HybridSearchEngine",
+      "lineno": 90
+    },
+    {
+      "kind": "variable",
+      "name": "XTRIndex",
+      "lineno": 91
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 93
+    },
+    {
       "kind": "function",
       "name": "_infer_index_root",
-      "lineno": 101
+      "lineno": 99
     },
     {
       "kind": "function",
       "name": "_build_factory_adjuster",
-      "lineno": 131
+      "lineno": 129
     },
     {
       "kind": "function",
       "name": "_assign_frozen",
-      "lineno": 167
+      "lineno": 165
     },
     {
       "kind": "function",
       "name": "_faiss_module",
-      "lineno": 172
+      "lineno": 170
     },
     {
       "kind": "function",
       "name": "_import_faiss_manager_cls",
-      "lineno": 188
+      "lineno": 186
     },
     {
       "kind": "function",
       "name": "_import_faiss_runtime_opts_cls",
-      "lineno": 200
+      "lineno": 198
     },
     {
       "kind": "function",
       "name": "_faiss_runtime_options_from_index",
-      "lineno": 212
+      "lineno": 210
     },
     {
       "kind": "function",
       "name": "_import_hybrid_engine_cls",
-      "lineno": 253
+      "lineno": 251
     },
     {
       "kind": "function",
       "name": "_import_xtr_index_cls",
-      "lineno": 270
+      "lineno": 268
     },
     {
       "kind": "function",
       "name": "_require_dependency",
-      "lineno": 287
+      "lineno": 285
     },
     {
       "kind": "function",
       "name": "_ensure_path_exists",
-      "lineno": 346
+      "lineno": 344
     },
     {
       "kind": "class",
       "name": "ResolvedPaths",
-      "lineno": 406
+      "lineno": 404
     },
     {
       "kind": "function",
       "name": "resolve_application_paths",
-      "lineno": 462
+      "lineno": 460
     },
     {
-      "kind": "function",
-      "name": "_resolve",
-      "lineno": 523
+      "kind": "variable",
+      "name": "T",
+      "lineno": 573
     },
     {
       "kind": "class",
       "name": "_FaissRuntimeState",
-      "lineno": 578
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 583
+      "lineno": 576
     },
     {
       "kind": "class",
       "name": "_ContextRuntimeState",
-      "lineno": 590
-    },
-    {
-      "kind": "function",
-      "name": "attach_observer",
-      "lineno": 602
-    },
-    {
-      "kind": "function",
-      "name": "attach_adjuster",
-      "lineno": 608
-    },
-    {
-      "kind": "function",
-      "name": "iter_cells",
-      "lineno": 614
+      "lineno": 588
     },
     {
       "kind": "class",
       "name": "ApplicationContext",
-      "lineno": 630
-    },
-    {
-      "kind": "function",
-      "name": "__post_init__",
-      "lineno": 731
-    },
-    {
-      "kind": "function",
-      "name": "create",
-      "lineno": 744
-    },
-    {
-      "kind": "function",
-      "name": "_iter_runtime_cells",
-      "lineno": 887
-    },
-    {
-      "kind": "function",
-      "name": "reload_indices",
-      "lineno": 897
-    },
-    {
-      "kind": "function",
-      "name": "_update_index_version_metrics",
-      "lineno": 915
-    },
-    {
-      "kind": "function",
-      "name": "apply_factory_adjuster",
-      "lineno": 924
-    },
-    {
-      "kind": "function",
-      "name": "get_hybrid_engine",
-      "lineno": 935
-    },
-    {
-      "kind": "function",
-      "name": "_factory",
-      "lineno": 949
-    },
-    {
-      "kind": "function",
-      "name": "get_offline_recall_evaluator",
-      "lineno": 958
-    },
-    {
-      "kind": "function",
-      "name": "get_coderank_faiss_manager",
-      "lineno": 989
-    },
-    {
-      "kind": "function",
-      "name": "_factory",
-      "lineno": 1022
-    },
-    {
-      "kind": "function",
-      "name": "get_xtr_index",
-      "lineno": 1035
-    },
-    {
-      "kind": "function",
-      "name": "_factory",
-      "lineno": 1057
-    },
-    {
-      "kind": "function",
-      "name": "_build_coderank_faiss_manager",
-      "lineno": 1082
-    },
-    {
-      "kind": "function",
-      "name": "_build_xtr_index",
-      "lineno": 1150
-    },
-    {
-      "kind": "function",
-      "name": "_build_hybrid_engine",
-      "lineno": 1186
-    },
-    {
-      "kind": "function",
-      "name": "ensure_faiss_ready",
-      "lineno": 1207
-    },
-    {
-      "kind": "function",
-      "name": "open_catalog",
-      "lineno": 1281
-    },
-    {
-      "kind": "function",
-      "name": "with_overrides",
-      "lineno": 1327
-    },
-    {
-      "kind": "function",
-      "name": "_component_value",
-      "lineno": 1394
-    },
-    {
-      "kind": "function",
-      "name": "close_all_runtimes",
-      "lineno": 1409
+      "lineno": 628
     }
   ],
   "exports": [
@@ -2395,10 +2460,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 20,
+  "fan_out": 18,
+  "cycle_group": 42
 }
 {
   "path": "app/main.py",
@@ -2669,6 +2736,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 38
+    },
+    {
       "kind": "function",
       "name": "_preload_faiss_index",
       "lineno": 41
@@ -2714,49 +2786,44 @@
       "lineno": 245
     },
     {
-      "kind": "function",
-      "name": "_handle_hup",
-      "lineno": 307
+      "kind": "variable",
+      "name": "app",
+      "lineno": 341
     },
     {
       "kind": "function",
       "name": "metrics_endpoint",
-      "lineno": 361
+      "lineno": 364
     },
     {
       "kind": "function",
       "name": "set_mcp_context",
-      "lineno": 377
+      "lineno": 380
     },
     {
       "kind": "function",
       "name": "disable_nginx_buffering",
-      "lineno": 446
+      "lineno": 449
     },
     {
       "kind": "function",
       "name": "healthz",
-      "lineno": 482
+      "lineno": 485
     },
     {
       "kind": "function",
       "name": "readyz",
-      "lineno": 494
+      "lineno": 497
     },
     {
       "kind": "function",
       "name": "capz",
-      "lineno": 529
+      "lineno": 532
     },
     {
       "kind": "function",
       "name": "sse_demo",
-      "lineno": 572
-    },
-    {
-      "kind": "function",
-      "name": "event_generator",
-      "lineno": 581
+      "lineno": 575
     }
   ],
   "exports": [
@@ -2867,10 +2934,12 @@
   "errors": [],
   "tags": [
     "fastapi",
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 12,
+  "cycle_group": 51
 }
 {
   "path": "app/scope_store.py",
@@ -2978,34 +3047,19 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "ScopeMapping",
+      "lineno": 18
+    },
+    {
+      "kind": "variable",
+      "name": "ScopeIn",
+      "lineno": 20
+    },
+    {
       "kind": "class",
       "name": "SupportsAsyncRedis",
       "lineno": 23
-    },
-    {
-      "kind": "function",
-      "name": "get",
-      "lineno": 26
-    },
-    {
-      "kind": "function",
-      "name": "setex",
-      "lineno": 29
-    },
-    {
-      "kind": "function",
-      "name": "set",
-      "lineno": 32
-    },
-    {
-      "kind": "function",
-      "name": "delete",
-      "lineno": 35
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 38
     },
     {
       "kind": "class",
@@ -3018,89 +3072,9 @@
       "lineno": 50
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 71
-    },
-    {
-      "kind": "function",
-      "name": "get",
-      "lineno": 92
-    },
-    {
-      "kind": "function",
-      "name": "set",
-      "lineno": 118
-    },
-    {
-      "kind": "function",
-      "name": "delete",
-      "lineno": 127
-    },
-    {
-      "kind": "function",
-      "name": "clear",
-      "lineno": 132
-    },
-    {
-      "kind": "function",
-      "name": "__contains__",
-      "lineno": 137
-    },
-    {
-      "kind": "function",
-      "name": "__len__",
-      "lineno": 166
-    },
-    {
-      "kind": "function",
-      "name": "items",
-      "lineno": 179
-    },
-    {
-      "kind": "function",
-      "name": "snapshot",
-      "lineno": 196
-    },
-    {
-      "kind": "function",
-      "name": "_enforce_size",
-      "lineno": 209
-    },
-    {
-      "kind": "function",
-      "name": "_purge_expired_entries",
-      "lineno": 213
-    },
-    {
-      "kind": "function",
-      "name": "_is_expired",
-      "lineno": 224
-    },
-    {
-      "kind": "function",
-      "name": "_has_expired",
-      "lineno": 229
-    },
-    {
       "kind": "class",
       "name": "AsyncSingleFlight",
       "lineno": 235
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 238
-    },
-    {
-      "kind": "function",
-      "name": "do",
-      "lineno": 242
-    },
-    {
-      "kind": "function",
-      "name": "_execute",
-      "lineno": 266
     },
     {
       "kind": "class",
@@ -3108,89 +3082,9 @@
       "lineno": 275
     },
     {
-      "kind": "function",
-      "name": "record_l1_hit",
-      "lineno": 283
-    },
-    {
-      "kind": "function",
-      "name": "record_l1_miss",
-      "lineno": 299
-    },
-    {
-      "kind": "function",
-      "name": "record_l2_hit",
-      "lineno": 315
-    },
-    {
-      "kind": "function",
-      "name": "record_l2_miss",
-      "lineno": 331
-    },
-    {
-      "kind": "function",
-      "name": "l1_hit_rate",
-      "lineno": 348
-    },
-    {
-      "kind": "function",
-      "name": "l2_hit_rate",
-      "lineno": 354
-    },
-    {
-      "kind": "function",
-      "name": "as_dict",
-      "lineno": 359
-    },
-    {
       "kind": "class",
       "name": "ScopeStore",
       "lineno": 378
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 381
-    },
-    {
-      "kind": "function",
-      "name": "metrics",
-      "lineno": 402
-    },
-    {
-      "kind": "function",
-      "name": "get",
-      "lineno": 406
-    },
-    {
-      "kind": "function",
-      "name": "set",
-      "lineno": 437
-    },
-    {
-      "kind": "function",
-      "name": "delete",
-      "lineno": 470
-    },
-    {
-      "kind": "function",
-      "name": "evict_l1",
-      "lineno": 491
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 511
-    },
-    {
-      "kind": "function",
-      "name": "_redis_key",
-      "lineno": 515
-    },
-    {
-      "kind": "function",
-      "name": "_fetch_from_l2",
-      "lineno": 518
     }
   ],
   "exports": [
@@ -3373,10 +3267,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 2,
+  "cycle_group": 30
 }
 {
   "path": "app/__init__.py",
@@ -3391,7 +3287,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 0,
+  "cycle_group": 81
 }
 {
   "path": "app/capabilities.py",
@@ -3538,6 +3437,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 24
+    },
+    {
       "kind": "function",
       "name": "_build_capability_gauge",
       "lineno": 27
@@ -3566,36 +3470,6 @@
       "kind": "class",
       "name": "Capabilities",
       "lineno": 190
-    },
-    {
-      "kind": "function",
-      "name": "has_semantic",
-      "lineno": 212
-    },
-    {
-      "kind": "function",
-      "name": "has_symbols",
-      "lineno": 223
-    },
-    {
-      "kind": "function",
-      "name": "has_reranker",
-      "lineno": 234
-    },
-    {
-      "kind": "function",
-      "name": "model_dump",
-      "lineno": 238
-    },
-    {
-      "kind": "function",
-      "name": "stamp",
-      "lineno": 278
-    },
-    {
-      "kind": "function",
-      "name": "from_context",
-      "lineno": 304
     }
   ],
   "exports": [
@@ -3701,10 +3575,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 3,
+  "cycle_group": 42
 }
 {
   "path": "app/readiness.py",
@@ -3832,99 +3708,34 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "duckdb",
+      "lineno": 61
+    },
+    {
+      "kind": "variable",
+      "name": "httpx",
+      "lineno": 62
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 64
+    },
+    {
+      "kind": "variable",
+      "name": "HTTP_HEALTH_TIMEOUT_S",
+      "lineno": 65
+    },
+    {
       "kind": "class",
       "name": "CheckResult",
       "lineno": 71
     },
     {
-      "kind": "function",
-      "name": "as_payload",
-      "lineno": 95
-    },
-    {
       "kind": "class",
       "name": "ReadinessProbe",
       "lineno": 109
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 150
-    },
-    {
-      "kind": "function",
-      "name": "initialize",
-      "lineno": 155
-    },
-    {
-      "kind": "function",
-      "name": "refresh",
-      "lineno": 168
-    },
-    {
-      "kind": "function",
-      "name": "shutdown",
-      "lineno": 196
-    },
-    {
-      "kind": "function",
-      "name": "snapshot",
-      "lineno": 209
-    },
-    {
-      "kind": "function",
-      "name": "_run_checks",
-      "lineno": 237
-    },
-    {
-      "kind": "function",
-      "name": "check_directory",
-      "lineno": 288
-    },
-    {
-      "kind": "function",
-      "name": "check_file",
-      "lineno": 326
-    },
-    {
-      "kind": "function",
-      "name": "_check_duckdb_catalog",
-      "lineno": 376
-    },
-    {
-      "kind": "function",
-      "name": "_check_xtr_artifacts",
-      "lineno": 422
-    },
-    {
-      "kind": "function",
-      "name": "_duckdb_table_exists",
-      "lineno": 445
-    },
-    {
-      "kind": "function",
-      "name": "_duckdb_index_exists",
-      "lineno": 469
-    },
-    {
-      "kind": "function",
-      "name": "_check_search_tools",
-      "lineno": 492
-    },
-    {
-      "kind": "function",
-      "name": "check_vllm_connection",
-      "lineno": 515
-    },
-    {
-      "kind": "function",
-      "name": "_check_vllm_inprocess",
-      "lineno": 528
-    },
-    {
-      "kind": "function",
-      "name": "_check_vllm_http",
-      "lineno": 553
     }
   ],
   "exports": [],
@@ -4028,10 +3839,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 3,
+  "cycle_group": 43
 }
 {
   "path": "bin/eval_offline.py",
@@ -4103,6 +3915,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 14
+    },
+    {
       "kind": "function",
       "name": "build_parser",
       "lineno": 17
@@ -4133,10 +3950,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 1,
+  "cycle_group": 52
 }
 {
   "path": "bin/eval_coverage.py",
@@ -4226,6 +4044,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 16
+    },
+    {
       "kind": "function",
       "name": "build_parser",
       "lineno": 19
@@ -4255,10 +4078,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 3,
+  "cycle_group": 54
 }
 {
   "path": "bin/index_all.py",
@@ -4474,6 +4298,26 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 58
+    },
+    {
+      "kind": "variable",
+      "name": "logger",
+      "lineno": 61
+    },
+    {
+      "kind": "variable",
+      "name": "EMBED_PREVIEW_CHARS",
+      "lineno": 63
+    },
+    {
+      "kind": "variable",
+      "name": "TRAINING_LIMIT",
+      "lineno": 64
+    },
+    {
       "kind": "class",
       "name": "PipelinePaths",
       "lineno": 68
@@ -4487,11 +4331,6 @@
       "kind": "function",
       "name": "_resolve_paths",
       "lineno": 153
-    },
-    {
-      "kind": "function",
-      "name": "_resolve",
-      "lineno": 168
     },
     {
       "kind": "function",
@@ -4552,11 +4391,6 @@
       "kind": "function",
       "name": "_write_symbols",
       "lineno": 651
-    },
-    {
-      "kind": "function",
-      "name": "_chunk_for",
-      "lineno": 661
     }
   ],
   "exports": [],
@@ -4695,10 +4529,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 12,
+  "cycle_group": 58
 }
 {
   "path": "bin/__init__.py",
@@ -4713,7 +4548,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 99
 }
 {
   "path": "config/settings.py",
@@ -4794,6 +4632,11 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "DEFAULT_RRF_WEIGHTS",
+      "lineno": 19
+    },
     {
       "kind": "class",
       "name": "_HybridChannelSettings",
@@ -4898,11 +4741,6 @@
       "kind": "class",
       "name": "IndexConfig",
       "lineno": 587
-    },
-    {
-      "kind": "function",
-      "name": "__post_init__",
-      "lineno": 653
     },
     {
       "kind": "class",
@@ -5337,11 +5175,13 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api",
     "reexport-hub"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 21,
+  "fan_out": 2,
+  "cycle_group": 27
 }
 {
   "path": "config/utils.py",
@@ -5406,10 +5246,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 1,
+  "cycle_group": 59
 }
 {
   "path": "config/__init__.py",
@@ -5424,7 +5266,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 0,
+  "cycle_group": 32
 }
 {
   "path": "indexing/scip_reader.py",
@@ -5505,6 +5350,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "RANGE_TUPLE_LENGTH",
+      "lineno": 21
+    },
+    {
       "kind": "function",
       "name": "_range_from_list",
       "lineno": 24
@@ -5553,11 +5403,6 @@
       "kind": "function",
       "name": "get_top_level_definitions",
       "lineno": 339
-    },
-    {
-      "kind": "function",
-      "name": "contains",
-      "lineno": 354
     }
   ],
   "exports": [
@@ -5632,10 +5477,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 1,
+  "cycle_group": 55
 }
 {
   "path": "indexing/xtr_build.py",
@@ -5776,6 +5623,16 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 22
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 24
+    },
+    {
       "kind": "class",
       "name": "XTRBuildSummary",
       "lineno": 28
@@ -5803,7 +5660,7 @@
     {
       "kind": "function",
       "name": "main",
-      "lineno": 330
+      "lineno": 333
     }
   ],
   "exports": [],
@@ -5874,10 +5731,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 6,
+  "cycle_group": 60
 }
 {
   "path": "indexing/index_lifecycle.py",
@@ -5987,14 +5845,14 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 34
+    },
+    {
       "kind": "class",
       "name": "LuceneAssets",
       "lineno": 39
-    },
-    {
-      "kind": "function",
-      "name": "iter_dirs",
-      "lineno": 45
     },
     {
       "kind": "function",
@@ -6007,89 +5865,14 @@
       "lineno": 72
     },
     {
-      "kind": "function",
-      "name": "ensure_exists",
-      "lineno": 82
-    },
-    {
       "kind": "class",
       "name": "VersionMeta",
       "lineno": 111
     },
     {
-      "kind": "function",
-      "name": "to_json",
-      "lineno": 118
-    },
-    {
       "kind": "class",
       "name": "IndexLifecycleManager",
       "lineno": 136
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 139
-    },
-    {
-      "kind": "function",
-      "name": "current_version",
-      "lineno": 147
-    },
-    {
-      "kind": "function",
-      "name": "current_dir",
-      "lineno": 161
-    },
-    {
-      "kind": "function",
-      "name": "list_versions",
-      "lineno": 177
-    },
-    {
-      "kind": "function",
-      "name": "read_assets",
-      "lineno": 193
-    },
-    {
-      "kind": "function",
-      "name": "prepare",
-      "lineno": 234
-    },
-    {
-      "kind": "function",
-      "name": "publish",
-      "lineno": 308
-    },
-    {
-      "kind": "function",
-      "name": "rollback",
-      "lineno": 358
-    },
-    {
-      "kind": "function",
-      "name": "link_lucene_assets",
-      "lineno": 395
-    },
-    {
-      "kind": "function",
-      "name": "_write_current_pointer",
-      "lineno": 435
-    },
-    {
-      "kind": "function",
-      "name": "_maybe_dir",
-      "lineno": 445
-    },
-    {
-      "kind": "function",
-      "name": "_copy_file",
-      "lineno": 449
-    },
-    {
-      "kind": "function",
-      "name": "_copy_tree",
-      "lineno": 454
     }
   ],
   "exports": [
@@ -6209,10 +5992,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 2,
+  "cycle_group": 39
 }
 {
   "path": "indexing/__init__.py",
@@ -6251,10 +6036,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 1,
+  "cycle_group": 61
 }
 {
   "path": "indexing/cast_chunker.py",
@@ -6339,11 +6126,6 @@
     },
     {
       "kind": "function",
-      "name": "text_length",
-      "lineno": 89
-    },
-    {
-      "kind": "function",
       "name": "_utf8_length",
       "lineno": 99
     },
@@ -6373,54 +6155,9 @@
       "lineno": 226
     },
     {
-      "kind": "function",
-      "name": "build_chunks",
-      "lineno": 236
-    },
-    {
       "kind": "class",
       "name": "_ChunkBuilder",
       "lineno": 278
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 289
-    },
-    {
-      "kind": "function",
-      "name": "add_symbol",
-      "lineno": 296
-    },
-    {
-      "kind": "function",
-      "name": "finalize",
-      "lineno": 347
-    },
-    {
-      "kind": "function",
-      "name": "_start_chunk",
-      "lineno": 376
-    },
-    {
-      "kind": "function",
-      "name": "_flush_current",
-      "lineno": 381
-    },
-    {
-      "kind": "function",
-      "name": "_append_chunk",
-      "lineno": 391
-    },
-    {
-      "kind": "function",
-      "name": "_split_large_symbol",
-      "lineno": 419
-    },
-    {
-      "kind": "function",
-      "name": "_reset",
-      "lineno": 441
     },
     {
       "kind": "function",
@@ -6441,11 +6178,6 @@
       "kind": "function",
       "name": "_apply_call_site_overlap",
       "lineno": 546
-    },
-    {
-      "kind": "function",
-      "name": "_slice_lines",
-      "lineno": 572
     }
   ],
   "exports": [
@@ -6607,10 +6339,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 2,
+  "cycle_group": 56
 }
 {
   "path": "metrics/registry.py",
@@ -6637,6 +6371,161 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "FAISS_BUILD_TOTAL",
+      "lineno": 7
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_BUILD_SECONDS_LAST",
+      "lineno": 8
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_INDEX_SIZE_VECTORS",
+      "lineno": 11
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_INDEX_CODE_SIZE_BYTES",
+      "lineno": 14
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_INDEX_DIM",
+      "lineno": 17
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_INDEX_FACTORY",
+      "lineno": 20
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_INDEX_GPU_ENABLED",
+      "lineno": 23
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_INDEX_CUVS_ENABLED",
+      "lineno": 26
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_SEARCH_TOTAL",
+      "lineno": 30
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_SEARCH_ERRORS_TOTAL",
+      "lineno": 31
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_SEARCH_LAST_MS",
+      "lineno": 34
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_SEARCH_LAST_K",
+      "lineno": 37
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_SEARCH_NPROBE",
+      "lineno": 38
+    },
+    {
+      "kind": "variable",
+      "name": "HNSW_SEARCH_EF",
+      "lineno": 41
+    },
+    {
+      "kind": "variable",
+      "name": "HYBRID_RETRIEVE_TOTAL",
+      "lineno": 44
+    },
+    {
+      "kind": "variable",
+      "name": "HYBRID_LAST_MS",
+      "lineno": 47
+    },
+    {
+      "kind": "variable",
+      "name": "RERANK_XTR_LAST_MS",
+      "lineno": 50
+    },
+    {
+      "kind": "variable",
+      "name": "RECALL_EST_AT_K",
+      "lineno": 53
+    },
+    {
+      "kind": "variable",
+      "name": "HITS_ABOVE_THRESH",
+      "lineno": 56
+    },
+    {
+      "kind": "variable",
+      "name": "POOL_SHARE_FAISS",
+      "lineno": 59
+    },
+    {
+      "kind": "variable",
+      "name": "POOL_SHARE_BM25",
+      "lineno": 62
+    },
+    {
+      "kind": "variable",
+      "name": "POOL_SHARE_SPLADE",
+      "lineno": 63
+    },
+    {
+      "kind": "variable",
+      "name": "POOL_SHARE_XTR",
+      "lineno": 66
+    },
+    {
+      "kind": "variable",
+      "name": "GPU_AVAILABLE",
+      "lineno": 69
+    },
+    {
+      "kind": "variable",
+      "name": "GPU_TEMP_SCRATCH_BYTES",
+      "lineno": 70
+    },
+    {
+      "kind": "variable",
+      "name": "FAISS_COMPILE_FLAGS_ID",
+      "lineno": 73
+    },
+    {
+      "kind": "variable",
+      "name": "OFFLINE_EVAL_RECALL_AT_K",
+      "lineno": 76
+    },
+    {
+      "kind": "variable",
+      "name": "OFFLINE_EVAL_QUERY_COUNT",
+      "lineno": 81
+    },
+    {
+      "kind": "variable",
+      "name": "SCIP_CHUNK_COVERAGE_RATIO",
+      "lineno": 84
+    },
+    {
+      "kind": "variable",
+      "name": "SCIP_INDEX_COVERAGE_RATIO",
+      "lineno": 88
+    },
+    {
+      "kind": "variable",
+      "name": "SCIP_RETRIEVAL_COVERAGE_RATIO",
+      "lineno": 92
+    },
     {
       "kind": "function",
       "name": "_stable_u32",
@@ -6737,11 +6626,13 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api",
     "reexport-hub"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 0,
+  "cycle_group": 18
 }
 {
   "path": "metrics/__init__.py",
@@ -6756,7 +6647,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 0,
+  "cycle_group": 25
 }
 {
   "path": "enrich/tree_sitter_bridge.py",
@@ -6849,22 +6743,22 @@
     {
       "kind": "class",
       "name": "OutlineNode",
-      "lineno": 58
+      "lineno": 65
     },
     {
       "kind": "class",
       "name": "TSOutline",
-      "lineno": 68
-    },
-    {
-      "kind": "function",
-      "name": "build_outline",
       "lineno": 75
     },
     {
       "kind": "function",
+      "name": "build_outline",
+      "lineno": 82
+    },
+    {
+      "kind": "function",
       "name": "_extract_identifier",
-      "lineno": 115
+      "lineno": 133
     }
   ],
   "exports": [],
@@ -6908,10 +6802,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 6
 }
 {
   "path": "enrich/scip_reader.py",
@@ -6984,47 +6879,27 @@
     {
       "kind": "class",
       "name": "Occurrence",
-      "lineno": 31
+      "lineno": 37
     },
     {
       "kind": "class",
       "name": "SymbolInfo",
-      "lineno": 40
+      "lineno": 46
     },
     {
       "kind": "class",
       "name": "Document",
-      "lineno": 50
+      "lineno": 56
     },
     {
       "kind": "class",
       "name": "SCIPIndex",
-      "lineno": 59
-    },
-    {
-      "kind": "function",
-      "name": "load",
-      "lineno": 66
-    },
-    {
-      "kind": "function",
-      "name": "by_file",
-      "lineno": 89
-    },
-    {
-      "kind": "function",
-      "name": "symbol_to_files",
-      "lineno": 99
-    },
-    {
-      "kind": "function",
-      "name": "file_symbol_kinds",
-      "lineno": 113
+      "lineno": 65
     },
     {
       "kind": "function",
       "name": "_parse_document",
-      "lineno": 129
+      "lineno": 142
     }
   ],
   "exports": [],
@@ -7080,10 +6955,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 1,
+  "cycle_group": 1
 }
 {
   "path": "enrich/output_writers.py",
@@ -7110,7 +6986,8 @@
     {
       "module": "collections.abc",
       "names": [
-        "Iterable"
+        "Iterable",
+        "Mapping"
       ],
       "aliases": {},
       "is_star": false,
@@ -7137,6 +7014,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "orjson",
+      "lineno": 13
+    },
+    {
       "kind": "function",
       "name": "_dump_json",
       "lineno": 16
@@ -7144,17 +7026,52 @@
     {
       "kind": "function",
       "name": "write_json",
-      "lineno": 32
-    },
-    {
-      "kind": "function",
-      "name": "write_jsonl",
       "lineno": 39
     },
     {
       "kind": "function",
+      "name": "write_jsonl",
+      "lineno": 46
+    },
+    {
+      "kind": "function",
+      "name": "_append_section",
+      "lineno": 56
+    },
+    {
+      "kind": "function",
+      "name": "_format_imports",
+      "lineno": 64
+    },
+    {
+      "kind": "function",
+      "name": "_format_definitions",
+      "lineno": 83
+    },
+    {
+      "kind": "function",
+      "name": "_format_graph_metrics",
+      "lineno": 99
+    },
+    {
+      "kind": "function",
+      "name": "_format_exports",
+      "lineno": 108
+    },
+    {
+      "kind": "function",
+      "name": "_format_exports_resolved",
+      "lineno": 116
+    },
+    {
+      "kind": "function",
+      "name": "_format_reexports",
+      "lineno": 126
+    },
+    {
+      "kind": "function",
       "name": "write_markdown_module",
-      "lineno": 49
+      "lineno": 140
     }
   ],
   "exports": [],
@@ -7187,10 +7104,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 0,
+  "cycle_group": 4
 }
 {
   "path": "enrich/tagging.py",
@@ -7209,6 +7127,15 @@
       "module": null,
       "names": [
         "re"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "collections.abc",
+      "names": [
+        "Mapping"
       ],
       "aliases": {},
       "is_star": false,
@@ -7256,22 +7183,22 @@
     {
       "kind": "class",
       "name": "TagResult",
-      "lineno": 15
+      "lineno": 16
     },
     {
       "kind": "class",
       "name": "ModuleTraits",
-      "lineno": 24
+      "lineno": 25
     },
     {
       "kind": "function",
       "name": "load_rules",
-      "lineno": 45
+      "lineno": 46
     },
     {
       "kind": "function",
       "name": "infer_tags",
-      "lineno": 67
+      "lineno": 76
     }
   ],
   "exports": [],
@@ -7306,10 +7233,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 8
 }
 {
   "path": "enrich/type_integration.py",
@@ -7390,32 +7318,32 @@
     {
       "kind": "function",
       "name": "_try_run",
-      "lineno": 61
+      "lineno": 74
     },
     {
       "kind": "function",
       "name": "collect_pyright",
-      "lineno": 79
+      "lineno": 104
     },
     {
       "kind": "function",
       "name": "collect_pyrefly",
-      "lineno": 110
-    },
-    {
-      "kind": "function",
-      "name": "_parse_pyrefly_jsonl",
-      "lineno": 134
-    },
-    {
-      "kind": "function",
-      "name": "_parse_pyrefly_json",
       "lineno": 143
     },
     {
       "kind": "function",
+      "name": "_parse_pyrefly_jsonl",
+      "lineno": 174
+    },
+    {
+      "kind": "function",
+      "name": "_parse_pyrefly_json",
+      "lineno": 183
+    },
+    {
+      "kind": "function",
       "name": "_apply_pyrefly_record",
-      "lineno": 150
+      "lineno": 190
     }
   ],
   "exports": [],
@@ -7474,10 +7402,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 0,
+  "cycle_group": 7
 }
 {
   "path": "enrich/libcst_bridge.py",
@@ -7585,52 +7514,22 @@
     {
       "kind": "function",
       "name": "_literal_string_values",
-      "lineno": 76
+      "lineno": 81
     },
     {
       "kind": "class",
       "name": "_IndexVisitor",
-      "lineno": 108
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 113
-    },
-    {
-      "kind": "function",
-      "name": "on_visit",
       "lineno": 119
     },
     {
       "kind": "function",
-      "name": "_handle_import",
-      "lineno": 141
-    },
-    {
-      "kind": "function",
-      "name": "_handle_import_from",
-      "lineno": 157
-    },
-    {
-      "kind": "function",
-      "name": "_handle_function_def",
-      "lineno": 186
-    },
-    {
-      "kind": "function",
-      "name": "_handle_class_def",
-      "lineno": 194
-    },
-    {
-      "kind": "function",
-      "name": "_handle_assign",
-      "lineno": 202
-    },
-    {
-      "kind": "function",
       "name": "index_module",
-      "lineno": 208
+      "lineno": 256
+    },
+    {
+      "kind": "function",
+      "name": "_lineno",
+      "lineno": 294
     }
   ],
   "exports": [],
@@ -7710,14 +7609,15 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 0,
+  "cycle_group": 3
 }
 {
-  "path": "enrich/stubs_overlay.py",
-  "docstring": "Overlay generation utilities for the enrichment CLI.",
+  "path": "enrich/stitch.py",
+  "docstring": "Stitch LibCST + SCIP + tagging outputs into enriched module records.",
   "imports": [
     {
       "module": "__future__",
@@ -7729,10 +7629,196 @@
       "level": 0
     },
     {
+      "module": "collections",
+      "names": [
+        "defaultdict"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "collections.abc",
       "names": [
         "Iterable",
         "Mapping"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "dataclasses",
+      "names": [
+        "dataclass"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "pathlib",
+      "names": [
+        "Path"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "typing",
+      "names": [
+        "Any"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev.enrich.scip_reader",
+      "names": [
+        "SCIPIndex"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    }
+  ],
+  "defs": [
+    {
+      "kind": "function",
+      "name": "_module_name_from_path",
+      "lineno": 17
+    },
+    {
+      "kind": "function",
+      "name": "_package_root",
+      "lineno": 32
+    },
+    {
+      "kind": "function",
+      "name": "_candidate_init_path",
+      "lineno": 37
+    },
+    {
+      "kind": "function",
+      "name": "_public_names_from_row",
+      "lineno": 41
+    },
+    {
+      "kind": "function",
+      "name": "_resolve_absolute_module",
+      "lineno": 56
+    },
+    {
+      "kind": "function",
+      "name": "_possible_module_names",
+      "lineno": 68
+    },
+    {
+      "kind": "function",
+      "name": "_target_path",
+      "lineno": 77
+    },
+    {
+      "kind": "function",
+      "name": "_import_targets",
+      "lineno": 94
+    },
+    {
+      "kind": "class",
+      "name": "_Graph",
+      "lineno": 122
+    },
+    {
+      "kind": "class",
+      "name": "_GraphContext",
+      "lineno": 128
+    },
+    {
+      "kind": "function",
+      "name": "_build_import_graph",
+      "lineno": 137
+    },
+    {
+      "kind": "function",
+      "name": "_process_imports_for_row",
+      "lineno": 155
+    },
+    {
+      "kind": "function",
+      "name": "_add_edges",
+      "lineno": 171
+    },
+    {
+      "kind": "function",
+      "name": "_module_rows_by_name",
+      "lineno": 189
+    },
+    {
+      "kind": "function",
+      "name": "_tarjan_scc",
+      "lineno": 205
+    },
+    {
+      "kind": "function",
+      "name": "_module_rows_by_name",
+      "lineno": 244
+    },
+    {
+      "kind": "function",
+      "name": "_resolve_star_imports",
+      "lineno": 263
+    },
+    {
+      "kind": "function",
+      "name": "stitch_records",
+      "lineno": 296
+    }
+  ],
+  "exports": [
+    "stitch_records"
+  ],
+  "outline_nodes": [],
+  "scip_symbols": [],
+  "parse_ok": true,
+  "errors": [],
+  "tags": [
+    "public-api"
+  ],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 2,
+  "cycle_group": 2
+}
+{
+  "path": "enrich/stubs_overlay.py",
+  "docstring": "Targeted overlay generation with opt-in activation.",
+  "imports": [
+    {
+      "module": "__future__",
+      "names": [
+        "annotations"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": null,
+      "names": [
+        "platform"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "collections.abc",
+      "names": [
+        "Mapping",
+        "MutableMapping",
+        "Sequence"
       ],
       "aliases": {},
       "is_star": false,
@@ -7780,7 +7866,6 @@
     {
       "module": "codeintel_rev.enrich.scip_reader",
       "names": [
-        "Document",
         "SCIPIndex"
       ],
       "aliases": {},
@@ -7791,78 +7876,78 @@
   "defs": [
     {
       "kind": "class",
+      "name": "OverlayPolicy",
+      "lineno": 17
+    },
+    {
+      "kind": "class",
       "name": "OverlayResult",
-      "lineno": 16
+      "lineno": 31
     },
     {
       "kind": "function",
       "name": "generate_overlay_for_file",
-      "lineno": 24
+      "lineno": 40
     },
     {
       "kind": "function",
-      "name": "_infer_repo_root",
-      "lineno": 123
+      "name": "activate_overlays",
+      "lineno": 157
     },
     {
       "kind": "function",
-      "name": "_safe_relative",
-      "lineno": 130
+      "name": "deactivate_all",
+      "lineno": 206
     },
     {
       "kind": "function",
-      "name": "_module_name_from_path",
-      "lineno": 137
-    },
-    {
-      "kind": "function",
-      "name": "_collect_star_reexports",
-      "lineno": 149
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_target_module",
-      "lineno": 172
-    },
-    {
-      "kind": "function",
-      "name": "_names_from_scip",
-      "lineno": 185
-    },
-    {
-      "kind": "function",
-      "name": "_candidate_file_paths_for_module",
-      "lineno": 209
-    },
-    {
-      "kind": "function",
-      "name": "_simple_name_from_scip_symbol",
-      "lineno": 233
-    },
-    {
-      "kind": "function",
-      "name": "_is_private",
+      "name": "_overlay_path",
       "lineno": 244
     },
     {
       "kind": "function",
-      "name": "_is_public_def",
-      "lineno": 248
+      "name": "_normalized_module_key",
+      "lineno": 267
     },
     {
       "kind": "function",
-      "name": "_pyi_header",
-      "lineno": 252
+      "name": "_module_name_from_path",
+      "lineno": 287
+    },
+    {
+      "kind": "function",
+      "name": "_collect_star_reexports",
+      "lineno": 308
+    },
+    {
+      "kind": "function",
+      "name": "_extract_simple_name",
+      "lineno": 336
     },
     {
       "kind": "function",
       "name": "_build_overlay_text",
-      "lineno": 262
+      "lineno": 363
     },
     {
       "kind": "function",
-      "name": "_write_sidecar",
-      "lineno": 298
+      "name": "_render_star_exports",
+      "lineno": 422
+    },
+    {
+      "kind": "function",
+      "name": "_render_public_defs",
+      "lineno": 444
+    },
+    {
+      "kind": "function",
+      "name": "_collect_import_reexports",
+      "lineno": 473
+    },
+    {
+      "kind": "function",
+      "name": "_is_windows",
+      "lineno": 504
     }
   ],
   "exports": [],
@@ -7971,10 +8056,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 3,
+  "cycle_group": 5
 }
 {
   "path": "enrich/__init__.py",
@@ -7989,7 +8075,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 100
 }
 {
   "path": "observability/runtime_observer.py",
@@ -8032,36 +8121,6 @@
       "kind": "class",
       "name": "TimelineRuntimeObserver",
       "lineno": 14
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 19
-    },
-    {
-      "kind": "function",
-      "name": "_timeline",
-      "lineno": 22
-    },
-    {
-      "kind": "function",
-      "name": "on_init_start",
-      "lineno": 27
-    },
-    {
-      "kind": "function",
-      "name": "on_init_end",
-      "lineno": 45
-    },
-    {
-      "kind": "function",
-      "name": "on_close_end",
-      "lineno": 76
-    },
-    {
-      "kind": "function",
-      "name": "record_decision",
-      "lineno": 90
     }
   ],
   "exports": [],
@@ -8104,10 +8163,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 2,
+  "cycle_group": 44
 }
 {
   "path": "observability/metrics.py",
@@ -8144,6 +8204,66 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "QUERIES_TOTAL",
+      "lineno": 32
+    },
+    {
+      "kind": "variable",
+      "name": "QUERY_ERRORS_TOTAL",
+      "lineno": 38
+    },
+    {
+      "kind": "variable",
+      "name": "RRF_DURATION_SECONDS",
+      "lineno": 44
+    },
+    {
+      "kind": "variable",
+      "name": "CHANNEL_LATENCY_SECONDS",
+      "lineno": 51
+    },
+    {
+      "kind": "variable",
+      "name": "INDEX_VERSION_INFO",
+      "lineno": 59
+    },
+    {
+      "kind": "variable",
+      "name": "RRF_K",
+      "lineno": 65
+    },
+    {
+      "kind": "variable",
+      "name": "BUDGET_DEPTH",
+      "lineno": 70
+    },
+    {
+      "kind": "variable",
+      "name": "QUERY_AMBIGUITY",
+      "lineno": 76
+    },
+    {
+      "kind": "variable",
+      "name": "DEBUG_BUNDLE_TOTAL",
+      "lineno": 82
+    },
+    {
+      "kind": "variable",
+      "name": "RESULTS_TOTAL",
+      "lineno": 87
+    },
+    {
+      "kind": "variable",
+      "name": "RECENCY_BOOSTED_TOTAL",
+      "lineno": 92
+    },
+    {
+      "kind": "variable",
+      "name": "RECALL_AT_K",
+      "lineno": 97
+    },
     {
       "kind": "function",
       "name": "observe_budget_depths",
@@ -8218,11 +8338,13 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api",
     "reexport-hub"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 101
 }
 {
   "path": "observability/otel.py",
@@ -8322,14 +8444,19 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 16
+    },
+    {
+      "kind": "variable",
+      "name": "SpanAttribute",
+      "lineno": 18
+    },
+    {
       "kind": "class",
       "name": "_TelemetryState",
       "lineno": 21
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 26
     },
     {
       "kind": "class",
@@ -8478,10 +8605,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 4,
+  "fan_out": 1,
+  "cycle_group": 14
 }
 {
   "path": "observability/__init__.py",
@@ -8524,10 +8653,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 1,
+  "cycle_group": 29
 }
 {
   "path": "observability/timeline.py",
@@ -8694,6 +8825,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 23
+    },
+    {
       "kind": "function",
       "name": "_env_float",
       "lineno": 32
@@ -8725,26 +8861,6 @@
     },
     {
       "kind": "function",
-      "name": "should_sample",
-      "lineno": 78
-    },
-    {
-      "kind": "function",
-      "name": "_current_file",
-      "lineno": 123
-    },
-    {
-      "kind": "function",
-      "name": "_rotate_if_needed",
-      "lineno": 128
-    },
-    {
-      "kind": "function",
-      "name": "write",
-      "lineno": 140
-    },
-    {
-      "kind": "function",
       "name": "_scrub_value",
       "lineno": 180
     },
@@ -8759,39 +8875,9 @@
       "lineno": 206
     },
     {
-      "kind": "function",
-      "name": "event",
-      "lineno": 213
-    },
-    {
-      "kind": "function",
-      "name": "operation",
-      "lineno": 247
-    },
-    {
-      "kind": "function",
-      "name": "step",
-      "lineno": 280
-    },
-    {
       "kind": "class",
       "name": "_TimelineScope",
       "lineno": 315
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 320
-    },
-    {
-      "kind": "function",
-      "name": "__enter__",
-      "lineno": 332
-    },
-    {
-      "kind": "function",
-      "name": "__exit__",
-      "lineno": 343
     },
     {
       "kind": "function",
@@ -8938,10 +9024,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 11,
+  "fan_out": 2,
+  "cycle_group": 15
 }
 {
   "path": "io/rrf.py",
@@ -9067,10 +9155,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 3,
+  "cycle_group": 64
 }
 {
   "path": "io/path_utils.py",
@@ -9123,10 +9213,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 0,
+  "cycle_group": 45
 }
 {
   "path": "io/coderank_embedder.py",
@@ -9223,64 +9314,29 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 17
+    },
+    {
+      "kind": "variable",
+      "name": "SentenceTransformer",
+      "lineno": 18
+    },
+    {
       "kind": "class",
       "name": "SupportsCodeRankSettings",
       "lineno": 21
     },
     {
-      "kind": "function",
-      "name": "model_id",
-      "lineno": 25
-    },
-    {
-      "kind": "function",
-      "name": "device",
-      "lineno": 30
-    },
-    {
-      "kind": "function",
-      "name": "trust_remote_code",
-      "lineno": 35
-    },
-    {
-      "kind": "function",
-      "name": "query_prefix",
-      "lineno": 40
-    },
-    {
-      "kind": "function",
-      "name": "normalize",
-      "lineno": 45
-    },
-    {
-      "kind": "function",
-      "name": "batch_size",
-      "lineno": 50
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 55
     },
     {
       "kind": "class",
       "name": "CodeRankEmbedder",
       "lineno": 58
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 69
-    },
-    {
-      "kind": "function",
-      "name": "encode_queries",
-      "lineno": 77
-    },
-    {
-      "kind": "function",
-      "name": "encode_codes",
-      "lineno": 108
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_model",
-      "lineno": 139
     }
   ],
   "exports": [],
@@ -9353,10 +9409,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 2,
+  "cycle_group": 65
 }
 {
   "path": "io/vllm_engine.py",
@@ -9545,59 +9602,44 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 28
+    },
+    {
+      "kind": "variable",
+      "name": "transformers",
+      "lineno": 29
+    },
+    {
+      "kind": "variable",
+      "name": "vllm",
+      "lineno": 30
+    },
+    {
+      "kind": "variable",
+      "name": "vllm_config",
+      "lineno": 31
+    },
+    {
+      "kind": "variable",
+      "name": "vllm_inputs",
+      "lineno": 32
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 34
+    },
+    {
       "kind": "class",
       "name": "_InprocessVLLMRuntime",
       "lineno": 37
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 42
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 46
-    },
-    {
       "kind": "class",
       "name": "InprocessVLLMEmbedder",
       "lineno": 60
-    },
-    {
-      "kind": "function",
-      "name": "__post_init__",
-      "lineno": 96
-    },
-    {
-      "kind": "function",
-      "name": "embed_batch",
-      "lineno": 108
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 164
-    },
-    {
-      "kind": "function",
-      "name": "_load_tokenizer",
-      "lineno": 168
-    },
-    {
-      "kind": "function",
-      "name": "_load_engine",
-      "lineno": 175
-    },
-    {
-      "kind": "function",
-      "name": "_initialize_runtime",
-      "lineno": 191
-    },
-    {
-      "kind": "function",
-      "name": "_runtime",
-      "lineno": 205
     }
   ],
   "exports": [
@@ -9686,10 +9728,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 5,
+  "cycle_group": 35
 }
 {
   "path": "io/symbol_catalog.py",
@@ -9748,36 +9792,6 @@
       "kind": "class",
       "name": "SymbolCatalog",
       "lineno": 45
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 48
-    },
-    {
-      "kind": "function",
-      "name": "ensure_schema",
-      "lineno": 51
-    },
-    {
-      "kind": "function",
-      "name": "upsert_symbol_defs",
-      "lineno": 125
-    },
-    {
-      "kind": "function",
-      "name": "bulk_insert_occurrences",
-      "lineno": 168
-    },
-    {
-      "kind": "function",
-      "name": "bulk_insert_chunk_symbols",
-      "lineno": 176
-    },
-    {
-      "kind": "function",
-      "name": "fetch_symbol_defs",
-      "lineno": 188
     }
   ],
   "exports": [],
@@ -9844,10 +9858,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 1,
+  "cycle_group": 38
 }
 {
   "path": "io/splade_manager.py",
@@ -10078,34 +10093,9 @@
       "lineno": 30
     },
     {
-      "kind": "function",
-      "name": "encode_document",
-      "lineno": 53
-    },
-    {
-      "kind": "function",
-      "name": "encode_query",
-      "lineno": 86
-    },
-    {
-      "kind": "function",
-      "name": "decode",
-      "lineno": 117
-    },
-    {
-      "kind": "function",
-      "name": "save_pretrained",
-      "lineno": 161
-    },
-    {
       "kind": "class",
       "name": "_OptimizerFunction",
       "lineno": 190
-    },
-    {
-      "kind": "function",
-      "name": "__call__",
-      "lineno": 191
     },
     {
       "kind": "class",
@@ -10113,9 +10103,29 @@
       "lineno": 201
     },
     {
-      "kind": "function",
-      "name": "__call__",
-      "lineno": 202
+      "kind": "variable",
+      "name": "GENERATOR_NAME",
+      "lineno": 230
+    },
+    {
+      "kind": "variable",
+      "name": "ARTIFACT_METADATA_FILENAME",
+      "lineno": 231
+    },
+    {
+      "kind": "variable",
+      "name": "ENCODING_METADATA_FILENAME",
+      "lineno": 232
+    },
+    {
+      "kind": "variable",
+      "name": "INDEX_METADATA_FILENAME",
+      "lineno": 233
+    },
+    {
+      "kind": "variable",
+      "name": "logger",
+      "lineno": 238
     },
     {
       "kind": "class",
@@ -10263,89 +10273,14 @@
       "lineno": 921
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 924
-    },
-    {
-      "kind": "function",
-      "name": "model_dir",
-      "lineno": 931
-    },
-    {
-      "kind": "function",
-      "name": "onnx_dir",
-      "lineno": 942
-    },
-    {
-      "kind": "function",
-      "name": "export_onnx",
-      "lineno": 952
-    },
-    {
       "kind": "class",
       "name": "SpladeEncoderService",
       "lineno": 1006
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 1009
-    },
-    {
-      "kind": "function",
-      "name": "vectors_dir",
-      "lineno": 1016
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_vectors_dir",
-      "lineno": 1026
-    },
-    {
-      "kind": "function",
-      "name": "_initialise_encoder",
-      "lineno": 1056
-    },
-    {
-      "kind": "function",
-      "name": "_build_encoder",
-      "lineno": 1124
-    },
-    {
-      "kind": "function",
-      "name": "encode_corpus",
-      "lineno": 1128
-    },
-    {
-      "kind": "function",
-      "name": "benchmark_queries",
-      "lineno": 1201
-    },
-    {
       "kind": "class",
       "name": "SpladeIndexManager",
       "lineno": 1287
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 1290
-    },
-    {
-      "kind": "function",
-      "name": "vectors_dir",
-      "lineno": 1297
-    },
-    {
-      "kind": "function",
-      "name": "index_dir",
-      "lineno": 1308
-    },
-    {
-      "kind": "function",
-      "name": "build_index",
-      "lineno": 1318
     }
   ],
   "exports": [
@@ -10724,11 +10659,13 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api",
     "reexport-hub"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 3,
+  "cycle_group": 66
 }
 {
   "path": "io/vllm_client.py",
@@ -10872,17 +10809,6 @@
       "level": 0
     },
     {
-      "module": null,
-      "names": [
-        "numpy"
-      ],
-      "aliases": {
-        "numpy": "np"
-      },
-      "is_star": false,
-      "level": 0
-    },
-    {
       "module": "codeintel_rev.config.settings",
       "names": [
         "VLLMConfig"
@@ -10903,94 +10829,39 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "httpx",
+      "lineno": 31
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 33
+    },
+    {
       "kind": "function",
       "name": "_get_numpy",
-      "lineno": 38
+      "lineno": 37
     },
     {
       "kind": "class",
       "name": "EmbeddingRequest",
-      "lineno": 74
+      "lineno": 73
     },
     {
       "kind": "class",
       "name": "EmbeddingData",
-      "lineno": 102
+      "lineno": 101
     },
     {
       "kind": "class",
       "name": "EmbeddingResponse",
-      "lineno": 127
+      "lineno": 126
     },
     {
       "kind": "class",
       "name": "VLLMClient",
-      "lineno": 158
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 209
-    },
-    {
-      "kind": "function",
-      "name": "_initialize_local_engine",
-      "lineno": 224
-    },
-    {
-      "kind": "function",
-      "name": "_initialize_http_client",
-      "lineno": 233
-    },
-    {
-      "kind": "function",
-      "name": "embed_batch",
-      "lineno": 252
-    },
-    {
-      "kind": "function",
-      "name": "_embed_batch_http",
-      "lineno": 361
-    },
-    {
-      "kind": "function",
-      "name": "embed_single",
-      "lineno": 388
-    },
-    {
-      "kind": "function",
-      "name": "embed_chunks",
-      "lineno": 412
-    },
-    {
-      "kind": "function",
-      "name": "embed_batch_async",
-      "lineno": 465
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 545
-    },
-    {
-      "kind": "function",
-      "name": "aclose",
-      "lineno": 569
-    },
-    {
-      "kind": "function",
-      "name": "_embed_batch_async_local",
-      "lineno": 582
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_async_http_client",
-      "lineno": 593
-    },
-    {
-      "kind": "function",
-      "name": "_require_http_client",
-      "lineno": 611
+      "lineno": 157
     }
   ],
   "exports": [
@@ -11128,10 +10999,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 4,
+  "fan_out": 6,
+  "cycle_group": 36
 }
 {
   "path": "io/parquet_store.py",
@@ -11246,6 +11119,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 26
+    },
+    {
       "kind": "function",
       "name": "get_chunks_schema",
       "lineno": 29
@@ -11342,10 +11220,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 3,
+  "cycle_group": 57
 }
 {
   "path": "io/duckdb_manager.py",
@@ -11449,6 +11329,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "duckdb",
+      "lineno": 18
+    },
+    {
       "kind": "class",
       "name": "DuckDBConfig",
       "lineno": 24
@@ -11459,51 +11344,6 @@
       "lineno": 52
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 64
-    },
-    {
-      "kind": "function",
-      "name": "connection",
-      "lineno": 76
-    },
-    {
-      "kind": "function",
-      "name": "config",
-      "lineno": 98
-    },
-    {
-      "kind": "function",
-      "name": "connections_created",
-      "lineno": 103
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 110
-    },
-    {
-      "kind": "function",
-      "name": "__del__",
-      "lineno": 125
-    },
-    {
-      "kind": "function",
-      "name": "_create_connection",
-      "lineno": 130
-    },
-    {
-      "kind": "function",
-      "name": "_acquire_connection",
-      "lineno": 137
-    },
-    {
-      "kind": "function",
-      "name": "_release_connection",
-      "lineno": 157
-    },
-    {
       "kind": "class",
       "name": "DuckDBQueryOptions",
       "lineno": 172
@@ -11512,26 +11352,6 @@
       "kind": "class",
       "name": "DuckDBQueryBuilder",
       "lineno": 182
-    },
-    {
-      "kind": "function",
-      "name": "build_filter_query",
-      "lineno": 185
-    },
-    {
-      "kind": "function",
-      "name": "_build_where_clauses",
-      "lineno": 275
-    },
-    {
-      "kind": "function",
-      "name": "_glob_to_like",
-      "lineno": 324
-    },
-    {
-      "kind": "function",
-      "name": "_escape_like_wildcards",
-      "lineno": 345
     }
   ],
   "exports": [
@@ -11634,10 +11454,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 9,
+  "fan_out": 2,
+  "cycle_group": 21
 }
 {
   "path": "io/xtr_manager.py",
@@ -11695,7 +11517,6 @@
         "TYPE_CHECKING",
         "Any",
         "Literal",
-        "Protocol",
         "TypedDict",
         "cast"
       ],
@@ -11734,6 +11555,7 @@
       "module": "codeintel_rev.typing",
       "names": [
         "NDArrayF32",
+        "TorchModule",
         "gate_import"
       ],
       "aliases": {},
@@ -11763,6 +11585,16 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 20
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 22
+    },
+    {
       "kind": "class",
       "name": "XTRMetadata",
       "lineno": 25
@@ -11773,119 +11605,9 @@
       "lineno": 37
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 42
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 50
-    },
-    {
       "kind": "class",
       "name": "XTRIndex",
       "lineno": 61
-    },
-    {
-      "kind": "function",
-      "name": "open",
-      "lineno": 72
-    },
-    {
-      "kind": "function",
-      "name": "ready",
-      "lineno": 127
-    },
-    {
-      "kind": "function",
-      "name": "metadata",
-      "lineno": 138
-    },
-    {
-      "kind": "function",
-      "name": "encode_query_tokens",
-      "lineno": 151
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 193
-    },
-    {
-      "kind": "function",
-      "name": "rescore",
-      "lineno": 269
-    },
-    {
-      "kind": "function",
-      "name": "score_candidates",
-      "lineno": 343
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_encoder",
-      "lineno": 423
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_device",
-      "lineno": 447
-    },
-    {
-      "kind": "function",
-      "name": "_parse_cuda_ordinal",
-      "lineno": 508
-    },
-    {
-      "kind": "function",
-      "name": "_slice_chunk",
-      "lineno": 547
-    },
-    {
-      "kind": "function",
-      "name": "_build_chunk_lookup",
-      "lineno": 585
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 608
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_state",
-      "lineno": 612
-    },
-    {
-      "kind": "function",
-      "name": "_current_state",
-      "lineno": 615
-    },
-    {
-      "kind": "class",
-      "name": "TorchDeviceModule",
-      "lineno": 619
-    },
-    {
-      "kind": "class",
-      "name": "_CudaAPI",
-      "lineno": 622
-    },
-    {
-      "kind": "function",
-      "name": "is_available",
-      "lineno": 646
-    },
-    {
-      "kind": "function",
-      "name": "device_count",
-      "lineno": 657
-    },
-    {
-      "kind": "function",
-      "name": "device",
-      "lineno": 670
     }
   ],
   "exports": [],
@@ -12058,10 +11780,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 6,
+  "fan_out": 4,
+  "cycle_group": 40
 }
 {
   "path": "io/hybrid_search.py",
@@ -12276,6 +11999,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 39
+    },
+    {
       "kind": "class",
       "name": "_LuceneHit",
       "lineno": 42
@@ -12284,21 +12012,6 @@
       "kind": "class",
       "name": "_LuceneSearcher",
       "lineno": 47
-    },
-    {
-      "kind": "function",
-      "name": "set_bm25",
-      "lineno": 48
-    },
-    {
-      "kind": "function",
-      "name": "set_rm3",
-      "lineno": 52
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 56
     },
     {
       "kind": "class",
@@ -12311,54 +12024,9 @@
       "lineno": 71
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 74
-    },
-    {
-      "kind": "function",
-      "name": "_create_searcher",
-      "lineno": 99
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_rm3_searcher",
-      "lineno": 107
-    },
-    {
-      "kind": "function",
-      "name": "_should_use_rm3",
-      "lineno": 123
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 132
-    },
-    {
       "kind": "class",
       "name": "SpladeSearchProvider",
       "lineno": 161
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 200
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 236
-    },
-    {
-      "kind": "function",
-      "name": "_filter_pairs",
-      "lineno": 277
-    },
-    {
-      "kind": "function",
-      "name": "_build_bow",
-      "lineno": 290
     },
     {
       "kind": "class",
@@ -12389,161 +12057,6 @@
       "kind": "class",
       "name": "HybridSearchEngine",
       "lineno": 363
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 366
-    },
-    {
-      "kind": "function",
-      "name": "_make_stage_gate_config",
-      "lineno": 392
-    },
-    {
-      "kind": "function",
-      "name": "_recency_config",
-      "lineno": 423
-    },
-    {
-      "kind": "function",
-      "name": "_profile_query",
-      "lineno": 432
-    },
-    {
-      "kind": "function",
-      "name": "_rrf_fuse",
-      "lineno": 451
-    },
-    {
-      "kind": "function",
-      "name": "_build_debug_bundle",
-      "lineno": 471
-    },
-    {
-      "kind": "function",
-      "name": "_fuse_runs",
-      "lineno": 487
-    },
-    {
-      "kind": "function",
-      "name": "_apply_extra_channels",
-      "lineno": 528
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_active_channels",
-      "lineno": 541
-    },
-    {
-      "kind": "function",
-      "name": "_record_fusion_start",
-      "lineno": 545
-    },
-    {
-      "kind": "function",
-      "name": "_execute_fusion",
-      "lineno": 563
-    },
-    {
-      "kind": "function",
-      "name": "_run_rrf",
-      "lineno": 612
-    },
-    {
-      "kind": "function",
-      "name": "_run_pool",
-      "lineno": 635
-    },
-    {
-      "kind": "function",
-      "name": "_apply_recency_boost_if_needed",
-      "lineno": 663
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 676
-    },
-    {
-      "kind": "function",
-      "name": "_gather_channel_hits",
-      "lineno": 726
-    },
-    {
-      "kind": "function",
-      "name": "_channel_disabled_reason",
-      "lineno": 798
-    },
-    {
-      "kind": "function",
-      "name": "_missing_capabilities",
-      "lineno": 809
-    },
-    {
-      "kind": "function",
-      "name": "_collect_channel_hits",
-      "lineno": 818
-    },
-    {
-      "kind": "function",
-      "name": "_emit_channel_skip",
-      "lineno": 865
-    },
-    {
-      "kind": "function",
-      "name": "_emit_channel_run",
-      "lineno": 875
-    },
-    {
-      "kind": "function",
-      "name": "resolve_path",
-      "lineno": 888
-    },
-    {
-      "kind": "function",
-      "name": "_build_semantic_channel_hits",
-      "lineno": 907
-    },
-    {
-      "kind": "function",
-      "name": "_compute_pool_weights",
-      "lineno": 919
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_pool_weights",
-      "lineno": 931
-    },
-    {
-      "kind": "function",
-      "name": "_make_pooler",
-      "lineno": 944
-    },
-    {
-      "kind": "function",
-      "name": "_select_pooler",
-      "lineno": 954
-    },
-    {
-      "kind": "function",
-      "name": "_method_stats",
-      "lineno": 967
-    },
-    {
-      "kind": "function",
-      "name": "_flatten_hits_for_pool",
-      "lineno": 982
-    },
-    {
-      "kind": "function",
-      "name": "_build_contribution_map",
-      "lineno": 997
-    },
-    {
-      "kind": "function",
-      "name": "_compose_method_metadata",
-      "lineno": 1006
     }
   ],
   "exports": [
@@ -12951,10 +12464,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 15,
+  "cycle_group": 42
 }
 {
   "path": "io/warp_engine.py",
@@ -13029,14 +12544,19 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 15
+    },
+    {
       "kind": "class",
       "name": "WarpExecutorProtocol",
       "lineno": 18
     },
     {
-      "kind": "function",
-      "name": "search",
-      "lineno": 21
+      "kind": "variable",
+      "name": "WarpExecutorFactory",
+      "lineno": 32
     },
     {
       "kind": "class",
@@ -13047,31 +12567,6 @@
       "kind": "class",
       "name": "WarpEngine",
       "lineno": 39
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 42
-    },
-    {
-      "kind": "function",
-      "name": "rerank",
-      "lineno": 51
-    },
-    {
-      "kind": "function",
-      "name": "_load_executor_cls",
-      "lineno": 109
-    },
-    {
-      "kind": "function",
-      "name": "_import_warp_executor_module",
-      "lineno": 130
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_executor",
-      "lineno": 135
     },
     {
       "kind": "function",
@@ -13147,10 +12642,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 67
 }
 {
   "path": "io/faiss_manager.py",
@@ -13364,24 +12860,29 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 49
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 51
+    },
+    {
+      "kind": "variable",
+      "name": "logger",
+      "lineno": 52
+    },
+    {
       "kind": "class",
       "name": "_LazyFaissProxy",
       "lineno": 55
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 60
-    },
-    {
-      "kind": "function",
-      "name": "module",
-      "lineno": 63
-    },
-    {
-      "kind": "function",
-      "name": "__getattr__",
-      "lineno": 76
+      "kind": "variable",
+      "name": "faiss",
+      "lineno": 99
     },
     {
       "kind": "function",
@@ -13425,288 +12926,18 @@
     },
     {
       "kind": "function",
-      "name": "__init__",
-      "lineno": 259
-    },
-    {
-      "kind": "function",
-      "name": "build_index",
-      "lineno": 307
-    },
-    {
-      "kind": "function",
-      "name": "estimate_memory_usage",
-      "lineno": 392
-    },
-    {
-      "kind": "function",
-      "name": "add_vectors",
-      "lineno": 456
-    },
-    {
-      "kind": "function",
-      "name": "update_index",
-      "lineno": 494
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_secondary_index",
-      "lineno": 562
-    },
-    {
-      "kind": "function",
-      "name": "_build_primary_contains",
-      "lineno": 574
-    },
-    {
-      "kind": "function",
-      "name": "_wrap_bool_contains",
-      "lineno": 597
-    },
-    {
-      "kind": "function",
-      "name": "contains",
-      "lineno": 630
-    },
-    {
-      "kind": "function",
-      "name": "_wrap_index_contains",
-      "lineno": 652
-    },
-    {
-      "kind": "function",
-      "name": "contains",
-      "lineno": 684
-    },
-    {
-      "kind": "function",
-      "name": "_build_existing_ids_set",
-      "lineno": 709
-    },
-    {
-      "kind": "function",
-      "name": "_collect_unique_indices",
-      "lineno": 726
-    },
-    {
-      "kind": "function",
-      "name": "_log_secondary_added",
-      "lineno": 746
-    },
-    {
-      "kind": "function",
-      "name": "save_cpu_index",
-      "lineno": 761
-    },
-    {
-      "kind": "function",
-      "name": "load_cpu_index",
-      "lineno": 785
-    },
-    {
-      "kind": "function",
-      "name": "save_secondary_index",
-      "lineno": 813
-    },
-    {
-      "kind": "function",
-      "name": "load_secondary_index",
-      "lineno": 841
-    },
-    {
-      "kind": "function",
-      "name": "clone_to_gpu",
-      "lineno": 884
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 979
-    },
-    {
-      "kind": "function",
-      "name": "_prepare_search_plan",
-      "lineno": 1115
-    },
-    {
-      "kind": "function",
-      "name": "get_runtime_tuning",
-      "lineno": 1188
-    },
-    {
-      "kind": "function",
-      "name": "apply_runtime_tuning",
-      "lineno": 1215
-    },
-    {
-      "kind": "function",
-      "name": "reset_runtime_tuning",
-      "lineno": 1261
-    },
-    {
-      "kind": "function",
-      "name": "search_primary",
-      "lineno": 1280
-    },
-    {
-      "kind": "function",
-      "name": "_execute_dual_search",
-      "lineno": 1335
-    },
-    {
-      "kind": "function",
-      "name": "search_secondary",
-      "lineno": 1397
-    },
-    {
-      "kind": "function",
-      "name": "primary_index_impl",
-      "lineno": 1436
-    },
-    {
-      "kind": "function",
-      "name": "_merge_results",
-      "lineno": 1449
-    },
-    {
-      "kind": "function",
-      "name": "merge_indexes",
-      "lineno": 1514
-    },
-    {
-      "kind": "function",
-      "name": "_extract_all_vectors",
-      "lineno": 1606
-    },
-    {
-      "kind": "function",
-      "name": "_try_load_cuvs",
-      "lineno": 1672
-    },
-    {
-      "kind": "function",
-      "name": "_require_cpu_index",
-      "lineno": 1700
-    },
-    {
-      "kind": "function",
-      "name": "get_compile_options",
-      "lineno": 1723
-    },
-    {
-      "kind": "function",
-      "name": "_search_with_params",
-      "lineno": 1738
-    },
-    {
-      "kind": "function",
-      "name": "autotune",
-      "lineno": 1790
-    },
-    {
-      "kind": "function",
-      "name": "_build_adaptive_index",
-      "lineno": 1885
-    },
-    {
-      "kind": "function",
-      "name": "_dynamic_nlist",
-      "lineno": 1946
-    },
-    {
-      "kind": "function",
-      "name": "_factory_string_for",
-      "lineno": 1952
-    },
-    {
-      "kind": "function",
-      "name": "_record_factory_choice",
-      "lineno": 1969
-    },
-    {
-      "kind": "function",
-      "name": "_apply_runtime_parameters",
-      "lineno": 1978
-    },
-    {
-      "kind": "function",
-      "name": "_maybe_apply_runtime_parameters",
-      "lineno": 2002
-    },
-    {
-      "kind": "function",
-      "name": "_sanitize_runtime_overrides",
-      "lineno": 2023
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_search_knobs",
-      "lineno": 2057
-    },
-    {
-      "kind": "function",
-      "name": "_lookup_override",
-      "lineno": 2070
-    },
-    {
-      "kind": "function",
-      "name": "_pick",
-      "lineno": 2077
-    },
-    {
-      "kind": "function",
-      "name": "_load_tuned_profile",
-      "lineno": 2130
-    },
-    {
-      "kind": "function",
-      "name": "_timed_search_with_params",
-      "lineno": 2154
-    },
-    {
-      "kind": "function",
-      "name": "_brute_force_truth_ids",
-      "lineno": 2163
-    },
-    {
-      "kind": "function",
-      "name": "_estimate_recall",
-      "lineno": 2172
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_2d",
-      "lineno": 2186
-    },
-    {
-      "kind": "function",
-      "name": "_refine_with_flat",
-      "lineno": 2192
-    },
-    {
-      "kind": "function",
-      "name": "_downcast_index",
-      "lineno": 2223
-    },
-    {
-      "kind": "function",
-      "name": "_active_index",
-      "lineno": 2249
-    },
-    {
-      "kind": "function",
       "name": "_coerce_to_int",
-      "lineno": 2270
+      "lineno": 2271
     },
     {
       "kind": "function",
       "name": "_configure_direct_map",
-      "lineno": 2293
+      "lineno": 2294
     },
     {
       "kind": "function",
       "name": "_set_direct_map_type",
-      "lineno": 2301
+      "lineno": 2302
     }
   ],
   "exports": [
@@ -14266,10 +13497,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 5,
+  "cycle_group": 37
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -14418,144 +13651,24 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 24
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 26
+    },
+    {
       "kind": "class",
       "name": "IndexManifest",
       "lineno": 32
     },
     {
-      "kind": "function",
-      "name": "from_file",
-      "lineno": 49
-    },
-    {
-      "kind": "function",
-      "name": "to_file",
-      "lineno": 82
-    },
-    {
       "kind": "class",
       "name": "FAISSDualIndexManager",
       "lineno": 89
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 92
-    },
-    {
-      "kind": "function",
-      "name": "set_test_indexes",
-      "lineno": 108
-    },
-    {
-      "kind": "function",
-      "name": "gpu_enabled",
-      "lineno": 130
-    },
-    {
-      "kind": "function",
-      "name": "gpu_disabled_reason",
-      "lineno": 135
-    },
-    {
-      "kind": "function",
-      "name": "primary_index",
-      "lineno": 140
-    },
-    {
-      "kind": "function",
-      "name": "secondary_index",
-      "lineno": 145
-    },
-    {
-      "kind": "function",
-      "name": "manifest",
-      "lineno": 150
-    },
-    {
-      "kind": "function",
-      "name": "ensure_ready",
-      "lineno": 154
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 197
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 208
-    },
-    {
-      "kind": "function",
-      "name": "add_incremental",
-      "lineno": 285
-    },
-    {
-      "kind": "function",
-      "name": "needs_compaction",
-      "lineno": 376
-    },
-    {
-      "kind": "function",
-      "name": "_reset_gpu_state",
-      "lineno": 398
-    },
-    {
-      "kind": "function",
-      "name": "_import_faiss",
-      "lineno": 405
-    },
-    {
-      "kind": "function",
-      "name": "_load_primary_index",
-      "lineno": 416
-    },
-    {
-      "kind": "function",
-      "name": "_load_secondary_index",
-      "lineno": 455
-    },
-    {
-      "kind": "function",
-      "name": "_wrap_with_idmap",
-      "lineno": 469
-    },
-    {
-      "kind": "function",
-      "name": "_configure_direct_map",
-      "lineno": 478
-    },
-    {
-      "kind": "function",
-      "name": "_load_manifest",
-      "lineno": 501
-    },
-    {
-      "kind": "function",
-      "name": "try_gpu_clone",
-      "lineno": 516
-    },
-    {
-      "kind": "function",
-      "name": "_build_gpu_cloner_options",
-      "lineno": 576
-    },
-    {
-      "kind": "function",
-      "name": "_clone_index_to_gpu",
-      "lineno": 595
-    },
-    {
-      "kind": "function",
-      "name": "_select_primary_index",
-      "lineno": 631
-    },
-    {
-      "kind": "function",
-      "name": "_select_secondary_index",
-      "lineno": 639
     }
   ],
   "exports": [
@@ -14753,10 +13866,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 3,
+  "cycle_group": 68
 }
 {
   "path": "io/duckdb_catalog.py",
@@ -14927,149 +14042,29 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "duckdb",
+      "lineno": 36
+    },
+    {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 37
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 39
+    },
+    {
       "kind": "class",
       "name": "_ScopeFilterSpec",
       "lineno": 65
     },
     {
-      "kind": "function",
-      "name": "has_complex_globs",
-      "lineno": 76
-    },
-    {
       "kind": "class",
       "name": "DuckDBCatalog",
       "lineno": 81
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 103
-    },
-    {
-      "kind": "function",
-      "name": "open",
-      "lineno": 123
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 127
-    },
-    {
-      "kind": "function",
-      "name": "__enter__",
-      "lineno": 131
-    },
-    {
-      "kind": "function",
-      "name": "__exit__",
-      "lineno": 142
-    },
-    {
-      "kind": "function",
-      "name": "manager",
-      "lineno": 147
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_ready",
-      "lineno": 151
-    },
-    {
-      "kind": "function",
-      "name": "connection",
-      "lineno": 163
-    },
-    {
-      "kind": "function",
-      "name": "_log_query",
-      "lineno": 175
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_views",
-      "lineno": 188
-    },
-    {
-      "kind": "function",
-      "name": "_relation_exists",
-      "lineno": 246
-    },
-    {
-      "kind": "function",
-      "name": "relation_exists",
-      "lineno": 280
-    },
-    {
-      "kind": "function",
-      "name": "query_by_ids",
-      "lineno": 297
-    },
-    {
-      "kind": "function",
-      "name": "query_by_filters",
-      "lineno": 364
-    },
-    {
-      "kind": "function",
-      "name": "_build_scope_filter_spec",
-      "lineno": 496
-    },
-    {
-      "kind": "function",
-      "name": "_apply_complex_glob_filters",
-      "lineno": 557
-    },
-    {
-      "kind": "function",
-      "name": "_apply_language_filters",
-      "lineno": 610
-    },
-    {
-      "kind": "function",
-      "name": "_observe_scope_filter_duration",
-      "lineno": 648
-    },
-    {
-      "kind": "function",
-      "name": "_determine_filter_type",
-      "lineno": 662
-    },
-    {
-      "kind": "function",
-      "name": "_is_simple_glob",
-      "lineno": 696
-    },
-    {
-      "kind": "function",
-      "name": "get_chunk_by_id",
-      "lineno": 739
-    },
-    {
-      "kind": "function",
-      "name": "get_symbols_for_chunk",
-      "lineno": 757
-    },
-    {
-      "kind": "function",
-      "name": "query_by_uri",
-      "lineno": 778
-    },
-    {
-      "kind": "function",
-      "name": "get_embeddings_by_ids",
-      "lineno": 820
-    },
-    {
-      "kind": "function",
-      "name": "count_chunks",
-      "lineno": 881
-    },
-    {
-      "kind": "function",
-      "name": "_embedding_dim",
-      "lineno": 901
     }
   ],
   "exports": [
@@ -15284,10 +14279,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 5,
+  "cycle_group": 42
 }
 {
   "path": "io/bm25_manager.py",
@@ -15423,6 +14420,26 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "GENERATOR_NAME",
+      "lineno": 23
+    },
+    {
+      "kind": "variable",
+      "name": "CORPUS_METADATA_FILENAME",
+      "lineno": 24
+    },
+    {
+      "kind": "variable",
+      "name": "INDEX_METADATA_FILENAME",
+      "lineno": 25
+    },
+    {
+      "kind": "variable",
+      "name": "logger",
+      "lineno": 27
+    },
+    {
       "kind": "class",
       "name": "BM25CorpusMetadata",
       "lineno": 30
@@ -15446,31 +14463,6 @@
       "kind": "class",
       "name": "BM25IndexManager",
       "lineno": 75
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 78
-    },
-    {
-      "kind": "function",
-      "name": "corpus_dir",
-      "lineno": 85
-    },
-    {
-      "kind": "function",
-      "name": "index_dir",
-      "lineno": 90
-    },
-    {
-      "kind": "function",
-      "name": "prepare_corpus",
-      "lineno": 94
-    },
-    {
-      "kind": "function",
-      "name": "build_index",
-      "lineno": 206
     },
     {
       "kind": "function",
@@ -15627,10 +14619,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 3,
+  "cycle_group": 69
 }
 {
   "path": "io/__init__.py",
@@ -15754,11 +14748,13 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api",
     "reexport-hub"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 4,
+  "cycle_group": 70
 }
 {
   "path": "io/git_client.py",
@@ -15870,6 +14866,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 58
+    },
+    {
       "kind": "function",
       "name": "_string_attr",
       "lineno": 61
@@ -15905,44 +14906,9 @@
       "lineno": 117
     },
     {
-      "kind": "function",
-      "name": "repo",
-      "lineno": 168
-    },
-    {
-      "kind": "function",
-      "name": "with_cached_repo",
-      "lineno": 212
-    },
-    {
-      "kind": "function",
-      "name": "blame_range",
-      "lineno": 229
-    },
-    {
-      "kind": "function",
-      "name": "file_history",
-      "lineno": 367
-    },
-    {
       "kind": "class",
       "name": "AsyncGitClient",
       "lineno": 486
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 533
-    },
-    {
-      "kind": "function",
-      "name": "blame_range",
-      "lineno": 536
-    },
-    {
-      "kind": "function",
-      "name": "file_history",
-      "lineno": 575
     }
   ],
   "exports": [
@@ -16042,10 +15008,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 3,
+  "cycle_group": 41
 }
 {
   "path": "io/rerank_coderankllm.py",
@@ -16130,34 +15098,14 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 16
+    },
+    {
       "kind": "class",
       "name": "CodeRankListwiseReranker",
       "lineno": 33
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 41
-    },
-    {
-      "kind": "function",
-      "name": "rerank",
-      "lineno": 56
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_model",
-      "lineno": 113
-    },
-    {
-      "kind": "function",
-      "name": "_build_prompt",
-      "lineno": 143
-    },
-    {
-      "kind": "function",
-      "name": "_parse_rankings",
-      "lineno": 151
     }
   ],
   "exports": [],
@@ -16239,10 +15187,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 71
 }
 {
   "path": "plugins/registry.py",
@@ -16309,29 +15258,14 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 12
+    },
+    {
       "kind": "class",
       "name": "ChannelRegistry",
       "lineno": 19
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 22
-    },
-    {
-      "kind": "function",
-      "name": "discover",
-      "lineno": 26
-    },
-    {
-      "kind": "function",
-      "name": "from_channels",
-      "lineno": 72
-    },
-    {
-      "kind": "function",
-      "name": "channels",
-      "lineno": 102
     },
     {
       "kind": "function",
@@ -16391,10 +15325,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 2,
+  "cycle_group": 42
 }
 {
   "path": "plugins/builtins.py",
@@ -16489,6 +15425,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 15
+    },
+    {
       "kind": "function",
       "name": "bm25_factory",
       "lineno": 20
@@ -16504,39 +15445,9 @@
       "lineno": 85
     },
     {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 90
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 99
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_provider",
-      "lineno": 154
-    },
-    {
       "kind": "class",
       "name": "_SpladeChannel",
       "lineno": 214
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 219
-    },
-    {
-      "kind": "function",
-      "name": "search",
-      "lineno": 228
-    },
-    {
-      "kind": "function",
-      "name": "_ensure_provider",
-      "lineno": 285
     },
     {
       "kind": "function",
@@ -16626,10 +15537,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 4,
+  "cycle_group": 72
 }
 {
   "path": "plugins/channels.py",
@@ -16712,6 +15625,21 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "Capabilities",
+      "lineno": 16
+    },
+    {
+      "kind": "variable",
+      "name": "ResolvedPaths",
+      "lineno": 17
+    },
+    {
+      "kind": "variable",
+      "name": "Settings",
+      "lineno": 18
+    },
+    {
       "kind": "class",
       "name": "ChannelContext",
       "lineno": 24
@@ -16722,19 +15650,9 @@
       "lineno": 32
     },
     {
-      "kind": "function",
-      "name": "search",
-      "lineno": 39
-    },
-    {
       "kind": "class",
       "name": "ChannelError",
       "lineno": 44
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 47
     }
   ],
   "exports": [
@@ -16774,10 +15692,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 5,
+  "cycle_group": 42
 }
 {
   "path": "plugins/__init__.py",
@@ -16792,7 +15712,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 102
 }
 {
   "path": "rerank/xtr.py",
@@ -16842,16 +15765,6 @@
       "kind": "class",
       "name": "XTRReranker",
       "lineno": 13
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 19
-    },
-    {
-      "kind": "function",
-      "name": "rescore",
-      "lineno": 22
     }
   ],
   "exports": [
@@ -16884,10 +15797,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 2,
+  "cycle_group": 74
 }
 {
   "path": "rerank/base.py",
@@ -16950,11 +15865,6 @@
       "kind": "class",
       "name": "Reranker",
       "lineno": 38
-    },
-    {
-      "kind": "function",
-      "name": "rescore",
-      "lineno": 44
     }
   ],
   "exports": [
@@ -16988,10 +15898,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 1,
+  "cycle_group": 73
 }
 {
   "path": "rerank/__init__.py",
@@ -17006,7 +15918,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 103
 }
 {
   "path": "retrieval/types.py",
@@ -17063,11 +15978,6 @@
       "lineno": 37
     },
     {
-      "kind": "function",
-      "name": "margin",
-      "lineno": 45
-    },
-    {
       "kind": "class",
       "name": "StageDecision",
       "lineno": 59
@@ -17111,10 +16021,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 9,
+  "fan_out": 0,
+  "cycle_group": 23
 }
 {
   "path": "retrieval/telemetry.py",
@@ -17229,24 +16141,9 @@
       "lineno": 20
     },
     {
-      "kind": "function",
-      "name": "as_payload",
-      "lineno": 28
-    },
-    {
       "kind": "class",
       "name": "_TimerRuntime",
       "lineno": 44
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 49
-    },
-    {
-      "kind": "function",
-      "name": "stop",
-      "lineno": 54
     },
     {
       "kind": "class",
@@ -17255,18 +16152,13 @@
     },
     {
       "kind": "function",
-      "name": "stop",
-      "lineno": 91
-    },
-    {
-      "kind": "function",
-      "name": "snapshot",
-      "lineno": 111
-    },
-    {
-      "kind": "function",
       "name": "track_stage",
       "lineno": 150
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 196
     },
     {
       "kind": "function",
@@ -17354,10 +16246,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 2,
+  "cycle_group": 75
 }
 {
   "path": "retrieval/gating.py",
@@ -17561,10 +16455,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 1,
+  "cycle_group": 26
 }
 {
   "path": "retrieval/hybrid.py",
@@ -17657,10 +16553,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 1,
+  "cycle_group": 76
 }
 {
   "path": "retrieval/rm3_heuristics.py",
@@ -17713,31 +16611,6 @@
       "kind": "class",
       "name": "RM3Heuristics",
       "lineno": 21
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 65
-    },
-    {
-      "kind": "function",
-      "name": "_tokenize",
-      "lineno": 85
-    },
-    {
-      "kind": "function",
-      "name": "_looks_symbolic",
-      "lineno": 88
-    },
-    {
-      "kind": "function",
-      "name": "should_enable",
-      "lineno": 91
-    },
-    {
-      "kind": "function",
-      "name": "parameters",
-      "lineno": 114
     }
   ],
   "exports": [
@@ -17786,10 +16659,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 0,
+  "cycle_group": 22
 }
 {
   "path": "retrieval/__init__.py",
@@ -17804,7 +16679,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 104
 }
 {
   "path": "retrieval/boosters.py",
@@ -17920,6 +16798,26 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "duckdb",
+      "lineno": 16
+    },
+    {
+      "kind": "variable",
+      "name": "DuckDBManagerType",
+      "lineno": 21
+    },
+    {
+      "kind": "variable",
+      "name": "DuckDBManager",
+      "lineno": 26
+    },
+    {
+      "kind": "variable",
+      "name": "DuckConnection",
+      "lineno": 31
+    },
+    {
       "kind": "class",
       "name": "RecencyConfig",
       "lineno": 39
@@ -17963,11 +16861,6 @@
       "kind": "function",
       "name": "apply_recency_boost",
       "lineno": 141
-    },
-    {
-      "kind": "function",
-      "name": "_lookup",
-      "lineno": 176
     }
   ],
   "exports": [
@@ -18049,10 +16942,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 3,
+  "cycle_group": 24
 }
 {
   "path": "runtime/request_context.py",
@@ -18086,7 +16981,18 @@
       "level": 0
     }
   ],
-  "defs": [],
+  "defs": [
+    {
+      "kind": "variable",
+      "name": "session_id_var",
+      "lineno": 18
+    },
+    {
+      "kind": "variable",
+      "name": "capability_stamp_var",
+      "lineno": 25
+    }
+  ],
   "exports": [
     "capability_stamp_var",
     "session_id_var"
@@ -18101,10 +17007,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 1,
+  "cycle_group": 16
 }
 {
   "path": "runtime/factory_adjustment.py",
@@ -18161,14 +17069,14 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "T",
+      "lineno": 10
+    },
+    {
       "kind": "class",
       "name": "FactoryAdjuster",
       "lineno": 13
-    },
-    {
-      "kind": "function",
-      "name": "adjust",
-      "lineno": 16
     },
     {
       "kind": "class",
@@ -18176,59 +17084,14 @@
       "lineno": 47
     },
     {
-      "kind": "function",
-      "name": "adjust",
-      "lineno": 50
-    },
-    {
       "kind": "class",
       "name": "DefaultFactoryAdjuster",
       "lineno": 75
     },
     {
-      "kind": "function",
-      "name": "adjust",
-      "lineno": 86
-    },
-    {
-      "kind": "function",
-      "name": "_wrap_faiss",
-      "lineno": 120
-    },
-    {
-      "kind": "function",
-      "name": "_wrapped",
-      "lineno": 141
-    },
-    {
-      "kind": "function",
-      "name": "_wrap_hybrid",
-      "lineno": 160
-    },
-    {
-      "kind": "function",
-      "name": "_wrapped",
-      "lineno": 181
-    },
-    {
-      "kind": "function",
-      "name": "_wrap_xtr",
-      "lineno": 203
-    },
-    {
       "kind": "class",
       "name": "SuppressException",
       "lineno": 225
-    },
-    {
-      "kind": "function",
-      "name": "__enter__",
-      "lineno": 228
-    },
-    {
-      "kind": "function",
-      "name": "__exit__",
-      "lineno": 231
     }
   ],
   "exports": [
@@ -18293,10 +17156,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 4,
+  "fan_out": 1,
+  "cycle_group": 31
 }
 {
   "path": "runtime/cells.py",
@@ -18422,6 +17287,26 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "T",
+      "lineno": 18
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 20
+    },
+    {
+      "kind": "variable",
+      "name": "InitStatus",
+      "lineno": 26
+    },
+    {
+      "kind": "variable",
+      "name": "CloseStatus",
+      "lineno": 27
+    },
+    {
       "kind": "class",
       "name": "RuntimeCellCloseResult",
       "lineno": 31
@@ -18447,159 +17332,14 @@
       "lineno": 71
     },
     {
-      "kind": "function",
-      "name": "on_init_start",
-      "lineno": 74
-    },
-    {
-      "kind": "function",
-      "name": "on_init_end",
-      "lineno": 83
-    },
-    {
-      "kind": "function",
-      "name": "on_close_end",
-      "lineno": 86
-    },
-    {
       "kind": "class",
       "name": "NullRuntimeCellObserver",
       "lineno": 90
     },
     {
-      "kind": "function",
-      "name": "on_init_start",
-      "lineno": 95
-    },
-    {
-      "kind": "function",
-      "name": "on_init_end",
-      "lineno": 105
-    },
-    {
-      "kind": "function",
-      "name": "on_close_end",
-      "lineno": 110
-    },
-    {
       "kind": "class",
       "name": "RuntimeCell",
       "lineno": 117
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 139
-    },
-    {
-      "kind": "function",
-      "name": "__repr__",
-      "lineno": 164
-    },
-    {
-      "kind": "function",
-      "name": "__bool__",
-      "lineno": 174
-    },
-    {
-      "kind": "function",
-      "name": "peek",
-      "lineno": 184
-    },
-    {
-      "kind": "function",
-      "name": "configure_observer",
-      "lineno": 195
-    },
-    {
-      "kind": "function",
-      "name": "configure_adjuster",
-      "lineno": 200
-    },
-    {
-      "kind": "function",
-      "name": "get_or_initialize",
-      "lineno": 208
-    },
-    {
-      "kind": "function",
-      "name": "seed",
-      "lineno": 281
-    },
-    {
-      "kind": "function",
-      "name": "close",
-      "lineno": 311
-    },
-    {
-      "kind": "function",
-      "name": "invalidate",
-      "lineno": 437
-    },
-    {
-      "kind": "function",
-      "name": "record_failure",
-      "lineno": 441
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_disposer",
-      "lineno": 454
-    },
-    {
-      "kind": "function",
-      "name": "_run_close",
-      "lineno": 458
-    },
-    {
-      "kind": "function",
-      "name": "_run_exit",
-      "lineno": 466
-    },
-    {
-      "kind": "function",
-      "name": "_adjust_factory",
-      "lineno": 472
-    },
-    {
-      "kind": "function",
-      "name": "_capture_init_context",
-      "lineno": 476
-    },
-    {
-      "kind": "function",
-      "name": "_next_generation_locked",
-      "lineno": 488
-    },
-    {
-      "kind": "function",
-      "name": "_clear_cooldown_locked",
-      "lineno": 492
-    },
-    {
-      "kind": "function",
-      "name": "_cooldown_error_locked",
-      "lineno": 496
-    },
-    {
-      "kind": "function",
-      "name": "_wait_for_initializer",
-      "lineno": 505
-    },
-    {
-      "kind": "function",
-      "name": "_run_initializer",
-      "lineno": 530
-    },
-    {
-      "kind": "function",
-      "name": "_handle_init_success",
-      "lineno": 549
-    },
-    {
-      "kind": "function",
-      "name": "_handle_init_failure",
-      "lineno": 585
     }
   ],
   "exports": [
@@ -18786,10 +17526,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 5,
+  "cycle_group": 33
 }
 {
   "path": "runtime/__init__.py",
@@ -18850,10 +17592,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 2,
+  "cycle_group": 34
 }
 {
   "path": "mcp_server/telemetry.py",
@@ -18932,10 +17676,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 2,
+  "cycle_group": 47
 }
 {
   "path": "mcp_server/service_context.py",
@@ -19010,10 +17756,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 1,
+  "cycle_group": 77
 }
 {
   "path": "mcp_server/schemas.py",
@@ -19246,11 +17994,13 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api",
     "reexport-hub"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 12,
+  "fan_out": 1,
+  "cycle_group": 12
 }
 {
   "path": "mcp_server/server_semantic.py",
@@ -19358,10 +18108,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 5,
+  "cycle_group": 78
 }
 {
   "path": "mcp_server/server_symbols.py",
@@ -19476,10 +18227,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 4,
+  "cycle_group": 79
 }
 {
   "path": "mcp_server/error_handling.py",
@@ -19611,9 +18363,29 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 72
+    },
+    {
+      "kind": "variable",
+      "name": "COMPONENT_NAME",
+      "lineno": 73
+    },
+    {
+      "kind": "variable",
+      "name": "F",
+      "lineno": 75
+    },
+    {
       "kind": "class",
       "name": "ProblemMapping",
       "lineno": 111
+    },
+    {
+      "kind": "variable",
+      "name": "EXCEPTION_TO_ERROR_CODE",
+      "lineno": 152
     },
     {
       "kind": "function",
@@ -19629,21 +18401,6 @@
       "kind": "function",
       "name": "handle_adapter_errors",
       "lineno": 411
-    },
-    {
-      "kind": "function",
-      "name": "decorator",
-      "lineno": 532
-    },
-    {
-      "kind": "function",
-      "name": "async_wrapper",
-      "lineno": 560
-    },
-    {
-      "kind": "function",
-      "name": "sync_wrapper",
-      "lineno": 621
     }
   ],
   "exports": [
@@ -19732,10 +18489,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 3,
+  "cycle_group": 46
 }
 {
   "path": "mcp_server/scope_utils.py",
@@ -19815,6 +18574,16 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 66
+    },
+    {
+      "kind": "variable",
+      "name": "LANGUAGE_EXTENSIONS",
+      "lineno": 77
+    },
     {
       "kind": "function",
       "name": "get_effective_scope",
@@ -19896,10 +18665,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 5,
+  "fan_out": 3,
+  "cycle_group": 42
 }
 {
   "path": "mcp_server/server.py",
@@ -20030,6 +18801,16 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "mcp",
+      "lineno": 24
+    },
+    {
+      "kind": "variable",
+      "name": "app_context",
+      "lineno": 29
+    },
     {
       "kind": "function",
       "name": "get_context",
@@ -20163,10 +18944,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 6,
+  "cycle_group": 49
 }
 {
   "path": "mcp_server/__init__.py",
@@ -20181,7 +18964,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 105
 }
 {
   "path": "cache/__init__.py",
@@ -20196,7 +18982,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 106
 }
 {
   "path": "evaluation/offline_recall.py",
@@ -20251,8 +19040,7 @@
     {
       "module": "typing",
       "names": [
-        "TYPE_CHECKING",
-        "cast"
+        "TYPE_CHECKING"
       ],
       "aliases": {},
       "is_star": false,
@@ -20348,6 +19136,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 27
+    },
+    {
       "kind": "class",
       "name": "EvalQuery",
       "lineno": 31
@@ -20356,61 +19149,6 @@
       "kind": "class",
       "name": "OfflineRecallEvaluator",
       "lineno": 40
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 43
-    },
-    {
-      "kind": "function",
-      "name": "run",
-      "lineno": 59
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_output_dir",
-      "lineno": 133
-    },
-    {
-      "kind": "function",
-      "name": "_load_queries",
-      "lineno": 141
-    },
-    {
-      "kind": "function",
-      "name": "_synthesize_queries",
-      "lineno": 166
-    },
-    {
-      "kind": "function",
-      "name": "_build_question",
-      "lineno": 185
-    },
-    {
-      "kind": "function",
-      "name": "_embed_query",
-      "lineno": 192
-    },
-    {
-      "kind": "function",
-      "name": "_write_artifacts",
-      "lineno": 197
-    },
-    {
-      "kind": "function",
-      "name": "_record_metrics",
-      "lineno": 216
-    },
-    {
-      "kind": "function",
-      "name": "_prepare_queries",
-      "lineno": 221
-    },
-    {
-      "kind": "function",
-      "name": "_evaluate_query",
-      "lineno": 231
     }
   ],
   "exports": [],
@@ -20515,10 +19253,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 8,
+  "cycle_group": 42
 }
 {
   "path": "evaluation/scip_coverage.py",
@@ -20650,24 +19389,19 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 24
+    },
+    {
       "kind": "class",
       "name": "SupportsFaissSearch",
       "lineno": 27
     },
     {
-      "kind": "function",
-      "name": "search",
-      "lineno": 30
-    },
-    {
       "kind": "class",
       "name": "SupportsEmbedSingle",
       "lineno": 42
-    },
-    {
-      "kind": "function",
-      "name": "embed_single",
-      "lineno": 45
     },
     {
       "kind": "class",
@@ -20683,46 +19417,6 @@
       "kind": "class",
       "name": "SCIPCoverageEvaluator",
       "lineno": 71
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 74
-    },
-    {
-      "kind": "function",
-      "name": "run",
-      "lineno": 90
-    },
-    {
-      "kind": "function",
-      "name": "_lookup_chunk_ids",
-      "lineno": 178
-    },
-    {
-      "kind": "function",
-      "name": "_embed",
-      "lineno": 193
-    },
-    {
-      "kind": "function",
-      "name": "_question_for",
-      "lineno": 198
-    },
-    {
-      "kind": "function",
-      "name": "_record_metrics",
-      "lineno": 206
-    },
-    {
-      "kind": "function",
-      "name": "_write_artifacts",
-      "lineno": 211
-    },
-    {
-      "kind": "function",
-      "name": "_evaluate_symbol",
-      "lineno": 238
     }
   ],
   "exports": [],
@@ -20832,10 +19526,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 6,
+  "cycle_group": 53
 }
 {
   "path": "evaluation/__init__.py",
@@ -20850,7 +19545,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 107
 }
 {
   "path": "evaluation/hybrid_pool.py",
@@ -20945,21 +19643,6 @@
       "kind": "class",
       "name": "HybridPoolEvaluator",
       "lineno": 71
-    },
-    {
-      "kind": "function",
-      "name": "__init__",
-      "lineno": 74
-    },
-    {
-      "kind": "function",
-      "name": "pool",
-      "lineno": 85
-    },
-    {
-      "kind": "function",
-      "name": "_record_pool_metrics",
-      "lineno": 158
     }
   ],
   "exports": [
@@ -21033,10 +19716,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 20
 }
 {
   "path": "cli/xtr.py",
@@ -21075,10 +19760,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 2,
+  "cycle_group": 82
 }
 {
   "path": "cli/indexctl.py",
@@ -21159,6 +19846,36 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 15
+    },
+    {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 16
+    },
+    {
+      "kind": "variable",
+      "name": "RootOption",
+      "lineno": 18
+    },
+    {
+      "kind": "variable",
+      "name": "ExtraOption",
+      "lineno": 19
+    },
+    {
+      "kind": "variable",
+      "name": "VersionArg",
+      "lineno": 27
+    },
+    {
+      "kind": "variable",
+      "name": "PathArg",
+      "lineno": 28
+    },
     {
       "kind": "function",
       "name": "global_options",
@@ -21276,10 +19993,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 2,
+  "cycle_group": 83
 }
 {
   "path": "cli/splade.py",
@@ -21369,6 +20088,26 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "OptimizeFlag",
+      "lineno": 23
+    },
+    {
+      "kind": "variable",
+      "name": "QuantizeFlag",
+      "lineno": 31
+    },
+    {
+      "kind": "variable",
+      "name": "OverwriteFlag",
+      "lineno": 39
+    },
+    {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 48
+    },
+    {
       "kind": "function",
       "name": "_create_artifacts_manager",
       "lineno": 55
@@ -21389,14 +20128,44 @@
       "lineno": 88
     },
     {
+      "kind": "variable",
+      "name": "MODEL_ID_OPTION",
+      "lineno": 94
+    },
+    {
+      "kind": "variable",
+      "name": "QUANTIZATION_OPTION",
+      "lineno": 99
+    },
+    {
       "kind": "function",
       "name": "export_onnx",
       "lineno": 107
     },
     {
-      "kind": "function",
-      "name": "_run",
-      "lineno": 117
+      "kind": "variable",
+      "name": "SOURCE_ARGUMENT",
+      "lineno": 162
+    },
+    {
+      "kind": "variable",
+      "name": "OUTPUT_DIR_OPTION",
+      "lineno": 166
+    },
+    {
+      "kind": "variable",
+      "name": "BATCH_SIZE_OPTION",
+      "lineno": 172
+    },
+    {
+      "kind": "variable",
+      "name": "QUANTIZATION_OPTION_ENCODE",
+      "lineno": 179
+    },
+    {
+      "kind": "variable",
+      "name": "SHARD_SIZE_OPTION",
+      "lineno": 186
     },
     {
       "kind": "function",
@@ -21404,9 +20173,44 @@
       "lineno": 196
     },
     {
-      "kind": "function",
-      "name": "_run",
-      "lineno": 207
+      "kind": "variable",
+      "name": "VECTORS_DIR_OPTION",
+      "lineno": 254
+    },
+    {
+      "kind": "variable",
+      "name": "INDEX_DIR_OPTION",
+      "lineno": 260
+    },
+    {
+      "kind": "variable",
+      "name": "THREADS_OPTION",
+      "lineno": 266
+    },
+    {
+      "kind": "variable",
+      "name": "MAX_CLAUSE_OPTION",
+      "lineno": 273
+    },
+    {
+      "kind": "variable",
+      "name": "QUERY_OPTION",
+      "lineno": 280
+    },
+    {
+      "kind": "variable",
+      "name": "QUERIES_FILE_OPTION",
+      "lineno": 286
+    },
+    {
+      "kind": "variable",
+      "name": "WARMUP_OPTION",
+      "lineno": 291
+    },
+    {
+      "kind": "variable",
+      "name": "RUNS_OPTION",
+      "lineno": 298
     },
     {
       "kind": "function",
@@ -21415,18 +20219,8 @@
     },
     {
       "kind": "function",
-      "name": "_run",
-      "lineno": 319
-    },
-    {
-      "kind": "function",
       "name": "bench",
       "lineno": 369
-    },
-    {
-      "kind": "function",
-      "name": "_run",
-      "lineno": 437
     },
     {
       "kind": "function",
@@ -21551,10 +20345,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 3,
+  "cycle_group": 84
 }
 {
   "path": "cli/bm25.py",
@@ -21621,6 +20417,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 13
+    },
+    {
       "kind": "function",
       "name": "_create_bm25_manager",
       "lineno": 20
@@ -21631,24 +20432,49 @@
       "lineno": 31
     },
     {
+      "kind": "variable",
+      "name": "SOURCE_ARGUMENT",
+      "lineno": 37
+    },
+    {
+      "kind": "variable",
+      "name": "OVERWRITE_DEFAULT",
+      "lineno": 41
+    },
+    {
+      "kind": "variable",
+      "name": "OUTPUT_DIR_OPTION",
+      "lineno": 42
+    },
+    {
+      "kind": "variable",
+      "name": "OVERWRITE_OPTION",
+      "lineno": 48
+    },
+    {
       "kind": "function",
       "name": "prepare_corpus",
       "lineno": 57
     },
     {
-      "kind": "function",
-      "name": "_run",
-      "lineno": 66
+      "kind": "variable",
+      "name": "JSON_DIR_OPTION",
+      "lineno": 105
+    },
+    {
+      "kind": "variable",
+      "name": "INDEX_DIR_OPTION",
+      "lineno": 111
+    },
+    {
+      "kind": "variable",
+      "name": "THREADS_OPTION",
+      "lineno": 117
     },
     {
       "kind": "function",
       "name": "build_index",
       "lineno": 127
-    },
-    {
-      "kind": "function",
-      "name": "_run",
-      "lineno": 136
     },
     {
       "kind": "function",
@@ -21728,10 +20554,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 2,
+  "cycle_group": 85
 }
 {
   "path": "cli/build_indexes.py",
@@ -21815,6 +20643,61 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "JsonDirOption",
+      "lineno": 15
+    },
+    {
+      "kind": "variable",
+      "name": "IndexDirOption",
+      "lineno": 23
+    },
+    {
+      "kind": "variable",
+      "name": "VectorsDirOption",
+      "lineno": 31
+    },
+    {
+      "kind": "variable",
+      "name": "ThreadsOption",
+      "lineno": 39
+    },
+    {
+      "kind": "variable",
+      "name": "MaxClauseOption",
+      "lineno": 48
+    },
+    {
+      "kind": "variable",
+      "name": "OverwriteFlag",
+      "lineno": 57
+    },
+    {
+      "kind": "variable",
+      "name": "VersionArgument",
+      "lineno": 65
+    },
+    {
+      "kind": "variable",
+      "name": "BaseDirOption",
+      "lineno": 69
+    },
+    {
+      "kind": "variable",
+      "name": "Bm25DirOption",
+      "lineno": 77
+    },
+    {
+      "kind": "variable",
+      "name": "SpladeDirOption",
+      "lineno": 81
+    },
+    {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 86
+    },
+    {
       "kind": "function",
       "name": "_bm25_manager",
       "lineno": 93
@@ -21892,10 +20775,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 5,
+  "cycle_group": 86
 }
 {
   "path": "cli/__init__.py",
@@ -21934,6 +20819,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 9
+    },
+    {
       "kind": "function",
       "name": "main",
       "lineno": 20
@@ -21949,10 +20839,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 108
 }
 {
   "path": "mcp_server/common/observability.py",
@@ -22026,6 +20918,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 43
+    },
+    {
       "kind": "function",
       "name": "_supports_histogram_labels",
       "lineno": 46
@@ -22036,29 +20933,9 @@
       "lineno": 69
     },
     {
-      "kind": "function",
-      "name": "mark_error",
-      "lineno": 72
-    },
-    {
-      "kind": "function",
-      "name": "mark_success",
-      "lineno": 75
-    },
-    {
       "kind": "class",
       "name": "Observation",
       "lineno": 79
-    },
-    {
-      "kind": "function",
-      "name": "mark_error",
-      "lineno": 82
-    },
-    {
-      "kind": "function",
-      "name": "mark_success",
-      "lineno": 85
     },
     {
       "kind": "function",
@@ -22108,10 +20985,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 3,
+  "fan_out": 1,
+  "cycle_group": 87
 }
 {
   "path": "mcp_server/common/__init__.py",
@@ -22126,7 +21005,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 109
 }
 {
   "path": "mcp_server/tools/__init__.py",
@@ -22141,7 +21023,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 110
 }
 {
   "path": "mcp_server/tools/gpu_doctor.py",
@@ -22186,7 +21071,6 @@
     {
       "module": "typing",
       "names": [
-        "TYPE_CHECKING",
         "cast"
       ],
       "aliases": {},
@@ -22205,61 +21089,36 @@
     {
       "module": "codeintel_rev.typing",
       "names": [
+        "FaissModule",
+        "NumpyModule",
+        "TorchModule",
         "gate_import"
       ],
       "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": null,
-      "names": [
-        "faiss"
-      ],
-      "aliases": {
-        "faiss": "_faiss"
-      },
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": null,
-      "names": [
-        "numpy"
-      ],
-      "aliases": {
-        "numpy": "np"
-      },
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": null,
-      "names": [
-        "torch"
-      ],
-      "aliases": {
-        "torch": "_torch"
-      },
       "is_star": false,
       "level": 0
     }
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 28
+    },
+    {
       "kind": "function",
       "name": "check_torch",
-      "lineno": 36
+      "lineno": 31
     },
     {
       "kind": "function",
       "name": "check_faiss",
-      "lineno": 96
+      "lineno": 91
     },
     {
       "kind": "function",
       "name": "main",
-      "lineno": 149
+      "lineno": 144
     }
   ],
   "exports": [],
@@ -22302,10 +21161,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 2,
+  "cycle_group": 88
 }
 {
   "path": "mcp_server/retrieval/xtr_cli.py",
@@ -22377,6 +21237,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 14
+    },
+    {
       "kind": "function",
       "name": "build",
       "lineno": 31
@@ -22432,10 +21297,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 5,
+  "cycle_group": 80
 }
 {
   "path": "mcp_server/retrieval/__init__.py",
@@ -22463,10 +21330,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 111
 }
 {
   "path": "mcp_server/adapters/semantic.py",
@@ -22674,19 +21543,34 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "httpx",
+      "lineno": 39
+    },
+    {
+      "kind": "variable",
+      "name": "np",
+      "lineno": 40
+    },
+    {
+      "kind": "variable",
+      "name": "SNIPPET_PREVIEW_CHARS",
+      "lineno": 42
+    },
+    {
+      "kind": "variable",
+      "name": "COMPONENT_NAME",
+      "lineno": 43
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 44
+    },
+    {
       "kind": "class",
       "name": "_ScopeFilterFlags",
       "lineno": 48
-    },
-    {
-      "kind": "function",
-      "name": "from_scope",
-      "lineno": 56
-    },
-    {
-      "kind": "function",
-      "name": "has_filters",
-      "lineno": 77
     },
     {
       "kind": "class",
@@ -23080,10 +21964,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 10,
+  "cycle_group": 89
 }
 {
   "path": "mcp_server/adapters/files.py",
@@ -23234,6 +22120,11 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 35
+    },
     {
       "kind": "class",
       "name": "FileListFilters",
@@ -23448,10 +22339,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 7,
+  "cycle_group": 90
 }
 {
   "path": "mcp_server/adapters/semantic_pro.py",
@@ -23729,6 +22622,26 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "SNIPPET_PREVIEW_CHARS",
+      "lineno": 55
+    },
+    {
+      "kind": "variable",
+      "name": "COMPONENT_NAME",
+      "lineno": 56
+    },
+    {
+      "kind": "variable",
+      "name": "RERANK_STAGE_NAME",
+      "lineno": 57
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 58
+    },
+    {
       "kind": "class",
       "name": "RerankOptionPayload",
       "lineno": 61
@@ -23752,6 +22665,11 @@
       "kind": "class",
       "name": "SemanticProRuntimeOptions",
       "lineno": 104
+    },
+    {
+      "kind": "variable",
+      "name": "WideSearchHandle",
+      "lineno": 116
     },
     {
       "kind": "class",
@@ -24432,10 +23350,11 @@
   ],
   "parse_ok": true,
   "errors": [],
-  "tags": [
-    "overlay-needed"
-  ],
-  "type_errors": 0
+  "tags": [],
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 18,
+  "cycle_group": 91
 }
 {
   "path": "mcp_server/adapters/text_search.py",
@@ -24586,14 +23505,39 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "SEARCH_TIMEOUT_SECONDS",
+      "lineno": 33
+    },
+    {
+      "kind": "variable",
+      "name": "MAX_PREVIEW_CHARS",
+      "lineno": 34
+    },
+    {
+      "kind": "variable",
+      "name": "GREP_SPLIT_PARTS",
+      "lineno": 35
+    },
+    {
+      "kind": "variable",
+      "name": "COMMAND_NOT_FOUND_RETURN_CODE",
+      "lineno": 36
+    },
+    {
+      "kind": "variable",
+      "name": "COMPONENT_NAME",
+      "lineno": 37
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 38
+    },
+    {
       "kind": "class",
       "name": "TextSearchOptions",
       "lineno": 42
-    },
-    {
-      "kind": "function",
-      "name": "from_overrides",
-      "lineno": 65
     },
     {
       "kind": "function",
@@ -24778,10 +23722,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 6,
+  "cycle_group": 92
 }
 {
   "path": "mcp_server/adapters/__init__.py",
@@ -24807,7 +23753,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 2,
+  "fan_out": 0,
+  "cycle_group": 48
 }
 {
   "path": "mcp_server/adapters/history.py",
@@ -24880,6 +23829,11 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 21
+    },
+    {
       "kind": "function",
       "name": "blame_range",
       "lineno": 24
@@ -24928,10 +23882,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 4,
+  "cycle_group": 93
 }
 {
   "path": "retrieval/fusion/weighted_rrf.py",
@@ -25001,10 +23957,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 62
 }
 {
   "path": "retrieval/fusion/__init__.py",
@@ -25041,10 +23999,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 1,
+  "cycle_group": 63
 }
 {
   "path": "patches/Supporting Documentation/BM25+SPLADEv3-patchfiles/tools_recall_harness.py",
@@ -25059,7 +24019,10 @@
     "LibCST parse failed: ParserSyntaxError('parser error: error at 2:0: expected one of +, -, ..., AWAIT, False, NAME, NUMBER, None, True, ~', lines=[...], raw_line=3, raw_column=0)"
   ],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 112
 }
 {
   "path": "app/routers/index_admin.py",
@@ -25180,6 +24143,16 @@
     }
   ],
   "defs": [
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 19
+    },
+    {
+      "kind": "variable",
+      "name": "router",
+      "lineno": 20
+    },
     {
       "kind": "function",
       "name": "_require_admin",
@@ -25361,10 +24334,12 @@
   "errors": [],
   "tags": [
     "fastapi",
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 6,
+  "cycle_group": 94
 }
 {
   "path": "app/routers/__init__.py",
@@ -25389,7 +24364,13 @@
       "level": 0
     }
   ],
-  "defs": [],
+  "defs": [
+    {
+      "kind": "variable",
+      "name": "index_admin",
+      "lineno": 7
+    }
+  ],
   "exports": [
     "index_admin"
   ],
@@ -25402,10 +24383,12 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "overlay-needed",
     "public-api"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 1,
+  "fan_out": 0,
+  "cycle_group": 50
 }
 {
   "path": "ops/runtime/__init__.py",
@@ -25430,7 +24413,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 0,
+  "cycle_group": 113
 }
 {
   "path": "ops/runtime/xtr_open.py",
@@ -25529,6 +24515,21 @@
   ],
   "defs": [
     {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 29
+    },
+    {
+      "kind": "variable",
+      "name": "APP",
+      "lineno": 30
+    },
+    {
+      "kind": "variable",
+      "name": "PROBLEM_INSTANCE",
+      "lineno": 31
+    },
+    {
       "kind": "function",
       "name": "xtr_open",
       "lineno": 53
@@ -25581,8 +24582,10 @@
   "parse_ok": true,
   "errors": [],
   "tags": [
-    "cli",
-    "overlay-needed"
+    "cli"
   ],
-  "type_errors": 0
+  "type_errors": 0,
+  "fan_in": 0,
+  "fan_out": 5,
+  "cycle_group": 95
 }
