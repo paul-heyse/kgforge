@@ -104,6 +104,48 @@
   "doc_summary": "Helpers for lazily importing heavy optional dependencies."
 }
 {
+  "path": "cst_build/cst_serialize.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": true,
+  "doc_summary": "Writers and helpers that persist CST datasets to disk."
+}
+{
+  "path": "cst_build/cst_schema.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Dataclasses and helpers describing the CST dataset schema."
+}
+{
+  "path": "cst_build/cst_collect.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "LibCST traversal utilities that emit normalized node records."
+}
+{
+  "path": "cst_build/cst_cli.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "CLI entrypoint for CST dataset builds."
+}
+{
+  "path": "cst_build/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "CST build package exposing the LibCST-based dataset pipeline."
+}
+{
+  "path": "cst_build/cst_resolve.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Stitch CST nodes to module summary rows and SCIP symbols."
+}
+{
   "path": "diagnostics/report_cli.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -186,6 +228,27 @@
   "doc_param_parity": true,
   "doc_examples_present": true,
   "doc_summary": "Application readiness checks for Kubernetes health probes."
+}
+{
+  "path": "eval/pool_writer.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Lightweight Parquet writer for evaluator pools."
+}
+{
+  "path": "eval/hybrid_evaluator.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Offline hybrid evaluator with oracle reranking and pool exports."
+}
+{
+  "path": "eval/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Evaluation utilities for offline recall diagnostics."
 }
 {
   "path": "bin/eval_offline.py",
@@ -300,6 +363,13 @@
   "doc_summary": "Lightweight helpers for loading and querying SCIP JSON indices."
 }
 {
+  "path": "enrich/graph_builder.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Re-export graph builder utilities within the enrich package."
+}
+{
   "path": "enrich/output_writers.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -314,6 +384,13 @@
   "doc_summary": "Rule-based tagging helpers for enrichment outputs."
 }
 {
+  "path": "enrich/ast_indexer.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "AST indexer producing join-ready Parquet datasets."
+}
+{
   "path": "enrich/type_integration.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -321,11 +398,32 @@
   "doc_summary": "Helpers for collecting Pyright/Pyrefly error summaries."
 }
 {
+  "path": "enrich/slices_builder.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Utilities for generating opt-in LLM slice packs."
+}
+{
+  "path": "enrich/ownership.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Ownership, churn, and bus-factor analytics sourced from Git history."
+}
+{
   "path": "enrich/libcst_bridge.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "LibCST-powered index utilities (imports, defs, exports, docstrings)."
+}
+{
+  "path": "enrich/pathnorm.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for repo-relative path normalization and stable identifiers."
 }
 {
   "path": "enrich/stubs_overlay.py",
@@ -875,10 +973,10 @@
 }
 {
   "path": "patches/Supporting Documentation/BM25+SPLADEv3-patchfiles/tools_recall_harness.py",
-  "doc_has_summary": false,
-  "doc_param_parity": true,
+  "doc_has_summary": true,
+  "doc_param_parity": false,
   "doc_examples_present": false,
-  "doc_summary": null
+  "doc_summary": "High-recall harness for BM25 + RM3 and (optionally) SPLADE."
 }
 {
   "path": "app/routers/index_admin.py",

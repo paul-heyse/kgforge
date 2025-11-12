@@ -74,6 +74,36 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "cst_build/cst_serialize.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cst_build/cst_schema.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cst_build/cst_collect.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cst_build/cst_cli.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cst_build/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cst_build/cst_resolve.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "diagnostics/report_cli.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -130,6 +160,21 @@
 }
 {
   "path": "app/readiness.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "eval/pool_writer.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "eval/hybrid_evaluator.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "eval/__init__.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
@@ -214,6 +259,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "enrich/graph_builder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "enrich/output_writers.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -224,12 +274,32 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "enrich/ast_indexer.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "enrich/type_integration.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "enrich/slices_builder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/ownership.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "enrich/libcst_bridge.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "enrich/pathnorm.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }

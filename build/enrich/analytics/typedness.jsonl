@@ -104,6 +104,48 @@
   "untyped_defs": 0
 }
 {
+  "path": "cst_build/cst_serialize.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "cst_build/cst_schema.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "cst_build/cst_collect.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "cst_build/cst_cli.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "cst_build/__init__.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "cst_build/cst_resolve.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "diagnostics/report_cli.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -182,6 +224,27 @@
 }
 {
   "path": "app/readiness.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "eval/pool_writer.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "eval/hybrid_evaluator.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "eval/__init__.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -300,6 +363,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "enrich/graph_builder.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "enrich/output_writers.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -314,6 +384,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "enrich/ast_indexer.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "enrich/type_integration.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -321,7 +398,28 @@
   "untyped_defs": 0
 }
 {
+  "path": "enrich/slices_builder.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "enrich/ownership.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "enrich/libcst_bridge.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "enrich/pathnorm.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -876,8 +974,8 @@
 {
   "path": "patches/Supporting Documentation/BM25+SPLADEv3-patchfiles/tools_recall_harness.py",
   "type_error_count": 0,
-  "params_ratio": 1.0,
-  "returns_ratio": 1.0,
+  "params_ratio": 0.96,
+  "returns_ratio": 0.9,
   "untyped_defs": 0
 }
 {
