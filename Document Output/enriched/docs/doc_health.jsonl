@@ -99,7 +99,7 @@
 {
   "path": "polars_support.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Helpers for optional polars exports."
 }
@@ -764,7 +764,7 @@
 {
   "path": "retrieval/mcp_search.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Deep-Research compatible search/fetch orchestration helpers."
 }
@@ -855,7 +855,7 @@
 {
   "path": "mcp_server/server_semantic.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Semantic MCP tool registrations (pure move from server.py)."
 }
@@ -1058,7 +1058,7 @@
 {
   "path": "mcp_server/adapters/deep_research.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Adapters that expose MCP Deep-Research search/fetch semantics."
 }
@@ -1100,7 +1100,7 @@
 {
   "path": "patches/Supporting Documentation/BM25+SPLADEv3-patchfiles/tools_recall_harness.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "High-recall harness for BM25 + RM3 and (optionally) SPLADE."
 }
