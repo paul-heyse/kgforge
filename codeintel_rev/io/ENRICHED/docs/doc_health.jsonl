@@ -188,6 +188,13 @@
   "doc_summary": "GPU warmup and initialization sequence."
 }
 {
+  "path": "app/server_settings.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Server-facing configuration for FastAPI + Hypercorn deployment."
+}
+{
   "path": "app/config_context.py",
   "doc_has_summary": true,
   "doc_param_parity": true,

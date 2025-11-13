@@ -134,6 +134,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "app/server_settings.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "app/config_context.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0

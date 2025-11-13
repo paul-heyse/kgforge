@@ -188,6 +188,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "app/server_settings.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "app/config_context.py",
   "type_error_count": 0,
   "params_ratio": 1.0,

@@ -1,15 +1,15 @@
 {
   "path": "risk_hotspots.py",
   "module": "risk_hotspots",
-  "func_count": 2,
+  "func_count": 4,
   "class_count": 0,
-  "assign_count": 17,
-  "import_count": 7,
-  "branch_nodes": 10,
-  "cyclomatic": 11,
-  "cognitive": 12,
-  "max_nesting": 1,
-  "statements": 35
+  "assign_count": 19,
+  "import_count": 9,
+  "branch_nodes": 14,
+  "cyclomatic": 15,
+  "cognitive": 17,
+  "max_nesting": 2,
+  "statements": 56
 }
 {
   "path": "typing.py",
@@ -92,15 +92,15 @@
 {
   "path": "cli_enrich.py",
   "module": "cli_enrich",
-  "func_count": 55,
-  "class_count": 4,
-  "assign_count": 262,
-  "import_count": 29,
-  "branch_nodes": 164,
-  "cyclomatic": 165,
-  "cognitive": 169,
+  "func_count": 66,
+  "class_count": 10,
+  "assign_count": 325,
+  "import_count": 30,
+  "branch_nodes": 187,
+  "cyclomatic": 188,
+  "cognitive": 192,
   "max_nesting": 4,
-  "statements": 621
+  "statements": 744
 }
 {
   "path": "typedness.py",
@@ -121,12 +121,12 @@
   "func_count": 2,
   "class_count": 0,
   "assign_count": 10,
-  "import_count": 4,
-  "branch_nodes": 11,
-  "cyclomatic": 12,
-  "cognitive": 15,
+  "import_count": 3,
+  "branch_nodes": 10,
+  "cyclomatic": 11,
+  "cognitive": 14,
   "max_nesting": 3,
-  "statements": 34
+  "statements": 32
 }
 {
   "path": "errors.py",
@@ -224,7 +224,7 @@
   "module": "cst_build.cst_collect",
   "func_count": 40,
   "class_count": 3,
-  "assign_count": 94,
+  "assign_count": 98,
   "import_count": 14,
   "branch_nodes": 92,
   "cyclomatic": 93,
@@ -350,6 +350,19 @@
   "statements": 114
 }
 {
+  "path": "app/server_settings.py",
+  "module": "app.server_settings",
+  "func_count": 1,
+  "class_count": 1,
+  "assign_count": 14,
+  "import_count": 5,
+  "branch_nodes": 0,
+  "cyclomatic": 1,
+  "cognitive": 1,
+  "max_nesting": 0,
+  "statements": 25
+}
+{
   "path": "app/config_context.py",
   "module": "app.config_context",
   "func_count": 43,
@@ -367,13 +380,13 @@
   "module": "app.main",
   "func_count": 18,
   "class_count": 0,
-  "assign_count": 50,
-  "import_count": 28,
-  "branch_nodes": 44,
-  "cyclomatic": 45,
-  "cognitive": 49,
+  "assign_count": 54,
+  "import_count": 34,
+  "branch_nodes": 46,
+  "cyclomatic": 47,
+  "cognitive": 51,
   "max_nesting": 4,
-  "statements": 222
+  "statements": 235
 }
 {
   "path": "app/scope_store.py",
@@ -716,15 +729,15 @@
 {
   "path": "enrich/ast_indexer.py",
   "module": "enrich.ast_indexer",
-  "func_count": 39,
+  "func_count": 21,
   "class_count": 4,
-  "assign_count": 99,
+  "assign_count": 94,
   "import_count": 9,
-  "branch_nodes": 29,
-  "cyclomatic": 30,
-  "cognitive": 34,
+  "branch_nodes": 31,
+  "cyclomatic": 32,
+  "cognitive": 36,
   "max_nesting": 4,
-  "statements": 255
+  "statements": 200
 }
 {
   "path": "enrich/type_integration.py",
@@ -755,28 +768,28 @@
 {
   "path": "enrich/ownership.py",
   "module": "enrich.ownership",
-  "func_count": 11,
+  "func_count": 9,
   "class_count": 2,
-  "assign_count": 55,
+  "assign_count": 43,
   "import_count": 12,
-  "branch_nodes": 44,
-  "cyclomatic": 45,
-  "cognitive": 49,
+  "branch_nodes": 35,
+  "cyclomatic": 36,
+  "cognitive": 40,
   "max_nesting": 4,
-  "statements": 136
+  "statements": 116
 }
 {
   "path": "enrich/libcst_bridge.py",
   "module": "enrich.libcst_bridge",
-  "func_count": 23,
-  "class_count": 4,
-  "assign_count": 162,
+  "func_count": 35,
+  "class_count": 5,
+  "assign_count": 158,
   "import_count": 10,
-  "branch_nodes": 132,
-  "cyclomatic": 133,
-  "cognitive": 141,
-  "max_nesting": 8,
-  "statements": 371
+  "branch_nodes": 121,
+  "cyclomatic": 122,
+  "cognitive": 129,
+  "max_nesting": 7,
+  "statements": 389
 }
 {
   "path": "enrich/pathnorm.py",
@@ -795,14 +808,14 @@
   "path": "enrich/stubs_overlay.py",
   "module": "enrich.stubs_overlay",
   "func_count": 13,
-  "class_count": 2,
-  "assign_count": 65,
+  "class_count": 4,
+  "assign_count": 74,
   "import_count": 8,
   "branch_nodes": 76,
   "cyclomatic": 77,
   "cognitive": 82,
   "max_nesting": 5,
-  "statements": 207
+  "statements": 220
 }
 {
   "path": "enrich/__init__.py",
@@ -1043,13 +1056,13 @@
   "module": "io.faiss_manager",
   "func_count": 76,
   "class_count": 7,
-  "assign_count": 377,
+  "assign_count": 380,
   "import_count": 25,
-  "branch_nodes": 218,
-  "cyclomatic": 219,
-  "cognitive": 223,
+  "branch_nodes": 216,
+  "cyclomatic": 217,
+  "cognitive": 221,
   "max_nesting": 4,
-  "statements": 999
+  "statements": 1002
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -1290,13 +1303,13 @@
   "module": "retrieval.rerank_flat",
   "func_count": 9,
   "class_count": 0,
-  "assign_count": 42,
+  "assign_count": 49,
   "import_count": 4,
   "branch_nodes": 15,
   "cyclomatic": 16,
   "cognitive": 18,
   "max_nesting": 2,
-  "statements": 90
+  "statements": 105
 }
 {
   "path": "retrieval/__init__.py",
@@ -1576,13 +1589,13 @@
   "module": "cli.indexctl",
   "func_count": 26,
   "class_count": 0,
-  "assign_count": 116,
+  "assign_count": 123,
   "import_count": 17,
   "branch_nodes": 49,
   "cyclomatic": 50,
   "cognitive": 54,
   "max_nesting": 4,
-  "statements": 271
+  "statements": 278
 }
 {
   "path": "cli/splade.py",
@@ -1836,13 +1849,13 @@
   "module": "app.routers.index_admin",
   "func_count": 10,
   "class_count": 3,
-  "assign_count": 61,
+  "assign_count": 63,
   "import_count": 13,
   "branch_nodes": 21,
   "cyclomatic": 22,
   "cognitive": 24,
   "max_nesting": 2,
-  "statements": 137
+  "statements": 139
 }
 {
   "path": "app/routers/__init__.py",
