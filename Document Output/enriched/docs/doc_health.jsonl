@@ -97,6 +97,13 @@
   "doc_summary": "Resolve exports and re-exports for module records."
 }
 {
+  "path": "polars_support.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for optional polars exports."
+}
+{
   "path": "_lazy_imports.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -461,6 +468,13 @@
   "doc_summary": "RuntimeCell observer that writes lifecycle events to the active timeline."
 }
 {
+  "path": "observability/reporting.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Timeline-based run report builder and CLI helpers."
+}
+{
   "path": "observability/metrics.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -748,6 +762,13 @@
   "doc_summary": "Adaptive gating helpers for multi-stage retrieval pipelines."
 }
 {
+  "path": "retrieval/mcp_search.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Deep-Research compatible search/fetch orchestration helpers."
+}
+{
   "path": "retrieval/hybrid.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -834,7 +855,7 @@
 {
   "path": "mcp_server/server_semantic.py",
   "doc_has_summary": true,
-  "doc_param_parity": true,
+  "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "Semantic MCP tool registrations (pure move from server.py)."
 }
@@ -937,6 +958,13 @@
   "doc_summary": "Typer CLI for managing index lifecycle operations."
 }
 {
+  "path": "cli/telemetry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Telemetry-focused CLI commands."
+}
+{
   "path": "cli/splade.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -1026,6 +1054,13 @@
   "doc_param_parity": true,
   "doc_examples_present": true,
   "doc_summary": "Two-stage semantic search (CodeRank → optional WARP → optional reranker)."
+}
+{
+  "path": "mcp_server/adapters/deep_research.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Adapters that expose MCP Deep-Research search/fetch semantics."
 }
 {
   "path": "mcp_server/adapters/text_search.py",

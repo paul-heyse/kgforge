@@ -97,6 +97,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "polars_support.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "_lazy_imports.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -461,6 +468,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "observability/reporting.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "observability/metrics.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -748,6 +762,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "retrieval/mcp_search.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "retrieval/hybrid.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -937,6 +958,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "cli/telemetry.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "cli/splade.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -1022,6 +1050,13 @@
 }
 {
   "path": "mcp_server/adapters/semantic_pro.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "mcp_server/adapters/deep_research.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
