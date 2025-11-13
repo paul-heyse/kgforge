@@ -342,6 +342,13 @@
   "doc_summary": "cAST chunking using SCIP symbol ranges."
 }
 {
+  "path": "indexing/chunk_ids.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Deterministic chunk identifier helpers."
+}
+{
   "path": "metrics/registry.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -414,7 +421,7 @@
 {
   "path": "enrich/ownership.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Ownership, churn, and bus-factor analytics sourced from Git history."
 }
@@ -428,7 +435,7 @@
 {
   "path": "enrich/pathnorm.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Helpers for repo-relative path normalization and stable identifiers."
 }
@@ -480,6 +487,62 @@
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Lightweight per-session timeline recording utilities."
+}
+{
+  "path": "telemetry/context.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Context variable helpers for telemetry metadata."
+}
+{
+  "path": "telemetry/decorators.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Decorators for consistent span/timeline instrumentation."
+}
+{
+  "path": "telemetry/logging.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Structured logging bridge + optional OTLP exporter."
+}
+{
+  "path": "telemetry/reporter.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "In-memory run report builder fed by timeline events."
+}
+{
+  "path": "telemetry/events.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Typed event helpers shared across telemetry modules."
+}
+{
+  "path": "telemetry/otel.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "OpenTelemetry bootstrap helpers for CodeIntel."
+}
+{
+  "path": "telemetry/prom.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Prometheus helpers for MCP diagnostics."
+}
+{
+  "path": "telemetry/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Phase-0 telemetry helpers (tracing, metrics, logging, run reports)."
 }
 {
   "path": "io/rrf.py",
@@ -844,6 +907,20 @@
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Feature-normalized hybrid pooling utilities."
+}
+{
+  "path": "embeddings/embedding_service.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Embedding provider abstractions for chunk ingestion and runtime services."
+}
+{
+  "path": "embeddings/__init__.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Embedding provider public API."
 }
 {
   "path": "cli/xtr.py",

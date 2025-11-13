@@ -244,6 +244,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "indexing/chunk_ids.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "metrics/registry.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -340,6 +345,46 @@
 }
 {
   "path": "observability/timeline.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/context.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/decorators.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/logging.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/reporter.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/events.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/otel.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/prom.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/__init__.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
@@ -600,6 +645,16 @@
 }
 {
   "path": "evaluation/hybrid_pool.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "embeddings/embedding_service.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "embeddings/__init__.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }

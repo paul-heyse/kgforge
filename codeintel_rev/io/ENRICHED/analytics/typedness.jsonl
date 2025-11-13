@@ -342,6 +342,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "indexing/chunk_ids.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "metrics/registry.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -476,6 +483,62 @@
 }
 {
   "path": "observability/timeline.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/context.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/decorators.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/logging.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/reporter.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/events.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/otel.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/prom.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/__init__.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -840,6 +903,20 @@
 }
 {
   "path": "evaluation/hybrid_pool.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "embeddings/embedding_service.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "embeddings/__init__.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
