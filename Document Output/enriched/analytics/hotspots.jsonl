@@ -720,7 +720,7 @@
 }
 {
   "path": "io/hybrid_search.py",
-  "hotspot_score": 3.234,
+  "hotspot_score": 3.239,
   "fan_in": 5,
   "fan_out": 16,
   "type_error_count": 0,
@@ -736,7 +736,7 @@
 }
 {
   "path": "io/faiss_manager.py",
-  "hotspot_score": 3.377,
+  "hotspot_score": 3.388,
   "fan_in": 8,
   "fan_out": 10,
   "type_error_count": 0,
@@ -848,8 +848,8 @@
 }
 {
   "path": "retrieval/types.py",
-  "hotspot_score": 2.018,
-  "fan_in": 13,
+  "hotspot_score": 2.046,
+  "fan_in": 14,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
@@ -880,9 +880,9 @@
 }
 {
   "path": "retrieval/hybrid.py",
-  "hotspot_score": 1.361,
+  "hotspot_score": 1.524,
   "fan_in": 0,
-  "fan_out": 1,
+  "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1088,7 +1088,7 @@
 }
 {
   "path": "cli/indexctl.py",
-  "hotspot_score": 2.966,
+  "hotspot_score": 2.969,
   "fan_in": 0,
   "fan_out": 12,
   "type_error_count": 0,

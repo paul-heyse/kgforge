@@ -4287,7 +4287,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 21,
+  "cycle_group": 23,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/type_integration.py"
@@ -4438,7 +4438,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 23,
+  "cycle_group": 18,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.515,
@@ -4848,8 +4848,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 4,
-  "recent_churn_90": 4
+  "recent_churn_30": 5,
+  "recent_churn_90": 5
 }
 {
   "path": "uses_builder.py",
@@ -5072,7 +5072,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 18,
+  "cycle_group": 15,
   "imports_internal": [
     "enrich/scip_reader.py",
     "polars_support.py",
@@ -5350,7 +5350,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 22,
+  "cycle_group": 21,
   "imports_internal": [
     "module_utils.py",
     "typing.py"
@@ -5500,8 +5500,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "_lazy_imports.py",
@@ -6476,152 +6476,152 @@
     {
       "kind": "class",
       "name": "CSTCollector",
-      "lineno": 138
+      "lineno": 135
     },
     {
       "kind": "function",
       "name": "index_file",
-      "lineno": 363
+      "lineno": 360
     },
     {
       "kind": "function",
       "name": "_should_emit",
-      "lineno": 383
+      "lineno": 380
     },
     {
       "kind": "function",
       "name": "_resolve_span",
-      "lineno": 410
+      "lineno": 407
     },
     {
       "kind": "function",
       "name": "_node_id",
-      "lineno": 420
+      "lineno": 417
     },
     {
       "kind": "function",
       "name": "_node_name",
-      "lineno": 426
+      "lineno": 423
     },
     {
       "kind": "function",
       "name": "_definition_or_class_name",
-      "lineno": 437
+      "lineno": 434
     },
     {
       "kind": "function",
       "name": "_assign_target_name",
-      "lineno": 443
+      "lineno": 440
     },
     {
       "kind": "function",
       "name": "_annassign_target_name",
-      "lineno": 451
+      "lineno": 448
     },
     {
       "kind": "function",
       "name": "_attribute_or_name",
-      "lineno": 457
+      "lineno": 454
     },
     {
       "kind": "function",
       "name": "_call_target_name",
-      "lineno": 465
+      "lineno": 462
     },
     {
       "kind": "function",
       "name": "_import_alias_name",
-      "lineno": 471
+      "lineno": 468
     },
     {
       "kind": "function",
       "name": "_parent_chain",
-      "lineno": 489
+      "lineno": 486
     },
     {
       "kind": "function",
       "name": "_scope",
-      "lineno": 518
+      "lineno": 515
     },
     {
       "kind": "function",
       "name": "_extract_module_doc",
-      "lineno": 535
+      "lineno": 532
     },
     {
       "kind": "function",
       "name": "_summarize",
-      "lineno": 542
+      "lineno": 539
     },
     {
       "kind": "function",
       "name": "_doc_snippet",
-      "lineno": 549
+      "lineno": 546
     },
     {
       "kind": "function",
       "name": "_preview_text",
-      "lineno": 560
+      "lineno": 557
     },
     {
       "kind": "function",
       "name": "_decorators",
-      "lineno": 568
+      "lineno": 565
     },
     {
       "kind": "function",
       "name": "_call_targets",
-      "lineno": 584
+      "lineno": 581
     },
     {
       "kind": "function",
       "name": "_annotation",
-      "lineno": 596
+      "lineno": 593
     },
     {
       "kind": "function",
       "name": "_import_metadata",
-      "lineno": 612
+      "lineno": 609
     },
     {
       "kind": "function",
       "name": "_normalize_alias",
-      "lineno": 650
+      "lineno": 647
     },
     {
       "kind": "function",
       "name": "_normalize_module_expr",
-      "lineno": 667
+      "lineno": 664
     },
     {
       "kind": "function",
       "name": "_is_public",
-      "lineno": 677
+      "lineno": 674
     },
     {
       "kind": "function",
       "name": "_resolve_lazy",
-      "lineno": 687
+      "lineno": 684
     },
     {
       "kind": "function",
       "name": "_qualified_name_entries",
-      "lineno": 696
+      "lineno": 693
     },
     {
       "kind": "function",
       "name": "_normalize_qnames",
-      "lineno": 715
+      "lineno": 712
     },
     {
       "kind": "function",
       "name": "_module_name_from_path",
-      "lineno": 724
+      "lineno": 721
     },
     {
       "kind": "function",
       "name": "_build_parse_error_node",
-      "lineno": 755
+      "lineno": 752
     }
   ],
   "exports": [],
@@ -6727,10 +6727,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/CollectorConfig#max_preview_chars.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/CollectorConfig#text_preview_skip_bytes.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#_replace().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#_replace().(field_name)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#_replace().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#_replace().(value)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#files_indexed.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#increment_parse_errors().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cst_build.cst_collect`/_CollectorStatsBuilder#increment_parse_errors().(count)",
@@ -6872,7 +6868,7 @@
       "name": "CSTCollector",
       "kind": "class",
       "public": true,
-      "lineno": 138,
+      "lineno": 135,
       "doc_summary": "Collect LibCST node records for a repository.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -6882,7 +6878,7 @@
       "name": "index_file",
       "kind": "function",
       "public": true,
-      "lineno": 363,
+      "lineno": 360,
       "doc_summary": "Index a single file and return node records.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -6892,7 +6888,7 @@
       "name": "_should_emit",
       "kind": "function",
       "public": false,
-      "lineno": 383,
+      "lineno": 380,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6902,7 +6898,7 @@
       "name": "_resolve_span",
       "kind": "function",
       "public": false,
-      "lineno": 410,
+      "lineno": 407,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6912,7 +6908,7 @@
       "name": "_node_id",
       "kind": "function",
       "public": false,
-      "lineno": 420,
+      "lineno": 417,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6922,7 +6918,7 @@
       "name": "_node_name",
       "kind": "function",
       "public": false,
-      "lineno": 426,
+      "lineno": 423,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6932,7 +6928,7 @@
       "name": "_definition_or_class_name",
       "kind": "function",
       "public": false,
-      "lineno": 437,
+      "lineno": 434,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6942,7 +6938,7 @@
       "name": "_assign_target_name",
       "kind": "function",
       "public": false,
-      "lineno": 443,
+      "lineno": 440,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6952,7 +6948,7 @@
       "name": "_annassign_target_name",
       "kind": "function",
       "public": false,
-      "lineno": 451,
+      "lineno": 448,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6962,7 +6958,7 @@
       "name": "_attribute_or_name",
       "kind": "function",
       "public": false,
-      "lineno": 457,
+      "lineno": 454,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6972,7 +6968,7 @@
       "name": "_call_target_name",
       "kind": "function",
       "public": false,
-      "lineno": 465,
+      "lineno": 462,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6982,7 +6978,7 @@
       "name": "_import_alias_name",
       "kind": "function",
       "public": false,
-      "lineno": 471,
+      "lineno": 468,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -6992,7 +6988,7 @@
       "name": "_parent_chain",
       "kind": "function",
       "public": false,
-      "lineno": 489,
+      "lineno": 486,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7002,7 +6998,7 @@
       "name": "_scope",
       "kind": "function",
       "public": false,
-      "lineno": 518,
+      "lineno": 515,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7012,7 +7008,7 @@
       "name": "_extract_module_doc",
       "kind": "function",
       "public": false,
-      "lineno": 535,
+      "lineno": 532,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7022,7 +7018,7 @@
       "name": "_summarize",
       "kind": "function",
       "public": false,
-      "lineno": 542,
+      "lineno": 539,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7032,7 +7028,7 @@
       "name": "_doc_snippet",
       "kind": "function",
       "public": false,
-      "lineno": 549,
+      "lineno": 546,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7042,7 +7038,7 @@
       "name": "_preview_text",
       "kind": "function",
       "public": false,
-      "lineno": 560,
+      "lineno": 557,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7052,7 +7048,7 @@
       "name": "_decorators",
       "kind": "function",
       "public": false,
-      "lineno": 568,
+      "lineno": 565,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7062,7 +7058,7 @@
       "name": "_call_targets",
       "kind": "function",
       "public": false,
-      "lineno": 584,
+      "lineno": 581,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7072,7 +7068,7 @@
       "name": "_annotation",
       "kind": "function",
       "public": false,
-      "lineno": 596,
+      "lineno": 593,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7082,7 +7078,7 @@
       "name": "_import_metadata",
       "kind": "function",
       "public": false,
-      "lineno": 612,
+      "lineno": 609,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7092,7 +7088,7 @@
       "name": "_normalize_alias",
       "kind": "function",
       "public": false,
-      "lineno": 650,
+      "lineno": 647,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7102,7 +7098,7 @@
       "name": "_normalize_module_expr",
       "kind": "function",
       "public": false,
-      "lineno": 667,
+      "lineno": 664,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7112,7 +7108,7 @@
       "name": "_is_public",
       "kind": "function",
       "public": false,
-      "lineno": 677,
+      "lineno": 674,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7122,7 +7118,7 @@
       "name": "_resolve_lazy",
       "kind": "function",
       "public": false,
-      "lineno": 687,
+      "lineno": 684,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7132,7 +7128,7 @@
       "name": "_qualified_name_entries",
       "kind": "function",
       "public": false,
-      "lineno": 696,
+      "lineno": 693,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7142,7 +7138,7 @@
       "name": "_normalize_qnames",
       "kind": "function",
       "public": false,
-      "lineno": 715,
+      "lineno": 712,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -7152,7 +7148,7 @@
       "name": "_module_name_from_path",
       "kind": "function",
       "public": false,
-      "lineno": 724,
+      "lineno": 721,
       "doc_summary": "Convert a relative file path into its dotted module name.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -7162,7 +7158,7 @@
       "name": "_build_parse_error_node",
       "kind": "function",
       "public": false,
-      "lineno": 755,
+      "lineno": 752,
       "doc_summary": "Return a placeholder row describing a parse failure.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -7184,7 +7180,7 @@
   "complexity": {
     "branches": 101,
     "cyclomatic": 102,
-    "loc": 794
+    "loc": 791
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -9354,8 +9350,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 11,
-  "recent_churn_90": 11
+  "recent_churn_30": 12,
+  "recent_churn_90": 12
 }
 {
   "path": "app/gpu_warmup.py",
@@ -10794,7 +10790,7 @@
   "overlay_needed": false,
   "fan_in": 23,
   "fan_out": 17,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "app/capabilities.py",
     "app/scope_store.py",
@@ -11744,8 +11740,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 28,
-  "recent_churn_90": 28
+  "recent_churn_30": 29,
+  "recent_churn_90": 29
 }
 {
   "path": "app/scope_store.py",
@@ -12183,7 +12179,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 53,
+  "cycle_group": 69,
   "imports_internal": [
     "mcp_server/schemas.py",
     "typing.py"
@@ -12660,7 +12656,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 3,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "app/config_context.py",
     "errors.py",
@@ -13004,7 +13000,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 85,
+  "cycle_group": 78,
   "imports_internal": [
     "_lazy_imports.py",
     "app/config_context.py",
@@ -13193,17 +13189,17 @@
     {
       "kind": "function",
       "name": "_empty_table",
-      "lineno": 48
+      "lineno": 62
     },
     {
       "kind": "function",
       "name": "_normalize_meta",
-      "lineno": 84
+      "lineno": 98
     },
     {
       "kind": "function",
       "name": "write_pool",
-      "lineno": 122
+      "lineno": 136
     }
   ],
   "exports": [
@@ -13299,7 +13295,7 @@
       "name": "_empty_table",
       "kind": "function",
       "public": false,
-      "lineno": 48,
+      "lineno": 62,
       "doc_summary": "Return an empty evaluator table with the expected schema.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -13309,7 +13305,7 @@
       "name": "_normalize_meta",
       "kind": "function",
       "public": false,
-      "lineno": 84,
+      "lineno": 98,
       "doc_summary": "Return a JSON-serialisable copy of ``meta``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -13319,7 +13315,7 @@
       "name": "write_pool",
       "kind": "function",
       "public": true,
-      "lineno": 122,
+      "lineno": 136,
       "doc_summary": "Write `(query_id, channel, rank, chunk_id, score, uri, ...)` rows to Parquet.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -13341,7 +13337,7 @@
   "complexity": {
     "branches": 15,
     "cyclomatic": 16,
-    "loc": 184
+    "loc": 198
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -13366,8 +13362,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 7,
-  "recent_churn_90": 7
+  "recent_churn_30": 8,
+  "recent_churn_90": 8
 }
 {
   "path": "eval/hybrid_evaluator.py",
@@ -13788,8 +13784,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 7,
-  "recent_churn_90": 7
+  "recent_churn_30": 8,
+  "recent_churn_90": 8
 }
 {
   "path": "eval/__init__.py",
@@ -13904,8 +13900,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "bin/eval_offline.py",
@@ -16822,7 +16818,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 47,
+  "cycle_group": 44,
   "imports_internal": [
     "typing.py"
   ],
@@ -17718,7 +17714,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 2,
-  "cycle_group": 62,
+  "cycle_group": 67,
   "imports_internal": [
     "errors.py",
     "typing.py"
@@ -18312,7 +18308,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 48,
+  "cycle_group": 45,
   "imports_internal": [
     "indexing/scip_reader.py",
     "typing.py"
@@ -18439,7 +18435,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 49,
+  "cycle_group": 46,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.24,
@@ -18899,7 +18895,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 0,
-  "cycle_group": 51,
+  "cycle_group": 52,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.655,
@@ -19224,7 +19220,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 17,
+  "cycle_group": 9,
   "imports_internal": [
     "typing.py"
   ],
@@ -19496,7 +19492,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 14,
+  "cycle_group": 13,
   "imports_internal": [
     "typing.py"
   ],
@@ -19603,7 +19599,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 16,
+  "cycle_group": 10,
   "imports_internal": [
     "graph_builder.py"
   ],
@@ -20238,7 +20234,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 0,
-  "cycle_group": 10,
+  "cycle_group": 12,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.547,
@@ -20488,7 +20484,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 13,
+  "cycle_group": 20,
   "imports_internal": [
     "typing.py"
   ],
@@ -21375,7 +21371,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 20,
+  "cycle_group": 22,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.789,
@@ -21626,7 +21622,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 11,
+  "cycle_group": 14,
   "imports_internal": [
     "enrich/output_writers.py",
     "typing.py"
@@ -22101,7 +22097,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 12,
+  "cycle_group": 11,
   "imports_internal": [
     "typing.py"
   ],
@@ -22944,7 +22940,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 9,
+  "cycle_group": 16,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.543,
@@ -23463,7 +23459,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 15,
+  "cycle_group": 17,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/output_writers.py",
@@ -23691,7 +23687,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 83,
+  "cycle_group": 77,
   "imports_internal": [
     "observability/timeline.py",
     "runtime/cells.py"
@@ -24071,7 +24067,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 2,
-  "cycle_group": 77,
+  "cycle_group": 82,
   "imports_internal": [
     "observability/timeline.py",
     "typing.py"
@@ -24088,8 +24084,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 2,
-  "recent_churn_90": 2
+  "recent_churn_30": 3,
+  "recent_churn_90": 3
 }
 {
   "path": "observability/metrics.py",
@@ -24350,7 +24346,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 59,
+  "cycle_group": 66,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.524,
@@ -24880,7 +24876,7 @@
   "overlay_needed": false,
   "fan_in": 10,
   "fan_out": 1,
-  "cycle_group": 40,
+  "cycle_group": 41,
   "imports_internal": [
     "typing.py"
   ],
@@ -24895,8 +24891,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 5,
-  "recent_churn_90": 5
+  "recent_churn_30": 6,
+  "recent_churn_90": 6
 }
 {
   "path": "observability/__init__.py",
@@ -25591,7 +25587,7 @@
   "overlay_needed": false,
   "fan_in": 19,
   "fan_out": 2,
-  "cycle_group": 41,
+  "cycle_group": 42,
   "imports_internal": [
     "observability/otel.py",
     "typing.py"
@@ -25608,8 +25604,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 8,
-  "recent_churn_90": 8
+  "recent_churn_30": 9,
+  "recent_churn_90": 9
 }
 {
   "path": "telemetry/context.py",
@@ -25948,7 +25944,7 @@
   "overlay_needed": false,
   "fan_in": 9,
   "fan_out": 2,
-  "cycle_group": 45,
+  "cycle_group": 40,
   "imports_internal": [
     "runtime/request_context.py",
     "typing.py"
@@ -26594,7 +26590,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 4,
-  "cycle_group": 46,
+  "cycle_group": 50,
   "imports_internal": [
     "observability/timeline.py",
     "telemetry/context.py",
@@ -26615,8 +26611,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "telemetry/logging.py",
@@ -26803,7 +26799,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 84,
+  "cycle_group": 76,
   "imports_internal": [
     "telemetry/otel.py",
     "typing.py"
@@ -27597,7 +27593,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 70,
+  "cycle_group": 43,
   "imports_internal": [
     "typing.py"
   ],
@@ -28185,8 +28181,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "telemetry/prom.py",
@@ -28641,7 +28637,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 1,
-  "cycle_group": 44,
+  "cycle_group": 49,
   "imports_internal": [
     "typing.py"
   ],
@@ -28656,8 +28652,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "telemetry/__init__.py",
@@ -28911,7 +28907,7 @@
     {
       "module": "codeintel_rev.retrieval.types",
       "names": [
-        "ChannelHit"
+        "SearchHit"
       ],
       "aliases": {},
       "is_star": false,
@@ -28927,12 +28923,12 @@
     {
       "kind": "function",
       "name": "_normalize_channel_hits",
-      "lineno": 108
+      "lineno": 114
     },
     {
       "kind": "function",
       "name": "_to_int",
-      "lineno": 154
+      "lineno": 160
     }
   ],
   "exports": [
@@ -28963,20 +28959,21 @@
     "local 24",
     "local 25",
     "local 26",
-    "local 28",
+    "local 27",
     "local 29",
     "local 3",
-    "local 31",
+    "local 30",
     "local 32",
     "local 33",
     "local 34",
     "local 35",
     "local 36",
-    "local 38",
+    "local 37",
+    "local 39",
     "local 4",
     "local 5",
     "local 6",
-    "local 9",
+    "local 7",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.rrf`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.rrf`/__init__:",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.rrf`/_normalize_channel_hits().",
@@ -29020,7 +29017,7 @@
       "name": "_normalize_channel_hits",
       "kind": "function",
       "public": false,
-      "lineno": 108,
+      "lineno": 114,
       "doc_summary": "Normalize channel hit scores using the specified mode.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -29030,7 +29027,7 @@
       "name": "_to_int",
       "kind": "function",
       "public": false,
-      "lineno": 154,
+      "lineno": 160,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -29052,7 +29049,7 @@
   "complexity": {
     "branches": 7,
     "cyclomatic": 8,
-    "loc": 163
+    "loc": 169
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -29196,7 +29193,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 0,
-  "cycle_group": 78,
+  "cycle_group": 80,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.801,
@@ -29865,7 +29862,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 4,
-  "cycle_group": 66,
+  "cycle_group": 59,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -30085,7 +30082,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 63,
+  "cycle_group": 68,
   "imports_internal": [
     "io/duckdb_manager.py"
   ],
@@ -31778,7 +31775,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 7,
-  "cycle_group": 67,
+  "cycle_group": 60,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -31805,8 +31802,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 22,
-  "recent_churn_90": 22
+  "recent_churn_30": 23,
+  "recent_churn_90": 23
 }
 {
   "path": "io/parquet_store.py",
@@ -32184,7 +32181,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 4,
-  "cycle_group": 50,
+  "cycle_group": 47,
   "imports_internal": [
     "_lazy_imports.py",
     "indexing/cast_chunker.py",
@@ -32595,7 +32592,7 @@
   "overlay_needed": false,
   "fan_in": 10,
   "fan_out": 4,
-  "cycle_group": 42,
+  "cycle_group": 48,
   "imports_internal": [
     "_lazy_imports.py",
     "observability/otel.py",
@@ -32616,8 +32613,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 6,
-  "recent_churn_90": 6
+  "recent_churn_30": 7,
+  "recent_churn_90": 7
 }
 {
   "path": "io/xtr_manager.py",
@@ -33003,7 +33000,7 @@
   "overlay_needed": false,
   "fan_in": 8,
   "fan_out": 4,
-  "cycle_group": 68,
+  "cycle_group": 58,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -33208,9 +33205,9 @@
     {
       "module": "codeintel_rev.retrieval.types",
       "names": [
-        "ChannelHit",
         "HybridResultDoc",
-        "HybridSearchResult"
+        "HybridSearchResult",
+        "SearchHit"
       ],
       "aliases": {},
       "is_star": false,
@@ -33276,72 +33273,71 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 42
+      "lineno": 38
     },
     {
       "kind": "class",
       "name": "_LuceneHit",
-      "lineno": 45
+      "lineno": 41
     },
     {
       "kind": "class",
       "name": "_LuceneSearcher",
-      "lineno": 50
+      "lineno": 46
     },
     {
       "kind": "class",
       "name": "BM25Rm3Config",
-      "lineno": 65
+      "lineno": 61
     },
     {
       "kind": "class",
       "name": "BM25SearchProvider",
-      "lineno": 74
+      "lineno": 70
     },
     {
       "kind": "class",
       "name": "SpladeSearchProvider",
-      "lineno": 164
+      "lineno": 169
     },
     {
       "kind": "class",
       "name": "HybridSearchTuning",
-      "lineno": 312
+      "lineno": 326
     },
     {
       "kind": "class",
       "name": "HybridSearchOptions",
-      "lineno": 320
+      "lineno": 334
     },
     {
       "kind": "class",
       "name": "_MethodStats",
-      "lineno": 329
+      "lineno": 343
     },
     {
       "kind": "class",
       "name": "_FusionContext",
-      "lineno": 338
-    },
-    {
-      "kind": "class",
-      "name": "_SearchTelemetryContext",
       "lineno": 352
     },
     {
       "kind": "class",
+      "name": "_SearchTelemetryContext",
+      "lineno": 366
+    },
+    {
+      "kind": "class",
       "name": "_FusionWork",
-      "lineno": 358
+      "lineno": 372
     },
     {
       "kind": "class",
       "name": "HybridSearchEngine",
-      "lineno": 372
+      "lineno": 386
     }
   ],
   "exports": [
     "BM25SearchProvider",
-    "ChannelHit",
     "HybridResultDoc",
     "HybridSearchEngine",
     "HybridSearchOptions",
@@ -33351,7 +33347,6 @@
   ],
   "exports_declared": [
     "BM25SearchProvider",
-    "ChannelHit",
     "HybridResultDoc",
     "HybridSearchEngine",
     "HybridSearchOptions",
@@ -33364,19 +33359,18 @@
     "local 0",
     "local 1",
     "local 10",
-    "local 100",
     "local 101",
     "local 102",
     "local 103",
     "local 104",
-    "local 109",
+    "local 105",
     "local 11",
     "local 110",
     "local 111",
     "local 112",
     "local 113",
     "local 114",
-    "local 118",
+    "local 115",
     "local 119",
     "local 12",
     "local 120",
@@ -33385,7 +33379,7 @@
     "local 123",
     "local 124",
     "local 125",
-    "local 127",
+    "local 126",
     "local 128",
     "local 129",
     "local 13",
@@ -33394,54 +33388,54 @@
     "local 132",
     "local 133",
     "local 134",
-    "local 136",
+    "local 135",
     "local 137",
     "local 138",
     "local 139",
     "local 14",
-    "local 142",
+    "local 140",
     "local 143",
-    "local 147",
+    "local 144",
     "local 148",
+    "local 149",
     "local 15",
-    "local 150",
     "local 151",
     "local 152",
     "local 153",
     "local 154",
-    "local 157",
+    "local 155",
     "local 158",
     "local 159",
     "local 16",
     "local 160",
     "local 161",
     "local 162",
-    "local 164",
+    "local 163",
     "local 165",
     "local 166",
-    "local 168",
+    "local 167",
     "local 169",
     "local 17",
-    "local 171",
-    "local 173",
-    "local 175",
-    "local 179",
+    "local 170",
+    "local 172",
+    "local 174",
+    "local 176",
     "local 18",
-    "local 182",
+    "local 180",
     "local 183",
     "local 184",
-    "local 186",
+    "local 185",
     "local 187",
     "local 188",
     "local 189",
     "local 19",
-    "local 192",
-    "local 194",
-    "local 199",
+    "local 190",
+    "local 193",
+    "local 195",
     "local 2",
     "local 20",
     "local 200",
-    "local 202",
+    "local 201",
     "local 203",
     "local 204",
     "local 205",
@@ -33451,7 +33445,7 @@
     "local 209",
     "local 21",
     "local 210",
-    "local 212",
+    "local 211",
     "local 213",
     "local 214",
     "local 215",
@@ -33459,37 +33453,36 @@
     "local 217",
     "local 218",
     "local 219",
+    "local 22",
     "local 220",
     "local 221",
-    "local 223",
-    "local 225",
+    "local 222",
+    "local 224",
     "local 226",
     "local 227",
     "local 228",
-    "local 23",
-    "local 231",
-    "local 232",
-    "local 233",
-    "local 234",
-    "local 235",
+    "local 229",
     "local 236",
     "local 237",
+    "local 238",
     "local 239",
     "local 24",
     "local 240",
-    "local 241",
     "local 242",
     "local 243",
     "local 244",
     "local 245",
     "local 246",
+    "local 247",
+    "local 248",
+    "local 249",
     "local 25",
-    "local 257",
-    "local 258",
     "local 259",
     "local 26",
+    "local 260",
     "local 261",
-    "local 262",
+    "local 263",
+    "local 264",
     "local 27",
     "local 28",
     "local 29",
@@ -33508,11 +33501,11 @@
     "local 40",
     "local 41",
     "local 42",
-    "local 46",
-    "local 47",
+    "local 43",
+    "local 44",
+    "local 48",
+    "local 49",
     "local 5",
-    "local 50",
-    "local 51",
     "local 52",
     "local 53",
     "local 54",
@@ -33526,10 +33519,11 @@
     "local 61",
     "local 62",
     "local 63",
-    "local 68",
+    "local 64",
+    "local 65",
     "local 69",
     "local 7",
-    "local 71",
+    "local 70",
     "local 72",
     "local 73",
     "local 74",
@@ -33539,17 +33533,18 @@
     "local 78",
     "local 79",
     "local 8",
-    "local 82",
+    "local 80",
     "local 83",
     "local 84",
     "local 85",
+    "local 86",
     "local 9",
-    "local 90",
     "local 91",
-    "local 93",
-    "local 96",
+    "local 92",
+    "local 94",
     "local 97",
     "local 98",
+    "local 99",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.hybrid_search`/BM25Rm3Config#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.hybrid_search`/BM25Rm3Config#auto_rm3.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.hybrid_search`/BM25Rm3Config#enable_rm3.",
@@ -33833,7 +33828,7 @@
       "name": "_LuceneHit",
       "kind": "class",
       "public": false,
-      "lineno": 45,
+      "lineno": 41,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -33843,7 +33838,7 @@
       "name": "_LuceneSearcher",
       "kind": "class",
       "public": false,
-      "lineno": 50,
+      "lineno": 46,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -33853,7 +33848,7 @@
       "name": "BM25Rm3Config",
       "kind": "class",
       "public": true,
-      "lineno": 65,
+      "lineno": 61,
       "doc_summary": "Bundle RM3 parameters and heuristics for BM25 search.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33863,7 +33858,7 @@
       "name": "BM25SearchProvider",
       "kind": "class",
       "public": true,
-      "lineno": 74,
+      "lineno": 70,
       "doc_summary": "Pyserini-backed BM25 searcher with optional RM3 heuristics.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33873,7 +33868,7 @@
       "name": "SpladeSearchProvider",
       "kind": "class",
       "public": true,
-      "lineno": 164,
+      "lineno": 169,
       "doc_summary": "SPLADE query encoder and Lucene impact searcher for learned sparse retrieval.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33883,7 +33878,7 @@
       "name": "HybridSearchTuning",
       "kind": "class",
       "public": true,
-      "lineno": 312,
+      "lineno": 326,
       "doc_summary": "Runtime overrides for FAISS search metadata.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33893,7 +33888,7 @@
       "name": "HybridSearchOptions",
       "kind": "class",
       "public": true,
-      "lineno": 320,
+      "lineno": 334,
       "doc_summary": "Optional knobs influencing hybrid fusion.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33903,7 +33898,7 @@
       "name": "_MethodStats",
       "kind": "class",
       "public": false,
-      "lineno": 329,
+      "lineno": 343,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -33913,7 +33908,7 @@
       "name": "_FusionContext",
       "kind": "class",
       "public": false,
-      "lineno": 338,
+      "lineno": 352,
       "doc_summary": "All inputs required to fuse dense and sparse channel runs.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33923,7 +33918,7 @@
       "name": "_SearchTelemetryContext",
       "kind": "class",
       "public": false,
-      "lineno": 352,
+      "lineno": 366,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -33933,7 +33928,7 @@
       "name": "_FusionWork",
       "kind": "class",
       "public": false,
-      "lineno": 358,
+      "lineno": 372,
       "doc_summary": "Resolved fusion parameters after pooler/weights are selected.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33943,7 +33938,7 @@
       "name": "HybridSearchEngine",
       "kind": "class",
       "public": true,
-      "lineno": 372,
+      "lineno": 386,
       "doc_summary": "Combine dense (FAISS) and sparse channel plugins via RRF.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -33963,9 +33958,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 124,
-    "cyclomatic": 125,
-    "loc": 1241
+    "branches": 126,
+    "cyclomatic": 127,
+    "loc": 1268
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -33973,7 +33968,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 16,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -34012,14 +34007,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.234,
+  "hotspot_score": 3.239,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 18,
-  "recent_churn_90": 18
+  "recent_churn_30": 19,
+  "recent_churn_90": 19
 }
 {
   "path": "io/warp_engine.py",
@@ -34381,6 +34376,16 @@
       "level": 0
     },
     {
+      "module": "numbers",
+      "names": [
+        "Integral",
+        "Real"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "pathlib",
       "names": [
         "Path"
@@ -34607,117 +34612,162 @@
     {
       "kind": "variable",
       "name": "FaissIndex",
-      "lineno": 61
+      "lineno": 62
     },
     {
       "kind": "variable",
       "name": "np",
-      "lineno": 63
-    },
-    {
-      "kind": "variable",
-      "name": "FaissIndex",
       "lineno": 64
     },
     {
       "kind": "variable",
-      "name": "pa",
-      "lineno": 70
+      "name": "FaissIndex",
+      "lineno": 65
     },
     {
       "kind": "variable",
-      "name": "pq",
+      "name": "pa",
       "lineno": 71
     },
     {
       "kind": "variable",
+      "name": "pq",
+      "lineno": 72
+    },
+    {
+      "kind": "variable",
       "name": "LOGGER",
-      "lineno": 73
+      "lineno": 74
     },
     {
       "kind": "variable",
       "name": "logger",
-      "lineno": 74
+      "lineno": 75
     },
     {
       "kind": "class",
       "name": "_LazyFaissProxy",
-      "lineno": 77
+      "lineno": 78
     },
     {
       "kind": "variable",
       "name": "faiss",
-      "lineno": 121
+      "lineno": 122
     },
     {
       "kind": "function",
       "name": "_faiss_module",
-      "lineno": 124
+      "lineno": 125
     },
     {
       "kind": "function",
       "name": "_has_faiss_gpu_support",
-      "lineno": 135
+      "lineno": 136
     },
     {
       "kind": "function",
       "name": "apply_parameters",
-      "lineno": 151
+      "lineno": 152
     },
     {
       "kind": "function",
       "name": "_log_extra",
-      "lineno": 208
+      "lineno": 209
     },
     {
       "kind": "class",
       "name": "FAISSRuntimeOptions",
-      "lineno": 226
+      "lineno": 227
     },
     {
       "kind": "class",
       "name": "SearchRuntimeOverrides",
-      "lineno": 247
+      "lineno": 248
     },
     {
       "kind": "class",
-      "name": "_SearchExecutionParams",
-      "lineno": 256
+      "name": "RefineSearchConfig",
+      "lineno": 257
     },
     {
       "kind": "class",
-      "name": "_SearchPlan",
+      "name": "_TuningOverrides",
       "lineno": 266
     },
     {
       "kind": "class",
+      "name": "_SearchExecutionParams",
+      "lineno": 277
+    },
+    {
+      "kind": "class",
+      "name": "_SearchPlan",
+      "lineno": 287
+    },
+    {
+      "kind": "class",
       "name": "_FAISSIdMapMixin",
-      "lineno": 276
+      "lineno": 297
     },
     {
       "kind": "class",
       "name": "FAISSManager",
-      "lineno": 453
+      "lineno": 474
     },
     {
       "kind": "class",
       "name": "AutoTuner",
-      "lineno": 3741
+      "lineno": 3607
     },
     {
       "kind": "function",
       "name": "_coerce_to_int",
-      "lineno": 3871
+      "lineno": 3737
     },
     {
       "kind": "function",
       "name": "_configure_direct_map",
-      "lineno": 3894
+      "lineno": 3760
     },
     {
       "kind": "function",
       "name": "_set_direct_map_type",
-      "lineno": 3902
+      "lineno": 3768
+    },
+    {
+      "kind": "function",
+      "name": "_wrap_bool_contains",
+      "lineno": 3811
+    },
+    {
+      "kind": "function",
+      "name": "_wrap_index_contains",
+      "lineno": 3847
+    },
+    {
+      "kind": "function",
+      "name": "_coerce_optional_int",
+      "lineno": 3885
+    },
+    {
+      "kind": "function",
+      "name": "_coerce_optional_float",
+      "lineno": 3919
+    },
+    {
+      "kind": "function",
+      "name": "_parse_tuning_overrides",
+      "lineno": 3953
+    },
+    {
+      "kind": "function",
+      "name": "_persist_tuning_profile",
+      "lineno": 3979
+    },
+    {
+      "kind": "function",
+      "name": "_get_compile_options",
+      "lineno": 3991
     }
   ],
   "exports": [
@@ -34747,10 +34797,10 @@
     "local 118",
     "local 119",
     "local 12",
-    "local 120",
+    "local 121",
     "local 122",
-    "local 123",
-    "local 126",
+    "local 125",
+    "local 128",
     "local 129",
     "local 13",
     "local 130",
@@ -34758,26 +34808,26 @@
     "local 132",
     "local 133",
     "local 134",
-    "local 135",
+    "local 136",
     "local 137",
     "local 138",
-    "local 139",
+    "local 140",
     "local 141",
     "local 142",
     "local 143",
     "local 144",
     "local 145",
     "local 146",
-    "local 147",
+    "local 148",
     "local 149",
     "local 150",
     "local 151",
     "local 152",
-    "local 153",
+    "local 154",
     "local 155",
     "local 156",
     "local 157",
-    "local 158",
+    "local 159",
     "local 16",
     "local 160",
     "local 161",
@@ -34801,11 +34851,11 @@
     "local 178",
     "local 179",
     "local 180",
-    "local 181",
+    "local 183",
     "local 184",
-    "local 185",
+    "local 186",
     "local 187",
-    "local 188",
+    "local 189",
     "local 19",
     "local 190",
     "local 191",
@@ -34835,21 +34885,21 @@
     "local 226",
     "local 227",
     "local 228",
-    "local 229",
     "local 23",
     "local 230",
-    "local 232",
+    "local 231",
     "local 233",
-    "local 234",
+    "local 235",
     "local 236",
+    "local 237",
     "local 238",
     "local 239",
     "local 240",
-    "local 241",
-    "local 242",
     "local 243",
-    "local 246",
+    "local 248",
+    "local 249",
     "local 25",
+    "local 250",
     "local 251",
     "local 252",
     "local 253",
@@ -34858,25 +34908,25 @@
     "local 256",
     "local 257",
     "local 258",
-    "local 259",
     "local 26",
-    "local 260",
-    "local 261",
-    "local 265",
-    "local 266",
+    "local 262",
+    "local 263",
+    "local 264",
     "local 267",
     "local 27",
     "local 270",
+    "local 271",
+    "local 272",
     "local 273",
     "local 274",
     "local 275",
-    "local 276",
-    "local 277",
     "local 278",
+    "local 279",
     "local 28",
     "local 281",
-    "local 282",
+    "local 283",
     "local 284",
+    "local 285",
     "local 286",
     "local 287",
     "local 288",
@@ -34887,63 +34937,64 @@
     "local 292",
     "local 293",
     "local 294",
-    "local 295",
-    "local 296",
     "local 297",
+    "local 299",
     "local 3",
-    "local 300",
+    "local 301",
     "local 302",
     "local 304",
-    "local 305",
+    "local 306",
     "local 307",
-    "local 309",
+    "local 308",
     "local 31",
-    "local 310",
-    "local 311",
+    "local 314",
+    "local 315",
+    "local 316",
     "local 317",
-    "local 318",
     "local 319",
-    "local 320",
-    "local 322",
+    "local 321",
+    "local 323",
     "local 324",
     "local 326",
-    "local 327",
-    "local 329",
+    "local 328",
     "local 33",
+    "local 330",
     "local 331",
+    "local 332",
     "local 333",
     "local 334",
     "local 335",
     "local 336",
-    "local 337",
     "local 338",
     "local 339",
     "local 34",
     "local 341",
     "local 342",
     "local 344",
-    "local 345",
-    "local 347",
+    "local 346",
+    "local 348",
     "local 349",
     "local 35",
+    "local 350",
     "local 351",
     "local 352",
     "local 353",
-    "local 354",
     "local 355",
+    "local 356",
     "local 357",
-    "local 358",
-    "local 359",
     "local 36",
+    "local 360",
     "local 361",
     "local 362",
     "local 363",
+    "local 364",
     "local 366",
     "local 367",
     "local 368",
     "local 369",
     "local 37",
     "local 370",
+    "local 371",
     "local 372",
     "local 373",
     "local 374",
@@ -34970,52 +35021,52 @@
     "local 393",
     "local 394",
     "local 395",
-    "local 396",
     "local 397",
-    "local 398",
     "local 399",
     "local 4",
     "local 40",
-    "local 400",
     "local 401",
+    "local 402",
     "local 403",
     "local 405",
+    "local 406",
     "local 407",
     "local 408",
     "local 409",
     "local 41",
-    "local 411",
-    "local 412",
     "local 413",
-    "local 414",
-    "local 415",
-    "local 419",
     "local 42",
+    "local 421",
+    "local 422",
+    "local 424",
     "local 427",
-    "local 428",
+    "local 429",
     "local 43",
     "local 430",
+    "local 431",
+    "local 432",
     "local 433",
+    "local 434",
     "local 435",
     "local 436",
-    "local 437",
     "local 438",
     "local 439",
     "local 44",
     "local 440",
     "local 441",
     "local 442",
+    "local 443",
     "local 444",
     "local 445",
     "local 446",
     "local 447",
-    "local 448",
     "local 449",
     "local 45",
     "local 450",
     "local 451",
     "local 452",
     "local 453",
+    "local 454",
     "local 455",
     "local 456",
     "local 457",
@@ -35026,44 +35077,49 @@
     "local 461",
     "local 462",
     "local 463",
-    "local 464",
-    "local 465",
     "local 466",
     "local 467",
     "local 468",
     "local 469",
+    "local 470",
     "local 472",
     "local 473",
     "local 474",
     "local 475",
     "local 476",
+    "local 477",
     "local 478",
-    "local 479",
     "local 48",
-    "local 480",
-    "local 481",
-    "local 482",
     "local 483",
     "local 484",
+    "local 485",
+    "local 486",
+    "local 488",
     "local 489",
     "local 49",
     "local 490",
-    "local 491",
     "local 492",
-    "local 494",
-    "local 495",
-    "local 496",
     "local 498",
+    "local 499",
     "local 5",
     "local 50",
+    "local 500",
+    "local 503",
     "local 504",
     "local 505",
     "local 506",
-    "local 509",
     "local 51",
     "local 510",
     "local 511",
+    "local 515",
+    "local 516",
+    "local 517",
+    "local 518",
+    "local 519",
     "local 52",
+    "local 520",
+    "local 521",
+    "local 522",
     "local 54",
     "local 58",
     "local 59",
@@ -35195,10 +35251,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_apply_runtime_parameters().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_apply_runtime_parameters().(overrides)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_apply_runtime_parameters().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_float().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_float().(value)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_int().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_int().(value)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_refine_results().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_refine_results().(catalog)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_maybe_refine_results().(identifiers)",
@@ -35261,6 +35313,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_sanitize_runtime_overrides().(k_factor)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_sanitize_runtime_overrides().(nprobe)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_sanitize_runtime_overrides().(quantizer_ef_search)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_save_tuning_profile().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_save_tuning_profile().(path)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_save_tuning_profile().(profile)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_save_tuning_profile().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_search_primary().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_search_primary().(k)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_search_primary().(nprobe)",
@@ -35284,10 +35340,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_try_load_cuvs().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_tuned_parameters.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_tuning_lock.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_wrap_bool_contains().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_wrap_bool_contains().(raw)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_wrap_index_contains().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_wrap_index_contains().(raw)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_write_meta_snapshot().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_write_meta_snapshot().(factory)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#_write_meta_snapshot().(parameter_space)",
@@ -35303,7 +35355,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_runtime_tuning().(nprobe)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_runtime_tuning().(quantizer_ef_search)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_runtime_tuning().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_tuning.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_tuning_profile().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_tuning_profile().(profile)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#apply_tuning_profile().(self)",
@@ -35321,8 +35372,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#clone_to_gpu().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#clone_to_gpu().(device)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#clone_to_gpu().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#contains().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#contains().(id_val)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#default_k.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#default_nprobe.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#enable_range_search.",
@@ -35355,10 +35404,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_cpu_index().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_secondary_index().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_secondary_index().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_tuning_profile().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_tuning_profile().(path)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_tuning_profile().(profile)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#save_tuning_profile().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search().(catalog)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search().(k)",
@@ -35368,12 +35413,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(catalog)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(config)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(k)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(nprobe)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(query)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(runtime)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#search_with_refine().(source)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#secondary_index.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#secondary_index_path.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSManager#semantic_min_score.",
@@ -35404,6 +35447,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FAISSRuntimeOptions#use_gpu.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/FaissIndex.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/LOGGER.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/RefineSearchConfig#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/RefineSearchConfig#nprobe.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/RefineSearchConfig#runtime.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/RefineSearchConfig#source.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/SearchRuntimeOverrides#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/SearchRuntimeOverrides#ef_search.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/SearchRuntimeOverrides#k_factor.",
@@ -35445,19 +35492,43 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_SearchPlan#queries.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_SearchPlan#search_k.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_SearchPlan#timeline.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_TuningOverrides#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_TuningOverrides#ef_search.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_TuningOverrides#k_factor.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_TuningOverrides#nprobe.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_TuningOverrides#param_str.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_TuningOverrides#quantizer_ef_search.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/__init__:",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_optional_float().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_optional_float().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_optional_int().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_optional_int().(value)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_to_int().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_to_int().(default)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_coerce_to_int().(value)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_configure_direct_map().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_configure_direct_map().(index)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_faiss_module().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_get_compile_options().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_has_faiss_gpu_support().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_log_extra().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_log_extra().(kwargs)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_parse_tuning_overrides().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_parse_tuning_overrides().(profile)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_persist_tuning_profile().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_persist_tuning_profile().(manager)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_persist_tuning_profile().(profile)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_set_direct_map_type().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_set_direct_map_type().(index)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_bool_contains().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_bool_contains().(raw)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_bool_contains().contains().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_bool_contains().contains().(id_val)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_index_contains().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_index_contains().(raw)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_index_contains().contains().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/_wrap_index_contains().contains().(id_val)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/apply_parameters().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/apply_parameters().(index)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/apply_parameters().(param_str)",
@@ -35483,7 +35554,7 @@
       "name": "_LazyFaissProxy",
       "kind": "class",
       "public": false,
-      "lineno": 77,
+      "lineno": 78,
       "doc_summary": "Deferred FAISS module loader to avoid import-time side effects.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35493,7 +35564,7 @@
       "name": "_faiss_module",
       "kind": "function",
       "public": false,
-      "lineno": 124,
+      "lineno": 125,
       "doc_summary": "Return the lazily imported FAISS module.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -35503,7 +35574,7 @@
       "name": "_has_faiss_gpu_support",
       "kind": "function",
       "public": false,
-      "lineno": 135,
+      "lineno": 136,
       "doc_summary": "Return ``True`` when FAISS exposes GPU bindings, otherwise ``False``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -35513,7 +35584,7 @@
       "name": "apply_parameters",
       "kind": "function",
       "public": true,
-      "lineno": 151,
+      "lineno": 152,
       "doc_summary": "Apply a FAISS ParameterSpace string to ``index``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -35523,7 +35594,7 @@
       "name": "_log_extra",
       "kind": "function",
       "public": false,
-      "lineno": 208,
+      "lineno": 209,
       "doc_summary": "Build structured logging extras for FAISS manager events.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -35533,7 +35604,7 @@
       "name": "FAISSRuntimeOptions",
       "kind": "class",
       "public": true,
-      "lineno": 226,
+      "lineno": 227,
       "doc_summary": "Runtime tuning options passed to :class:`FAISSManager`.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35543,8 +35614,28 @@
       "name": "SearchRuntimeOverrides",
       "kind": "class",
       "public": true,
-      "lineno": 247,
+      "lineno": 248,
       "doc_summary": "Per-search overrides for HNSW/quantizer parameters.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "RefineSearchConfig",
+      "kind": "class",
+      "public": true,
+      "lineno": 257,
+      "doc_summary": "Configuration bundle for refine searches.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_TuningOverrides",
+      "kind": "class",
+      "public": false,
+      "lineno": 266,
+      "doc_summary": "Normalized tuning overrides extracted from a profile payload.",
       "doc_has_summary": true,
       "doc_param_parity": null,
       "doc_examples_present": false
@@ -35553,7 +35644,7 @@
       "name": "_SearchExecutionParams",
       "kind": "class",
       "public": false,
-      "lineno": 256,
+      "lineno": 277,
       "doc_summary": "Runtime parameters applied during dual search execution.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35563,7 +35654,7 @@
       "name": "_SearchPlan",
       "kind": "class",
       "public": false,
-      "lineno": 266,
+      "lineno": 287,
       "doc_summary": "Resolved parameters, query buffer, and timeline metadata for a search.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35573,7 +35664,7 @@
       "name": "_FAISSIdMapMixin",
       "kind": "class",
       "public": false,
-      "lineno": 276,
+      "lineno": 297,
       "doc_summary": "Mixin providing ID map export helpers.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35583,7 +35674,7 @@
       "name": "FAISSManager",
       "kind": "class",
       "public": true,
-      "lineno": 453,
+      "lineno": 474,
       "doc_summary": "FAISS index manager with adaptive indexing, GPU support, and incremental updates.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35593,7 +35684,7 @@
       "name": "AutoTuner",
       "kind": "class",
       "public": true,
-      "lineno": 3741,
+      "lineno": 3607,
       "doc_summary": "Evaluate FAISS ParameterSpace candidates for a given manager.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -35603,7 +35694,7 @@
       "name": "_coerce_to_int",
       "kind": "function",
       "public": false,
-      "lineno": 3871,
+      "lineno": 3737,
       "doc_summary": "Safely round arbitrary objects to integers for index comparisons.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -35613,7 +35704,7 @@
       "name": "_configure_direct_map",
       "kind": "function",
       "public": false,
-      "lineno": 3894,
+      "lineno": 3760,
       "doc_summary": "Ensure FAISS direct maps are array-backed for reconstruction.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -35623,8 +35714,78 @@
       "name": "_set_direct_map_type",
       "kind": "function",
       "public": false,
-      "lineno": 3902,
+      "lineno": 3768,
       "doc_summary": "Enable direct map support on FAISS indexes when available.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_wrap_bool_contains",
+      "kind": "function",
+      "public": false,
+      "lineno": 3811,
+      "doc_summary": "Wrap a raw contains function that returns a boolean-like value.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_wrap_index_contains",
+      "kind": "function",
+      "public": false,
+      "lineno": 3847,
+      "doc_summary": "Wrap a raw contains function that returns an index position.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_coerce_optional_int",
+      "kind": "function",
+      "public": false,
+      "lineno": 3885,
+      "doc_summary": "Return ``value`` coerced to int when possible.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_coerce_optional_float",
+      "kind": "function",
+      "public": false,
+      "lineno": 3919,
+      "doc_summary": "Return ``value`` coerced to float when possible.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_parse_tuning_overrides",
+      "kind": "function",
+      "public": false,
+      "lineno": 3953,
+      "doc_summary": "Normalize raw profile payload into structured overrides.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_persist_tuning_profile",
+      "kind": "function",
+      "public": false,
+      "lineno": 3979,
+      "doc_summary": "Persist tuning metadata without interrupting the caller.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_get_compile_options",
+      "kind": "function",
+      "public": false,
+      "lineno": 3991,
+      "doc_summary": "Return FAISS compile options for readiness logs.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -35643,9 +35804,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 245,
-    "cyclomatic": 246,
-    "loc": 3946
+    "branches": 254,
+    "cyclomatic": 255,
+    "loc": 4008
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -35653,7 +35814,7 @@
   "overlay_needed": false,
   "fan_in": 8,
   "fan_out": 10,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "_lazy_imports.py",
     "errors.py",
@@ -35680,14 +35841,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.377,
+  "hotspot_score": 3.388,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 43,
-  "recent_churn_90": 43
+  "recent_churn_30": 44,
+  "recent_churn_90": 44
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -36170,6 +36331,7 @@
     {
       "module": "collections.abc",
       "names": [
+        "Callable",
         "Iterator",
         "Mapping",
         "Sequence"
@@ -36229,6 +36391,7 @@
       "names": [
         "TYPE_CHECKING",
         "Any",
+        "ClassVar",
         "Self",
         "TypedDict",
         "Unpack",
@@ -36402,15 +36565,32 @@
       "kind": "class",
       "name": "DuckDBCatalog",
       "lineno": 420
+    },
+    {
+      "kind": "function",
+      "name": "_relation_exists",
+      "lineno": 1632
+    },
+    {
+      "kind": "function",
+      "name": "relation_exists",
+      "lineno": 1666
+    },
+    {
+      "kind": "function",
+      "name": "_file_checksum",
+      "lineno": 1684
     }
   ],
   "exports": [
     "DuckDBCatalog",
-    "StructureAnnotations"
+    "StructureAnnotations",
+    "relation_exists"
   ],
   "exports_declared": [
     "DuckDBCatalog",
-    "StructureAnnotations"
+    "StructureAnnotations",
+    "relation_exists"
   ],
   "outline_nodes": [],
   "scip_symbols": [
@@ -36480,109 +36660,109 @@
     "local 16",
     "local 160",
     "local 161",
-    "local 162",
+    "local 164",
     "local 165",
+    "local 166",
+    "local 167",
     "local 168",
     "local 169",
     "local 17",
     "local 170",
-    "local 171",
     "local 172",
     "local 173",
     "local 174",
+    "local 175",
     "local 176",
     "local 177",
     "local 178",
-    "local 179",
     "local 18",
-    "local 180",
-    "local 181",
     "local 182",
+    "local 183",
+    "local 185",
     "local 186",
     "local 187",
+    "local 188",
     "local 189",
     "local 19",
-    "local 190",
     "local 191",
-    "local 192",
-    "local 193",
     "local 195",
+    "local 196",
+    "local 197",
+    "local 198",
     "local 199",
     "local 2",
     "local 20",
     "local 200",
     "local 201",
-    "local 202",
-    "local 203",
-    "local 204",
-    "local 205",
-    "local 216",
-    "local 217",
+    "local 212",
+    "local 213",
+    "local 214",
+    "local 215",
     "local 218",
-    "local 219",
     "local 22",
-    "local 222",
-    "local 225",
-    "local 227",
+    "local 221",
+    "local 223",
+    "local 226",
+    "local 228",
     "local 23",
     "local 230",
+    "local 231",
     "local 232",
+    "local 233",
     "local 234",
     "local 235",
     "local 236",
-    "local 237",
-    "local 238",
     "local 239",
     "local 24",
-    "local 240",
+    "local 241",
+    "local 242",
     "local 243",
+    "local 244",
     "local 245",
-    "local 246",
     "local 247",
     "local 248",
     "local 249",
     "local 25",
-    "local 251",
+    "local 250",
     "local 252",
     "local 253",
     "local 254",
+    "local 255",
     "local 256",
     "local 257",
     "local 258",
     "local 259",
     "local 26",
-    "local 260",
     "local 261",
     "local 262",
-    "local 263",
-    "local 265",
+    "local 264",
     "local 266",
+    "local 267",
     "local 268",
+    "local 269",
     "local 27",
     "local 270",
-    "local 271",
     "local 272",
     "local 273",
     "local 274",
-    "local 276",
+    "local 275",
     "local 277",
     "local 278",
     "local 279",
     "local 28",
-    "local 281",
-    "local 282",
-    "local 283",
-    "local 288",
+    "local 284",
+    "local 285",
+    "local 286",
+    "local 287",
     "local 289",
     "local 29",
-    "local 290",
-    "local 291",
     "local 293",
+    "local 295",
     "local 297",
     "local 299",
     "local 3",
     "local 30",
-    "local 301",
+    "local 300",
     "local 31",
     "local 32",
     "local 36",
@@ -36674,8 +36854,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_ensure_views().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_ensure_views().(conn)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_ensure_views().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_file_checksum().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_file_checksum().(path)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_idmap_path.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_init_lock.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_install_chunk_symbols_view().",
@@ -36711,9 +36889,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_observe_scope_filter_duration().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_observe_scope_filter_duration().(start_time)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_query_builder.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_relation_exists().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_relation_exists().(conn)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_relation_exists().(name)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_repo_root.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#_views_ready.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#close().",
@@ -36762,9 +36937,7 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#register_idmap_parquet().(materialize)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#register_idmap_parquet().(path)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#register_idmap_parquet().(self)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#relation_exists().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#relation_exists().(conn)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#relation_exists().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#relation_exists.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#sample_query_vectors().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#sample_query_vectors().(limit)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#sample_query_vectors().(self)",
@@ -36831,10 +37004,18 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/__init__:",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_catalog_view_bootstrap_seconds.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_file_checksum().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_file_checksum().(path)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_hydration_duration_seconds.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_log_extra().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_log_extra().(kwargs)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_scope_filter_duration_seconds."
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_relation_exists().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_relation_exists().(conn)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_relation_exists().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/_scope_filter_duration_seconds.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/relation_exists().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/relation_exists().(conn)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/relation_exists().(name)"
   ],
   "parse_ok": true,
   "errors": [],
@@ -36920,6 +37101,36 @@
       "doc_has_summary": true,
       "doc_param_parity": null,
       "doc_examples_present": false
+    },
+    {
+      "name": "_relation_exists",
+      "kind": "function",
+      "public": false,
+      "lineno": 1632,
+      "doc_summary": "Return True when a table or view with ``name`` exists in the main schema.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "relation_exists",
+      "kind": "function",
+      "public": true,
+      "lineno": 1666,
+      "doc_summary": "Public helper returning True when a DuckDB relation exists.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_file_checksum",
+      "kind": "function",
+      "public": false,
+      "lineno": 1684,
+      "doc_summary": "Return SHA-256 checksum for ``path``.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
     }
   ],
   "annotation_ratio": {
@@ -36937,7 +37148,7 @@
   "complexity": {
     "branches": 141,
     "cyclomatic": 142,
-    "loc": 1705
+    "loc": 1707
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -36945,7 +37156,7 @@
   "overlay_needed": false,
   "fan_in": 9,
   "fan_out": 8,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "_lazy_imports.py",
     "io/duckdb_manager.py",
@@ -36974,8 +37185,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 37,
-  "recent_churn_90": 37
+  "recent_churn_30": 38,
+  "recent_churn_90": 38
 }
 {
   "path": "io/bm25_manager.py",
@@ -38116,7 +38327,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 4,
-  "cycle_group": 54,
+  "cycle_group": 53,
   "imports_internal": [
     "mcp_server/schemas.py",
     "observability/timeline.py",
@@ -38590,7 +38801,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "plugins/channels.py",
     "typing.py"
@@ -38691,7 +38902,7 @@
     {
       "module": "codeintel_rev.retrieval.types",
       "names": [
-        "ChannelHit"
+        "SearchHit"
       ],
       "aliases": {},
       "is_star": false,
@@ -38996,7 +39207,7 @@
     {
       "module": "codeintel_rev.retrieval.types",
       "names": [
-        "ChannelHit"
+        "SearchHit"
       ],
       "aliases": {},
       "is_star": false,
@@ -39170,7 +39381,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 5,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -39756,32 +39967,26 @@
     },
     {
       "kind": "class",
-      "name": "ChannelHit",
+      "name": "HybridResultDoc",
       "lineno": 39
     },
     {
       "kind": "class",
-      "name": "HybridResultDoc",
+      "name": "HybridSearchResult",
       "lineno": 47
     },
     {
       "kind": "class",
-      "name": "HybridSearchResult",
-      "lineno": 55
-    },
-    {
-      "kind": "class",
       "name": "StageSignals",
-      "lineno": 66
+      "lineno": 58
     },
     {
       "kind": "class",
       "name": "StageDecision",
-      "lineno": 88
+      "lineno": 80
     }
   ],
   "exports": [
-    "ChannelHit",
     "ChunkId",
     "Distance",
     "FactoryString",
@@ -39794,7 +39999,6 @@
     "StageSignals"
   ],
   "exports_declared": [
-    "ChannelHit",
     "ChunkId",
     "Distance",
     "FactoryString",
@@ -39808,9 +40012,6 @@
   ],
   "outline_nodes": [],
   "scip_symbols": [
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/ChannelHit#",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/ChannelHit#doc_id.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/ChannelHit#score.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/ChunkId.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/Distance.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/FactoryString.",
@@ -39825,9 +40026,9 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/HybridSearchResult#method.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/HybridSearchResult#warnings.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#doc_id.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#explain.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#faiss_row.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#id.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#rank.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#score.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.types`/SearchHit#source.",
@@ -39889,20 +40090,10 @@
       "doc_examples_present": false
     },
     {
-      "name": "ChannelHit",
-      "kind": "class",
-      "public": true,
-      "lineno": 39,
-      "doc_summary": "Score emitted by a retrieval channel prior to fusion.",
-      "doc_has_summary": true,
-      "doc_param_parity": null,
-      "doc_examples_present": false
-    },
-    {
       "name": "HybridResultDoc",
       "kind": "class",
       "public": true,
-      "lineno": 47,
+      "lineno": 39,
       "doc_summary": "Final fused result produced by weighted RRF.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39912,7 +40103,7 @@
       "name": "HybridSearchResult",
       "kind": "class",
       "public": true,
-      "lineno": 55,
+      "lineno": 47,
       "doc_summary": "Container for fused docs alongside explainability metadata.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39922,7 +40113,7 @@
       "name": "StageSignals",
       "kind": "class",
       "public": true,
-      "lineno": 66,
+      "lineno": 58,
       "doc_summary": "Signals gathered from a stage for downstream gating decisions.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39932,7 +40123,7 @@
       "name": "StageDecision",
       "kind": "class",
       "public": true,
-      "lineno": 88,
+      "lineno": 80,
       "doc_summary": "Decision emitted by gating logic describing whether to run the stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -39954,25 +40145,25 @@
   "complexity": {
     "branches": 2,
     "cyclomatic": 3,
-    "loc": 109
+    "loc": 100
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 13,
+  "fan_in": 14,
   "fan_out": 0,
-  "cycle_group": 52,
+  "cycle_group": 51,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.018,
+  "hotspot_score": 2.046,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 2,
-  "recent_churn_90": 2
+  "recent_churn_30": 3,
+  "recent_churn_90": 3
 }
 {
   "path": "retrieval/telemetry.py",
@@ -40300,7 +40491,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 60,
+  "cycle_group": 62,
   "imports_internal": [
     "retrieval/types.py",
     "typing.py"
@@ -40697,7 +40888,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 4,
-  "cycle_group": 61,
+  "cycle_group": 63,
   "imports_internal": [
     "observability/otel.py",
     "observability/timeline.py",
@@ -40718,8 +40909,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 7,
-  "recent_churn_90": 7
+  "recent_churn_30": 8,
+  "recent_churn_90": 8
 }
 {
   "path": "retrieval/mcp_search.py",
@@ -41866,8 +42057,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "retrieval/hybrid.py",
@@ -41889,18 +42080,18 @@
       "level": 0
     },
     {
-      "module": "dataclasses",
+      "module": "typing",
       "names": [
-        "dataclass"
+        "TYPE_CHECKING"
       ],
       "aliases": {},
       "is_star": false,
       "level": 0
     },
     {
-      "module": "typing",
+      "module": "codeintel_rev.retrieval.types",
       "names": [
-        "TYPE_CHECKING"
+        "SearchHit"
       ],
       "aliases": {},
       "is_star": false,
@@ -41918,19 +42109,14 @@
   ],
   "defs": [
     {
-      "kind": "class",
-      "name": "SearchHit",
+      "kind": "function",
+      "name": "reciprocal_rank_fusion",
       "lineno": 16
     },
     {
       "kind": "function",
-      "name": "reciprocal_rank_fusion",
-      "lineno": 54
-    },
-    {
-      "kind": "function",
       "name": "create_hit_list",
-      "lineno": 102
+      "lineno": 64
     }
   ],
   "exports": [
@@ -41952,11 +42138,6 @@
     "local 7",
     "local 8",
     "local 9",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/SearchHit#",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/SearchHit#doc_id.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/SearchHit#rank.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/SearchHit#score.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/SearchHit#source.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/__init__:",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.hybrid`/create_hit_list().",
@@ -41984,20 +42165,10 @@
   },
   "doc_items": [
     {
-      "name": "SearchHit",
-      "kind": "class",
-      "public": true,
-      "lineno": 16,
-      "doc_summary": "Search result hit from a single retrieval system.",
-      "doc_has_summary": true,
-      "doc_param_parity": null,
-      "doc_examples_present": false
-    },
-    {
       "name": "reciprocal_rank_fusion",
       "kind": "function",
       "public": true,
-      "lineno": 54,
+      "lineno": 16,
       "doc_summary": "Fuse multiple ranked lists using RRF.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -42007,7 +42178,7 @@
       "name": "create_hit_list",
       "kind": "function",
       "public": true,
-      "lineno": 102,
+      "lineno": 64,
       "doc_summary": "Create SearchHit list from retrieval results.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -42029,24 +42200,26 @@
   "complexity": {
     "branches": 4,
     "cyclomatic": 5,
-    "loc": 134
+    "loc": 96
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 0,
-  "fan_out": 1,
+  "fan_out": 2,
   "cycle_group": 122,
   "imports_internal": [
+    "retrieval/types.py",
     "typing.py"
   ],
   "imports_intra_repo": [
+    "retrieval/types.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.361,
+  "hotspot_score": 1.524,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -42220,7 +42393,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 55,
+  "cycle_group": 64,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.645,
@@ -42605,7 +42778,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "io/duckdb_catalog.py"
   ],
@@ -43083,7 +43256,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 58,
+  "cycle_group": 61,
   "imports_internal": [
     "io/duckdb_manager.py",
     "retrieval/types.py",
@@ -43455,7 +43628,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 43,
+  "cycle_group": 54,
   "imports_internal": [
     "typing.py"
   ],
@@ -43960,7 +44133,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 5,
-  "cycle_group": 64,
+  "cycle_group": 55,
   "imports_internal": [
     "errors.py",
     "observability/timeline.py",
@@ -43983,8 +44156,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 12,
-  "recent_churn_90": 12
+  "recent_churn_30": 13,
+  "recent_churn_90": 13
 }
 {
   "path": "runtime/__init__.py",
@@ -44097,7 +44270,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 65,
+  "cycle_group": 56,
   "imports_internal": [
     "runtime/cells.py",
     "runtime/factory_adjustment.py"
@@ -44350,7 +44523,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 7,
-  "cycle_group": 81,
+  "cycle_group": 83,
   "imports_internal": [
     "app/middleware.py",
     "observability/otel.py",
@@ -44377,8 +44550,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 5,
-  "recent_churn_90": 5
+  "recent_churn_30": 6,
+  "recent_churn_90": 6
 }
 {
   "path": "mcp_server/service_context.py",
@@ -45246,8 +45419,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 10,
-  "recent_churn_90": 10
+  "recent_churn_30": 11,
+  "recent_churn_90": 11
 }
 {
   "path": "mcp_server/server_semantic.py",
@@ -45608,8 +45781,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 5,
-  "recent_churn_90": 5
+  "recent_churn_30": 6,
+  "recent_churn_90": 6
 }
 {
   "path": "mcp_server/server_symbols.py",
@@ -46164,7 +46337,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 3,
-  "cycle_group": 79,
+  "cycle_group": 81,
   "imports_internal": [
     "errors.py",
     "io/path_utils.py",
@@ -46455,7 +46628,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 3,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "app/config_context.py",
     "mcp_server/schemas.py",
@@ -46923,7 +47096,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 7,
-  "cycle_group": 82,
+  "cycle_group": 84,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -46950,8 +47123,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 13,
-  "recent_churn_90": 13
+  "recent_churn_30": 14,
+  "recent_churn_90": 14
 }
 {
   "path": "mcp_server/__init__.py",
@@ -47508,7 +47681,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 8,
-  "cycle_group": 69,
+  "cycle_group": 70,
   "imports_internal": [
     "app/config_context.py",
     "config/settings.py",
@@ -48257,7 +48430,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 56,
+  "cycle_group": 65,
   "imports_internal": [
     "metrics/registry.py"
   ],
@@ -49422,7 +49595,9 @@
       "names": [
         "duckdb"
       ],
-      "aliases": {},
+      "aliases": {
+        "duckdb": "duckdb_mod"
+      },
       "is_star": false,
       "level": 0
     },
@@ -49527,6 +49702,7 @@
       "module": "codeintel_rev.io.faiss_manager",
       "names": [
         "FAISSManager",
+        "RefineSearchConfig",
         "SearchRuntimeOverrides"
       ],
       "aliases": {},
@@ -49588,392 +49764,397 @@
     {
       "kind": "variable",
       "name": "pyarrow_parquet",
-      "lineno": 47
-    },
-    {
-      "kind": "variable",
-      "name": "LOGGER",
-      "lineno": 49
-    },
-    {
-      "kind": "variable",
-      "name": "app",
-      "lineno": 50
-    },
-    {
-      "kind": "variable",
-      "name": "DEFAULT_XTR_ORACLE",
       "lineno": 51
     },
     {
       "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 53
+    },
+    {
+      "kind": "variable",
+      "name": "app",
+      "lineno": 54
+    },
+    {
+      "kind": "variable",
+      "name": "DEFAULT_XTR_ORACLE",
+      "lineno": 55
+    },
+    {
+      "kind": "variable",
       "name": "embeddings_app",
-      "lineno": 52
+      "lineno": 56
     },
     {
       "kind": "function",
       "name": "_get_settings",
-      "lineno": 57
+      "lineno": 61
     },
     {
       "kind": "variable",
       "name": "RootOption",
-      "lineno": 68
+      "lineno": 72
     },
     {
       "kind": "variable",
       "name": "ExtraOption",
-      "lineno": 69
+      "lineno": 73
     },
     {
       "kind": "variable",
       "name": "VersionArg",
-      "lineno": 77
+      "lineno": 81
     },
     {
       "kind": "variable",
       "name": "PathArg",
-      "lineno": 78
+      "lineno": 82
     },
     {
       "kind": "variable",
       "name": "QueriesArg",
-      "lineno": 79
-    },
-    {
-      "kind": "variable",
-      "name": "IndexOption",
       "lineno": 83
     },
     {
       "kind": "variable",
+      "name": "IndexOption",
+      "lineno": 87
+    },
+    {
+      "kind": "variable",
       "name": "AssetsArg",
-      "lineno": 84
+      "lineno": 88
     },
     {
       "kind": "variable",
       "name": "SidecarOption",
-      "lineno": 92
+      "lineno": 96
     },
     {
       "kind": "variable",
       "name": "VersionOption",
-      "lineno": 100
-    },
-    {
-      "kind": "variable",
-      "name": "ParquetOption",
       "lineno": 104
     },
     {
       "kind": "variable",
-      "name": "OutputOption",
-      "lineno": 107
-    },
-    {
-      "kind": "variable",
-      "name": "ChunkBatchOption",
+      "name": "ParquetOption",
       "lineno": 108
     },
     {
       "kind": "variable",
-      "name": "SampleOption",
+      "name": "OutputOption",
+      "lineno": 111
+    },
+    {
+      "kind": "variable",
+      "name": "ChunkBatchOption",
       "lineno": 112
     },
     {
       "kind": "variable",
-      "name": "EpsilonOption",
-      "lineno": 113
+      "name": "SampleOption",
+      "lineno": 116
     },
     {
       "kind": "variable",
-      "name": "SweepMode",
+      "name": "EpsilonOption",
       "lineno": 117
     },
     {
       "kind": "variable",
-      "name": "SWEEP_OPTION",
-      "lineno": 130
+      "name": "SweepMode",
+      "lineno": 121
     },
     {
-      "kind": "variable",
-      "name": "IdMapOption",
-      "lineno": 135
-    },
-    {
-      "kind": "variable",
-      "name": "DuckOption",
+      "kind": "class",
+      "name": "SearchCommandParams",
       "lineno": 136
     },
     {
       "kind": "variable",
+      "name": "SWEEP_OPTION",
+      "lineno": 148
+    },
+    {
+      "kind": "variable",
+      "name": "IdMapOption",
+      "lineno": 153
+    },
+    {
+      "kind": "variable",
+      "name": "DuckOption",
+      "lineno": 154
+    },
+    {
+      "kind": "variable",
       "name": "OutOption",
-      "lineno": 137
+      "lineno": 155
     },
     {
       "kind": "variable",
       "name": "ParamSpaceArg",
-      "lineno": 138
+      "lineno": 156
     },
     {
       "kind": "variable",
       "name": "EvalTopKOption",
-      "lineno": 142
+      "lineno": 160
     },
     {
       "kind": "variable",
       "name": "EvalKFactorOption",
-      "lineno": 146
+      "lineno": 164
     },
     {
       "kind": "variable",
       "name": "EvalNProbeOption",
-      "lineno": 150
+      "lineno": 168
     },
     {
       "kind": "variable",
       "name": "EvalXtrOracleOption",
-      "lineno": 154
+      "lineno": 172
     },
     {
       "kind": "function",
       "name": "global_options",
-      "lineno": 164
-    },
-    {
-      "kind": "function",
-      "name": "_default_root",
-      "lineno": 169
-    },
-    {
-      "kind": "function",
-      "name": "_resolve_root",
-      "lineno": 176
-    },
-    {
-      "kind": "function",
-      "name": "_manager",
       "lineno": 182
     },
     {
       "kind": "function",
-      "name": "_build_assets",
+      "name": "_default_root",
       "lineno": 187
     },
     {
       "kind": "function",
-      "name": "_parse_extras",
+      "name": "_resolve_root",
+      "lineno": 194
+    },
+    {
+      "kind": "function",
+      "name": "_manager",
+      "lineno": 200
+    },
+    {
+      "kind": "function",
+      "name": "_build_assets",
       "lineno": 205
     },
     {
       "kind": "function",
+      "name": "_parse_extras",
+      "lineno": 223
+    },
+    {
+      "kind": "function",
       "name": "_parse_sidecars",
-      "lineno": 216
+      "lineno": 234
     },
     {
       "kind": "function",
       "name": "_resolve_version_dir",
-      "lineno": 235
+      "lineno": 253
     },
     {
       "kind": "function",
       "name": "_manifest_path_for",
-      "lineno": 245
+      "lineno": 263
     },
     {
       "kind": "function",
       "name": "_load_manifest",
-      "lineno": 249
+      "lineno": 267
     },
     {
       "kind": "function",
       "name": "_write_manifest",
-      "lineno": 259
+      "lineno": 277
     },
     {
       "kind": "class",
       "name": "_EmbeddingBuildContext",
-      "lineno": 264
+      "lineno": 282
     },
     {
       "kind": "function",
       "name": "_build_context",
-      "lineno": 274
+      "lineno": 292
     },
     {
       "kind": "function",
       "name": "_resolve_duck_path",
-      "lineno": 302
+      "lineno": 320
     },
     {
       "kind": "function",
       "name": "_resolve_output_path",
-      "lineno": 319
+      "lineno": 337
     },
     {
       "kind": "function",
       "name": "_parquet_meta",
-      "lineno": 339
+      "lineno": 357
     },
     {
       "kind": "function",
       "name": "_build_embedding_manifest",
-      "lineno": 352
+      "lineno": 370
     },
     {
       "kind": "function",
       "name": "_compute_chunk_checksum",
-      "lineno": 378
+      "lineno": 396
     },
     {
       "kind": "function",
       "name": "_collect_chunks_and_embeddings",
-      "lineno": 393
+      "lineno": 411
     },
     {
       "kind": "function",
       "name": "_deterministic_sample",
-      "lineno": 440
+      "lineno": 458
     },
     {
       "kind": "function",
       "name": "_evaluate_drift",
-      "lineno": 474
+      "lineno": 492
     },
     {
       "kind": "function",
       "name": "_execute_embeddings_build",
-      "lineno": 499
+      "lineno": 517
     },
     {
       "kind": "function",
       "name": "_run_embedding_validation",
-      "lineno": 561
+      "lineno": 579
     },
     {
       "kind": "function",
       "name": "_write_embedding_meta",
-      "lineno": 598
+      "lineno": 616
     },
     {
       "kind": "function",
       "name": "embeddings_build_command",
-      "lineno": 613
+      "lineno": 631
     },
     {
       "kind": "function",
       "name": "embeddings_validate_command",
-      "lineno": 638
+      "lineno": 656
     },
     {
       "kind": "function",
       "name": "_parse_tune_overrides",
-      "lineno": 700
+      "lineno": 718
     },
     {
       "kind": "function",
       "name": "_faiss_manager",
-      "lineno": 740
+      "lineno": 758
     },
     {
       "kind": "function",
       "name": "_duckdb_catalog",
-      "lineno": 754
+      "lineno": 772
     },
     {
       "kind": "function",
       "name": "_duckdb_embedding_dim",
-      "lineno": 768
+      "lineno": 786
     },
     {
       "kind": "function",
       "name": "_count_idmap_rows",
-      "lineno": 794
+      "lineno": 812
     },
     {
       "kind": "function",
       "name": "_load_xtr_index",
-      "lineno": 824
+      "lineno": 842
     },
     {
       "kind": "function",
       "name": "_eval_paths",
-      "lineno": 840
+      "lineno": 858
     },
     {
       "kind": "function",
       "name": "status_command",
-      "lineno": 850
+      "lineno": 868
     },
     {
       "kind": "function",
       "name": "stage_command",
-      "lineno": 860
+      "lineno": 878
     },
     {
       "kind": "function",
       "name": "publish_command",
-      "lineno": 917
+      "lineno": 935
     },
     {
       "kind": "function",
       "name": "rollback_command",
-      "lineno": 927
+      "lineno": 945
     },
     {
       "kind": "function",
       "name": "list_command",
-      "lineno": 937
+      "lineno": 955
     },
     {
       "kind": "function",
       "name": "health_command",
-      "lineno": 949
+      "lineno": 967
     },
     {
       "kind": "function",
       "name": "export_idmap_command",
-      "lineno": 1004
+      "lineno": 1026
     },
     {
       "kind": "function",
       "name": "materialize_join_command",
-      "lineno": 1025
+      "lineno": 1047
     },
     {
       "kind": "function",
       "name": "tune_command",
-      "lineno": 1041
+      "lineno": 1063
     },
     {
       "kind": "function",
       "name": "tune_params_command",
-      "lineno": 1111
+      "lineno": 1133
     },
     {
       "kind": "function",
       "name": "show_profile_command",
-      "lineno": 1153
+      "lineno": 1175
     },
     {
       "kind": "function",
       "name": "_write_tuning_audit",
-      "lineno": 1159
+      "lineno": 1181
     },
     {
       "kind": "function",
       "name": "_run_autotune",
-      "lineno": 1170
+      "lineno": 1192
     },
     {
       "kind": "function",
       "name": "eval_command",
-      "lineno": 1196
+      "lineno": 1218
     },
     {
       "kind": "function",
-      "name": "search_command",
-      "lineno": 1230
+      "name": "_execute_search",
+      "lineno": 1251
     }
   ],
   "exports": [],
@@ -49988,7 +50169,7 @@
     "local 103",
     "local 104",
     "local 105",
-    "local 109",
+    "local 106",
     "local 110",
     "local 111",
     "local 112",
@@ -49999,15 +50180,14 @@
     "local 117",
     "local 118",
     "local 119",
-    "local 12",
     "local 120",
-    "local 123",
-    "local 125",
+    "local 121",
+    "local 124",
     "local 126",
     "local 127",
     "local 128",
+    "local 129",
     "local 13",
-    "local 130",
     "local 131",
     "local 132",
     "local 133",
@@ -50017,31 +50197,31 @@
     "local 137",
     "local 138",
     "local 139",
+    "local 14",
     "local 140",
     "local 141",
-    "local 143",
+    "local 142",
     "local 144",
     "local 145",
-    "local 147",
+    "local 146",
     "local 148",
     "local 149",
     "local 150",
     "local 151",
-    "local 153",
+    "local 152",
     "local 154",
     "local 155",
     "local 156",
     "local 157",
-    "local 159",
+    "local 158",
     "local 160",
     "local 161",
-    "local 163",
+    "local 162",
     "local 164",
     "local 165",
     "local 166",
-    "local 168",
-    "local 17",
-    "local 172",
+    "local 167",
+    "local 169",
     "local 173",
     "local 174",
     "local 175",
@@ -50049,7 +50229,8 @@
     "local 177",
     "local 178",
     "local 179",
-    "local 181",
+    "local 18",
+    "local 180",
     "local 182",
     "local 183",
     "local 184",
@@ -50057,22 +50238,22 @@
     "local 186",
     "local 187",
     "local 188",
-    "local 19",
-    "local 190",
-    "local 193",
+    "local 189",
+    "local 191",
     "local 194",
-    "local 196",
+    "local 195",
     "local 197",
     "local 198",
     "local 199",
     "local 2",
+    "local 20",
     "local 200",
     "local 201",
     "local 202",
     "local 203",
     "local 204",
     "local 205",
-    "local 208",
+    "local 206",
     "local 209",
     "local 210",
     "local 211",
@@ -50083,17 +50264,16 @@
     "local 216",
     "local 217",
     "local 218",
-    "local 22",
-    "local 220",
+    "local 219",
     "local 221",
     "local 222",
     "local 223",
     "local 224",
     "local 225",
     "local 226",
-    "local 228",
+    "local 227",
+    "local 229",
     "local 23",
-    "local 230",
     "local 231",
     "local 232",
     "local 233",
@@ -50104,10 +50284,10 @@
     "local 238",
     "local 239",
     "local 24",
-    "local 242",
+    "local 240",
     "local 243",
     "local 244",
-    "local 246",
+    "local 245",
     "local 247",
     "local 248",
     "local 249",
@@ -50115,7 +50295,8 @@
     "local 250",
     "local 251",
     "local 252",
-    "local 254",
+    "local 253",
+    "local 255",
     "local 257",
     "local 258",
     "local 26",
@@ -50125,8 +50306,11 @@
     "local 264",
     "local 265",
     "local 266",
+    "local 267",
     "local 268",
     "local 27",
+    "local 270",
+    "local 272",
     "local 28",
     "local 29",
     "local 3",
@@ -50143,27 +50327,28 @@
     "local 4",
     "local 40",
     "local 41",
-    "local 43",
+    "local 42",
     "local 44",
     "local 45",
     "local 46",
-    "local 49",
+    "local 47",
     "local 5",
     "local 50",
-    "local 53",
-    "local 55",
+    "local 51",
+    "local 54",
     "local 56",
+    "local 57",
     "local 6",
-    "local 67",
     "local 68",
     "local 69",
+    "local 7",
     "local 70",
     "local 71",
-    "local 73",
+    "local 72",
     "local 74",
     "local 75",
     "local 76",
-    "local 78",
+    "local 77",
     "local 79",
     "local 80",
     "local 81",
@@ -50173,9 +50358,9 @@
     "local 85",
     "local 86",
     "local 87",
-    "local 90",
-    "local 93",
-    "local 96",
+    "local 88",
+    "local 91",
+    "local 94",
     "local 97",
     "local 98",
     "local 99",
@@ -50202,6 +50387,13 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/RootOption.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SWEEP_OPTION.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SampleOption.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#dry_run.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#duckdb.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#index.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#k.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#nprobe.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SearchCommandParams#queries.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SidecarOption.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/SweepMode.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/VersionArg.",
@@ -50264,6 +50456,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_embeddings_build().(chunk_size)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_embeddings_build().(context)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_embeddings_build().(force)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_search().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_search().(params)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_search()._summarize_query().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_execute_search()._summarize_query().(raw_line)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_faiss_manager().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_faiss_manager().(index_override)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/_get_settings().",
@@ -50353,13 +50549,6 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/publish_command().(version)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/rollback_command().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/rollback_command().(version)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().(dry_run)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().(duckdb)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().(index)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().(k)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().(nprobe)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/search_command().(queries)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/show_profile_command().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/show_profile_command().(index)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.indexctl`/stage_command().",
@@ -50397,17 +50586,27 @@
       "name": "_get_settings",
       "kind": "function",
       "public": false,
-      "lineno": 57,
+      "lineno": 61,
       "doc_summary": "Load settings once and reuse for subsequent commands.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
     },
     {
+      "name": "SearchCommandParams",
+      "kind": "class",
+      "public": true,
+      "lineno": 136,
+      "doc_summary": "Typed container for CLI-provided semantic search arguments.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
       "name": "global_options",
       "kind": "function",
       "public": true,
-      "lineno": 164,
+      "lineno": 182,
       "doc_summary": "Configure shared CLI options.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50417,7 +50616,7 @@
       "name": "_default_root",
       "kind": "function",
       "public": false,
-      "lineno": 169,
+      "lineno": 187,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50427,7 +50626,7 @@
       "name": "_resolve_root",
       "kind": "function",
       "public": false,
-      "lineno": 176,
+      "lineno": 194,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50437,7 +50636,7 @@
       "name": "_manager",
       "kind": "function",
       "public": false,
-      "lineno": 182,
+      "lineno": 200,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50447,7 +50646,7 @@
       "name": "_build_assets",
       "kind": "function",
       "public": false,
-      "lineno": 187,
+      "lineno": 205,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50457,7 +50656,7 @@
       "name": "_parse_extras",
       "kind": "function",
       "public": false,
-      "lineno": 205,
+      "lineno": 223,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50467,7 +50666,7 @@
       "name": "_parse_sidecars",
       "kind": "function",
       "public": false,
-      "lineno": 216,
+      "lineno": 234,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50477,7 +50676,7 @@
       "name": "_resolve_version_dir",
       "kind": "function",
       "public": false,
-      "lineno": 235,
+      "lineno": 253,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50487,7 +50686,7 @@
       "name": "_manifest_path_for",
       "kind": "function",
       "public": false,
-      "lineno": 245,
+      "lineno": 263,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50497,7 +50696,7 @@
       "name": "_load_manifest",
       "kind": "function",
       "public": false,
-      "lineno": 249,
+      "lineno": 267,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50507,7 +50706,7 @@
       "name": "_write_manifest",
       "kind": "function",
       "public": false,
-      "lineno": 259,
+      "lineno": 277,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50517,7 +50716,7 @@
       "name": "_EmbeddingBuildContext",
       "kind": "class",
       "public": false,
-      "lineno": 264,
+      "lineno": 282,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50527,7 +50726,7 @@
       "name": "_build_context",
       "kind": "function",
       "public": false,
-      "lineno": 274,
+      "lineno": 292,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50537,7 +50736,7 @@
       "name": "_resolve_duck_path",
       "kind": "function",
       "public": false,
-      "lineno": 302,
+      "lineno": 320,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50547,7 +50746,7 @@
       "name": "_resolve_output_path",
       "kind": "function",
       "public": false,
-      "lineno": 319,
+      "lineno": 337,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50557,7 +50756,7 @@
       "name": "_parquet_meta",
       "kind": "function",
       "public": false,
-      "lineno": 339,
+      "lineno": 357,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50567,7 +50766,7 @@
       "name": "_build_embedding_manifest",
       "kind": "function",
       "public": false,
-      "lineno": 352,
+      "lineno": 370,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50577,7 +50776,7 @@
       "name": "_compute_chunk_checksum",
       "kind": "function",
       "public": false,
-      "lineno": 378,
+      "lineno": 396,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50587,7 +50786,7 @@
       "name": "_collect_chunks_and_embeddings",
       "kind": "function",
       "public": false,
-      "lineno": 393,
+      "lineno": 411,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50597,7 +50796,7 @@
       "name": "_deterministic_sample",
       "kind": "function",
       "public": false,
-      "lineno": 440,
+      "lineno": 458,
       "doc_summary": "Return a deterministic pseudo-random selection of indices.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50607,7 +50806,7 @@
       "name": "_evaluate_drift",
       "kind": "function",
       "public": false,
-      "lineno": 474,
+      "lineno": 492,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50617,7 +50816,7 @@
       "name": "_execute_embeddings_build",
       "kind": "function",
       "public": false,
-      "lineno": 499,
+      "lineno": 517,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50627,7 +50826,7 @@
       "name": "_run_embedding_validation",
       "kind": "function",
       "public": false,
-      "lineno": 561,
+      "lineno": 579,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50637,7 +50836,7 @@
       "name": "_write_embedding_meta",
       "kind": "function",
       "public": false,
-      "lineno": 598,
+      "lineno": 616,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50647,7 +50846,7 @@
       "name": "embeddings_build_command",
       "kind": "function",
       "public": true,
-      "lineno": 613,
+      "lineno": 631,
       "doc_summary": "Embed chunks from DuckDB and write Parquet + manifest artifacts.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50657,7 +50856,7 @@
       "name": "embeddings_validate_command",
       "kind": "function",
       "public": true,
-      "lineno": 638,
+      "lineno": 656,
       "doc_summary": "Sample stored embeddings, recompute vectors, and detect drift.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50667,7 +50866,7 @@
       "name": "_parse_tune_overrides",
       "kind": "function",
       "public": false,
-      "lineno": 700,
+      "lineno": 718,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50677,7 +50876,7 @@
       "name": "_faiss_manager",
       "kind": "function",
       "public": false,
-      "lineno": 740,
+      "lineno": 758,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50687,7 +50886,7 @@
       "name": "_duckdb_catalog",
       "kind": "function",
       "public": false,
-      "lineno": 754,
+      "lineno": 772,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50697,7 +50896,7 @@
       "name": "_duckdb_embedding_dim",
       "kind": "function",
       "public": false,
-      "lineno": 768,
+      "lineno": 786,
       "doc_summary": "Return the embedding dimension stored in DuckDB.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50707,7 +50906,7 @@
       "name": "_count_idmap_rows",
       "kind": "function",
       "public": false,
-      "lineno": 794,
+      "lineno": 812,
       "doc_summary": "Return row count for a FAISS idmap sidecar.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50717,7 +50916,7 @@
       "name": "_load_xtr_index",
       "kind": "function",
       "public": false,
-      "lineno": 824,
+      "lineno": 842,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50727,7 +50926,7 @@
       "name": "_eval_paths",
       "kind": "function",
       "public": false,
-      "lineno": 840,
+      "lineno": 858,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50737,7 +50936,7 @@
       "name": "status_command",
       "kind": "function",
       "public": true,
-      "lineno": 850,
+      "lineno": 868,
       "doc_summary": "Print the active version and available versions.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50747,7 +50946,7 @@
       "name": "stage_command",
       "kind": "function",
       "public": true,
-      "lineno": 860,
+      "lineno": 878,
       "doc_summary": "Stage a new version by copying assets into the lifecycle root.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50757,7 +50956,7 @@
       "name": "publish_command",
       "kind": "function",
       "public": true,
-      "lineno": 917,
+      "lineno": 935,
       "doc_summary": "Publish a previously staged version.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50767,7 +50966,7 @@
       "name": "rollback_command",
       "kind": "function",
       "public": true,
-      "lineno": 927,
+      "lineno": 945,
       "doc_summary": "Rollback to a previously published version.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50777,7 +50976,7 @@
       "name": "list_command",
       "kind": "function",
       "public": true,
-      "lineno": 937,
+      "lineno": 955,
       "doc_summary": "List all published versions.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50787,7 +50986,7 @@
       "name": "health_command",
       "kind": "function",
       "public": true,
-      "lineno": 949,
+      "lineno": 967,
       "doc_summary": "Validate FAISS, DuckDB, and ID map invariants.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50797,7 +50996,7 @@
       "name": "export_idmap_command",
       "kind": "function",
       "public": true,
-      "lineno": 1004,
+      "lineno": 1026,
       "doc_summary": "Export FAISS ID map to Parquet and optionally refresh DuckDB materialization.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50807,7 +51006,7 @@
       "name": "materialize_join_command",
       "kind": "function",
       "public": true,
-      "lineno": 1025,
+      "lineno": 1047,
       "doc_summary": "Refresh DuckDB's materialized FAISS join if the ID map sidecar changed.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50817,7 +51016,7 @@
       "name": "tune_command",
       "kind": "function",
       "public": true,
-      "lineno": 1041,
+      "lineno": 1063,
       "doc_summary": "Apply FAISS tuning overrides or run an autotune sweep.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50827,7 +51026,7 @@
       "name": "tune_params_command",
       "kind": "function",
       "public": true,
-      "lineno": 1111,
+      "lineno": 1133,
       "doc_summary": "Apply FAISS ParameterSpace string (nprobe/efSearch/quantizer/k_factor).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -50837,7 +51036,7 @@
       "name": "show_profile_command",
       "kind": "function",
       "public": true,
-      "lineno": 1153,
+      "lineno": 1175,
       "doc_summary": "Print the active tuning profile, overrides, and saved ParameterSpace.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -50847,7 +51046,7 @@
       "name": "_write_tuning_audit",
       "kind": "function",
       "public": false,
-      "lineno": 1159,
+      "lineno": 1181,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50857,7 +51056,7 @@
       "name": "_run_autotune",
       "kind": "function",
       "public": false,
-      "lineno": 1170,
+      "lineno": 1192,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -50867,18 +51066,18 @@
       "name": "eval_command",
       "kind": "function",
       "public": true,
-      "lineno": 1196,
+      "lineno": 1218,
       "doc_summary": "Run ANN vs Flat evaluation and optionally rescore with XTR.",
       "doc_has_summary": true,
       "doc_param_parity": false,
       "doc_examples_present": false
     },
     {
-      "name": "search_command",
+      "name": "_execute_search",
       "kind": "function",
-      "public": true,
-      "lineno": 1230,
-      "doc_summary": "Execute ANN + refine search for newline-delimited queries and print a summary.",
+      "public": false,
+      "lineno": 1251,
+      "doc_summary": "Execute ANN + refine search for newline-delimited queries.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -50897,9 +51096,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 102,
-    "cyclomatic": 103,
-    "loc": 1323
+    "branches": 103,
+    "cyclomatic": 104,
+    "loc": 1330
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -50938,14 +51137,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.966,
+  "hotspot_score": 2.969,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 12,
-  "recent_churn_90": 12
+  "recent_churn_30": 13,
+  "recent_churn_90": 13
 }
 {
   "path": "cli/telemetry.py",
@@ -52538,8 +52737,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 8,
-  "recent_churn_90": 8
+  "recent_churn_30": 9,
+  "recent_churn_90": 9
 }
 {
   "path": "mcp_server/common/observability.py",
@@ -54590,8 +54789,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 38,
-  "recent_churn_90": 38
+  "recent_churn_30": 39,
+  "recent_churn_90": 39
 }
 {
   "path": "mcp_server/adapters/files.py",
@@ -55307,7 +55506,6 @@
     {
       "module": "codeintel_rev.io.hybrid_search",
       "names": [
-        "ChannelHit",
         "HybridSearchOptions",
         "HybridSearchTuning"
       ],
@@ -55423,6 +55621,7 @@
       "names": [
         "HybridResultDoc",
         "HybridSearchResult",
+        "SearchHit",
         "StageDecision",
         "StageSignals"
       ],
@@ -55491,277 +55690,277 @@
     {
       "kind": "variable",
       "name": "SNIPPET_PREVIEW_CHARS",
-      "lineno": 56
+      "lineno": 53
     },
     {
       "kind": "variable",
       "name": "COMPONENT_NAME",
-      "lineno": 57
+      "lineno": 54
     },
     {
       "kind": "variable",
       "name": "RERANK_STAGE_NAME",
-      "lineno": 58
+      "lineno": 55
     },
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 59
+      "lineno": 56
     },
     {
       "kind": "class",
       "name": "RerankOptionPayload",
-      "lineno": 62
+      "lineno": 59
     },
     {
       "kind": "class",
       "name": "SemanticProOptions",
-      "lineno": 71
+      "lineno": 68
     },
     {
       "kind": "class",
       "name": "RerankRuntimeOptions",
-      "lineno": 84
+      "lineno": 81
     },
     {
       "kind": "class",
       "name": "RerankPlan",
-      "lineno": 94
+      "lineno": 91
     },
     {
       "kind": "class",
       "name": "SemanticProRuntimeOptions",
-      "lineno": 105
+      "lineno": 102
     },
     {
       "kind": "variable",
       "name": "WideSearchHandle",
-      "lineno": 117
+      "lineno": 114
     },
     {
       "kind": "class",
       "name": "StageOnePlan",
-      "lineno": 121
+      "lineno": 118
     },
     {
       "kind": "class",
       "name": "HydrationPlan",
-      "lineno": 133
+      "lineno": 130
     },
     {
       "kind": "class",
       "name": "HydrationOutcome",
-      "lineno": 146
+      "lineno": 143
     },
     {
       "kind": "function",
       "name": "build_runtime_options",
-      "lineno": 153
+      "lineno": 150
     },
     {
       "kind": "function",
       "name": "_summarize_options",
-      "lineno": 235
+      "lineno": 232
     },
     {
       "kind": "function",
       "name": "semantic_search_pro",
-      "lineno": 248
+      "lineno": 245
     },
     {
       "kind": "function",
       "name": "_semantic_search_pro_sync",
-      "lineno": 341
+      "lineno": 338
     },
     {
       "kind": "function",
       "name": "_run_coderank_stage",
-      "lineno": 493
+      "lineno": 490
     },
     {
       "kind": "function",
       "name": "_timed_coderank_stage",
-      "lineno": 549
+      "lineno": 546
     },
     {
       "kind": "function",
       "name": "_maybe_run_warp",
-      "lineno": 569
+      "lineno": 566
     },
     {
       "kind": "function",
       "name": "_should_execute_stage_two",
-      "lineno": 594
+      "lineno": 591
     },
     {
       "kind": "function",
       "name": "_execute_stage_two",
-      "lineno": 648
+      "lineno": 645
     },
     {
       "kind": "function",
       "name": "_run_fusion_stage",
-      "lineno": 682
+      "lineno": 679
     },
     {
       "kind": "function",
       "name": "_maybe_apply_rerank_stage",
-      "lineno": 708
+      "lineno": 705
     },
     {
       "kind": "class",
       "name": "_RerankOutcome",
-      "lineno": 779
+      "lineno": 776
     },
     {
       "kind": "function",
       "name": "_reorder_docs",
-      "lineno": 784
+      "lineno": 781
     },
     {
       "kind": "function",
       "name": "_emit_rerank_decision",
-      "lineno": 826
+      "lineno": 823
     },
     {
       "kind": "function",
       "name": "_build_rerank_plan",
-      "lineno": 832
+      "lineno": 829
     },
     {
       "kind": "function",
       "name": "_resolve_reranker",
-      "lineno": 853
+      "lineno": 850
     },
     {
       "kind": "function",
       "name": "_maybe_schedule_xtr_wide",
-      "lineno": 868
+      "lineno": 865
     },
     {
       "kind": "function",
       "name": "_resolve_stage_one_outcome",
-      "lineno": 901
+      "lineno": 898
     },
     {
       "kind": "function",
       "name": "_run_xtr_wide_stage",
-      "lineno": 979
+      "lineno": 976
     },
     {
       "kind": "function",
       "name": "_calculate_xtr_k",
-      "lineno": 1011
+      "lineno": 1008
     },
     {
       "kind": "function",
       "name": "_build_extra_channels",
-      "lineno": 1018
+      "lineno": 1015
     },
     {
       "kind": "function",
       "name": "_append_budget_notes",
-      "lineno": 1031
+      "lineno": 1035
     },
     {
       "kind": "function",
       "name": "_safe_int",
-      "lineno": 1046
+      "lineno": 1050
     },
     {
       "kind": "function",
       "name": "_merge_rrf_weights",
-      "lineno": 1054
+      "lineno": 1058
     },
     {
       "kind": "function",
       "name": "_run_warp_stage",
-      "lineno": 1070
+      "lineno": 1074
     },
     {
       "kind": "function",
       "name": "_warp_executor_hits",
-      "lineno": 1093
+      "lineno": 1097
     },
     {
       "kind": "function",
       "name": "_xtr_rescore_hits",
-      "lineno": 1125
+      "lineno": 1129
     },
     {
       "kind": "function",
       "name": "_hydrate_records",
-      "lineno": 1164
+      "lineno": 1168
     },
     {
       "kind": "function",
       "name": "_hydrate_and_rerank_records",
-      "lineno": 1188
+      "lineno": 1192
     },
     {
       "kind": "function",
       "name": "_maybe_rerank",
-      "lineno": 1330
+      "lineno": 1334
     },
     {
       "kind": "function",
       "name": "_build_findings",
-      "lineno": 1375
+      "lineno": 1379
     },
     {
       "kind": "function",
       "name": "merge_explainability_into_findings",
-      "lineno": 1415
+      "lineno": 1419
     },
     {
       "kind": "function",
       "name": "_build_method_explainability",
-      "lineno": 1480
+      "lineno": 1484
     },
     {
       "kind": "function",
       "name": "_build_method",
-      "lineno": 1547
+      "lineno": 1551
     },
     {
       "kind": "function",
       "name": "_assemble_extras",
-      "lineno": 1586
+      "lineno": 1590
     },
     {
       "kind": "function",
       "name": "_make_envelope",
-      "lineno": 1650
+      "lineno": 1654
     },
     {
       "kind": "function",
       "name": "_clamp_limit",
-      "lineno": 1669
+      "lineno": 1673
     },
     {
       "kind": "function",
       "name": "_coerce_positive_int",
-      "lineno": 1680
+      "lineno": 1684
     },
     {
       "kind": "function",
       "name": "_dedupe_preserve_order",
-      "lineno": 1690
+      "lineno": 1694
     },
     {
       "kind": "class",
       "name": "WarpOutcome",
-      "lineno": 1702
+      "lineno": 1706
     },
     {
       "kind": "class",
       "name": "FusionRequest",
-      "lineno": 1713
+      "lineno": 1717
     },
     {
       "kind": "class",
       "name": "MethodContext",
-      "lineno": 1727
+      "lineno": 1731
     }
   ],
   "exports": [],
@@ -55835,21 +56034,21 @@
     "local 172",
     "local 173",
     "local 174",
-    "local 177",
+    "local 175",
     "local 178",
+    "local 179",
     "local 18",
-    "local 181",
     "local 182",
-    "local 189",
+    "local 183",
     "local 19",
-    "local 191",
-    "local 193",
+    "local 190",
+    "local 192",
     "local 194",
-    "local 197",
+    "local 195",
+    "local 198",
     "local 2",
     "local 20",
-    "local 200",
-    "local 202",
+    "local 201",
     "local 203",
     "local 204",
     "local 205",
@@ -55861,8 +56060,8 @@
     "local 210",
     "local 211",
     "local 212",
-    "local 214",
-    "local 216",
+    "local 213",
+    "local 215",
     "local 217",
     "local 218",
     "local 219",
@@ -55877,13 +56076,13 @@
     "local 228",
     "local 229",
     "local 230",
-    "local 233",
-    "local 235",
-    "local 237",
+    "local 231",
+    "local 234",
+    "local 236",
     "local 238",
-    "local 240",
+    "local 239",
     "local 241",
-    "local 243",
+    "local 242",
     "local 244",
     "local 245",
     "local 246",
@@ -55892,7 +56091,7 @@
     "local 249",
     "local 25",
     "local 250",
-    "local 252",
+    "local 251",
     "local 253",
     "local 254",
     "local 255",
@@ -55903,18 +56102,18 @@
     "local 26",
     "local 260",
     "local 261",
-    "local 264",
+    "local 262",
     "local 265",
     "local 266",
     "local 267",
-    "local 269",
+    "local 268",
     "local 27",
     "local 270",
     "local 271",
     "local 272",
     "local 273",
     "local 274",
-    "local 276",
+    "local 275",
     "local 277",
     "local 278",
     "local 279",
@@ -55922,21 +56121,22 @@
     "local 281",
     "local 282",
     "local 283",
-    "local 287",
+    "local 284",
     "local 288",
     "local 289",
-    "local 291",
+    "local 290",
     "local 292",
     "local 293",
     "local 294",
-    "local 296",
-    "local 298",
+    "local 295",
+    "local 297",
+    "local 299",
     "local 3",
     "local 30",
-    "local 300",
-    "local 302",
+    "local 301",
     "local 303",
-    "local 305",
+    "local 304",
+    "local 306",
     "local 31",
     "local 33",
     "local 34",
@@ -56235,7 +56435,7 @@
       "name": "RerankOptionPayload",
       "kind": "class",
       "public": true,
-      "lineno": 62,
+      "lineno": 59,
       "doc_summary": "User-facing payload for overruling rerank behavior.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56245,7 +56445,7 @@
       "name": "SemanticProOptions",
       "kind": "class",
       "public": true,
-      "lineno": 71,
+      "lineno": 68,
       "doc_summary": "User-facing options for semantic_pro retrieval.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56255,7 +56455,7 @@
       "name": "RerankRuntimeOptions",
       "kind": "class",
       "public": true,
-      "lineno": 84,
+      "lineno": 81,
       "doc_summary": "Runtime overrides for optional reranker stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56265,7 +56465,7 @@
       "name": "RerankPlan",
       "kind": "class",
       "public": true,
-      "lineno": 94,
+      "lineno": 91,
       "doc_summary": "Concrete rerank execution plan derived from settings + overrides.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56275,7 +56475,7 @@
       "name": "SemanticProRuntimeOptions",
       "kind": "class",
       "public": true,
-      "lineno": 105,
+      "lineno": 102,
       "doc_summary": "Internal immutable representation of semantic_pro options.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56285,7 +56485,7 @@
       "name": "StageOnePlan",
       "kind": "class",
       "public": true,
-      "lineno": 121,
+      "lineno": 118,
       "doc_summary": "Container for Stage-1 orchestration inputs to reduce argument lists.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56295,7 +56495,7 @@
       "name": "HydrationPlan",
       "kind": "class",
       "public": true,
-      "lineno": 133,
+      "lineno": 130,
       "doc_summary": "Hydration plus rerank inputs passed as a cohesive plan.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56305,7 +56505,7 @@
       "name": "HydrationOutcome",
       "kind": "class",
       "public": true,
-      "lineno": 146,
+      "lineno": 143,
       "doc_summary": "Result of DuckDB hydration and optional LLM rerank.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56315,7 +56515,7 @@
       "name": "build_runtime_options",
       "kind": "function",
       "public": true,
-      "lineno": 153,
+      "lineno": 150,
       "doc_summary": "Normalize user-supplied options into an immutable dataclass.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56325,7 +56525,7 @@
       "name": "_summarize_options",
       "kind": "function",
       "public": false,
-      "lineno": 235,
+      "lineno": 232,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56335,7 +56535,7 @@
       "name": "semantic_search_pro",
       "kind": "function",
       "public": true,
-      "lineno": 248,
+      "lineno": 245,
       "doc_summary": "Execute the two-stage semantic search pipeline (CodeRank → optional WARP → optional reranker).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56345,7 +56545,7 @@
       "name": "_semantic_search_pro_sync",
       "kind": "function",
       "public": false,
-      "lineno": 341,
+      "lineno": 338,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56355,7 +56555,7 @@
       "name": "_run_coderank_stage",
       "kind": "function",
       "public": false,
-      "lineno": 493,
+      "lineno": 490,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56365,7 +56565,7 @@
       "name": "_timed_coderank_stage",
       "kind": "function",
       "public": false,
-      "lineno": 549,
+      "lineno": 546,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56375,7 +56575,7 @@
       "name": "_maybe_run_warp",
       "kind": "function",
       "public": false,
-      "lineno": 569,
+      "lineno": 566,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56385,7 +56585,7 @@
       "name": "_should_execute_stage_two",
       "kind": "function",
       "public": false,
-      "lineno": 594,
+      "lineno": 591,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56395,7 +56595,7 @@
       "name": "_execute_stage_two",
       "kind": "function",
       "public": false,
-      "lineno": 648,
+      "lineno": 645,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56405,7 +56605,7 @@
       "name": "_run_fusion_stage",
       "kind": "function",
       "public": false,
-      "lineno": 682,
+      "lineno": 679,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56415,7 +56615,7 @@
       "name": "_maybe_apply_rerank_stage",
       "kind": "function",
       "public": false,
-      "lineno": 708,
+      "lineno": 705,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56425,7 +56625,7 @@
       "name": "_RerankOutcome",
       "kind": "class",
       "public": false,
-      "lineno": 779,
+      "lineno": 776,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56435,7 +56635,7 @@
       "name": "_reorder_docs",
       "kind": "function",
       "public": false,
-      "lineno": 784,
+      "lineno": 781,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56445,7 +56645,7 @@
       "name": "_emit_rerank_decision",
       "kind": "function",
       "public": false,
-      "lineno": 826,
+      "lineno": 823,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56455,7 +56655,7 @@
       "name": "_build_rerank_plan",
       "kind": "function",
       "public": false,
-      "lineno": 832,
+      "lineno": 829,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56465,7 +56665,7 @@
       "name": "_resolve_reranker",
       "kind": "function",
       "public": false,
-      "lineno": 853,
+      "lineno": 850,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56475,7 +56675,7 @@
       "name": "_maybe_schedule_xtr_wide",
       "kind": "function",
       "public": false,
-      "lineno": 868,
+      "lineno": 865,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56485,7 +56685,7 @@
       "name": "_resolve_stage_one_outcome",
       "kind": "function",
       "public": false,
-      "lineno": 901,
+      "lineno": 898,
       "doc_summary": "Resolve Stage-1 orchestration outcome from a StageOnePlan.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56495,7 +56695,7 @@
       "name": "_run_xtr_wide_stage",
       "kind": "function",
       "public": false,
-      "lineno": 979,
+      "lineno": 976,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56505,7 +56705,7 @@
       "name": "_calculate_xtr_k",
       "kind": "function",
       "public": false,
-      "lineno": 1011,
+      "lineno": 1008,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56515,7 +56715,7 @@
       "name": "_build_extra_channels",
       "kind": "function",
       "public": false,
-      "lineno": 1018,
+      "lineno": 1015,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56525,7 +56725,7 @@
       "name": "_append_budget_notes",
       "kind": "function",
       "public": false,
-      "lineno": 1031,
+      "lineno": 1035,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56535,7 +56735,7 @@
       "name": "_safe_int",
       "kind": "function",
       "public": false,
-      "lineno": 1046,
+      "lineno": 1050,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56545,7 +56745,7 @@
       "name": "_merge_rrf_weights",
       "kind": "function",
       "public": false,
-      "lineno": 1054,
+      "lineno": 1058,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56555,7 +56755,7 @@
       "name": "_run_warp_stage",
       "kind": "function",
       "public": false,
-      "lineno": 1070,
+      "lineno": 1074,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56565,7 +56765,7 @@
       "name": "_warp_executor_hits",
       "kind": "function",
       "public": false,
-      "lineno": 1093,
+      "lineno": 1097,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56575,7 +56775,7 @@
       "name": "_xtr_rescore_hits",
       "kind": "function",
       "public": false,
-      "lineno": 1125,
+      "lineno": 1129,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56585,7 +56785,7 @@
       "name": "_hydrate_records",
       "kind": "function",
       "public": false,
-      "lineno": 1164,
+      "lineno": 1168,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56595,7 +56795,7 @@
       "name": "_hydrate_and_rerank_records",
       "kind": "function",
       "public": false,
-      "lineno": 1188,
+      "lineno": 1192,
       "doc_summary": "Hydrate DuckDB records and optionally rerank them using CodeRankLLM.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56605,7 +56805,7 @@
       "name": "_maybe_rerank",
       "kind": "function",
       "public": false,
-      "lineno": 1330,
+      "lineno": 1334,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56615,7 +56815,7 @@
       "name": "_build_findings",
       "kind": "function",
       "public": false,
-      "lineno": 1375,
+      "lineno": 1379,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56625,7 +56825,7 @@
       "name": "merge_explainability_into_findings",
       "kind": "function",
       "public": true,
-      "lineno": 1415,
+      "lineno": 1419,
       "doc_summary": "Append token-level explainability snippets to existing findings.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56635,7 +56835,7 @@
       "name": "_build_method_explainability",
       "kind": "function",
       "public": false,
-      "lineno": 1480,
+      "lineno": 1484,
       "doc_summary": "Build explainability payload for MethodInfo.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56645,7 +56845,7 @@
       "name": "_build_method",
       "kind": "function",
       "public": false,
-      "lineno": 1547,
+      "lineno": 1551,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56655,7 +56855,7 @@
       "name": "_assemble_extras",
       "kind": "function",
       "public": false,
-      "lineno": 1586,
+      "lineno": 1590,
       "doc_summary": "Assemble response metadata extras dictionary.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -56665,7 +56865,7 @@
       "name": "_make_envelope",
       "kind": "function",
       "public": false,
-      "lineno": 1650,
+      "lineno": 1654,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56675,7 +56875,7 @@
       "name": "_clamp_limit",
       "kind": "function",
       "public": false,
-      "lineno": 1669,
+      "lineno": 1673,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56685,7 +56885,7 @@
       "name": "_coerce_positive_int",
       "kind": "function",
       "public": false,
-      "lineno": 1680,
+      "lineno": 1684,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56695,7 +56895,7 @@
       "name": "_dedupe_preserve_order",
       "kind": "function",
       "public": false,
-      "lineno": 1690,
+      "lineno": 1694,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -56705,7 +56905,7 @@
       "name": "WarpOutcome",
       "kind": "class",
       "public": true,
-      "lineno": 1702,
+      "lineno": 1706,
       "doc_summary": "Container describing the results of the optional WARP stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56715,7 +56915,7 @@
       "name": "FusionRequest",
       "kind": "class",
       "public": true,
-      "lineno": 1713,
+      "lineno": 1717,
       "doc_summary": "Inputs required to execute the fusion stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56725,7 +56925,7 @@
       "name": "MethodContext",
       "kind": "class",
       "public": true,
-      "lineno": 1727,
+      "lineno": 1731,
       "doc_summary": "Inputs required to build the MethodInfo payload.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -56747,7 +56947,7 @@
   "complexity": {
     "branches": 155,
     "cyclomatic": 156,
-    "loc": 1740
+    "loc": 1744
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -57179,8 +57379,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "mcp_server/adapters/text_search.py",
@@ -57786,7 +57986,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 80,
+  "cycle_group": 79,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.194,
@@ -58044,8 +58244,8 @@
     {
       "module": "codeintel_rev.retrieval.types",
       "names": [
-        "ChannelHit",
-        "HybridResultDoc"
+        "HybridResultDoc",
+        "SearchHit"
       ],
       "aliases": {},
       "is_star": false,
@@ -58069,14 +58269,14 @@
   "scip_symbols": [
     "local 0",
     "local 1",
-    "local 10",
+    "local 11",
     "local 12",
     "local 13",
     "local 14",
     "local 15",
     "local 16",
-    "local 17",
     "local 6",
+    "local 8",
     "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.fusion.weighted_rrf`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.fusion.weighted_rrf`/__init__:",
@@ -58594,6 +58794,7 @@
     "patches/Typing_gating_follow_small_architecture_changes.md",
     "patches/FAISS_detailed_implementation_plan.md",
     "patches/Enrich_Expansion.md",
+    "patches/OpenTelemetry_ExtensionPhase2addon.md",
     "patches/Enrich_Extension.md",
     "patches/Networking_Implementation.md",
     "patches/FAISS-Hardening.md",
@@ -58632,8 +58833,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "app/routers/index_admin.py",
@@ -59252,7 +59453,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 76,
+  "cycle_group": 85,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.032,

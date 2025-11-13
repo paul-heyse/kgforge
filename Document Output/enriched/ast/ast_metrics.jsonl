@@ -235,15 +235,15 @@
 {
   "path": "cst_build/cst_collect.py",
   "module": "cst_build.cst_collect",
-  "func_count": 41,
+  "func_count": 40,
   "class_count": 3,
-  "assign_count": 98,
+  "assign_count": 102,
   "import_count": 14,
   "branch_nodes": 97,
   "cyclomatic": 98,
   "cognitive": 102,
   "max_nesting": 4,
-  "statements": 358
+  "statements": 356
 }
 {
   "path": "cst_build/cst_cli.py",
@@ -464,7 +464,7 @@
   "cyclomatic": 25,
   "cognitive": 31,
   "max_nesting": 6,
-  "statements": 66
+  "statements": 67
 }
 {
   "path": "eval/hybrid_evaluator.py",
@@ -1173,13 +1173,13 @@
   "module": "io.hybrid_search",
   "func_count": 46,
   "class_count": 12,
-  "assign_count": 220,
+  "assign_count": 222,
   "import_count": 24,
-  "branch_nodes": 141,
-  "cyclomatic": 142,
-  "cognitive": 145,
+  "branch_nodes": 142,
+  "cyclomatic": 143,
+  "cognitive": 146,
   "max_nesting": 3,
-  "statements": 522
+  "statements": 528
 }
 {
   "path": "io/warp_engine.py",
@@ -1197,15 +1197,15 @@
 {
   "path": "io/faiss_manager.py",
   "module": "io.faiss_manager",
-  "func_count": 86,
-  "class_count": 8,
-  "assign_count": 409,
-  "import_count": 28,
-  "branch_nodes": 249,
-  "cyclomatic": 250,
-  "cognitive": 254,
+  "func_count": 89,
+  "class_count": 10,
+  "assign_count": 422,
+  "import_count": 29,
+  "branch_nodes": 258,
+  "cyclomatic": 259,
+  "cognitive": 263,
   "max_nesting": 4,
-  "statements": 1116
+  "statements": 1161
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -1225,13 +1225,13 @@
   "module": "io.duckdb_catalog",
   "func_count": 52,
   "class_count": 6,
-  "assign_count": 194,
+  "assign_count": 195,
   "import_count": 21,
   "branch_nodes": 156,
   "cyclomatic": 157,
   "cognitive": 161,
   "max_nesting": 4,
-  "statements": 600
+  "statements": 601
 }
 {
   "path": "io/bm25_manager.py",
@@ -1380,14 +1380,14 @@
   "path": "retrieval/types.py",
   "module": "retrieval.types",
   "func_count": 1,
-  "class_count": 7,
-  "assign_count": 33,
+  "class_count": 6,
+  "assign_count": 31,
   "import_count": 3,
   "branch_nodes": 2,
   "cyclomatic": 3,
   "cognitive": 5,
   "max_nesting": 2,
-  "statements": 56
+  "statements": 52
 }
 {
   "path": "retrieval/telemetry.py",
@@ -1432,14 +1432,14 @@
   "path": "retrieval/hybrid.py",
   "module": "retrieval.hybrid",
   "func_count": 2,
-  "class_count": 1,
-  "assign_count": 11,
+  "class_count": 0,
+  "assign_count": 7,
   "import_count": 4,
   "branch_nodes": 5,
   "cyclomatic": 6,
   "cognitive": 9,
   "max_nesting": 3,
-  "statements": 28
+  "statements": 22
 }
 {
   "path": "retrieval/rm3_heuristics.py",
@@ -1769,15 +1769,15 @@
 {
   "path": "cli/indexctl.py",
   "module": "cli.indexctl",
-  "func_count": 48,
-  "class_count": 1,
-  "assign_count": 250,
+  "func_count": 49,
+  "class_count": 2,
+  "assign_count": 258,
   "import_count": 29,
-  "branch_nodes": 105,
-  "cyclomatic": 106,
-  "cognitive": 110,
+  "branch_nodes": 107,
+  "cyclomatic": 108,
+  "cognitive": 112,
   "max_nesting": 4,
-  "statements": 554
+  "statements": 567
 }
 {
   "path": "cli/telemetry.py",
