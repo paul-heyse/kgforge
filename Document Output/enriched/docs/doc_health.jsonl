@@ -468,6 +468,13 @@
   "doc_summary": "RuntimeCell observer that writes lifecycle events to the active timeline."
 }
 {
+  "path": "observability/flight_recorder.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Trace-anchored flight recorder that mirrors run execution timelines."
+}
+{
   "path": "observability/reporting.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -494,6 +501,13 @@
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Observability helpers (telemetry + lightweight timelines)."
+}
+{
+  "path": "observability/semantic_conventions.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Shared OpenTelemetry semantic convention helpers for CodeIntel."
 }
 {
   "path": "observability/timeline.py",

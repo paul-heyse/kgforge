@@ -334,6 +334,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "observability/flight_recorder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "observability/reporting.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -350,6 +355,11 @@
 }
 {
   "path": "observability/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/semantic_conventions.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
