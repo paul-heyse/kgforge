@@ -615,6 +615,13 @@
   "doc_summary": "Phase-0 telemetry helpers (tracing, metrics, logging, run reports)."
 }
 {
+  "path": "telemetry/otel_metrics.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Compatibility layer exposing Prometheus-like helpers backed by OpenTelemetry."
+}
+{
   "path": "io/rrf.py",
   "doc_has_summary": true,
   "doc_param_parity": true,

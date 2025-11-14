@@ -827,12 +827,12 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 109,
+  "fan_in": 108,
   "fan_out": 0,
   "cycle_group": 0,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.756,
+  "hotspot_score": 2.753,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -4287,7 +4287,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 19,
+  "cycle_group": 17,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/type_integration.py"
@@ -4438,7 +4438,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 20,
+  "cycle_group": 23,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.515,
@@ -4872,8 +4872,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 6,
-  "recent_churn_90": 6
+  "recent_churn_30": 7,
+  "recent_churn_90": 7
 }
 {
   "path": "uses_builder.py",
@@ -5096,7 +5096,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 16,
+  "cycle_group": 21,
   "imports_internal": [
     "enrich/scip_reader.py",
     "polars_support.py",
@@ -5374,7 +5374,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 11,
+  "cycle_group": 22,
   "imports_internal": [
     "module_utils.py",
     "typing.py"
@@ -7233,8 +7233,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 11,
-  "recent_churn_90": 11
+  "recent_churn_30": 12,
+  "recent_churn_90": 12
 }
 {
   "path": "cst_build/cst_cli.py",
@@ -8446,11 +8446,13 @@
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.016,
-  "owner": null,
-  "primary_authors": [],
-  "bus_factor": 0.0,
-  "recent_churn_30": 0,
-  "recent_churn_90": 0
+  "owner": "paul-heyse",
+  "primary_authors": [
+    "paul-heyse"
+  ],
+  "bus_factor": 1.0,
+  "recent_churn_30": 1,
+  "recent_churn_90": 1
 }
 {
   "path": "diagnostics/report_cli.py",
@@ -9219,7 +9221,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "build_counter",
         "build_gauge"
@@ -9263,30 +9265,26 @@
     "local 10",
     "local 11",
     "local 12",
-    "local 13",
-    "local 14",
-    "local 15",
     "local 16",
+    "local 17",
+    "local 18",
     "local 2",
     "local 20",
     "local 21",
     "local 22",
+    "local 23",
     "local 24",
     "local 25",
     "local 26",
     "local 27",
-    "local 28",
     "local 29",
     "local 3",
-    "local 30",
     "local 31",
+    "local 32",
     "local 33",
-    "local 35",
-    "local 36",
-    "local 37",
-    "local 4",
     "local 5",
     "local 7",
+    "local 8",
     "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.scope_registry`/LOGGER.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.scope_registry`/ScopeRegistry#",
@@ -9364,19 +9362,21 @@
   ],
   "overlay_needed": false,
   "fan_in": 0,
-  "fan_out": 2,
-  "cycle_group": 40,
+  "fan_out": 3,
+  "cycle_group": 41,
   "imports_internal": [
     "mcp_server/schemas.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "imports_intra_repo": [
     "mcp_server/schemas.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.778,
+  "hotspot_score": 1.893,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -9735,7 +9735,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 9,
-  "cycle_group": 79,
+  "cycle_group": 80,
   "imports_internal": [
     "observability/ledger.py",
     "observability/otel.py",
@@ -9766,8 +9766,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 14,
-  "recent_churn_90": 14
+  "recent_churn_30": 15,
+  "recent_churn_90": 15
 }
 {
   "path": "app/gpu_warmup.py",
@@ -10023,7 +10023,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 80,
+  "cycle_group": 81,
   "imports_internal": [
     "_lazy_imports.py",
     "metrics/registry.py",
@@ -10205,7 +10205,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 81,
+  "cycle_group": 82,
   "imports_internal": [
     "typing.py"
   ],
@@ -11206,7 +11206,7 @@
   "overlay_needed": false,
   "fan_in": 26,
   "fan_out": 17,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "app/capabilities.py",
     "app/scope_store.py",
@@ -11553,8 +11553,6 @@
         "as_span",
         "current_trace_id",
         "init_all_telemetry",
-        "instrument_fastapi",
-        "instrument_httpx",
         "set_current_span_attrs"
       ],
       "aliases": {},
@@ -11670,182 +11668,187 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 65
+      "lineno": 63
     },
     {
       "kind": "variable",
       "name": "SERVER_SETTINGS",
-      "lineno": 66
+      "lineno": 64
     },
     {
       "kind": "function",
       "name": "_sse_keepalive_interval",
-      "lineno": 77
+      "lineno": 75
+    },
+    {
+      "kind": "function",
+      "name": "_sse_keepalive_budget",
+      "lineno": 93
     },
     {
       "kind": "function",
       "name": "_client_address",
-      "lineno": 95
+      "lineno": 113
     },
     {
       "kind": "function",
       "name": "_log_request_summary",
-      "lineno": 117
+      "lineno": 135
     },
     {
       "kind": "function",
       "name": "_stream_log_extra",
-      "lineno": 133
+      "lineno": 151
     },
     {
       "kind": "function",
       "name": "_preload_faiss_index",
-      "lineno": 172
+      "lineno": 190
     },
     {
       "kind": "function",
       "name": "_env_flag",
-      "lineno": 203
+      "lineno": 221
     },
     {
       "kind": "function",
       "name": "_log_gpu_warmup",
-      "lineno": 220
+      "lineno": 238
     },
     {
       "kind": "function",
       "name": "_preload_faiss_if_configured",
-      "lineno": 241
+      "lineno": 259
     },
     {
       "kind": "function",
       "name": "_preload_xtr_if_configured",
-      "lineno": 251
+      "lineno": 269
     },
     {
       "kind": "function",
       "name": "_preload_hybrid_if_configured",
-      "lineno": 265
+      "lineno": 283
     },
     {
       "kind": "function",
       "name": "_initialize_context",
-      "lineno": 276
+      "lineno": 294
     },
     {
       "kind": "function",
       "name": "_shutdown_context",
-      "lineno": 364
+      "lineno": 382
     },
     {
       "kind": "function",
       "name": "lifespan",
-      "lineno": 387
+      "lineno": 405
     },
     {
       "kind": "variable",
       "name": "app",
-      "lineno": 482
+      "lineno": 500
     },
     {
       "kind": "variable",
       "name": "metrics_router",
-      "lineno": 513
+      "lineno": 529
     },
     {
       "kind": "function",
       "name": "get_run_report",
-      "lineno": 523
+      "lineno": 539
     },
     {
       "kind": "function",
       "name": "get_run_report_markdown",
-      "lineno": 565
+      "lineno": 581
     },
     {
       "kind": "function",
       "name": "get_run_report_mermaid",
-      "lineno": 608
+      "lineno": 624
     },
     {
       "kind": "function",
       "name": "get_run_report_v2",
-      "lineno": 640
+      "lineno": 656
     },
     {
       "kind": "function",
       "name": "get_run_report_markdown_v2",
-      "lineno": 660
+      "lineno": 676
     },
     {
       "kind": "function",
       "name": "get_run_report_mermaid_v2",
-      "lineno": 682
+      "lineno": 698
     },
     {
       "kind": "function",
       "name": "inject_request_id",
-      "lineno": 704
+      "lineno": 720
     },
     {
       "kind": "function",
       "name": "set_mcp_context",
-      "lineno": 731
+      "lineno": 747
     },
     {
       "kind": "function",
       "name": "disable_nginx_buffering",
-      "lineno": 810
+      "lineno": 826
     },
     {
       "kind": "function",
       "name": "healthz",
-      "lineno": 846
+      "lineno": 862
     },
     {
       "kind": "function",
       "name": "readyz",
-      "lineno": 858
+      "lineno": 874
     },
     {
       "kind": "function",
       "name": "capz",
-      "lineno": 893
+      "lineno": 909
     },
     {
       "kind": "function",
       "name": "_stream_with_logging",
-      "lineno": 935
+      "lineno": 951
     },
     {
       "kind": "function",
       "name": "sse_demo",
-      "lineno": 997
+      "lineno": 1013
     },
     {
       "kind": "function",
       "name": "http_exception_handler_with_request_id",
-      "lineno": 1047
+      "lineno": 1066
     },
     {
       "kind": "function",
       "name": "unhandled_exception_handler",
-      "lineno": 1079
+      "lineno": 1098
     },
     {
       "kind": "variable",
       "name": "proxy_wrapped",
-      "lineno": 1120
+      "lineno": 1139
     },
     {
       "kind": "variable",
       "name": "asgi",
-      "lineno": 1125
+      "lineno": 1144
     },
     {
       "kind": "variable",
       "name": "asgi",
-      "lineno": 1127
+      "lineno": 1146
     }
   ],
   "exports": [
@@ -11861,25 +11864,28 @@
     "local 0",
     "local 1",
     "local 10",
-    "local 101",
-    "local 105",
-    "local 106",
+    "local 100",
+    "local 103",
     "local 107",
     "local 108",
+    "local 109",
     "local 11",
     "local 110",
-    "local 112",
+    "local 111",
     "local 113",
-    "local 115",
+    "local 114",
     "local 116",
     "local 117",
-    "local 118",
+    "local 119",
     "local 12",
+    "local 120",
+    "local 121",
+    "local 122",
+    "local 13",
     "local 14",
-    "local 15",
     "local 16",
+    "local 17",
     "local 18",
-    "local 19",
     "local 2",
     "local 20",
     "local 21",
@@ -11887,15 +11893,15 @@
     "local 23",
     "local 24",
     "local 25",
+    "local 26",
     "local 27",
-    "local 28",
     "local 29",
     "local 3",
+    "local 30",
     "local 31",
     "local 33",
-    "local 34",
-    "local 37",
-    "local 38",
+    "local 35",
+    "local 36",
     "local 39",
     "local 4",
     "local 40",
@@ -11903,8 +11909,8 @@
     "local 42",
     "local 43",
     "local 44",
+    "local 45",
     "local 46",
-    "local 47",
     "local 48",
     "local 49",
     "local 5",
@@ -11922,15 +11928,15 @@
     "local 60",
     "local 61",
     "local 62",
+    "local 63",
     "local 64",
     "local 66",
-    "local 67",
     "local 68",
     "local 69",
     "local 7",
     "local 70",
+    "local 71",
     "local 72",
-    "local 73",
     "local 74",
     "local 75",
     "local 76",
@@ -11939,19 +11945,20 @@
     "local 79",
     "local 8",
     "local 80",
+    "local 81",
     "local 82",
-    "local 83",
     "local 84",
     "local 85",
     "local 86",
+    "local 87",
     "local 88",
     "local 9",
     "local 90",
-    "local 91",
     "local 92",
-    "local 95",
+    "local 93",
+    "local 94",
     "local 97",
-    "local 98",
+    "local 99",
     "scip-python python fastapi 0.121.2 `fastapi.applications`/FastAPI#state.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/LOGGER.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/SERVER_SETTINGS.",
@@ -11983,6 +11990,7 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_shutdown_context().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_shutdown_context().(context)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_shutdown_context().(readiness)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_sse_keepalive_budget().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_sse_keepalive_interval().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_stream_log_extra().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/_stream_log_extra().(chunk_bytes)",
@@ -12069,8 +12077,18 @@
       "name": "_sse_keepalive_interval",
       "kind": "function",
       "public": false,
-      "lineno": 77,
+      "lineno": 75,
       "doc_summary": "Return the configured SSE keep-alive interval (seconds).",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_sse_keepalive_budget",
+      "kind": "function",
+      "public": false,
+      "lineno": 93,
+      "doc_summary": "Return optional cap on keep-alive frames for long-lived SSE streams.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -12079,7 +12097,7 @@
       "name": "_client_address",
       "kind": "function",
       "public": false,
-      "lineno": 95,
+      "lineno": 113,
       "doc_summary": "Return a printable representation of the originating client address.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12089,7 +12107,7 @@
       "name": "_log_request_summary",
       "kind": "function",
       "public": false,
-      "lineno": 117,
+      "lineno": 135,
       "doc_summary": "Emit a structured log describing a completed HTTP request.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12099,7 +12117,7 @@
       "name": "_stream_log_extra",
       "kind": "function",
       "public": false,
-      "lineno": 133,
+      "lineno": 151,
       "doc_summary": "Return structured logging metadata for streaming lifecycle events.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12109,7 +12127,7 @@
       "name": "_preload_faiss_index",
       "kind": "function",
       "public": false,
-      "lineno": 172,
+      "lineno": 190,
       "doc_summary": "Pre-load FAISS index during startup to avoid first-request latency.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12119,7 +12137,7 @@
       "name": "_env_flag",
       "kind": "function",
       "public": false,
-      "lineno": 203,
+      "lineno": 221,
       "doc_summary": "Return ``True`` when an environment flag is explicitly enabled.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12129,7 +12147,7 @@
       "name": "_log_gpu_warmup",
       "kind": "function",
       "public": false,
-      "lineno": 220,
+      "lineno": 238,
       "doc_summary": "Log the GPU warmup status summary.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12139,7 +12157,7 @@
       "name": "_preload_faiss_if_configured",
       "kind": "function",
       "public": false,
-      "lineno": 241,
+      "lineno": 259,
       "doc_summary": "Preload FAISS indexes when configured to do so.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12149,7 +12167,7 @@
       "name": "_preload_xtr_if_configured",
       "kind": "function",
       "public": false,
-      "lineno": 251,
+      "lineno": 269,
       "doc_summary": "Preload XTR runtime when toggle is enabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12159,7 +12177,7 @@
       "name": "_preload_hybrid_if_configured",
       "kind": "function",
       "public": false,
-      "lineno": 265,
+      "lineno": 283,
       "doc_summary": "Preload HybridSearchEngine when toggle is enabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12169,7 +12187,7 @@
       "name": "_initialize_context",
       "kind": "function",
       "public": false,
-      "lineno": 276,
+      "lineno": 294,
       "doc_summary": "Initialize application context, readiness probe, and optional runtimes.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12179,7 +12197,7 @@
       "name": "_shutdown_context",
       "kind": "function",
       "public": false,
-      "lineno": 364,
+      "lineno": 382,
       "doc_summary": "Shut down mutable runtimes and readiness probes.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12189,7 +12207,7 @@
       "name": "lifespan",
       "kind": "function",
       "public": true,
-      "lineno": 387,
+      "lineno": 405,
       "doc_summary": "Application lifespan manager with explicit configuration initialization.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12199,7 +12217,7 @@
       "name": "get_run_report",
       "kind": "function",
       "public": true,
-      "lineno": 523,
+      "lineno": 539,
       "doc_summary": "Return JSON run report for the session/run identifier.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12209,7 +12227,7 @@
       "name": "get_run_report_markdown",
       "kind": "function",
       "public": true,
-      "lineno": 565,
+      "lineno": 581,
       "doc_summary": "Return Markdown run report for the session/run identifier.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12219,7 +12237,7 @@
       "name": "get_run_report_mermaid",
       "kind": "function",
       "public": true,
-      "lineno": 608,
+      "lineno": 624,
       "doc_summary": "Return a Mermaid representation of the run.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12229,7 +12247,7 @@
       "name": "get_run_report_v2",
       "kind": "function",
       "public": true,
-      "lineno": 640,
+      "lineno": 656,
       "doc_summary": "Alias for `/reports/{session_id}` retaining backwards compatibility.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12239,7 +12257,7 @@
       "name": "get_run_report_markdown_v2",
       "kind": "function",
       "public": true,
-      "lineno": 660,
+      "lineno": 676,
       "doc_summary": "Alias for `/reports/{session_id}.md`.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12249,7 +12267,7 @@
       "name": "get_run_report_mermaid_v2",
       "kind": "function",
       "public": true,
-      "lineno": 682,
+      "lineno": 698,
       "doc_summary": "Alias for `/reports/{session_id}.mmd`.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12259,7 +12277,7 @@
       "name": "inject_request_id",
       "kind": "function",
       "public": true,
-      "lineno": 704,
+      "lineno": 720,
       "doc_summary": "Ensure every request carries a stable request identifier.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12269,7 +12287,7 @@
       "name": "set_mcp_context",
       "kind": "function",
       "public": true,
-      "lineno": 731,
+      "lineno": 747,
       "doc_summary": "Set ApplicationContext in context variable for MCP tool handlers.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12279,7 +12297,7 @@
       "name": "disable_nginx_buffering",
       "kind": "function",
       "public": true,
-      "lineno": 810,
+      "lineno": 826,
       "doc_summary": "Disable NGINX buffering for streaming responses.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12289,7 +12307,7 @@
       "name": "healthz",
       "kind": "function",
       "public": true,
-      "lineno": 846,
+      "lineno": 862,
       "doc_summary": "Health check endpoint (network-only).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12299,7 +12317,7 @@
       "name": "readyz",
       "kind": "function",
       "public": true,
-      "lineno": 858,
+      "lineno": 874,
       "doc_summary": "Readiness check endpoint.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12309,7 +12327,7 @@
       "name": "capz",
       "kind": "function",
       "public": true,
-      "lineno": 893,
+      "lineno": 909,
       "doc_summary": "Return a cached capability snapshot (refreshable via query flag).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12319,7 +12337,7 @@
       "name": "_stream_with_logging",
       "kind": "function",
       "public": false,
-      "lineno": 935,
+      "lineno": 951,
       "doc_summary": "Wrap a streaming iterator and emit lifecycle logs for observability.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12329,7 +12347,7 @@
       "name": "sse_demo",
       "kind": "function",
       "public": true,
-      "lineno": 997,
+      "lineno": 1013,
       "doc_summary": "SSE streaming demo endpoint with keep-alive comments.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12339,7 +12357,7 @@
       "name": "http_exception_handler_with_request_id",
       "kind": "function",
       "public": true,
-      "lineno": 1047,
+      "lineno": 1066,
       "doc_summary": "Return HTTPException responses with structured payloads and request IDs.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12349,7 +12367,7 @@
       "name": "unhandled_exception_handler",
       "kind": "function",
       "public": true,
-      "lineno": 1079,
+      "lineno": 1098,
       "doc_summary": "Wrap unhandled exceptions in a debuggable envelope.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12369,9 +12387,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 78,
-    "cyclomatic": 79,
-    "loc": 1131
+    "branches": 82,
+    "cyclomatic": 83,
+    "loc": 1150
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -12381,7 +12399,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 19,
-  "cycle_group": 90,
+  "cycle_group": 91,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -12426,14 +12444,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.059,
+  "hotspot_score": 3.074,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 31,
-  "recent_churn_90": 31
+  "recent_churn_30": 32,
+  "recent_churn_90": 32
 }
 {
   "path": "app/scope_store.py",
@@ -12871,7 +12889,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 73,
+  "cycle_group": 47,
   "imports_internal": [
     "mcp_server/schemas.py",
     "typing.py"
@@ -12947,7 +12965,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 91,
+  "cycle_group": 92,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -13071,7 +13089,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "GaugeLike",
         "build_gauge"
@@ -13165,11 +13183,12 @@
   "scip_symbols": [
     "local 0",
     "local 1",
-    "local 10",
-    "local 13",
+    "local 11",
+    "local 12",
     "local 14",
-    "local 16",
     "local 2",
+    "local 22",
+    "local 23",
     "local 24",
     "local 25",
     "local 26",
@@ -13179,10 +13198,10 @@
     "local 3",
     "local 30",
     "local 31",
-    "local 32",
-    "local 33",
-    "local 37",
+    "local 35",
+    "local 36",
     "local 38",
+    "local 39",
     "local 4",
     "local 40",
     "local 41",
@@ -13213,11 +13232,8 @@
     "local 64",
     "local 65",
     "local 66",
-    "local 67",
-    "local 68",
     "local 7",
     "local 8",
-    "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.capabilities`/Capabilities#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.capabilities`/Capabilities#active_index_version.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.capabilities`/Capabilities#coderank_index_present.",
@@ -13365,23 +13381,25 @@
   ],
   "overlay_needed": false,
   "fan_in": 6,
-  "fan_out": 4,
-  "cycle_group": 77,
+  "fan_out": 5,
+  "cycle_group": 78,
   "imports_internal": [
     "app/config_context.py",
     "errors.py",
     "observability/otel.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "imports_intra_repo": [
     "app/config_context.py",
     "errors.py",
     "observability/otel.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.494,
+  "hotspot_score": 2.529,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -13737,7 +13755,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 5,
-  "cycle_group": 82,
+  "cycle_group": 90,
   "imports_internal": [
     "_lazy_imports.py",
     "app/config_context.py",
@@ -14086,7 +14104,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 92,
+  "cycle_group": 93,
   "imports_internal": [
     "retrieval/types.py",
     "typing.py"
@@ -14500,7 +14518,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 6,
-  "cycle_group": 93,
+  "cycle_group": 94,
   "imports_internal": [
     "eval/pool_writer.py",
     "io/duckdb_catalog.py",
@@ -14624,7 +14642,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 2,
-  "cycle_group": 94,
+  "cycle_group": 95,
   "imports_internal": [
     "eval/hybrid_evaluator.py",
     "eval/pool_writer.py"
@@ -14812,7 +14830,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 1,
-  "cycle_group": 95,
+  "cycle_group": 96,
   "imports_internal": [
     "app/config_context.py"
   ],
@@ -15015,7 +15033,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 3,
-  "cycle_group": 97,
+  "cycle_group": 98,
   "imports_internal": [
     "app/config_context.py",
     "config/settings.py",
@@ -15685,7 +15703,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 13,
-  "cycle_group": 100,
+  "cycle_group": 101,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -15781,7 +15799,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 101,
+  "cycle_group": 102,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -16968,7 +16986,7 @@
   "overlay_needed": false,
   "fan_in": 23,
   "fan_out": 2,
-  "cycle_group": 47,
+  "cycle_group": 60,
   "imports_internal": [
     "io/duckdb_manager.py",
     "typing.py"
@@ -17117,7 +17135,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 1,
-  "cycle_group": 102,
+  "cycle_group": 103,
   "imports_internal": [
     "config/settings.py"
   ],
@@ -17189,7 +17207,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 103,
+  "cycle_group": 104,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -17559,7 +17577,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 65,
+  "cycle_group": 73,
   "imports_internal": [
     "typing.py"
   ],
@@ -17929,7 +17947,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 6,
-  "cycle_group": 104,
+  "cycle_group": 105,
   "imports_internal": [
     "_lazy_imports.py",
     "app/config_context.py",
@@ -18494,7 +18512,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 2,
-  "cycle_group": 54,
+  "cycle_group": 48,
   "imports_internal": [
     "errors.py",
     "typing.py"
@@ -18511,8 +18529,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 9,
-  "recent_churn_90": 9
+  "recent_churn_30": 10,
+  "recent_churn_90": 10
 }
 {
   "path": "indexing/__init__.py",
@@ -18596,7 +18614,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 1,
-  "cycle_group": 105,
+  "cycle_group": 106,
   "imports_internal": [
     "indexing/index_lifecycle.py"
   ],
@@ -19088,7 +19106,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 66,
+  "cycle_group": 74,
   "imports_internal": [
     "indexing/scip_reader.py",
     "typing.py"
@@ -19215,7 +19233,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 67,
+  "cycle_group": 75,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.24,
@@ -19247,7 +19265,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "build_counter",
         "build_gauge",
@@ -19573,11 +19591,6 @@
   "outline_nodes": [],
   "scip_symbols": [
     "local 0",
-    "local 1",
-    "local 2",
-    "local 3",
-    "local 4",
-    "local 5",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.metrics.registry`/FAISS_ANN_LATENCY_SECONDS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.metrics.registry`/FAISS_BUILD_SECONDS_LAST.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.metrics.registry`/FAISS_BUILD_TOTAL.",
@@ -19698,11 +19711,17 @@
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 6,
-  "fan_out": 0,
-  "cycle_group": 51,
+  "fan_out": 1,
+  "cycle_group": 63,
+  "imports_internal": [
+    "telemetry/otel_metrics.py"
+  ],
+  "imports_intra_repo": [
+    "telemetry/otel_metrics.py"
+  ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.655,
+  "hotspot_score": 1.708,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -19765,7 +19784,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 106,
+  "cycle_group": 107,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -20024,7 +20043,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 12,
+  "cycle_group": 20,
   "imports_internal": [
     "typing.py"
   ],
@@ -20296,7 +20315,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 15,
+  "cycle_group": 14,
   "imports_internal": [
     "typing.py"
   ],
@@ -20403,7 +20422,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 17,
+  "cycle_group": 10,
   "imports_internal": [
     "graph_builder.py"
   ],
@@ -21038,7 +21057,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 0,
-  "cycle_group": 9,
+  "cycle_group": 11,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.547,
@@ -21288,7 +21307,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 23,
+  "cycle_group": 18,
   "imports_internal": [
     "typing.py"
   ],
@@ -21857,7 +21876,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 13,
+  "cycle_group": 9,
   "imports_internal": [
     "typing.py"
   ],
@@ -22175,7 +22194,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 18,
+  "cycle_group": 16,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.789,
@@ -22426,7 +22445,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 10,
+  "cycle_group": 13,
   "imports_internal": [
     "enrich/output_writers.py",
     "typing.py"
@@ -22901,7 +22920,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 22,
+  "cycle_group": 19,
   "imports_internal": [
     "typing.py"
   ],
@@ -23744,7 +23763,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 14,
+  "cycle_group": 12,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.543,
@@ -24263,7 +24282,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 21,
+  "cycle_group": 15,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/output_writers.py",
@@ -24343,7 +24362,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 107,
+  "cycle_group": 108,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -24572,7 +24591,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 3,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "observability/ledger.py",
     "observability/timeline.py",
@@ -25204,7 +25223,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 42,
+  "cycle_group": 43,
   "imports_internal": [
     "observability/semantic_conventions.py",
     "typing.py"
@@ -25616,7 +25635,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 6,
-  "cycle_group": 87,
+  "cycle_group": 84,
   "imports_internal": [
     "app/config_context.py",
     "io/__init__.py",
@@ -25636,11 +25655,13 @@
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.436,
-  "owner": null,
-  "primary_authors": [],
-  "bus_factor": 0.0,
-  "recent_churn_30": 0,
-  "recent_churn_90": 0
+  "owner": "paul-heyse",
+  "primary_authors": [
+    "paul-heyse"
+  ],
+  "bus_factor": 1.0,
+  "recent_churn_30": 1,
+  "recent_churn_90": 1
 }
 {
   "path": "observability/reporting.py",
@@ -26072,7 +26093,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 2,
-  "cycle_group": 84,
+  "cycle_group": 83,
   "imports_internal": [
     "observability/timeline.py",
     "typing.py"
@@ -26089,8 +26110,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "observability/metrics.py",
@@ -26121,7 +26142,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "build_counter",
         "build_gauge",
@@ -26136,77 +26157,77 @@
     {
       "kind": "variable",
       "name": "QUERIES_TOTAL",
-      "lineno": 32
+      "lineno": 28
     },
     {
       "kind": "variable",
       "name": "QUERY_ERRORS_TOTAL",
-      "lineno": 38
+      "lineno": 34
     },
     {
       "kind": "variable",
       "name": "RRF_DURATION_SECONDS",
-      "lineno": 44
+      "lineno": 40
     },
     {
       "kind": "variable",
       "name": "CHANNEL_LATENCY_SECONDS",
-      "lineno": 51
+      "lineno": 47
     },
     {
       "kind": "variable",
       "name": "INDEX_VERSION_INFO",
-      "lineno": 59
+      "lineno": 55
     },
     {
       "kind": "variable",
       "name": "RRF_K",
-      "lineno": 65
+      "lineno": 61
     },
     {
       "kind": "variable",
       "name": "BUDGET_DEPTH",
-      "lineno": 70
+      "lineno": 66
     },
     {
       "kind": "variable",
       "name": "QUERY_AMBIGUITY",
-      "lineno": 76
+      "lineno": 72
     },
     {
       "kind": "variable",
       "name": "DEBUG_BUNDLE_TOTAL",
-      "lineno": 82
+      "lineno": 78
     },
     {
       "kind": "variable",
       "name": "RESULTS_TOTAL",
-      "lineno": 87
+      "lineno": 83
     },
     {
       "kind": "variable",
       "name": "RECENCY_BOOSTED_TOTAL",
-      "lineno": 92
+      "lineno": 88
     },
     {
       "kind": "variable",
       "name": "RECALL_AT_K",
-      "lineno": 97
+      "lineno": 93
     },
     {
       "kind": "function",
       "name": "observe_budget_depths",
-      "lineno": 104
+      "lineno": 100
     },
     {
       "kind": "function",
       "name": "record_recall",
-      "lineno": 110
+      "lineno": 106
     },
     {
       "kind": "function",
       "name": "set_index_version",
-      "lineno": 115
+      "lineno": 111
     }
   ],
   "exports": [
@@ -26245,19 +26266,12 @@
   ],
   "outline_nodes": [],
   "scip_symbols": [
-    "local 0",
-    "local 1",
-    "local 10",
-    "local 11",
-    "local 12",
-    "local 13",
-    "local 14",
     "local 2",
     "local 3",
     "local 4",
     "local 5",
-    "local 8",
-    "local 9",
+    "local 6",
+    "local 7",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.metrics`/BUDGET_DEPTH.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.metrics`/CHANNEL_LATENCY_SECONDS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.metrics`/DEBUG_BUNDLE_TOTAL.",
@@ -26301,7 +26315,7 @@
       "name": "observe_budget_depths",
       "kind": "function",
       "public": true,
-      "lineno": 104,
+      "lineno": 100,
       "doc_summary": "Record per-channel depth decisions.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -26311,7 +26325,7 @@
       "name": "record_recall",
       "kind": "function",
       "public": true,
-      "lineno": 110,
+      "lineno": 106,
       "doc_summary": "Record recall@k values produced by offline harnesses.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -26321,7 +26335,7 @@
       "name": "set_index_version",
       "kind": "function",
       "public": true,
-      "lineno": 115,
+      "lineno": 111,
       "doc_summary": "Expose the current index version for dashboards.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -26343,18 +26357,24 @@
   "complexity": {
     "branches": 4,
     "cyclomatic": 5,
-    "loc": 135
+    "loc": 131
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 2,
-  "fan_out": 0,
-  "cycle_group": 53,
+  "fan_out": 1,
+  "cycle_group": 68,
+  "imports_internal": [
+    "telemetry/otel_metrics.py"
+  ],
+  "imports_intra_repo": [
+    "telemetry/otel_metrics.py"
+  ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.524,
+  "hotspot_score": 1.639,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -26581,7 +26601,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 2,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "io/__init__.py",
     "typing.py"
@@ -26641,7 +26661,8 @@
     {
       "module": "collections.abc",
       "names": [
-        "Mapping"
+        "Mapping",
+        "Sequence"
       ],
       "aliases": {},
       "is_star": false,
@@ -26713,6 +26734,17 @@
       "level": 0
     },
     {
+      "module": "prometheus_client",
+      "names": [
+        "start_http_server"
+      ],
+      "aliases": {
+        "start_http_server": "_prom_start_http_server"
+      },
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.observability.flight_recorder",
       "names": [
         "install_flight_recorder"
@@ -26728,152 +26760,172 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 24
+      "lineno": 29
     },
     {
       "kind": "variable",
       "name": "SpanAttribute",
-      "lineno": 26
+      "lineno": 31
     },
     {
       "kind": "class",
       "name": "_TelemetryState",
-      "lineno": 29
+      "lineno": 34
     },
     {
       "kind": "class",
       "name": "SupportsState",
-      "lineno": 52
+      "lineno": 61
     },
     {
       "kind": "class",
       "name": "_TraceHandles",
-      "lineno": 59
+      "lineno": 68
     },
     {
       "kind": "function",
       "name": "_env_flag",
-      "lineno": 72
+      "lineno": 86
     },
     {
       "kind": "function",
       "name": "_sanitize_span_attrs",
-      "lineno": 102
+      "lineno": 116
     },
     {
       "kind": "function",
       "name": "_coerce_span_value",
-      "lineno": 111
-    },
-    {
-      "kind": "function",
-      "name": "_should_enable",
       "lineno": 125
     },
     {
       "kind": "function",
+      "name": "_should_enable",
+      "lineno": 139
+    },
+    {
+      "kind": "function",
       "name": "_optional_import",
-      "lineno": 131
+      "lineno": 145
     },
     {
       "kind": "function",
       "name": "_load_trace_modules",
-      "lineno": 138
+      "lineno": 152
     },
     {
       "kind": "function",
       "name": "_parse_sampler_spec",
-      "lineno": 165
+      "lineno": 179
     },
     {
       "kind": "function",
       "name": "_build_sampler",
-      "lineno": 178
+      "lineno": 192
     },
     {
       "kind": "function",
       "name": "_build_resource",
-      "lineno": 207
+      "lineno": 221
+    },
+    {
+      "kind": "function",
+      "name": "_merge_detected_resources",
+      "lineno": 254
     },
     {
       "kind": "function",
       "name": "_build_provider",
-      "lineno": 218
+      "lineno": 287
     },
     {
       "kind": "function",
       "name": "telemetry_enabled",
-      "lineno": 246
+      "lineno": 315
     },
     {
       "kind": "function",
       "name": "init_telemetry",
-      "lineno": 257
+      "lineno": 326
     },
     {
       "kind": "function",
       "name": "init_otel",
-      "lineno": 331
+      "lineno": 401
     },
     {
       "kind": "function",
       "name": "init_all_telemetry",
-      "lineno": 354
+      "lineno": 424
     },
     {
       "kind": "function",
       "name": "as_span",
-      "lineno": 375
+      "lineno": 448
     },
     {
       "kind": "function",
       "name": "record_span_event",
-      "lineno": 403
+      "lineno": 476
     },
     {
       "kind": "function",
       "name": "_current_span",
-      "lineno": 427
+      "lineno": 500
     },
     {
       "kind": "function",
       "name": "set_current_span_attrs",
-      "lineno": 440
+      "lineno": 513
     },
     {
       "kind": "function",
       "name": "_current_span_context",
-      "lineno": 456
+      "lineno": 529
     },
     {
       "kind": "function",
       "name": "current_trace_id",
-      "lineno": 469
+      "lineno": 542
     },
     {
       "kind": "function",
       "name": "current_span_id",
-      "lineno": 485
+      "lineno": 558
     },
     {
       "kind": "function",
       "name": "_install_logging_instrumentation",
-      "lineno": 501
+      "lineno": 574
     },
     {
       "kind": "function",
       "name": "_install_metrics_provider",
-      "lineno": 515
+      "lineno": 588
+    },
+    {
+      "kind": "function",
+      "name": "_build_prometheus_reader",
+      "lineno": 638
+    },
+    {
+      "kind": "function",
+      "name": "_start_prometheus_http_server",
+      "lineno": 659
+    },
+    {
+      "kind": "function",
+      "name": "_build_metric_views",
+      "lineno": 677
     },
     {
       "kind": "function",
       "name": "instrument_fastapi",
-      "lineno": 539
+      "lineno": 715
     },
     {
       "kind": "function",
       "name": "instrument_httpx",
-      "lineno": 554
+      "lineno": 730
     }
   ],
   "exports": [
@@ -26906,10 +26958,58 @@
   "scip_symbols": [
     "local 0",
     "local 1",
+    "local 100",
+    "local 101",
+    "local 102",
+    "local 103",
+    "local 104",
+    "local 105",
+    "local 106",
+    "local 108",
+    "local 109",
     "local 11",
+    "local 110",
+    "local 111",
+    "local 112",
+    "local 113",
+    "local 114",
+    "local 115",
+    "local 116",
+    "local 117",
+    "local 118",
+    "local 119",
     "local 12",
+    "local 120",
+    "local 121",
+    "local 122",
+    "local 123",
+    "local 124",
+    "local 125",
+    "local 126",
+    "local 127",
+    "local 128",
+    "local 129",
     "local 13",
+    "local 130",
+    "local 131",
+    "local 132",
+    "local 133",
+    "local 134",
+    "local 135",
+    "local 136",
+    "local 137",
+    "local 138",
+    "local 139",
     "local 14",
+    "local 140",
+    "local 141",
+    "local 142",
+    "local 143",
+    "local 144",
+    "local 145",
+    "local 146",
+    "local 147",
+    "local 148",
     "local 15",
     "local 17",
     "local 18",
@@ -26924,22 +27024,19 @@
     "local 30",
     "local 31",
     "local 32",
+    "local 33",
     "local 34",
     "local 35",
     "local 36",
     "local 37",
-    "local 38",
     "local 39",
     "local 40",
-    "local 41",
-    "local 42",
     "local 43",
     "local 44",
     "local 45",
     "local 46",
     "local 47",
     "local 48",
-    "local 49",
     "local 50",
     "local 51",
     "local 52",
@@ -26954,6 +27051,7 @@
     "local 61",
     "local 62",
     "local 63",
+    "local 64",
     "local 65",
     "local 66",
     "local 67",
@@ -26961,6 +27059,9 @@
     "local 69",
     "local 70",
     "local 71",
+    "local 72",
+    "local 73",
+    "local 74",
     "local 75",
     "local 76",
     "local 77",
@@ -26968,7 +27069,6 @@
     "local 79",
     "local 80",
     "local 81",
-    "local 82",
     "local 83",
     "local 84",
     "local 85",
@@ -26976,9 +27076,6 @@
     "local 87",
     "local 88",
     "local 89",
-    "local 90",
-    "local 91",
-    "local 92",
     "local 93",
     "local 94",
     "local 95",
@@ -27007,6 +27104,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_TraceHandles#trace.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/__init__:",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_metric_views().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_metric_views().(export_module)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_metric_views().(view_module)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_prometheus_reader().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_provider().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_provider().(endpoint)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_build_provider().(handles)",
@@ -27031,6 +27132,8 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_install_metrics_provider().(endpoint)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_install_metrics_provider().(resource)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_load_trace_modules().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_merge_detected_resources().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_merge_detected_resources().(resource)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_optional_import().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_optional_import().(module_name)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_parse_sampler_spec().",
@@ -27038,6 +27141,7 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_sanitize_span_attrs().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_sanitize_span_attrs().(attrs)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_should_enable().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/_start_prometheus_http_server().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/as_span().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/as_span().(attrs)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.observability.otel`/as_span().(name)",
@@ -27091,7 +27195,7 @@
       "name": "_TelemetryState",
       "kind": "class",
       "public": false,
-      "lineno": 29,
+      "lineno": 34,
       "doc_summary": "Mutable telemetry state shared across module functions.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -27101,7 +27205,7 @@
       "name": "SupportsState",
       "kind": "class",
       "public": true,
-      "lineno": 52,
+      "lineno": 61,
       "doc_summary": "Protocol describing FastAPI-style objects exposing ``state``.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -27111,7 +27215,7 @@
       "name": "_TraceHandles",
       "kind": "class",
       "public": false,
-      "lineno": 59,
+      "lineno": 68,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27121,7 +27225,7 @@
       "name": "_env_flag",
       "kind": "function",
       "public": false,
-      "lineno": 72,
+      "lineno": 86,
       "doc_summary": "Check if an environment variable is set to a truthy value.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27131,7 +27235,7 @@
       "name": "_sanitize_span_attrs",
       "kind": "function",
       "public": false,
-      "lineno": 102,
+      "lineno": 116,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27141,7 +27245,7 @@
       "name": "_coerce_span_value",
       "kind": "function",
       "public": false,
-      "lineno": 111,
+      "lineno": 125,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27151,7 +27255,7 @@
       "name": "_should_enable",
       "kind": "function",
       "public": false,
-      "lineno": 125,
+      "lineno": 139,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27161,7 +27265,7 @@
       "name": "_optional_import",
       "kind": "function",
       "public": false,
-      "lineno": 131,
+      "lineno": 145,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27171,7 +27275,7 @@
       "name": "_load_trace_modules",
       "kind": "function",
       "public": false,
-      "lineno": 138,
+      "lineno": 152,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27181,7 +27285,7 @@
       "name": "_parse_sampler_spec",
       "kind": "function",
       "public": false,
-      "lineno": 165,
+      "lineno": 179,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27191,7 +27295,7 @@
       "name": "_build_sampler",
       "kind": "function",
       "public": false,
-      "lineno": 178,
+      "lineno": 192,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27201,17 +27305,27 @@
       "name": "_build_resource",
       "kind": "function",
       "public": false,
-      "lineno": 207,
+      "lineno": 221,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
       "doc_examples_present": false
     },
     {
+      "name": "_merge_detected_resources",
+      "kind": "function",
+      "public": false,
+      "lineno": 254,
+      "doc_summary": "Augment ``resource`` with optional detector-provided attributes.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
+      "doc_examples_present": false
+    },
+    {
       "name": "_build_provider",
       "kind": "function",
       "public": false,
-      "lineno": 218,
+      "lineno": 287,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27221,7 +27335,7 @@
       "name": "telemetry_enabled",
       "kind": "function",
       "public": true,
-      "lineno": 246,
+      "lineno": 315,
       "doc_summary": "Return ``True`` when tracing has been configured for this process.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27231,7 +27345,7 @@
       "name": "init_telemetry",
       "kind": "function",
       "public": true,
-      "lineno": 257,
+      "lineno": 326,
       "doc_summary": "Best-effort OpenTelemetry bootstrap (safe no-op when disabled/unavailable).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27241,7 +27355,7 @@
       "name": "init_otel",
       "kind": "function",
       "public": true,
-      "lineno": 331,
+      "lineno": 401,
       "doc_summary": "Initialize tracing/metrics using the CODEINTEL_OTEL_* env conventions.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27251,7 +27365,7 @@
       "name": "init_all_telemetry",
       "kind": "function",
       "public": true,
-      "lineno": 354,
+      "lineno": 424,
       "doc_summary": "Initialize traces, metrics, and logs in one call.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27261,7 +27375,7 @@
       "name": "as_span",
       "kind": "function",
       "public": true,
-      "lineno": 375,
+      "lineno": 448,
       "doc_summary": "Create a span context that no-ops when telemetry is disabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27271,7 +27385,7 @@
       "name": "record_span_event",
       "kind": "function",
       "public": true,
-      "lineno": 403,
+      "lineno": 476,
       "doc_summary": "Attach ``name`` as an event on the current span when tracing is active.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27281,7 +27395,7 @@
       "name": "_current_span",
       "kind": "function",
       "public": false,
-      "lineno": 427,
+      "lineno": 500,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27291,7 +27405,7 @@
       "name": "set_current_span_attrs",
       "kind": "function",
       "public": true,
-      "lineno": 440,
+      "lineno": 513,
       "doc_summary": "Attach attributes to the active span when tracing is enabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27301,7 +27415,7 @@
       "name": "_current_span_context",
       "kind": "function",
       "public": false,
-      "lineno": 456,
+      "lineno": 529,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27311,7 +27425,7 @@
       "name": "current_trace_id",
       "kind": "function",
       "public": true,
-      "lineno": 469,
+      "lineno": 542,
       "doc_summary": "Return the hex trace identifier for the active span.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27321,7 +27435,7 @@
       "name": "current_span_id",
       "kind": "function",
       "public": true,
-      "lineno": 485,
+      "lineno": 558,
       "doc_summary": "Return the hex span identifier for the active span.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27331,7 +27445,7 @@
       "name": "_install_logging_instrumentation",
       "kind": "function",
       "public": false,
-      "lineno": 501,
+      "lineno": 574,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27341,8 +27455,38 @@
       "name": "_install_metrics_provider",
       "kind": "function",
       "public": false,
-      "lineno": 515,
-      "doc_summary": "Configure OTLP metric reader when SDK components are present.",
+      "lineno": 588,
+      "doc_summary": "Configure OTLP/Prometheus metric readers when SDK components are present.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_build_prometheus_reader",
+      "kind": "function",
+      "public": false,
+      "lineno": 638,
+      "doc_summary": "Return a PrometheusMetricReader when exporter is installed.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_start_prometheus_http_server",
+      "kind": "function",
+      "public": false,
+      "lineno": 659,
+      "doc_summary": "Expose the default Prometheus registry when supported.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_build_metric_views",
+      "kind": "function",
+      "public": false,
+      "lineno": 677,
+      "doc_summary": "Return default metric views for latency/counter instruments.",
       "doc_has_summary": true,
       "doc_param_parity": false,
       "doc_examples_present": false
@@ -27351,7 +27495,7 @@
       "name": "instrument_fastapi",
       "kind": "function",
       "public": true,
-      "lineno": 539,
+      "lineno": 715,
       "doc_summary": "Instrument FastAPI routes when instrumentation packages are installed.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27361,7 +27505,7 @@
       "name": "instrument_httpx",
       "kind": "function",
       "public": true,
-      "lineno": 554,
+      "lineno": 730,
       "doc_summary": "Instrument httpx clients when instrumentation packages are installed.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27381,9 +27525,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 92,
-    "cyclomatic": 93,
-    "loc": 582
+    "branches": 123,
+    "cyclomatic": 124,
+    "loc": 758
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -27391,7 +27535,7 @@
   "overlay_needed": false,
   "fan_in": 20,
   "fan_out": 3,
-  "cycle_group": 44,
+  "cycle_group": 45,
   "imports_internal": [
     "observability/flight_recorder.py",
     "observability/logs.py",
@@ -27404,7 +27548,7 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.181,
+  "hotspot_score": 3.266,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -27621,8 +27765,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "observability/__init__.py",
@@ -27718,7 +27862,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 108,
+  "cycle_group": 109,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -28000,7 +28144,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 43,
+  "cycle_group": 44,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.737,
@@ -28211,7 +28355,7 @@
   "overlay_needed": false,
   "fan_in": 12,
   "fan_out": 0,
-  "cycle_group": 41,
+  "cycle_group": 42,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.988,
@@ -28220,8 +28364,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 2,
-  "recent_churn_90": 2
+  "recent_churn_30": 3,
+  "recent_churn_90": 3
 }
 {
   "path": "observability/timeline.py",
@@ -28816,7 +28960,7 @@
   "overlay_needed": false,
   "fan_in": 20,
   "fan_out": 2,
-  "cycle_group": 45,
+  "cycle_group": 54,
   "imports_internal": [
     "observability/otel.py",
     "typing.py"
@@ -29113,7 +29257,7 @@
   "overlay_needed": false,
   "fan_in": 9,
   "fan_out": 4,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "observability/ledger.py",
     "observability/runtime_observer.py",
@@ -29474,7 +29618,7 @@
   "overlay_needed": false,
   "fan_in": 10,
   "fan_out": 2,
-  "cycle_group": 63,
+  "cycle_group": 52,
   "imports_internal": [
     "runtime/request_context.py",
     "typing.py"
@@ -30219,7 +30363,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 5,
-  "cycle_group": 64,
+  "cycle_group": 55,
   "imports_internal": [
     "observability/timeline.py",
     "telemetry/__init__.py",
@@ -30242,8 +30386,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 5,
-  "recent_churn_90": 5
+  "recent_churn_30": 6,
+  "recent_churn_90": 6
 }
 {
   "path": "telemetry/logging.py",
@@ -30430,7 +30574,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 61,
+  "cycle_group": 50,
   "imports_internal": [
     "telemetry/otel.py",
     "typing.py"
@@ -30713,7 +30857,7 @@
     {
       "kind": "function",
       "name": "render_markdown",
-      "lineno": 694
+      "lineno": 704
     }
   ],
   "exports": [
@@ -31174,14 +31318,14 @@
       "lineno": 666,
       "doc_summary": "Return a Mermaid graph describing stage checkpoints.",
       "doc_has_summary": true,
-      "doc_param_parity": false,
+      "doc_param_parity": true,
       "doc_examples_present": false
     },
     {
       "name": "render_markdown",
       "kind": "function",
       "public": true,
-      "lineno": 694,
+      "lineno": 704,
       "doc_summary": "Render the report as Markdown.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -31203,7 +31347,7 @@
   "complexity": {
     "branches": 107,
     "cyclomatic": 108,
-    "loc": 769
+    "loc": 779
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -31211,7 +31355,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 7,
-  "cycle_group": 78,
+  "cycle_group": 79,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -31238,8 +31382,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 5,
-  "recent_churn_90": 5
+  "recent_churn_30": 6,
+  "recent_churn_90": 6
 }
 {
   "path": "telemetry/events.py",
@@ -31506,7 +31650,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 62,
+  "cycle_group": 46,
   "imports_internal": [
     "typing.py"
   ],
@@ -32079,7 +32223,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 60,
+  "cycle_group": 49,
   "imports_internal": [
     "typing.py"
   ],
@@ -32138,20 +32282,17 @@
       "module": "typing",
       "names": [
         "TYPE_CHECKING",
-        "Protocol",
-        "cast"
+        "Any"
       ],
       "aliases": {},
       "is_star": false,
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
-        "CollectorRegistry",
         "build_counter",
-        "build_histogram",
-        "get_default_registry"
+        "build_histogram"
       ],
       "aliases": {},
       "is_star": false,
@@ -32196,160 +32337,118 @@
       },
       "is_star": false,
       "level": 0
-    },
-    {
-      "module": "prometheus_client",
-      "names": [
-        "CONTENT_TYPE_LATEST"
-      ],
-      "aliases": {
-        "CONTENT_TYPE_LATEST": "PROM_CONTENT_TYPE"
-      },
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": "prometheus_client",
-      "names": [
-        "generate_latest"
-      ],
-      "aliases": {
-        "generate_latest": "_prometheus_generate_latest_impl"
-      },
-      "is_star": false,
-      "level": 0
     }
   ],
   "defs": [
     {
       "kind": "variable",
+      "name": "ResponseType",
+      "lineno": 14
+    },
+    {
+      "kind": "variable",
+      "name": "ResponseType",
+      "lineno": 16
+    },
+    {
+      "kind": "variable",
       "name": "RuntimeAPIRouter",
-      "lineno": 24
+      "lineno": 22
     },
     {
       "kind": "variable",
       "name": "RuntimeResponse",
-      "lineno": 25
-    },
-    {
-      "kind": "class",
-      "name": "_GenerateLatest",
-      "lineno": 28
-    },
-    {
-      "kind": "variable",
-      "name": "PROM_CONTENT_TYPE",
-      "lineno": 36
-    },
-    {
-      "kind": "function",
-      "name": "_prometheus_generate_latest",
-      "lineno": 38
-    },
-    {
-      "kind": "function",
-      "name": "_prometheus_generate_latest",
-      "lineno": 48
-    },
-    {
-      "kind": "variable",
-      "name": "CONTENT_TYPE_LATEST",
-      "lineno": 54
-    },
-    {
-      "kind": "function",
-      "name": "generate_latest",
-      "lineno": 57
+      "lineno": 23
     },
     {
       "kind": "function",
       "name": "_env_flag",
-      "lineno": 100
+      "lineno": 43
     },
     {
       "kind": "variable",
       "name": "RUNS_TOTAL",
-      "lineno": 107
+      "lineno": 50
     },
     {
       "kind": "variable",
       "name": "RUN_ERRORS_TOTAL",
-      "lineno": 113
+      "lineno": 56
     },
     {
       "kind": "variable",
       "name": "REQUEST_LATENCY_SECONDS",
-      "lineno": 119
+      "lineno": 62
     },
     {
       "kind": "variable",
       "name": "STAGE_LATENCY_SECONDS",
-      "lineno": 126
+      "lineno": 69
     },
     {
       "kind": "variable",
       "name": "EMBED_BATCH_SIZE",
-      "lineno": 133
+      "lineno": 76
     },
     {
       "kind": "variable",
       "name": "EMBED_LATENCY_SECONDS",
-      "lineno": 139
+      "lineno": 82
     },
     {
       "kind": "variable",
       "name": "FAISS_SEARCH_LATENCY_SECONDS",
-      "lineno": 145
+      "lineno": 88
     },
     {
       "kind": "variable",
       "name": "XTR_SEARCH_LATENCY_SECONDS",
-      "lineno": 151
+      "lineno": 94
     },
     {
       "kind": "variable",
       "name": "GATING_DECISIONS_TOTAL",
-      "lineno": 157
+      "lineno": 100
     },
     {
       "kind": "variable",
       "name": "RRFK",
-      "lineno": 163
+      "lineno": 106
     },
     {
       "kind": "variable",
       "name": "QUERY_AMBIGUITY",
-      "lineno": 169
+      "lineno": 112
     },
     {
       "kind": "class",
       "name": "MetricsConfig",
-      "lineno": 177
+      "lineno": 120
     },
     {
       "kind": "function",
       "name": "build_metrics_router",
-      "lineno": 184
+      "lineno": 126
     },
     {
       "kind": "function",
       "name": "record_run",
-      "lineno": 246
+      "lineno": 156
     },
     {
       "kind": "function",
       "name": "record_run_error",
-      "lineno": 251
+      "lineno": 161
     },
     {
       "kind": "function",
       "name": "observe_request_latency",
-      "lineno": 256
+      "lineno": 166
     },
     {
       "kind": "function",
       "name": "record_stage_latency",
-      "lineno": 261
+      "lineno": 171
     }
   ],
   "exports": [
@@ -32393,15 +32492,7 @@
     "local 14",
     "local 15",
     "local 16",
-    "local 17",
-    "local 18",
-    "local 19",
     "local 2",
-    "local 20",
-    "local 21",
-    "local 22",
-    "local 23",
-    "local 24",
     "local 3",
     "local 4",
     "local 5",
@@ -32409,39 +32500,28 @@
     "local 7",
     "local 8",
     "local 9",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/CONTENT_TYPE_LATEST.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/EMBED_BATCH_SIZE.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/EMBED_LATENCY_SECONDS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/FAISS_SEARCH_LATENCY_SECONDS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/GATING_DECISIONS_TOTAL.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/MetricsConfig#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/MetricsConfig#enabled.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/MetricsConfig#registry.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/QUERY_AMBIGUITY.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/REQUEST_LATENCY_SECONDS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/RRFK.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/RUNS_TOTAL.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/RUN_ERRORS_TOTAL.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/ResponseType.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/STAGE_LATENCY_SECONDS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/XTR_SEARCH_LATENCY_SECONDS.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_GenerateLatest#",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_GenerateLatest#__call__().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_GenerateLatest#__call__().(escaping)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_GenerateLatest#__call__().(registry)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_GenerateLatest#__call__().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/__init__:",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_env_flag().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_env_flag().(default)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_env_flag().(name)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_prometheus_generate_latest().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_prometheus_generate_latest().(registry)",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/_prometheus_generate_latest_typed.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/build_metrics_router().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/build_metrics_router().(config)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/build_metrics_router().metrics_endpoint().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/generate_latest().",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/generate_latest().(registry)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/observe_request_latency().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/observe_request_latency().(duration_s)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.prom`/observe_request_latency().(status)",
@@ -32474,50 +32554,10 @@
   },
   "doc_items": [
     {
-      "name": "_GenerateLatest",
-      "kind": "class",
-      "public": false,
-      "lineno": 28,
-      "doc_summary": null,
-      "doc_has_summary": false,
-      "doc_param_parity": null,
-      "doc_examples_present": false
-    },
-    {
-      "name": "_prometheus_generate_latest",
-      "kind": "function",
-      "public": false,
-      "lineno": 38,
-      "doc_summary": null,
-      "doc_has_summary": false,
-      "doc_param_parity": null,
-      "doc_examples_present": false
-    },
-    {
-      "name": "_prometheus_generate_latest",
-      "kind": "function",
-      "public": false,
-      "lineno": 48,
-      "doc_summary": null,
-      "doc_has_summary": false,
-      "doc_param_parity": null,
-      "doc_examples_present": false
-    },
-    {
-      "name": "generate_latest",
-      "kind": "function",
-      "public": true,
-      "lineno": 57,
-      "doc_summary": "Proxy to prometheus_client.generate_latest with graceful fallback.",
-      "doc_has_summary": true,
-      "doc_param_parity": true,
-      "doc_examples_present": false
-    },
-    {
       "name": "_env_flag",
       "kind": "function",
       "public": false,
-      "lineno": 100,
+      "lineno": 43,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -32527,7 +32567,7 @@
       "name": "MetricsConfig",
       "kind": "class",
       "public": true,
-      "lineno": 177,
+      "lineno": 120,
       "doc_summary": "Configuration container for exposing `/metrics`.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -32537,17 +32577,17 @@
       "name": "build_metrics_router",
       "kind": "function",
       "public": true,
-      "lineno": 184,
-      "doc_summary": "Return an APIRouter exposing the Prometheus scrape endpoint.",
+      "lineno": 126,
+      "doc_summary": "Return an APIRouter exposing a compatibility message.",
       "doc_has_summary": true,
-      "doc_param_parity": true,
+      "doc_param_parity": false,
       "doc_examples_present": false
     },
     {
       "name": "record_run",
       "kind": "function",
       "public": true,
-      "lineno": 246,
+      "lineno": 156,
       "doc_summary": "Increment the runs counter for the given tool/status.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32557,7 +32597,7 @@
       "name": "record_run_error",
       "kind": "function",
       "public": true,
-      "lineno": 251,
+      "lineno": 161,
       "doc_summary": "Increment the run error counter.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32567,7 +32607,7 @@
       "name": "observe_request_latency",
       "kind": "function",
       "public": true,
-      "lineno": 256,
+      "lineno": 166,
       "doc_summary": "Record request latency for a tool/status pair.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32577,7 +32617,7 @@
       "name": "record_stage_latency",
       "kind": "function",
       "public": true,
-      "lineno": 261,
+      "lineno": 171,
       "doc_summary": "Record a telemetry stage duration.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32597,26 +32637,28 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 13,
-    "cyclomatic": 14,
-    "loc": 264
+    "branches": 7,
+    "cyclomatic": 8,
+    "loc": 174
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 9,
-  "fan_out": 1,
-  "cycle_group": 59,
+  "fan_out": 2,
+  "cycle_group": 53,
   "imports_internal": [
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "imports_intra_repo": [
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.318,
+  "hotspot_score": 2.2,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -32799,7 +32841,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 6,
-  "cycle_group": 64,
+  "cycle_group": 55,
   "imports_internal": [
     "telemetry/context.py",
     "telemetry/decorators.py",
@@ -32826,6 +32868,405 @@
   "bus_factor": 1.0,
   "recent_churn_30": 1,
   "recent_churn_90": 1
+}
+{
+  "path": "telemetry/otel_metrics.py",
+  "repo_path": "codeintel_rev/telemetry/otel_metrics.py",
+  "module_name": "codeintel_rev.telemetry.otel_metrics",
+  "stable_id": "d7cdba9062ab",
+  "docstring": "Compatibility layer exposing Prometheus-like helpers backed by OpenTelemetry.",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "imports": [
+    {
+      "module": "__future__",
+      "names": [
+        "annotations"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "collections.abc",
+      "names": [
+        "Mapping",
+        "Sequence"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "dataclasses",
+      "names": [
+        "dataclass"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "threading",
+      "names": [
+        "Lock"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "opentelemetry",
+      "names": [
+        "metrics"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "opentelemetry.metrics",
+      "names": [
+        "CallbackOptions",
+        "Observation"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    }
+  ],
+  "defs": [
+    {
+      "kind": "class",
+      "name": "CounterHandle",
+      "lineno": 24
+    },
+    {
+      "kind": "class",
+      "name": "HistogramHandle",
+      "lineno": 38
+    },
+    {
+      "kind": "class",
+      "name": "CounterLike",
+      "lineno": 52
+    },
+    {
+      "kind": "class",
+      "name": "HistogramLike",
+      "lineno": 95
+    },
+    {
+      "kind": "class",
+      "name": "_GaugeEntry",
+      "lineno": 147
+    },
+    {
+      "kind": "class",
+      "name": "GaugeHandle",
+      "lineno": 152
+    },
+    {
+      "kind": "class",
+      "name": "GaugeLike",
+      "lineno": 166
+    },
+    {
+      "kind": "function",
+      "name": "build_counter",
+      "lineno": 261
+    },
+    {
+      "kind": "function",
+      "name": "build_histogram",
+      "lineno": 276
+    },
+    {
+      "kind": "function",
+      "name": "build_gauge",
+      "lineno": 300
+    }
+  ],
+  "exports": [
+    "CounterLike",
+    "GaugeLike",
+    "HistogramLike",
+    "build_counter",
+    "build_gauge",
+    "build_histogram"
+  ],
+  "exports_declared": [
+    "CounterLike",
+    "GaugeLike",
+    "HistogramLike",
+    "build_counter",
+    "build_gauge",
+    "build_histogram"
+  ],
+  "outline_nodes": [],
+  "scip_symbols": [
+    "local 12",
+    "local 13",
+    "local 14",
+    "local 15",
+    "local 16",
+    "local 17",
+    "local 2",
+    "local 3",
+    "local 6",
+    "local 7",
+    "local 8",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#__init__().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#__init__().(attributes)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#__init__().(instrument)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#__init__().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#__slots__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#inc().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#inc().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterHandle#inc().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#__init__().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#__init__().(description)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#__init__().(labelnames)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#__init__().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#__init__().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#__slots__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#inc().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#inc().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#inc().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#labels().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#labels().(attributes)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/CounterLike#labels().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#__init__().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#__init__().(key)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#__init__().(owner)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#__init__().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#__slots__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#set().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#set().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeHandle#set().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__init__().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__init__().(description)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__init__().(labelnames)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__init__().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__init__().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__init__().(unit)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#__slots__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_default_key.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_entries.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_key_from_attributes().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_key_from_attributes().(attributes)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_key_from_attributes().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_observe().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_observe().(_)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#_observe().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#labels().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#labels().(attributes)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#labels().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set_value().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set_value().(key)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set_value().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/GaugeLike#set_value().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#__init__().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#__init__().(attributes)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#__init__().(instrument)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#__init__().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#__slots__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#observe().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#observe().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramHandle#observe().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().(buckets)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().(description)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().(labelnames)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__init__().(unit)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#__slots__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#labels().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#labels().(attributes)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#labels().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#observe().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#observe().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/HistogramLike#observe().(value)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/_GaugeEntry#",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/_GaugeEntry#attributes.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/_GaugeEntry#value.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/_METER.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/__all__.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/__init__:",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_counter().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_counter().(description)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_counter().(labelnames)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_counter().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_gauge().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_gauge().(description)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_gauge().(labelnames)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_gauge().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_gauge().(unit)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_histogram().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_histogram().(buckets)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_histogram().(description)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_histogram().(labelnames)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_histogram().(name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.otel_metrics`/build_histogram().(unit)"
+  ],
+  "parse_ok": true,
+  "errors": [],
+  "tags": [
+    "low-coverage",
+    "public-api"
+  ],
+  "type_errors": 0,
+  "type_error_count": 0,
+  "doc_summary": "Compatibility layer exposing Prometheus-like helpers backed by OpenTelemetry.",
+  "doc_metrics": {
+    "has_summary": true,
+    "param_parity": false,
+    "examples_present": false
+  },
+  "doc_items": [
+    {
+      "name": "CounterHandle",
+      "kind": "class",
+      "public": true,
+      "lineno": 24,
+      "doc_summary": "Lightweight handle mutating a counter with pre-bound attributes.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "HistogramHandle",
+      "kind": "class",
+      "public": true,
+      "lineno": 38,
+      "doc_summary": "Histogram view that records values with pre-bound attributes.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "CounterLike",
+      "kind": "class",
+      "public": true,
+      "lineno": 52,
+      "doc_summary": "Counter facade exposing `.inc()` and `.labels().inc()`.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "HistogramLike",
+      "kind": "class",
+      "public": true,
+      "lineno": 95,
+      "doc_summary": "Histogram facade exposing `.observe()` and `.labels().observe()`.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_GaugeEntry",
+      "kind": "class",
+      "public": false,
+      "lineno": 147,
+      "doc_summary": null,
+      "doc_has_summary": false,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "GaugeHandle",
+      "kind": "class",
+      "public": true,
+      "lineno": 152,
+      "doc_summary": "Gauge handle supporting ``set`` semantics.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "GaugeLike",
+      "kind": "class",
+      "public": true,
+      "lineno": 166,
+      "doc_summary": "Gauge facade backed by an ObservableGauge.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "build_counter",
+      "kind": "function",
+      "public": true,
+      "lineno": 261,
+      "doc_summary": "Return a CounterLike backed by OpenTelemetry.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
+      "doc_examples_present": false
+    },
+    {
+      "name": "build_histogram",
+      "kind": "function",
+      "public": true,
+      "lineno": 276,
+      "doc_summary": "Return a HistogramLike backed by OpenTelemetry.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
+      "doc_examples_present": false
+    },
+    {
+      "name": "build_gauge",
+      "kind": "function",
+      "public": true,
+      "lineno": 300,
+      "doc_summary": "Return an ObservableGauge facade.",
+      "doc_has_summary": true,
+      "doc_param_parity": false,
+      "doc_examples_present": false
+    }
+  ],
+  "annotation_ratio": {
+    "params": 1.0,
+    "returns": 1.0
+  },
+  "untyped_defs": 0,
+  "side_effects": {
+    "filesystem": false,
+    "network": false,
+    "subprocess": false,
+    "database": false
+  },
+  "raises": [],
+  "complexity": {
+    "branches": 17,
+    "cyclomatic": 18,
+    "loc": 320
+  },
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0,
+  "config_refs": [],
+  "overlay_needed": false,
+  "fan_in": 9,
+  "fan_out": 0,
+  "cycle_group": 39,
+  "used_by_files": 0,
+  "used_by_symbols": 0,
+  "hotspot_score": 2.351,
+  "owner": null,
+  "primary_authors": [],
+  "bus_factor": 0.0,
+  "recent_churn_30": 0,
+  "recent_churn_90": 0
 }
 {
   "path": "io/rrf.py",
@@ -33027,7 +33468,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 3,
-  "cycle_group": 111,
+  "cycle_group": 112,
   "imports_internal": [
     "retrieval/fusion/__init__.py",
     "retrieval/types.py",
@@ -33163,7 +33604,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 0,
-  "cycle_group": 48,
+  "cycle_group": 69,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.801,
@@ -33428,7 +33869,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 2,
-  "cycle_group": 112,
+  "cycle_group": 113,
   "imports_internal": [
     "_lazy_imports.py",
     "typing.py"
@@ -33832,7 +34273,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 4,
-  "cycle_group": 70,
+  "cycle_group": 61,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -34052,7 +34493,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 71,
+  "cycle_group": 77,
   "imports_internal": [
     "io/duckdb_manager.py"
   ],
@@ -35260,7 +35701,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 3,
-  "cycle_group": 49,
+  "cycle_group": 71,
   "imports_internal": [
     "config/settings.py",
     "io/path_utils.py",
@@ -35569,11 +36010,11 @@
     "local 29",
     "local 3",
     "local 30",
-    "local 31",
+    "local 32",
     "local 33",
     "local 34",
     "local 35",
-    "local 36",
+    "local 37",
     "local 38",
     "local 39",
     "local 4",
@@ -35583,14 +36024,14 @@
     "local 43",
     "local 44",
     "local 45",
-    "local 46",
+    "local 48",
     "local 49",
     "local 5",
     "local 50",
     "local 51",
     "local 52",
     "local 53",
-    "local 54",
+    "local 55",
     "local 56",
     "local 57",
     "local 58",
@@ -35598,18 +36039,18 @@
     "local 6",
     "local 60",
     "local 61",
-    "local 62",
+    "local 63",
     "local 64",
     "local 65",
     "local 66",
     "local 67",
     "local 68",
-    "local 69",
     "local 7",
+    "local 70",
     "local 71",
     "local 72",
     "local 73",
-    "local 74",
+    "local 75",
     "local 76",
     "local 77",
     "local 78",
@@ -35623,7 +36064,6 @@
     "local 85",
     "local 86",
     "local 87",
-    "local 88",
     "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.vllm_client`/EmbeddingData#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.vllm_client`/EmbeddingData#embedding.",
@@ -35772,7 +36212,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 10,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -36184,7 +36624,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 4,
-  "cycle_group": 68,
+  "cycle_group": 76,
   "imports_internal": [
     "_lazy_imports.py",
     "indexing/cast_chunker.py",
@@ -36602,7 +37042,7 @@
   "overlay_needed": false,
   "fan_in": 10,
   "fan_out": 4,
-  "cycle_group": 46,
+  "cycle_group": 59,
   "imports_internal": [
     "_lazy_imports.py",
     "observability/otel.py",
@@ -36824,10 +37264,10 @@
     "local 0",
     "local 1",
     "local 10",
+    "local 101",
     "local 102",
     "local 103",
     "local 104",
-    "local 105",
     "local 13",
     "local 14",
     "local 15",
@@ -36872,14 +37312,14 @@
     "local 54",
     "local 55",
     "local 56",
-    "local 57",
+    "local 58",
     "local 59",
     "local 6",
     "local 60",
     "local 61",
     "local 62",
     "local 63",
-    "local 64",
+    "local 67",
     "local 68",
     "local 69",
     "local 7",
@@ -36890,7 +37330,7 @@
     "local 74",
     "local 75",
     "local 76",
-    "local 77",
+    "local 78",
     "local 79",
     "local 8",
     "local 80",
@@ -36906,12 +37346,11 @@
     "local 9",
     "local 90",
     "local 91",
-    "local 92",
+    "local 93",
     "local 94",
     "local 95",
     "local 96",
     "local 97",
-    "local 98",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.xtr_manager`/LOGGER.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.xtr_manager`/XTRIndex#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.xtr_manager`/XTRIndex#_build_chunk_lookup().",
@@ -37381,37 +37820,37 @@
     {
       "kind": "class",
       "name": "HybridSearchTuning",
-      "lineno": 423
+      "lineno": 429
     },
     {
       "kind": "class",
       "name": "HybridSearchOptions",
-      "lineno": 431
+      "lineno": 437
     },
     {
       "kind": "class",
       "name": "_MethodStats",
-      "lineno": 441
+      "lineno": 447
     },
     {
       "kind": "class",
       "name": "_FusionContext",
-      "lineno": 450
+      "lineno": 456
     },
     {
       "kind": "class",
       "name": "_SearchTelemetryContext",
-      "lineno": 464
-    },
-    {
-      "kind": "class",
-      "name": "_FusionWork",
       "lineno": 470
     },
     {
       "kind": "class",
+      "name": "_FusionWork",
+      "lineno": 476
+    },
+    {
+      "kind": "class",
       "name": "HybridSearchEngine",
-      "lineno": 484
+      "lineno": 490
     }
   ],
   "exports": [
@@ -37437,25 +37876,26 @@
     "local 0",
     "local 1",
     "local 10",
-    "local 101",
+    "local 100",
     "local 102",
-    "local 104",
+    "local 105",
+    "local 106",
     "local 107",
-    "local 108",
     "local 109",
     "local 11",
+    "local 110",
     "local 111",
     "local 112",
     "local 113",
-    "local 114",
-    "local 115",
+    "local 118",
+    "local 119",
     "local 12",
     "local 120",
     "local 121",
     "local 122",
     "local 123",
-    "local 124",
-    "local 125",
+    "local 127",
+    "local 128",
     "local 129",
     "local 13",
     "local 130",
@@ -37463,64 +37903,64 @@
     "local 132",
     "local 133",
     "local 134",
-    "local 135",
     "local 136",
+    "local 137",
     "local 138",
     "local 139",
     "local 14",
-    "local 140",
-    "local 141",
+    "local 142",
+    "local 143",
     "local 144",
     "local 145",
     "local 146",
-    "local 147",
     "local 148",
+    "local 149",
     "local 15",
     "local 150",
-    "local 151",
-    "local 152",
     "local 153",
-    "local 156",
-    "local 157",
+    "local 154",
+    "local 158",
+    "local 159",
     "local 16",
     "local 161",
     "local 162",
+    "local 163",
     "local 164",
     "local 165",
-    "local 166",
-    "local 167",
     "local 168",
+    "local 169",
     "local 17",
+    "local 170",
     "local 171",
     "local 172",
     "local 173",
-    "local 174",
     "local 175",
     "local 176",
-    "local 178",
+    "local 177",
     "local 179",
     "local 180",
     "local 182",
-    "local 183",
-    "local 185",
-    "local 187",
-    "local 189",
+    "local 184",
+    "local 186",
     "local 19",
+    "local 192",
     "local 195",
-    "local 198",
+    "local 196",
+    "local 197",
     "local 199",
     "local 2",
     "local 20",
     "local 200",
+    "local 201",
     "local 202",
-    "local 203",
-    "local 204",
     "local 205",
-    "local 208",
+    "local 207",
     "local 21",
-    "local 210",
+    "local 212",
+    "local 213",
     "local 215",
     "local 216",
+    "local 217",
     "local 218",
     "local 219",
     "local 22",
@@ -37528,50 +37968,46 @@
     "local 221",
     "local 222",
     "local 223",
-    "local 224",
     "local 225",
     "local 226",
+    "local 227",
     "local 228",
     "local 229",
     "local 230",
     "local 231",
     "local 232",
     "local 233",
-    "local 234",
     "local 235",
-    "local 236",
     "local 237",
+    "local 238",
     "local 239",
     "local 24",
-    "local 241",
-    "local 242",
-    "local 243",
-    "local 244",
+    "local 240",
+    "local 247",
+    "local 248",
+    "local 249",
     "local 25",
+    "local 250",
     "local 251",
-    "local 252",
     "local 253",
     "local 254",
     "local 255",
+    "local 256",
     "local 257",
     "local 258",
     "local 259",
     "local 26",
     "local 260",
-    "local 261",
-    "local 262",
-    "local 263",
-    "local 264",
     "local 27",
+    "local 270",
+    "local 271",
+    "local 272",
     "local 274",
     "local 275",
-    "local 276",
+    "local 277",
     "local 278",
-    "local 279",
+    "local 280",
     "local 281",
-    "local 282",
-    "local 284",
-    "local 285",
     "local 29",
     "local 3",
     "local 30",
@@ -37616,10 +38052,10 @@
     "local 72",
     "local 73",
     "local 74",
-    "local 75",
+    "local 78",
     "local 79",
     "local 8",
-    "local 80",
+    "local 81",
     "local 82",
     "local 83",
     "local 84",
@@ -37629,11 +38065,10 @@
     "local 88",
     "local 89",
     "local 9",
-    "local 90",
+    "local 92",
     "local 93",
     "local 94",
     "local 95",
-    "local 96",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.hybrid_search`/BM25Rm3Config#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.hybrid_search`/BM25Rm3Config#auto_rm3.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.hybrid_search`/BM25Rm3Config#enable_rm3.",
@@ -37972,7 +38407,7 @@
       "name": "HybridSearchTuning",
       "kind": "class",
       "public": true,
-      "lineno": 423,
+      "lineno": 429,
       "doc_summary": "Runtime overrides for FAISS search metadata.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -37982,7 +38417,7 @@
       "name": "HybridSearchOptions",
       "kind": "class",
       "public": true,
-      "lineno": 431,
+      "lineno": 437,
       "doc_summary": "Optional knobs influencing hybrid fusion.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -37992,7 +38427,7 @@
       "name": "_MethodStats",
       "kind": "class",
       "public": false,
-      "lineno": 441,
+      "lineno": 447,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -38002,7 +38437,7 @@
       "name": "_FusionContext",
       "kind": "class",
       "public": false,
-      "lineno": 450,
+      "lineno": 456,
       "doc_summary": "All inputs required to fuse dense and sparse channel runs.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38012,7 +38447,7 @@
       "name": "_SearchTelemetryContext",
       "kind": "class",
       "public": false,
-      "lineno": 464,
+      "lineno": 470,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -38022,7 +38457,7 @@
       "name": "_FusionWork",
       "kind": "class",
       "public": false,
-      "lineno": 470,
+      "lineno": 476,
       "doc_summary": "Resolved fusion parameters after pooler/weights are selected.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38032,7 +38467,7 @@
       "name": "HybridSearchEngine",
       "kind": "class",
       "public": true,
-      "lineno": 484,
+      "lineno": 490,
       "doc_summary": "Combine dense (FAISS) and sparse channel plugins via RRF.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38054,7 +38489,7 @@
   "complexity": {
     "branches": 140,
     "cyclomatic": 141,
-    "loc": 1447
+    "loc": 1453
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -38062,7 +38497,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 17,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -38109,8 +38544,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 22,
-  "recent_churn_90": 22
+  "recent_churn_30": 23,
+  "recent_churn_90": 23
 }
 {
   "path": "io/warp_engine.py",
@@ -38377,7 +38812,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 113,
+  "cycle_group": 114,
   "imports_internal": [
     "typing.py"
   ],
@@ -38912,34 +39347,34 @@
     "local 100",
     "local 101",
     "local 102",
-    "local 103",
+    "local 107",
     "local 108",
     "local 109",
     "local 11",
     "local 110",
     "local 111",
-    "local 112",
-    "local 114",
-    "local 118",
+    "local 113",
+    "local 117",
+    "local 119",
     "local 12",
-    "local 120",
+    "local 121",
     "local 122",
-    "local 123",
+    "local 124",
     "local 125",
-    "local 126",
-    "local 129",
+    "local 128",
     "local 13",
+    "local 131",
     "local 132",
     "local 133",
     "local 134",
     "local 135",
     "local 136",
     "local 137",
-    "local 138",
+    "local 139",
     "local 140",
     "local 141",
     "local 142",
-    "local 143",
+    "local 145",
     "local 146",
     "local 147",
     "local 148",
@@ -38955,17 +39390,17 @@
     "local 158",
     "local 159",
     "local 16",
-    "local 160",
+    "local 161",
     "local 162",
     "local 163",
     "local 164",
     "local 165",
-    "local 166",
+    "local 167",
     "local 168",
     "local 169",
     "local 17",
     "local 170",
-    "local 171",
+    "local 172",
     "local 173",
     "local 174",
     "local 175",
@@ -38987,53 +39422,53 @@
     "local 190",
     "local 191",
     "local 192",
-    "local 193",
-    "local 196",
+    "local 195",
     "local 197",
-    "local 199",
+    "local 198",
     "local 2",
     "local 20",
     "local 200",
+    "local 201",
     "local 202",
     "local 203",
     "local 204",
     "local 205",
     "local 206",
-    "local 207",
-    "local 208",
-    "local 209",
     "local 21",
     "local 210",
-    "local 214",
-    "local 215",
+    "local 211",
+    "local 216",
+    "local 217",
+    "local 218",
     "local 22",
-    "local 220",
-    "local 221",
-    "local 222",
-    "local 227",
-    "local 228",
-    "local 229",
+    "local 223",
+    "local 224",
+    "local 225",
     "local 23",
+    "local 230",
+    "local 231",
+    "local 232",
+    "local 233",
     "local 234",
     "local 235",
     "local 236",
     "local 237",
-    "local 238",
     "local 239",
     "local 240",
-    "local 241",
-    "local 243",
+    "local 242",
     "local 244",
+    "local 245",
     "local 246",
+    "local 247",
     "local 248",
     "local 249",
     "local 25",
-    "local 250",
-    "local 251",
     "local 252",
-    "local 253",
-    "local 256",
+    "local 257",
+    "local 258",
+    "local 259",
     "local 26",
+    "local 260",
     "local 261",
     "local 262",
     "local 263",
@@ -39041,26 +39476,26 @@
     "local 265",
     "local 266",
     "local 267",
-    "local 268",
-    "local 269",
     "local 27",
-    "local 270",
     "local 271",
-    "local 275",
+    "local 272",
+    "local 273",
     "local 276",
-    "local 277",
+    "local 279",
     "local 28",
     "local 280",
+    "local 281",
+    "local 282",
     "local 283",
     "local 284",
-    "local 285",
-    "local 286",
     "local 287",
     "local 288",
     "local 29",
-    "local 291",
+    "local 290",
     "local 292",
+    "local 293",
     "local 294",
+    "local 295",
     "local 296",
     "local 297",
     "local 298",
@@ -39070,61 +39505,61 @@
     "local 301",
     "local 302",
     "local 303",
-    "local 304",
-    "local 305",
     "local 306",
-    "local 307",
+    "local 308",
     "local 31",
     "local 310",
-    "local 312",
-    "local 314",
+    "local 311",
+    "local 313",
     "local 315",
+    "local 316",
     "local 317",
-    "local 319",
-    "local 320",
-    "local 321",
-    "local 327",
+    "local 323",
+    "local 324",
+    "local 325",
+    "local 326",
     "local 328",
-    "local 329",
     "local 33",
     "local 330",
     "local 332",
-    "local 334",
-    "local 336",
+    "local 333",
+    "local 335",
     "local 337",
     "local 339",
     "local 34",
+    "local 340",
     "local 341",
+    "local 342",
     "local 343",
     "local 344",
     "local 345",
-    "local 346",
     "local 347",
     "local 348",
-    "local 349",
     "local 35",
+    "local 350",
     "local 351",
-    "local 352",
-    "local 354",
+    "local 353",
     "local 355",
     "local 357",
+    "local 358",
     "local 359",
     "local 36",
+    "local 360",
     "local 361",
     "local 362",
-    "local 363",
     "local 364",
     "local 365",
     "local 366",
-    "local 368",
     "local 369",
     "local 37",
     "local 370",
+    "local 371",
+    "local 372",
     "local 373",
-    "local 374",
     "local 375",
     "local 376",
     "local 377",
+    "local 378",
     "local 379",
     "local 38",
     "local 380",
@@ -39155,49 +39590,49 @@
     "local 402",
     "local 403",
     "local 404",
-    "local 405",
     "local 406",
-    "local 407",
     "local 408",
     "local 41",
     "local 410",
+    "local 411",
     "local 412",
     "local 414",
     "local 415",
     "local 416",
+    "local 417",
     "local 418",
-    "local 419",
     "local 42",
-    "local 420",
-    "local 421",
     "local 422",
-    "local 426",
     "local 43",
-    "local 434",
-    "local 435",
-    "local 437",
+    "local 430",
+    "local 431",
+    "local 433",
+    "local 436",
+    "local 438",
+    "local 439",
     "local 44",
     "local 440",
+    "local 441",
     "local 442",
     "local 443",
     "local 444",
     "local 445",
-    "local 446",
     "local 447",
     "local 448",
     "local 449",
     "local 45",
+    "local 450",
     "local 451",
     "local 452",
     "local 453",
     "local 454",
     "local 455",
     "local 456",
-    "local 457",
     "local 458",
     "local 459",
     "local 46",
     "local 460",
+    "local 461",
     "local 462",
     "local 463",
     "local 464",
@@ -39209,53 +39644,49 @@
     "local 470",
     "local 471",
     "local 472",
-    "local 473",
-    "local 474",
     "local 475",
     "local 476",
+    "local 477",
+    "local 478",
     "local 479",
     "local 48",
-    "local 480",
     "local 481",
     "local 482",
     "local 483",
+    "local 484",
     "local 485",
     "local 486",
     "local 487",
-    "local 488",
-    "local 489",
     "local 49",
-    "local 490",
-    "local 491",
-    "local 496",
+    "local 492",
+    "local 493",
+    "local 494",
+    "local 495",
     "local 497",
     "local 498",
     "local 499",
     "local 5",
     "local 50",
     "local 501",
-    "local 502",
-    "local 503",
-    "local 505",
+    "local 507",
+    "local 508",
+    "local 509",
     "local 51",
-    "local 511",
     "local 512",
     "local 513",
-    "local 516",
-    "local 517",
-    "local 518",
+    "local 514",
+    "local 515",
     "local 519",
     "local 52",
-    "local 523",
+    "local 520",
     "local 524",
+    "local 525",
+    "local 526",
+    "local 527",
     "local 528",
     "local 529",
     "local 530",
     "local 531",
-    "local 532",
-    "local 533",
-    "local 534",
-    "local 535",
     "local 54",
     "local 58",
     "local 59",
@@ -39288,14 +39719,14 @@
     "local 86",
     "local 87",
     "local 88",
-    "local 89",
     "local 9",
+    "local 90",
     "local 91",
     "local 92",
     "local 93",
     "local 94",
     "local 95",
-    "local 96",
+    "local 97",
     "local 98",
     "local 99",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.faiss_manager`/AutoTuner#_DEFAULT_SWEEP.",
@@ -39955,7 +40386,7 @@
   "overlay_needed": false,
   "fan_in": 8,
   "fan_out": 13,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "_lazy_imports.py",
     "errors.py",
@@ -39994,8 +40425,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 47,
-  "recent_churn_90": 47
+  "recent_churn_30": 48,
+  "recent_churn_90": 48
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -40425,7 +40856,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 3,
-  "cycle_group": 114,
+  "cycle_group": 115,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -40643,7 +41074,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "build_histogram"
       ],
@@ -40782,6 +41213,7 @@
     "local 10",
     "local 100",
     "local 101",
+    "local 102",
     "local 103",
     "local 104",
     "local 105",
@@ -40789,7 +41221,6 @@
     "local 107",
     "local 108",
     "local 109",
-    "local 11",
     "local 110",
     "local 111",
     "local 112",
@@ -40807,10 +41238,11 @@
     "local 123",
     "local 124",
     "local 125",
-    "local 126",
     "local 127",
     "local 128",
     "local 129",
+    "local 13",
+    "local 130",
     "local 131",
     "local 132",
     "local 133",
@@ -40818,11 +41250,11 @@
     "local 135",
     "local 136",
     "local 137",
-    "local 138",
-    "local 139",
     "local 14",
     "local 140",
     "local 141",
+    "local 142",
+    "local 143",
     "local 144",
     "local 145",
     "local 146",
@@ -40830,156 +41262,152 @@
     "local 148",
     "local 149",
     "local 15",
-    "local 150",
     "local 151",
     "local 152",
     "local 153",
+    "local 154",
     "local 155",
     "local 156",
     "local 157",
     "local 158",
     "local 159",
     "local 16",
-    "local 160",
-    "local 161",
     "local 162",
     "local 163",
-    "local 166",
+    "local 164",
+    "local 165",
     "local 167",
     "local 168",
     "local 169",
     "local 17",
+    "local 170",
     "local 171",
     "local 172",
     "local 173",
-    "local 174",
-    "local 175",
-    "local 176",
     "local 177",
+    "local 178",
     "local 18",
+    "local 180",
     "local 181",
     "local 182",
+    "local 183",
     "local 184",
-    "local 185",
     "local 186",
-    "local 187",
-    "local 188",
-    "local 19",
     "local 190",
+    "local 191",
+    "local 192",
+    "local 193",
     "local 194",
     "local 195",
     "local 196",
-    "local 197",
-    "local 198",
-    "local 199",
     "local 2",
     "local 20",
-    "local 200",
-    "local 211",
-    "local 212",
+    "local 207",
+    "local 208",
+    "local 209",
+    "local 21",
+    "local 210",
     "local 213",
-    "local 214",
-    "local 217",
+    "local 216",
+    "local 218",
     "local 22",
-    "local 220",
-    "local 222",
+    "local 221",
+    "local 223",
     "local 225",
+    "local 226",
     "local 227",
+    "local 228",
     "local 229",
     "local 23",
     "local 230",
     "local 231",
-    "local 232",
-    "local 233",
     "local 234",
-    "local 235",
+    "local 236",
+    "local 237",
     "local 238",
+    "local 239",
     "local 24",
     "local 240",
-    "local 241",
     "local 242",
     "local 243",
     "local 244",
-    "local 246",
+    "local 245",
     "local 247",
     "local 248",
     "local 249",
     "local 25",
+    "local 250",
     "local 251",
     "local 252",
     "local 253",
     "local 254",
-    "local 255",
     "local 256",
     "local 257",
-    "local 258",
+    "local 259",
     "local 26",
-    "local 260",
     "local 261",
+    "local 262",
     "local 263",
+    "local 264",
     "local 265",
-    "local 266",
     "local 267",
     "local 268",
     "local 269",
     "local 27",
-    "local 271",
+    "local 270",
     "local 272",
     "local 273",
     "local 274",
-    "local 276",
-    "local 277",
-    "local 278",
+    "local 279",
     "local 28",
-    "local 283",
+    "local 280",
+    "local 281",
+    "local 282",
     "local 284",
-    "local 285",
-    "local 286",
     "local 288",
     "local 29",
+    "local 290",
     "local 292",
     "local 294",
-    "local 296",
+    "local 295",
     "local 298",
     "local 299",
     "local 3",
     "local 30",
     "local 302",
     "local 303",
+    "local 304",
+    "local 305",
     "local 306",
     "local 307",
-    "local 308",
-    "local 309",
-    "local 31",
-    "local 310",
-    "local 311",
-    "local 32",
-    "local 36",
+    "local 34",
     "local 37",
     "local 38",
+    "local 39",
     "local 4",
-    "local 41",
+    "local 40",
     "local 42",
-    "local 43",
-    "local 44",
-    "local 46",
-    "local 49",
+    "local 45",
     "local 5",
-    "local 57",
+    "local 53",
+    "local 56",
     "local 6",
     "local 60",
-    "local 64",
+    "local 61",
+    "local 62",
     "local 65",
-    "local 66",
     "local 69",
     "local 7",
+    "local 70",
+    "local 71",
     "local 73",
     "local 74",
     "local 75",
-    "local 77",
     "local 78",
     "local 79",
     "local 8",
+    "local 80",
+    "local 81",
     "local 82",
     "local 83",
     "local 84",
@@ -40989,12 +41417,11 @@
     "local 88",
     "local 89",
     "local 9",
-    "local 90",
-    "local 91",
-    "local 92",
     "local 93",
+    "local 94",
+    "local 95",
+    "local 96",
     "local 97",
-    "local 98",
     "local 99",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#__enter__().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#__enter__().(self)",
@@ -41399,8 +41826,8 @@
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 9,
-  "fan_out": 9,
-  "cycle_group": 77,
+  "fan_out": 10,
+  "cycle_group": 78,
   "imports_internal": [
     "_lazy_imports.py",
     "io/duckdb_manager.py",
@@ -41409,6 +41836,7 @@
     "observability/otel.py",
     "observability/timeline.py",
     "telemetry/decorators.py",
+    "telemetry/otel_metrics.py",
     "telemetry/steps.py",
     "typing.py"
   ],
@@ -41420,19 +41848,20 @@
     "observability/otel.py",
     "observability/timeline.py",
     "telemetry/decorators.py",
+    "telemetry/otel_metrics.py",
     "telemetry/steps.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.226,
+  "hotspot_score": 3.246,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 41,
-  "recent_churn_90": 41
+  "recent_churn_30": 42,
+  "recent_churn_90": 42
 }
 {
   "path": "io/bm25_manager.py",
@@ -41926,7 +42355,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 3,
-  "cycle_group": 50,
+  "cycle_group": 70,
   "imports_internal": [
     "config/settings.py",
     "io/path_utils.py",
@@ -42154,7 +42583,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 4,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "io/bm25_manager.py",
     "io/hybrid_search.py",
@@ -42601,7 +43030,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 7,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "mcp_server/schemas.py",
     "observability/otel.py",
@@ -42856,7 +43285,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 115,
+  "cycle_group": 116,
   "imports_internal": [
     "typing.py"
   ],
@@ -43081,7 +43510,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "plugins/channels.py",
     "typing.py"
@@ -43412,7 +43841,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 4,
-  "cycle_group": 116,
+  "cycle_group": 117,
   "imports_internal": [
     "io/hybrid_search.py",
     "plugins/channels.py",
@@ -43661,7 +44090,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 5,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -43741,7 +44170,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 117,
+  "cycle_group": 118,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -43888,7 +44317,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 119,
+  "cycle_group": 120,
   "imports_internal": [
     "io/xtr_manager.py",
     "rerank/base.py"
@@ -44090,7 +44519,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 118,
+  "cycle_group": 119,
   "imports_internal": [
     "typing.py"
   ],
@@ -44162,7 +44591,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 120,
+  "cycle_group": 121,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -44433,7 +44862,7 @@
   "overlay_needed": false,
   "fan_in": 14,
   "fan_out": 0,
-  "cycle_group": 69,
+  "cycle_group": 62,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.046,
@@ -44502,24 +44931,6 @@
       "level": 0
     },
     {
-      "module": "typing",
-      "names": [
-        "cast"
-      ],
-      "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": "prometheus_client",
-      "names": [
-        "CollectorRegistry"
-      ],
-      "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
       "module": "codeintel_rev.retrieval.types",
       "names": [
         "StageDecision"
@@ -44547,10 +44958,9 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
-        "build_counter",
-        "get_default_registry"
+        "build_counter"
       ],
       "aliases": {},
       "is_star": false,
@@ -44561,37 +44971,37 @@
     {
       "kind": "class",
       "name": "StageTiming",
-      "lineno": 20
+      "lineno": 17
     },
     {
       "kind": "class",
       "name": "_TimerRuntime",
-      "lineno": 44
+      "lineno": 41
     },
     {
       "kind": "class",
       "name": "_StageTimer",
-      "lineno": 86
+      "lineno": 83
     },
     {
       "kind": "function",
       "name": "track_stage",
-      "lineno": 150
+      "lineno": 147
     },
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 196
+      "lineno": 193
     },
     {
       "kind": "function",
       "name": "record_stage_metric",
-      "lineno": 205
+      "lineno": 201
     },
     {
       "kind": "function",
       "name": "record_stage_decision",
-      "lineno": 230
+      "lineno": 226
     }
   ],
   "exports": [
@@ -44616,20 +45026,15 @@
     "local 13",
     "local 14",
     "local 15",
-    "local 16",
     "local 17",
     "local 18",
-    "local 2",
+    "local 19",
     "local 20",
     "local 21",
     "local 22",
     "local 23",
-    "local 24",
-    "local 25",
-    "local 26",
-    "local 27",
-    "local 28",
     "local 3",
+    "local 4",
     "local 5",
     "local 6",
     "local 7",
@@ -44691,7 +45096,7 @@
       "name": "StageTiming",
       "kind": "class",
       "public": true,
-      "lineno": 20,
+      "lineno": 17,
       "doc_summary": "Snapshot describing how long a stage took relative to its budget.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -44701,7 +45106,7 @@
       "name": "_TimerRuntime",
       "kind": "class",
       "public": false,
-      "lineno": 44,
+      "lineno": 41,
       "doc_summary": "Mutable stopwatch backing the frozen stage timer.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -44711,7 +45116,7 @@
       "name": "_StageTimer",
       "kind": "class",
       "public": false,
-      "lineno": 86,
+      "lineno": 83,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -44721,7 +45126,7 @@
       "name": "track_stage",
       "kind": "function",
       "public": true,
-      "lineno": 150,
+      "lineno": 147,
       "doc_summary": "Context manager yielding a timer that can be converted into StageTiming.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -44731,7 +45136,7 @@
       "name": "record_stage_metric",
       "kind": "function",
       "public": true,
-      "lineno": 205,
+      "lineno": 201,
       "doc_summary": "Record the provided ``timing`` in Prometheus metrics.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -44741,7 +45146,7 @@
       "name": "record_stage_decision",
       "kind": "function",
       "public": true,
-      "lineno": 230,
+      "lineno": 226,
       "doc_summary": "Increment the stage decision counter for the given outcome.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -44763,7 +45168,7 @@
   "complexity": {
     "branches": 7,
     "cyclomatic": 8,
-    "loc": 251
+    "loc": 247
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -44771,14 +45176,14 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 74,
+  "cycle_group": 67,
   "imports_internal": [
     "retrieval/types.py",
-    "typing.py"
+    "telemetry/otel_metrics.py"
   ],
   "imports_intra_repo": [
     "retrieval/types.py",
-    "typing.py"
+    "telemetry/otel_metrics.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
@@ -45000,11 +45405,8 @@
     "local 33",
     "local 34",
     "local 35",
-    "local 36",
     "local 37",
-    "local 39",
     "local 4",
-    "local 40",
     "local 5",
     "local 6",
     "local 7",
@@ -45207,7 +45609,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 7,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "observability/otel.py",
     "observability/semantic_conventions.py",
@@ -45701,12 +46103,12 @@
     "local 101",
     "local 102",
     "local 103",
-    "local 104",
     "local 11",
+    "local 111",
     "local 112",
     "local 113",
     "local 114",
-    "local 115",
+    "local 117",
     "local 118",
     "local 119",
     "local 12",
@@ -45716,16 +46118,15 @@
     "local 123",
     "local 124",
     "local 125",
-    "local 126",
+    "local 129",
     "local 13",
     "local 130",
     "local 131",
     "local 132",
     "local 133",
-    "local 134",
-    "local 136",
+    "local 135",
+    "local 137",
     "local 138",
-    "local 139",
     "local 14",
     "local 15",
     "local 16",
@@ -45742,15 +46143,15 @@
     "local 28",
     "local 3",
     "local 31",
-    "local 33",
+    "local 35",
     "local 36",
     "local 37",
-    "local 38",
     "local 4",
-    "local 41",
+    "local 40",
+    "local 44",
     "local 45",
     "local 46",
-    "local 47",
+    "local 48",
     "local 49",
     "local 5",
     "local 50",
@@ -45759,16 +46160,16 @@
     "local 53",
     "local 54",
     "local 55",
-    "local 56",
-    "local 59",
+    "local 58",
     "local 6",
-    "local 61",
+    "local 60",
+    "local 64",
     "local 65",
     "local 66",
-    "local 67",
-    "local 69",
+    "local 68",
     "local 7",
-    "local 71",
+    "local 70",
+    "local 72",
     "local 73",
     "local 74",
     "local 75",
@@ -45783,10 +46184,10 @@
     "local 83",
     "local 84",
     "local 85",
-    "local 86",
+    "local 87",
     "local 88",
-    "local 89",
     "local 9",
+    "local 93",
     "local 94",
     "local 95",
     "local 96",
@@ -46468,7 +46869,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 8,
-  "cycle_group": 121,
+  "cycle_group": 122,
   "imports_internal": [
     "eval/pool_writer.py",
     "io/duckdb_catalog.py",
@@ -46497,8 +46898,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "retrieval/hybrid.py",
@@ -46648,7 +47049,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 2,
-  "cycle_group": 122,
+  "cycle_group": 123,
   "imports_internal": [
     "retrieval/types.py",
     "typing.py"
@@ -46833,7 +47234,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 76,
+  "cycle_group": 65,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.645,
@@ -47218,7 +47619,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "io/duckdb_catalog.py"
   ],
@@ -47290,7 +47691,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 123,
+  "cycle_group": 124,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -47696,7 +48097,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 75,
+  "cycle_group": 66,
   "imports_internal": [
     "io/duckdb_manager.py",
     "retrieval/types.py",
@@ -47821,7 +48222,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 56,
+  "cycle_group": 51,
   "imports_internal": [
     "typing.py"
   ],
@@ -48068,7 +48469,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 55,
+  "cycle_group": 56,
   "imports_internal": [
     "typing.py"
   ],
@@ -49004,7 +49405,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 124,
+  "cycle_group": 125,
   "imports_internal": [
     "typing.py"
   ],
@@ -49278,7 +49679,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 9,
-  "cycle_group": 85,
+  "cycle_group": 86,
   "imports_internal": [
     "app/middleware.py",
     "observability/ledger.py",
@@ -49471,7 +49872,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 1,
-  "cycle_group": 125,
+  "cycle_group": 126,
   "imports_internal": [
     "app/config_context.py"
   ],
@@ -50167,7 +50568,7 @@
   "overlay_needed": false,
   "fan_in": 13,
   "fan_out": 1,
-  "cycle_group": 39,
+  "cycle_group": 40,
   "imports_internal": [
     "typing.py"
   ],
@@ -50391,7 +50792,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 4,
-  "cycle_group": 128,
+  "cycle_group": 129,
   "imports_internal": [
     "mcp_server/fetch_tool.py",
     "mcp_server/search_tool.py",
@@ -50412,8 +50813,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "mcp_server/search_tool.py",
@@ -50702,7 +51103,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 127,
+  "cycle_group": 128,
   "imports_internal": [
     "mcp_server/types.py",
     "typing.py"
@@ -50719,8 +51120,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "mcp_server/server_semantic.py",
@@ -51062,7 +51463,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 10,
-  "cycle_group": 129,
+  "cycle_group": 130,
   "imports_internal": [
     "app/config_context.py",
     "mcp_server/adapters/__init__.py",
@@ -51284,7 +51685,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 4,
-  "cycle_group": 130,
+  "cycle_group": 131,
   "imports_internal": [
     "mcp_server/error_handling.py",
     "mcp_server/schemas.py",
@@ -51799,7 +52200,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 9,
-  "cycle_group": 88,
+  "cycle_group": 85,
   "imports_internal": [
     "app/config_context.py",
     "errors.py",
@@ -51830,8 +52231,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 14,
-  "recent_churn_90": 14
+  "recent_churn_30": 15,
+  "recent_churn_90": 15
 }
 {
   "path": "mcp_server/scope_utils.py",
@@ -51889,7 +52290,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "build_histogram"
       ],
@@ -51972,25 +52373,21 @@
   "outline_nodes": [],
   "scip_symbols": [
     "local 0",
-    "local 1",
     "local 10",
+    "local 11",
     "local 12",
     "local 13",
-    "local 14",
-    "local 15",
+    "local 16",
+    "local 17",
     "local 18",
-    "local 19",
     "local 2",
-    "local 20",
+    "local 21",
     "local 23",
+    "local 24",
     "local 25",
     "local 26",
-    "local 27",
-    "local 28",
-    "local 29",
-    "local 30",
-    "local 4",
-    "local 5",
+    "local 3",
+    "local 6",
     "local 8",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.scope_utils`/LOGGER.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.scope_utils`/__all__.",
@@ -52101,21 +52498,23 @@
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 5,
-  "fan_out": 3,
-  "cycle_group": 77,
+  "fan_out": 4,
+  "cycle_group": 78,
   "imports_internal": [
     "app/config_context.py",
     "mcp_server/schemas.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "imports_intra_repo": [
     "app/config_context.py",
     "mcp_server/schemas.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.293,
+  "hotspot_score": 2.335,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -52380,7 +52779,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 126,
+  "cycle_group": 127,
   "imports_internal": [
     "mcp_server/types.py",
     "typing.py"
@@ -52397,8 +52796,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "mcp_server/server.py",
@@ -52846,7 +53245,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 7,
-  "cycle_group": 89,
+  "cycle_group": 88,
   "imports_internal": [
     "app/capabilities.py",
     "app/config_context.py",
@@ -53020,7 +53419,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 1,
-  "cycle_group": 131,
+  "cycle_group": 132,
   "imports_internal": [
     "typing.py"
   ],
@@ -53157,7 +53556,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 2,
-  "cycle_group": 132,
+  "cycle_group": 133,
   "imports_internal": [
     "mcp_server/registry.py",
     "typing.py"
@@ -53174,8 +53573,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "cache/__init__.py",
@@ -53231,7 +53630,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 133,
+  "cycle_group": 134,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -53450,11 +53849,10 @@
     "local 5",
     "local 50",
     "local 51",
-    "local 52",
+    "local 53",
     "local 54",
     "local 55",
-    "local 56",
-    "local 59",
+    "local 58",
     "local 6",
     "local 7",
     "local 8",
@@ -53570,7 +53968,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 8,
-  "cycle_group": 77,
+  "cycle_group": 78,
   "imports_internal": [
     "app/config_context.py",
     "config/settings.py",
@@ -53795,16 +54193,15 @@
     "local 31",
     "local 32",
     "local 33",
-    "local 34",
+    "local 36",
     "local 37",
     "local 38",
     "local 39",
     "local 4",
     "local 40",
     "local 41",
-    "local 42",
+    "local 43",
     "local 44",
-    "local 45",
     "local 5",
     "local 6",
     "local 8",
@@ -53962,7 +54359,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 6,
-  "cycle_group": 96,
+  "cycle_group": 97,
   "imports_internal": [
     "config/settings.py",
     "io/duckdb_manager.py",
@@ -54044,7 +54441,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 134,
+  "cycle_group": 135,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -54174,22 +54571,21 @@
     "local 10",
     "local 11",
     "local 12",
-    "local 13",
-    "local 17",
+    "local 16",
     "local 2",
+    "local 20",
     "local 21",
-    "local 22",
-    "local 25",
-    "local 29",
+    "local 24",
+    "local 28",
     "local 3",
+    "local 31",
     "local 32",
     "local 33",
     "local 34",
     "local 35",
-    "local 36",
-    "local 38",
+    "local 37",
     "local 4",
-    "local 41",
+    "local 40",
     "local 5",
     "local 6",
     "local 7",
@@ -54319,7 +54715,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 52,
+  "cycle_group": 64,
   "imports_internal": [
     "metrics/registry.py"
   ],
@@ -54496,7 +54892,7 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.prometheus",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
         "build_counter",
         "build_gauge",
@@ -54612,14 +55008,18 @@
     "local 1",
     "local 10",
     "local 100",
-    "local 101",
+    "local 102",
+    "local 103",
+    "local 104",
     "local 105",
     "local 106",
     "local 107",
+    "local 108",
     "local 109",
     "local 11",
     "local 110",
     "local 111",
+    "local 112",
     "local 113",
     "local 114",
     "local 115",
@@ -54638,30 +55038,18 @@
     "local 127",
     "local 128",
     "local 129",
-    "local 13",
     "local 130",
-    "local 131",
-    "local 132",
-    "local 133",
-    "local 134",
-    "local 135",
-    "local 136",
-    "local 137",
-    "local 138",
-    "local 139",
     "local 14",
-    "local 140",
-    "local 141",
-    "local 15",
     "local 16",
     "local 17",
-    "local 18",
-    "local 19",
     "local 2",
     "local 20",
+    "local 21",
     "local 22",
+    "local 23",
     "local 24",
     "local 25",
+    "local 27",
     "local 28",
     "local 29",
     "local 3",
@@ -54671,40 +55059,41 @@
     "local 33",
     "local 35",
     "local 36",
-    "local 37",
     "local 38",
     "local 39",
     "local 4",
-    "local 40",
     "local 41",
+    "local 42",
     "local 43",
-    "local 44",
-    "local 46",
+    "local 45",
     "local 47",
+    "local 48",
     "local 49",
     "local 5",
     "local 50",
     "local 51",
     "local 53",
     "local 55",
-    "local 56",
-    "local 57",
     "local 58",
     "local 59",
     "local 6",
+    "local 60",
     "local 61",
+    "local 62",
     "local 63",
-    "local 66",
-    "local 67",
+    "local 64",
+    "local 65",
     "local 68",
     "local 69",
     "local 7",
-    "local 70",
     "local 71",
     "local 72",
     "local 73",
+    "local 74",
+    "local 75",
     "local 76",
     "local 77",
+    "local 78",
     "local 79",
     "local 8",
     "local 80",
@@ -54719,13 +55108,9 @@
     "local 89",
     "local 9",
     "local 90",
-    "local 91",
-    "local 92",
-    "local 93",
     "local 94",
     "local 95",
     "local 96",
-    "local 97",
     "local 98",
     "local 99",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.embeddings.embedding_service`/EMBEDDING_RANK.",
@@ -55116,21 +55501,23 @@
   ],
   "overlay_needed": false,
   "fan_in": 1,
-  "fan_out": 3,
-  "cycle_group": 98,
+  "fan_out": 4,
+  "cycle_group": 99,
   "imports_internal": [
     "config/settings.py",
     "io/vllm_engine.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "imports_intra_repo": [
     "config/settings.py",
     "io/vllm_engine.py",
+    "telemetry/otel_metrics.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.443,
+  "hotspot_score": 2.516,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -55238,7 +55625,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 99,
+  "cycle_group": 100,
   "imports_internal": [
     "embeddings/embedding_service.py"
   ],
@@ -55338,7 +55725,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 1,
-  "cycle_group": 136,
+  "cycle_group": 137,
   "imports_internal": [
     "mcp_server/retrieval/xtr_cli.py"
   ],
@@ -56995,7 +57382,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 12,
-  "cycle_group": 137,
+  "cycle_group": 138,
   "imports_internal": [
     "config/settings.py",
     "embeddings/__init__.py",
@@ -57262,7 +57649,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 4,
-  "cycle_group": 138,
+  "cycle_group": 139,
   "imports_internal": [
     "app/config_context.py",
     "observability/reporting.py",
@@ -57283,8 +57670,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "cli/splade.py",
@@ -57763,7 +58150,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 3,
-  "cycle_group": 139,
+  "cycle_group": 140,
   "imports_internal": [
     "config/settings.py",
     "io/splade_manager.py",
@@ -58079,7 +58466,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 2,
-  "cycle_group": 140,
+  "cycle_group": 141,
   "imports_internal": [
     "config/settings.py",
     "io/bm25_manager.py"
@@ -58415,7 +58802,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 5,
-  "cycle_group": 141,
+  "cycle_group": 142,
   "imports_internal": [
     "config/settings.py",
     "indexing/index_lifecycle.py",
@@ -58683,7 +59070,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 3,
-  "cycle_group": 142,
+  "cycle_group": 143,
   "imports_internal": [
     "observability/reporting.py",
     "observability/timeline.py",
@@ -58981,7 +59368,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 143,
+  "cycle_group": 144,
   "imports_internal": [
     "observability/otel.py",
     "typing.py"
@@ -59055,7 +59442,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 144,
+  "cycle_group": 145,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -59121,7 +59508,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 145,
+  "cycle_group": 146,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -59334,7 +59721,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 2,
-  "cycle_group": 146,
+  "cycle_group": 147,
   "imports_internal": [
     "_lazy_imports.py",
     "typing.py"
@@ -59566,7 +59953,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 5,
-  "cycle_group": 135,
+  "cycle_group": 136,
   "imports_internal": [
     "app/config_context.py",
     "config/settings.py",
@@ -59662,7 +60049,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 147,
+  "cycle_group": 148,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -60941,7 +61328,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 18,
-  "cycle_group": 148,
+  "cycle_group": 149,
   "imports_internal": [
     "_lazy_imports.py",
     "app/config_context.py",
@@ -60990,8 +61377,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 42,
-  "recent_churn_90": 42
+  "recent_churn_30": 43,
+  "recent_churn_90": 43
 }
 {
   "path": "mcp_server/adapters/files.py",
@@ -61568,7 +61955,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 7,
-  "cycle_group": 149,
+  "cycle_group": 150,
   "imports_internal": [
     "app/config_context.py",
     "app/middleware.py",
@@ -63251,7 +63638,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 23,
-  "cycle_group": 150,
+  "cycle_group": 151,
   "imports_internal": [
     "app/config_context.py",
     "app/middleware.py",
@@ -63693,7 +64080,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 5,
-  "cycle_group": 151,
+  "cycle_group": 152,
   "imports_internal": [
     "app/config_context.py",
     "mcp_server/schemas.py",
@@ -63716,8 +64103,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "mcp_server/adapters/text_search.py",
@@ -64230,7 +64617,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 6,
-  "cycle_group": 152,
+  "cycle_group": 153,
   "imports_internal": [
     "app/config_context.py",
     "app/middleware.py",
@@ -64323,7 +64710,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 86,
+  "cycle_group": 87,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.194,
@@ -64525,7 +64912,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 4,
-  "cycle_group": 153,
+  "cycle_group": 154,
   "imports_internal": [
     "app/config_context.py",
     "errors.py",
@@ -64672,7 +65059,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 109,
+  "cycle_group": 110,
   "imports_internal": [
     "retrieval/types.py"
   ],
@@ -64769,7 +65156,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 110,
+  "cycle_group": 111,
   "imports_internal": [
     "retrieval/fusion/weighted_rrf.py"
   ],
@@ -65143,6 +65530,7 @@
     "patches/MCP_through_search_hardening_phase2.md",
     "patches/DuckDB_data_expansion_FAISS.md",
     "patches/Type_Gating_Followup.md",
+    "patches/OpenTelemetry_Reconfig_for_efficient_libraries.md",
     "patches/Cli_enrich_fix.md",
     "patches/AST_Data_Build.md",
     "patches/audit_closeout.md",
@@ -65165,7 +65553,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 154,
+  "cycle_group": 155,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.695,
@@ -65742,7 +66130,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 7,
-  "cycle_group": 155,
+  "cycle_group": 156,
   "imports_internal": [
     "app/config_context.py",
     "app/scope_store.py",
@@ -65769,8 +66157,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 9,
-  "recent_churn_90": 9
+  "recent_churn_30": 10,
+  "recent_churn_90": 10
 }
 {
   "path": "app/routers/__init__.py",
@@ -65860,7 +66248,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 83,
+  "cycle_group": 89,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.032,
@@ -65936,7 +66324,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 0,
-  "cycle_group": 156,
+  "cycle_group": 157,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 0.755,
@@ -66184,7 +66572,7 @@
   "overlay_needed": false,
   "fan_in": 0,
   "fan_out": 5,
-  "cycle_group": 157,
+  "cycle_group": 158,
   "imports_internal": [
     "app/config_context.py",
     "config/settings.py",

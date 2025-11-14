@@ -404,15 +404,15 @@
 {
   "path": "app/main.py",
   "module": "app.main",
-  "func_count": 31,
+  "func_count": 32,
   "class_count": 0,
-  "assign_count": 99,
+  "assign_count": 104,
   "import_count": 42,
-  "branch_nodes": 78,
-  "cyclomatic": 79,
-  "cognitive": 83,
+  "branch_nodes": 82,
+  "cyclomatic": 83,
+  "cognitive": 87,
   "max_nesting": 4,
-  "statements": 380
+  "statements": 390
 }
 {
   "path": "app/scope_store.py",
@@ -950,15 +950,15 @@
 {
   "path": "observability/otel.py",
   "module": "observability.otel",
-  "func_count": 26,
+  "func_count": 30,
   "class_count": 3,
-  "assign_count": 107,
-  "import_count": 12,
-  "branch_nodes": 92,
-  "cyclomatic": 93,
-  "cognitive": 97,
+  "assign_count": 143,
+  "import_count": 13,
+  "branch_nodes": 123,
+  "cyclomatic": 124,
+  "cognitive": 128,
   "max_nesting": 4,
-  "statements": 329
+  "statements": 424
 }
 {
   "path": "observability/run_report.py",
@@ -1119,15 +1119,15 @@
 {
   "path": "telemetry/prom.py",
   "module": "telemetry.prom",
-  "func_count": 11,
-  "class_count": 2,
-  "assign_count": 26,
-  "import_count": 11,
-  "branch_nodes": 13,
-  "cyclomatic": 14,
-  "cognitive": 16,
+  "func_count": 7,
+  "class_count": 1,
+  "assign_count": 21,
+  "import_count": 9,
+  "branch_nodes": 7,
+  "cyclomatic": 8,
+  "cognitive": 10,
   "max_nesting": 2,
-  "statements": 87
+  "statements": 60
 }
 {
   "path": "telemetry/__init__.py",
@@ -1141,6 +1141,19 @@
   "cognitive": 1,
   "max_nesting": 0,
   "statements": 9
+}
+{
+  "path": "telemetry/otel_metrics.py",
+  "module": "telemetry.otel_metrics",
+  "func_count": 21,
+  "class_count": 7,
+  "assign_count": 42,
+  "import_count": 6,
+  "branch_nodes": 18,
+  "cyclomatic": 19,
+  "cognitive": 21,
+  "max_nesting": 2,
+  "statements": 134
 }
 {
   "path": "io/rrf.py",
@@ -1499,12 +1512,12 @@
   "func_count": 8,
   "class_count": 3,
   "assign_count": 21,
-  "import_count": 11,
+  "import_count": 9,
   "branch_nodes": 7,
   "cyclomatic": 8,
   "cognitive": 10,
   "max_nesting": 2,
-  "statements": 66
+  "statements": 64
 }
 {
   "path": "retrieval/gating.py",

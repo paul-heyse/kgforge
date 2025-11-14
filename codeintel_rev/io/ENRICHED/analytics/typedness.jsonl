@@ -615,6 +615,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "telemetry/otel_metrics.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "io/rrf.py",
   "type_error_count": 0,
   "params_ratio": 1.0,

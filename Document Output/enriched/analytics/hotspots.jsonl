@@ -8,8 +8,8 @@
 }
 {
   "path": "typing.py",
-  "hotspot_score": 2.756,
-  "fan_in": 109,
+  "hotspot_score": 2.753,
+  "fan_in": 108,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
@@ -208,9 +208,9 @@
 }
 {
   "path": "app/scope_registry.py",
-  "hotspot_score": 1.778,
+  "hotspot_score": 1.893,
   "fan_in": 0,
-  "fan_out": 2,
+  "fan_out": 3,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -248,7 +248,7 @@
 }
 {
   "path": "app/main.py",
-  "hotspot_score": 3.059,
+  "hotspot_score": 3.074,
   "fan_in": 0,
   "fan_out": 19,
   "type_error_count": 0,
@@ -272,9 +272,9 @@
 }
 {
   "path": "app/capabilities.py",
-  "hotspot_score": 2.494,
+  "hotspot_score": 2.529,
   "fan_in": 6,
-  "fan_out": 4,
+  "fan_out": 5,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -416,9 +416,9 @@
 }
 {
   "path": "metrics/registry.py",
-  "hotspot_score": 1.655,
+  "hotspot_score": 1.708,
   "fan_in": 6,
-  "fan_out": 0,
+  "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -568,9 +568,9 @@
 }
 {
   "path": "observability/metrics.py",
-  "hotspot_score": 1.524,
+  "hotspot_score": 1.639,
   "fan_in": 2,
-  "fan_out": 0,
+  "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -584,7 +584,7 @@
 }
 {
   "path": "observability/otel.py",
-  "hotspot_score": 3.181,
+  "hotspot_score": 3.266,
   "fan_in": 20,
   "fan_out": 3,
   "type_error_count": 0,
@@ -688,9 +688,9 @@
 }
 {
   "path": "telemetry/prom.py",
-  "hotspot_score": 2.318,
+  "hotspot_score": 2.2,
   "fan_in": 9,
-  "fan_out": 1,
+  "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -699,6 +699,14 @@
   "hotspot_score": 1.586,
   "fan_in": 1,
   "fan_out": 6,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "telemetry/otel_metrics.py",
+  "hotspot_score": 2.351,
+  "fan_in": 9,
+  "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -816,9 +824,9 @@
 }
 {
   "path": "io/duckdb_catalog.py",
-  "hotspot_score": 3.226,
+  "hotspot_score": 3.246,
   "fan_in": 9,
-  "fan_out": 9,
+  "fan_out": 10,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1088,9 +1096,9 @@
 }
 {
   "path": "mcp_server/scope_utils.py",
-  "hotspot_score": 2.293,
+  "hotspot_score": 2.335,
   "fan_in": 5,
-  "fan_out": 3,
+  "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1168,9 +1176,9 @@
 }
 {
   "path": "embeddings/embedding_service.py",
-  "hotspot_score": 2.443,
+  "hotspot_score": 2.516,
   "fan_in": 1,
-  "fan_out": 3,
+  "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
 }
