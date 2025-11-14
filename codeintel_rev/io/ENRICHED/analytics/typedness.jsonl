@@ -489,6 +489,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "observability/ledger.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "observability/otel.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -496,7 +503,21 @@
   "untyped_defs": 0
 }
 {
+  "path": "observability/run_report.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "observability/__init__.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "observability/logs.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -511,6 +532,13 @@
 }
 {
   "path": "observability/timeline.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/steps.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -846,6 +874,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "mcp_server/types.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "mcp_server/telemetry.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -861,6 +896,20 @@
 }
 {
   "path": "mcp_server/schemas.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "mcp_server/registry.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "mcp_server/search_tool.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -895,6 +944,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "mcp_server/fetch_tool.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "mcp_server/server.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -903,6 +959,13 @@
 }
 {
   "path": "mcp_server/__init__.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "mcp_server/testing.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,

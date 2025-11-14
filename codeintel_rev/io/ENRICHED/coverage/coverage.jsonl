@@ -349,12 +349,27 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "observability/ledger.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "observability/otel.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "observability/run_report.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "observability/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/logs.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
@@ -365,6 +380,11 @@
 }
 {
   "path": "observability/timeline.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/steps.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
@@ -604,6 +624,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "mcp_server/types.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "mcp_server/telemetry.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -615,6 +640,16 @@
 }
 {
   "path": "mcp_server/schemas.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/registry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/search_tool.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
@@ -639,12 +674,22 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "mcp_server/fetch_tool.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "mcp_server/server.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
 {
   "path": "mcp_server/__init__.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "mcp_server/testing.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }

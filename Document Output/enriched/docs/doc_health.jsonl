@@ -157,7 +157,7 @@
   "doc_has_summary": true,
   "doc_param_parity": true,
   "doc_examples_present": false,
-  "doc_summary": "CLI for rendering session timelines as Markdown diagnostics."
+  "doc_summary": "Diagnostics CLI for rendering run reports from session event ledgers."
 }
 {
   "path": "diagnostics/__init__.py",
@@ -463,7 +463,7 @@
 {
   "path": "observability/runtime_observer.py",
   "doc_has_summary": true,
-  "doc_param_parity": true,
+  "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "RuntimeCell observer that writes lifecycle events to the active timeline."
 }
@@ -489,6 +489,13 @@
   "doc_summary": "Prometheus metrics for hybrid retrieval."
 }
 {
+  "path": "observability/ledger.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Append-only run ledger utilities."
+}
+{
   "path": "observability/otel.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -496,11 +503,25 @@
   "doc_summary": "Optional OpenTelemetry bootstrap helpers."
 }
 {
+  "path": "observability/run_report.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Utilities for composing run reports from JSONL ledgers."
+}
+{
   "path": "observability/__init__.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Observability helpers (telemetry + lightweight timelines)."
+}
+{
+  "path": "observability/logs.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "OpenTelemetry logging bootstrap helpers."
 }
 {
   "path": "observability/semantic_conventions.py",
@@ -515,6 +536,13 @@
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Lightweight per-session timeline recording utilities."
+}
+{
+  "path": "telemetry/steps.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Structured step event helpers."
 }
 {
   "path": "telemetry/context.py",
@@ -673,7 +701,7 @@
 {
   "path": "io/duckdb_catalog.py",
   "doc_has_summary": true,
-  "doc_param_parity": true,
+  "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "DuckDB catalog for querying Parquet chunks."
 }
@@ -778,7 +806,7 @@
 {
   "path": "retrieval/mcp_search.py",
   "doc_has_summary": true,
-  "doc_param_parity": true,
+  "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "Deep-Research compatible search/fetch orchestration helpers."
 }
@@ -846,6 +874,13 @@
   "doc_summary": "Runtime helpers for mutable, closeable state."
 }
 {
+  "path": "mcp_server/types.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Typed DTOs and JSON Schema helpers for MCP search/fetch tools."
+}
+{
   "path": "mcp_server/telemetry.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -865,6 +900,20 @@
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "MCP server schemas using TypedDict for FastMCP compatibility."
+}
+{
+  "path": "mcp_server/registry.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "In-process registry for the lightweight MCP testing harness."
+}
+{
+  "path": "mcp_server/search_tool.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Lightweight search helpers used by the in-process MCP harness."
 }
 {
   "path": "mcp_server/server_semantic.py",
@@ -895,6 +944,13 @@
   "doc_summary": "Scope filtering and merging utilities for CodeIntel MCP."
 }
 {
+  "path": "mcp_server/fetch_tool.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Lightweight fetch helper used by the in-process MCP harness."
+}
+{
   "path": "mcp_server/server.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -907,6 +963,13 @@
   "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "MCP server implementation and tool adapters for CodeIntel."
+}
+{
+  "path": "mcp_server/testing.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Small in-process harness for exercising MCP tools without FastMCP."
 }
 {
   "path": "cache/__init__.py",
