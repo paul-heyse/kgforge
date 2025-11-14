@@ -1388,7 +1388,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 0,
-  "cycle_group": 5,
+  "cycle_group": 4,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.0,
@@ -4287,7 +4287,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 17,
+  "cycle_group": 22,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/type_integration.py"
@@ -4438,7 +4438,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 23,
+  "cycle_group": 14,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.515,
@@ -5096,7 +5096,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 21,
+  "cycle_group": 23,
   "imports_internal": [
     "enrich/scip_reader.py",
     "polars_support.py",
@@ -5374,7 +5374,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 22,
+  "cycle_group": 13,
   "imports_internal": [
     "module_utils.py",
     "typing.py"
@@ -5509,7 +5509,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 4,
+  "cycle_group": 5,
   "imports_internal": [
     "typing.py"
   ],
@@ -8696,11 +8696,10 @@
     "local 46",
     "local 47",
     "local 48",
-    "local 49",
     "local 50",
     "local 51",
     "local 52",
-    "local 55",
+    "local 53",
     "local 56",
     "local 57",
     "local 58",
@@ -8710,6 +8709,8 @@
     "local 62",
     "local 63",
     "local 64",
+    "local 65",
+    "local 66",
     "local 8",
     "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.diagnostics.report_cli`/EventRecord.",
@@ -9212,19 +9213,19 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.logging",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
-        "get_logger"
+        "build_counter",
+        "build_gauge"
       ],
       "aliases": {},
       "is_star": false,
       "level": 0
     },
     {
-      "module": "codeintel_rev.telemetry.otel_metrics",
+      "module": "kgfoundry_common.logging",
       "names": [
-        "build_counter",
-        "build_gauge"
+        "get_logger"
       ],
       "aliases": {},
       "is_star": false,
@@ -9382,8 +9383,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 7,
-  "recent_churn_90": 7
+  "recent_churn_30": 8,
+  "recent_churn_90": 8
 }
 {
   "path": "app/middleware.py",
@@ -11637,7 +11638,9 @@
     {
       "module": "codeintel_rev.telemetry.reporter",
       "names": [
+        "build_run_report_v2",
         "render_markdown",
+        "render_markdown_v2",
         "render_mermaid",
         "report_to_json"
       ],
@@ -11668,187 +11671,192 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 63
+      "lineno": 65
     },
     {
       "kind": "variable",
       "name": "SERVER_SETTINGS",
-      "lineno": 64
+      "lineno": 66
     },
     {
       "kind": "function",
       "name": "_sse_keepalive_interval",
-      "lineno": 75
+      "lineno": 77
     },
     {
       "kind": "function",
       "name": "_sse_keepalive_budget",
-      "lineno": 93
+      "lineno": 95
     },
     {
       "kind": "function",
       "name": "_client_address",
-      "lineno": 113
+      "lineno": 115
     },
     {
       "kind": "function",
       "name": "_log_request_summary",
-      "lineno": 135
+      "lineno": 137
     },
     {
       "kind": "function",
       "name": "_stream_log_extra",
-      "lineno": 151
+      "lineno": 153
     },
     {
       "kind": "function",
       "name": "_preload_faiss_index",
-      "lineno": 190
+      "lineno": 192
     },
     {
       "kind": "function",
       "name": "_env_flag",
-      "lineno": 221
+      "lineno": 223
     },
     {
       "kind": "function",
       "name": "_log_gpu_warmup",
-      "lineno": 238
+      "lineno": 240
     },
     {
       "kind": "function",
       "name": "_preload_faiss_if_configured",
-      "lineno": 259
+      "lineno": 261
     },
     {
       "kind": "function",
       "name": "_preload_xtr_if_configured",
-      "lineno": 269
+      "lineno": 271
     },
     {
       "kind": "function",
       "name": "_preload_hybrid_if_configured",
-      "lineno": 283
+      "lineno": 285
     },
     {
       "kind": "function",
       "name": "_initialize_context",
-      "lineno": 294
+      "lineno": 296
     },
     {
       "kind": "function",
       "name": "_shutdown_context",
-      "lineno": 382
+      "lineno": 384
     },
     {
       "kind": "function",
       "name": "lifespan",
-      "lineno": 405
+      "lineno": 407
     },
     {
       "kind": "variable",
       "name": "app",
-      "lineno": 500
+      "lineno": 502
     },
     {
       "kind": "variable",
       "name": "metrics_router",
-      "lineno": 529
+      "lineno": 531
+    },
+    {
+      "kind": "function",
+      "name": "observability_run_report",
+      "lineno": 541
     },
     {
       "kind": "function",
       "name": "get_run_report",
-      "lineno": 539
+      "lineno": 578
     },
     {
       "kind": "function",
       "name": "get_run_report_markdown",
-      "lineno": 581
+      "lineno": 620
     },
     {
       "kind": "function",
       "name": "get_run_report_mermaid",
-      "lineno": 624
+      "lineno": 663
     },
     {
       "kind": "function",
       "name": "get_run_report_v2",
-      "lineno": 656
+      "lineno": 695
     },
     {
       "kind": "function",
       "name": "get_run_report_markdown_v2",
-      "lineno": 676
+      "lineno": 715
     },
     {
       "kind": "function",
       "name": "get_run_report_mermaid_v2",
-      "lineno": 698
+      "lineno": 737
     },
     {
       "kind": "function",
       "name": "inject_request_id",
-      "lineno": 720
+      "lineno": 759
     },
     {
       "kind": "function",
       "name": "set_mcp_context",
-      "lineno": 747
+      "lineno": 786
     },
     {
       "kind": "function",
       "name": "disable_nginx_buffering",
-      "lineno": 826
+      "lineno": 865
     },
     {
       "kind": "function",
       "name": "healthz",
-      "lineno": 862
+      "lineno": 901
     },
     {
       "kind": "function",
       "name": "readyz",
-      "lineno": 874
+      "lineno": 913
     },
     {
       "kind": "function",
       "name": "capz",
-      "lineno": 909
+      "lineno": 948
     },
     {
       "kind": "function",
       "name": "_stream_with_logging",
-      "lineno": 951
+      "lineno": 990
     },
     {
       "kind": "function",
       "name": "sse_demo",
-      "lineno": 1013
+      "lineno": 1052
     },
     {
       "kind": "function",
       "name": "http_exception_handler_with_request_id",
-      "lineno": 1066
+      "lineno": 1105
     },
     {
       "kind": "function",
       "name": "unhandled_exception_handler",
-      "lineno": 1098
+      "lineno": 1137
     },
     {
       "kind": "variable",
       "name": "proxy_wrapped",
-      "lineno": 1139
+      "lineno": 1178
     },
     {
       "kind": "variable",
       "name": "asgi",
-      "lineno": 1144
+      "lineno": 1183
     },
     {
       "kind": "variable",
       "name": "asgi",
-      "lineno": 1146
+      "lineno": 1185
     }
   ],
   "exports": [
@@ -11865,13 +11873,13 @@
     "local 1",
     "local 10",
     "local 100",
+    "local 102",
     "local 103",
-    "local 107",
-    "local 108",
-    "local 109",
+    "local 106",
     "local 11",
     "local 110",
     "local 111",
+    "local 112",
     "local 113",
     "local 114",
     "local 116",
@@ -11879,8 +11887,10 @@
     "local 119",
     "local 12",
     "local 120",
-    "local 121",
     "local 122",
+    "local 123",
+    "local 124",
+    "local 125",
     "local 13",
     "local 14",
     "local 16",
@@ -11930,16 +11940,16 @@
     "local 62",
     "local 63",
     "local 64",
+    "local 65",
     "local 66",
-    "local 68",
+    "local 67",
     "local 69",
     "local 7",
-    "local 70",
     "local 71",
     "local 72",
+    "local 73",
     "local 74",
     "local 75",
-    "local 76",
     "local 77",
     "local 78",
     "local 79",
@@ -11947,18 +11957,19 @@
     "local 80",
     "local 81",
     "local 82",
+    "local 83",
     "local 84",
     "local 85",
-    "local 86",
     "local 87",
     "local 88",
+    "local 89",
     "local 9",
     "local 90",
-    "local 92",
+    "local 91",
     "local 93",
-    "local 94",
+    "local 95",
+    "local 96",
     "local 97",
-    "local 99",
     "scip-python python fastapi 0.121.2 `fastapi.applications`/FastAPI#state.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/LOGGER.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/SERVER_SETTINGS.",
@@ -12039,6 +12050,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/lifespan()._handle_hup().(frame)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/lifespan()._handle_hup().(signum)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/metrics_router.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/observability_run_report().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/observability_run_report().(response_format)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/observability_run_report().(run_id)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/observability_run_report().(session_id)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/proxy_wrapped.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/readyz().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.app.main`/readyz().(request)",
@@ -12077,7 +12092,7 @@
       "name": "_sse_keepalive_interval",
       "kind": "function",
       "public": false,
-      "lineno": 75,
+      "lineno": 77,
       "doc_summary": "Return the configured SSE keep-alive interval (seconds).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12087,7 +12102,7 @@
       "name": "_sse_keepalive_budget",
       "kind": "function",
       "public": false,
-      "lineno": 93,
+      "lineno": 95,
       "doc_summary": "Return optional cap on keep-alive frames for long-lived SSE streams.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12097,7 +12112,7 @@
       "name": "_client_address",
       "kind": "function",
       "public": false,
-      "lineno": 113,
+      "lineno": 115,
       "doc_summary": "Return a printable representation of the originating client address.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12107,7 +12122,7 @@
       "name": "_log_request_summary",
       "kind": "function",
       "public": false,
-      "lineno": 135,
+      "lineno": 137,
       "doc_summary": "Emit a structured log describing a completed HTTP request.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12117,7 +12132,7 @@
       "name": "_stream_log_extra",
       "kind": "function",
       "public": false,
-      "lineno": 151,
+      "lineno": 153,
       "doc_summary": "Return structured logging metadata for streaming lifecycle events.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12127,7 +12142,7 @@
       "name": "_preload_faiss_index",
       "kind": "function",
       "public": false,
-      "lineno": 190,
+      "lineno": 192,
       "doc_summary": "Pre-load FAISS index during startup to avoid first-request latency.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12137,7 +12152,7 @@
       "name": "_env_flag",
       "kind": "function",
       "public": false,
-      "lineno": 221,
+      "lineno": 223,
       "doc_summary": "Return ``True`` when an environment flag is explicitly enabled.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12147,7 +12162,7 @@
       "name": "_log_gpu_warmup",
       "kind": "function",
       "public": false,
-      "lineno": 238,
+      "lineno": 240,
       "doc_summary": "Log the GPU warmup status summary.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12157,7 +12172,7 @@
       "name": "_preload_faiss_if_configured",
       "kind": "function",
       "public": false,
-      "lineno": 259,
+      "lineno": 261,
       "doc_summary": "Preload FAISS indexes when configured to do so.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12167,7 +12182,7 @@
       "name": "_preload_xtr_if_configured",
       "kind": "function",
       "public": false,
-      "lineno": 269,
+      "lineno": 271,
       "doc_summary": "Preload XTR runtime when toggle is enabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12177,7 +12192,7 @@
       "name": "_preload_hybrid_if_configured",
       "kind": "function",
       "public": false,
-      "lineno": 283,
+      "lineno": 285,
       "doc_summary": "Preload HybridSearchEngine when toggle is enabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12187,7 +12202,7 @@
       "name": "_initialize_context",
       "kind": "function",
       "public": false,
-      "lineno": 294,
+      "lineno": 296,
       "doc_summary": "Initialize application context, readiness probe, and optional runtimes.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12197,7 +12212,7 @@
       "name": "_shutdown_context",
       "kind": "function",
       "public": false,
-      "lineno": 382,
+      "lineno": 384,
       "doc_summary": "Shut down mutable runtimes and readiness probes.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -12207,8 +12222,18 @@
       "name": "lifespan",
       "kind": "function",
       "public": true,
-      "lineno": 405,
+      "lineno": 407,
       "doc_summary": "Application lifespan manager with explicit configuration initialization.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "observability_run_report",
+      "kind": "function",
+      "public": true,
+      "lineno": 541,
+      "doc_summary": "Return RunReport V2 for observability dashboards.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -12217,7 +12242,7 @@
       "name": "get_run_report",
       "kind": "function",
       "public": true,
-      "lineno": 539,
+      "lineno": 578,
       "doc_summary": "Return JSON run report for the session/run identifier.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12227,7 +12252,7 @@
       "name": "get_run_report_markdown",
       "kind": "function",
       "public": true,
-      "lineno": 581,
+      "lineno": 620,
       "doc_summary": "Return Markdown run report for the session/run identifier.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12237,7 +12262,7 @@
       "name": "get_run_report_mermaid",
       "kind": "function",
       "public": true,
-      "lineno": 624,
+      "lineno": 663,
       "doc_summary": "Return a Mermaid representation of the run.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12247,7 +12272,7 @@
       "name": "get_run_report_v2",
       "kind": "function",
       "public": true,
-      "lineno": 656,
+      "lineno": 695,
       "doc_summary": "Alias for `/reports/{session_id}` retaining backwards compatibility.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12257,7 +12282,7 @@
       "name": "get_run_report_markdown_v2",
       "kind": "function",
       "public": true,
-      "lineno": 676,
+      "lineno": 715,
       "doc_summary": "Alias for `/reports/{session_id}.md`.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12267,7 +12292,7 @@
       "name": "get_run_report_mermaid_v2",
       "kind": "function",
       "public": true,
-      "lineno": 698,
+      "lineno": 737,
       "doc_summary": "Alias for `/reports/{session_id}.mmd`.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12277,7 +12302,7 @@
       "name": "inject_request_id",
       "kind": "function",
       "public": true,
-      "lineno": 720,
+      "lineno": 759,
       "doc_summary": "Ensure every request carries a stable request identifier.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12287,7 +12312,7 @@
       "name": "set_mcp_context",
       "kind": "function",
       "public": true,
-      "lineno": 747,
+      "lineno": 786,
       "doc_summary": "Set ApplicationContext in context variable for MCP tool handlers.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12297,7 +12322,7 @@
       "name": "disable_nginx_buffering",
       "kind": "function",
       "public": true,
-      "lineno": 826,
+      "lineno": 865,
       "doc_summary": "Disable NGINX buffering for streaming responses.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12307,7 +12332,7 @@
       "name": "healthz",
       "kind": "function",
       "public": true,
-      "lineno": 862,
+      "lineno": 901,
       "doc_summary": "Health check endpoint (network-only).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12317,7 +12342,7 @@
       "name": "readyz",
       "kind": "function",
       "public": true,
-      "lineno": 874,
+      "lineno": 913,
       "doc_summary": "Readiness check endpoint.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12327,7 +12352,7 @@
       "name": "capz",
       "kind": "function",
       "public": true,
-      "lineno": 909,
+      "lineno": 948,
       "doc_summary": "Return a cached capability snapshot (refreshable via query flag).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12337,7 +12362,7 @@
       "name": "_stream_with_logging",
       "kind": "function",
       "public": false,
-      "lineno": 951,
+      "lineno": 990,
       "doc_summary": "Wrap a streaming iterator and emit lifecycle logs for observability.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12347,7 +12372,7 @@
       "name": "sse_demo",
       "kind": "function",
       "public": true,
-      "lineno": 1013,
+      "lineno": 1052,
       "doc_summary": "SSE streaming demo endpoint with keep-alive comments.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12357,7 +12382,7 @@
       "name": "http_exception_handler_with_request_id",
       "kind": "function",
       "public": true,
-      "lineno": 1066,
+      "lineno": 1105,
       "doc_summary": "Return HTTPException responses with structured payloads and request IDs.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12367,7 +12392,7 @@
       "name": "unhandled_exception_handler",
       "kind": "function",
       "public": true,
-      "lineno": 1098,
+      "lineno": 1137,
       "doc_summary": "Wrap unhandled exceptions in a debuggable envelope.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -12387,9 +12412,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 82,
-    "cyclomatic": 83,
-    "loc": 1150
+    "branches": 86,
+    "cyclomatic": 87,
+    "loc": 1189
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -12444,14 +12469,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.074,
+  "hotspot_score": 3.088,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 32,
-  "recent_churn_90": 32
+  "recent_churn_30": 33,
+  "recent_churn_90": 33
 }
 {
   "path": "app/scope_store.py",
@@ -12889,7 +12914,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 47,
+  "cycle_group": 74,
   "imports_internal": [
     "mcp_server/schemas.py",
     "typing.py"
@@ -13080,19 +13105,19 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.logging",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
-        "get_logger"
+        "GaugeLike",
+        "build_gauge"
       ],
       "aliases": {},
       "is_star": false,
       "level": 0
     },
     {
-      "module": "codeintel_rev.telemetry.otel_metrics",
+      "module": "kgfoundry_common.logging",
       "names": [
-        "GaugeLike",
-        "build_gauge"
+        "get_logger"
       ],
       "aliases": {},
       "is_star": false,
@@ -13405,8 +13430,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 7,
-  "recent_churn_90": 7
+  "recent_churn_30": 8,
+  "recent_churn_90": 8
 }
 {
   "path": "app/readiness.py",
@@ -16986,7 +17011,7 @@
   "overlay_needed": false,
   "fan_in": 23,
   "fan_out": 2,
-  "cycle_group": 60,
+  "cycle_group": 51,
   "imports_internal": [
     "io/duckdb_manager.py",
     "typing.py"
@@ -17577,7 +17602,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 73,
+  "cycle_group": 66,
   "imports_internal": [
     "typing.py"
   ],
@@ -18512,7 +18537,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 2,
-  "cycle_group": 48,
+  "cycle_group": 59,
   "imports_internal": [
     "errors.py",
     "typing.py"
@@ -19106,7 +19131,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 74,
+  "cycle_group": 67,
   "imports_internal": [
     "indexing/scip_reader.py",
     "typing.py"
@@ -19233,7 +19258,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 75,
+  "cycle_group": 68,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.24,
@@ -19712,7 +19737,7 @@
   "overlay_needed": false,
   "fan_in": 6,
   "fan_out": 1,
-  "cycle_group": 63,
+  "cycle_group": 56,
   "imports_internal": [
     "telemetry/otel_metrics.py"
   ],
@@ -19727,8 +19752,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 6,
-  "recent_churn_90": 6
+  "recent_churn_30": 7,
+  "recent_churn_90": 7
 }
 {
   "path": "metrics/__init__.py",
@@ -20043,7 +20068,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 20,
+  "cycle_group": 18,
   "imports_internal": [
     "typing.py"
   ],
@@ -20315,7 +20340,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 14,
+  "cycle_group": 15,
   "imports_internal": [
     "typing.py"
   ],
@@ -20422,7 +20447,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 10,
+  "cycle_group": 11,
   "imports_internal": [
     "graph_builder.py"
   ],
@@ -21057,7 +21082,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 0,
-  "cycle_group": 11,
+  "cycle_group": 10,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.547,
@@ -21307,7 +21332,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 18,
+  "cycle_group": 20,
   "imports_internal": [
     "typing.py"
   ],
@@ -22194,7 +22219,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 16,
+  "cycle_group": 21,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.789,
@@ -22445,7 +22470,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 2,
-  "cycle_group": 13,
+  "cycle_group": 19,
   "imports_internal": [
     "enrich/output_writers.py",
     "typing.py"
@@ -22920,7 +22945,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 19,
+  "cycle_group": 16,
   "imports_internal": [
     "typing.py"
   ],
@@ -24282,7 +24307,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 15,
+  "cycle_group": 17,
   "imports_internal": [
     "enrich/libcst_bridge.py",
     "enrich/output_writers.py",
@@ -25223,7 +25248,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 43,
+  "cycle_group": 45,
   "imports_internal": [
     "observability/semantic_conventions.py",
     "typing.py"
@@ -26365,7 +26390,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 68,
+  "cycle_group": 55,
   "imports_internal": [
     "telemetry/otel_metrics.py"
   ],
@@ -26380,8 +26405,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "observability/ledger.py",
@@ -26830,102 +26855,102 @@
     {
       "kind": "function",
       "name": "_merge_detected_resources",
-      "lineno": 254
+      "lineno": 256
     },
     {
       "kind": "function",
       "name": "_build_provider",
-      "lineno": 287
+      "lineno": 289
     },
     {
       "kind": "function",
       "name": "telemetry_enabled",
-      "lineno": 315
+      "lineno": 317
     },
     {
       "kind": "function",
       "name": "init_telemetry",
-      "lineno": 326
+      "lineno": 328
     },
     {
       "kind": "function",
       "name": "init_otel",
-      "lineno": 401
+      "lineno": 403
     },
     {
       "kind": "function",
       "name": "init_all_telemetry",
-      "lineno": 424
+      "lineno": 426
     },
     {
       "kind": "function",
       "name": "as_span",
-      "lineno": 448
+      "lineno": 450
     },
     {
       "kind": "function",
       "name": "record_span_event",
-      "lineno": 476
+      "lineno": 478
     },
     {
       "kind": "function",
       "name": "_current_span",
-      "lineno": 500
+      "lineno": 502
     },
     {
       "kind": "function",
       "name": "set_current_span_attrs",
-      "lineno": 513
+      "lineno": 515
     },
     {
       "kind": "function",
       "name": "_current_span_context",
-      "lineno": 529
+      "lineno": 531
     },
     {
       "kind": "function",
       "name": "current_trace_id",
-      "lineno": 542
+      "lineno": 544
     },
     {
       "kind": "function",
       "name": "current_span_id",
-      "lineno": 558
+      "lineno": 560
     },
     {
       "kind": "function",
       "name": "_install_logging_instrumentation",
-      "lineno": 574
+      "lineno": 576
     },
     {
       "kind": "function",
       "name": "_install_metrics_provider",
-      "lineno": 588
+      "lineno": 590
     },
     {
       "kind": "function",
       "name": "_build_prometheus_reader",
-      "lineno": 638
+      "lineno": 640
     },
     {
       "kind": "function",
       "name": "_start_prometheus_http_server",
-      "lineno": 659
+      "lineno": 661
     },
     {
       "kind": "function",
       "name": "_build_metric_views",
-      "lineno": 677
+      "lineno": 679
     },
     {
       "kind": "function",
       "name": "instrument_fastapi",
-      "lineno": 715
+      "lineno": 725
     },
     {
       "kind": "function",
       "name": "instrument_httpx",
-      "lineno": 730
+      "lineno": 740
     }
   ],
   "exports": [
@@ -26992,24 +27017,11 @@
     "local 13",
     "local 130",
     "local 131",
-    "local 132",
-    "local 133",
-    "local 134",
-    "local 135",
-    "local 136",
     "local 137",
     "local 138",
     "local 139",
     "local 14",
     "local 140",
-    "local 141",
-    "local 142",
-    "local 143",
-    "local 144",
-    "local 145",
-    "local 146",
-    "local 147",
-    "local 148",
     "local 15",
     "local 17",
     "local 18",
@@ -27315,7 +27327,7 @@
       "name": "_merge_detected_resources",
       "kind": "function",
       "public": false,
-      "lineno": 254,
+      "lineno": 256,
       "doc_summary": "Augment ``resource`` with optional detector-provided attributes.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27325,7 +27337,7 @@
       "name": "_build_provider",
       "kind": "function",
       "public": false,
-      "lineno": 287,
+      "lineno": 289,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27335,7 +27347,7 @@
       "name": "telemetry_enabled",
       "kind": "function",
       "public": true,
-      "lineno": 315,
+      "lineno": 317,
       "doc_summary": "Return ``True`` when tracing has been configured for this process.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27345,7 +27357,7 @@
       "name": "init_telemetry",
       "kind": "function",
       "public": true,
-      "lineno": 326,
+      "lineno": 328,
       "doc_summary": "Best-effort OpenTelemetry bootstrap (safe no-op when disabled/unavailable).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27355,7 +27367,7 @@
       "name": "init_otel",
       "kind": "function",
       "public": true,
-      "lineno": 401,
+      "lineno": 403,
       "doc_summary": "Initialize tracing/metrics using the CODEINTEL_OTEL_* env conventions.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27365,7 +27377,7 @@
       "name": "init_all_telemetry",
       "kind": "function",
       "public": true,
-      "lineno": 424,
+      "lineno": 426,
       "doc_summary": "Initialize traces, metrics, and logs in one call.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27375,7 +27387,7 @@
       "name": "as_span",
       "kind": "function",
       "public": true,
-      "lineno": 448,
+      "lineno": 450,
       "doc_summary": "Create a span context that no-ops when telemetry is disabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27385,7 +27397,7 @@
       "name": "record_span_event",
       "kind": "function",
       "public": true,
-      "lineno": 476,
+      "lineno": 478,
       "doc_summary": "Attach ``name`` as an event on the current span when tracing is active.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27395,7 +27407,7 @@
       "name": "_current_span",
       "kind": "function",
       "public": false,
-      "lineno": 500,
+      "lineno": 502,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27405,7 +27417,7 @@
       "name": "set_current_span_attrs",
       "kind": "function",
       "public": true,
-      "lineno": 513,
+      "lineno": 515,
       "doc_summary": "Attach attributes to the active span when tracing is enabled.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27415,7 +27427,7 @@
       "name": "_current_span_context",
       "kind": "function",
       "public": false,
-      "lineno": 529,
+      "lineno": 531,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27425,7 +27437,7 @@
       "name": "current_trace_id",
       "kind": "function",
       "public": true,
-      "lineno": 542,
+      "lineno": 544,
       "doc_summary": "Return the hex trace identifier for the active span.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27435,7 +27447,7 @@
       "name": "current_span_id",
       "kind": "function",
       "public": true,
-      "lineno": 558,
+      "lineno": 560,
       "doc_summary": "Return the hex span identifier for the active span.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27445,7 +27457,7 @@
       "name": "_install_logging_instrumentation",
       "kind": "function",
       "public": false,
-      "lineno": 574,
+      "lineno": 576,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -27455,7 +27467,7 @@
       "name": "_install_metrics_provider",
       "kind": "function",
       "public": false,
-      "lineno": 588,
+      "lineno": 590,
       "doc_summary": "Configure OTLP/Prometheus metric readers when SDK components are present.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27465,7 +27477,7 @@
       "name": "_build_prometheus_reader",
       "kind": "function",
       "public": false,
-      "lineno": 638,
+      "lineno": 640,
       "doc_summary": "Return a PrometheusMetricReader when exporter is installed.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27475,7 +27487,7 @@
       "name": "_start_prometheus_http_server",
       "kind": "function",
       "public": false,
-      "lineno": 659,
+      "lineno": 661,
       "doc_summary": "Expose the default Prometheus registry when supported.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27485,7 +27497,7 @@
       "name": "_build_metric_views",
       "kind": "function",
       "public": false,
-      "lineno": 677,
+      "lineno": 679,
       "doc_summary": "Return default metric views for latency/counter instruments.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27495,7 +27507,7 @@
       "name": "instrument_fastapi",
       "kind": "function",
       "public": true,
-      "lineno": 715,
+      "lineno": 725,
       "doc_summary": "Instrument FastAPI routes when instrumentation packages are installed.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -27505,7 +27517,7 @@
       "name": "instrument_httpx",
       "kind": "function",
       "public": true,
-      "lineno": 730,
+      "lineno": 740,
       "doc_summary": "Instrument httpx clients when instrumentation packages are installed.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -27525,9 +27537,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 123,
-    "cyclomatic": 124,
-    "loc": 758
+    "branches": 125,
+    "cyclomatic": 126,
+    "loc": 768
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -27535,7 +27547,7 @@
   "overlay_needed": false,
   "fan_in": 20,
   "fan_out": 3,
-  "cycle_group": 45,
+  "cycle_group": 46,
   "imports_internal": [
     "observability/flight_recorder.py",
     "observability/logs.py",
@@ -27548,14 +27560,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.266,
+  "hotspot_score": 3.271,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 8,
-  "recent_churn_90": 8
+  "recent_churn_30": 9,
+  "recent_churn_90": 9
 }
 {
   "path": "observability/run_report.py",
@@ -28144,7 +28156,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 0,
-  "cycle_group": 44,
+  "cycle_group": 43,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.737,
@@ -28353,12 +28365,12 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 12,
+  "fan_in": 16,
   "fan_out": 0,
-  "cycle_group": 42,
+  "cycle_group": 44,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.988,
+  "hotspot_score": 2.096,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -28960,7 +28972,7 @@
   "overlay_needed": false,
   "fan_in": 20,
   "fan_out": 2,
-  "cycle_group": 54,
+  "cycle_group": 47,
   "imports_internal": [
     "observability/otel.py",
     "typing.py"
@@ -29104,6 +29116,16 @@
       "aliases": {},
       "is_star": false,
       "level": 0
+    },
+    {
+      "module": "codeintel_rev.telemetry.context",
+      "names": [
+        "current_run_id",
+        "current_session"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
     }
   ],
   "defs": [
@@ -29115,32 +29137,32 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 22
+      "lineno": 23
     },
     {
       "kind": "variable",
       "name": "StepStatus",
-      "lineno": 25
+      "lineno": 26
     },
     {
       "kind": "class",
       "name": "StepEvent",
-      "lineno": 31
+      "lineno": 32
     },
     {
       "kind": "function",
       "name": "_now_iso",
-      "lineno": 40
+      "lineno": 41
     },
     {
       "kind": "function",
       "name": "emit_step",
-      "lineno": 44
+      "lineno": 45
     },
     {
       "kind": "function",
       "name": "_record_structured_event",
-      "lineno": 82
+      "lineno": 85
     }
   ],
   "exports": [
@@ -29197,7 +29219,7 @@
       "name": "StepEvent",
       "kind": "class",
       "public": true,
-      "lineno": 31,
+      "lineno": 32,
       "doc_summary": "Immutable representation of a discrete pipeline step.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -29207,7 +29229,7 @@
       "name": "_now_iso",
       "kind": "function",
       "public": false,
-      "lineno": 40,
+      "lineno": 41,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -29217,7 +29239,7 @@
       "name": "emit_step",
       "kind": "function",
       "public": true,
-      "lineno": 44,
+      "lineno": 45,
       "doc_summary": "Emit a structured step event to the current sinks.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -29227,7 +29249,7 @@
       "name": "_record_structured_event",
       "kind": "function",
       "public": false,
-      "lineno": 82,
+      "lineno": 85,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -29249,37 +29271,39 @@
   "complexity": {
     "branches": 16,
     "cyclomatic": 17,
-    "loc": 99
+    "loc": 102
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 9,
-  "fan_out": 4,
+  "fan_out": 5,
   "cycle_group": 78,
   "imports_internal": [
     "observability/ledger.py",
     "observability/runtime_observer.py",
     "observability/semantic_conventions.py",
+    "telemetry/context.py",
     "typing.py"
   ],
   "imports_intra_repo": [
     "observability/ledger.py",
     "observability/runtime_observer.py",
     "observability/semantic_conventions.py",
+    "telemetry/context.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.469,
+  "hotspot_score": 2.497,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 1,
-  "recent_churn_90": 1
+  "recent_churn_30": 2,
+  "recent_churn_90": 2
 }
 {
   "path": "telemetry/context.py",
@@ -29616,9 +29640,9 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 10,
+  "fan_in": 11,
   "fan_out": 2,
-  "cycle_group": 52,
+  "cycle_group": 64,
   "imports_internal": [
     "runtime/request_context.py",
     "typing.py"
@@ -29629,7 +29653,7 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.364,
+  "hotspot_score": 2.394,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -30361,9 +30385,9 @@
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 6,
+  "fan_in": 9,
   "fan_out": 5,
-  "cycle_group": 55,
+  "cycle_group": 65,
   "imports_internal": [
     "observability/timeline.py",
     "telemetry/__init__.py",
@@ -30380,7 +30404,7 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.624,
+  "hotspot_score": 2.713,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
@@ -30574,7 +30598,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 50,
+  "cycle_group": 62,
   "imports_internal": [
     "telemetry/otel.py",
     "typing.py"
@@ -30752,124 +30776,157 @@
     {
       "kind": "function",
       "name": "_env_retention",
-      "lineno": 45
+      "lineno": 48
     },
     {
       "kind": "function",
       "name": "_infer_stop_reason_from_events",
-      "lineno": 54
+      "lineno": 57
     },
     {
       "kind": "function",
       "name": "_default_budget_snapshot",
-      "lineno": 68
+      "lineno": 71
     },
     {
       "kind": "function",
       "name": "_checkpoint_hit",
-      "lineno": 85
+      "lineno": 88
     },
     {
       "kind": "function",
       "name": "_checkpoint_summaries",
-      "lineno": 98
+      "lineno": 101
     },
     {
       "kind": "function",
       "name": "_compute_ops_coverage",
-      "lineno": 119
+      "lineno": 122
+    },
+    {
+      "kind": "function",
+      "name": "_normalize_stage_event",
+      "lineno": 147
+    },
+    {
+      "kind": "function",
+      "name": "_build_stage_summary",
+      "lineno": 176
     },
     {
       "kind": "function",
       "name": "_budgets_from_timeline",
-      "lineno": 136
+      "lineno": 211
     },
     {
       "kind": "class",
       "name": "RunRecord",
-      "lineno": 161
+      "lineno": 236
     },
     {
       "kind": "class",
       "name": "RunReport",
-      "lineno": 203
+      "lineno": 278
     },
     {
       "kind": "class",
       "name": "RunReportStore",
-      "lineno": 251
+      "lineno": 326
     },
     {
       "kind": "variable",
       "name": "RUN_REPORT_STORE",
-      "lineno": 408
+      "lineno": 483
     },
     {
       "kind": "function",
       "name": "start_run",
-      "lineno": 411
+      "lineno": 486
     },
     {
       "kind": "function",
       "name": "finalize_run",
-      "lineno": 429
+      "lineno": 504
     },
     {
       "kind": "function",
       "name": "record_timeline_payload",
-      "lineno": 447
+      "lineno": 522
     },
     {
       "kind": "function",
       "name": "record_step_payload",
-      "lineno": 452
+      "lineno": 527
     },
     {
       "kind": "function",
       "name": "emit_checkpoint",
-      "lineno": 457
+      "lineno": 532
     },
     {
       "kind": "function",
       "name": "_build_operations",
-      "lineno": 474
+      "lineno": 549
     },
     {
       "kind": "function",
       "name": "_collect",
-      "lineno": 513
+      "lineno": 588
     },
     {
       "kind": "function",
       "name": "build_report",
-      "lineno": 534
+      "lineno": 609
+    },
+    {
+      "kind": "function",
+      "name": "build_run_report_v2",
+      "lineno": 691
     },
     {
       "kind": "function",
       "name": "report_to_json",
-      "lineno": 616
+      "lineno": 734
+    },
+    {
+      "kind": "class",
+      "name": "RunReportStage",
+      "lineno": 785
+    },
+    {
+      "kind": "class",
+      "name": "RunReportV2",
+      "lineno": 808
     },
     {
       "kind": "function",
       "name": "render_mermaid",
-      "lineno": 666
+      "lineno": 836
     },
     {
       "kind": "function",
       "name": "render_markdown",
-      "lineno": 704
+      "lineno": 874
+    },
+    {
+      "kind": "function",
+      "name": "render_markdown_v2",
+      "lineno": 951
     }
   ],
   "exports": [
     "RUN_REPORT_STORE",
     "RunReport",
     "RunReportStore",
+    "RunReportV2",
     "build_report",
+    "build_run_report_v2",
     "emit_checkpoint",
     "finalize_run",
     "record_step_payload",
     "record_timeline_payload",
     "render_markdown",
+    "render_markdown_v2",
     "render_mermaid",
     "report_to_json",
     "start_run"
@@ -30878,12 +30935,15 @@
     "RUN_REPORT_STORE",
     "RunReport",
     "RunReportStore",
+    "RunReportV2",
     "build_report",
+    "build_run_report_v2",
     "emit_checkpoint",
     "finalize_run",
     "record_step_payload",
     "record_timeline_payload",
     "render_markdown",
+    "render_markdown_v2",
     "render_mermaid",
     "report_to_json",
     "start_run"
@@ -30893,83 +30953,94 @@
     "local 0",
     "local 1",
     "local 10",
+    "local 100",
+    "local 101",
     "local 103",
-    "local 104",
     "local 105",
     "local 106",
-    "local 107",
     "local 108",
+    "local 109",
+    "local 111",
     "local 112",
     "local 113",
-    "local 114",
     "local 115",
     "local 116",
+    "local 117",
     "local 12",
+    "local 121",
+    "local 122",
+    "local 123",
+    "local 124",
+    "local 125",
+    "local 126",
+    "local 130",
+    "local 131",
+    "local 132",
+    "local 133",
+    "local 134",
+    "local 135",
+    "local 137",
+    "local 138",
     "local 14",
     "local 17",
     "local 20",
     "local 22",
     "local 23",
     "local 24",
-    "local 26",
-    "local 27",
-    "local 30",
-    "local 32",
+    "local 29",
     "local 33",
-    "local 35",
+    "local 34",
     "local 36",
     "local 37",
-    "local 38",
-    "local 39",
     "local 4",
     "local 40",
-    "local 41",
     "local 42",
     "local 43",
-    "local 44",
     "local 45",
     "local 46",
     "local 47",
+    "local 48",
+    "local 49",
     "local 5",
+    "local 50",
     "local 51",
     "local 52",
     "local 53",
     "local 54",
     "local 55",
     "local 56",
+    "local 57",
     "local 6",
+    "local 61",
     "local 62",
     "local 63",
+    "local 64",
+    "local 65",
     "local 66",
-    "local 69",
-    "local 70",
-    "local 71",
     "local 72",
     "local 73",
-    "local 74",
-    "local 75",
     "local 76",
-    "local 77",
-    "local 78",
     "local 79",
     "local 8",
     "local 80",
     "local 81",
+    "local 82",
     "local 83",
     "local 84",
+    "local 85",
     "local 86",
+    "local 87",
     "local 88",
     "local 89",
     "local 9",
-    "local 91",
-    "local 92",
+    "local 90",
+    "local 93",
     "local 94",
     "local 95",
     "local 96",
+    "local 97",
     "local 98",
-    "local 99",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RUN_REPORT_STORE.",
-    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunRecord#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunRecord#capability_stamp.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunRecord#checkpoints.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunRecord#clone().",
@@ -31004,6 +31075,11 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReport#to_dict().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReport#to_dict().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReport#warnings.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStage#as_dict().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStage#as_dict().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStage#detail.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStage#name.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStage#status.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStore#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStore#__init__().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStore#__init__().(retention)",
@@ -31047,6 +31123,14 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStore#start_run().(session_id)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStore#start_run().(started_at)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportStore#start_run().(tool_name)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#as_dict().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#as_dict().(self)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#run_id.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#session_id.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#stages.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#stopped_after_stage.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#trace_id.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/RunReportV2#warnings.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/__all__.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/__init__:",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_budgets_from_timeline().",
@@ -31054,6 +31138,8 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_budgets_from_timeline().(structured_events)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_build_operations().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_build_operations().(events)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_build_stage_summary().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_build_stage_summary().(record)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_checkpoint_hit().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_checkpoint_hit().(checkpoints)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_checkpoint_hit().(prefixes)",
@@ -31070,10 +31156,15 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_env_retention().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_infer_stop_reason_from_events().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_infer_stop_reason_from_events().(events)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_normalize_stage_event().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/_normalize_stage_event().(kind)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_report().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_report().(context)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_report().(run_id)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_report().(session_id)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_run_report_v2().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_run_report_v2().(run_id)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/build_run_report_v2().(session_id)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/emit_checkpoint().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/emit_checkpoint().(attrs)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/emit_checkpoint().(ok)",
@@ -31094,6 +31185,8 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_markdown()._append_section().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_markdown()._append_section().(entries)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_markdown()._append_section().(title)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_markdown_v2().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_markdown_v2().(report)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_mermaid().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/render_mermaid().(report)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.telemetry.reporter`/report_to_json().",
@@ -31125,7 +31218,7 @@
       "name": "_env_retention",
       "kind": "function",
       "public": false,
-      "lineno": 45,
+      "lineno": 48,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31135,7 +31228,7 @@
       "name": "_infer_stop_reason_from_events",
       "kind": "function",
       "public": false,
-      "lineno": 54,
+      "lineno": 57,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31145,7 +31238,7 @@
       "name": "_default_budget_snapshot",
       "kind": "function",
       "public": false,
-      "lineno": 68,
+      "lineno": 71,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31155,7 +31248,7 @@
       "name": "_checkpoint_hit",
       "kind": "function",
       "public": false,
-      "lineno": 85,
+      "lineno": 88,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31165,7 +31258,7 @@
       "name": "_checkpoint_summaries",
       "kind": "function",
       "public": false,
-      "lineno": 98,
+      "lineno": 101,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31175,17 +31268,37 @@
       "name": "_compute_ops_coverage",
       "kind": "function",
       "public": false,
-      "lineno": 119,
+      "lineno": 122,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
       "doc_examples_present": false
     },
     {
+      "name": "_normalize_stage_event",
+      "kind": "function",
+      "public": false,
+      "lineno": 147,
+      "doc_summary": "Normalize event kind to a stage label.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_build_stage_summary",
+      "kind": "function",
+      "public": false,
+      "lineno": 176,
+      "doc_summary": "Return ordered stage summaries and the last completed stage.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
       "name": "_budgets_from_timeline",
       "kind": "function",
       "public": false,
-      "lineno": 136,
+      "lineno": 211,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31195,7 +31308,7 @@
       "name": "RunRecord",
       "kind": "class",
       "public": true,
-      "lineno": 161,
+      "lineno": 236,
       "doc_summary": "Mutable storage for a sampled run.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -31205,7 +31318,7 @@
       "name": "RunReport",
       "kind": "class",
       "public": true,
-      "lineno": 203,
+      "lineno": 278,
       "doc_summary": "Structured run summary consumable by humans and automation.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -31215,7 +31328,7 @@
       "name": "RunReportStore",
       "kind": "class",
       "public": true,
-      "lineno": 251,
+      "lineno": 326,
       "doc_summary": "Thread-safe circular buffer of run data.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -31225,7 +31338,7 @@
       "name": "start_run",
       "kind": "function",
       "public": true,
-      "lineno": 411,
+      "lineno": 486,
       "doc_summary": "Register a run at request ingress.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -31235,7 +31348,7 @@
       "name": "finalize_run",
       "kind": "function",
       "public": true,
-      "lineno": 429,
+      "lineno": 504,
       "doc_summary": "Mark the run as complete/partial/error.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -31245,7 +31358,7 @@
       "name": "record_timeline_payload",
       "kind": "function",
       "public": true,
-      "lineno": 447,
+      "lineno": 522,
       "doc_summary": "Subscribe to timeline events.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -31255,7 +31368,7 @@
       "name": "record_step_payload",
       "kind": "function",
       "public": true,
-      "lineno": 452,
+      "lineno": 527,
       "doc_summary": "Record structured step events for inclusion in run reports.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -31265,7 +31378,7 @@
       "name": "emit_checkpoint",
       "kind": "function",
       "public": true,
-      "lineno": 457,
+      "lineno": 532,
       "doc_summary": "Capture a stage checkpoint tied to the current request.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -31275,7 +31388,7 @@
       "name": "_build_operations",
       "kind": "function",
       "public": false,
-      "lineno": 474,
+      "lineno": 549,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31285,7 +31398,7 @@
       "name": "_collect",
       "kind": "function",
       "public": false,
-      "lineno": 513,
+      "lineno": 588,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -31295,8 +31408,18 @@
       "name": "build_report",
       "kind": "function",
       "public": true,
-      "lineno": 534,
+      "lineno": 609,
       "doc_summary": "Build a run report for the provided session/run identifiers.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "build_run_report_v2",
+      "kind": "function",
+      "public": true,
+      "lineno": 691,
+      "doc_summary": "Return a compact stage-centric report for ``session_id``/``run_id``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -31305,17 +31428,37 @@
       "name": "report_to_json",
       "kind": "function",
       "public": true,
-      "lineno": 616,
+      "lineno": 734,
       "doc_summary": "Return JSON-serializable payload for the report.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
     },
     {
+      "name": "RunReportStage",
+      "kind": "class",
+      "public": true,
+      "lineno": 785,
+      "doc_summary": "Normalized stage summary for RunReportV2.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "RunReportV2",
+      "kind": "class",
+      "public": true,
+      "lineno": 808,
+      "doc_summary": "Compact narrative describing key retrieval stages.",
+      "doc_has_summary": true,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
       "name": "render_mermaid",
       "kind": "function",
       "public": true,
-      "lineno": 666,
+      "lineno": 836,
       "doc_summary": "Return a Mermaid graph describing stage checkpoints.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -31325,8 +31468,18 @@
       "name": "render_markdown",
       "kind": "function",
       "public": true,
-      "lineno": 704,
+      "lineno": 874,
       "doc_summary": "Render the report as Markdown.",
+      "doc_has_summary": true,
+      "doc_param_parity": true,
+      "doc_examples_present": false
+    },
+    {
+      "name": "render_markdown_v2",
+      "kind": "function",
+      "public": true,
+      "lineno": 951,
+      "doc_summary": "Render a RunReportV2 payload as Markdown text.",
       "doc_has_summary": true,
       "doc_param_parity": true,
       "doc_examples_present": false
@@ -31345,9 +31498,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 107,
-    "cyclomatic": 108,
-    "loc": 779
+    "branches": 127,
+    "cyclomatic": 128,
+    "loc": 986
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -31376,14 +31529,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.01,
+  "hotspot_score": 3.06,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 6,
-  "recent_churn_90": 6
+  "recent_churn_30": 7,
+  "recent_churn_90": 7
 }
 {
   "path": "telemetry/events.py",
@@ -31650,7 +31803,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 46,
+  "cycle_group": 60,
   "imports_internal": [
     "typing.py"
   ],
@@ -32223,7 +32376,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 1,
-  "cycle_group": 49,
+  "cycle_group": 61,
   "imports_internal": [
     "typing.py"
   ],
@@ -32343,112 +32496,112 @@
     {
       "kind": "variable",
       "name": "ResponseType",
-      "lineno": 14
+      "lineno": 15
     },
     {
       "kind": "variable",
       "name": "ResponseType",
-      "lineno": 16
+      "lineno": 17
     },
     {
       "kind": "variable",
       "name": "RuntimeAPIRouter",
-      "lineno": 22
+      "lineno": 23
     },
     {
       "kind": "variable",
       "name": "RuntimeResponse",
-      "lineno": 23
+      "lineno": 24
     },
     {
       "kind": "function",
       "name": "_env_flag",
-      "lineno": 43
+      "lineno": 44
     },
     {
       "kind": "variable",
       "name": "RUNS_TOTAL",
-      "lineno": 50
+      "lineno": 51
     },
     {
       "kind": "variable",
       "name": "RUN_ERRORS_TOTAL",
-      "lineno": 56
+      "lineno": 57
     },
     {
       "kind": "variable",
       "name": "REQUEST_LATENCY_SECONDS",
-      "lineno": 62
+      "lineno": 63
     },
     {
       "kind": "variable",
       "name": "STAGE_LATENCY_SECONDS",
-      "lineno": 69
+      "lineno": 70
     },
     {
       "kind": "variable",
       "name": "EMBED_BATCH_SIZE",
-      "lineno": 76
+      "lineno": 77
     },
     {
       "kind": "variable",
       "name": "EMBED_LATENCY_SECONDS",
-      "lineno": 82
+      "lineno": 83
     },
     {
       "kind": "variable",
       "name": "FAISS_SEARCH_LATENCY_SECONDS",
-      "lineno": 88
+      "lineno": 89
     },
     {
       "kind": "variable",
       "name": "XTR_SEARCH_LATENCY_SECONDS",
-      "lineno": 94
+      "lineno": 95
     },
     {
       "kind": "variable",
       "name": "GATING_DECISIONS_TOTAL",
-      "lineno": 100
+      "lineno": 101
     },
     {
       "kind": "variable",
       "name": "RRFK",
-      "lineno": 106
+      "lineno": 107
     },
     {
       "kind": "variable",
       "name": "QUERY_AMBIGUITY",
-      "lineno": 112
+      "lineno": 113
     },
     {
       "kind": "class",
       "name": "MetricsConfig",
-      "lineno": 120
+      "lineno": 121
     },
     {
       "kind": "function",
       "name": "build_metrics_router",
-      "lineno": 126
+      "lineno": 127
     },
     {
       "kind": "function",
       "name": "record_run",
-      "lineno": 156
+      "lineno": 176
     },
     {
       "kind": "function",
       "name": "record_run_error",
-      "lineno": 161
+      "lineno": 181
     },
     {
       "kind": "function",
       "name": "observe_request_latency",
-      "lineno": 166
+      "lineno": 186
     },
     {
       "kind": "function",
       "name": "record_stage_latency",
-      "lineno": 171
+      "lineno": 191
     }
   ],
   "exports": [
@@ -32557,7 +32710,7 @@
       "name": "_env_flag",
       "kind": "function",
       "public": false,
-      "lineno": 43,
+      "lineno": 44,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -32567,7 +32720,7 @@
       "name": "MetricsConfig",
       "kind": "class",
       "public": true,
-      "lineno": 120,
+      "lineno": 121,
       "doc_summary": "Configuration container for exposing `/metrics`.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -32577,17 +32730,17 @@
       "name": "build_metrics_router",
       "kind": "function",
       "public": true,
-      "lineno": 126,
+      "lineno": 127,
       "doc_summary": "Return an APIRouter exposing a compatibility message.",
       "doc_has_summary": true,
-      "doc_param_parity": false,
+      "doc_param_parity": true,
       "doc_examples_present": false
     },
     {
       "name": "record_run",
       "kind": "function",
       "public": true,
-      "lineno": 156,
+      "lineno": 176,
       "doc_summary": "Increment the runs counter for the given tool/status.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32597,7 +32750,7 @@
       "name": "record_run_error",
       "kind": "function",
       "public": true,
-      "lineno": 161,
+      "lineno": 181,
       "doc_summary": "Increment the run error counter.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32607,7 +32760,7 @@
       "name": "observe_request_latency",
       "kind": "function",
       "public": true,
-      "lineno": 166,
+      "lineno": 186,
       "doc_summary": "Record request latency for a tool/status pair.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32617,7 +32770,7 @@
       "name": "record_stage_latency",
       "kind": "function",
       "public": true,
-      "lineno": 171,
+      "lineno": 191,
       "doc_summary": "Record a telemetry stage duration.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -32639,7 +32792,7 @@
   "complexity": {
     "branches": 7,
     "cyclomatic": 8,
-    "loc": 174
+    "loc": 194
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -32647,7 +32800,7 @@
   "overlay_needed": false,
   "fan_in": 9,
   "fan_out": 2,
-  "cycle_group": 53,
+  "cycle_group": 63,
   "imports_internal": [
     "telemetry/otel_metrics.py",
     "typing.py"
@@ -32664,8 +32817,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 5,
-  "recent_churn_90": 5
+  "recent_churn_30": 6,
+  "recent_churn_90": 6
 }
 {
   "path": "telemetry/__init__.py",
@@ -32841,7 +32994,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 6,
-  "cycle_group": 55,
+  "cycle_group": 65,
   "imports_internal": [
     "telemetry/context.py",
     "telemetry/decorators.py",
@@ -32975,17 +33128,17 @@
     {
       "kind": "function",
       "name": "build_counter",
-      "lineno": 261
+      "lineno": 263
     },
     {
       "kind": "function",
       "name": "build_histogram",
-      "lineno": 276
+      "lineno": 278
     },
     {
       "kind": "function",
       "name": "build_gauge",
-      "lineno": 300
+      "lineno": 302
     }
   ],
   "exports": [
@@ -33208,7 +33361,7 @@
       "name": "build_counter",
       "kind": "function",
       "public": true,
-      "lineno": 261,
+      "lineno": 263,
       "doc_summary": "Return a CounterLike backed by OpenTelemetry.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -33218,7 +33371,7 @@
       "name": "build_histogram",
       "kind": "function",
       "public": true,
-      "lineno": 276,
+      "lineno": 278,
       "doc_summary": "Return a HistogramLike backed by OpenTelemetry.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -33228,7 +33381,7 @@
       "name": "build_gauge",
       "kind": "function",
       "public": true,
-      "lineno": 300,
+      "lineno": 302,
       "doc_summary": "Return an ObservableGauge facade.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -33248,25 +33401,27 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 17,
-    "cyclomatic": 18,
-    "loc": 320
+    "branches": 19,
+    "cyclomatic": 20,
+    "loc": 322
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
-  "fan_in": 9,
+  "fan_in": 10,
   "fan_out": 0,
   "cycle_group": 39,
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.351,
-  "owner": null,
-  "primary_authors": [],
-  "bus_factor": 0.0,
-  "recent_churn_30": 0,
-  "recent_churn_90": 0
+  "hotspot_score": 2.419,
+  "owner": "paul-heyse",
+  "primary_authors": [
+    "paul-heyse"
+  ],
+  "bus_factor": 1.0,
+  "recent_churn_30": 1,
+  "recent_churn_90": 1
 }
 {
   "path": "io/rrf.py",
@@ -33604,7 +33759,7 @@
   "overlay_needed": false,
   "fan_in": 5,
   "fan_out": 0,
-  "cycle_group": 69,
+  "cycle_group": 52,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.801,
@@ -34273,7 +34428,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 4,
-  "cycle_group": 61,
+  "cycle_group": 72,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -34493,7 +34648,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 77,
+  "cycle_group": 70,
   "imports_internal": [
     "io/duckdb_manager.py"
   ],
@@ -35701,7 +35856,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 3,
-  "cycle_group": 71,
+  "cycle_group": 54,
   "imports_internal": [
     "config/settings.py",
     "io/path_utils.py",
@@ -35827,7 +35982,6 @@
     {
       "module": "codeintel_rev.observability.otel",
       "names": [
-        "as_span",
         "record_span_event"
       ],
       "aliases": {},
@@ -36002,58 +36156,57 @@
     "local 2",
     "local 20",
     "local 21",
+    "local 22",
     "local 23",
-    "local 24",
-    "local 26",
+    "local 25",
     "local 27",
     "local 28",
-    "local 29",
     "local 3",
     "local 30",
+    "local 31",
     "local 32",
     "local 33",
     "local 34",
-    "local 35",
+    "local 36",
     "local 37",
     "local 38",
     "local 39",
     "local 4",
-    "local 40",
     "local 41",
     "local 42",
     "local 43",
     "local 44",
     "local 45",
+    "local 46",
+    "local 47",
     "local 48",
     "local 49",
     "local 5",
-    "local 50",
-    "local 51",
     "local 52",
     "local 53",
+    "local 54",
     "local 55",
     "local 56",
     "local 57",
-    "local 58",
     "local 59",
     "local 6",
     "local 60",
     "local 61",
+    "local 62",
     "local 63",
     "local 64",
     "local 65",
-    "local 66",
     "local 67",
     "local 68",
+    "local 69",
     "local 7",
     "local 70",
     "local 71",
     "local 72",
-    "local 73",
+    "local 74",
     "local 75",
     "local 76",
     "local 77",
-    "local 78",
     "local 79",
     "local 8",
     "local 80",
@@ -36064,7 +36217,11 @@
     "local 85",
     "local 86",
     "local 87",
+    "local 88",
+    "local 89",
     "local 9",
+    "local 90",
+    "local 91",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.vllm_client`/EmbeddingData#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.vllm_client`/EmbeddingData#embedding.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.vllm_client`/EmbeddingData#index.",
@@ -36204,7 +36361,7 @@
   "complexity": {
     "branches": 32,
     "cyclomatic": 33,
-    "loc": 658
+    "loc": 657
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -36245,8 +36402,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 25,
-  "recent_churn_90": 25
+  "recent_churn_30": 26,
+  "recent_churn_90": 26
 }
 {
   "path": "io/parquet_store.py",
@@ -36624,7 +36781,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 4,
-  "cycle_group": 76,
+  "cycle_group": 69,
   "imports_internal": [
     "_lazy_imports.py",
     "indexing/cast_chunker.py",
@@ -37042,7 +37199,7 @@
   "overlay_needed": false,
   "fan_in": 10,
   "fan_out": 4,
-  "cycle_group": 59,
+  "cycle_group": 50,
   "imports_internal": [
     "_lazy_imports.py",
     "observability/otel.py",
@@ -37492,7 +37649,7 @@
   "overlay_needed": false,
   "fan_in": 8,
   "fan_out": 7,
-  "cycle_group": 72,
+  "cycle_group": 73,
   "imports_internal": [
     "_lazy_imports.py",
     "config/settings.py",
@@ -37639,8 +37796,17 @@
     {
       "module": "codeintel_rev.observability.otel",
       "names": [
-        "as_span",
         "record_span_event"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev.observability.semantic_conventions",
+      "names": [
+        "Attrs",
+        "to_label_str"
       ],
       "aliases": {},
       "is_star": false,
@@ -37790,67 +37956,67 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 40
+      "lineno": 41
     },
     {
       "kind": "class",
       "name": "_LuceneHit",
-      "lineno": 43
+      "lineno": 44
     },
     {
       "kind": "class",
       "name": "_LuceneSearcher",
-      "lineno": 48
+      "lineno": 49
     },
     {
       "kind": "class",
       "name": "BM25Rm3Config",
-      "lineno": 63
+      "lineno": 64
     },
     {
       "kind": "class",
       "name": "BM25SearchProvider",
-      "lineno": 72
+      "lineno": 73
     },
     {
       "kind": "class",
       "name": "SpladeSearchProvider",
-      "lineno": 211
+      "lineno": 212
     },
     {
       "kind": "class",
       "name": "HybridSearchTuning",
-      "lineno": 429
+      "lineno": 430
     },
     {
       "kind": "class",
       "name": "HybridSearchOptions",
-      "lineno": 437
+      "lineno": 438
     },
     {
       "kind": "class",
       "name": "_MethodStats",
-      "lineno": 447
+      "lineno": 448
     },
     {
       "kind": "class",
       "name": "_FusionContext",
-      "lineno": 456
+      "lineno": 457
     },
     {
       "kind": "class",
       "name": "_SearchTelemetryContext",
-      "lineno": 470
+      "lineno": 471
     },
     {
       "kind": "class",
       "name": "_FusionWork",
-      "lineno": 476
+      "lineno": 477
     },
     {
       "kind": "class",
       "name": "HybridSearchEngine",
-      "lineno": 490
+      "lineno": 491
     }
   ],
   "exports": [
@@ -37917,50 +38083,51 @@
     "local 149",
     "local 15",
     "local 150",
+    "local 152",
     "local 153",
-    "local 154",
+    "local 156",
+    "local 157",
     "local 158",
-    "local 159",
     "local 16",
     "local 161",
     "local 162",
-    "local 163",
     "local 164",
     "local 165",
+    "local 166",
+    "local 167",
     "local 168",
-    "local 169",
     "local 17",
-    "local 170",
     "local 171",
     "local 172",
     "local 173",
+    "local 174",
     "local 175",
     "local 176",
-    "local 177",
+    "local 178",
     "local 179",
     "local 180",
+    "local 181",
     "local 182",
-    "local 184",
-    "local 186",
+    "local 183",
+    "local 185",
+    "local 187",
+    "local 189",
     "local 19",
-    "local 192",
     "local 195",
-    "local 196",
-    "local 197",
+    "local 198",
     "local 199",
     "local 2",
     "local 20",
     "local 200",
-    "local 201",
     "local 202",
+    "local 203",
+    "local 204",
     "local 205",
-    "local 207",
+    "local 208",
     "local 21",
-    "local 212",
-    "local 213",
+    "local 210",
     "local 215",
     "local 216",
-    "local 217",
     "local 218",
     "local 219",
     "local 22",
@@ -37968,46 +38135,49 @@
     "local 221",
     "local 222",
     "local 223",
+    "local 224",
     "local 225",
     "local 226",
-    "local 227",
     "local 228",
     "local 229",
     "local 230",
     "local 231",
     "local 232",
     "local 233",
+    "local 234",
     "local 235",
-    "local 237",
+    "local 236",
     "local 238",
-    "local 239",
     "local 24",
     "local 240",
-    "local 247",
-    "local 248",
-    "local 249",
+    "local 241",
+    "local 242",
+    "local 243",
     "local 25",
     "local 250",
     "local 251",
+    "local 252",
     "local 253",
     "local 254",
-    "local 255",
     "local 256",
     "local 257",
     "local 258",
     "local 259",
     "local 26",
     "local 260",
+    "local 261",
+    "local 262",
+    "local 263",
     "local 27",
-    "local 270",
-    "local 271",
-    "local 272",
+    "local 273",
     "local 274",
     "local 275",
     "local 277",
     "local 278",
     "local 280",
     "local 281",
+    "local 283",
+    "local 284",
     "local 29",
     "local 3",
     "local 30",
@@ -38357,7 +38527,7 @@
       "name": "_LuceneHit",
       "kind": "class",
       "public": false,
-      "lineno": 43,
+      "lineno": 44,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -38367,7 +38537,7 @@
       "name": "_LuceneSearcher",
       "kind": "class",
       "public": false,
-      "lineno": 48,
+      "lineno": 49,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -38377,7 +38547,7 @@
       "name": "BM25Rm3Config",
       "kind": "class",
       "public": true,
-      "lineno": 63,
+      "lineno": 64,
       "doc_summary": "Bundle RM3 parameters and heuristics for BM25 search.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38387,7 +38557,7 @@
       "name": "BM25SearchProvider",
       "kind": "class",
       "public": true,
-      "lineno": 72,
+      "lineno": 73,
       "doc_summary": "Pyserini-backed BM25 searcher with optional RM3 heuristics.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38397,7 +38567,7 @@
       "name": "SpladeSearchProvider",
       "kind": "class",
       "public": true,
-      "lineno": 211,
+      "lineno": 212,
       "doc_summary": "SPLADE query encoder and Lucene impact searcher for learned sparse retrieval.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38407,7 +38577,7 @@
       "name": "HybridSearchTuning",
       "kind": "class",
       "public": true,
-      "lineno": 429,
+      "lineno": 430,
       "doc_summary": "Runtime overrides for FAISS search metadata.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38417,7 +38587,7 @@
       "name": "HybridSearchOptions",
       "kind": "class",
       "public": true,
-      "lineno": 437,
+      "lineno": 438,
       "doc_summary": "Optional knobs influencing hybrid fusion.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38427,7 +38597,7 @@
       "name": "_MethodStats",
       "kind": "class",
       "public": false,
-      "lineno": 447,
+      "lineno": 448,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -38437,7 +38607,7 @@
       "name": "_FusionContext",
       "kind": "class",
       "public": false,
-      "lineno": 456,
+      "lineno": 457,
       "doc_summary": "All inputs required to fuse dense and sparse channel runs.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38447,7 +38617,7 @@
       "name": "_SearchTelemetryContext",
       "kind": "class",
       "public": false,
-      "lineno": 470,
+      "lineno": 471,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -38457,7 +38627,7 @@
       "name": "_FusionWork",
       "kind": "class",
       "public": false,
-      "lineno": 476,
+      "lineno": 477,
       "doc_summary": "Resolved fusion parameters after pooler/weights are selected.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38467,7 +38637,7 @@
       "name": "HybridSearchEngine",
       "kind": "class",
       "public": true,
-      "lineno": 490,
+      "lineno": 491,
       "doc_summary": "Combine dense (FAISS) and sparse channel plugins via RRF.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -38487,16 +38657,16 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 140,
-    "cyclomatic": 141,
-    "loc": 1453
+    "branches": 139,
+    "cyclomatic": 140,
+    "loc": 1482
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 5,
-  "fan_out": 17,
+  "fan_out": 18,
   "cycle_group": 78,
   "imports_internal": [
     "app/capabilities.py",
@@ -38506,6 +38676,7 @@
     "io/duckdb_manager.py",
     "observability/metrics.py",
     "observability/otel.py",
+    "observability/semantic_conventions.py",
     "observability/timeline.py",
     "plugins/channels.py",
     "plugins/registry.py",
@@ -38525,6 +38696,7 @@
     "io/duckdb_manager.py",
     "observability/metrics.py",
     "observability/otel.py",
+    "observability/semantic_conventions.py",
     "observability/timeline.py",
     "plugins/channels.py",
     "plugins/registry.py",
@@ -38538,14 +38710,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.288,
+  "hotspot_score": 3.302,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 23,
-  "recent_churn_90": 23
+  "recent_churn_30": 24,
+  "recent_churn_90": 24
 }
 {
   "path": "io/warp_engine.py",
@@ -39021,7 +39193,6 @@
     {
       "module": "codeintel_rev.observability.otel",
       "names": [
-        "as_span",
         "record_span_event"
       ],
       "aliases": {},
@@ -39276,57 +39447,57 @@
     {
       "kind": "class",
       "name": "AutoTuner",
-      "lineno": 3689
+      "lineno": 3717
     },
     {
       "kind": "function",
       "name": "_coerce_to_int",
-      "lineno": 3819
+      "lineno": 3847
     },
     {
       "kind": "function",
       "name": "_configure_direct_map",
-      "lineno": 3842
+      "lineno": 3870
     },
     {
       "kind": "function",
       "name": "_set_direct_map_type",
-      "lineno": 3850
+      "lineno": 3878
     },
     {
       "kind": "function",
       "name": "_wrap_bool_contains",
-      "lineno": 3893
+      "lineno": 3921
     },
     {
       "kind": "function",
       "name": "_wrap_index_contains",
-      "lineno": 3929
+      "lineno": 3957
     },
     {
       "kind": "function",
       "name": "_coerce_optional_int",
-      "lineno": 3967
+      "lineno": 3995
     },
     {
       "kind": "function",
       "name": "_coerce_optional_float",
-      "lineno": 4001
+      "lineno": 4029
     },
     {
       "kind": "function",
       "name": "_parse_tuning_overrides",
-      "lineno": 4035
+      "lineno": 4063
     },
     {
       "kind": "function",
       "name": "_persist_tuning_profile",
-      "lineno": 4061
+      "lineno": 4089
     },
     {
       "kind": "function",
       "name": "_get_compile_options",
-      "lineno": 4073
+      "lineno": 4101
     }
   ],
   "exports": [
@@ -39463,64 +39634,67 @@
     "local 248",
     "local 249",
     "local 25",
+    "local 250",
+    "local 251",
     "local 252",
+    "local 255",
+    "local 256",
     "local 257",
-    "local 258",
-    "local 259",
     "local 26",
     "local 260",
     "local 261",
-    "local 262",
-    "local 263",
     "local 264",
     "local 265",
     "local 266",
     "local 267",
+    "local 268",
+    "local 269",
     "local 27",
+    "local 270",
     "local 271",
     "local 272",
     "local 273",
-    "local 276",
+    "local 274",
+    "local 278",
     "local 279",
     "local 28",
     "local 280",
-    "local 281",
-    "local 282",
     "local 283",
-    "local 284",
+    "local 286",
     "local 287",
     "local 288",
+    "local 289",
     "local 29",
     "local 290",
-    "local 292",
-    "local 293",
+    "local 291",
     "local 294",
     "local 295",
-    "local 296",
     "local 297",
-    "local 298",
     "local 299",
     "local 3",
     "local 300",
     "local 301",
     "local 302",
     "local 303",
+    "local 304",
+    "local 305",
     "local 306",
+    "local 307",
     "local 308",
+    "local 309",
     "local 31",
     "local 310",
-    "local 311",
     "local 313",
     "local 315",
-    "local 316",
     "local 317",
+    "local 318",
+    "local 320",
+    "local 322",
     "local 323",
     "local 324",
-    "local 325",
-    "local 326",
-    "local 328",
     "local 33",
     "local 330",
+    "local 331",
     "local 332",
     "local 333",
     "local 335",
@@ -39528,42 +39702,39 @@
     "local 339",
     "local 34",
     "local 340",
-    "local 341",
     "local 342",
-    "local 343",
     "local 344",
-    "local 345",
+    "local 346",
     "local 347",
     "local 348",
+    "local 349",
     "local 35",
     "local 350",
     "local 351",
-    "local 353",
+    "local 352",
+    "local 354",
     "local 355",
     "local 357",
     "local 358",
-    "local 359",
     "local 36",
     "local 360",
-    "local 361",
     "local 362",
     "local 364",
     "local 365",
     "local 366",
+    "local 367",
+    "local 368",
     "local 369",
     "local 37",
-    "local 370",
     "local 371",
     "local 372",
     "local 373",
-    "local 375",
     "local 376",
     "local 377",
     "local 378",
     "local 379",
     "local 38",
     "local 380",
-    "local 381",
     "local 382",
     "local 383",
     "local 384",
@@ -39590,33 +39761,34 @@
     "local 402",
     "local 403",
     "local 404",
+    "local 405",
     "local 406",
+    "local 407",
     "local 408",
+    "local 409",
     "local 41",
     "local 410",
     "local 411",
-    "local 412",
-    "local 414",
+    "local 413",
     "local 415",
-    "local 416",
     "local 417",
     "local 418",
+    "local 419",
     "local 42",
+    "local 421",
     "local 422",
+    "local 423",
+    "local 424",
+    "local 425",
+    "local 429",
     "local 43",
-    "local 430",
-    "local 431",
-    "local 433",
-    "local 436",
+    "local 437",
     "local 438",
-    "local 439",
     "local 44",
     "local 440",
-    "local 441",
-    "local 442",
     "local 443",
-    "local 444",
     "local 445",
+    "local 446",
     "local 447",
     "local 448",
     "local 449",
@@ -39624,10 +39796,10 @@
     "local 450",
     "local 451",
     "local 452",
-    "local 453",
     "local 454",
     "local 455",
     "local 456",
+    "local 457",
     "local 458",
     "local 459",
     "local 46",
@@ -39635,7 +39807,6 @@
     "local 461",
     "local 462",
     "local 463",
-    "local 464",
     "local 465",
     "local 466",
     "local 467",
@@ -39644,49 +39815,56 @@
     "local 470",
     "local 471",
     "local 472",
+    "local 473",
+    "local 474",
     "local 475",
     "local 476",
     "local 477",
     "local 478",
     "local 479",
     "local 48",
-    "local 481",
     "local 482",
     "local 483",
     "local 484",
     "local 485",
     "local 486",
-    "local 487",
+    "local 488",
+    "local 489",
     "local 49",
+    "local 490",
+    "local 491",
     "local 492",
     "local 493",
     "local 494",
-    "local 495",
-    "local 497",
-    "local 498",
     "local 499",
     "local 5",
     "local 50",
+    "local 500",
     "local 501",
-    "local 507",
+    "local 502",
+    "local 504",
+    "local 505",
+    "local 506",
     "local 508",
-    "local 509",
     "local 51",
-    "local 512",
-    "local 513",
     "local 514",
     "local 515",
+    "local 516",
     "local 519",
     "local 52",
     "local 520",
-    "local 524",
-    "local 525",
+    "local 521",
+    "local 522",
     "local 526",
     "local 527",
-    "local 528",
-    "local 529",
-    "local 530",
     "local 531",
+    "local 532",
+    "local 533",
+    "local 534",
+    "local 535",
+    "local 536",
+    "local 537",
+    "local 538",
     "local 54",
     "local 58",
     "local 59",
@@ -40256,7 +40434,7 @@
       "name": "AutoTuner",
       "kind": "class",
       "public": true,
-      "lineno": 3689,
+      "lineno": 3717,
       "doc_summary": "Evaluate FAISS ParameterSpace candidates for a given manager.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -40266,7 +40444,7 @@
       "name": "_coerce_to_int",
       "kind": "function",
       "public": false,
-      "lineno": 3819,
+      "lineno": 3847,
       "doc_summary": "Safely round arbitrary objects to integers for index comparisons.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40276,7 +40454,7 @@
       "name": "_configure_direct_map",
       "kind": "function",
       "public": false,
-      "lineno": 3842,
+      "lineno": 3870,
       "doc_summary": "Ensure FAISS direct maps are array-backed for reconstruction.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -40286,7 +40464,7 @@
       "name": "_set_direct_map_type",
       "kind": "function",
       "public": false,
-      "lineno": 3850,
+      "lineno": 3878,
       "doc_summary": "Enable direct map support on FAISS indexes when available.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40296,7 +40474,7 @@
       "name": "_wrap_bool_contains",
       "kind": "function",
       "public": false,
-      "lineno": 3893,
+      "lineno": 3921,
       "doc_summary": "Wrap a raw contains function that returns a boolean-like value.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40306,7 +40484,7 @@
       "name": "_wrap_index_contains",
       "kind": "function",
       "public": false,
-      "lineno": 3929,
+      "lineno": 3957,
       "doc_summary": "Wrap a raw contains function that returns an index position.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40316,7 +40494,7 @@
       "name": "_coerce_optional_int",
       "kind": "function",
       "public": false,
-      "lineno": 3967,
+      "lineno": 3995,
       "doc_summary": "Return ``value`` coerced to int when possible.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40326,7 +40504,7 @@
       "name": "_coerce_optional_float",
       "kind": "function",
       "public": false,
-      "lineno": 4001,
+      "lineno": 4029,
       "doc_summary": "Return ``value`` coerced to float when possible.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40336,7 +40514,7 @@
       "name": "_parse_tuning_overrides",
       "kind": "function",
       "public": false,
-      "lineno": 4035,
+      "lineno": 4063,
       "doc_summary": "Normalize raw profile payload into structured overrides.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40346,7 +40524,7 @@
       "name": "_persist_tuning_profile",
       "kind": "function",
       "public": false,
-      "lineno": 4061,
+      "lineno": 4089,
       "doc_summary": "Persist tuning metadata without interrupting the caller.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -40356,7 +40534,7 @@
       "name": "_get_compile_options",
       "kind": "function",
       "public": false,
-      "lineno": 4073,
+      "lineno": 4101,
       "doc_summary": "Return FAISS compile options for readiness logs.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -40376,9 +40554,9 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 260,
-    "cyclomatic": 261,
-    "loc": 4090
+    "branches": 262,
+    "cyclomatic": 263,
+    "loc": 4118
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
@@ -40419,14 +40597,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.453,
+  "hotspot_score": 3.456,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 48,
-  "recent_churn_90": 48
+  "recent_churn_30": 49,
+  "recent_churn_90": 49
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -41028,6 +41206,15 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.observability.semantic_conventions",
+      "names": [
+        "Attrs"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.observability.timeline",
       "names": [
         "current_timeline"
@@ -41040,6 +41227,15 @@
       "module": "codeintel_rev.telemetry.decorators",
       "names": [
         "span_context"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev.telemetry.otel_metrics",
+      "names": [
+        "build_histogram"
       ],
       "aliases": {},
       "is_star": false,
@@ -41074,15 +41270,6 @@
       "level": 0
     },
     {
-      "module": "codeintel_rev.telemetry.otel_metrics",
-      "names": [
-        "build_histogram"
-      ],
-      "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
       "module": null,
       "names": [
         "duckdb"
@@ -41107,87 +41294,87 @@
     {
       "kind": "variable",
       "name": "duckdb",
-      "lineno": 43
-    },
-    {
-      "kind": "variable",
-      "name": "np",
       "lineno": 44
     },
     {
       "kind": "variable",
+      "name": "np",
+      "lineno": 45
+    },
+    {
+      "kind": "variable",
       "name": "LOGGER",
-      "lineno": 46
+      "lineno": 47
     },
     {
       "kind": "class",
       "name": "IdMapMeta",
-      "lineno": 50
+      "lineno": 51
     },
     {
       "kind": "function",
       "name": "_log_extra",
-      "lineno": 59
+      "lineno": 60
     },
     {
       "kind": "class",
       "name": "_ScopeFilterSpec",
-      "lineno": 133
+      "lineno": 134
     },
     {
       "kind": "class",
       "name": "StructureAnnotations",
-      "lineno": 150
+      "lineno": 151
     },
     {
       "kind": "class",
       "name": "DuckDBCatalogOptions",
-      "lineno": 160
+      "lineno": 161
     },
     {
       "kind": "class",
       "name": "_DuckDBQueryMixin",
-      "lineno": 169
+      "lineno": 170
     },
     {
       "kind": "class",
       "name": "_LegacyOptions",
-      "lineno": 435
+      "lineno": 445
     },
     {
       "kind": "class",
       "name": "DuckDBCatalog",
-      "lineno": 442
+      "lineno": 452
     },
     {
       "kind": "function",
       "name": "_relation_exists",
-      "lineno": 1632
+      "lineno": 1664
     },
     {
       "kind": "function",
       "name": "relation_exists",
-      "lineno": 1666
+      "lineno": 1698
     },
     {
       "kind": "function",
       "name": "_file_checksum",
-      "lineno": 1684
+      "lineno": 1716
     },
     {
       "kind": "function",
       "name": "_parquet_hash",
-      "lineno": 1706
+      "lineno": 1738
     },
     {
       "kind": "function",
       "name": "ensure_faiss_idmap_view",
-      "lineno": 1734
+      "lineno": 1766
     },
     {
       "kind": "function",
       "name": "refresh_faiss_idmap_materialized",
-      "lineno": 1765
+      "lineno": 1797
     }
   ],
   "exports": [
@@ -41214,7 +41401,6 @@
     "local 100",
     "local 101",
     "local 102",
-    "local 103",
     "local 104",
     "local 105",
     "local 106",
@@ -41238,103 +41424,100 @@
     "local 123",
     "local 124",
     "local 125",
+    "local 126",
     "local 127",
     "local 128",
     "local 129",
     "local 13",
     "local 130",
-    "local 131",
     "local 132",
     "local 133",
     "local 134",
     "local 135",
     "local 136",
     "local 137",
+    "local 138",
+    "local 139",
     "local 14",
     "local 140",
     "local 141",
     "local 142",
-    "local 143",
-    "local 144",
     "local 145",
     "local 146",
     "local 147",
     "local 148",
     "local 149",
     "local 15",
+    "local 150",
     "local 151",
     "local 152",
     "local 153",
     "local 154",
-    "local 155",
     "local 156",
     "local 157",
     "local 158",
     "local 159",
-    "local 16",
+    "local 160",
+    "local 161",
     "local 162",
     "local 163",
     "local 164",
-    "local 165",
     "local 167",
     "local 168",
     "local 169",
     "local 17",
     "local 170",
-    "local 171",
     "local 172",
     "local 173",
+    "local 174",
+    "local 175",
+    "local 176",
     "local 177",
     "local 178",
     "local 18",
-    "local 180",
-    "local 181",
     "local 182",
     "local 183",
     "local 184",
     "local 186",
+    "local 187",
+    "local 188",
+    "local 19",
     "local 190",
     "local 191",
     "local 192",
-    "local 193",
-    "local 194",
-    "local 195",
-    "local 196",
+    "local 197",
+    "local 198",
+    "local 199",
     "local 2",
     "local 20",
+    "local 200",
+    "local 201",
+    "local 202",
+    "local 204",
+    "local 205",
+    "local 206",
     "local 207",
-    "local 208",
     "local 209",
     "local 21",
     "local 210",
-    "local 213",
-    "local 216",
-    "local 218",
-    "local 22",
     "local 221",
+    "local 222",
     "local 223",
-    "local 225",
-    "local 226",
+    "local 224",
     "local 227",
-    "local 228",
-    "local 229",
-    "local 23",
     "local 230",
-    "local 231",
-    "local 234",
-    "local 236",
+    "local 232",
+    "local 235",
     "local 237",
-    "local 238",
     "local 239",
     "local 24",
     "local 240",
+    "local 241",
     "local 242",
     "local 243",
     "local 244",
     "local 245",
-    "local 247",
     "local 248",
-    "local 249",
     "local 25",
     "local 250",
     "local 251",
@@ -41343,6 +41526,7 @@
     "local 254",
     "local 256",
     "local 257",
+    "local 258",
     "local 259",
     "local 26",
     "local 261",
@@ -41350,65 +41534,75 @@
     "local 263",
     "local 264",
     "local 265",
+    "local 266",
     "local 267",
     "local 268",
-    "local 269",
     "local 27",
     "local 270",
-    "local 272",
+    "local 271",
     "local 273",
-    "local 274",
+    "local 275",
+    "local 276",
+    "local 277",
+    "local 278",
     "local 279",
     "local 28",
-    "local 280",
     "local 281",
     "local 282",
+    "local 283",
     "local 284",
+    "local 286",
+    "local 287",
     "local 288",
     "local 29",
-    "local 290",
-    "local 292",
+    "local 293",
     "local 294",
     "local 295",
+    "local 296",
     "local 298",
-    "local 299",
     "local 3",
     "local 30",
     "local 302",
-    "local 303",
     "local 304",
-    "local 305",
     "local 306",
-    "local 307",
-    "local 34",
-    "local 37",
-    "local 38",
+    "local 308",
+    "local 309",
+    "local 31",
+    "local 312",
+    "local 313",
+    "local 316",
+    "local 317",
+    "local 318",
+    "local 319",
+    "local 32",
+    "local 320",
+    "local 321",
+    "local 33",
+    "local 35",
     "local 39",
     "local 4",
-    "local 40",
     "local 42",
+    "local 43",
+    "local 44",
     "local 45",
+    "local 47",
     "local 5",
-    "local 53",
-    "local 56",
+    "local 50",
+    "local 58",
     "local 6",
-    "local 60",
     "local 61",
-    "local 62",
     "local 65",
-    "local 69",
+    "local 66",
+    "local 67",
     "local 7",
     "local 70",
-    "local 71",
-    "local 73",
     "local 74",
     "local 75",
+    "local 76",
     "local 78",
     "local 79",
     "local 8",
     "local 80",
-    "local 81",
-    "local 82",
     "local 83",
     "local 84",
     "local 85",
@@ -41417,11 +41611,12 @@
     "local 88",
     "local 89",
     "local 9",
+    "local 90",
+    "local 91",
+    "local 92",
     "local 93",
     "local 94",
-    "local 95",
-    "local 96",
-    "local 97",
+    "local 98",
     "local 99",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#__enter__().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.io.duckdb_catalog`/DuckDBCatalog#__enter__().(self)",
@@ -41667,7 +41862,7 @@
       "name": "IdMapMeta",
       "kind": "class",
       "public": true,
-      "lineno": 50,
+      "lineno": 51,
       "doc_summary": "Metadata describing a materialized FAISS ID map join.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -41677,7 +41872,7 @@
       "name": "_log_extra",
       "kind": "function",
       "public": false,
-      "lineno": 59,
+      "lineno": 60,
       "doc_summary": "Return structured log extras for catalog events.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -41687,7 +41882,7 @@
       "name": "_ScopeFilterSpec",
       "kind": "class",
       "public": false,
-      "lineno": 133,
+      "lineno": 134,
       "doc_summary": "Structured scope filter metadata used during scoped queries.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -41697,7 +41892,7 @@
       "name": "StructureAnnotations",
       "kind": "class",
       "public": true,
-      "lineno": 150,
+      "lineno": 151,
       "doc_summary": "Structure-aware metadata joined onto explainability pools.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -41707,7 +41902,7 @@
       "name": "DuckDBCatalogOptions",
       "kind": "class",
       "public": true,
-      "lineno": 160,
+      "lineno": 161,
       "doc_summary": "Optional configuration bundle for DuckDB catalog instantiation.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -41717,7 +41912,7 @@
       "name": "_DuckDBQueryMixin",
       "kind": "class",
       "public": false,
-      "lineno": 169,
+      "lineno": 170,
       "doc_summary": "Chunk-level query helpers shared by :class:`DuckDBCatalog`.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -41727,7 +41922,7 @@
       "name": "_LegacyOptions",
       "kind": "class",
       "public": false,
-      "lineno": 435,
+      "lineno": 445,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -41737,7 +41932,7 @@
       "name": "DuckDBCatalog",
       "kind": "class",
       "public": true,
-      "lineno": 442,
+      "lineno": 452,
       "doc_summary": "DuckDB catalog for querying chunks.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -41747,7 +41942,7 @@
       "name": "_relation_exists",
       "kind": "function",
       "public": false,
-      "lineno": 1632,
+      "lineno": 1664,
       "doc_summary": "Return True when a table or view with ``name`` exists in the main schema.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -41757,7 +41952,7 @@
       "name": "relation_exists",
       "kind": "function",
       "public": true,
-      "lineno": 1666,
+      "lineno": 1698,
       "doc_summary": "Public helper returning True when a DuckDB relation exists.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -41767,7 +41962,7 @@
       "name": "_file_checksum",
       "kind": "function",
       "public": false,
-      "lineno": 1684,
+      "lineno": 1716,
       "doc_summary": "Return SHA-256 checksum for ``path``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -41777,7 +41972,7 @@
       "name": "_parquet_hash",
       "kind": "function",
       "public": false,
-      "lineno": 1706,
+      "lineno": 1738,
       "doc_summary": "Return SHA256 checksum for the Parquet file at ``path``.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -41787,7 +41982,7 @@
       "name": "ensure_faiss_idmap_view",
       "kind": "function",
       "public": true,
-      "lineno": 1734,
+      "lineno": 1766,
       "doc_summary": "Register ``v_faiss_join`` by joining FAISS ID map and chunk metadata.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -41797,7 +41992,7 @@
       "name": "refresh_faiss_idmap_materialized",
       "kind": "function",
       "public": true,
-      "lineno": 1765,
+      "lineno": 1797,
       "doc_summary": "Materialize ``v_faiss_join`` into ``faiss_idmap_mat`` with checksum guard.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -41817,16 +42012,16 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 147,
-    "cyclomatic": 148,
-    "loc": 1864
+    "branches": 152,
+    "cyclomatic": 153,
+    "loc": 1896
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 9,
-  "fan_out": 10,
+  "fan_out": 11,
   "cycle_group": 78,
   "imports_internal": [
     "_lazy_imports.py",
@@ -41834,6 +42029,7 @@
     "io/parquet_store.py",
     "mcp_server/scope_utils.py",
     "observability/otel.py",
+    "observability/semantic_conventions.py",
     "observability/timeline.py",
     "telemetry/decorators.py",
     "telemetry/otel_metrics.py",
@@ -41846,6 +42042,7 @@
     "io/parquet_store.py",
     "mcp_server/scope_utils.py",
     "observability/otel.py",
+    "observability/semantic_conventions.py",
     "observability/timeline.py",
     "telemetry/decorators.py",
     "telemetry/otel_metrics.py",
@@ -41854,14 +42051,14 @@
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.246,
+  "hotspot_score": 3.275,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 42,
-  "recent_churn_90": 42
+  "recent_churn_30": 43,
+  "recent_churn_90": 43
 }
 {
   "path": "io/bm25_manager.py",
@@ -42355,7 +42552,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 3,
-  "cycle_group": 70,
+  "cycle_group": 53,
   "imports_internal": [
     "config/settings.py",
     "io/path_utils.py",
@@ -44862,7 +45059,7 @@
   "overlay_needed": false,
   "fan_in": 14,
   "fan_out": 0,
-  "cycle_group": 62,
+  "cycle_group": 58,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 2.046,
@@ -44940,6 +45137,15 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.telemetry.otel_metrics",
+      "names": [
+        "build_counter"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "kgfoundry_common.logging",
       "names": [
         "get_logger"
@@ -44952,15 +45158,6 @@
       "module": "kgfoundry_common.observability",
       "names": [
         "MetricsProvider"
-      ],
-      "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": "codeintel_rev.telemetry.otel_metrics",
-      "names": [
-        "build_counter"
       ],
       "aliases": {},
       "is_star": false,
@@ -45176,7 +45373,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 2,
-  "cycle_group": 67,
+  "cycle_group": 77,
   "imports_internal": [
     "retrieval/types.py",
     "telemetry/otel_metrics.py"
@@ -45193,8 +45390,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 4,
-  "recent_churn_90": 4
+  "recent_churn_30": 5,
+  "recent_churn_90": 5
 }
 {
   "path": "retrieval/gating.py",
@@ -47234,7 +47431,7 @@
   "overlay_needed": false,
   "fan_in": 2,
   "fan_out": 0,
-  "cycle_group": 65,
+  "cycle_group": 75,
   "used_by_files": 0,
   "used_by_symbols": 0,
   "hotspot_score": 1.645,
@@ -47266,6 +47463,15 @@
       "level": 0
     },
     {
+      "module": "time",
+      "names": [
+        "perf_counter"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": null,
       "names": [
         "numpy"
@@ -47286,6 +47492,33 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.observability.semantic_conventions",
+      "names": [
+        "Attrs"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev.telemetry.decorators",
+      "names": [
+        "span_context"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev.telemetry.otel_metrics",
+      "names": [
+        "build_histogram"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "kgfoundry_common.logging",
       "names": [
         "get_logger"
@@ -47299,62 +47532,67 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 10
+      "lineno": 15
+    },
+    {
+      "kind": "variable",
+      "name": "RERANK_LATENCY_MS",
+      "lineno": 20
     },
     {
       "kind": "function",
       "name": "_perform_exact_rerank",
-      "lineno": 16
+      "lineno": 27
     },
     {
       "kind": "function",
       "name": "_normalize_queries",
-      "lineno": 125
+      "lineno": 153
     },
     {
       "kind": "function",
       "name": "_prepare_candidate_matrix",
-      "lineno": 159
+      "lineno": 187
     },
     {
       "kind": "function",
       "name": "_hydrate_embeddings",
-      "lineno": 205
+      "lineno": 233
     },
     {
       "kind": "function",
       "name": "_build_candidate_vectors",
-      "lineno": 261
+      "lineno": 289
     },
     {
       "kind": "function",
       "name": "_compute_similarity",
-      "lineno": 330
+      "lineno": 358
     },
     {
       "kind": "function",
       "name": "_effective_top_k",
-      "lineno": 399
+      "lineno": 427
     },
     {
       "kind": "function",
       "name": "_select_topk",
-      "lineno": 449
+      "lineno": 477
     },
     {
       "kind": "function",
       "name": "_empty_result",
-      "lineno": 508
+      "lineno": 536
     },
     {
       "kind": "class",
       "name": "FlatReranker",
-      "lineno": 554
+      "lineno": 582
     },
     {
       "kind": "function",
       "name": "exact_rerank",
-      "lineno": 615
+      "lineno": 643
     }
   ],
   "exports": [
@@ -47369,34 +47607,29 @@
   "scip_symbols": [
     "local 0",
     "local 1",
+    "local 10",
     "local 11",
-    "local 12",
-    "local 13",
     "local 14",
-    "local 15",
-    "local 16",
     "local 17",
+    "local 18",
     "local 2",
-    "local 20",
     "local 21",
     "local 22",
     "local 23",
+    "local 24",
+    "local 25",
     "local 26",
-    "local 27",
-    "local 28",
     "local 29",
     "local 3",
     "local 30",
-    "local 33",
-    "local 34",
+    "local 31",
+    "local 32",
     "local 35",
     "local 36",
     "local 37",
     "local 38",
     "local 39",
     "local 4",
-    "local 40",
-    "local 41",
     "local 42",
     "local 43",
     "local 44",
@@ -47411,7 +47644,19 @@
     "local 52",
     "local 53",
     "local 54",
+    "local 55",
+    "local 56",
+    "local 57",
+    "local 58",
+    "local 59",
+    "local 6",
+    "local 60",
+    "local 61",
+    "local 62",
+    "local 63",
+    "local 7",
     "local 8",
+    "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/FlatReranker#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/FlatReranker#__init__().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/FlatReranker#__init__().(catalog)",
@@ -47425,6 +47670,7 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/FlatReranker#rerank().(self)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/FlatReranker#rerank().(top_k)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/LOGGER.",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/RERANK_LATENCY_MS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/_CANDIDATE_MATRIX_NDIM.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/_SIMILARITY_EPS.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.retrieval.rerank_flat`/_VECTOR_AXIS.",
@@ -47489,7 +47735,7 @@
       "name": "_perform_exact_rerank",
       "kind": "function",
       "public": false,
-      "lineno": 16,
+      "lineno": 27,
       "doc_summary": "Hydrate embeddings for candidate ids and compute exact similarities.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47499,7 +47745,7 @@
       "name": "_normalize_queries",
       "kind": "function",
       "public": false,
-      "lineno": 125,
+      "lineno": 153,
       "doc_summary": "Normalize query vectors to 2D array format for batch processing.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47509,7 +47755,7 @@
       "name": "_prepare_candidate_matrix",
       "kind": "function",
       "public": false,
-      "lineno": 159,
+      "lineno": 187,
       "doc_summary": "Validate and prepare candidate ID matrix for embedding retrieval.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47519,7 +47765,7 @@
       "name": "_hydrate_embeddings",
       "kind": "function",
       "public": false,
-      "lineno": 205,
+      "lineno": 233,
       "doc_summary": "Retrieve embeddings from catalog for valid candidate IDs.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47529,7 +47775,7 @@
       "name": "_build_candidate_vectors",
       "kind": "function",
       "public": false,
-      "lineno": 261,
+      "lineno": 289,
       "doc_summary": "Assemble candidate embedding vectors from lookup dictionary.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47539,7 +47785,7 @@
       "name": "_compute_similarity",
       "kind": "function",
       "public": false,
-      "lineno": 330,
+      "lineno": 358,
       "doc_summary": "Compute batch similarity scores between queries and candidate vectors.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47549,7 +47795,7 @@
       "name": "_effective_top_k",
       "kind": "function",
       "public": false,
-      "lineno": 399,
+      "lineno": 427,
       "doc_summary": "Compute effective top-k value bounded by available candidates.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47559,7 +47805,7 @@
       "name": "_select_topk",
       "kind": "function",
       "public": false,
-      "lineno": 449,
+      "lineno": 477,
       "doc_summary": "Select top-k candidates by similarity score with efficient partial sorting.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47569,7 +47815,7 @@
       "name": "_empty_result",
       "kind": "function",
       "public": false,
-      "lineno": 508,
+      "lineno": 536,
       "doc_summary": "Create sentinel result arrays for empty or failed reranking operations.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47579,7 +47825,7 @@
       "name": "FlatReranker",
       "kind": "class",
       "public": true,
-      "lineno": 554,
+      "lineno": 582,
       "doc_summary": "Rerank ANN candidates using exact similarities from DuckDB embeddings.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -47589,7 +47835,7 @@
       "name": "exact_rerank",
       "kind": "function",
       "public": true,
-      "lineno": 615,
+      "lineno": 643,
       "doc_summary": "Backward-compatible helper delegating to :class:`FlatReranker`.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -47609,33 +47855,39 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 14,
-    "cyclomatic": 15,
-    "loc": 678
+    "branches": 15,
+    "cyclomatic": 16,
+    "loc": 706
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 1,
-  "fan_out": 1,
+  "fan_out": 4,
   "cycle_group": 78,
   "imports_internal": [
-    "io/duckdb_catalog.py"
+    "io/duckdb_catalog.py",
+    "observability/semantic_conventions.py",
+    "telemetry/decorators.py",
+    "telemetry/otel_metrics.py"
   ],
   "imports_intra_repo": [
-    "io/duckdb_catalog.py"
+    "io/duckdb_catalog.py",
+    "observability/semantic_conventions.py",
+    "telemetry/decorators.py",
+    "telemetry/otel_metrics.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 1.818,
+  "hotspot_score": 2.113,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 6,
-  "recent_churn_90": 6
+  "recent_churn_30": 7,
+  "recent_churn_90": 7
 }
 {
   "path": "retrieval/__init__.py",
@@ -48097,7 +48349,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 3,
-  "cycle_group": 66,
+  "cycle_group": 76,
   "imports_internal": [
     "io/duckdb_manager.py",
     "retrieval/types.py",
@@ -48222,7 +48474,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 1,
-  "cycle_group": 51,
+  "cycle_group": 42,
   "imports_internal": [
     "typing.py"
   ],
@@ -48469,7 +48721,7 @@
   "overlay_needed": false,
   "fan_in": 4,
   "fan_out": 1,
-  "cycle_group": 56,
+  "cycle_group": 48,
   "imports_internal": [
     "typing.py"
   ],
@@ -48974,7 +49226,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 5,
-  "cycle_group": 57,
+  "cycle_group": 49,
   "imports_internal": [
     "errors.py",
     "observability/timeline.py",
@@ -49111,7 +49363,7 @@
   "overlay_needed": false,
   "fan_in": 3,
   "fan_out": 2,
-  "cycle_group": 58,
+  "cycle_group": 71,
   "imports_internal": [
     "runtime/cells.py",
     "runtime/factory_adjustment.py"
@@ -49492,7 +49744,6 @@
     {
       "module": "codeintel_rev.observability.otel",
       "names": [
-        "as_span",
         "record_span_event"
       ],
       "aliases": {},
@@ -49519,6 +49770,15 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.observability.semantic_conventions",
+      "names": [
+        "Attrs"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.observability.timeline",
       "names": [
         "Timeline",
@@ -49532,6 +49792,15 @@
       "module": "codeintel_rev.telemetry.context",
       "names": [
         "telemetry_context"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
+      "module": "codeintel_rev.telemetry.decorators",
+      "names": [
+        "span_context"
       ],
       "aliases": {},
       "is_star": false,
@@ -49570,17 +49839,17 @@
     {
       "kind": "variable",
       "name": "LOGGER",
-      "lineno": 21
+      "lineno": 23
     },
     {
       "kind": "function",
       "name": "tool_operation_scope",
-      "lineno": 25
+      "lineno": 27
     },
     {
       "kind": "function",
       "name": "_maybe_render_report",
-      "lineno": 151
+      "lineno": 160
     }
   ],
   "exports": [
@@ -49598,17 +49867,20 @@
     "local 12",
     "local 13",
     "local 14",
-    "local 15",
-    "local 16",
+    "local 17",
     "local 18",
-    "local 19",
     "local 2",
     "local 20",
     "local 21",
     "local 22",
+    "local 23",
     "local 24",
-    "local 25",
+    "local 26",
+    "local 27",
     "local 4",
+    "local 5",
+    "local 6",
+    "local 7",
     "local 8",
     "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.telemetry`/LOGGER.",
@@ -49639,7 +49911,7 @@
       "name": "tool_operation_scope",
       "kind": "function",
       "public": true,
-      "lineno": 25,
+      "lineno": 27,
       "doc_summary": "Emit start/end events for an MCP tool and yield the active timeline.",
       "doc_has_summary": true,
       "doc_param_parity": false,
@@ -49649,7 +49921,7 @@
       "name": "_maybe_render_report",
       "kind": "function",
       "public": false,
-      "lineno": 151,
+      "lineno": 160,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -49669,16 +49941,16 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 14,
-    "cyclomatic": 15,
-    "loc": 158
+    "branches": 15,
+    "cyclomatic": 16,
+    "loc": 167
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 3,
-  "fan_out": 9,
+  "fan_out": 11,
   "cycle_group": 86,
   "imports_internal": [
     "app/middleware.py",
@@ -49686,8 +49958,10 @@
     "observability/otel.py",
     "observability/reporting.py",
     "observability/runtime_observer.py",
+    "observability/semantic_conventions.py",
     "observability/timeline.py",
     "telemetry/context.py",
+    "telemetry/decorators.py",
     "telemetry/prom.py",
     "telemetry/reporter.py"
   ],
@@ -49697,21 +49971,23 @@
     "observability/otel.py",
     "observability/reporting.py",
     "observability/runtime_observer.py",
+    "observability/semantic_conventions.py",
     "observability/timeline.py",
     "telemetry/context.py",
+    "telemetry/decorators.py",
     "telemetry/prom.py",
     "telemetry/reporter.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 2.404,
+  "hotspot_score": 2.48,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 7,
-  "recent_churn_90": 7
+  "recent_churn_30": 8,
+  "recent_churn_90": 8
 }
 {
   "path": "mcp_server/service_context.py",
@@ -52281,18 +52557,18 @@
       "level": 0
     },
     {
-      "module": "kgfoundry_common.logging",
+      "module": "codeintel_rev.telemetry.otel_metrics",
       "names": [
-        "get_logger"
+        "build_histogram"
       ],
       "aliases": {},
       "is_star": false,
       "level": 0
     },
     {
-      "module": "codeintel_rev.telemetry.otel_metrics",
+      "module": "kgfoundry_common.logging",
       "names": [
-        "build_histogram"
+        "get_logger"
       ],
       "aliases": {},
       "is_star": false,
@@ -52520,8 +52796,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 6,
-  "recent_churn_90": 6
+  "recent_churn_30": 7,
+  "recent_churn_90": 7
 }
 {
   "path": "mcp_server/fetch_tool.py",
@@ -54715,7 +54991,7 @@
   "overlay_needed": false,
   "fan_in": 1,
   "fan_out": 1,
-  "cycle_group": 64,
+  "cycle_group": 57,
   "imports_internal": [
     "metrics/registry.py"
   ],
@@ -54873,6 +55149,17 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.telemetry.otel_metrics",
+      "names": [
+        "build_counter",
+        "build_gauge",
+        "build_histogram"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.typing",
       "names": [
         "NDArrayF32",
@@ -54886,17 +55173,6 @@
       "module": "kgfoundry_common.logging",
       "names": [
         "get_logger"
-      ],
-      "aliases": {},
-      "is_star": false,
-      "level": 0
-    },
-    {
-      "module": "codeintel_rev.telemetry.otel_metrics",
-      "names": [
-        "build_counter",
-        "build_gauge",
-        "build_histogram"
       ],
       "aliases": {},
       "is_star": false,
@@ -55523,8 +55799,8 @@
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 3,
-  "recent_churn_90": 3
+  "recent_churn_30": 4,
+  "recent_churn_90": 4
 }
 {
   "path": "embeddings/__init__.py",
@@ -57557,10 +57833,13 @@
   "exports_declared": [],
   "outline_nodes": [],
   "scip_symbols": [
-    "local 0",
     "local 1",
+    "local 2",
     "local 3",
     "local 4",
+    "local 6",
+    "local 8",
+    "local 9",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.telemetry`/OutputFormat#",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.telemetry`/OutputFormat#JSON.",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.cli.telemetry`/OutputFormat#MARKDOWN.",
@@ -62034,6 +62313,15 @@
       "level": 0
     },
     {
+      "module": "contextlib",
+      "names": [
+        "suppress"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "dataclasses",
       "names": [
         "dataclass",
@@ -62258,6 +62546,15 @@
       "level": 0
     },
     {
+      "module": "codeintel_rev.telemetry.decorators",
+      "names": [
+        "span_context"
+      ],
+      "aliases": {},
+      "is_star": false,
+      "level": 0
+    },
+    {
       "module": "codeintel_rev.telemetry.steps",
       "names": [
         "StepEvent",
@@ -62319,287 +62616,292 @@
     {
       "kind": "variable",
       "name": "SNIPPET_PREVIEW_CHARS",
-      "lineno": 57
-    },
-    {
-      "kind": "variable",
-      "name": "COMPONENT_NAME",
-      "lineno": 58
-    },
-    {
-      "kind": "variable",
-      "name": "RERANK_STAGE_NAME",
       "lineno": 59
     },
     {
       "kind": "variable",
-      "name": "LOGGER",
+      "name": "COMPONENT_NAME",
       "lineno": 60
+    },
+    {
+      "kind": "variable",
+      "name": "RERANK_STAGE_NAME",
+      "lineno": 61
+    },
+    {
+      "kind": "variable",
+      "name": "LOGGER",
+      "lineno": 62
     },
     {
       "kind": "class",
       "name": "RerankOptionPayload",
-      "lineno": 63
+      "lineno": 65
     },
     {
       "kind": "class",
       "name": "SemanticProOptions",
-      "lineno": 72
+      "lineno": 74
     },
     {
       "kind": "class",
       "name": "RerankRuntimeOptions",
-      "lineno": 85
+      "lineno": 87
     },
     {
       "kind": "class",
       "name": "RerankPlan",
-      "lineno": 95
+      "lineno": 97
     },
     {
       "kind": "class",
       "name": "SemanticProRuntimeOptions",
-      "lineno": 106
+      "lineno": 108
     },
     {
       "kind": "variable",
       "name": "WideSearchHandle",
-      "lineno": 118
+      "lineno": 120
     },
     {
       "kind": "class",
       "name": "StageOnePlan",
-      "lineno": 122
+      "lineno": 124
     },
     {
       "kind": "class",
       "name": "HydrationPlan",
-      "lineno": 134
+      "lineno": 136
     },
     {
       "kind": "class",
       "name": "HydrationOutcome",
-      "lineno": 147
+      "lineno": 149
     },
     {
       "kind": "function",
       "name": "build_runtime_options",
-      "lineno": 154
+      "lineno": 156
     },
     {
       "kind": "function",
       "name": "_summarize_options",
-      "lineno": 236
+      "lineno": 238
     },
     {
       "kind": "function",
       "name": "semantic_search_pro",
-      "lineno": 249
+      "lineno": 251
     },
     {
       "kind": "function",
       "name": "_semantic_search_pro_sync",
-      "lineno": 342
+      "lineno": 344
     },
     {
       "kind": "function",
       "name": "_run_coderank_stage",
-      "lineno": 537
+      "lineno": 539
     },
     {
       "kind": "function",
       "name": "_timed_coderank_stage",
-      "lineno": 605
+      "lineno": 607
     },
     {
       "kind": "function",
       "name": "_maybe_run_warp",
-      "lineno": 625
+      "lineno": 627
     },
     {
       "kind": "function",
       "name": "_should_execute_stage_two",
-      "lineno": 650
+      "lineno": 652
     },
     {
       "kind": "function",
       "name": "_execute_stage_two",
-      "lineno": 704
+      "lineno": 706
     },
     {
       "kind": "function",
       "name": "_run_fusion_stage",
-      "lineno": 738
+      "lineno": 740
     },
     {
       "kind": "function",
       "name": "_maybe_apply_rerank_stage",
-      "lineno": 772
+      "lineno": 774
     },
     {
       "kind": "class",
       "name": "_RerankOutcome",
-      "lineno": 850
+      "lineno": 852
     },
     {
       "kind": "function",
       "name": "_reorder_docs",
-      "lineno": 855
+      "lineno": 857
     },
     {
       "kind": "function",
       "name": "_emit_rerank_decision",
-      "lineno": 897
+      "lineno": 899
     },
     {
       "kind": "function",
       "name": "_build_rerank_plan",
-      "lineno": 903
+      "lineno": 905
     },
     {
       "kind": "function",
       "name": "_resolve_reranker",
-      "lineno": 924
+      "lineno": 926
     },
     {
       "kind": "function",
       "name": "_maybe_schedule_xtr_wide",
-      "lineno": 939
+      "lineno": 941
     },
     {
       "kind": "function",
       "name": "_resolve_stage_one_outcome",
-      "lineno": 972
+      "lineno": 974
     },
     {
       "kind": "function",
       "name": "_run_xtr_wide_stage",
-      "lineno": 1050
+      "lineno": 1052
     },
     {
       "kind": "function",
       "name": "_calculate_xtr_k",
-      "lineno": 1082
+      "lineno": 1084
     },
     {
       "kind": "function",
       "name": "_build_extra_channels",
-      "lineno": 1089
+      "lineno": 1091
     },
     {
       "kind": "function",
       "name": "_append_budget_notes",
-      "lineno": 1109
+      "lineno": 1111
     },
     {
       "kind": "function",
       "name": "_safe_int",
-      "lineno": 1124
+      "lineno": 1126
     },
     {
       "kind": "function",
       "name": "_merge_rrf_weights",
-      "lineno": 1132
+      "lineno": 1134
     },
     {
       "kind": "function",
       "name": "_run_warp_stage",
-      "lineno": 1148
+      "lineno": 1150
     },
     {
       "kind": "function",
       "name": "_warp_executor_hits",
-      "lineno": 1171
+      "lineno": 1173
     },
     {
       "kind": "function",
       "name": "_xtr_rescore_hits",
-      "lineno": 1212
+      "lineno": 1214
     },
     {
       "kind": "function",
       "name": "_hydrate_records",
-      "lineno": 1260
+      "lineno": 1262
     },
     {
       "kind": "function",
       "name": "_hydrate_and_rerank_records",
-      "lineno": 1284
+      "lineno": 1286
     },
     {
       "kind": "function",
       "name": "_maybe_rerank",
-      "lineno": 1439
+      "lineno": 1454
+    },
+    {
+      "kind": "function",
+      "name": "_rerank_gate_decision",
+      "lineno": 1499
     },
     {
       "kind": "function",
       "name": "_build_findings",
-      "lineno": 1484
+      "lineno": 1511
     },
     {
       "kind": "function",
       "name": "merge_explainability_into_findings",
-      "lineno": 1524
+      "lineno": 1551
     },
     {
       "kind": "function",
       "name": "_build_method_explainability",
-      "lineno": 1589
+      "lineno": 1616
     },
     {
       "kind": "function",
       "name": "_build_method",
-      "lineno": 1656
+      "lineno": 1683
     },
     {
       "kind": "function",
       "name": "_assemble_extras",
-      "lineno": 1695
+      "lineno": 1722
     },
     {
       "kind": "function",
       "name": "_make_envelope",
-      "lineno": 1760
+      "lineno": 1787
     },
     {
       "kind": "function",
       "name": "_observability_links",
-      "lineno": 1779
-    },
-    {
-      "kind": "function",
-      "name": "build_observability_links",
       "lineno": 1806
     },
     {
       "kind": "function",
+      "name": "build_observability_links",
+      "lineno": 1833
+    },
+    {
+      "kind": "function",
       "name": "_clamp_limit",
-      "lineno": 1817
+      "lineno": 1844
     },
     {
       "kind": "function",
       "name": "_coerce_positive_int",
-      "lineno": 1828
+      "lineno": 1855
     },
     {
       "kind": "function",
       "name": "_dedupe_preserve_order",
-      "lineno": 1838
+      "lineno": 1865
     },
     {
       "kind": "class",
       "name": "WarpOutcome",
-      "lineno": 1850
+      "lineno": 1877
     },
     {
       "kind": "class",
       "name": "FusionRequest",
-      "lineno": 1861
+      "lineno": 1888
     },
     {
       "kind": "class",
       "name": "MethodContext",
-      "lineno": 1875
+      "lineno": 1902
     }
   ],
   "exports": [],
@@ -62723,26 +63025,24 @@
     "local 242",
     "local 243",
     "local 244",
-    "local 245",
+    "local 247",
     "local 248",
     "local 249",
     "local 25",
+    "local 250",
     "local 251",
     "local 253",
-    "local 254",
     "local 256",
-    "local 257",
+    "local 258",
     "local 259",
     "local 26",
-    "local 260",
     "local 261",
     "local 262",
-    "local 263",
     "local 264",
     "local 265",
     "local 266",
-    "local 267",
     "local 268",
+    "local 269",
     "local 27",
     "local 270",
     "local 271",
@@ -62750,16 +63050,16 @@
     "local 273",
     "local 274",
     "local 275",
-    "local 276",
     "local 277",
     "local 278",
     "local 279",
+    "local 280",
+    "local 281",
     "local 282",
     "local 283",
     "local 284",
     "local 285",
-    "local 287",
-    "local 288",
+    "local 286",
     "local 289",
     "local 290",
     "local 291",
@@ -62772,30 +63072,36 @@
     "local 299",
     "local 3",
     "local 30",
-    "local 300",
     "local 301",
+    "local 302",
+    "local 303",
+    "local 304",
     "local 305",
     "local 306",
     "local 307",
-    "local 309",
+    "local 308",
     "local 31",
-    "local 310",
-    "local 311",
     "local 312",
+    "local 313",
     "local 314",
     "local 316",
+    "local 317",
     "local 318",
-    "local 320",
-    "local 322",
+    "local 319",
+    "local 321",
     "local 323",
-    "local 324",
     "local 325",
-    "local 326",
     "local 327",
-    "local 328",
     "local 329",
     "local 33",
+    "local 330",
     "local 331",
+    "local 332",
+    "local 333",
+    "local 334",
+    "local 335",
+    "local 336",
+    "local 338",
     "local 34",
     "local 39",
     "local 4",
@@ -63011,6 +63317,10 @@
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_reorder_docs().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_reorder_docs().(fused)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_reorder_docs().(results)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_rerank_gate_decision().",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_rerank_gate_decision().(options)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_rerank_gate_decision().(records)",
+    "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_rerank_gate_decision().(rerank_cfg)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_resolve_reranker().",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_resolve_reranker().(context)",
     "scip-python python kgfoundry 0.1.0 `codeintel_rev.mcp_server.adapters.semantic_pro`/_resolve_reranker().(provider)",
@@ -63098,7 +63408,7 @@
       "name": "RerankOptionPayload",
       "kind": "class",
       "public": true,
-      "lineno": 63,
+      "lineno": 65,
       "doc_summary": "User-facing payload for overruling rerank behavior.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63108,7 +63418,7 @@
       "name": "SemanticProOptions",
       "kind": "class",
       "public": true,
-      "lineno": 72,
+      "lineno": 74,
       "doc_summary": "User-facing options for semantic_pro retrieval.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63118,7 +63428,7 @@
       "name": "RerankRuntimeOptions",
       "kind": "class",
       "public": true,
-      "lineno": 85,
+      "lineno": 87,
       "doc_summary": "Runtime overrides for optional reranker stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63128,7 +63438,7 @@
       "name": "RerankPlan",
       "kind": "class",
       "public": true,
-      "lineno": 95,
+      "lineno": 97,
       "doc_summary": "Concrete rerank execution plan derived from settings + overrides.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63138,7 +63448,7 @@
       "name": "SemanticProRuntimeOptions",
       "kind": "class",
       "public": true,
-      "lineno": 106,
+      "lineno": 108,
       "doc_summary": "Internal immutable representation of semantic_pro options.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63148,7 +63458,7 @@
       "name": "StageOnePlan",
       "kind": "class",
       "public": true,
-      "lineno": 122,
+      "lineno": 124,
       "doc_summary": "Container for Stage-1 orchestration inputs to reduce argument lists.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63158,7 +63468,7 @@
       "name": "HydrationPlan",
       "kind": "class",
       "public": true,
-      "lineno": 134,
+      "lineno": 136,
       "doc_summary": "Hydration plus rerank inputs passed as a cohesive plan.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63168,7 +63478,7 @@
       "name": "HydrationOutcome",
       "kind": "class",
       "public": true,
-      "lineno": 147,
+      "lineno": 149,
       "doc_summary": "Result of DuckDB hydration and optional LLM rerank.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63178,7 +63488,7 @@
       "name": "build_runtime_options",
       "kind": "function",
       "public": true,
-      "lineno": 154,
+      "lineno": 156,
       "doc_summary": "Normalize user-supplied options into an immutable dataclass.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63188,7 +63498,7 @@
       "name": "_summarize_options",
       "kind": "function",
       "public": false,
-      "lineno": 236,
+      "lineno": 238,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63198,7 +63508,7 @@
       "name": "semantic_search_pro",
       "kind": "function",
       "public": true,
-      "lineno": 249,
+      "lineno": 251,
       "doc_summary": "Execute the two-stage semantic search pipeline (CodeRank → optional WARP → optional reranker).",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63208,7 +63518,7 @@
       "name": "_semantic_search_pro_sync",
       "kind": "function",
       "public": false,
-      "lineno": 342,
+      "lineno": 344,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63218,7 +63528,7 @@
       "name": "_run_coderank_stage",
       "kind": "function",
       "public": false,
-      "lineno": 537,
+      "lineno": 539,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63228,7 +63538,7 @@
       "name": "_timed_coderank_stage",
       "kind": "function",
       "public": false,
-      "lineno": 605,
+      "lineno": 607,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63238,7 +63548,7 @@
       "name": "_maybe_run_warp",
       "kind": "function",
       "public": false,
-      "lineno": 625,
+      "lineno": 627,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63248,7 +63558,7 @@
       "name": "_should_execute_stage_two",
       "kind": "function",
       "public": false,
-      "lineno": 650,
+      "lineno": 652,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63258,7 +63568,7 @@
       "name": "_execute_stage_two",
       "kind": "function",
       "public": false,
-      "lineno": 704,
+      "lineno": 706,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63268,7 +63578,7 @@
       "name": "_run_fusion_stage",
       "kind": "function",
       "public": false,
-      "lineno": 738,
+      "lineno": 740,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63278,7 +63588,7 @@
       "name": "_maybe_apply_rerank_stage",
       "kind": "function",
       "public": false,
-      "lineno": 772,
+      "lineno": 774,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63288,7 +63598,7 @@
       "name": "_RerankOutcome",
       "kind": "class",
       "public": false,
-      "lineno": 850,
+      "lineno": 852,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63298,7 +63608,7 @@
       "name": "_reorder_docs",
       "kind": "function",
       "public": false,
-      "lineno": 855,
+      "lineno": 857,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63308,7 +63618,7 @@
       "name": "_emit_rerank_decision",
       "kind": "function",
       "public": false,
-      "lineno": 897,
+      "lineno": 899,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63318,7 +63628,7 @@
       "name": "_build_rerank_plan",
       "kind": "function",
       "public": false,
-      "lineno": 903,
+      "lineno": 905,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63328,7 +63638,7 @@
       "name": "_resolve_reranker",
       "kind": "function",
       "public": false,
-      "lineno": 924,
+      "lineno": 926,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63338,7 +63648,7 @@
       "name": "_maybe_schedule_xtr_wide",
       "kind": "function",
       "public": false,
-      "lineno": 939,
+      "lineno": 941,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63348,7 +63658,7 @@
       "name": "_resolve_stage_one_outcome",
       "kind": "function",
       "public": false,
-      "lineno": 972,
+      "lineno": 974,
       "doc_summary": "Resolve Stage-1 orchestration outcome from a StageOnePlan.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63358,7 +63668,7 @@
       "name": "_run_xtr_wide_stage",
       "kind": "function",
       "public": false,
-      "lineno": 1050,
+      "lineno": 1052,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63368,7 +63678,7 @@
       "name": "_calculate_xtr_k",
       "kind": "function",
       "public": false,
-      "lineno": 1082,
+      "lineno": 1084,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63378,7 +63688,7 @@
       "name": "_build_extra_channels",
       "kind": "function",
       "public": false,
-      "lineno": 1089,
+      "lineno": 1091,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63388,7 +63698,7 @@
       "name": "_append_budget_notes",
       "kind": "function",
       "public": false,
-      "lineno": 1109,
+      "lineno": 1111,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63398,7 +63708,7 @@
       "name": "_safe_int",
       "kind": "function",
       "public": false,
-      "lineno": 1124,
+      "lineno": 1126,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63408,7 +63718,7 @@
       "name": "_merge_rrf_weights",
       "kind": "function",
       "public": false,
-      "lineno": 1132,
+      "lineno": 1134,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63418,7 +63728,7 @@
       "name": "_run_warp_stage",
       "kind": "function",
       "public": false,
-      "lineno": 1148,
+      "lineno": 1150,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63428,7 +63738,7 @@
       "name": "_warp_executor_hits",
       "kind": "function",
       "public": false,
-      "lineno": 1171,
+      "lineno": 1173,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63438,7 +63748,7 @@
       "name": "_xtr_rescore_hits",
       "kind": "function",
       "public": false,
-      "lineno": 1212,
+      "lineno": 1214,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63448,7 +63758,7 @@
       "name": "_hydrate_records",
       "kind": "function",
       "public": false,
-      "lineno": 1260,
+      "lineno": 1262,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63458,7 +63768,7 @@
       "name": "_hydrate_and_rerank_records",
       "kind": "function",
       "public": false,
-      "lineno": 1284,
+      "lineno": 1286,
       "doc_summary": "Hydrate DuckDB records and optionally rerank them using CodeRankLLM.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63468,7 +63778,17 @@
       "name": "_maybe_rerank",
       "kind": "function",
       "public": false,
-      "lineno": 1439,
+      "lineno": 1454,
+      "doc_summary": null,
+      "doc_has_summary": false,
+      "doc_param_parity": null,
+      "doc_examples_present": false
+    },
+    {
+      "name": "_rerank_gate_decision",
+      "kind": "function",
+      "public": false,
+      "lineno": 1499,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63478,7 +63798,7 @@
       "name": "_build_findings",
       "kind": "function",
       "public": false,
-      "lineno": 1484,
+      "lineno": 1511,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63488,7 +63808,7 @@
       "name": "merge_explainability_into_findings",
       "kind": "function",
       "public": true,
-      "lineno": 1524,
+      "lineno": 1551,
       "doc_summary": "Append token-level explainability snippets to existing findings.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63498,7 +63818,7 @@
       "name": "_build_method_explainability",
       "kind": "function",
       "public": false,
-      "lineno": 1589,
+      "lineno": 1616,
       "doc_summary": "Build explainability payload for MethodInfo.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63508,7 +63828,7 @@
       "name": "_build_method",
       "kind": "function",
       "public": false,
-      "lineno": 1656,
+      "lineno": 1683,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63518,7 +63838,7 @@
       "name": "_assemble_extras",
       "kind": "function",
       "public": false,
-      "lineno": 1695,
+      "lineno": 1722,
       "doc_summary": "Assemble response metadata extras dictionary.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63528,7 +63848,7 @@
       "name": "_make_envelope",
       "kind": "function",
       "public": false,
-      "lineno": 1760,
+      "lineno": 1787,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63538,7 +63858,7 @@
       "name": "_observability_links",
       "kind": "function",
       "public": false,
-      "lineno": 1779,
+      "lineno": 1806,
       "doc_summary": "Return trace/run metadata for semantic_pro envelopes.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63548,7 +63868,7 @@
       "name": "build_observability_links",
       "kind": "function",
       "public": true,
-      "lineno": 1806,
+      "lineno": 1833,
       "doc_summary": "Return observability extras for semantic-pro responses.",
       "doc_has_summary": true,
       "doc_param_parity": true,
@@ -63558,7 +63878,7 @@
       "name": "_clamp_limit",
       "kind": "function",
       "public": false,
-      "lineno": 1817,
+      "lineno": 1844,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63568,7 +63888,7 @@
       "name": "_coerce_positive_int",
       "kind": "function",
       "public": false,
-      "lineno": 1828,
+      "lineno": 1855,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63578,7 +63898,7 @@
       "name": "_dedupe_preserve_order",
       "kind": "function",
       "public": false,
-      "lineno": 1838,
+      "lineno": 1865,
       "doc_summary": null,
       "doc_has_summary": false,
       "doc_param_parity": null,
@@ -63588,7 +63908,7 @@
       "name": "WarpOutcome",
       "kind": "class",
       "public": true,
-      "lineno": 1850,
+      "lineno": 1877,
       "doc_summary": "Container describing the results of the optional WARP stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63598,7 +63918,7 @@
       "name": "FusionRequest",
       "kind": "class",
       "public": true,
-      "lineno": 1861,
+      "lineno": 1888,
       "doc_summary": "Inputs required to execute the fusion stage.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63608,7 +63928,7 @@
       "name": "MethodContext",
       "kind": "class",
       "public": true,
-      "lineno": 1875,
+      "lineno": 1902,
       "doc_summary": "Inputs required to build the MethodInfo payload.",
       "doc_has_summary": true,
       "doc_param_parity": null,
@@ -63628,16 +63948,16 @@
   },
   "raises": [],
   "complexity": {
-    "branches": 172,
-    "cyclomatic": 173,
-    "loc": 1888
+    "branches": 175,
+    "cyclomatic": 176,
+    "loc": 1915
   },
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0,
   "config_refs": [],
   "overlay_needed": false,
   "fan_in": 0,
-  "fan_out": 23,
+  "fan_out": 24,
   "cycle_group": 151,
   "imports_internal": [
     "app/config_context.py",
@@ -63661,6 +63981,7 @@
     "retrieval/telemetry.py",
     "retrieval/types.py",
     "telemetry/context.py",
+    "telemetry/decorators.py",
     "telemetry/steps.py",
     "typing.py"
   ],
@@ -63686,19 +64007,20 @@
     "retrieval/telemetry.py",
     "retrieval/types.py",
     "telemetry/context.py",
+    "telemetry/decorators.py",
     "telemetry/steps.py",
     "typing.py"
   ],
   "used_by_files": 0,
   "used_by_symbols": 0,
-  "hotspot_score": 3.366,
+  "hotspot_score": 3.387,
   "owner": "paul-heyse",
   "primary_authors": [
     "paul-heyse"
   ],
   "bus_factor": 1.0,
-  "recent_churn_30": 16,
-  "recent_churn_90": 16
+  "recent_churn_30": 17,
+  "recent_churn_90": 17
 }
 {
   "path": "mcp_server/adapters/deep_research.py",
@@ -65520,6 +65842,7 @@
     "patches/FAISS_detailed_implementation_plan.md",
     "patches/Enrich_Expansion.md",
     "patches/OpenTelemetry_ExtensionPhase2addon.md",
+    "patches/Front_End_Hardening_Phase2.md",
     "patches/Enrich_Extension.md",
     "patches/Networking_Implementation.md",
     "patches/FAISS-Hardening.md",
