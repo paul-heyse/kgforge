@@ -920,7 +920,7 @@
   "doc_has_summary": true,
   "doc_param_parity": false,
   "doc_examples_present": false,
-  "doc_summary": "Prometheus metrics for hybrid retrieval."
+  "doc_summary": "Telemetry metrics registry and OpenTelemetry Meter bootstrap."
 }
 {
   "path": "observability/otel.py",
@@ -1210,25 +1210,11 @@
   "doc_summary": "Structured logging bridge + optional OTLP exporter."
 }
 {
-  "path": "telemetry/otel.py",
-  "doc_has_summary": true,
-  "doc_param_parity": true,
-  "doc_examples_present": false,
-  "doc_summary": "OpenTelemetry bootstrap helpers for CodeIntel."
-}
-{
   "path": "telemetry/otel_metrics.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "Compatibility layer exposing Prometheus-like helpers backed by OpenTelemetry."
-}
-{
-  "path": "telemetry/prom.py",
-  "doc_has_summary": true,
-  "doc_param_parity": false,
-  "doc_examples_present": false,
-  "doc_summary": "Prometheus helpers for MCP diagnostics."
 }
 {
   "path": "telemetry/reporter.py",

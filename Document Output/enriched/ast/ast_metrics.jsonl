@@ -81,26 +81,26 @@
   "module": "app.main",
   "func_count": 34,
   "class_count": 0,
-  "assign_count": 109,
-  "import_count": 42,
-  "branch_nodes": 88,
-  "cyclomatic": 89,
-  "cognitive": 93,
+  "assign_count": 108,
+  "import_count": 41,
+  "branch_nodes": 87,
+  "cyclomatic": 88,
+  "cognitive": 92,
   "max_nesting": 4,
-  "statements": 412
+  "statements": 408
 }
 {
   "path": "app/middleware.py",
   "module": "app.middleware",
   "func_count": 4,
   "class_count": 1,
-  "assign_count": 26,
+  "assign_count": 27,
   "import_count": 20,
-  "branch_nodes": 9,
-  "cyclomatic": 10,
-  "cognitive": 12,
+  "branch_nodes": 10,
+  "cyclomatic": 11,
+  "cognitive": 13,
   "max_nesting": 2,
-  "statements": 81
+  "statements": 84
 }
 {
   "path": "app/readiness.py",
@@ -1069,13 +1069,13 @@
   "module": "io.duckdb_manager",
   "func_count": 18,
   "class_count": 5,
-  "assign_count": 78,
-  "import_count": 13,
+  "assign_count": 81,
+  "import_count": 15,
   "branch_nodes": 55,
   "cyclomatic": 56,
   "cognitive": 59,
   "max_nesting": 3,
-  "statements": 224
+  "statements": 230
 }
 {
   "path": "io/faiss_dual_index.py",
@@ -1353,15 +1353,15 @@
 {
   "path": "mcp_server/adapters/text_search.py",
   "module": "mcp_server.adapters.text_search",
-  "func_count": 9,
+  "func_count": 12,
   "class_count": 2,
-  "assign_count": 82,
-  "import_count": 15,
-  "branch_nodes": 54,
-  "cyclomatic": 55,
-  "cognitive": 61,
+  "assign_count": 90,
+  "import_count": 19,
+  "branch_nodes": 66,
+  "cyclomatic": 67,
+  "cognitive": 73,
   "max_nesting": 6,
-  "statements": 203
+  "statements": 232
 }
 {
   "path": "mcp_server/common/__init__.py",
@@ -1628,13 +1628,13 @@
   "module": "metrics.registry",
   "func_count": 3,
   "class_count": 0,
-  "assign_count": 46,
+  "assign_count": 58,
   "import_count": 2,
   "branch_nodes": 1,
   "cyclomatic": 2,
   "cognitive": 3,
   "max_nesting": 1,
-  "statements": 59
+  "statements": 71
 }
 {
   "path": "module_utils.py",
@@ -1704,28 +1704,28 @@
 {
   "path": "observability/metrics.py",
   "module": "observability.metrics",
-  "func_count": 3,
+  "func_count": 9,
   "class_count": 0,
-  "assign_count": 17,
-  "import_count": 3,
-  "branch_nodes": 5,
-  "cyclomatic": 6,
-  "cognitive": 9,
+  "assign_count": 48,
+  "import_count": 9,
+  "branch_nodes": 32,
+  "cyclomatic": 33,
+  "cognitive": 36,
   "max_nesting": 3,
-  "statements": 34
+  "statements": 131
 }
 {
   "path": "observability/otel.py",
   "module": "observability.otel",
-  "func_count": 30,
+  "func_count": 26,
   "class_count": 3,
-  "assign_count": 145,
+  "assign_count": 116,
   "import_count": 13,
-  "branch_nodes": 125,
-  "cyclomatic": 126,
-  "cognitive": 130,
+  "branch_nodes": 102,
+  "cyclomatic": 103,
+  "cognitive": 107,
   "max_nesting": 4,
-  "statements": 429
+  "statements": 350
 }
 {
   "path": "observability/reporting.py",
@@ -1784,26 +1784,26 @@
   "module": "observability.semantic_conventions",
   "func_count": 2,
   "class_count": 1,
-  "assign_count": 66,
+  "assign_count": 70,
   "import_count": 2,
   "branch_nodes": 3,
   "cyclomatic": 4,
   "cognitive": 5,
   "max_nesting": 1,
-  "statements": 81
+  "statements": 85
 }
 {
   "path": "observability/timeline.py",
   "module": "observability.timeline",
   "func_count": 25,
   "class_count": 3,
-  "assign_count": 62,
+  "assign_count": 64,
   "import_count": 18,
-  "branch_nodes": 45,
-  "cyclomatic": 46,
-  "cognitive": 52,
+  "branch_nodes": 47,
+  "cyclomatic": 48,
+  "cognitive": 54,
   "max_nesting": 6,
-  "statements": 212
+  "statements": 214
 }
 {
   "path": "ops/__init__.py",
@@ -2057,13 +2057,13 @@
   "module": "retrieval.mcp_search",
   "func_count": 43,
   "class_count": 17,
-  "assign_count": 139,
-  "import_count": 18,
-  "branch_nodes": 94,
-  "cyclomatic": 95,
-  "cognitive": 98,
+  "assign_count": 150,
+  "import_count": 21,
+  "branch_nodes": 106,
+  "cyclomatic": 107,
+  "cognitive": 110,
   "max_nesting": 3,
-  "statements": 406
+  "statements": 436
 }
 {
   "path": "retrieval/rerank_flat.py",
@@ -2188,12 +2188,12 @@
   "func_count": 0,
   "class_count": 0,
   "assign_count": 1,
-  "import_count": 7,
+  "import_count": 5,
   "branch_nodes": 0,
   "cyclomatic": 1,
   "cognitive": 1,
   "max_nesting": 0,
-  "statements": 9
+  "statements": 7
 }
 {
   "path": "telemetry/context.py",
@@ -2211,15 +2211,15 @@
 {
   "path": "telemetry/decorators.py",
   "module": "telemetry.decorators",
-  "func_count": 23,
+  "func_count": 24,
   "class_count": 6,
   "assign_count": 49,
   "import_count": 21,
-  "branch_nodes": 35,
-  "cyclomatic": 36,
-  "cognitive": 40,
+  "branch_nodes": 36,
+  "cyclomatic": 37,
+  "cognitive": 41,
   "max_nesting": 4,
-  "statements": 192
+  "statements": 197
 }
 {
   "path": "telemetry/events.py",
@@ -2237,28 +2237,15 @@
 {
   "path": "telemetry/logging.py",
   "module": "telemetry.logging",
-  "func_count": 2,
+  "func_count": 1,
   "class_count": 0,
-  "assign_count": 20,
-  "import_count": 7,
-  "branch_nodes": 7,
-  "cyclomatic": 8,
-  "cognitive": 10,
-  "max_nesting": 2,
-  "statements": 50
-}
-{
-  "path": "telemetry/otel.py",
-  "module": "telemetry.otel",
-  "func_count": 15,
-  "class_count": 8,
-  "assign_count": 50,
-  "import_count": 8,
-  "branch_nodes": 26,
-  "cyclomatic": 27,
-  "cognitive": 29,
-  "max_nesting": 2,
-  "statements": 142
+  "assign_count": 3,
+  "import_count": 4,
+  "branch_nodes": 2,
+  "cyclomatic": 3,
+  "cognitive": 4,
+  "max_nesting": 1,
+  "statements": 16
 }
 {
   "path": "telemetry/otel_metrics.py",
@@ -2274,30 +2261,17 @@
   "statements": 142
 }
 {
-  "path": "telemetry/prom.py",
-  "module": "telemetry.prom",
-  "func_count": 7,
-  "class_count": 1,
-  "assign_count": 23,
-  "import_count": 9,
-  "branch_nodes": 7,
-  "cyclomatic": 8,
-  "cognitive": 10,
-  "max_nesting": 2,
-  "statements": 63
-}
-{
   "path": "telemetry/reporter.py",
   "module": "telemetry.reporter",
   "func_count": 36,
   "class_count": 5,
-  "assign_count": 169,
-  "import_count": 15,
-  "branch_nodes": 139,
-  "cyclomatic": 140,
-  "cognitive": 146,
+  "assign_count": 203,
+  "import_count": 16,
+  "branch_nodes": 167,
+  "cyclomatic": 168,
+  "cognitive": 174,
   "max_nesting": 6,
-  "statements": 434
+  "statements": 494
 }
 {
   "path": "telemetry/steps.py",

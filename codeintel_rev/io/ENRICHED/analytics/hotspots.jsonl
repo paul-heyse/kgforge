@@ -48,15 +48,15 @@
 }
 {
   "path": "app/main.py",
-  "hotspot_score": 3.095,
+  "hotspot_score": 3.071,
   "fan_in": 0,
-  "fan_out": 19,
+  "fan_out": 18,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "app/middleware.py",
-  "hotspot_score": 2.375,
+  "hotspot_score": 2.401,
   "fan_in": 6,
   "fan_out": 9,
   "type_error_count": 0,
@@ -656,9 +656,9 @@
 }
 {
   "path": "io/duckdb_manager.py",
-  "hotspot_score": 2.837,
+  "hotspot_score": 2.887,
   "fan_in": 10,
-  "fan_out": 4,
+  "fan_out": 6,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -672,9 +672,9 @@
 }
 {
   "path": "io/faiss_manager.py",
-  "hotspot_score": 3.456,
+  "hotspot_score": 3.437,
   "fan_in": 8,
-  "fan_out": 13,
+  "fan_out": 12,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -832,9 +832,9 @@
 }
 {
   "path": "mcp_server/adapters/text_search.py",
-  "hotspot_score": 2.527,
+  "hotspot_score": 2.763,
   "fan_in": 0,
-  "fan_out": 6,
+  "fan_out": 10,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1000,8 +1000,8 @@
 }
 {
   "path": "metrics/registry.py",
-  "hotspot_score": 1.708,
-  "fan_in": 6,
+  "hotspot_score": 1.959,
+  "fan_in": 13,
   "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1040,25 +1040,25 @@
 }
 {
   "path": "observability/logs.py",
-  "hotspot_score": 1.737,
-  "fan_in": 1,
+  "hotspot_score": 1.899,
+  "fan_in": 2,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "observability/metrics.py",
-  "hotspot_score": 1.639,
-  "fan_in": 2,
-  "fan_out": 1,
+  "hotspot_score": 2.312,
+  "fan_in": 3,
+  "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "observability/otel.py",
-  "hotspot_score": 3.271,
-  "fan_in": 20,
-  "fan_out": 3,
+  "hotspot_score": 3.258,
+  "fan_in": 22,
+  "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1096,15 +1096,15 @@
 }
 {
   "path": "observability/semantic_conventions.py",
-  "hotspot_score": 2.096,
-  "fan_in": 16,
+  "hotspot_score": 2.18,
+  "fan_in": 20,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "observability/timeline.py",
-  "hotspot_score": 2.936,
+  "hotspot_score": 2.949,
   "fan_in": 20,
   "fan_out": 2,
   "type_error_count": 0,
@@ -1264,9 +1264,9 @@
 }
 {
   "path": "retrieval/mcp_search.py",
-  "hotspot_score": 2.831,
+  "hotspot_score": 2.972,
   "fan_in": 1,
-  "fan_out": 8,
+  "fan_out": 11,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1344,24 +1344,24 @@
 }
 {
   "path": "telemetry/__init__.py",
-  "hotspot_score": 1.586,
+  "hotspot_score": 1.471,
   "fan_in": 1,
-  "fan_out": 6,
+  "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "telemetry/context.py",
-  "hotspot_score": 2.394,
-  "fan_in": 11,
+  "hotspot_score": 2.422,
+  "fan_in": 12,
   "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "telemetry/decorators.py",
-  "hotspot_score": 2.713,
-  "fan_in": 9,
+  "hotspot_score": 2.771,
+  "fan_in": 11,
   "fan_out": 5,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1376,15 +1376,7 @@
 }
 {
   "path": "telemetry/logging.py",
-  "hotspot_score": 1.814,
-  "fan_in": 2,
-  "fan_out": 2,
-  "type_error_count": 0,
-  "used_by_files": 0
-}
-{
-  "path": "telemetry/otel.py",
-  "hotspot_score": 2.101,
+  "hotspot_score": 1.517,
   "fan_in": 2,
   "fan_out": 1,
   "type_error_count": 0,
@@ -1392,25 +1384,17 @@
 }
 {
   "path": "telemetry/otel_metrics.py",
-  "hotspot_score": 2.468,
-  "fan_in": 10,
+  "hotspot_score": 2.433,
+  "fan_in": 9,
   "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
-  "path": "telemetry/prom.py",
-  "hotspot_score": 2.2,
-  "fan_in": 9,
-  "fan_out": 2,
-  "type_error_count": 0,
-  "used_by_files": 0
-}
-{
   "path": "telemetry/reporter.py",
-  "hotspot_score": 3.06,
+  "hotspot_score": 3.141,
   "fan_in": 6,
-  "fan_out": 7,
+  "fan_out": 8,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1432,8 +1416,8 @@
 }
 {
   "path": "typing.py",
-  "hotspot_score": 2.774,
-  "fan_in": 114,
+  "hotspot_score": 2.767,
+  "fan_in": 112,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
