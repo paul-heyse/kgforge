@@ -8,8 +8,8 @@
 }
 {
   "path": "typing.py",
-  "hotspot_score": 2.745,
-  "fan_in": 106,
+  "hotspot_score": 2.756,
+  "fan_in": 109,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
@@ -80,8 +80,8 @@
 }
 {
   "path": "errors.py",
-  "hotspot_score": 2.293,
-  "fan_in": 13,
+  "hotspot_score": 2.321,
+  "fan_in": 14,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
@@ -175,6 +175,14 @@
   "used_by_files": 0
 }
 {
+  "path": "diagnostics/detectors.py",
+  "hotspot_score": 2.016,
+  "fan_in": 1,
+  "fan_out": 1,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
   "path": "diagnostics/report_cli.py",
   "hotspot_score": 2.128,
   "fan_in": 0,
@@ -232,15 +240,15 @@
 }
 {
   "path": "app/config_context.py",
-  "hotspot_score": 3.315,
-  "fan_in": 23,
+  "hotspot_score": 3.343,
+  "fan_in": 26,
   "fan_out": 17,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "app/main.py",
-  "hotspot_score": 2.973,
+  "hotspot_score": 3.059,
   "fan_in": 0,
   "fan_out": 19,
   "type_error_count": 0,
@@ -376,7 +384,7 @@
 }
 {
   "path": "indexing/index_lifecycle.py",
-  "hotspot_score": 2.64,
+  "hotspot_score": 2.665,
   "fan_in": 5,
   "fan_out": 2,
   "type_error_count": 0,
@@ -543,9 +551,17 @@
   "used_by_files": 0
 }
 {
+  "path": "observability/runpack.py",
+  "hotspot_score": 2.436,
+  "fan_in": 2,
+  "fan_out": 6,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
   "path": "observability/reporting.py",
-  "hotspot_score": 2.383,
-  "fan_in": 4,
+  "hotspot_score": 2.507,
+  "fan_in": 5,
   "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
@@ -568,8 +584,8 @@
 }
 {
   "path": "observability/otel.py",
-  "hotspot_score": 3.164,
-  "fan_in": 19,
+  "hotspot_score": 3.181,
+  "fan_in": 20,
   "fan_out": 3,
   "type_error_count": 0,
   "used_by_files": 0
@@ -608,8 +624,8 @@
 }
 {
   "path": "observability/timeline.py",
-  "hotspot_score": 2.918,
-  "fan_in": 19,
+  "hotspot_score": 2.936,
+  "fan_in": 20,
   "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
@@ -632,7 +648,7 @@
 }
 {
   "path": "telemetry/decorators.py",
-  "hotspot_score": 2.616,
+  "hotspot_score": 2.624,
   "fan_in": 6,
   "fan_out": 5,
   "type_error_count": 0,
@@ -648,9 +664,9 @@
 }
 {
   "path": "telemetry/reporter.py",
-  "hotspot_score": 2.855,
-  "fan_in": 5,
-  "fan_out": 6,
+  "hotspot_score": 3.01,
+  "fan_in": 6,
+  "fan_out": 7,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -768,7 +784,7 @@
 }
 {
   "path": "io/hybrid_search.py",
-  "hotspot_score": 3.266,
+  "hotspot_score": 3.288,
   "fan_in": 5,
   "fan_out": 17,
   "type_error_count": 0,
@@ -816,8 +832,8 @@
 }
 {
   "path": "io/__init__.py",
-  "hotspot_score": 1.679,
-  "fan_in": 1,
+  "hotspot_score": 1.741,
+  "fan_in": 2,
   "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1032,7 +1048,7 @@
 }
 {
   "path": "mcp_server/registry.py",
-  "hotspot_score": 1.801,
+  "hotspot_score": 1.887,
   "fan_in": 1,
   "fan_out": 4,
   "type_error_count": 0,
@@ -1040,7 +1056,7 @@
 }
 {
   "path": "mcp_server/search_tool.py",
-  "hotspot_score": 2.101,
+  "hotspot_score": 2.184,
   "fan_in": 1,
   "fan_out": 2,
   "type_error_count": 0,
@@ -1064,9 +1080,9 @@
 }
 {
   "path": "mcp_server/error_handling.py",
-  "hotspot_score": 2.395,
+  "hotspot_score": 2.622,
   "fan_in": 3,
-  "fan_out": 6,
+  "fan_out": 9,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1080,9 +1096,9 @@
 }
 {
   "path": "mcp_server/fetch_tool.py",
-  "hotspot_score": 1.677,
+  "hotspot_score": 2.111,
   "fan_in": 1,
-  "fan_out": 1,
+  "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1184,9 +1200,9 @@
 }
 {
   "path": "cli/telemetry.py",
-  "hotspot_score": 1.194,
+  "hotspot_score": 1.673,
   "fan_in": 0,
-  "fan_out": 2,
+  "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1272,9 +1288,9 @@
 }
 {
   "path": "mcp_server/adapters/semantic.py",
-  "hotspot_score": 3.105,
+  "hotspot_score": 3.126,
   "fan_in": 0,
-  "fan_out": 17,
+  "fan_out": 18,
   "type_error_count": 0,
   "used_by_files": 0
 }

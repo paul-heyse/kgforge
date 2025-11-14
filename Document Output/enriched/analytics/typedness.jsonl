@@ -153,6 +153,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "diagnostics/detectors.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "diagnostics/report_cli.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -469,6 +476,13 @@
 }
 {
   "path": "observability/flight_recorder.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "observability/runpack.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,

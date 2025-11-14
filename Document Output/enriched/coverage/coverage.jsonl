@@ -109,6 +109,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "diagnostics/detectors.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "diagnostics/report_cli.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -335,6 +340,11 @@
 }
 {
   "path": "observability/flight_recorder.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "observability/runpack.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }

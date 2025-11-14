@@ -153,6 +153,13 @@
   "doc_summary": "Stitch CST nodes to module summary rows and SCIP symbols."
 }
 {
+  "path": "diagnostics/detectors.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Lightweight heuristics over run reports to surface diagnostics hints."
+}
+{
   "path": "diagnostics/report_cli.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -473,6 +480,13 @@
   "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "Trace-anchored flight recorder that mirrors run execution timelines."
+}
+{
+  "path": "observability/runpack.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Helpers for building per-run diagnostic artifacts (\"runpacks\")."
 }
 {
   "path": "observability/reporting.py",
@@ -806,7 +820,7 @@
 {
   "path": "retrieval/mcp_search.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Deep-Research compatible search/fetch orchestration helpers."
 }
@@ -904,14 +918,14 @@
 {
   "path": "mcp_server/registry.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "In-process registry for the lightweight MCP testing harness."
 }
 {
   "path": "mcp_server/search_tool.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Lightweight search helpers used by the in-process MCP harness."
 }
@@ -946,7 +960,7 @@
 {
   "path": "mcp_server/fetch_tool.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Lightweight fetch helper used by the in-process MCP harness."
 }
