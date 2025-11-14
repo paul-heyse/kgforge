@@ -352,15 +352,15 @@
 {
   "path": "cli_enrich.py",
   "module": "cli_enrich",
-  "func_count": 83,
+  "func_count": 86,
   "class_count": 10,
-  "assign_count": 398,
-  "import_count": 36,
-  "branch_nodes": 232,
-  "cyclomatic": 233,
-  "cognitive": 237,
+  "assign_count": 410,
+  "import_count": 35,
+  "branch_nodes": 252,
+  "cyclomatic": 253,
+  "cognitive": 257,
   "max_nesting": 4,
-  "statements": 941
+  "statements": 1005
 }
 {
   "path": "config/__init__.py",
@@ -612,15 +612,15 @@
 {
   "path": "enrich/duckdb_store.py",
   "module": "enrich.duckdb_store",
-  "func_count": 5,
+  "func_count": 8,
   "class_count": 1,
-  "assign_count": 21,
-  "import_count": 5,
-  "branch_nodes": 15,
-  "cyclomatic": 16,
-  "cognitive": 19,
+  "assign_count": 30,
+  "import_count": 7,
+  "branch_nodes": 29,
+  "cyclomatic": 30,
+  "cognitive": 33,
   "max_nesting": 3,
-  "statements": 69
+  "statements": 102
 }
 {
   "path": "enrich/errors.py",
@@ -651,15 +651,15 @@
 {
   "path": "enrich/libcst_bridge.py",
   "module": "enrich.libcst_bridge",
-  "func_count": 35,
+  "func_count": 41,
   "class_count": 5,
-  "assign_count": 158,
-  "import_count": 10,
-  "branch_nodes": 121,
-  "cyclomatic": 122,
-  "cognitive": 129,
-  "max_nesting": 7,
-  "statements": 396
+  "assign_count": 171,
+  "import_count": 11,
+  "branch_nodes": 139,
+  "cyclomatic": 140,
+  "cognitive": 144,
+  "max_nesting": 4,
+  "statements": 446
 }
 {
   "path": "enrich/models.py",
@@ -677,15 +677,15 @@
 {
   "path": "enrich/output_writers.py",
   "module": "enrich.output_writers",
-  "func_count": 23,
+  "func_count": 27,
   "class_count": 0,
-  "assign_count": 79,
-  "import_count": 7,
-  "branch_nodes": 98,
-  "cyclomatic": 99,
-  "cognitive": 103,
+  "assign_count": 97,
+  "import_count": 9,
+  "branch_nodes": 120,
+  "cyclomatic": 121,
+  "cognitive": 125,
   "max_nesting": 4,
-  "statements": 272
+  "statements": 327
 }
 {
   "path": "enrich/ownership.py",
@@ -716,15 +716,15 @@
 {
   "path": "enrich/scip_reader.py",
   "module": "enrich.scip_reader",
-  "func_count": 6,
-  "class_count": 4,
-  "assign_count": 23,
-  "import_count": 6,
-  "branch_nodes": 16,
-  "cyclomatic": 17,
-  "cognitive": 20,
+  "func_count": 7,
+  "class_count": 5,
+  "assign_count": 26,
+  "import_count": 4,
+  "branch_nodes": 13,
+  "cyclomatic": 14,
+  "cognitive": 17,
   "max_nesting": 3,
-  "statements": 66
+  "statements": 67
 }
 {
   "path": "enrich/slices_builder.py",
@@ -744,13 +744,13 @@
   "module": "enrich.stubs_overlay",
   "func_count": 13,
   "class_count": 4,
-  "assign_count": 74,
+  "assign_count": 80,
   "import_count": 8,
-  "branch_nodes": 76,
-  "cyclomatic": 77,
-  "cognitive": 82,
+  "branch_nodes": 78,
+  "cyclomatic": 79,
+  "cognitive": 84,
   "max_nesting": 5,
-  "statements": 220
+  "statements": 226
 }
 {
   "path": "enrich/tagging.py",
@@ -768,15 +768,15 @@
 {
   "path": "enrich/tree_sitter_bridge.py",
   "module": "enrich.tree_sitter_bridge",
-  "func_count": 3,
+  "func_count": 7,
   "class_count": 2,
-  "assign_count": 28,
-  "import_count": 8,
-  "branch_nodes": 17,
-  "cyclomatic": 18,
-  "cognitive": 21,
+  "assign_count": 47,
+  "import_count": 10,
+  "branch_nodes": 29,
+  "cyclomatic": 30,
+  "cognitive": 33,
   "max_nesting": 3,
-  "statements": 75
+  "statements": 120
 }
 {
   "path": "enrich/type_integration.py",
@@ -1096,12 +1096,12 @@
   "func_count": 90,
   "class_count": 10,
   "assign_count": 427,
-  "import_count": 32,
+  "import_count": 31,
   "branch_nodes": 266,
   "cyclomatic": 267,
   "cognitive": 271,
   "max_nesting": 4,
-  "statements": 1187
+  "statements": 1186
 }
 {
   "path": "io/git_client.py",
@@ -1667,13 +1667,13 @@
   "module": "observability.flight_recorder",
   "func_count": 26,
   "class_count": 3,
-  "assign_count": 90,
+  "assign_count": 104,
   "import_count": 11,
-  "branch_nodes": 73,
-  "cyclomatic": 74,
-  "cognitive": 77,
-  "max_nesting": 3,
-  "statements": 243
+  "branch_nodes": 81,
+  "cyclomatic": 82,
+  "cognitive": 87,
+  "max_nesting": 5,
+  "statements": 267
 }
 {
   "path": "observability/ledger.py",
@@ -1681,12 +1681,12 @@
   "func_count": 5,
   "class_count": 1,
   "assign_count": 15,
-  "import_count": 8,
+  "import_count": 7,
   "branch_nodes": 5,
   "cyclomatic": 6,
   "cognitive": 7,
   "max_nesting": 1,
-  "statements": 49
+  "statements": 48
 }
 {
   "path": "observability/logs.py",
@@ -1704,28 +1704,28 @@
 {
   "path": "observability/metrics.py",
   "module": "observability.metrics",
-  "func_count": 9,
-  "class_count": 0,
-  "assign_count": 48,
-  "import_count": 9,
-  "branch_nodes": 32,
-  "cyclomatic": 33,
-  "cognitive": 36,
-  "max_nesting": 3,
-  "statements": 131
+  "func_count": 11,
+  "class_count": 1,
+  "assign_count": 58,
+  "import_count": 14,
+  "branch_nodes": 43,
+  "cyclomatic": 44,
+  "cognitive": 48,
+  "max_nesting": 4,
+  "statements": 166
 }
 {
   "path": "observability/otel.py",
   "module": "observability.otel",
-  "func_count": 26,
+  "func_count": 29,
   "class_count": 3,
-  "assign_count": 116,
-  "import_count": 13,
-  "branch_nodes": 102,
-  "cyclomatic": 103,
-  "cognitive": 107,
+  "assign_count": 114,
+  "import_count": 14,
+  "branch_nodes": 101,
+  "cyclomatic": 102,
+  "cognitive": 106,
   "max_nesting": 4,
-  "statements": 350
+  "statements": 363
 }
 {
   "path": "observability/reporting.py",
@@ -1784,13 +1784,13 @@
   "module": "observability.semantic_conventions",
   "func_count": 2,
   "class_count": 1,
-  "assign_count": 70,
+  "assign_count": 72,
   "import_count": 2,
   "branch_nodes": 3,
   "cyclomatic": 4,
   "cognitive": 5,
   "max_nesting": 1,
-  "statements": 85
+  "statements": 87
 }
 {
   "path": "observability/timeline.py",
@@ -2250,28 +2250,28 @@
 {
   "path": "telemetry/otel_metrics.py",
   "module": "telemetry.otel_metrics",
-  "func_count": 21,
+  "func_count": 22,
   "class_count": 7,
-  "assign_count": 46,
+  "assign_count": 47,
   "import_count": 8,
-  "branch_nodes": 20,
-  "cyclomatic": 21,
-  "cognitive": 23,
+  "branch_nodes": 21,
+  "cyclomatic": 22,
+  "cognitive": 24,
   "max_nesting": 2,
-  "statements": 142
+  "statements": 148
 }
 {
   "path": "telemetry/reporter.py",
   "module": "telemetry.reporter",
-  "func_count": 36,
+  "func_count": 40,
   "class_count": 5,
-  "assign_count": 203,
+  "assign_count": 212,
   "import_count": 16,
   "branch_nodes": 167,
   "cyclomatic": 168,
   "cognitive": 174,
   "max_nesting": 6,
-  "statements": 494
+  "statements": 514
 }
 {
   "path": "telemetry/steps.py",

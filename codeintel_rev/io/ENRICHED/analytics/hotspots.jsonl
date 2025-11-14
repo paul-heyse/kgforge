@@ -216,7 +216,7 @@
 }
 {
   "path": "cli_enrich.py",
-  "hotspot_score": 3.416,
+  "hotspot_score": 3.439,
   "fan_in": 0,
   "fan_out": 22,
   "type_error_count": 0,
@@ -376,7 +376,7 @@
 }
 {
   "path": "enrich/duckdb_store.py",
-  "hotspot_score": 1.818,
+  "hotspot_score": 1.952,
   "fan_in": 1,
   "fan_out": 1,
   "type_error_count": 0,
@@ -400,7 +400,7 @@
 }
 {
   "path": "enrich/libcst_bridge.py",
-  "hotspot_score": 2.697,
+  "hotspot_score": 2.739,
   "fan_in": 4,
   "fan_out": 1,
   "type_error_count": 0,
@@ -416,7 +416,7 @@
 }
 {
   "path": "enrich/output_writers.py",
-  "hotspot_score": 2.547,
+  "hotspot_score": 2.606,
   "fan_in": 4,
   "fan_out": 0,
   "type_error_count": 0,
@@ -440,7 +440,7 @@
 }
 {
   "path": "enrich/scip_reader.py",
-  "hotspot_score": 2.033,
+  "hotspot_score": 2.009,
   "fan_in": 4,
   "fan_out": 1,
   "type_error_count": 0,
@@ -456,7 +456,7 @@
 }
 {
   "path": "enrich/stubs_overlay.py",
-  "hotspot_score": 2.465,
+  "hotspot_score": 2.482,
   "fan_in": 1,
   "fan_out": 3,
   "type_error_count": 0,
@@ -472,7 +472,7 @@
 }
 {
   "path": "enrich/tree_sitter_bridge.py",
-  "hotspot_score": 1.869,
+  "hotspot_score": 2.016,
   "fan_in": 1,
   "fan_out": 1,
   "type_error_count": 0,
@@ -1024,7 +1024,7 @@
 }
 {
   "path": "observability/flight_recorder.py",
-  "hotspot_score": 2.554,
+  "hotspot_score": 2.585,
   "fan_in": 3,
   "fan_out": 2,
   "type_error_count": 0,
@@ -1032,9 +1032,9 @@
 }
 {
   "path": "observability/ledger.py",
-  "hotspot_score": 1.909,
+  "hotspot_score": 1.847,
   "fan_in": 4,
-  "fan_out": 2,
+  "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1048,7 +1048,7 @@
 }
 {
   "path": "observability/metrics.py",
-  "hotspot_score": 2.312,
+  "hotspot_score": 2.412,
   "fan_in": 3,
   "fan_out": 2,
   "type_error_count": 0,
@@ -1056,7 +1056,7 @@
 }
 {
   "path": "observability/otel.py",
-  "hotspot_score": 3.258,
+  "hotspot_score": 3.255,
   "fan_in": 22,
   "fan_out": 4,
   "type_error_count": 0,
@@ -1384,7 +1384,7 @@
 }
 {
   "path": "telemetry/otel_metrics.py",
-  "hotspot_score": 2.433,
+  "hotspot_score": 2.446,
   "fan_in": 9,
   "fan_out": 1,
   "type_error_count": 0,
@@ -1416,8 +1416,8 @@
 }
 {
   "path": "typing.py",
-  "hotspot_score": 2.767,
-  "fan_in": 112,
+  "hotspot_score": 2.764,
+  "fan_in": 111,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
