@@ -69,6 +69,13 @@
   "doc_summary": "FastAPI router modules for CodeIntel administrative endpoints."
 }
 {
+  "path": "app/routers/diagnostics.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Diagnostics endpoints for runtime execution ledger reports."
+}
+{
   "path": "app/routers/index_admin.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -174,11 +181,25 @@
   "doc_summary": "Command-line interface for SPLADE artifact management."
 }
 {
+  "path": "cli/st_embed.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Standalone sentence-transformers embedding helper."
+}
+{
   "path": "cli/telemetry.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
   "doc_examples_present": false,
   "doc_summary": "Telemetry-focused CLI commands."
+}
+{
+  "path": "cli/vllm.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Standalone helpers for managing a local vLLM HTTP server."
 }
 {
   "path": "cli/xtr.py",
@@ -895,6 +916,13 @@
   "doc_summary": "Observability helpers (telemetry + lightweight timelines)."
 }
 {
+  "path": "observability/execution_ledger.py",
+  "doc_has_summary": true,
+  "doc_param_parity": false,
+  "doc_examples_present": false,
+  "doc_summary": "Deterministic execution ledger aligned with OpenTelemetry traces."
+}
+{
   "path": "observability/flight_recorder.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -1175,6 +1203,13 @@
   "doc_summary": "Shared request-scoped context variables for runtime components."
 }
 {
+  "path": "startup/run_startup_pipeline.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Run the SCIP → chunk → embed → FAISS pipeline and summarize artifacts."
+}
+{
   "path": "telemetry/__init__.py",
   "doc_has_summary": true,
   "doc_param_parity": true,
@@ -1217,6 +1252,13 @@
   "doc_summary": "Compatibility layer exposing Prometheus-like helpers backed by OpenTelemetry."
 }
 {
+  "path": "telemetry/otel_shim.py",
+  "doc_has_summary": true,
+  "doc_param_parity": true,
+  "doc_examples_present": false,
+  "doc_summary": "Typed OpenTelemetry shims with graceful fallbacks."
+}
+{
   "path": "telemetry/reporter.py",
   "doc_has_summary": true,
   "doc_param_parity": false,
@@ -1226,7 +1268,7 @@
 {
   "path": "telemetry/steps.py",
   "doc_has_summary": true,
-  "doc_param_parity": false,
+  "doc_param_parity": true,
   "doc_examples_present": false,
   "doc_summary": "Structured step event helpers."
 }

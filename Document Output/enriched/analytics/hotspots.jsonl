@@ -32,8 +32,8 @@
 }
 {
   "path": "app/config_context.py",
-  "hotspot_score": 3.343,
-  "fan_in": 26,
+  "hotspot_score": 3.352,
+  "fan_in": 27,
   "fan_out": 17,
   "type_error_count": 0,
   "used_by_files": 0
@@ -48,9 +48,9 @@
 }
 {
   "path": "app/main.py",
-  "hotspot_score": 3.071,
+  "hotspot_score": 3.098,
   "fan_in": 0,
-  "fan_out": 18,
+  "fan_out": 19,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -75,6 +75,14 @@
   "hotspot_score": 1.032,
   "fan_in": 1,
   "fan_out": 0,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "app/routers/diagnostics.py",
+  "hotspot_score": 1.24,
+  "fan_in": 0,
+  "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -144,7 +152,7 @@
 }
 {
   "path": "bin/index_all.py",
-  "hotspot_score": 2.709,
+  "hotspot_score": 2.788,
   "fan_in": 0,
   "fan_out": 13,
   "type_error_count": 0,
@@ -199,10 +207,26 @@
   "used_by_files": 0
 }
 {
+  "path": "cli/st_embed.py",
+  "hotspot_score": 1.818,
+  "fan_in": 0,
+  "fan_out": 2,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
   "path": "cli/telemetry.py",
   "hotspot_score": 1.673,
   "fan_in": 0,
   "fan_out": 4,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "cli/vllm.py",
+  "hotspot_score": 1.596,
+  "fan_in": 0,
+  "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -216,7 +240,7 @@
 }
 {
   "path": "cli_enrich.py",
-  "hotspot_score": 3.439,
+  "hotspot_score": 3.44,
   "fan_in": 0,
   "fan_out": 22,
   "type_error_count": 0,
@@ -232,8 +256,8 @@
 }
 {
   "path": "config/settings.py",
-  "hotspot_score": 3.017,
-  "fan_in": 23,
+  "hotspot_score": 3.047,
+  "fan_in": 25,
   "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
@@ -352,7 +376,7 @@
 }
 {
   "path": "embeddings/embedding_service.py",
-  "hotspot_score": 2.516,
+  "hotspot_score": 2.52,
   "fan_in": 1,
   "fan_out": 4,
   "type_error_count": 0,
@@ -376,7 +400,7 @@
 }
 {
   "path": "enrich/duckdb_store.py",
-  "hotspot_score": 1.952,
+  "hotspot_score": 1.975,
   "fan_in": 1,
   "fan_out": 1,
   "type_error_count": 0,
@@ -400,7 +424,7 @@
 }
 {
   "path": "enrich/libcst_bridge.py",
-  "hotspot_score": 2.739,
+  "hotspot_score": 2.741,
   "fan_in": 4,
   "fan_out": 1,
   "type_error_count": 0,
@@ -416,9 +440,9 @@
 }
 {
   "path": "enrich/output_writers.py",
-  "hotspot_score": 2.606,
+  "hotspot_score": 2.681,
   "fan_in": 4,
-  "fan_out": 0,
+  "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -472,7 +496,7 @@
 }
 {
   "path": "enrich/tree_sitter_bridge.py",
-  "hotspot_score": 2.016,
+  "hotspot_score": 2.026,
   "fan_in": 1,
   "fan_out": 1,
   "type_error_count": 0,
@@ -512,7 +536,7 @@
 }
 {
   "path": "eval/hybrid_evaluator.py",
-  "hotspot_score": 2.436,
+  "hotspot_score": 2.456,
   "fan_in": 2,
   "fan_out": 6,
   "type_error_count": 0,
@@ -520,7 +544,7 @@
 }
 {
   "path": "eval/pool_writer.py",
-  "hotspot_score": 2.177,
+  "hotspot_score": 2.076,
   "fan_in": 3,
   "fan_out": 2,
   "type_error_count": 0,
@@ -608,7 +632,7 @@
 }
 {
   "path": "indexing/scip_reader.py",
-  "hotspot_score": 2.168,
+  "hotspot_score": 2.184,
   "fan_in": 2,
   "fan_out": 1,
   "type_error_count": 0,
@@ -648,9 +672,9 @@
 }
 {
   "path": "io/duckdb_catalog.py",
-  "hotspot_score": 3.291,
-  "fan_in": 9,
-  "fan_out": 11,
+  "hotspot_score": 3.392,
+  "fan_in": 11,
+  "fan_out": 12,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -672,9 +696,9 @@
 }
 {
   "path": "io/faiss_manager.py",
-  "hotspot_score": 3.437,
+  "hotspot_score": 3.464,
   "fan_in": 8,
-  "fan_out": 12,
+  "fan_out": 13,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -688,9 +712,9 @@
 }
 {
   "path": "io/hybrid_search.py",
-  "hotspot_score": 3.302,
+  "hotspot_score": 3.325,
   "fan_in": 5,
-  "fan_out": 18,
+  "fan_out": 19,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -744,15 +768,15 @@
 }
 {
   "path": "io/vllm_client.py",
-  "hotspot_score": 2.688,
+  "hotspot_score": 2.739,
   "fan_in": 4,
-  "fan_out": 10,
+  "fan_out": 11,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "io/vllm_engine.py",
-  "hotspot_score": 2.094,
+  "hotspot_score": 2.157,
   "fan_in": 2,
   "fan_out": 4,
   "type_error_count": 0,
@@ -792,49 +816,49 @@
 }
 {
   "path": "mcp_server/adapters/deep_research.py",
-  "hotspot_score": 2.076,
+  "hotspot_score": 2.175,
+  "fan_in": 0,
+  "fan_out": 6,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "mcp_server/adapters/files.py",
+  "hotspot_score": 2.633,
+  "fan_in": 0,
+  "fan_out": 8,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "mcp_server/adapters/history.py",
+  "hotspot_score": 1.983,
   "fan_in": 0,
   "fan_out": 5,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
-  "path": "mcp_server/adapters/files.py",
-  "hotspot_score": 2.558,
-  "fan_in": 0,
-  "fan_out": 7,
-  "type_error_count": 0,
-  "used_by_files": 0
-}
-{
-  "path": "mcp_server/adapters/history.py",
-  "hotspot_score": 1.774,
-  "fan_in": 0,
-  "fan_out": 4,
-  "type_error_count": 0,
-  "used_by_files": 0
-}
-{
   "path": "mcp_server/adapters/semantic.py",
-  "hotspot_score": 3.126,
+  "hotspot_score": 3.166,
   "fan_in": 0,
-  "fan_out": 18,
+  "fan_out": 19,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "mcp_server/adapters/semantic_pro.py",
-  "hotspot_score": 3.392,
+  "hotspot_score": 3.437,
   "fan_in": 0,
-  "fan_out": 24,
+  "fan_out": 26,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "mcp_server/adapters/text_search.py",
-  "hotspot_score": 2.763,
+  "hotspot_score": 2.806,
   "fan_in": 0,
-  "fan_out": 10,
+  "fan_out": 11,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -952,9 +976,9 @@
 }
 {
   "path": "mcp_server/telemetry.py",
-  "hotspot_score": 2.48,
+  "hotspot_score": 2.539,
   "fan_in": 3,
-  "fan_out": 11,
+  "fan_out": 12,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1016,9 +1040,17 @@
 }
 {
   "path": "observability/__init__.py",
-  "hotspot_score": 0.755,
-  "fan_in": 0,
+  "hotspot_score": 1.316,
+  "fan_in": 2,
   "fan_out": 0,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "observability/execution_ledger.py",
+  "hotspot_score": 3.012,
+  "fan_in": 12,
+  "fan_out": 3,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1040,9 +1072,9 @@
 }
 {
   "path": "observability/logs.py",
-  "hotspot_score": 1.899,
+  "hotspot_score": 2.0,
   "fan_in": 2,
-  "fan_out": 0,
+  "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1056,8 +1088,8 @@
 }
 {
   "path": "observability/otel.py",
-  "hotspot_score": 3.255,
-  "fan_in": 22,
+  "hotspot_score": 3.27,
+  "fan_in": 23,
   "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1096,8 +1128,8 @@
 }
 {
   "path": "observability/semantic_conventions.py",
-  "hotspot_score": 2.18,
-  "fan_in": 20,
+  "hotspot_score": 2.199,
+  "fan_in": 21,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1264,7 +1296,7 @@
 }
 {
   "path": "retrieval/mcp_search.py",
-  "hotspot_score": 2.972,
+  "hotspot_score": 3.011,
   "fan_in": 1,
   "fan_out": 11,
   "type_error_count": 0,
@@ -1343,41 +1375,49 @@
   "used_by_files": 0
 }
 {
-  "path": "telemetry/__init__.py",
-  "hotspot_score": 1.471,
-  "fan_in": 1,
+  "path": "startup/run_startup_pipeline.py",
+  "hotspot_score": 1.96,
+  "fan_in": 0,
   "fan_out": 4,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
+  "path": "telemetry/__init__.py",
+  "hotspot_score": 1.24,
+  "fan_in": 1,
+  "fan_out": 0,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
   "path": "telemetry/context.py",
-  "hotspot_score": 2.422,
-  "fan_in": 12,
+  "hotspot_score": 2.394,
+  "fan_in": 11,
   "fan_out": 2,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "telemetry/decorators.py",
-  "hotspot_score": 2.771,
-  "fan_in": 11,
-  "fan_out": 5,
+  "hotspot_score": 2.755,
+  "fan_in": 10,
+  "fan_out": 6,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "telemetry/events.py",
-  "hotspot_score": 1.792,
-  "fan_in": 2,
+  "hotspot_score": 1.677,
+  "fan_in": 1,
   "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
 }
 {
   "path": "telemetry/logging.py",
-  "hotspot_score": 1.517,
-  "fan_in": 2,
+  "hotspot_score": 1.402,
+  "fan_in": 1,
   "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1386,6 +1426,14 @@
   "path": "telemetry/otel_metrics.py",
   "hotspot_score": 2.446,
   "fan_in": 9,
+  "fan_out": 1,
+  "type_error_count": 0,
+  "used_by_files": 0
+}
+{
+  "path": "telemetry/otel_shim.py",
+  "hotspot_score": 1.685,
+  "fan_in": 2,
   "fan_out": 1,
   "type_error_count": 0,
   "used_by_files": 0
@@ -1400,9 +1448,9 @@
 }
 {
   "path": "telemetry/steps.py",
-  "hotspot_score": 2.497,
+  "hotspot_score": 2.547,
   "fan_in": 9,
-  "fan_out": 5,
+  "fan_out": 7,
   "type_error_count": 0,
   "used_by_files": 0
 }
@@ -1416,8 +1464,8 @@
 }
 {
   "path": "typing.py",
-  "hotspot_score": 2.764,
-  "fan_in": 111,
+  "hotspot_score": 2.784,
+  "fan_in": 117,
   "fan_out": 0,
   "type_error_count": 0,
   "used_by_files": 0

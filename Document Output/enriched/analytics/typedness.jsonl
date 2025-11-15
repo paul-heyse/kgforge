@@ -69,6 +69,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "app/routers/diagnostics.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "app/routers/index_admin.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -174,7 +181,21 @@
   "untyped_defs": 0
 }
 {
+  "path": "cli/st_embed.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "cli/telemetry.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "cli/vllm.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,
@@ -895,6 +916,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "observability/execution_ledger.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "observability/flight_recorder.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -1175,6 +1203,13 @@
   "untyped_defs": 0
 }
 {
+  "path": "startup/run_startup_pipeline.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
   "path": "telemetry/__init__.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
@@ -1211,6 +1246,13 @@
 }
 {
   "path": "telemetry/otel_metrics.py",
+  "type_error_count": 0,
+  "params_ratio": 1.0,
+  "returns_ratio": 1.0,
+  "untyped_defs": 0
+}
+{
+  "path": "telemetry/otel_shim.py",
   "type_error_count": 0,
   "params_ratio": 1.0,
   "returns_ratio": 1.0,

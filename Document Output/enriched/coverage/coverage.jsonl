@@ -49,6 +49,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "app/routers/diagnostics.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "app/routers/index_admin.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -124,7 +129,17 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "cli/st_embed.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "cli/telemetry.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "cli/vllm.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
@@ -639,6 +654,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "observability/execution_ledger.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "observability/flight_recorder.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -839,6 +859,11 @@
   "covered_defs_ratio": 0.0
 }
 {
+  "path": "startup/run_startup_pipeline.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
   "path": "telemetry/__init__.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
@@ -865,6 +890,11 @@
 }
 {
   "path": "telemetry/otel_metrics.py",
+  "covered_lines_ratio": 0.0,
+  "covered_defs_ratio": 0.0
+}
+{
+  "path": "telemetry/otel_shim.py",
   "covered_lines_ratio": 0.0,
   "covered_defs_ratio": 0.0
 }
